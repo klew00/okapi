@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2011-2012 by the Okapi Framework contributors
+  Copyright (C) 2012 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -18,56 +18,23 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.lib.xliff;
+package org.oasisopen.xliff.v2;
 
-import org.oasisopen.xliff.v2.INote;
+import org.oasisopen.xliff.v2.IWithCandidates;
+import org.oasisopen.xliff.v2.IWithNotes;
 
-public class Note implements INote {
+public interface ISegment extends IPart, IWithCandidates, IWithNotes {
 
-	private static final long serialVersionUID = 0100L;
-
-	private String content;
-	private AppliesTo appliesTo;
+	public String getId ();
 	
-	public Note (String content,
-		AppliesTo appliesTo)
-	{
-		this.content = content;
-		this.appliesTo = appliesTo;
-	}
-
-	public Note (String content) {
-		this(content, AppliesTo.DEFAULT);
-	}
+	public void setId (String id);
 	
-	@Override
-	public String toString () {
-		return content;
-	}
+	public boolean isTranslatable ();
 	
-	@Override
-	public String getText () {
-		return content;
-	}
+	public void setTranslatable (boolean translatable);
 	
-	@Override
-	public void setText (String content) {
-		this.content = content;
-	}
+	public boolean getPreserveWS ();
 	
-	@Override
-	public boolean hasText () {
-		return !Util.isNullOrEmpty(content);
-	}
-
-	@Override
-	public AppliesTo getAppliesTo () {
-		return appliesTo;
-	}
-
-	@Override
-	public void setAppliesTo (AppliesTo appliesTo) {
-		this.appliesTo = appliesTo;
-	}
-
+	public void setPreserveWS (boolean preserveWS);
+	
 }

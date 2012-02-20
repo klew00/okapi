@@ -10,6 +10,7 @@ import java.io.ObjectOutputStream;
 
 import org.junit.Test;
 import org.oasisopen.xliff.v2.IFragment;
+import org.oasisopen.xliff.v2.ISegment;
 import org.oasisopen.xliff.v2.InlineType;
 
 public class SegmentTest {
@@ -18,7 +19,7 @@ public class SegmentTest {
 	public void testSerialization ()
 		throws IOException, ClassNotFoundException
 	{
-		Segment seg = new Segment(new Unit("id").getDataStore());
+		ISegment seg = new Segment(new Unit("id").getDataStore());
 		IFragment frag = seg.getSource();
 		frag.append(InlineType.OPENING, "1", "[1]");
 		frag.append("text with \u0305 and \u0001");
@@ -32,7 +33,7 @@ public class SegmentTest {
 		oos.writeObject(seg);
 		oos.close();
 		ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(bos.toByteArray()));
-		Segment seg2 = (Segment)ois.readObject();
+		ISegment seg2 = (Segment)ois.readObject();
 		IFragment frag2 = seg2.getSource();
 		assertEquals(frag.toXLIFF(Fragment.STYLE_DATAINSIDE),
 			frag2.toXLIFF(Fragment.STYLE_DATAINSIDE));

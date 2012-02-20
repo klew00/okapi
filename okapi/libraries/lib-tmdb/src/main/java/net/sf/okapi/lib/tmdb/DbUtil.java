@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2011 by the Okapi Framework contributors
+  Copyright (C) 2011-2012 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -20,8 +20,6 @@
 
 package net.sf.okapi.lib.tmdb;
 
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -33,7 +31,6 @@ import net.sf.okapi.common.filterwriter.GenericContent;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.lib.tmdb.lucene.OField;
-import net.sf.okapi.lib.tmdb.lucene.OFields;
 import net.sf.okapi.lib.tmdb.lucene.OTranslationUnitInput;
 import net.sf.okapi.lib.tmdb.lucene.OTranslationUnitVariant;
 

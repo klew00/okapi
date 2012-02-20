@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2011 by the Okapi Framework contributors
+  Copyright (C) 2011-2012 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -87,14 +87,14 @@ public class Fragment implements IFragment {
 			|| ( ch == ANNO_CLOSING ));
 	}
 
-	public Fragment (DataStore store) {
+	public Fragment (IDataStore store) {
 		ctext = new StringBuilder();
 		if ( store != null ) {
 			this.markers = store.getSourceMarkers();
 		}
 	}
 	
-	public Fragment (DataStore store,
+	public Fragment (IDataStore store,
 		boolean target)
 	{
 		ctext = new StringBuilder();
@@ -104,7 +104,7 @@ public class Fragment implements IFragment {
 		}
 	}
 	
-	public Fragment (DataStore store,
+	public Fragment (IDataStore store,
 		boolean target,
 		String plainText)
 	{

@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2011 by the Okapi Framework contributors
+  Copyright (C) 2011-2012 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -40,7 +40,10 @@ import javax.xml.stream.XMLStreamReader;
 import org.oasisopen.xliff.v2.IAnnotation;
 import org.oasisopen.xliff.v2.ICode;
 import org.oasisopen.xliff.v2.IDataStore;
+import org.oasisopen.xliff.v2.IFragment;
 import org.oasisopen.xliff.v2.IMarker;
+import org.oasisopen.xliff.v2.IPart;
+import org.oasisopen.xliff.v2.ISegment;
 import org.oasisopen.xliff.v2.IWithCandidates;
 import org.oasisopen.xliff.v2.IWithNotes;
 import org.oasisopen.xliff.v2.InlineType;
@@ -60,8 +63,8 @@ public class XLIFFReader {
 	private SectionData sectionData;
 	private Stack<GroupData> groups;
 	private Unit unit;
-	private Segment segment;
-	private Part ignorable;
+	private ISegment segment;
+	private IPart ignorable;
 	private Stack<Boolean> preserveWS;
 	private int lastAutoId = 0;
 
@@ -573,11 +576,11 @@ public class XLIFFReader {
 		}
 	}
 	
-	private void processContent (Part partToFill,
+	private void processContent (IPart partToFill,
 		boolean isTarget)
 		throws XMLStreamException
 	{
-		Fragment frag = new Fragment(partToFill.getDataStore(), isTarget);
+		IFragment frag = new Fragment(partToFill.getDataStore(), isTarget);
 		String tmp;
 		ICode code = null;
 		boolean inTextContent = true;

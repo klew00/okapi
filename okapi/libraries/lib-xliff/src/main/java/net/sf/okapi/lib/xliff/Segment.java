@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2011 by the Okapi Framework contributors
+  Copyright (C) 2011-2012 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -26,10 +26,9 @@ import java.util.List;
 
 import org.oasisopen.xliff.v2.ICandidate;
 import org.oasisopen.xliff.v2.INote;
-import org.oasisopen.xliff.v2.IWithCandidates;
-import org.oasisopen.xliff.v2.IWithNotes;
+import org.oasisopen.xliff.v2.ISegment;
 
-public class Segment extends Part implements IWithCandidates, IWithNotes {
+public class Segment extends Part implements ISegment {
 
 	private static final long serialVersionUID = 0100L;
 
@@ -43,26 +42,32 @@ public class Segment extends Part implements IWithCandidates, IWithNotes {
 		super(store);
 	}
 
+	@Override
 	public String getId () {
 		return id;
 	}
 	
+	@Override
 	public void setId (String id) {
 		this.id = id;
 	}
 	
+	@Override
 	public boolean isTranslatable () {
 		return translatable;
 	}
 	
+	@Override
 	public void setTranslatable (boolean translatable) {
 		this.translatable = translatable;
 	}
 	
+	@Override
 	public boolean getPreserveWS () {
 		return preserveWS;
 	}
 	
+	@Override
 	public void setPreserveWS (boolean preserveWS) {
 		this.preserveWS = preserveWS;
 	}

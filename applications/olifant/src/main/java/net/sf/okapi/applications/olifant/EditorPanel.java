@@ -51,12 +51,14 @@ class EditorPanel extends SashForm {
 	}
 
 	public void setFields (String source,
+		String sourceCodes,
 		int sourceColumn,
 		String target,
+		String targetCodes,
 		int targetColumn)
 	{
-		edSource.setText(source, sourceColumn);
-		edTarget.setText(target, targetColumn);
+		edSource.setText(source, sourceCodes, sourceColumn);
+		edTarget.setText(target, targetCodes, targetColumn);
 	}
 	
 	public void setFullCodesMode (boolean fullCodesMode) {
@@ -65,14 +67,15 @@ class EditorPanel extends SashForm {
 	}
 	
 	public boolean getFullCodesMode () {
-		return edSource.getFullcodesMode();
+		return edSource.getFullCodesMode();
 		// Source and target are always in the same mode
 	}
 	
 	public void setExtraText (String text,
+		String codesAsText,
 		int column)
 	{
-		extraPanel.setText(text, column);
+		extraPanel.setText(text, codesAsText, column);
 	}
 	
 	public String getSourceText () {

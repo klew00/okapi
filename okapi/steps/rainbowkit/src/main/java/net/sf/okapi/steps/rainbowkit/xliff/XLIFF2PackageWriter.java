@@ -27,6 +27,10 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import org.oasisopen.xliff.v2.ICode;
+import org.oasisopen.xliff.v2.IDataStore;
+import org.oasisopen.xliff.v2.IFragment;
+import org.oasisopen.xliff.v2.INote;
+import org.oasisopen.xliff.v2.IPart;
 import org.oasisopen.xliff.v2.IWithCandidates;
 
 import net.sf.okapi.common.Event;
@@ -48,10 +52,8 @@ import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.filters.rainbowkit.Manifest;
 import net.sf.okapi.filters.rainbowkit.MergingInfo;
 import net.sf.okapi.lib.xliff.Candidate;
-import net.sf.okapi.lib.xliff.DataStore;
 import net.sf.okapi.lib.xliff.Fragment;
 import net.sf.okapi.lib.xliff.Note;
-import net.sf.okapi.lib.xliff.Part;
 import net.sf.okapi.lib.xliff.Unit;
 import net.sf.okapi.lib.xliff.XLIFFWriter;
 import net.sf.okapi.steps.rainbowkit.common.BasePackageWriter;
@@ -303,11 +305,11 @@ public class XLIFF2PackageWriter extends BasePackageWriter {
 		}
 		// Add source notes
 		if ( tu.hasSourceProperty(Property.NOTE) ) {
-			unit.addNote(new Note(tu.getSourceProperty(Property.NOTE).getValue(), Note.AppliesTo.SOURCE));
+			unit.addNote(new Note(tu.getSourceProperty(Property.NOTE).getValue(), INote.AppliesTo.SOURCE));
 		}
 		// Add target notes
 		if ( tu.hasTargetProperty(manifest.getTargetLocale(), Property.NOTE) ) {
-			unit.addNote(new Note(tu.getTargetProperty(manifest.getTargetLocale(), Property.NOTE).getValue(), Note.AppliesTo.TARGET));
+			unit.addNote(new Note(tu.getTargetProperty(manifest.getTargetLocale(), Property.NOTE).getValue(), INote.AppliesTo.TARGET));
 		}
 		
 		// Go through the parts: Use the source to drive the order
@@ -323,7 +325,7 @@ public class XLIFF2PackageWriter extends BasePackageWriter {
 			if ( part.isSegment() ) {
 				Segment srcSeg = (Segment)part;
 				srcSegIndex++;
-				net.sf.okapi.lib.xliff.Segment xSeg = unit.appendNewSegment();
+				org.oasisopen.xliff.v2.ISegment xSeg = unit.appendNewSegment();
 				xSeg.setSource(toXLIFF2Fragment(srcSeg.text, unit.getDataStore(), false));
 				xSeg.setId(srcSeg.getId());
 				
@@ -353,7 +355,7 @@ public class XLIFF2PackageWriter extends BasePackageWriter {
 				}
 			}
 			else { // Non-segment part
-				Part xPart = unit.appendNewIgnorable();
+				IPart xPart = unit.appendNewIgnorable();
 				xPart.setSource(toXLIFF2Fragment(part.text, unit.getDataStore(), false));
 				// Target
 				if ( trgTc != null ) {
@@ -382,7 +384,7 @@ public class XLIFF2PackageWriter extends BasePackageWriter {
 		IWithCandidates xObject)
 	{
 		Candidate xAlt = new Candidate();
-		DataStore cs = xAlt.getDataStore();
+		IDataStore cs = xAlt.getDataStore();
 		if ( alt.getSource().isEmpty() ) { // Same as the base source
 			xAlt.setSource(toXLIFF2Fragment(oriSource, cs, false));
 		}
@@ -394,8 +396,8 @@ public class XLIFF2PackageWriter extends BasePackageWriter {
 		xObject.addCandidate(xAlt);
 	}
 	
-	private Fragment toXLIFF2Fragment (TextFragment tf,
-		DataStore store,
+	private IFragment toXLIFF2Fragment (TextFragment tf,
+		IDataStore store,
 		boolean isTarget)
 	{
 		// Fast track for content without codes
@@ -404,7 +406,7 @@ public class XLIFF2PackageWriter extends BasePackageWriter {
 		}
 		
 		// Otherwise: we map the codes
-		Fragment xFrag = new Fragment(store, isTarget);
+		IFragment xFrag = new Fragment(store, isTarget);
 		String ctext = tf.getCodedText();
 		List<Code> codes = tf.getCodes();
 

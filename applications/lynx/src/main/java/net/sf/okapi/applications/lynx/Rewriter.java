@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2011 by the Okapi Framework contributors
+  Copyright (C) 2011-2012 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -23,10 +23,11 @@ package net.sf.okapi.applications.lynx;
 import java.io.File;
 import java.util.List;
 
+import org.oasisopen.xliff.v2.IPart;
+
 import net.sf.okapi.lib.xliff.DocumentData;
 import net.sf.okapi.lib.xliff.Fragment;
 import net.sf.okapi.lib.xliff.GroupData;
-import net.sf.okapi.lib.xliff.Part;
 import net.sf.okapi.lib.xliff.SectionData;
 import net.sf.okapi.lib.xliff.Segment;
 import net.sf.okapi.lib.xliff.Unit;
@@ -108,7 +109,7 @@ public class Rewriter {
 					case TEXT_UNIT:
 						Unit unit = event.getUnit();
 						printLine(String.format("Unit (id=%s):", unit.getId()));
-						for ( Part part : unit ) {
+						for ( IPart part : unit ) {
 							printPart(part);
 						}
 						break;
@@ -147,7 +148,7 @@ public class Rewriter {
 		}
 	}
 	
-	private void printPart (Part part) {
+	private void printPart (IPart part) {
 		if ( !verbose ) return;
 		if ( part instanceof Segment ) {
 			Segment seg = (Segment)part;

@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2011 by the Okapi Framework contributors
+  Copyright (C) 2011-2012 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -29,27 +29,28 @@ import org.oasisopen.xliff.v2.ICandidate;
 import org.oasisopen.xliff.v2.IFragment;
 import org.oasisopen.xliff.v2.INote;
 import org.oasisopen.xliff.v2.IPart;
+import org.oasisopen.xliff.v2.ISegment;
 import org.oasisopen.xliff.v2.IWithCandidates;
 import org.oasisopen.xliff.v2.IWithNotes;
 
-public class Unit extends EventData implements Iterable<Part>, IWithCandidates, IWithNotes {
+public class Unit extends EventData implements Iterable<IPart>, IWithCandidates, IWithNotes {
 	
 	private static final long serialVersionUID = 0100L;
 
-	private ArrayList<Part> list;
+	private ArrayList<IPart> list;
 	private DataStore store;
 	private ArrayList<ICandidate> candidates;
 	private ArrayList<INote> notes;
 
 	public Unit (String id) {
 		setId(id);
-		list = new ArrayList<Part>();
+		list = new ArrayList<IPart>();
 		store = new DataStore();
 	}
 	
 	@Override
-    public Iterator<Part> iterator() {
-		return new Iterator<Part>() {
+    public Iterator<IPart> iterator() {
+		return new Iterator<IPart>() {
 			int current = 0;
 
 			@Override
@@ -58,7 +59,7 @@ public class Unit extends EventData implements Iterable<Part>, IWithCandidates, 
 			}
 
 			@Override
-			public Part next () {
+			public IPart next () {
 				return list.get((++current)-1);
 			}
 
@@ -73,7 +74,7 @@ public class Unit extends EventData implements Iterable<Part>, IWithCandidates, 
 		return list.size();
 	}
 	
-	public Segment appendNewSegment () {
+	public ISegment appendNewSegment () {
 		Segment seg = new Segment(store);
 		list.add(seg);
 		return seg;
@@ -85,7 +86,7 @@ public class Unit extends EventData implements Iterable<Part>, IWithCandidates, 
 		return part;
 	}
 
-	public Part getPart (int partIndex) {
+	public IPart getPart (int partIndex) {
 		return list.get(partIndex);
 	}
 

@@ -47,6 +47,7 @@ class SegmentEditor {
 	private boolean modified;
 	private boolean fullCodesMode;
 	private Pattern currentCodes;
+	private String codesAsText;
 	
 	public SegmentEditor (Composite parent,
 		int flags,
@@ -173,13 +174,34 @@ class SegmentEditor {
 	}
 
 	public void setFullCodesMode (boolean fullCodesMode) {
+		// Save and validate text in current mode
+		if ( fullCodesMode ) {
+			saveTextWithRealCodes();
+		}
+		else {
+			saveTextWithFullCodes();
+		}
+
+		// Set the new mode and its text
 		this.fullCodesMode = fullCodesMode;
-		if ( fullCodesMode ) currentCodes = REALCODES;
-		else currentCodes = SHORTCODES;
+		if ( fullCodesMode ) {
+			currentCodes = REALCODES;
+		}
+		else {
+			currentCodes = SHORTCODES;
+		}
 		edit.append(""); // Make a modification to trigger the re-parsing
 	}
 	
-	public boolean getFullcodesMode () {
+	private void saveTextWithFullCodes () {
+		
+	}
+	
+	private void saveTextWithRealCodes () {
+		
+	}
+
+	public boolean getFullCodesMode () {
 		return fullCodesMode;
 	}
 	
@@ -204,6 +226,7 @@ class SegmentEditor {
 
 	public void clear () {
 		edit.setText("");
+		codesAsText = null;
 		modified = false;
 	}
 	
@@ -218,13 +241,16 @@ class SegmentEditor {
 	/**
 	 * Sets the text of the field, and its originating column.
 	 * @param text the text
+	 * @param codesAsText the codes as text
 	 * @param column the column. Use -1 for no column, -2 for not changing the current one.
 	 */
 	public void setText (String text,
+		String codesAsText,
 		int column)
 	{
 		if ( column != -2 ) this.column = column;
 		edit.setEnabled(text != null);
+		this.codesAsText = codesAsText;
 		if ( text == null ) {
 			edit.setText("");
 		}

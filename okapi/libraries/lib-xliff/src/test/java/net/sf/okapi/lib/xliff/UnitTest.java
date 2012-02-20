@@ -10,6 +10,8 @@ import java.io.ObjectOutputStream;
 
 import org.junit.Test;
 import org.oasisopen.xliff.v2.IFragment;
+import org.oasisopen.xliff.v2.IPart;
+import org.oasisopen.xliff.v2.ISegment;
 import org.oasisopen.xliff.v2.InlineType;
 
 public class UnitTest {
@@ -17,7 +19,7 @@ public class UnitTest {
 	@Test
 	public void testNewSegment () {
 		Unit unit = new Unit("id");
-		Segment seg = unit.appendNewSegment();
+		ISegment seg = unit.appendNewSegment();
 		assertNull(seg.getId());
 		assertTrue(seg.getDataStore() == unit.getDataStore());
 		assertEquals("", seg.getSource().toXLIFF());
@@ -36,7 +38,7 @@ public class UnitTest {
 	@Test
 	public void testIsolatedRebuilding () {
 		Unit unit = new Unit("u1");
-		Segment seg = unit.appendNewSegment();
+		ISegment seg = unit.appendNewSegment();
 		IFragment srcFrag = seg.getSource();
 		srcFrag.append("Text of part ");
 		srcFrag.append(InlineType.OPENING, "1", "<b>");
@@ -61,7 +63,7 @@ public class UnitTest {
 
 //TC needs to decide when isolated is used (outside the unit or outside the segment?)		
 		unit.getDataStore().calculateOriginalDataToIdsMap();
-		Part part = unit.getPart(0);
+		IPart part = unit.getPart(0);
 		assertEquals("Text of part <sc id=\"1\" nid=\"d1\"/>1. ",
 			part.getSource().toXLIFF(IFragment.STYLE_DATAOUTSIDE));
 		part = unit.getPart(1);
@@ -78,7 +80,7 @@ public class UnitTest {
 		assertEquals("UNIT-TEXT<ph id=\"1\"/>",
 			unit.getCandidates().get(0).getTarget().toXLIFF());
 		
-		Segment seg = (Segment)unit.getPart(0);
+		ISegment seg = (Segment)unit.getPart(0);
 		assertEquals("seg-text<ph id=\"1\"/>",
 			seg.getCandidates().get(0).getSource().toXLIFF());
 		assertEquals("SEG-TEXT<ph id=\"1\"/>",
@@ -95,7 +97,7 @@ public class UnitTest {
 		assertEquals("unit-SrcAndTrgNote", unit.getNotes().get(2).getText());
 		assertEquals(Note.AppliesTo.DEFAULT, unit.getNotes().get(2).getAppliesTo());
 
-		Segment seg = (Segment)unit.getPart(0);
+		ISegment seg = (Segment)unit.getPart(0);
 		assertEquals("seg-SrcNote", seg.getNotes().get(0).getText());
 		assertEquals(Note.AppliesTo.SOURCE, seg.getNotes().get(0).getAppliesTo());
 		assertEquals("seg-TrgNote", seg.getNotes().get(1).getText());
@@ -148,8 +150,8 @@ public class UnitTest {
 		assertEquals(unit1.getNotes().get(2).getText(), unit2.getNotes().get(2).getText());
 		assertEquals(unit1.getNotes().get(2).getAppliesTo(), unit2.getNotes().get(2).getAppliesTo());
 		
-		Segment seg1 = (Segment)unit1.getPart(0);
-		Segment seg2 = (Segment)unit2.getPart(0);
+		ISegment seg1 = (Segment)unit1.getPart(0);
+		ISegment seg2 = (Segment)unit2.getPart(0);
 		// Check attributes
 		assertEquals(seg1.isTranslatable(), seg2.isTranslatable());
 		assertEquals(seg1.getId(), seg2.getId());
@@ -202,7 +204,7 @@ public class UnitTest {
 	@Test
 	public void testPcVsScEc () {
 		Unit unit = new Unit("u1");
-		Segment seg = unit.appendNewSegment();
+		ISegment seg = unit.appendNewSegment();
 		IFragment frag = seg.getSource();
 		frag.append("This ");
 		frag.append(InlineType.OPENING, "1", "[1]");
@@ -221,7 +223,7 @@ public class UnitTest {
 
 	private Unit createSimpleUnit () {
 		Unit unit = new Unit("u1");
-		Segment seg = unit.appendNewSegment();
+		ISegment seg = unit.appendNewSegment();
 		IFragment srcFrag = seg.getSource();
 		srcFrag.append("text ");
 		srcFrag.append(InlineType.OPENING, "1", "<b>");
@@ -232,7 +234,7 @@ public class UnitTest {
 	}
 	private Unit createUnitWithSegment () {
 		Unit unit = new Unit("u1");
-		Segment seg = unit.appendNewSegment();
+		ISegment seg = unit.appendNewSegment();
 		IFragment srcFrag = seg.getSource();
 		srcFrag.append("Text");
 		srcFrag.append(InlineType.PLACEHOLDER, "1", "<br/>");

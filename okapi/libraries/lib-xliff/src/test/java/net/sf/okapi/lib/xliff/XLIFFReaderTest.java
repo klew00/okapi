@@ -14,6 +14,7 @@ import org.oasisopen.xliff.v2.IExtendedAttribute;
 import org.oasisopen.xliff.v2.IExtendedAttributes;
 import org.oasisopen.xliff.v2.IFragment;
 import org.oasisopen.xliff.v2.INote;
+import org.oasisopen.xliff.v2.ISegment;
 import org.oasisopen.xliff.v2.InlineType;
 
 public class XLIFFReaderTest {
@@ -26,6 +27,45 @@ public class XLIFFReaderTest {
 			+ "<file>\n<unit id=\"id\">\n<segment>\n<source>Source 1.</source><target>Target 1.</target>\n"
 			+ "</segment>\n<segment>\n<source>Source 2.</source><target>Target 2.</target>\n</segment>\n</unit>\n</file></xliff>";
 		verifyDocument(text);
+	}
+	
+	@Test
+	public void testWithExtensions () {
+		String text = "<?xml version='1.0'?>\n"
+			+ "<xliff version=\"2.0\" xmlns=\"urn:oasis:names:tc:xliff:document:2.0\" xmlns:x='myNS' "
+			+ "srcLang=\"en\" tgtLang=\"fr\" x:atRoot='v0'>"
+			+ "<file x:atFile='v1'>\n<unit id=\"id\" x:atUnit='v2'>\n<segment x:atSeg='v3'>\n"
+			+ "<source x:atSrc='v4'>Source 1.</source><target x:atTrg='v5'>Target 1.</target>\n"
+			+ "</segment>\n<segment>\n<source>Source 2.</source><target>Target 2.</target>\n</segment>\n</unit>\n</file></xliff>";
+		
+		String myNS = "myNS";
+		XLIFFReader reader = new XLIFFReader();
+		reader.open(text);
+		int i = 0;
+		while ( reader.hasNext() ) {
+			XLIFFEvent e = reader.next();
+			switch ( i ) {
+			case 0:
+				DocumentData dd = e.getDocumentData();
+				assertEquals("v0", dd.getExtendedAttributes().getAttributeValue(myNS, "atRoot"));
+				break;
+			case 1:
+				SectionData sd = e.getSectionData();
+				assertEquals("v1", sd.getExtendedAttributes().getAttributeValue(myNS, "atFile"));
+				break;
+			case 2:
+				Unit unit = e.getUnit();
+				assertEquals("v2", unit.getExtendedAttributes().getAttributeValue(myNS, "atUnit"));
+				ISegment seg = (ISegment)unit.getPart(0);
+				assertEquals("v3", seg.getExtendedAttributes().getAttributeValue(myNS, "atSeg"));
+//				IFragment frag = seg.getSource();
+//				assertEquals("v4", frag.getExtendedAttributes().getAttributeValue(myNS, "atSrc"));
+				break;
+			}
+			i++;
+		}
+		reader.close();
+		
 	}
 	
 	@Test
@@ -246,7 +286,7 @@ public class XLIFFReaderTest {
 		Unit unit = getUnit(text, 1);
 		assertNotNull(unit);
 		
-		Segment seg = (Segment)unit.getPart(0);
+		ISegment seg = (ISegment)unit.getPart(0);
 		assertEquals("a  b \t c <ph id=\"1\">a  b</ph>", seg.getSource().toXLIFF(IFragment.STYLE_DATAINSIDE));
 		
 	}
@@ -286,7 +326,7 @@ public class XLIFFReaderTest {
 		Unit unit = getUnit(text, 1);
 		assertNotNull(unit);
 		// Test segment-level match
-		Segment seg = (Segment)unit.getPart(0);
+		ISegment seg = (ISegment)unit.getPart(0);
 		assertEquals("source", seg.getSource().toString());
 		List<ICandidate> list = seg.getCandidates();
 		assertNotNull(list);
@@ -315,7 +355,7 @@ public class XLIFFReaderTest {
 		Unit unit = getUnit(text, 1);
 		assertNotNull(unit);
 		// Test segment-level match
-		Segment seg = (Segment)unit.getPart(0);
+		ISegment seg = (ISegment)unit.getPart(0);
 		unit.getDataStore().calculateOriginalDataToIdsMap();
 		assertEquals("source <ph id=\"1\" nid=\"d1\"/> and <pc id=\"2\" nidEnd=\"d3\" nidStart=\"d2\">bold</pc>",
 			seg.getSource().toXLIFF(IFragment.STYLE_DATAOUTSIDE));
@@ -337,7 +377,7 @@ public class XLIFFReaderTest {
 		Unit unit = getUnit(text, 1);
 		assertNotNull(unit);
 		// Test segment-level match
-		Segment seg = (Segment)unit.getPart(0);
+		ISegment seg = (ISegment)unit.getPart(0);
 		assertEquals("source", seg.getSource().toString());
 		List<INote> list = seg.getNotes();
 		assertNotNull(list);
@@ -369,7 +409,7 @@ public class XLIFFReaderTest {
 		assertEquals("a1", att.getLocalPart());
 		assertEquals("v1", att.getValue());
 
-		Segment seg = (Segment)unit.getPart(0);
+		ISegment seg = (ISegment)unit.getPart(0);
 		atts = seg.getExtendedAttributes();
 		assertNotNull(atts);
 		att = atts.getAttribute("abc", "sa1");

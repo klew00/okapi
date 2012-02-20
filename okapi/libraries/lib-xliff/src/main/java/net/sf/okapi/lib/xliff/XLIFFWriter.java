@@ -37,6 +37,7 @@ import org.oasisopen.xliff.v2.IExtendedAttribute;
 import org.oasisopen.xliff.v2.IExtendedAttributes;
 import org.oasisopen.xliff.v2.IFragment;
 import org.oasisopen.xliff.v2.INote;
+import org.oasisopen.xliff.v2.IPart;
 import org.oasisopen.xliff.v2.IWithCandidates;
 import org.oasisopen.xliff.v2.IWithNotes;
 
@@ -191,7 +192,7 @@ public class XLIFFWriter {
 		if ( isIndented ) indent += " ";
 		unit.getDataStore().calculateOriginalDataToIdsMap();
 		
-		for ( Part part : unit ) {
+		for ( IPart part : unit ) {
 			Segment seg = null;
 			if ( part instanceof Segment ) {
 				seg = (Segment)part;

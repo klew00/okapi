@@ -6,6 +6,7 @@ import java.io.StringWriter;
 
 import org.junit.Test;
 import org.oasisopen.xliff.v2.IFragment;
+import org.oasisopen.xliff.v2.ISegment;
 import org.oasisopen.xliff.v2.InlineType;
 
 public class XLIFFWriterTest {
@@ -100,7 +101,7 @@ public class XLIFFWriterTest {
 		writer.setInlineStyle(Fragment.STYLE_DATAOUTSIDE);
 		
 		Unit unit = new Unit("id");
-		Segment seg = unit.appendNewSegment();
+		ISegment seg = unit.appendNewSegment();
 		seg.setSource("Source 1.");
 		seg.addCandidate(createAlternate("seg"));
 		unit.addCandidate(createAlternate("unit"));
@@ -145,7 +146,7 @@ public class XLIFFWriterTest {
 		writer.setInlineStyle(Fragment.STYLE_DATAOUTSIDE);
 		
 		Unit unit = new Unit("id");
-		Segment seg = unit.appendNewSegment();
+		ISegment seg = unit.appendNewSegment();
 		seg.setSource("Source 1.");
 		seg.addNote(new Note("seg-note1", Note.AppliesTo.SOURCE));
 		seg.addNote(new Note("seg-note2", Note.AppliesTo.DEFAULT));
@@ -258,7 +259,7 @@ public class XLIFFWriterTest {
 		Unit unit = new Unit("id");
 		// Source = "Source A. Source B."
 		// Target = "Target B. Target A."
-		Segment seg = unit.appendNewSegment();
+		ISegment seg = unit.appendNewSegment();
 		seg.setSource("Source A.");
 		seg.setTarget("Target A.");
 		seg.setTargetOrder(3);
@@ -295,7 +296,7 @@ public class XLIFFWriterTest {
 	}
 
 	private void createSegment (Unit unit) {
-		Segment seg = unit.appendNewSegment();
+		ISegment seg = unit.appendNewSegment();
 		seg.getSource().append(InlineType.OPENING, "1", "<b>");
 		seg.getSource().append("source");
 		seg.getSource().append(InlineType.CLOSING, "1", "</b>");

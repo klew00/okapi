@@ -717,13 +717,13 @@ class TmPanel extends Composite implements IObserver, ISegmentEditorUser {
 		try {
 			int n = table.getSelectionIndex();
 			if ( n == -1 ) {
-				editPanel.setFields(null, -1, null, -1);
+				editPanel.setFields(null, null, -1, null, null, -1);
 			}
 			else {
 				TableItem ti = table.getItem(n);
 				editPanel.setFields(
-					srcCol==-1 ? null : ti.getText(srcCol), srcCol,
-					trgCol==-1 ? null : ti.getText(trgCol), trgCol);
+					srcCol==-1 ? null : ti.getText(srcCol), null, srcCol,
+					trgCol==-1 ? null : ti.getText(trgCol), null, trgCol);
 			}
 			previousRow = currentRow;
 			currentRow = n;
