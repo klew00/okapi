@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009-2010 by the Okapi Framework contributors
+  Copyright (C) 2009-2012 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -60,6 +60,7 @@ class StreamedSourceCopy {
 		URI tempUri = File.createTempFile("_modifiedHtml", ".sourceTemp").toURI();
 
 		boolean needEncodingDeclaration = !documentEncoding;
+		boolean isXHTML = false;
 		
 		// make a new source copy with tidied tags and add any missing meta tags
 		Writer writer = null;
@@ -106,11 +107,31 @@ class StreamedSourceCopy {
 						// If needed: add the encoding declaration just after <head>
 						// (If there is a <head> in the file, this is not triggered.
 						if ( needEncodingDeclaration ) {
-							if ( st.getName() == HTMLElementName.HEAD ) {
+							// Check for XHTML files
+							if ( st.getName() == HTMLElementName.HTML ) {
+								// If this is an XHTML file it does not need an added meta declaration
+								String xmlns = st.getAttributeValue("xmlns");
+								if ( xmlns == null ) {
+									// It's likely HTML
+									// We can add <meta> (not <meta/>)
+								}
+								else if ( xmlns.equals("http://www.w3.org/1999/xhtml") ) {
+									// It's XHTML
+									// We can add <meta/>. It should be ok with both strict and transitional XHTML
+									isXHTML = true;
+								}
+								else {
+									// It's some other XML format
+									// We shouldn't add <meta/>
+									needEncodingDeclaration = false;
+								}
+							}
+							else if ( st.getName() == HTMLElementName.HEAD ) {
 								// Insert the encoding declaration
-								writer.write(String.format(
-									"<meta http-equiv=\"Content-Type\" content=\"text/html; charset=%s\"/>",
-									(input.getEncoding()==RawDocument.UNKOWN_ENCODING ? encoding : input.getEncoding())));
+								writer.write(String.format( // Use <meta /> for HTML and XHTML
+									"<meta http-equiv=\"Content-Type\" content=\"text/html; charset=%s\"%s>",
+									(input.getEncoding()==RawDocument.UNKOWN_ENCODING ? encoding : input.getEncoding()),
+									(isXHTML ? " /" : "") ));
 								needEncodingDeclaration = false;
 							}
 						}

@@ -149,6 +149,28 @@ public class HtmlSnippetsTest {
 	}
 
 	@Test
+	public void testAddingMETAinHTML() {
+		String snippet = "<html><head></head><p>test</p></html>";
+		assertEquals("<html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"></head><p>test</p></html>",
+			generateOutput(getEvents(snippet), snippet, locEN));
+	}
+
+	@Test
+	public void testAddingMETAinXHTML() {
+		String snippet = "<html xmlns=\"http://www.w3.org/1999/xhtml\"><head></head><p>test</p></html>";
+		assertEquals("<html xmlns=\"http://www.w3.org/1999/xhtml\"><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" /></head><p>test</p></html>",
+			generateOutput(getEvents(snippet), snippet, locEN));
+	}
+
+	@Test
+	public void testAddingMETAinXML() {
+		String snippet = "<html xmlns=\"someURI\"><head></head><p>test</p></html>";
+		assertEquals("<html xmlns=\"someURI\"><head></head><p>test</p></html>",
+			generateOutput(getEvents(snippet), snippet, locEN));
+	}
+
+	
+	@Test
 	public void testMETATag1() {
 		String snippet = "<meta http-equiv=\"keywords\" content=\"one,two,three\"/>";
 		assertEquals(snippet, generateOutput(getEvents(snippet), snippet, locEN));
