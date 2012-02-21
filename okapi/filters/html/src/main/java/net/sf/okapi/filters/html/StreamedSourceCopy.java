@@ -29,6 +29,7 @@ import java.net.URI;
 import java.util.LinkedHashMap;
 
 import net.htmlparser.jericho.Attribute;
+import net.htmlparser.jericho.Attributes;
 import net.htmlparser.jericho.HTMLElementName;
 import net.htmlparser.jericho.Segment;
 import net.htmlparser.jericho.StartTag;
@@ -110,20 +111,26 @@ class StreamedSourceCopy {
 							// Check for XHTML files
 							if ( st.getName() == HTMLElementName.HTML ) {
 								// If this is an XHTML file it does not need an added meta declaration
-								String xmlns = st.getAttributeValue("xmlns");
-								if ( xmlns == null ) {
-									// It's likely HTML
-									// We can add <meta> (not <meta/>)
-								}
-								else if ( xmlns.equals("http://www.w3.org/1999/xhtml") ) {
-									// It's XHTML
-									// We can add <meta/>. It should be ok with both strict and transitional XHTML
-									isXHTML = true;
-								}
-								else {
-									// It's some other XML format
-									// We shouldn't add <meta/>
-									needEncodingDeclaration = false;
+								Attributes attrs = st.getAttributes();
+								for ( int i=0; i<attrs.getCount(); i++ ) {
+									String name = attrs.get(i).getName();
+									if ( name.equals("xmlns") || name.startsWith("xmlns:") ) {
+										String xmlns = st.getAttributeValue(name);
+										if ( xmlns == null ) {
+											// It's likely HTML
+											// We can add <meta> (not <meta/>)
+										}
+										else if ( xmlns.equals("http://www.w3.org/1999/xhtml") ) {
+											// It's XHTML
+											// We can add <meta/>. It should be ok with both strict and transitional XHTML
+											isXHTML = true;
+										}
+										else {
+											// It's some other XML format
+											// We shouldn't add <meta/>
+											needEncodingDeclaration = false;
+										}
+									}
 								}
 							}
 							else if ( st.getName() == HTMLElementName.HEAD ) {

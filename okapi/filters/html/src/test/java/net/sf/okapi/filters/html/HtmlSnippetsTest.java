@@ -164,8 +164,8 @@ public class HtmlSnippetsTest {
 
 	@Test
 	public void testAddingMETAinXML() {
-		String snippet = "<html xmlns=\"someURI\"><head></head><p>test</p></html>";
-		assertEquals("<html xmlns=\"someURI\"><head></head><p>test</p></html>",
+		String snippet = "<html xmlns:MadCap=\"http://www.madcapsoftware.com/Schemas/MadCap.xsd\"><head></head><p>test</p></html>";
+		assertEquals("<html xmlns:MadCap=\"http://www.madcapsoftware.com/Schemas/MadCap.xsd\"><head></head><p>test</p></html>",
 			generateOutput(getEvents(snippet), snippet, locEN));
 	}
 
