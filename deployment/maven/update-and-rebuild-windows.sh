@@ -1,7 +1,6 @@
 #!/bin/bash -e
 
 cd ../..
-#svn update
 #mvn clean
 #mvn install
 
