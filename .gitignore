@@ -1,6 +1,6 @@
-META-INF/**
+META-INF/
 .project
-target/**
+target/
 MANIFEST.MF
 
 *.pydevproject
@@ -10,8 +10,8 @@ tmp/**
 tmp/**/*
 *.tmp
 *.bak
-*.swp
-*~.nib
+*.class
+*.orig
 local.properties
 .classpath
 .settings/
