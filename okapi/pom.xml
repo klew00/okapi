@@ -13,10 +13,10 @@
 	</issueManagement>
 
 	<scm>
-		<connection>scm:svn:http://okapi.googlecode.com/svn/trunk/</connection>
-		<developerConnection>scm:svn:https://okapi.googlecode.com/svn/trunk/</developerConnection>
-		<url>http://code.google.com/p/okapi/source/browse/</url>
-	</scm>
+    	<connection>scm:git:https://code.google.com/p/okapi/</connection>
+    	<developerConnection>scm:git:https://code.google.com/p/okapi/</developerConnection>
+    	<url>http://code.google.com/p/okapi/source/browse/</url>
+  	</scm>
 
 	<repositories>
 		<repository>
