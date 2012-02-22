@@ -3,6 +3,13 @@ META-INF/
 target/
 MANIFEST.MF
 
+/deployment/maven/dist_common/
+/deployment/maven/dist_gtk2-linux-x86_64/
+/deployment/maven/dist_omtplugins/
+/deployment/maven/dist_plugins/
+/deployment/maven/done/
+/deployment/maven/tmp/
+
 *.pydevproject
 .metadata
 bin/**
@@ -12,6 +19,7 @@ tmp/**/*
 *.bak
 *.class
 *.orig
+*~
 local.properties
 .classpath
 .settings/
