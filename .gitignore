@@ -1,11 +1,29 @@
-META-INF/
-target/
-.settings/
+META-INF/**
 .project
+target/**
+MANIFEST.MF
+
+*.pydevproject
+.metadata
+bin/**
+tmp/**
+tmp/**/*
+*.tmp
+*.bak
+*.swp
+*~.nib
+local.properties
 .classpath
-okapi/core/nullout.xlf
-okapi/integration-tests/output.xml
-okapi/integration-tests/output1.html
-okapi/integration-tests/genericOutput.txt
-okapi/integration-tests/output2.html
-okapi/steps/termextraction/terms.txt
+.settings/
+.loadpath
+/web-app/plugins
+/web-app/WEB-INF/classes
+
+# External tool builders
+.externalToolBuilders/
+
+# Locally stored "Eclipse launch configurations"
+*.launch
+
+#python specific
+*.pyc
