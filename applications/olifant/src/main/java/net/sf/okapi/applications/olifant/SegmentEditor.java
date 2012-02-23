@@ -23,6 +23,8 @@ package net.sf.okapi.applications.olifant;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import net.sf.okapi.common.Util;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ExtendedModifyEvent;
 import org.eclipse.swt.custom.ExtendedModifyListener;
@@ -176,10 +178,10 @@ class SegmentEditor {
 	public void setFullCodesMode (boolean fullCodesMode) {
 		// Save and validate text in current mode
 		if ( fullCodesMode ) {
-			saveTextWithRealCodes();
+			saveTextWithFullCodes();
 		}
 		else {
-			saveTextWithFullCodes();
+			saveTextWithShortCodes();
 		}
 
 		// Set the new mode and its text
@@ -197,7 +199,11 @@ class SegmentEditor {
 		
 	}
 	
-	private void saveTextWithRealCodes () {
+	private void saveTextWithShortCodes () {
+		String text = edit.getText();
+		Matcher m = SHORTCODES.matcher(text);
+
+		if ( Util.isEmpty(codesAsText) ) return; // Nothing to check
 		
 	}
 
