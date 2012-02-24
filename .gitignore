@@ -42,3 +42,4 @@ local.properties
 /deployment/maven/dist_gtk2-linux-x86
 /deployment/maven/dist_longhorn
 /deployment/maven/dist_cocoa-macosx
+/deployment/maven/dist_xlifflib
