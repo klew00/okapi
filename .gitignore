@@ -43,3 +43,10 @@ local.properties
 /deployment/maven/dist_longhorn
 /deployment/maven/dist_cocoa-macosx
 /deployment/maven/dist_xlifflib
+
+/okapi/core/nullout.xlf
+/okapi/integration-tests/genericOutput.txt
+/okapi/integration-tests/output.xml
+/okapi/integration-tests/output1.html
+/okapi/integration-tests/output2.html
+/okapi/steps/termextraction/terms.txt
