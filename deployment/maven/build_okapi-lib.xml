@@ -396,9 +396,9 @@
 		   <fileset dir="../shared/licenses" includes="**/icu4j-*"/>
 		</copy>
 
-		<property name="dep021" value="${mavenStore}/gnu/trove/trov4j/2.1.0"/>
+		<property name="dep021" value="${mavenStore}/net/sf/trove4j/trove4j/3.0.2"/>
 		<fileset id="list.contents" dir="${dep021}"
-		 includes="**/trov4j-2.1.0.jar"/>
+		 includes="**/trove4j-3.0.2.jar"/>
 		<property name="jar021" refid="list.contents"/>
 		<echo file="tmpJars" append="yes"> ${jar021}</echo>
 		<copy todir="${distLib}" file="${dep021}/${jar021}"/>
