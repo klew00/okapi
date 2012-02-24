@@ -1,6 +1,6 @@
 package net.sf.okapi.lib.search.lucene.scorer;
 
-import gnu.trove.TIntIntHashMap;
+import gnu.trove.map.hash.TIntIntHashMap;
 
 import java.io.IOException;
 import java.util.Iterator;
