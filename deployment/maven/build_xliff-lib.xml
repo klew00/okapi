@@ -1,0 +1,110 @@
+<?xml version="1.0"?> 
+<project name="okapi-xlifflib" default="all" basedir="."> 
+
+	<!-- Get the version information to use from file -->
+	<property file="../shared/release.properties" />
+	<property name="okapilibStamp" value="${okapilibVersion}${releaseInfo}" />
+	<property name="mavenStore" value="${user.home}/.m2/repository"/>
+
+ 	<property name="tmp" value="tmp"/>
+	<property name="done" value="done"/>
+	<property name="dist_xlifflib" value="dist_xlifflib"/>
+	<property name="lib_name" value="okapiXLIFFLibrary"/>
+	<property name="lynx_name" value="lynx"/>
+	<property name="distName" value="${lib_name}-${okapilibStamp}"/>
+	<property name="zipName" value="okapi-xliffLib_all-platforms_${okapilibStamp}"/>
+
+	<tstamp>
+	 <format property="TODAY" pattern="MMM-dd-yyyy"/>
+	</tstamp>
+
+	<!-- Initialization -->
+	<target name="init">
+		<delete includeEmptyDirs="true" failonerror="false">
+			<fileset dir="${dist_xlifflib}"/>
+		</delete>
+		<mkdir dir="${dist_xlifflib}"/>
+		<delete includeEmptyDirs="true" failonerror="false">
+			<fileset dir="${tmp}"/>
+		</delete>
+		<mkdir dir="${tmp}"/>
+	</target>
+
+	<!-- Make the jar files -->
+	<target name="makeJars"> 
+
+	<jar destfile="${dist_xlifflib}/${distName}.jar"
+		manifest="../../okapi/libraries/lib-xliff/META-INF/MANIFEST.MF">
+		
+		<fileset dir="data/xliff-lib" includes="**/*.txt"/>
+		<fileset dir="../../okapi/libraries/lib-xliff/target/classes" includes="net/**"/>
+		<fileset dir="../../okapi/libraries/lib-xliff/target/classes" includes="org/**"/>
+		
+	</jar>
+	
+	<!-- Copy and update the readme -->
+	<copy tofile="${dist_xlifflib}/readme.html" file="data/xliff-lib/readme.html"/>
+	<replace file="${dist_xlifflib}/readme.html" token="@version@" value="${okapilibStamp}"/>
+	<replace file="${dist_xlifflib}/readme.html" token="@date@" value="${TODAY}"/>
+	<!-- Copy samples -->
+	<copy todir="${dist_xlifflib}/samples">
+    	<fileset dir="data/xliff-lib/samples"/>
+  	</copy>
+  	
+	<!-- javadoc files
+	<javadoc destdir="${dist_xlifflib}/javadoc" Encoding="UTF-8">
+		<packageset dir="../../okapi/libraries/lib-xliff/src/main/java" defaultexcludes="yes"/>
+	</javadoc>
+	-->
+
+	</target>
+	
+	<!-- Make Lynx -->
+	<target name="makeLynx">
+		<!-- Prepare tmp dir for creating the jar -->
+		<delete includeEmptyDirs="true" failonerror="false">
+			<fileset dir="${tmp}"/>
+		</delete>
+		<mkdir dir="${tmp}"/>
+
+		<!-- Copy classes -->
+		<copy todir="${tmp}">
+			<fileset dir="../../applications/lynx/target/classes"/>
+		</copy>
+		
+		<!-- Create the manifest file -->
+		<manifest file="${tmp}/MANIFEST.MF">
+			<attribute name="Implementation-Title" value="lynx"/>
+			<attribute name="Implementation-Version" value="${okapilibStamp}"/>
+			<attribute name="Main-Class" value="net.sf.okapi.applications.lynx.Main"/>
+			<attribute name="Class-Path" value="${distName}.jar"/>
+  		</manifest>
+		
+		<!-- Create the jar file -->
+		<jar jarfile="${dist_xlifflib}/lynx.jar" basedir="${tmp}"
+		 manifest="${tmp}/MANIFEST.MF"
+		 excludes="MANIFEST.MF">
+			<fileset dir="data/xliff-lib" includes="**/*.txt"/>
+		</jar>
+
+		<!-- Copy batch/shell -->
+		<copy todir="${dist_xlifflib}">
+			<fileset dir="data/xliff-lib" includes="**/lynx*"/>
+			<fileset dir="data/xliff-lib" includes="**/startLynx*"/>
+			<fileset dir="data/xliff-lib" includes="**/license.txt"/>
+		</copy>
+
+		<!-- Clean up -->
+		<delete includeEmptyDirs="true" failonerror="false">
+			<fileset dir="${tmp}"/>
+		</delete>
+
+		<!-- Make ZIP of the package -->
+		<zip destfile="${done}/${zipName}.zip" basedir="${dist_xlifflib}"/>
+
+	</target>
+	
+	
+	<target name="all" depends="init, makeJars, makeLynx"/>
+
+</project>

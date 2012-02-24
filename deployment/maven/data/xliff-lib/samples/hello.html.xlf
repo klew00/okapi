@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:2.0" version="2.0" srcLang="en" tgtLang="fr">
+ <!-- EXPERIMENTAL OUTPUT ONLY!-->
+ <file>
+  <unit id="tu1">
+   <segment id="0">
+    <source>Hello <pc id="1" nidEnd="d2" nidStart="d1">World</pc>!</source>
+   </segment>
+   <originalData>
+    <data id="d1">&lt;b></data>
+    <data id="d2">&lt;/b></data>
+   </originalData>
+  </unit>
+ </file>
+</xliff>
