@@ -393,6 +393,8 @@ public class XLIFF2PackageWriter extends BasePackageWriter {
 			
 		}
 		xAlt.setTarget(toXLIFF2Fragment(alt.getTarget().getFirstContent(), cs, true));
+		xAlt.setSimilarity(alt.getFuzzyScore());
+		xAlt.setQuality(alt.getQualityScore());
 		xObject.addCandidate(xAlt);
 	}
 	

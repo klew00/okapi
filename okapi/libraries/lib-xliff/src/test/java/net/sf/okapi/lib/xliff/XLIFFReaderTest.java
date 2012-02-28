@@ -310,7 +310,7 @@ public class XLIFFReaderTest {
 			+ "<file>\n<unit id=\"id\"><segment>\n"
 			+ "<source>source</source>"
 			+ "<matches>\n"
-			+ "<match>\n"
+			+ "<match similarity=\"88\" quality=\"99\">\n"
 			+ "<source>src-match</source>"
 			+ "<target>trg-match</target>"
 			+ "</match>\n"
@@ -331,11 +331,15 @@ public class XLIFFReaderTest {
 		List<ICandidate> list = seg.getCandidates();
 		assertNotNull(list);
 		assertEquals(1, seg.getCandidateCount());
+		assertEquals(88, list.get(0).getSimilarity());
+		assertEquals(99, list.get(0).getQuality());
 		assertEquals("src-match", list.get(0).getSource().toString());
 		assertEquals("trg-match", list.get(0).getTarget().toString());
 		// test unit-level match
 		list = unit.getCandidates();
 		assertEquals(1, unit.getCandidateCount());
+		assertEquals(-1, list.get(0).getSimilarity());
+		assertEquals(-1, list.get(0).getQuality());
 		assertEquals("unit-src-match", list.get(0).getSource().toString());
 		assertEquals("unit-trg-match", list.get(0).getTarget().toString());
 	}

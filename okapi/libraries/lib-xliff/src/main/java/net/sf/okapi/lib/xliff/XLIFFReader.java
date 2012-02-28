@@ -253,6 +253,27 @@ public class XLIFFReader {
 		groups.push(gd);
 		queue.add(new XLIFFEvent(XLIFFEventType.START_SECTION, gd));
 	}
+
+	private int checkIntegerValue (String name,
+		String value,
+		int min,
+		int max)
+	{
+		if ( value == null ) return -1;
+		if ( value.isEmpty() ) {
+			throw new XLIFFReaderException(String.format("Empty attribute '%s'", name));
+		}
+		try {
+			int tmp = Integer.parseInt(value);
+			if (( tmp < min ) || ( tmp > max )) {
+				throw new XLIFFReaderException(String.format("Invalid value for attribute '%s'", name));
+			}
+			return tmp;
+		}
+		catch ( NumberFormatException e ) {
+			throw new XLIFFReaderException(String.format("Invalid value for attribute '%s'", name));
+		}
+	}
 	
 	/**
 	 * Throws an exception if the value is null or empty.
@@ -346,6 +367,11 @@ public class XLIFFReader {
 		// New candidate
 		Candidate alt = new Candidate();
 		Part part = new Part(alt.getDataStore());
+		// Get the attributes
+		int intVal = checkIntegerValue("similarity", reader.getAttributeValue(null, "similarity"), 0, 100);
+		if ( intVal != -1 ) alt.setSimilarity(intVal);
+		intVal = checkIntegerValue("quality", reader.getAttributeValue(null, "quality"), 0, 100);
+		if ( intVal != -1 ) alt.setQuality(intVal);
 
 		String tmp;
 		while ( reader.hasNext() ) {

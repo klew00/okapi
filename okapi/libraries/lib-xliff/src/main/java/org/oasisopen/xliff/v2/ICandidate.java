@@ -63,4 +63,18 @@ public interface ICandidate extends Serializable {
 
 	public void setTarget (IFragment fragment);
 
+	/**
+	 * Gets the measure of how the source of this candidate is similar to the source content
+	 * it applies to.
+	 * @return 100 if the two source and exactly the same, or a value between 99 and 0.
+	 * Or -1 if not similarity is set.
+	 */
+	public int getSimilarity ();
+
+	public void setSimilarity (int similarity);
+
+	public int getQuality ();
+
+	public void setQuality (int quality);
+	
 }

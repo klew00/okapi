@@ -259,7 +259,14 @@ public class XLIFFWriter {
 		writer.print(indent+"<matches>"+lb);
 		if ( isIndented ) indent += " ";
 		for ( ICandidate alt : parent.getCandidates() ) {
-			writer.print(indent+"<match>"+lb);
+			writer.print(indent+"<match");
+			if ( alt.getSimilarity() > -1 ) {
+				writer.print(String.format(" similarity=\"%d\"", alt.getSimilarity()));
+			}
+			if ( alt.getQuality() > -1 ) {
+				writer.print(String.format(" quality=\"%d\"", alt.getQuality()));
+			}
+			writer.print(">"+lb);
 			if ( isIndented ) indent += " ";
 			alt.getDataStore().calculateOriginalDataToIdsMap();
 			writeFragment(Util.ELEM_SOURCE, alt.getSource(), -1);

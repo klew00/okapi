@@ -30,6 +30,8 @@ public class Candidate implements ICandidate {
 	private Fragment source;
 	private Fragment target;
 	private DataStore store;
+	private int similarity = -1;
+	private int quality = -1;
 	
 	public Candidate () {
 		store = new DataStore();
@@ -72,6 +74,32 @@ public class Candidate implements ICandidate {
 		return target;
 	}
 	
+	@Override
+	public int getSimilarity () {
+		return similarity;
+	}
+
+	@Override
+	public void setSimilarity (int similarity) {
+		if (( similarity < -1 ) || ( similarity > 100 )) {
+			throw new RuntimeException("Invalid similarity value.");
+		}
+		this.similarity = similarity;
+	}
+
+	@Override
+	public int getQuality () {
+		return quality;
+	}
+
+	@Override
+	public void setQuality (int quality) {
+		if (( quality < -1 ) || ( quality > 100 )) {
+			throw new RuntimeException("Invalid quality value.");
+		}
+		this.quality = quality;
+	}
+
 	@Override
 	public DataStore getDataStore () {
 		return store;

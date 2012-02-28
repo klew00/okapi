@@ -115,7 +115,7 @@ public class XLIFFWriterTest {
 			+ "<segment>\n"
 			+ "<source>Source 1.</source>\n"
 			+ "<matches>\n"
-			+ "<match>\n"
+			+ "<match similarity=\"77\">\n"
 			+ "<source>seg-text<ph id=\"1\" nid=\"d1\"/></source>\n"
 			+ "<target>SEG-TEXT<ph id=\"1\" nid=\"d1\"/></target>\n"
 			+ "<originalData>\n"
@@ -125,7 +125,7 @@ public class XLIFFWriterTest {
 			+ "</matches>\n"
 			+ "</segment>\n"
 			+ "<matches>\n"
-			+ "<match>\n"
+			+ "<match similarity=\"77\">\n"
 			+ "<source>unit-text<ph id=\"1\" nid=\"d1\"/></source>\n"
 			+ "<target>UNIT-TEXT<ph id=\"1\" nid=\"d1\"/></target>\n"
 			+ "<originalData>\n"
@@ -308,6 +308,7 @@ public class XLIFFWriterTest {
 	
 	private Candidate createAlternate (String prefix) {
 		Candidate alt = new Candidate();
+		alt.setSimilarity(77);
 		Fragment frag = new Fragment(alt.getDataStore());
 		frag.append(prefix+"-text");
 		frag.append(InlineType.PLACEHOLDER, "1", "<br/>");
