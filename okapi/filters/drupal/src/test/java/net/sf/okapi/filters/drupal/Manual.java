@@ -64,11 +64,13 @@ public class Manual {
 						// Change content to verify the merge
 						TextContainer tc = tu.createTarget(locEN, true, IResource.COPY_ALL);
 						String ctext = tc.getFirstContent().getCodedText();
-						if ( ctext.indexOf('\u0114') != -1 ) {
+						if (( ctext.indexOf('\u0114') != -1 ) || ( ctext.indexOf('\u00d8') != -1 )) {
 							ctext = ctext.replaceAll("\u0114", "e");
+							ctext = ctext.replaceAll("\u00d8", "o");
 						}
 						else {
 							ctext = ctext.replaceAll("e", "\u0114");
+							ctext = ctext.replaceAll("o", "\u00d8");
 						}
 						tc.getFirstContent().setCodedText(ctext);
 					}

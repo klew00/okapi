@@ -114,11 +114,19 @@ public class Node {
 		return store.toJSONString();
 	}
 	
-	@SuppressWarnings("unchecked")
 	public void setBody (String lang, String body) {
+		setBody(lang, body, null);
+	}
+	
+	@SuppressWarnings("unchecked")
+	public void setBody (String lang, String body, String summary) {
 
 		JSONObject bodyVal = new JSONObject();
 		bodyVal.put("value", body);
+		
+		if(summary != null){
+			bodyVal.put("summary", summary);
+		}
 		
 		JSONArray bodyArr = new JSONArray();
 		bodyArr.add(bodyVal);
@@ -127,5 +135,15 @@ public class Node {
 		bodyLang.put(lang, bodyArr);
 		
 		store.put("body", bodyLang);
+	}
+	
+	/**
+	 * NOTE: Title is currently treated as a top level attribute.
+	 *       With the title translation module it would follow the body format.
+	 * @param title
+	 */
+	@SuppressWarnings("unchecked")
+	public void setTitle (String title) {
+		store.put("title", title);
 	}
 }
