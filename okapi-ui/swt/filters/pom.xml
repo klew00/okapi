@@ -25,6 +25,7 @@
         <module>rainbowkit-ui</module>
         <module>transifex-ui</module>
         <module>mif-ui</module>
+        <module>drupal-ui</module>
     </modules>
 
    <dependencies>

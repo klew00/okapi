@@ -1,3 +1,9 @@
-host=http://192.168.5.123/drupal7
-username=yourusername
-password=yourpassword
+host=http://192.168.5.123/drupal7/
+user=ysavourel
+password=#BeNcStreXNhdm91cmVs
+sourceLocale=en
+targetLocale=en
+9	yes
+8	no
+3	no
+1	yes
