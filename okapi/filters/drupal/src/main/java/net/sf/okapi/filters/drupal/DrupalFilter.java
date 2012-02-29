@@ -112,8 +112,7 @@ public class DrupalFilter implements IFilter {
 	}
 
 	public EncoderManager getEncoderManager () {
-//		return pof.getEncoderManager();
-		return null; //TODO
+		return null;
 	}
 
 	public String getDisplayName () {
