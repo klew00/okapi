@@ -44,5 +44,6 @@
 		<module>xini</module>
 		<module>txml</module>
 		<module>transtable</module>
+		<module>drupal</module>
     </modules>
 </project>
