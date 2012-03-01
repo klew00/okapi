@@ -108,6 +108,12 @@ public class DrupalFilter implements IFilter {
 			"Default Drupal project",
 			null,
 			Project.PROJECT_EXTENSION+";"));
+		list.add(new FilterConfiguration(getName()+"-noPrompt",
+			MIMETYPE,
+			getClass().getName(),
+			"Drupal Project (without prompt)",
+			"Drupal project without prompt when starting",
+			"noPrompt.fprm"));
 		return list;
 	}
 
@@ -176,6 +182,15 @@ public class DrupalFilter implements IFilter {
 			proj = new Project();
 			proj.read(new BufferedReader(input.getReader()), input.getSourceLocale(), input.getTargetLocale());
 			proj.setPath(input.getInputURI().getPath());
+			
+			// Refresh the list of resources
+			// Prompt the user if requested
+			if ( params.getOpenProject() ) {
+				if ( !editProjectFile() ) {
+					return;
+				}
+			}
+			
 			srcLang = input.getSourceLocale().toString();
 			
 			htmlFilter = new HtmlFilter();
@@ -214,22 +229,22 @@ public class DrupalFilter implements IFilter {
 		}
 	}
 	
-//	public boolean editProjectFile () {
-//		String className = "net.sf.okapi.filters.drupal.ui.ProjectDialog";
-//		try {
-//			IProjectEditor dlg = (IProjectEditor)Class.forName(className).newInstance();
-//			if ( !dlg.edit(null, proj, true) ) {
-//				canceled = true;
-//				return false; // Canceled
-//			}
-//		}
-//		catch ( Throwable e ) {
-//			logger.severe(String.format("Cannot create the editor (%s)\n"+e.getMessage(), className));
-//			// And move on
-//			return false;
-//		}
-//		return true;
-//	}
+	public boolean editProjectFile () {
+		String className = "net.sf.okapi.filters.drupal.ui.ProjectDialog";
+		try {
+			IProjectEditor dlg = (IProjectEditor)Class.forName(className).newInstance();
+			if ( !dlg.edit(null, proj, true) ) {
+				canceled = true;
+				return false; // Canceled
+			}
+		}
+		catch ( Throwable e ) {
+			logger.severe(String.format("Cannot create the editor (%s)\n"+e.getMessage(), className));
+			// And move on
+			return false;
+		}
+		return true;
+	}
 
 	public void setFilterConfigurationMapper (IFilterConfigurationMapper fcMapper) {
 		// Not used
