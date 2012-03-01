@@ -84,8 +84,7 @@ public class DrupalFilter implements IFilter {
 	}
 
 	public void close () {
-//		pof.close();
-		if (cli != null && cli.isLoggedIn()){
+		if (( cli != null ) && cli.isLoggedIn() ) {
 			cli.logout();
 		}
 	}
@@ -359,7 +358,7 @@ public class DrupalFilter implements IFilter {
 		if ( fieldIndex >= fields.size()-1 ) {
 			// We are done with this node
 			// post an end of sub-document
-			htmlFilter.close(); //TODO close as sub-filter
+			htmlFilter.close();
 			Ending ending = new Ending(subDocId);
 			queue.add(new Event(EventType.END_SUBDOCUMENT, ending));
 			return nextNode();
@@ -368,7 +367,8 @@ public class DrupalFilter implements IFilter {
 		
 		// Apply the HTML filter
 		RawDocument rd = new RawDocument(fields.get(fieldIndex).getContent(), proj.getSourceLocale());
-		htmlFilter.open(rd); //TODO sub-filter call
+		htmlFilter.setParentId(subDocId);
+		htmlFilter.open(rd);
 		nextEventInField();
 		return true;
 	}

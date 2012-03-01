@@ -53,6 +53,7 @@ public class ProjectDialog implements IProjectEditor {
 	private Text edPassword;
 	private Text edSource;
 	private Text edTarget;
+	private Button chkNeutralLikeSource;
 
 	public ProjectDialog () {
 		// Needed to be able to instantiate this class with Class.forName().
@@ -104,6 +105,12 @@ public class ProjectDialog implements IProjectEditor {
 		edPassword.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
 		edPassword.setEchoChar('*');
 		
+		chkNeutralLikeSource = new Button(cmpTmp, SWT.CHECK);
+		chkNeutralLikeSource.setText("Treat neutral (und) entries like source entries");
+		GridData gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+		gdTmp.horizontalSpan = 2;
+		chkNeutralLikeSource.setLayoutData(gdTmp);
+		
 		Button btRefresh = UIUtil.createGridButton(shell, SWT.PUSH, "Refresh Resources List", UIUtil.BUTTON_DEFAULT_WIDTH*2, 1);
 		btRefresh.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
@@ -118,7 +125,7 @@ public class ProjectDialog implements IProjectEditor {
 		cmpTmp.setLayoutData(new GridData(GridData.FILL_BOTH));
 		
 		final Table tableDocs = new Table(cmpTmp, SWT.CHECK | SWT.BORDER | SWT.MULTI | SWT.FULL_SELECTION | SWT.V_SCROLL);
-		GridData gdTmp = new GridData(GridData.FILL_BOTH);
+		gdTmp = new GridData(GridData.FILL_BOTH);
 		gdTmp.minimumHeight = 300;
 		gdTmp.minimumWidth = 550;
 		tableDocs.setLayoutData(gdTmp);
@@ -155,13 +162,6 @@ public class ProjectDialog implements IProjectEditor {
 		if ( startSize.x < 450 ) startSize.x = 450;
 		shell.setSize(startSize);
 
-//    	Rectangle rect = tableDocs.getClientArea();
-//		int nPart = (int)(rect.width / 100);
-//		tableDocs.getColumn(0).setWidth(10*nPart);
-//		tableDocs.getColumn(1).setWidth(rect.width-(40*nPart));
-//		tableDocs.getColumn(2).setWidth(rect.width-(25*nPart));
-//		tableDocs.getColumn(3).setWidth(rect.width-(25*nPart));
-		
 		Dialogs.centerWindow(shell, parent);
 	}
 	
@@ -172,6 +172,7 @@ public class ProjectDialog implements IProjectEditor {
 		edPassword.setText(project.getPassword());
 		edSource.setText(project.getSourceLocale().toString());
 		edTarget.setText(project.getTargetLocale().toString());
+		chkNeutralLikeSource.setSelection(project.getNeutralLikeSource());
 	}
 	
 	private boolean saveData () {
@@ -204,6 +205,8 @@ public class ProjectDialog implements IProjectEditor {
 			return false;
 		}
 		project.setTargetLocale(LocaleId.fromString(tmp));
+		
+		project.setNeutralLikeSource(chkNeutralLikeSource.getSelection());
 		
 		tableMod.saveData();
 		return true;

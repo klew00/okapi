@@ -41,6 +41,7 @@ public class Project {
 	public static final String PASSWORD = "password";
 	public static final String SOURCELOCALE = "sourceLocale";
 	public static final String TARGETLOCALE = "targetLocale";
+	public static final String NEUTRALLIKESOURCEE = "neutralLikeSource";
 	
 	public static final String PROJECT_EXTENSION = ".drp";
 
@@ -50,6 +51,7 @@ public class Project {
 	private String password;
 	private LocaleId sourceLocale;
 	private LocaleId targetLocale;
+	private boolean neutralLikeSource;
 	private List<NodeInfo> entries;
 	private DrupalConnector cli;
 	
@@ -67,6 +69,7 @@ public class Project {
 		setPassword("");
 		sourceLocale = srcLoc;
 		targetLocale = trgLoc;
+		neutralLikeSource = true;
 	}
 	
 	public String getHost () {
@@ -85,6 +88,14 @@ public class Project {
 
 	public LocaleId getSourceLocale () {
 		return sourceLocale;
+	}
+	
+	public void setNeutralLikeSource (boolean neutralLikeSource) {
+		this.neutralLikeSource = neutralLikeSource;
+	}
+	
+	public boolean getNeutralLikeSource () {
+		return neutralLikeSource;
 	}
 	
 	public void setSourceLocale (LocaleId srcLoc) {
@@ -134,6 +145,7 @@ public class Project {
 			pw.println(PASSWORD + "=" + Base64.encodePassword(password));
 			pw.println(SOURCELOCALE + "=" + sourceLocale.toString());
 			pw.println(TARGETLOCALE + "=" + targetLocale.toString());
+			pw.println(NEUTRALLIKESOURCEE + "=" + (neutralLikeSource ? "yes" : "no"));
 			// Entries
 			for ( NodeInfo info : entries ) {
 				pw.println(info.getNid() + "\t" + (info.getSelected() ? "yes" : "no" ));
@@ -184,6 +196,9 @@ public class Project {
 						if ( targetLocale == null ) {
 							setTargetLocale(LocaleId.fromString(value));
 						}
+					}
+					else if ( line.startsWith(NEUTRALLIKESOURCEE) ) {
+						setNeutralLikeSource(value.equals("yes"));
 					}
 				}
 				else {
