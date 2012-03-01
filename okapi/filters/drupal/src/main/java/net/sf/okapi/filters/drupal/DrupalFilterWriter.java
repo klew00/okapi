@@ -209,7 +209,7 @@ public class DrupalFilterWriter implements IFilterWriter {
 		}
 		
 		// Update the fields
-		node.setTitle(outFields.get("title"));
+		node.setTitle(trgLoc.getLanguage(), outFields.get("title"));
 		node.setBody(trgLoc.getLanguage(), outFields.get("body"), outFields.get("summary"));
 		
 		// Push the updated field

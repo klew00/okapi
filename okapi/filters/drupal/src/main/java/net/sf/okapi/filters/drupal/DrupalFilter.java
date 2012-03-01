@@ -310,7 +310,7 @@ public class DrupalFilter implements IFilter {
 		fieldIndex = -1;
 		
 		// Get the title
-		String data = node.getTitle();
+		String data = node.getTitle(srcLang);
 		if ( !Util.isEmpty(data) ) {
 			fields.add(new Field("title", data)); // Title
 		}

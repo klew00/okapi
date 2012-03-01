@@ -226,7 +226,8 @@ public class DrupalConnector {
 
 			for ( Object object : array ) {
 				JSONObject node = (JSONObject)object;
-				NodeInfo ni = new NodeInfo((String)node.get("vid"), true);
+				NodeInfo ni = new NodeInfo((String)node.get("nid"), true);
+				//TODO: Not sure if this is the actual title because of the title module
 				ni.setTitle((String)node.get("title"));
 				ni.setType((String)node.get("type"));
 				nodes.add(ni);

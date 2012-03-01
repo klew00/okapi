@@ -42,7 +42,7 @@ public class Node {
 		store = new JSONObject();
 		store.put("language", language);
 		store.put("type", type);
-		store.put("title", title);
+		setTitle(language, title);
 		setBody(language, body);
 	}
 	
@@ -57,7 +57,7 @@ public class Node {
 		store.put("nid", nid);
 		store.put("language", language);
 		store.put("type", type);
-		store.put("title", title);
+		setTitle(language, title);
 		setBody(language, body);
 	}
 	
@@ -65,8 +65,28 @@ public class Node {
 		return (String)store.get("nid");
 	}
 	
-	public String getTitle () {
+/*	public String getTitle () {
 		return (String)store.get("title");
+	}*/
+	
+	@SuppressWarnings("unchecked")
+	public String getTitle (String lang) {
+		Object obj = store.get("title_field");
+		if ( !(obj instanceof Map) ) {
+			return null;
+		}
+		Map<String, JSONArray> map = (Map<String, JSONArray>)store.get("title_field");
+		// Look for the source
+		JSONArray data = map.get(lang);
+		if ( data == null ) {
+			data = map.get("und");
+			if ( data == null ) {
+				return null;
+			}
+		}
+		JSONObject cnt = (JSONObject)data.get(0);
+		String value = (String)cnt.get("value");
+		return value;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -137,13 +157,18 @@ public class Node {
 		store.put("body", bodyLang);
 	}
 	
-	/**
-	 * NOTE: Title is currently treated as a top level attribute.
-	 *       With the title translation module it would follow the body format.
-	 * @param title
-	 */
 	@SuppressWarnings("unchecked")
-	public void setTitle (String title) {
-		store.put("title", title);
+	public void setTitle (String lang, String title) {
+
+		JSONObject titleVal = new JSONObject();
+		titleVal.put("value", title);
+		
+		JSONArray titleArr = new JSONArray();
+		titleArr.add(titleVal);
+		
+		JSONObject titleLang = new JSONObject();
+		titleLang.put(lang, titleArr);
+		
+		store.put("title_field", titleLang);
 	}
 }
