@@ -85,6 +85,9 @@ public class DrupalFilter implements IFilter {
 
 	public void close () {
 //		pof.close();
+		if (cli != null && cli.isLoggedIn()){
+			cli.logout();
+		}
 	}
 
 	public ISkeletonWriter createSkeletonWriter () {
@@ -200,6 +203,7 @@ public class DrupalFilter implements IFilter {
 			// Initialize the client
 			cli = new DrupalConnector(proj.getHost());
 			cli.setCredentials(proj.getUser(), proj.getPassword());
+			cli.login();
 			
 			String docName = null;
 			if ( input.getInputURI() != null ) {

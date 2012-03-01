@@ -333,4 +333,8 @@ public class DrupalConnector {
 
 			return conn;
 	}
+	
+	public boolean isLoggedIn(){
+		return (session_cookie != null);
+	}
 }

@@ -211,6 +211,10 @@ public class Project {
 			cli.setCredentials(getUser(), getPassword());
 		}
 		
+		if (!cli.isLoggedIn()){
+			cli.login();			
+		}
+		
 		// Get the list of the nodes
 		List<NodeInfo> list = cli.getNodes();
 		// Make a temporary copy of the existing list
@@ -233,6 +237,10 @@ public class Project {
 			if ( found || !onlyExistingEntries ) {
 				entries.add(info);
 			}
+		}
+		
+		if (cli.isLoggedIn()){
+			cli.logout();			
 		}
 	}
 	

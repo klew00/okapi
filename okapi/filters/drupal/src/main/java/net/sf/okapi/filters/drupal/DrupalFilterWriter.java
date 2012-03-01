@@ -96,6 +96,8 @@ public class DrupalFilterWriter implements IFilterWriter {
 			return processStartSubDocument(event);
 		case END_SUBDOCUMENT:
 			return processEndSubDocument(event);
+		case END_DOCUMENT:
+			return processEndDocument(event);
 		case START_GROUP:
 			return processStartGroup(event);
 		case END_GROUP:
@@ -215,6 +217,16 @@ public class DrupalFilterWriter implements IFilterWriter {
 		// Push the updated field
 		cli.updateNode(node);
 
+		return event;
+	}
+	
+	/**
+	 * Log out at the end of the document
+	 * @param event
+	 * @return
+	 */
+	private Event processEndDocument (Event event) {
+		cli.logout();
 		return event;
 	}
 }
