@@ -26,6 +26,9 @@ import net.sf.okapi.filters.drupal.NodeInfo;
 import net.sf.okapi.filters.drupal.Project;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ControlAdapter;
+import org.eclipse.swt.events.ControlEvent;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
@@ -35,12 +38,39 @@ class ProjectTableModel {
 	private Table table;
 	private Project project;
 
-	public void linkTable (Table newTable) {
+	public void initializeTable (Table newTable) {
 		table = newTable;
 		TableColumn col = new TableColumn(table, SWT.NONE);
-		col.setText("Resource to Process");
+		col.setText("ID");
+		col.setWidth(100);
 		col = new TableColumn(table, SWT.NONE);
-		col.setText("Resource ID");
+		col.setText("Title");
+		col = new TableColumn(table, SWT.NONE);
+		col.setText("Type");
+		col = new TableColumn(table, SWT.NONE);
+		col.setText("Status");
+		
+		table.addControlListener(new ControlAdapter() {
+		    public void controlResized(ControlEvent e) {
+		    	int count = table.getColumnCount()-1; // Exclude ID column
+		    	try {
+		    		table.setRedraw(false);
+		    		Rectangle rect = table.getClientArea();
+		    		int keyColWidth = table.getColumn(0).getWidth();
+		    		int part = (int)((rect.width-keyColWidth) / count);
+		    		int remainder = (int)((rect.width-keyColWidth) % count);
+		    		for ( int i=1; i<table.getColumnCount(); i++ ) {
+		    			table.getColumn(i).setWidth(part);
+		    		}
+		    		table.getColumn(1).setWidth(table.getColumn(1).getWidth()+remainder);
+		    	}
+		    	finally {
+		    		table.setRedraw(true);
+		    	}
+		    }
+		});
+		
+		
 	}
 	
 	public void setProject (Project project) {
@@ -54,9 +84,12 @@ class ProjectTableModel {
 		table.removeAll();
 		for ( NodeInfo info : project.getEntries() ) {
 			TableItem item = new TableItem(table, SWT.NONE);
-			item.setText(0, info.getTitle()==null ? "" : info.getTitle());
-			item.setText(1, info.getNid());
+			item.setText(0, info.getNid());
 			item.setChecked(info.getSelected());
+			item.setText(1, info.getTitle());
+			item.setText(2, info.getType());
+			String status = info.getStatus();
+			item.setText(3, status.isEmpty() ? "" : status.equals("0") ? "unpublished" : "published");
 		}
 		if ( selection == null ) {
 			if ( table.getItemCount() > 0 ) {

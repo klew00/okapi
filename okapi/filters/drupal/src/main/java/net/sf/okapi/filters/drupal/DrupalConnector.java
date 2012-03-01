@@ -205,7 +205,7 @@ public class DrupalConnector {
 	 * Get all nodes
 	 * @return
 	 */
-	public List<NodeInfo> getNodes() {
+	public List<NodeInfo> getNodes () {
 		URL url;
 		HttpURLConnection conn;
 		List<NodeInfo> nodes = new ArrayList<NodeInfo>();
@@ -226,8 +226,9 @@ public class DrupalConnector {
 
 			for ( Object object : array ) {
 				JSONObject node = (JSONObject)object;
-				NodeInfo ni = new NodeInfo((String)node.get("nid"), true);
-				//TODO: Not sure if this is the actual title because of the title module
+				String status = (String)node.get("status");
+				NodeInfo ni = new NodeInfo((String)node.get("nid"), !status.equals("0"));
+				ni.setStatus(status);
 				ni.setTitle((String)node.get("title"));
 				ni.setType((String)node.get("type"));
 				nodes.add(ni);

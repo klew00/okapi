@@ -323,6 +323,8 @@ public class DrupalFilter implements IFilter {
 		
 		subDocId = info.getNid();
 		StartSubDocument ssd = new StartSubDocument(docId, subDocId);
+		ssd.setName("node-"+subDocId);
+		ssd.setMimeType(MIMETYPE);
 		queue.add(new Event(EventType.START_SUBDOCUMENT, ssd));
 		
 		fields = new ArrayList<Field>();

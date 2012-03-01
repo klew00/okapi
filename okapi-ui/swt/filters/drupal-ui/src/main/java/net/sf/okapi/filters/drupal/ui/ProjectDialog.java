@@ -32,7 +32,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -126,8 +125,8 @@ public class ProjectDialog implements IProjectEditor {
 		tableDocs.setHeaderVisible(true);
 		tableDocs.setLinesVisible(true);
 		tableMod = new ProjectTableModel();
-		tableMod.linkTable(tableDocs);
-
+		tableMod.initializeTable(tableDocs);
+		
 		//--- Dialog-level buttons
 
 		CloseActions = new SelectionAdapter() {
@@ -156,10 +155,12 @@ public class ProjectDialog implements IProjectEditor {
 		if ( startSize.x < 450 ) startSize.x = 450;
 		shell.setSize(startSize);
 
-    	Rectangle rect = tableDocs.getClientArea();
-		int nPart = (int)(rect.width / 100);
-		tableDocs.getColumn(0).setWidth(55*nPart);
-		tableDocs.getColumn(1).setWidth(rect.width-(55*nPart));
+//    	Rectangle rect = tableDocs.getClientArea();
+//		int nPart = (int)(rect.width / 100);
+//		tableDocs.getColumn(0).setWidth(10*nPart);
+//		tableDocs.getColumn(1).setWidth(rect.width-(40*nPart));
+//		tableDocs.getColumn(2).setWidth(rect.width-(25*nPart));
+//		tableDocs.getColumn(3).setWidth(rect.width-(25*nPart));
 		
 		Dialogs.centerWindow(shell, parent);
 	}

@@ -26,14 +26,23 @@ public class NodeInfo {
 	private String title;
 	private String type;
 	private boolean selected;
+	private String status;
 	
 	public NodeInfo (String nid,
 		boolean selected)
 	{
 		this.nid = nid;
 		this.selected = selected;
+		this.title = "";
+		this.status = "";
+		this.type = "";
 	}
-	
+
+	@Override
+	public String toString(){
+		return "nid: "+nid+"\ttitle: "+title+"\ttype: "+type;
+	}
+
 	public String getNid () {
 		return nid;
 	}
@@ -47,7 +56,8 @@ public class NodeInfo {
 	}
 	
 	public void setTitle (String title) {
-		this.title = title;
+		if ( title == null ) this.title = "";
+		else this.title = title;
 	}
 	
 	public String getType () {
@@ -62,12 +72,16 @@ public class NodeInfo {
 		return selected;
 	}
 	
-	public String toString(){
-		return "nid: "+nid+"\ttitle: "+title+"\ttype: "+type;
-	}
-
 	public void setSelected (boolean selected) {
 		this.selected = selected;
 	}
 
+	public String getStatus () {
+		return status;
+	}
+	
+	public void setStatus (String status) {
+		this.status = status;
+	}
+	
 }
