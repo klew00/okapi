@@ -219,7 +219,7 @@ public class DrupalFilter implements IFilter {
 			
 			// Initialize the iteration
 			
-			nodeIter = cli.getNodes().iterator();
+			nodeIter = proj.getEntries().iterator();
 			hasMoreDoc = true;
 			hasNext = true;
 			nextNode();
@@ -257,6 +257,10 @@ public class DrupalFilter implements IFilter {
 	private boolean nextNode () {
 		while ( nodeIter.hasNext() ) {
 			NodeInfo info = nodeIter.next();
+			// Check if the node should be extracted
+			if ( !info.getSelected() ) {
+				continue;
+			}
 			if ( prepareNode(info) ) {
 				nextEventInField();
 				return true;

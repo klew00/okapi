@@ -45,6 +45,9 @@ public class Manual {
 			
 			File file = new File(root+"/test.drp");
 			RawDocument rd = new RawDocument(file.toURI(), "UTF-8", locEN);
+			
+			Parameters params = (Parameters)filter.getParameters();
+			params.setOpenProject(false);
 
 			filter.open(rd);
 			if ( merge ) {
