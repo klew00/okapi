@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2011 by the Okapi Framework contributors
+  Copyright (C) 2011-2012 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -27,7 +27,6 @@ import java.util.List;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.MimeTypeMapper;
-import net.sf.okapi.common.UsingParameters;
 import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.IFilter;
@@ -37,16 +36,14 @@ import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
 import net.sf.okapi.common.skeleton.ISkeletonWriter;
 
-@UsingParameters(Parameters.class)
 public class XINIFilter implements IFilter {
-	private Parameters params;
+	
 	private EncoderManager encoderManager;
 	private XINIReader reader;
 	private LinkedList<Event> queue;
 	private String relDocName;
 	
 	public XINIFilter () {
-		params = new Parameters();
 		queue = new LinkedList<Event>();
 	}
 
@@ -112,7 +109,7 @@ public class XINIFilter implements IFilter {
 
 	@Override
 	public IParameters getParameters () {
-		return params;
+		return null; // No parameters
 	}
 
 	@Override
@@ -153,7 +150,7 @@ public class XINIFilter implements IFilter {
 
 	@Override
 	public void setParameters (IParameters params) {
-		this.params = (Parameters)params;
+		// No parameters
 	}
 
 	public ISkeletonWriter createSkeletonWriter() {
