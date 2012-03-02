@@ -62,6 +62,7 @@ import net.sf.okapi.filters.xini.jaxb.Xini;
 import net.sf.okapi.filters.xini.jaxb.Element.ElementContent;
 
 public class XINIReader {
+	
     private static final Map<String, String> tagType;
     private static final Logger LOGGER = Logger.getLogger(XINIReader.class.getName());
     static {
