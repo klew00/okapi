@@ -210,10 +210,12 @@ public class DrupalFilterWriter implements IFilterWriter {
 			return event;
 		}
 		
-		// Update the fields
-		node.setTitle(trgLoc.getLanguage(), outFields.get("title"));
-		node.setBody(trgLoc.getLanguage(), outFields.get("body"), outFields.get("summary"));
+		boolean neutralLikeSource = ann.getProject().getNeutralLikeSource();
 		
+		// Update the fields
+		node.setTitle(trgLoc.getLanguage(), outFields.get("title"), neutralLikeSource);
+		node.setBody(trgLoc.getLanguage(), outFields.get("body"), outFields.get("summary"), neutralLikeSource);
+
 		// Push the updated field
 		cli.updateNode(node);
 

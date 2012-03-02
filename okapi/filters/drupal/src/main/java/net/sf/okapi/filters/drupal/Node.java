@@ -21,12 +21,15 @@
 package net.sf.okapi.filters.drupal;
 
 import java.util.Map;
+import java.util.logging.Logger;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 public class Node {
 
+	private final Logger logger = Logger.getLogger(getClass().getName());
+	
 	private JSONObject store;
 	
 	public Node (JSONObject store) {
@@ -135,40 +138,109 @@ public class Node {
 	}
 	
 	public void setBody (String lang, String body) {
-		setBody(lang, body, null);
+		setBody(lang, body, null, true);
+	}
+	
+	public void setBody (String lang, String body, boolean neutralLikeSource) {
+		setBody(lang, body, null, neutralLikeSource);
 	}
 	
 	@SuppressWarnings("unchecked")
-	public void setBody (String lang, String body, String summary) {
+	public void setBody (String lang, String body, String summary, boolean neutralLikeSource) {
 
-		JSONObject bodyVal = new JSONObject();
-		bodyVal.put("value", body);
-		
-		if(summary != null){
-			bodyVal.put("summary", summary);
+		//if existing update the fields else create field from scratch
+		JSONObject field = (JSONObject) store.get("body");
+		if(field != null){
+			
+			//--check language
+			if(!field.containsKey(lang)){
+				
+				if(field.containsKey("und")){
+					if(neutralLikeSource){
+						lang = "und";
+					}else{
+						logger.warning("Specified language not found for current body. Content will not be updated. Enable the neutralLikeSource option to write back to \"undefined\" language.");
+						return;
+					}
+				}else{
+					//--neither the specified language or an undefined language exists
+					//--TODO: update if we're able to create new targets--
+					logger.warning("Specified language not found for current body. Content will not be updated.");
+					return;
+				}
+			}	
+			
+			JSONArray langField = (JSONArray) field.get(lang);
+			JSONObject arrayObj = (JSONObject) langField.get(0);
+			
+			//--overwrite value
+			arrayObj.put("value", body);
+			arrayObj.put("summary", summary);
+
+		}else{
+			JSONObject bodyVal = new JSONObject();
+			bodyVal.put("value", body);
+			
+			if(summary != null){
+				bodyVal.put("summary", summary);
+			}
+			
+			JSONArray bodyArr = new JSONArray();
+			bodyArr.add(bodyVal);
+			
+			JSONObject bodyLang = new JSONObject();
+			bodyLang.put(lang, bodyArr);
+			
+			store.put("body", bodyLang);
 		}
-		
-		JSONArray bodyArr = new JSONArray();
-		bodyArr.add(bodyVal);
-		
-		JSONObject bodyLang = new JSONObject();
-		bodyLang.put(lang, bodyArr);
-		
-		store.put("body", bodyLang);
+	}
+	
+	public void setTitle (String lang, String title) {
+		setTitle(lang, title, true);
 	}
 	
 	@SuppressWarnings("unchecked")
-	public void setTitle (String lang, String title) {
+	public void setTitle (String lang, String title, boolean neutralLikeSource) {
 
-		JSONObject titleVal = new JSONObject();
-		titleVal.put("value", title);
-		
-		JSONArray titleArr = new JSONArray();
-		titleArr.add(titleVal);
-		
-		JSONObject titleLang = new JSONObject();
-		titleLang.put(lang, titleArr);
-		
-		store.put("title_field", titleLang);
+		//if existing update the fields else create field from scratch
+		JSONObject field = (JSONObject) store.get("title_field");
+		if(field != null){
+			
+			//--check language
+			if(!field.containsKey(lang)){
+				if(field.containsKey("und")){
+					if(neutralLikeSource){
+						lang = "und";
+					}else{
+						logger.warning("Specified language not found for current title. Content will not be updated. Enable the neutralLikeSource option to write back to \"undefined\" language.");
+						return;
+					}
+				}else{
+					//--neither the specified language or an undefined language exists
+					//--TODO: update if we're able to create new targets--
+					logger.warning("Specified language not found for current title. Content will not be updated.");
+					return;
+				}
+			}
+			
+			JSONArray langField = (JSONArray) field.get(lang);
+			JSONObject arrayObj = (JSONObject) langField.get(0);
+			
+			//--overwrite value
+			arrayObj.put("value", title);
+			
+		}else{
+
+			JSONObject titleVal = new JSONObject();
+			titleVal.put("value", title);
+			
+			JSONArray titleArr = new JSONArray();
+			titleArr.add(titleVal);
+			
+			JSONObject titleLang = new JSONObject();
+			titleLang.put(lang, titleArr);
+			
+			store.put("title_field", titleLang);
+		}
 	}
 }
