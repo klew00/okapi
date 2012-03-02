@@ -161,4 +161,9 @@ public interface IFilter {
 	 */
 	public List<FilterConfiguration> getConfigurations();
 	
+	/**
+	 * is this filter configured as a subfilter?
+	 * @return true if subfilter, false otherwise
+	 */
+	public boolean isSubfilter();
 }

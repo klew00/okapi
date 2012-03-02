@@ -423,15 +423,16 @@ public abstract class AbstractFilter implements IFilter {
 		return documentId;
 	}
 
-	public boolean isSubFilter() {
-		return this.getClass().isAnnotationPresent(SubFilter.class);
-	}
-
 	public String getParentId() {
 		return parentId;
 	}
 
 	public void setParentId(String parentId) {
 		this.parentId = parentId;
+	}
+	
+	@Override
+	public boolean isSubfilter() {
+		return false;
 	}
 }

@@ -59,7 +59,6 @@ import net.sf.okapi.common.filters.EventBuilder;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filters.PropertyTextUnitPlaceholder;
 import net.sf.okapi.common.filters.PropertyTextUnitPlaceholder.PlaceholderAccessType;
-import net.sf.okapi.common.filters.SubFilter;
 import net.sf.okapi.common.filters.SubFilterEventConverter;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.Code;
@@ -101,10 +100,8 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 	private boolean hasBOM;
 	private EventBuilder eventBuilder;
 	private RawDocument currentRawDocument;
-	private ExtractionRuleState ruleState;
-	@SubFilter() // make this IFilter a subfilter 
-	private IFilter cdataSubfilter;
-	@SubFilter() // make this IFilter a subfilter 
+	private ExtractionRuleState ruleState; 
+	private IFilter cdataSubfilter; 
 	private IFilter pcdataSubfilter;
 	private String currentId;
 	private boolean documentEncoding;
@@ -375,10 +372,10 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 	protected void startFilter() {
 		// order of execution matters
 		if (eventBuilder == null) {
-			eventBuilder = new AbstractMarkupEventBuilder(getParentId(), isSubFilter());
+			eventBuilder = new AbstractMarkupEventBuilder(getParentId(), isSubfilter());
 			eventBuilder.setMimeType(getMimeType());
 		} else {
-			eventBuilder.reset(getParentId(), isSubFilter());
+			eventBuilder.reset(getParentId(), isSubfilter());
 		}		
 
 		eventBuilder.addFilterEvent(createStartFilterEvent());		
