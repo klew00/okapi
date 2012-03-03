@@ -88,7 +88,7 @@ public class Node {
 			}
 		}
 		JSONObject cnt = (JSONObject)data.get(0);
-		String value = (String)cnt.get("value");
+		String value = (String)cnt.get("safe_value");
 		return value;
 	}
 
@@ -108,7 +108,7 @@ public class Node {
 			}
 		}
 		JSONObject cnt = (JSONObject)data.get(0);
-		String value = (String)cnt.get("value");
+		String value = (String)cnt.get("safe_value");
 		return value;
 	}
 
@@ -128,7 +128,7 @@ public class Node {
 			}
 		}
 		JSONObject cnt = (JSONObject)data.get(0);
-		String value = (String)cnt.get("summary");
+		String value = (String)cnt.get("safe_summary");
 		return value;
 	}
 
