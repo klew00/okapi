@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009-2010 by the Okapi Framework contributors
+  Copyright (C) 2009-2012 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -25,6 +25,8 @@ import net.sf.okapi.common.BaseParameters;
 public class Parameters extends BaseParameters {
 
 	private static final String LEVERAGE = "leverage";
+	private static final String NOQUERYTHRESHOLD = "noQueryThreshold";
+	private static final String THRESHOLD = "threshold";
 	private static final String FILLTARGET = "fillTarget";
 	private static final String FILLTARGETTHRESHOLD = "fillTargetThreshold";
 	private static final String FILLIFTARGETISEMPTY = "fillIfTargetIsEmpty";
@@ -40,6 +42,7 @@ public class Parameters extends BaseParameters {
 	
 	private String resourceClassName;
 	private String resourceParameters;
+	private int noQueryThreshold;
 	private int threshold;
 	private boolean fillTarget;
 	private int fillTargetThreshold;
@@ -97,6 +100,14 @@ public class Parameters extends BaseParameters {
 
 	public void setResourceParameters (String resourceParameters) {
 		this.resourceParameters = resourceParameters;
+	}
+
+	public int getNoQueryThreshold () {
+		return noQueryThreshold;
+	}
+
+	public void setNoQueryThreshold (int noQuerythreshold) {
+		this.noQueryThreshold = noQuerythreshold;
 	}
 
 	public int getThreshold () {
@@ -192,6 +203,7 @@ public class Parameters extends BaseParameters {
 		leverage = true;
 		resourceClassName = "net.sf.okapi.connectors.pensieve.PensieveTMConnector";
 		resourceParameters = null;
+		noQueryThreshold = 101;
 		threshold = 95;
 		fillTarget = true;
 		fillTargetThreshold = 95;
@@ -213,7 +225,8 @@ public class Parameters extends BaseParameters {
 		buffer.fromString(data);
 		resourceClassName = buffer.getString("resourceClassName", resourceClassName);
 		resourceParameters = buffer.getGroup("resourceParameters", resourceParameters);
-		threshold = buffer.getInteger("threshold", threshold);
+		noQueryThreshold = buffer.getInteger(NOQUERYTHRESHOLD, noQueryThreshold);
+		threshold = buffer.getInteger(THRESHOLD, threshold);
 		fillTarget = buffer.getBoolean(FILLTARGET, fillTarget);
 		fillTargetThreshold = buffer.getInteger(FILLTARGETTHRESHOLD, fillTargetThreshold);
 		fillIfTargetIsEmpty = buffer.getBoolean(FILLIFTARGETISEMPTY, fillIfTargetIsEmpty);
@@ -234,7 +247,8 @@ public class Parameters extends BaseParameters {
 		buffer.reset();
 		buffer.setString("resourceClassName", resourceClassName);
 		buffer.setGroup("resourceParameters", resourceParameters);
-		buffer.setInteger("threshold", threshold);
+		buffer.setInteger(NOQUERYTHRESHOLD, noQueryThreshold);
+		buffer.setInteger(THRESHOLD, threshold);
 		buffer.setBoolean(FILLTARGET, fillTarget);
 		buffer.setInteger(FILLTARGETTHRESHOLD, fillTargetThreshold);
 		buffer.setBoolean(FILLIFTARGETISEMPTY, fillIfTargetIsEmpty);

@@ -55,6 +55,7 @@ public class QueryManager {
 	private int exactBestMatches;
 	private int fuzzyBestMatches;
 	private String rootDir;
+	private int noQueryThreshold = 101;
 	// Options
 	private int thresholdToFill = Integer.MAX_VALUE;
 	private boolean keepIfNotEmpty = true; // == false for actual option
@@ -108,6 +109,7 @@ public class QueryManager {
 		// Add the resource
 		int id = addResource(connector, resourceName);
 		// Set the parameters and open 
+		connector.setNoQueryThreshold(noQueryThreshold);
 		connector.setRootDirectory(rootDir); // Before open()
 		connector.setParameters(params);
 		connector.open();
@@ -477,6 +479,19 @@ public class QueryManager {
 	}
 
 	/**
+	 * Sets the no-query threshold for this query manager.
+	 * and all the translation resources it holds.
+	 * @param noQueryThreshold the value of the no-query threshold (between 0 and 101).
+	 * Use 101 to always allow the query.
+	 */
+	public void setNoQueryThreshold (int noQueryThreshold) {
+		this.noQueryThreshold = noQueryThreshold;
+		for ( ResourceItem ri : resList.values() ) {
+			ri.query.setNoQueryThreshold(this.noQueryThreshold);
+		}
+	}
+	
+	/**
 	 * Sets the options for performing the leverage.
 	 * @param thresholdToFill if the first match has a score equal or above this value,
 	 * the target text of the match is placed in the target content. To avoid any filling of
@@ -514,18 +529,19 @@ public class QueryManager {
 	 * Leverages a text unit (segmented or not) based on the current settings.
 	 * Any options or attributes needed must be set before calling this method.
 	 * @param tu the text unit to leverage.
+	 * @see #setAttribute(String, String)
+	 * @see #setLanguages(LocaleId, LocaleId)
+	 * @see #setMaximumHits(int)
+	 * @see #setNoQueryThreshold(int)
 	 * @see #setOptions(int, boolean, boolean, boolean, String, int, boolean)
+	 * @see #setRootDirectory(String)
+	 * @see #setThreshold(int)
 	 */
-	public void leverage (ITextUnit tu)
-//		int thresholdToFill,
-//		boolean downgradeIdenticalBestMatches,
-//		String targetPrefix,
-//		int thresholdToPrefix)
-	{
+	public void leverage (ITextUnit tu) {
 		if ( !tu.isTranslatable() ) {
 			return;
-		} 
-
+		}
+		
 		totalSegments += tu.getSource().getSegments().count();
 		
 		// Query each translation resource

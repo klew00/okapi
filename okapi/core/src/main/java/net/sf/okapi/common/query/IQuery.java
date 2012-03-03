@@ -180,4 +180,19 @@ public interface IQuery {
 	 * @return the weight for this connector
 	 */
 	public int getWeight();
+	
+	/**
+	 * Sets the threshold for when to avoid executing a query.
+	 * <p>If the entry to leverage has already one candidate with a score equals or above this value,
+	 * no query is performed. Use 101 to always allow the query.
+	 * @param noQueryThreshold no-query threshold (a value between 0 and 101).
+	 */
+	public void setNoQueryThreshold (int noQueryThreshold);
+	
+	/**
+	 * Gets the threshold for when to avoid a query.
+	 * @return the current no-query threshold.
+	 */
+	public int getNoQueryThreshold ();
+
 }
