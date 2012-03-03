@@ -142,6 +142,7 @@ public class HtmlFilter extends AbstractMarkupFilter {
 			final Tag tag = (Tag) segment;
 			boolean inlineTag = false;
 			if (getConfig().getElementRuleType(tag.getName()) == RULE_TYPE.INLINE_ELEMENT
+					|| getConfig().getElementRuleType(tag.getName()) == RULE_TYPE.INLINE_ELEMENT
 					|| (getEventBuilder().isInsideTextRun() && (tag
 							.getTagType() == StartTagType.COMMENT || tag
 							.getTagType() == StartTagType.XML_PROCESSING_INSTRUCTION)))
@@ -163,6 +164,7 @@ public class HtmlFilter extends AbstractMarkupFilter {
 		RuleType currentState = null;
 
 		switch (ruleType) {
+		case INLINE_EXCLUDED_ELEMENT:
 		case INLINE_ELEMENT:
 			try {
 				currentState = getRuleState().popInlineRule();
