@@ -213,12 +213,12 @@ public class DrupalFilterWriter implements IFilterWriter {
 		boolean neutralLikeSource = ann.getProject().getNeutralLikeSource();
 		
 		// Update the fields
-		node.setTitle(trgLoc.getLanguage(), outFields.get("title"), neutralLikeSource);
-		node.setBody(trgLoc.getLanguage(), outFields.get("body"), outFields.get("summary"), neutralLikeSource);
+		node.setTitle(trgLoc.getLanguage(), (outFields.get("title") == null) ? null : outFields.get("title").replaceAll("<p[^>]*>", "").replace("</p>", "\r\n"), neutralLikeSource);
+		node.setBody(trgLoc.getLanguage(), (outFields.get("body") == null) ? null : outFields.get("body").replaceAll("<p[^>]*>", "").replace("</p>", "\r\n"), (outFields.get("summary") == null) ? null : outFields.get("summary").replaceAll("<p[^>]*>", "").replace("</p>", "\r\n"), neutralLikeSource);
 
 		// Push the updated field
 		cli.updateNode(node);
-
+		
 		return event;
 	}
 	
