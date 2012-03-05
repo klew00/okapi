@@ -65,6 +65,7 @@ import net.sf.okapi.filters.abstractmarkup.AbstractMarkupFilter;
  * attached to both elements and attributes. More than one conditional rules are evaluated as OR expressions. For
  * example, "type=button" OR "type=default".
  */
+@SuppressWarnings({ "unchecked", "rawtypes" })
 public class TaggedFilterConfiguration {
 	public static final String RULETYPES = "ruleTypes";
 	public static final String GLOBAL_PRESERVE_WHITESPACE = "preserve_whitespace";
@@ -125,6 +126,11 @@ public class TaggedFilterConfiguration {
 		 * conditional rule. Treat as a standalone inline code
 		 */
 		INLINE_EXCLUDED_ELEMENT,
+		/**
+		 * Tag that exists inside a text run, i.e., bold, underline etc.. but has been included based on another
+		 * conditional rule. Treat as a standalone inline code
+		 */
+		INLINE_INCLUDED_ELEMENT,
 		/**
 		 * Marks the beginning of an excluded block - all content in this block will be filtered as {@link DocumentPart}
 		 * s
@@ -286,7 +292,6 @@ public class TaggedFilterConfiguration {
 		return false;
 	}
 
-	@SuppressWarnings("unchecked")
 	public boolean isRuleType(String ruleName, RULE_TYPE ruleType) {
 		List<Map> rules = configReader.getRules(ruleName.toLowerCase());
 		for (Map rule : rules) {
@@ -299,8 +304,20 @@ public class TaggedFilterConfiguration {
 		}
 		return false;
 	}
+	
+	public boolean hasDefinedInlineRule(String ruleName) {
+		Map rule = configReader.getNonRegexElementRule(ruleName);
+		if (rule == null) {
+			return false;
+		}
+		
+		List<String> ruleTypes = (List<String>) rule.get("ruleTypes");
+		if (isRuleType(ruleName, RULE_TYPE.INLINE_ELEMENT, ruleTypes)) {
+			return true;
+		}
+		return false;
+	}
 
-	@SuppressWarnings("unchecked")
 	public String getElementType(Tag element) {
 		if (element.getTagType() == StartTagType.COMMENT) {
 			return Code.TYPE_COMMENT;
@@ -343,7 +360,6 @@ public class TaggedFilterConfiguration {
 				getAttributeRuleType(attribute.toLowerCase()));
 	}
 
-	@SuppressWarnings({ "unchecked" })
 	private RULE_TYPE findMatchingAttributeRuleOnElementRule(String tag,
 			Map<String, String> attributes, String attribute) {
 
@@ -433,7 +449,6 @@ public class TaggedFilterConfiguration {
 		return type;
 	}
 
-	@SuppressWarnings({ "unchecked" })
 	public RULE_TYPE getAttributeRuleType(String attribute) {
 		Map rule = configReader.getAttributeRule(attribute.toLowerCase());
 		if (rule != null) {
@@ -458,7 +473,6 @@ public class TaggedFilterConfiguration {
 	 * @param elementName
 	 * @return
 	 */
-	@SuppressWarnings("unchecked")
 	private RULE_TYPE findMatchingElementOnAttributeRule(String tag, String attribute,
 			Map<String, String> attributes, RULE_TYPE ruleType) {
 		List excludedElements;
@@ -507,21 +521,16 @@ public class TaggedFilterConfiguration {
 	}
 
 	public RULE_TYPE getConditionalElementRuleType(String tag, Map<String, String> attributes) {
-		RULE_TYPE type = getElementRuleType(tag.toLowerCase());
-		if (type != RULE_TYPE.RULE_NOT_FOUND) {
-			
-			// handle case where a regex rule may override the normal rule
+		RULE_TYPE type = getElementRuleTypeCandidate(tag.toLowerCase());
+		
+		if (type != RULE_TYPE.RULE_NOT_FOUND) {		
 			if (type == RULE_TYPE.INLINE_EXCLUDED_ELEMENT) {
-				if (doesElementRuleConditionApply(configReader.getElementRule(tag), attributes) &&
-						doesElementRuleConditionApply(configReader.getRegexElementRule(tag), attributes)) {
-					return RULE_TYPE.INLINE_EXCLUDED_ELEMENT;
-				} else if (doesElementRuleConditionApply(configReader.getElementRule(tag), attributes)) {
-					return RULE_TYPE.INLINE_ELEMENT;
+				if (doesElementRuleConditionApply(configReader.getRegexElementRule(tag), attributes)) {
+					return type;
 				} else {
-					return RULE_TYPE.RULE_FAILED;
+					return RULE_TYPE.INLINE_ELEMENT;
 				}
 			}
-			
 			if (doesElementRuleConditionApply(configReader.getElementRule(tag), attributes)) {
 				return type;
 			} else {
@@ -531,8 +540,7 @@ public class TaggedFilterConfiguration {
 		return type;
 	}
 
-	@SuppressWarnings({ "unchecked" })
-	public RULE_TYPE getElementRuleType(String tag) {
+	public RULE_TYPE getElementRuleTypeCandidate(String tag) {
 		Map rule = configReader.getElementRule(tag.toLowerCase());
 		if (rule != null) {
 			List<String> ruleTypes = (List<String>) rule.get("ruleTypes");
@@ -638,7 +646,6 @@ public class TaggedFilterConfiguration {
 		}
 	}
 
-	@SuppressWarnings({ "unchecked" })
 	private boolean applyConditions(List condition, Map<String, String> attributes) {
 		String conditionalAttribute = null;
 		conditionalAttribute = (String) condition.get(0);
@@ -709,7 +716,6 @@ public class TaggedFilterConfiguration {
 		}
 	}
 
-	@SuppressWarnings({ "unchecked" })
 	private boolean doesElementRuleConditionApply(Map elementRule, Map<String, String> attributes) {
 		List conditions = (List) elementRule.get(CONDITIONS);
 		if (conditions != null) {
@@ -719,9 +725,11 @@ public class TaggedFilterConfiguration {
 		return true;
 	}
 
-	@SuppressWarnings("unchecked")
 	private boolean doesAttributeRuleConditionApply(Map attributeRule,
 			Map<String, String> attributes) {
+		if (attributeRule == null) {
+			return false;
+		}
 		List conditions = (List) attributeRule.get(CONDITIONS);
 		if (conditions != null) {
 			return applyConditions(conditions, attributes);
@@ -730,7 +738,6 @@ public class TaggedFilterConfiguration {
 		return true;
 	}
 
-	@SuppressWarnings("unchecked")
 	public boolean isPreserveWhitespaceCondition(String attribute, Map<String, String> attributes) {
 		Map attributeRule = configReader.getAttributeRule(attribute);
 		if (doesAttributeRuleConditionApply(attributeRule, attributes)) {
@@ -742,7 +749,6 @@ public class TaggedFilterConfiguration {
 		return false;
 	}
 
-	@SuppressWarnings("unchecked")
 	public boolean isDefaultWhitespaceCondition(String attribute, Map<String, String> attributes) {
 		Map attributeRule = configReader.getAttributeRule(attribute);
 		if (doesAttributeRuleConditionApply(attributeRule, attributes)) {

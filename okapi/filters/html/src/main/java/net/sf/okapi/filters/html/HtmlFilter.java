@@ -141,8 +141,8 @@ public class HtmlFilter extends AbstractMarkupFilter {
 			// We just hit a tag that could close the current TextUnit
 			final Tag tag = (Tag) segment;
 			boolean inlineTag = false;
-			if (getConfig().getElementRuleType(tag.getName()) == RULE_TYPE.INLINE_ELEMENT
-					|| getConfig().getElementRuleType(tag.getName()) == RULE_TYPE.INLINE_ELEMENT
+			if (getConfig().getElementRuleTypeCandidate(tag.getName()) == RULE_TYPE.INLINE_ELEMENT
+					|| getConfig().getElementRuleTypeCandidate(tag.getName()) == RULE_TYPE.INLINE_EXCLUDED_ELEMENT
 					|| (getEventBuilder().isInsideTextRun() && (tag
 							.getTagType() == StartTagType.COMMENT || tag
 							.getTagType() == StartTagType.XML_PROCESSING_INSTRUCTION)))
@@ -160,7 +160,7 @@ public class HtmlFilter extends AbstractMarkupFilter {
 	 * Overridden to support non-wellformed (unbalanced tag exceptions in HTML)
 	 */
 	protected RULE_TYPE updateEndTagRuleState(EndTag endTag) {
-		RULE_TYPE ruleType = getConfig().getElementRuleType(endTag.getName());
+		RULE_TYPE ruleType = getConfig().getElementRuleTypeCandidate(endTag.getName());
 		RuleType currentState = null;
 
 		switch (ruleType) {
@@ -168,7 +168,7 @@ public class HtmlFilter extends AbstractMarkupFilter {
 		case INLINE_ELEMENT:
 			try {
 				currentState = getRuleState().popInlineRule();
-				ruleType = currentState.ruleType;
+				ruleType = currentState.ruleType;				
 			} catch (EmptyStackException e) {
 				// empty stack means the inline tags are not wellformed.
 				// assume the tag is a valid inline tag - even if
@@ -213,7 +213,7 @@ public class HtmlFilter extends AbstractMarkupFilter {
 			// if the end tag doesn't match with what is on the stack then
 			// assume the default (non-conditional) rule
 			if (!currentState.ruleName.equalsIgnoreCase(endTag.getName())) {
-				ruleType = getConfig().getElementRuleType(endTag.getName());
+				ruleType = getConfig().getElementRuleTypeCandidate(endTag.getName());
 
 				String character = Integer.toString(endTag.getBegin());
 				LOGGER.log(Level.FINE, "End tag " + endTag.getName()

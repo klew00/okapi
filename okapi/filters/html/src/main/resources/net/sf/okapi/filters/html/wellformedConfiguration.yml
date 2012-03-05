@@ -376,7 +376,7 @@ elements:
   
   # Excluded elements
   '.*':
-    ruleTypes: [EXCLUDE, INLINE]
+    ruleTypes: [EXCLUDE]
     conditions: [translate, EQUALS, 'no']
     
   style:

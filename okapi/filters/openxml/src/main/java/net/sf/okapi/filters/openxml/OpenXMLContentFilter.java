@@ -959,7 +959,7 @@ public class OpenXMLContentFilter extends AbstractMarkupFilter {
 		if (getRuleState().isExludedState()) {
 			addToDocumentPart(sTagString);
 			// process these tag types to update parser state
-			switch (getConfig().getElementRuleType(sTagName)) {
+			switch (getConfig().getElementRuleTypeCandidate(sTagName)) {
 			  // DWH 1-23-09
 			case EXCLUDED_ELEMENT:
 				getRuleState().pushExcludedRule(sTagName);
@@ -973,7 +973,7 @@ public class OpenXMLContentFilter extends AbstractMarkupFilter {
 			}
 			return;
 		}
-		switch (getConfig().getElementRuleType(sTagName)) {
+		switch (getConfig().getElementRuleTypeCandidate(sTagName)) {
 		  // DWH 1-23-09
 		case INLINE_ELEMENT:
 			if (canStartNewTextUnit()) {
@@ -1224,7 +1224,7 @@ public class OpenXMLContentFilter extends AbstractMarkupFilter {
 		if (getRuleState().isExludedState()) {
 			addToDocumentPart(sTagString); // DWH 7-16-09
 			// process these tag types to update parser state
-			switch (getConfig().getElementRuleType(sTagName)) {
+			switch (getConfig().getElementRuleTypeCandidate(sTagName)) {
 			  // DWH 1-23-09
 			case EXCLUDED_ELEMENT:
 				getRuleState().popExcludedIncludedRule();
@@ -1239,7 +1239,7 @@ public class OpenXMLContentFilter extends AbstractMarkupFilter {
 
 			return;
 		}
-		if (bInTextBox && getConfig().getElementRuleType(sTagName)!=RULE_TYPE.GROUP_ELEMENT)
+		if (bInTextBox && getConfig().getElementRuleTypeCandidate(sTagName)!=RULE_TYPE.GROUP_ELEMENT)
 		{
 			if (sTagName.equals("w:txbxcontent")) // DWH 10-22-09 so this won't be an inline code
 				sEndTxbxContent = sTagString;
@@ -1254,7 +1254,7 @@ public class OpenXMLContentFilter extends AbstractMarkupFilter {
 				bInPowerpointEndPara = false;
 			return;
 		}
-		switch (getConfig().getElementRuleType(sTagName)) {
+		switch (getConfig().getElementRuleTypeCandidate(sTagName)) {
 		  // DWH 1-23-09
 		case INLINE_ELEMENT:
 			if (canStartNewTextUnit())
