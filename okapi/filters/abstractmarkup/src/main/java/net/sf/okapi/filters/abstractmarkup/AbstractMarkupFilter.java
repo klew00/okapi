@@ -769,8 +769,8 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 	}
 
 	protected void updateStartTagRuleState(String tag, RULE_TYPE ruleType, String idValue) {
-		RULE_TYPE r = getConfig().getElementRuleTypeCandidate(tag);
-		switch (r) {	
+		//RULE_TYPE r = getConfig().getElementRuleTypeCandidate(tag);
+		switch (ruleType) {	
 		case INLINE_EXCLUDED_ELEMENT:
 		case INLINE_ELEMENT:
 			ruleState.pushInlineRule(tag, ruleType);

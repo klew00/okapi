@@ -185,8 +185,12 @@ public class HtmlFilter extends AbstractMarkupFilter {
 			break;
 		case EXCLUDED_ELEMENT:
 			// must be wellformed - don't check for EmptyStackException
-			currentState = getRuleState().popExcludedIncludedRule();
-			ruleType = currentState.ruleType;
+			try {
+				currentState = getRuleState().popExcludedIncludedRule();
+				ruleType = currentState.ruleType;
+			} catch (EmptyStackException e) {
+				
+			}
 			break;
 		case INCLUDED_ELEMENT:
 			// must be wellformed - don't check for EmptyStackException

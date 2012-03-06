@@ -521,17 +521,28 @@ public class TaggedFilterConfiguration {
 	}
 
 	public RULE_TYPE getConditionalElementRuleType(String tag, Map<String, String> attributes) {
-		RULE_TYPE type = getElementRuleTypeCandidate(tag.toLowerCase());
+		RULE_TYPE type = getElementRuleTypeCandidate(tag.toLowerCase());		
 		
 		if (type != RULE_TYPE.RULE_NOT_FOUND) {		
+			if (attributes.isEmpty() && 
+					configReader.getElementRule(tag.toLowerCase()).get(CONDITIONS) != null)  {
+				return RULE_TYPE.RULE_NOT_FOUND;
+			}
+			
 			if (type == RULE_TYPE.INLINE_EXCLUDED_ELEMENT) {
-				if (doesElementRuleConditionApply(configReader.getRegexElementRule(tag), attributes)) {
+				if (doesElementRuleConditionApply(configReader.getRegexElementRule(tag.toLowerCase()), attributes)) {
 					return type;
 				} else {
 					return RULE_TYPE.INLINE_ELEMENT;
 				}
 			}
-			if (doesElementRuleConditionApply(configReader.getElementRule(tag), attributes)) {
+			
+			if (attributes.isEmpty() && 
+					configReader.getElementRule(tag.toLowerCase()).get(CONDITIONS) == null)  {
+				return type;
+			}
+			
+			if (doesElementRuleConditionApply(configReader.getElementRule(tag.toLowerCase()), attributes)) {
 				return type;
 			} else {
 				return RULE_TYPE.RULE_FAILED;
@@ -652,9 +663,9 @@ public class TaggedFilterConfiguration {
 
 		// we didn't find the conditional test attribute - we assume no
 		// extraction
-//		if (attributes.get(conditionalAttribute.toLowerCase()) == null) {
-//			return false;
-//		}
+		if (attributes.get(conditionalAttribute.toLowerCase()) == null) {
+			return false;
+		}
 
 		// '=', '!=' or regex
 		String compareType = (String) condition.get(1);
