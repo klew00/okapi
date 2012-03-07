@@ -20,7 +20,10 @@
 
 package net.sf.okapi.filters.drupal;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
+
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.LocaleId;
@@ -33,6 +36,39 @@ import net.sf.okapi.common.resource.TextContainer;
 public class Manual {
 
 	public static void main (String[] args) {
+		//testFilter();
+		testConnector();
+	}
+	
+	private static  void testConnector () {
+		String root = TestUtil.getParentDir(Manual.class, "/test.drp");
+		File file = new File(root+"/test.drp");
+		Project prj = new Project();
+		DrupalConnector cli = null;
+		try {
+			prj.read(new BufferedReader(new FileReader(file)), LocaleId.ENGLISH, LocaleId.FRENCH);
+			cli = new DrupalConnector(prj.getHost());
+			cli.setCredentials(prj.getUser(), prj.getPassword());
+			cli.login();
+			
+			Node node = cli.getNode("10", prj.getSourceLocale().toString(), false);
+			
+			boolean hasTarget = node.hasLanguageForBody(prj.getTargetLocale().toString());
+			
+			node.setTitle(prj.getTargetLocale().toString(), "New title text");
+			cli.updateNode(node);
+		}
+		catch (Throwable e ) {
+			e.printStackTrace();
+		}
+		finally {
+			if ( cli != null ) {
+				cli.logout();
+			}
+		}
+	}
+	
+	private static void testFilter () {
 		LocaleId locEN = LocaleId.ENGLISH;
 		DrupalFilter filter = null;
 		boolean merge = true;

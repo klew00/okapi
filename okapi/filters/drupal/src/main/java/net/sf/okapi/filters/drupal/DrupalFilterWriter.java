@@ -201,7 +201,7 @@ public class DrupalFilterWriter implements IFilterWriter {
 		// Get the node from the server
 		Node node;
 		try {
-			node = cli.getNode(nid);
+			node = cli.getNode(nid, ann.getProject().getSourceLocale().toString(), ann.getProject().getNeutralLikeSource());
 		}
 		catch ( Throwable e ) {
 			logger.warning(String.format("Could not find node %s in server when trying to merge.", nid));
@@ -211,15 +211,33 @@ public class DrupalFilterWriter implements IFilterWriter {
 		}
 		
 		boolean neutralLikeSource = ann.getProject().getNeutralLikeSource();
+		String trgLang = trgLoc.getLanguage(); 
+		
+		// Detect if we have a field for the given target language
+		//TODO
+		boolean trgBodyExists = node.hasLanguageForBody(trgLang);
+		boolean trgTitleExists = node.hasLanguageForTitle(trgLang);
 		
 		// Update the fields
-		node.setTitle(trgLoc.getLanguage(), (outFields.get("title") == null) ? null : outFields.get("title").replaceAll("<p[^>]*>", "").replace("</p>", "\r\n"), neutralLikeSource);
-		node.setBody(trgLoc.getLanguage(), (outFields.get("body") == null) ? null : outFields.get("body").replaceAll("<p[^>]*>", "").replace("</p>", "\r\n"), (outFields.get("summary") == null) ? null : outFields.get("summary").replaceAll("<p[^>]*>", "").replace("</p>", "\r\n"), neutralLikeSource);
+		node.setTitle(trgLang,
+			convertToValueHTML(outFields.get("title")),
+			neutralLikeSource);
+		
+		node.setBody(trgLang,
+			convertToValueHTML(outFields.get("body")),
+			convertToValueHTML(outFields.get("summary")),
+			neutralLikeSource);
 
 		// Push the updated field
 		cli.updateNode(node);
 		
 		return event;
+	}
+	
+	private String convertToValueHTML (String content) {
+		if ( content == null ) return null;
+		// For now, just replace the paragraph elements by a line break
+		return content.replaceAll("<p[^>]*>", "").replace("</p>", "\r\n"); 
 	}
 	
 	/**

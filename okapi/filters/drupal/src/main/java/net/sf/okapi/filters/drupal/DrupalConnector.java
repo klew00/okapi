@@ -176,7 +176,9 @@ public class DrupalConnector {
 		}
 	}
 	
-	public Node getNode (String nodeId)
+	public Node getNode (String nodeId,
+		String srcLang,
+		boolean neutralLikeSource)
 	{
 		try {
 			URL url = new URL(host + String.format("rest/node/%s", nodeId));
@@ -194,7 +196,7 @@ public class DrupalConnector {
 			
 			conn.disconnect();
 			
-		    return new Node(node);
+		    return new Node(node, srcLang, neutralLikeSource);
 		}
 		catch ( Throwable e ) {
 			throw new RuntimeException("Error in getNode(): "+e.getMessage(), e);
@@ -317,7 +319,10 @@ public class DrupalConnector {
 	 * @return
 	 * @throws IOException
 	 */
-	private HttpURLConnection createConnection (URL url, String method, boolean setDoOutput) throws IOException
+	private HttpURLConnection createConnection (URL url,
+		String method,
+		boolean setDoOutput)
+		throws IOException
 	{
 			HttpURLConnection conn = null;
 			conn = (HttpURLConnection)url.openConnection();
