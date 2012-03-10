@@ -68,6 +68,7 @@ import net.sf.okapi.lib.persistence.VersionMapper;
 import net.sf.okapi.lib.persistence.beans.TypeInfoBean;
 import net.sf.okapi.steps.formatconversion.TableFilterWriter;
 import net.sf.okapi.steps.repetitionanalysis.RepetitiveSegmentAnnotation;
+import net.sf.okapi.steps.repetitionanalysis.SegmentInfo;
 import net.sf.okapi.steps.tokenization.common.InputTokenAnnotation;
 import net.sf.okapi.steps.tokenization.common.Lexem;
 import net.sf.okapi.steps.tokenization.common.Token;
@@ -99,6 +100,7 @@ public class OkapiBeans implements IVersionDriver {
 		beanMapper.registerBean(MultiEvent.class, MultiEventBean.class);
 		beanMapper.registerBean(TextPart.class, TextPartBean.class);
 		beanMapper.registerBean(Segment.class, SegmentBean.class);
+		beanMapper.registerBean(SegmentInfo.class, SegmentInfoBean.class);
 		beanMapper.registerBean(Range.class, RangeBean.class);
 		beanMapper.registerBean(BaseNameable.class, BaseNameableBean.class);
 		beanMapper.registerBean(BaseReferenceable.class, BaseReferenceableBean.class);

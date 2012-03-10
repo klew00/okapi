@@ -21,6 +21,7 @@
 package net.sf.okapi.lib.segmentation;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
@@ -43,21 +44,23 @@ public class SRXSegmenter implements ISegmenter {
 	private boolean includeEndCodes;
 	private boolean includeIsolatedCodes;
 	private LocaleId currentLanguageCode;
-	private boolean oneSegmentIncludesAll;
-	private boolean trimLeadingWS;
-	private boolean trimTrailingWS;
-	private boolean trimCodes;
+	private boolean oneSegmentIncludesAll; // Extension
+	private boolean trimLeadingWS; // Extension
+	private boolean trimTrailingWS; // Extension
+	private boolean trimCodes; // Extension
 	private ArrayList<CompiledRule> rules;
-	private Pattern maskRule;
+	private Pattern maskRule; // Extension
 	private TreeMap<Integer, Boolean> splits;
 	private List<Integer> finalSplits;
 	private ArrayList<Integer> starts;
 	private ArrayList<Integer> ends;
+	private ICURegex icuRegex;
 
 	/**
 	 * Creates a new SRXSegmenter object.
 	 */
 	public SRXSegmenter () {
+		icuRegex = new ICURegex();
 		reset();
 	}
 
@@ -79,6 +82,7 @@ public class SRXSegmenter implements ISegmenter {
 		trimLeadingWS = false; // Extension IN TEST (was true for StringInfo)
 		trimTrailingWS = false; // Extension IN TEST (was true for StringInfo)
 		trimCodes = false; // Extension IN TEST (was false for StringInfo) NOT USED for now
+		icuRegex.reset();
 	}
 
 	/**
@@ -205,19 +209,28 @@ public class SRXSegmenter implements ISegmenter {
 		// Build the list of split positions
 		// Get the coded text for the whole content
 		String codedText = container.getCodedText();
+		icuRegex.processText(codedText, rules);
+
 		splits = new TreeMap<Integer, Boolean>();
 		Matcher m;
 		for ( CompiledRule rule : rules ) {
+			
 			m = rule.pattern.matcher(codedText);
 			while ( m.find() ) {
 				int n = m.start()+m.group(1).length();
-				if ( n >= codedText.length() ) continue; // Match the end
+				if ( n >= codedText.length() ) continue; // Match the end m.group() m.end() String.format("%4X", (int) codedText.charAt(1))
+				
 				// Already a match: Per SRX algorithm, we use the first one only
+				// see http://www.gala-global.org/oscarStandards/srx/srx20.html#Struct_classdefinitions
 				if ( splits.containsKey(n) ) continue;
+				if (!icuRegex.verifyPos(n, rule, m)) continue;
+				
 				// Else add a split marker
 				splits.put(n, rule.isBreak);
 			}
 		}
+		
+		codedText = container.getCodedText(); // restore codedText after word breaks
 		
 		// Set the additional split positions for mask-rules
 		if ( maskRule != null ) {
@@ -431,7 +444,7 @@ return null;
 		if ( finalSplits == null ) {
 			finalSplits = new ArrayList<Integer>();
 		}
-		return finalSplits;
+		return Collections.unmodifiableList(finalSplits);
 	}
 
 	@Override
@@ -441,7 +454,7 @@ return null;
 		for ( int i=0; i<starts.size(); i++ ) {
 			list.add(new Range(starts.get(i), ends.get(i)));
 		}
-		return list;
+		return Collections.unmodifiableList(list);
 	}
 	
 	@Override
@@ -455,6 +468,7 @@ return null;
 	 */
 	protected void setLanguage (LocaleId languageCode) {
 		currentLanguageCode = languageCode;
+		icuRegex.setLanguage(languageCode);
 	}
 	
 	/**
@@ -483,6 +497,10 @@ return null;
 			maskRule = Pattern.compile(pattern);
 		else
 			maskRule = null;
+	}
+
+	public ICURegex getICURegex() {
+		return icuRegex;
 	}
 
 }

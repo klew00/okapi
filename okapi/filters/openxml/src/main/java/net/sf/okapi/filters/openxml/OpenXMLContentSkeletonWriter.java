@@ -317,4 +317,18 @@ public class OpenXMLContentSkeletonWriter extends GenericSkeletonWriter {
 		nContentDepth--;
 		return result;
 	}
+	
+//	// SV 2-27-1012
+//	@Override
+//	protected String expandCodeContent(Code code, LocaleId locToUse, int context) {
+//		String text = super.expandCodeContent(code, locToUse, context);
+//		if (configurationType != MSWORD) return text;
+//		
+//		boolean bHasBlankInText = ((text.indexOf(' ')>-1) || 
+//				(text.indexOf('\u00A0')>-1));
+//		String sPreserve = bHasBlankInText ? " xml:space=\"preserve\"" : "";
+//		text = "<w:r><w:t"+sPreserve+">" + text + "</w:t></w:r>";
+//		
+//		return text;
+//	}
 }

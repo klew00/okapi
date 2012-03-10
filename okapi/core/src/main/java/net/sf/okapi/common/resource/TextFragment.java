@@ -22,9 +22,13 @@ package net.sf.okapi.common.resource;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import net.sf.okapi.common.filters.PropertyTextUnitPlaceholder.PlaceholderAccessType;
 
 /**
  * Implements the methods for creating and manipulating a pre-parsed
@@ -95,7 +99,7 @@ public class TextFragment implements Appendable, CharSequence, Comparable<Object
 	/*
 	 * Compiled regex for all TextFragment markers
 	 */
-	private static final Pattern MARKERS_REGEX = Pattern.compile("[\uE101\uE102\uE103\uE104].");
+	public static final Pattern MARKERS_REGEX = Pattern.compile("[\uE101\uE102\uE103\uE104].");
 
 	/*
 	 * Typical whitespace space (U+0020) tab (U+0009) form feed (U+000C) line feed
@@ -656,8 +660,19 @@ public class TextFragment implements Appendable, CharSequence, Comparable<Object
 	 * @throws InvalidPositionException when offset points inside a marker.
 	 */
 	public void insert (int offset,
-		TextFragment fragment)
-	{
+		TextFragment fragment) {
+		insert(offset, fragment, false);
+	}
+	
+	/**
+	 * Inserts a TextFragment object to this fragment.
+	 * @param offset position in the coded text where to insert the new fragment.
+	 * You can use -1 to append at the end of the current content.
+	 * @param fragment the TextFragment to insert.
+	 * @param keepCodeIds true to not change Ids of the codes of the inserted TextFragment. 
+	 */
+	public void insert (int offset,
+			TextFragment fragment, boolean keepCodeIds) {
 		if ( fragment == null ) return;
 		checkPositionForMarker(offset);
 		StringBuilder tmp = new StringBuilder(fragment.getCodedText());
@@ -672,8 +687,8 @@ public class TextFragment implements Appendable, CharSequence, Comparable<Object
 			case MARKER_OPENING:
 			case MARKER_CLOSING:
 			case MARKER_ISOLATED:
-				Code c = newCodes.get(toIndex(tmp.charAt(++i))).clone();
-				if (( c.getTagType() != TagType.CLOSING ) && ( c.getId() <= lastCodeID )) {
+				Code c = newCodes.get(toIndex(tmp.charAt(++i))).clone();				
+				if ( !keepCodeIds && (c.getTagType() != TagType.CLOSING ) && ( c.getId() <= lastCodeID )) {
 					c.setId(++lastCodeID);
 					// Closing codes will be handled when re-balancing
 				}
@@ -1273,6 +1288,9 @@ public class TextFragment implements Appendable, CharSequence, Comparable<Object
 		}
 		// Insert the new marker into the coded text
 		text.insert(start, marker);
+		if (code.data.toString().contains(TextFragment.REFMARKER_START)) {
+			code.setReferenceFlag(true);
+		}
 		// Add the new code
 		codes.add(code);
 		isBalanced = false;
@@ -1522,15 +1540,44 @@ public class TextFragment implements Appendable, CharSequence, Comparable<Object
 	/**
 	 * Renumbers the IDs of the codes in the fragment.
 	 */
-	public void renumberCodes () {
-		lastCodeID = 0;
+	public void renumberCodes () {		
 		if ( codes == null ) return;
-		for ( Code code : codes ) {
-			if ( code.tagType != TagType.CLOSING ) code.id = ++lastCodeID;
+//		for ( Code code : codes ) {
+//			if ( code.tagType != TagType.CLOSING ) code.id = ++lastCodeID;
+//		}
+//		// go ahead and balance as we usually 
+//		//want full id assignment at this point
+//		balanceMarkers();
+		Map<Integer, Integer> lookup = new HashMap<Integer, Integer>();
+		int curId = 1;
+		
+		for (int i = 0; i < text.length(); i++) {
+			char ch = text.charAt(i);
+			if (isMarker(ch)) {
+				Code code = codes.get(toIndex(text.charAt(++i)));
+				
+				switch (code.tagType) {
+				case OPENING:					
+					if (code.id != curId) {
+						lookup.put(code.id, curId); // store for the closing code with same id
+						code.id = curId;						
+					}
+					lastCodeID = curId++;
+					break;
+					
+				case CLOSING:
+					if (lookup.containsKey(code.id)) {
+						code.id = lookup.get(code.id); // set the stored id of the opening code
+					}
+					break;
+					
+				case PLACEHOLDER:
+					code.id = curId;
+					lastCodeID = curId++; 
+					break;
+				}
+			}
 		}
-		// go ahead and balance as we usually 
-		//want full id assignment at this point
-		balanceMarkers();
 	}
 	
 	/**

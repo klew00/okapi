@@ -228,11 +228,15 @@ public class TextUnitUtil {
 		// If needed, check for missing codes in new fragment
 		if ( oriCodes.size() > done ) {
 			// Any index > -1 in source means it was was deleted in target
+			TextFragment leadingCodes = new TextFragment();
 			for ( int i=0; i<oriIndices.length; i++ ) {
 				if ( oriIndices[i] != -1 ) {
 					Code code = oriCodes.get(oriIndices[i]);
 					if ( addMissingCodes ) {
-						newTrg.append(code.clone());
+						if (isLeadingCode(code, oriSrc))
+							leadingCodes.append(code.clone());
+						else
+							newTrg.append(code.clone());
 					}
 //					else {
 //						if ( !code.isDeleteable() ) {
@@ -248,8 +252,25 @@ public class TextUnitUtil {
 //					}
 				}
 			}
+			if ( addMissingCodes ) {
+				newTrg.insert(0, leadingCodes, true);
+			}
 		}
 		return newTrg;
+	}
+
+	private static boolean isLeadingCode(Code code, TextFragment oriSrc) {		
+		int index = oriSrc.getCodes().indexOf(code);
+		if (index == -1) return false;
+		
+		String ctext = oriSrc.getCodedText();
+		int pos = ctext.indexOf(String.valueOf(TextFragment.toChar(index)), 0);
+		if (pos == -1) return false;
+		
+		// Remove all codes from the beginning of the string before the pos and see if any text remains
+		String substr = ctext.substring(0, pos - 1);
+		substr = TextFragment.MARKERS_REGEX.matcher(substr).replaceAll("");
+		return substr.trim().length() == 0;
 	}
 
 	/**
@@ -1853,4 +1874,45 @@ public class TextUnitUtil {
 		return tmp.toString();
 	}
 
+	public static boolean isApproved(ITextUnit tu, LocaleId targetLocale) {
+		if ( !tu.isTranslatable() ) return false;
+		
+		Property prop = tu.getTargetProperty(targetLocale, Property.APPROVED);
+    	if ( prop != null ) {
+    		if ( "yes".equals(prop.getValue()) ) return true;
+    	}
+		
+    	return false;
+	}
+	
+	/**
+	 * Convert all TextParts (not Segments) in a given TextContainer to each contain 
+	 * a single code with the part's text. Needed to protect the text of 
+	 * text part (e.g. created from original codes) against being escaped by 
+	 * an encoder.
+	 * @param tc the given TextContainer
+	 */
+	public static void convertTextParts(TextContainer tc) {
+		for (TextPart textPart : tc) {
+			convertTextPart(textPart);
+		}
+	}
+	
+	/**
+	 * Create a single code with a given TextPart's text.
+	 * Needed to protect the text of the text part from being escaped by 
+	 * an encoder. If the TextPart already has codes, no conversion
+	 * is performed.
+	 * @param textPart the given TextPart
+	 */
+	public static void convertTextPart(TextPart textPart) {
+		if (!textPart.isSegment()) {
+			TextFragment tf = textPart.getContent();
+			if (tf.hasCode()) return;
+			
+			// Move the whole text of text part to a single code
+			tf.changeToCode(0, tf.getCodedText().length(), 
+					TagType.PLACEHOLDER, null);
+		}
+	}
 }

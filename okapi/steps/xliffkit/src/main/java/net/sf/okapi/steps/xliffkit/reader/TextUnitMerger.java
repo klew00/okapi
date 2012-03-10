@@ -29,9 +29,11 @@ import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.MimeTypeMapper;
 import net.sf.okapi.common.Range;
+import net.sf.okapi.common.annotation.IAnnotation;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.Property;
+import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextContainer;
 
 public class TextUnitMerger {
@@ -87,15 +89,16 @@ public class TextUnitMerger {
 			return; // Use the source
 		}
 
-		// Do we need to preserve the segmentation for merging (e.g. TTX case)
-		boolean mergeAsSegments = false;
-		if ( tu.getMimeType() != null ) { 
-			if ( tu.getMimeType().equals(MimeTypeMapper.TTX_MIME_TYPE)
-				|| tu.getMimeType().equals(MimeTypeMapper.XLIFF_MIME_TYPE) ) {
-				mergeAsSegments = true;
-			}
-		}
-		
+//		// Do we need to preserve the segmentation for merging (e.g. TTX case)
+//		boolean mergeAsSegments = false;
+//		if ( tu.getMimeType() != null ) { 
+//			if ( tu.getMimeType().equals(MimeTypeMapper.TTX_MIME_TYPE)
+//				|| tu.getMimeType().equals(MimeTypeMapper.XLIFF_MIME_TYPE) ) {
+//				mergeAsSegments = true;
+//			}
+//		}
+		boolean mergeAsSegments = true; // We always want segments from XLIFF
+
 		// Un-segment if needed (and remember the ranges if we will need to re-split after)
 		// Merging the segments allow to check/transfer the codes at the text unit level
 		List<Range> ranges = null;
@@ -104,6 +107,11 @@ public class TextUnitMerger {
 			ranges = new ArrayList<Range>();
 			srcRanges = tuFromTrans.getSourceSegments().getRanges(); //.saveCurrentSourceSegmentation();
 		}
+		
+		// To be able to transfer annotations from the fromTrans target, we need
+		// to preserve the original fromTrans, as its segments get joined and
+		// loose their annotations
+		TextContainer origFromTrans = fromTrans.clone(); 
 		if ( !fromTrans.contentIsOneSegment() ) {
 			fromTrans.getSegments().joinAll(ranges);
 		}
@@ -111,8 +119,9 @@ public class TextUnitMerger {
 		// Get the source (as a clone if we need to change the segments)
 		TextContainer srcCont;
 		if ( !tu.getSource().contentIsOneSegment() ) {
-			srcCont  = tu.getSource().clone();
-			srcCont.getSegments().joinAll();
+//			srcCont  = tu.getSource().clone();
+//			srcCont.getSegments().joinAll();
+			srcCont = tu.getSource();
 		}
 		else {
 			srcCont = tu.getSource();
@@ -143,8 +152,8 @@ public class TextUnitMerger {
 			trgCont.getFirstContent().setCodedText(fromTrans.getCodedText(), transCodes, false);
 			// Re-set the ranges on the translated entry
 			if ( mergeAsSegments ) {
-				trgCont.getSegments().create(ranges);
-				tu.getSource().getSegments().create(srcRanges);
+				trgCont.getSegments().create(ranges, true); // Empty segments can contain ATA
+				//tu.getSource().getSegments().create(srcRanges); // No need to resegment source, looses segment annotations
 				//tu.setSourceSegmentationForTarget(trgLoc, srcRanges);
 				//tu.synchronizeSourceSegmentation(trgLoc);
 			}
@@ -154,6 +163,17 @@ public class TextUnitMerger {
 				String.format("Inline code error with item id=\"%s\".\n" + e.getLocalizedMessage(), tu.getId()));
 			// Use the source instead, continue the merge
 			tu.setTarget(trgLoc, tu.getSource());
+		}
+		
+		// Transfer annotations
+		for (Segment seg : origFromTrans.getSegments()) {
+			Segment tseg = trgCont.getSegments().get(seg.id);
+			if (tseg == null) continue;
+			if (seg.getAnnotations() == null) continue;
+			
+			for (IAnnotation ann : seg.getAnnotations()) {
+				tseg.setAnnotation(ann);
+			}			
 		}
 	}
 

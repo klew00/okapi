@@ -20,20 +20,14 @@
 
 package net.sf.okapi.lib.segmentation;
 
-import net.sf.okapi.common.DefaultEntityResolver;
-import net.sf.okapi.common.ISegmenter;
-import net.sf.okapi.common.LocaleId;
-import net.sf.okapi.common.NSContextManager;
-import net.sf.okapi.common.Util;
-import net.sf.okapi.common.XMLWriter;
-import net.sf.okapi.common.exceptions.OkapiIOException;
-import net.sf.okapi.common.resource.TextFragment;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.regex.Pattern;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -44,14 +38,22 @@ import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.regex.Pattern;
+import net.sf.okapi.common.DefaultEntityResolver;
+import net.sf.okapi.common.ISegmenter;
+import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.NSContextManager;
+import net.sf.okapi.common.RegexUtil;
+import net.sf.okapi.common.Util;
+import net.sf.okapi.common.XMLWriter;
+import net.sf.okapi.common.exceptions.OkapiIOException;
+import net.sf.okapi.common.resource.TextFragment;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 /**
  * Provides facilities to load, save, and manage segmentation rules in SRX format.
@@ -104,6 +106,7 @@ public class SRXDocument {
 	private String maskRule;
 	private String docComment;
 	private String headerComment;
+	private ICURegex icuRegex;
 
 	/**
 	 * Creates an empty SRX document.
@@ -564,6 +567,7 @@ public class SRXDocument {
 			segmenter = new SRXSegmenter();
 		}
 		
+		icuRegex = segmenter.getICURegex();
 		segmenter.setCascade(cascade);
 		segmenter.setOptions(segmentSubFlows, includeStartCodes,
 			includeEndCodes, includeIsolatedCodes, 	oneSegmentIncludesAll,
@@ -607,6 +611,7 @@ public class SRXDocument {
 			segmenter = new SRXSegmenter();
 		}
 
+		icuRegex = segmenter.getICURegex();
 		segmenter.setOptions(segmentSubFlows, includeStartCodes,
 			includeEndCodes, includeIsolatedCodes, oneSegmentIncludesAll,
 			trimLeadingWS, trimTrailingWS);
@@ -629,18 +634,37 @@ public class SRXDocument {
 		String pattern;
 		for ( Rule rule : langRule ) {
 			if ( rule.isActive ) {
+				boolean hasICURules =
+					icuRegex != null && 
+					(ICURegex.isICURule(rule.before) ||
+					ICURegex.isICURule(rule.after));
+				
+				if (hasICURules) icuRegex.setHasICURules(true);
+				
 				if ( rule.before.endsWith(NOAUTO)) {
 					// If the rule.before ends with NOAUTO, then we do not put pattern for in-line codes
-					pattern = "("+rule.before.substring(0, rule.before.length()-NOAUTO.length())
-						+")("+rule.after+")";
+					pattern = "(" +
+						WrapBeforePart(rule.before.substring(0,
+							rule.before.length()-NOAUTO.length()), hasICURules) +
+							")(" + WrapAfterPart(rule.after, hasICURules) + ")";
 				}
 				else {
 					// The compiled rule is made of two groups: the pattern before and the pattern after
 					// the break. A special pattern for in-line codes is also added transparently.
-					pattern = "("+rule.before+AUTO_INLINECODES+")("+rule.after+")";
+					pattern = "(" + WrapBeforePart(rule.before, hasICURules)	+
+							AUTO_INLINECODES + ")(" + 
+							WrapAfterPart(rule.after, hasICURules) + ")";
 				}
 				// Replace special markers ANYCODES by inline code pattern
 				pattern = pattern.replace(ANYCODE, INLINECODE_PATTERN);
+				
+				// We need to increase the numbers by 1 as we add the 
+				// before-break group to the rule
+				pattern = RegexUtil.updateGroupReferences(pattern, 1);				
+				if (hasICURules) {
+					pattern = icuRegex.processRule(pattern);
+				}				
+				//pattern = pattern.replaceAll(Placeholder.AREA_MARKERS, "");
 				// Compile and add the rule
 				segmenter.addRule(new CompiledRule(pattern, rule.isBreak));
 			}
@@ -649,7 +673,21 @@ public class SRXDocument {
 		// Range rules
 		segmenter.setMaskRule(maskRule);
 	}
+
+	private String WrapBeforePart(String before, boolean addPlaceholders) {
+		return addPlaceholders ? 
+				Placeholder.START_BEFORE + before + Placeholder.END_BEFORE :
+				before;
+//		return before;
+	}
 	
+	private String WrapAfterPart(String after, boolean addPlaceholders) {
+		return addPlaceholders ? 
+				Placeholder.START_AFTER + after + Placeholder.END_AFTER :
+				after;
+//		return after;
+	}
+
 	/**
 	 * Loads an SRX document from a CharSequence object.
 	 * Calling this method resets all settings and rules to their default

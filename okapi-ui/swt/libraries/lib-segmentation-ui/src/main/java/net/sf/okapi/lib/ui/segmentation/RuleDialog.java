@@ -26,6 +26,7 @@ import net.sf.okapi.common.IHelp;
 import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.OKCancelPanel;
 import net.sf.okapi.common.ui.UIUtil;
+import net.sf.okapi.lib.segmentation.ICURegex;
 import net.sf.okapi.lib.segmentation.Rule;
 import net.sf.okapi.lib.segmentation.SRXDocument;
 
@@ -51,11 +52,17 @@ public class RuleDialog {
 	private Rule result = null;
 	private IHelp help;
 	private Text edComments;
+	private Label label_1;
+	private Label label_2;
+	private Composite composite;
+	private GridData gdTmp_1;
+	private ICURegex icuRegex;
 
 	public RuleDialog (Shell parent,
 		Rule rule,
 		IHelp helpParam)
 	{
+		icuRegex = new ICURegex(); 
 		help = helpParam;
 		shell = new Shell(parent, SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.APPLICATION_MODAL);
 		shell.setText(Res.getString("ruleDlg.caption")); //$NON-NLS-1$
@@ -65,48 +72,55 @@ public class RuleDialog {
 		Composite cmpTmp = new Composite(shell, SWT.BORDER);
 		cmpTmp.setLayoutData(new GridData(GridData.FILL_BOTH));
 		GridLayout layTmp = new GridLayout();
+		layTmp.numColumns = 2;
 		cmpTmp.setLayout(layTmp);
 
 		Label label = new Label(cmpTmp, SWT.NONE);
 		label.setText(Res.getString("ruleDlg.beforeLabel")); //$NON-NLS-1$
 		
+		label = new Label(cmpTmp, SWT.NONE);
+		label.setText(Res.getString("ruleDlg.afterLabel"));
+		
 		edBefore = new Text(cmpTmp, SWT.BORDER | SWT.SINGLE);
 		GridData gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		edBefore.setLayoutData(gdTmp);
 		
-		label = new Label(cmpTmp, SWT.NONE);
-		label.setText(Res.getString("ruleDlg.afterLabel")); //$NON-NLS-1$
-		
 		edAfter = new Text(cmpTmp, SWT.BORDER | SWT.SINGLE);
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		edAfter.setLayoutData(gdTmp);
-		
-		label = new Label(cmpTmp, SWT.NONE);
-		label.setText(Res.getString("ruleDlg.actionLabel")); //$NON-NLS-1$
-		
-		rdBreak = new Button(cmpTmp, SWT.RADIO);
-		rdBreak.setText(Res.getString("ruleDlg.isBreak")); //$NON-NLS-1$
-		gdTmp = new GridData();
 		int indent = 20;
-		gdTmp.horizontalIndent = indent;
-		rdBreak.setLayoutData(gdTmp);
-
-		rdNoBreak = new Button(cmpTmp, SWT.RADIO);
-		rdNoBreak.setText(Res.getString("ruleDlg.notBreak")); //$NON-NLS-1$
-		gdTmp = new GridData();
-		gdTmp.horizontalIndent = indent;
-		rdNoBreak.setLayoutData(gdTmp);
-
+		
+		composite = new Composite(cmpTmp, SWT.NONE);
+		composite.setLayout(new GridLayout(1, false));
+		composite.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, false, false, 2, 1));
+		
+		label_1 = new Label(composite, SWT.NONE);
+		label_1.setText(Res.getString("ruleDlg.actionLabel"));
+				
+		rdBreak = new Button(composite, SWT.RADIO);
+		GridData gd_rdBreak = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
+		gd_rdBreak.horizontalIndent = indent;
+		rdBreak.setLayoutData(gd_rdBreak);
+		rdBreak.setText(Res.getString("ruleDlg.isBreak"));
+						
 		rdBreak.setSelection(rule.isBreak());
+								
+		rdNoBreak = new Button(composite, SWT.RADIO);
+		GridData gd_rdNoBreak = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
+		gd_rdNoBreak.horizontalIndent = indent;
+		rdNoBreak.setLayoutData(gd_rdNoBreak);
+		rdNoBreak.setText(Res.getString("ruleDlg.notBreak"));
 		rdNoBreak.setSelection(!rule.isBreak());
 		
-		label = new Label(cmpTmp, SWT.NONE);
-		label.setText(Res.getString("RuleDialog.comments")); //$NON-NLS-1$
+		label_2 = new Label(cmpTmp, SWT.NONE);
+		label_2.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 2, 1));
+		label_2.setText(Res.getString("RuleDialog.comments"));
 
 		edComments = new Text(cmpTmp, SWT.MULTI | SWT.BORDER | SWT.V_SCROLL);
-		gdTmp = new GridData(GridData.FILL_BOTH);
-		gdTmp.heightHint = 60;
-		edComments.setLayoutData(gdTmp);
+		gdTmp_1 = new GridData(GridData.FILL_BOTH);
+		gdTmp_1.horizontalSpan = 2;
+		gdTmp_1.heightHint = 60;
+		edComments.setLayoutData(gdTmp_1);
 		edComments.setText(rule.getComment()==null ? "" : rule.getComment()); //$NON-NLS-1$
 
 		//--- Dialog-level buttons
@@ -159,8 +173,8 @@ public class RuleDialog {
 			}
 			// We are just testing the syntax here, so no need to do more that replace
 			// the ANYCODE by something valid
-			Pattern.compile(edBefore.getText().replace(SRXDocument.ANYCODE, SRXDocument.INLINECODE_PATTERN));
-			Pattern.compile(edAfter.getText().replace(SRXDocument.ANYCODE, SRXDocument.INLINECODE_PATTERN));
+			Pattern.compile(icuRegex.processRule(edBefore.getText().replace(SRXDocument.ANYCODE, SRXDocument.INLINECODE_PATTERN)));
+			Pattern.compile(icuRegex.processRule(edAfter.getText().replace(SRXDocument.ANYCODE, SRXDocument.INLINECODE_PATTERN)));
 			// The patterns pass: create the new rule
 			result = new Rule(edBefore.getText(), edAfter.getText(), rdBreak.getSelection());
 			result.setComment(edComments.getText());

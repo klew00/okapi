@@ -164,6 +164,47 @@ public class TextUnitUtilTest {
 	}
 	
 	@Test
+	public void testAddMissingCodes() {
+		TextFragment oriFrag;
+		TextFragment trgFrag;
+		
+		oriFrag = fmt.fromLetterCodedToFragment("src<x1/>", null, false);
+		trgFrag = fmt.fromLetterCodedToFragment("trg", null, false);
+		TextUnitUtil.copySrcCodeDataToMatchingTrgCodes(oriFrag, trgFrag, true, true, null, null);
+		assertEquals("trg<1/>", fmt.setContent(trgFrag).toString());
+		
+		oriFrag = fmt.fromLetterCodedToFragment("src<x1/>", null, false);
+		trgFrag = fmt.fromLetterCodedToFragment("trg<x2/>", null, false);
+		TextUnitUtil.copySrcCodeDataToMatchingTrgCodes(oriFrag, trgFrag, true, true, null, null);
+		assertEquals("trg<2/><1/>", fmt.setContent(trgFrag).toString());
+		
+		oriFrag = fmt.fromLetterCodedToFragment("src<x1/><x2/>", null, false);
+		trgFrag = fmt.fromLetterCodedToFragment("trg<x2/>", null, false);
+		TextUnitUtil.copySrcCodeDataToMatchingTrgCodes(oriFrag, trgFrag, true, true, null, null);
+		assertEquals("trg<2/><1/>", fmt.setContent(trgFrag).toString());
+		
+		oriFrag = fmt.fromLetterCodedToFragment("<x1/>src<x2/>", null, false);
+		trgFrag = fmt.fromLetterCodedToFragment("trg<x2/>", null, false);
+		TextUnitUtil.copySrcCodeDataToMatchingTrgCodes(oriFrag, trgFrag, true, true, null, null);
+		assertEquals("<1/>trg<2/>", fmt.setContent(trgFrag).toString());
+		
+		oriFrag = fmt.fromLetterCodedToFragment("<x1/> src", null, false);
+		trgFrag = fmt.fromLetterCodedToFragment("trg", null, false);
+		TextUnitUtil.copySrcCodeDataToMatchingTrgCodes(oriFrag, trgFrag, true, true, null, null);
+		assertEquals("<1/>trg", fmt.setContent(trgFrag).toString());
+		
+		oriFrag = fmt.fromLetterCodedToFragment("<x1/> src<x2/>", null, false);
+		trgFrag = fmt.fromLetterCodedToFragment("trg", null, false);
+		TextUnitUtil.copySrcCodeDataToMatchingTrgCodes(oriFrag, trgFrag, true, true, null, null);
+		assertEquals("<1/>trg<2/>", fmt.setContent(trgFrag).toString());
+		
+		oriFrag = fmt.fromLetterCodedToFragment("<x1/> src<x2/>", null, false);
+		trgFrag = fmt.fromLetterCodedToFragment("<x2/>trg", null, false);
+		TextUnitUtil.copySrcCodeDataToMatchingTrgCodes(oriFrag, trgFrag, true, true, null, null);
+		assertEquals("<1/><2/>trg", fmt.setContent(trgFrag).toString());
+	}
+	
+	@Test
 	public void testUtils() {
 		String st = "12345678";
 		assertEquals("45678", Util.trimStart(st, "123"));

@@ -20,34 +20,63 @@
 
 package net.sf.okapi.steps.repetitionanalysis;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import net.sf.okapi.common.annotation.IAnnotation;
+import net.sf.okapi.tm.pensieve.common.TmHit;
+import net.sf.okapi.tm.pensieve.common.TranslationUnit;
 
 public class RepetitiveSegmentAnnotation implements IAnnotation {
 	
-	private String tuid;
-	private String headTuid;
-	private float score;
-	
-	public RepetitiveSegmentAnnotation(String tuid, String headTuid, float score) {
+	private SegmentInfo info;
+	private Map<SegmentInfo, Float> map; // TranslationUnit Id + score
+
+	public RepetitiveSegmentAnnotation(SegmentInfo info, Map<SegmentInfo, Float> map) {
 		super();
-		this.tuid = tuid;
-		this.headTuid = headTuid;
-		this.score = score;
+		this.info = info;
+		this.map = map;
+	}
+	
+	public RepetitiveSegmentAnnotation(SegmentInfo info, List<TmHit> hits) {
+		super();
+		this.info = info;
+		map = new HashMap<SegmentInfo, Float> ();
+		if (hits == null) return;
+		
+		for (TmHit hit : hits) {
+			TranslationUnit hitTu = hit.getTu();
+			//map.put(hitTu.getMetadataValue(MetadataType.ID), hit.getScore());
+			map.put(new SegmentInfo(hitTu.getMetadata()), hit.getScore());
+		}
+	}
+	
+	public Map<SegmentInfo, Float> getMap() {
+		return Collections.unmodifiableMap(map);
 	}
 
-	public String getTuid() {
-		return tuid;
+	public void setMap(Map<SegmentInfo, Float> map) {
+		this.map = map;
 	}
 
-	/**
-	 * Gets the first repetitive segment matching the one the annotation is attached to (the head of the list of repetitive segments).
-	 * @return tuid of the head segment
-	 */
-	public String getHeadTuid() {
-		return headTuid;
+	public SegmentInfo getInfo() {
+		return info;
 	}
 
-	public float getScore() {
-		return score;
+	public void setInfo(SegmentInfo info) {
+		this.info = info;
 	}
+	
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		for (SegmentInfo refInfo : map.keySet()) {
+			sb.append(String.format(", %s - %3.2f", refInfo.getTuid(), map.get(refInfo)));
+		}
+		return String.format("(tuid: %s groupId: %s segId: %s)%s", 
+				info.getTuid(), info.getGroupId(), info.getSegId(), sb.toString());
+	}
+
 }

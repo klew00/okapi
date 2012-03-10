@@ -62,6 +62,33 @@ public class Range {
 		this.id = id;
 	}
 	
+	/**
+	 * Returns true if the range contains a given position within its bounds. 
+	 * @param pos the given position.
+	 * @return true if the given position is inside the range.
+	 */
+	public boolean contains(int pos) {
+		return pos >= start && pos <= end;
+	}
+	
+	/**
+	 * Returns true if the range contains a given range within its bounds.
+	 * @param range the given range.
+	 * @return true if the given range is inside the range.
+	 */
+	public boolean contains(Range range) {
+		return contains(range.start) && contains(range.end);
+	}
+	
+	/**
+	 * Returns true if the range intersects with a given range.
+	 * @param range the given range.
+	 * @return true if the given and this range have at least one common position.
+	 */
+	public boolean intersectsWith(Range range) {
+		return contains(range.start) || contains(range.end);
+	}
+	
 //	/**
 //	 * Gets the string representation of the range without id 
 //	 * (its start and end position between parenthesis, the id is not represented).

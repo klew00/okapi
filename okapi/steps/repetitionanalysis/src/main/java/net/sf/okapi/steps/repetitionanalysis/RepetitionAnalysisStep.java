@@ -20,6 +20,7 @@
 
 package net.sf.okapi.steps.repetitionanalysis;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -58,8 +59,9 @@ import net.sf.okapi.tm.pensieve.writer.TmWriterFactory;
 public class RepetitionAnalysisStep extends BasePipelineStep {
 
 	private Parameters params;
-	private boolean searchExact;
-	private long counter;
+	private boolean searchExact;	
+	private long tuCounter;	
+	private long groupCounter;	
 	private String tmDir;
 	private ITmWriter tmWriter;
 	private ITmSeeker currentTm;
@@ -72,7 +74,9 @@ public class RepetitionAnalysisStep extends BasePipelineStep {
 		//tmDir = Util.ensureSeparator(Util.getTempDirectory(), true) + "tm/";
 		
 		// For concurrent pipelines 
-		tmDir = String.format("%s~okapi-step-repetitionanalysis-%s/", Util.ensureSeparator(Util.getTempDirectory(), true), UUID.randomUUID().toString());		
+		tmDir = String.format("%s~okapi-step-repetitionanalysis-%s/", 
+				Util.ensureSeparator(Util.getTempDirectory(), true), 
+				UUID.randomUUID().toString());		
 	}
 	
 	@Override
@@ -129,7 +133,9 @@ public class RepetitionAnalysisStep extends BasePipelineStep {
 		close();
 		Util.createDirectories(tmDir);
 		searchExact = params.getFuzzyThreshold() >= 100;
-		counter = 0;
+		
+		tuCounter = 0;
+		groupCounter = 1;
 		
 		tmWriter = TmWriterFactory.createFileBasedTmWriter(tmDir, true);
 		tmWriter.close(); // To create a TM for the seeker
@@ -145,11 +151,11 @@ public class RepetitionAnalysisStep extends BasePipelineStep {
 		return super.handleEndDocument(event);
 	}
 	
-	public static boolean checkSegment(Segment segment) {
-		return 
-			segment != null &&
-			segment.getContent() != null &&
-			segment.getContent().hasText();
+	public static boolean checkSegments(Segment sseg, Segment tseg) {
+		// tseg is allowed to be null
+		return	sseg != null && 
+				(sseg.getContent().hasText() || 
+				(tseg != null && tseg.getContent().hasText()));
 	}
 	
 	@Override
@@ -164,71 +170,98 @@ public class RepetitionAnalysisStep extends BasePipelineStep {
 //				TextContainer ttc = tu.getTarget(targetLocale);				
 //				if (ttc != null) tsegments = ttc.getSegments();
 			}
-						
-			for (Segment seg : ssegments) {				
-				if (!checkSegment(seg)) continue;
-				counter++;
-				TextFragment tf = seg.getContent();
-				//if (tf.isEmpty()) continue;				
-				
-				String tuid = Long.toString(counter);
-				List<TmHit> hits = null;
-				if (searchExact) {
-					hits = currentTm.searchExact(tf, null);
+			
+			int segCounter = 0;
+			boolean hasTranslationUnits = false;
+			for (Segment seg : ssegments) {
+				segCounter++;
+				Segment tseg = null;
+				if (tsegments != null) {
+					tseg = tsegments.get(seg.getId());
 				}
-				else {
-					hits = currentTm.searchFuzzy(tf, params.getFuzzyThreshold(), 1, null);
+				if (!checkSegments(seg, tseg)) continue;
+				tuCounter++;
+				hasTranslationUnits = true;
+				
+				// We don't take codes into account when analizing repetitive text
+				TextFragment content = seg.getContent();
+				if (content.isEmpty()) continue;
+				
+				TextFragment tf = new TextFragment(content.getText());
+				
+				String tuid = Long.toString(tuCounter);
+				String groupId = Long.toString(groupCounter);
+				String segId = Long.toString(segCounter);
+				
+				SegmentInfo info = new SegmentInfo(tuid, groupId, segId); 
+				
+				List<TmHit> hits = new ArrayList<TmHit>();
+				hits.addAll(currentTm.searchExact(tf, null));
+				if (!searchExact) {
+					hits.addAll(currentTm.searchFuzzy(tf, params.getFuzzyThreshold(), params.getMaxHits(), null));
 				}
 								
 				if (hits.size() > 0) {
-					TmHit hit = hits.get(0);
-					TranslationUnit hitTu = hit.getTu();
-					RepetitiveSegmentAnnotation ann = 
-						new RepetitiveSegmentAnnotation(
-								tuid,
-								hitTu.getMetadataValue(MetadataType.ID), 
-								hit.getScore());
+					RepetitiveSegmentAnnotation ann =
+							new RepetitiveSegmentAnnotation(info, hits);
 					seg.setAnnotation(ann);
 					//System.out.println("= " + tf);
 					
-					if (tsegments != null) {
-						Segment tseg = tsegments.get(seg.getId()); // Always exists, created empty in case of no target
-						TextFragment stf = hitTu.getSource().getContent();
-						TextFragment ttf = hitTu.getTarget().getContent();
+					for (TmHit hit : hits) {
+						TranslationUnit hitTu = hit.getTu();
 						
-						AltTranslationsAnnotation ata = tseg.getAnnotation(AltTranslationsAnnotation.class);
-						if (ata == null) {
-							ata = new AltTranslationsAnnotation() ;
+						if (tsegments != null) {
+							//Segment tseg = tsegments.get(seg.getId()); // Always exists, created empty in case of no target							
+//							TextFragment stf = hitTu.getSource().getContent();
+//							TextFragment ttf = hitTu.getTarget().getContent();
+							TextFragment otf = new TextFragment(tf.getText());
+							TextFragment stf = new TextFragment(hitTu.getSource().getContent().getText());
+							TextFragment ttf = new TextFragment(hitTu.getTarget().getContent().getText());
+							
+							// For word counts
+							AltTranslationsAnnotation ata = tseg.getAnnotation(AltTranslationsAnnotation.class);
+							if (ata == null) {
+								ata = new AltTranslationsAnnotation();
+								tseg.setAnnotation(ata);
+							}
+							ata.add(new AltTranslation(sourceLocale, targetLocale == null ? sourceLocale : targetLocale, 
+									otf, stf, ttf, MatchType.EXACT_DOCUMENT_CONTEXT,
+									//tf, stf, ttf, MatchType.EXACT_DOCUMENT_CONTEXT,
+									//Math.round(hit.getScore() * 100), ""));
+									(int) Math.floor(hit.getScore()), ""));							
 						}
-						ata.add(new AltTranslation(sourceLocale, targetLocale == null ? sourceLocale : targetLocale, 
-								tf, stf, ttf, MatchType.EXACT_DOCUMENT_CONTEXT, 
-								//Math.round(hit.getScore() * 100), ""));
-								Math.round(hit.getScore()), ""));
-						tseg.setAnnotation(ata);
-					}
+					}					
 				}
-				else {
-					TranslationUnit ntu = new TranslationUnit(
-							new TranslationUnitVariant(sourceLocale, tf),
-							new TranslationUnitVariant(targetLocale == null ? sourceLocale : targetLocale, new TextFragment("")));
-					ntu.setMetadataValue(MetadataType.ID, tuid);
+				
+				TranslationUnit ntu = new TranslationUnit(
+						new TranslationUnitVariant(sourceLocale, tf),
+						new TranslationUnitVariant(targetLocale == null ? sourceLocale : targetLocale, 
+								new TextFragment(tuid))); // To have a unique target
+				ntu.setMetadataValue(MetadataType.ID, tuid);
+				
+				// TODO create real MetadataTypes for these
+				ntu.setMetadataValue(MetadataType.GROUP_NAME, groupId);
+				ntu.setMetadataValue(MetadataType.FILE_NAME, segId);
+				
+				// The segment can be referenced from the maps in RSA of other segments, so we create a RSA for it
+				if (seg.getAnnotation(RepetitiveSegmentAnnotation.class) == null) {
 					RepetitiveSegmentAnnotation ann = 
-						new RepetitiveSegmentAnnotation(
-								tuid,
-								tuid, // Is the head translation unit for itself 
-								1.0f);
+							new RepetitiveSegmentAnnotation(info, (List<TmHit>) null);
 					seg.setAnnotation(ann);
-					tmWriter.indexTranslationUnit(ntu);
-					//System.out.println("+ " + tf);
-					
-					// Should be called here after every segment addition to the TM for the situations 
-					// of repetitive segments within a tu
-					tmWriter.commit();
-					
-					currentTm.close();
-					currentTm = TmSeekerFactory.createFileBasedTmSeeker(tmDir);
 				}
+				
+				tmWriter.indexTranslationUnit(ntu);
+				//System.out.println("+ " + tf);
+				
+				// Should be called here after every segment addition to the TM for the situations 
+				// of repetitive segments within a tu
+				tmWriter.commit();
+				
+				// Need to reopen the TM, otherwise doesn't work
+				currentTm.close();
+				currentTm = TmSeekerFactory.createFileBasedTmSeeker(tmDir);
 			}
+			if (hasTranslationUnits) groupCounter++;
 		}
 		return super.handleTextUnit(event);
 	}
