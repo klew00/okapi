@@ -22,8 +22,13 @@ package net.sf.okapi.steps.xmlvalidation;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URL;
 import java.util.logging.Logger;
 
+import javax.xml.XMLConstants;
+import javax.xml.bind.JAXBContext;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
@@ -31,6 +36,9 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.Source;
+import javax.xml.validation.Schema;
+import javax.xml.validation.SchemaFactory;
+import javax.xml.validation.Validator;
 
 /*import org.iso_relax.verifier.VerifierConfigurationException;
 import org.iso_relax.verifier.VerifierFactory;
@@ -49,6 +57,7 @@ import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.UsingParameters;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.exceptions.OkapiBadStepInputException;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
 import net.sf.okapi.common.resource.RawDocument;
 
@@ -68,6 +77,7 @@ public class XMLValidationStep extends BasePipelineStep {
 	@Override
 	public void destroy () {
 		// Make available to GC
+		xmlInputFact = null;
 	}
 	
 	public String getDescription () {
@@ -142,138 +152,112 @@ public class XMLValidationStep extends BasePipelineStep {
 			return event;
 		}
 		
-		/*if(params.isValidate() && params.getValidationType() == Parameters.VALIDATIONTYPE_RELAXNG){
-
-			try {
-			
-				SAXParserFactory factory = SAXParserFactory.newInstance();
-
-				// create a VerifierFactory with the default SAX parser
-				VerifierFactory vFact = new com.sun.msv.verifier.jarv.TheFactoryImpl();
-
-				// compile a RELAX schema (or whatever schema you like)
-				org.iso_relax.verifier.Schema relaxSchema = null;
-
-				try {
-					 
-					if(params.getSchemaPath().length() > 0){
-						//relaxSchema = vFact.compileSchema(new File("C:\\Documents and Settings\\fliden\\Desktop\\xslt_test\\relaxng.rng"));
-						relaxSchema = vFact.compileSchema(new File(params.getSchemaPath()));
-					}
-
-					// obtain a verifier
-					org.iso_relax.verifier.Verifier verifier = relaxSchema.newVerifier();
-
-					// set an error handler
-					// this error handler will throw an exception if there is an error
-					verifier.setErrorHandler( com.sun.msv.verifier.util.ErrorHandlerImpl.theInstance );
-
-					// get a XMLFilter
-					VerifierFilter filter = verifier.getVerifierFilter();
-
-					// set up the pipe-line
-					XMLReader reader = factory.newSAXParser().getXMLReader();
-					filter.setParent( reader );
-					//filter.setContentHandler( new ContentHandler() );
-
-					//filter.parse(new File("C:\\Documents and Settings\\fliden\\Desktop\\xslt_test\\relaxng.xml").toURI().toString());
-					filter.parse(rawDoc.getInputURI().toString());
-
-				} catch (VerifierConfigurationException e) {
-					logger.severe(e.getMessage());
-
-				} catch( SAXException e ) {
-					//com.sun.msv.verifier.ValidityViolation violation = (ValidityViolation) e;
-					logger.severe(e.getMessage());
-				}
-
-			} catch ( ParserConfigurationException e) {
-				logger.severe(e.getMessage());
-				return event;
-			} catch ( IOException e) {
-				logger.severe(e.getMessage());
-				return event;
-			}
-			
-			return event;
-		}*/
-		
-
-		if(params.isValidate()){
-			
+		if(params.isValidate()){			
 			xmlInput = new javax.xml.transform.stream.StreamSource(rawDoc.getStream());
 			
 			//--validating against schema--
-
-			
 			try {
-				  SAXParserFactory factory = SAXParserFactory.newInstance();
-				  factory.setNamespaceAware( true);
-				  factory.setValidating( true);
+				SchemaFactory factory = null;	
+			    if(params.getValidationType() == Parameters.VALIDATIONTYPE_DTD){
+			    	// JAXB doesn't seem to handle DTD very well, resort to SAX parser
+			    	SAXParserFactory saxFactory = SAXParserFactory.newInstance();
+			    	saxFactory.setNamespaceAware(true);
+			    	saxFactory.setValidating(true);
 
-				  SAXParser parser = factory.newSAXParser();
-
-				  if(params.getValidationType() == Parameters.VALIDATIONTYPE_DTD){
-					  
-				  }else if(params.getValidationType() == Parameters.VALIDATIONTYPE_SCHEMA){
-					  
-					  parser.setProperty( "http://java.sun.com/xml/jaxp/properties/schemaLanguage", 
-					                      "http://www.w3.org/2001/XMLSchema");
-					  if(params.getSchemaPath().length() > 0){
-						  parser.setProperty( "http://java.sun.com/xml/jaxp/properties/schemaSource", new File(params.getSchemaPath()));						  
-					  }
-				  }
-
-				  XMLReader reader = parser.getXMLReader();
-
-				  reader.setErrorHandler(new ErrorHandler(){
-
-					public void error(SAXParseException e) throws SAXException {
-						logger.severe("Validation Error " +
-								"Line: "+ e.getLineNumber() +
-								", Column: "+ e.getColumnNumber() +
-								"\n"+ e.getMessage()+"\n");
-						throw new SAXException("Error encountered");
+					SAXParser parser = saxFactory.newSAXParser();
+					XMLReader reader = parser.getXMLReader();
+					reader.setErrorHandler(new ValidatingErrorHandler(logger));
+					reader.setEntityResolver(new DTDResolver(currentFileDir));
+					reader.parse(new InputSource(rawDoc.getStream()));
+			    } else {
+			    	// normal JAXB validation
+					if(params.getValidationType() == Parameters.VALIDATIONTYPE_SCHEMA) {
+						factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);    
+					} else if(params.getValidationType() == Parameters.VALIDATIONTYPE_RELAXNG) {
+						System.setProperty(SchemaFactory.class.getName() + ":" + 
+				    			XMLConstants.RELAXNG_NS_URI, "com.thaiopensource.relaxng.jaxp.XMLSyntaxSchemaFactory");
+						factory = SchemaFactory.newInstance(XMLConstants.RELAXNG_NS_URI);
+						if (params.getSchemaPath().length() <= 0) {
+							throw new OkapiBadStepInputException("Please specify a valid RelaxNG schema path");
+						}
+					}			    
+					URL schemaLocation = null;
+					if (params.getSchemaPath().length() > 0) {
+						try {
+							// try true URL syntax first
+							schemaLocation = new URL(params.getSchemaPath());
+						} catch(MalformedURLException e) {
+							// URL parse failed must be a local file path
+							schemaLocation = new File(params.getSchemaPath()).toURI().toURL();
+						}
 					}
-
-					public void fatalError(SAXParseException e) throws SAXException {
-						logger.severe("Validation Fatal Error " +
-								"Line: "+ e.getLineNumber() +
-								", Column: "+ e.getColumnNumber() +
-								"\n"+ e.getMessage()+"\n");
-						throw new SAXException("Fatal Error encountered");
-					}
-
-					public void warning(SAXParseException e) throws SAXException {
-						logger.severe("Validation Warning " +
-								"Line: "+ e.getLineNumber() +
-								", Column: "+ e.getColumnNumber() +
-								"\n"+ e.getMessage()+"\n");
-						throw new SAXException("Warning encountered");
-					}
-					  
-				  });
-				  reader.setEntityResolver(new DTDResolver(currentFileDir));
-				  reader.parse( new InputSource(rawDoc.getStream()));
-
-				} catch ( ParserConfigurationException e) {
-					logger.severe(e.getMessage());
-					return event;
-				} catch ( SAXException e) {
-					logger.severe(e.getMessage());
-					return event;
-				} catch ( IOException e) {
-				  logger.severe(e.getMessage());
-				  return event;
+					         
+				    Schema schema;
+				    if (schemaLocation == null) {
+				    	// the xml document specifies the schema internally
+				    	// only works for W3C schemas
+				    	schema = factory.newSchema();
+				    } else {
+				    	// user specified schema
+				    	schema = factory.newSchema(schemaLocation);
+				    }
+				      
+			        Validator validator = schema.newValidator();
+			        validator.setErrorHandler(new ValidatingErrorHandler(logger));
+				    validator.validate(xmlInput);
 				}
+			} catch (SAXException e) {
+				logger.severe(e.getMessage());
+				return event;
+			} catch (IOException e) {
+				logger.severe(e.getMessage());
+				  return event;
+			} catch (ParserConfigurationException e) {
+				logger.severe(e.getMessage());
+				return event;
+			} 			
 		}
 		
 		return event;
 	}
 }
 
-class DTDResolver implements EntityResolver {
+class ValidatingErrorHandler implements ErrorHandler {
+	Logger logger;
 	
+	public ValidatingErrorHandler(Logger logger) {
+		this.logger = logger;
+	}
+	
+	 @Override
+	public void error(SAXParseException e) throws SAXException {
+		logger.severe("Validation Error " +
+				"Line: "+ e.getLineNumber() +
+				", Column: "+ e.getColumnNumber() +
+				"\n"+ e.getMessage()+"\n");
+		throw new SAXException("Error encountered");
+	}
+
+	@Override
+	public void fatalError(SAXParseException e) throws SAXException {
+		logger.severe("Validation Fatal Error " +
+				"Line: "+ e.getLineNumber() +
+				", Column: "+ e.getColumnNumber() +
+				"\n"+ e.getMessage()+"\n");
+		throw new SAXException("Fatal Error encountered");
+	}
+
+	@Override
+	public void warning(SAXParseException e) throws SAXException {
+		logger.severe("Validation Warning " +
+				"Line: "+ e.getLineNumber() +
+				", Column: "+ e.getColumnNumber() +
+				"\n"+ e.getMessage()+"\n");
+		throw new SAXException("Warning encountered");
+	}
+}
+	 
+class DTDResolver implements EntityResolver {
 	String currentFileDir;
 	
     public DTDResolver(String currentFileDir) {
