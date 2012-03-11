@@ -57,6 +57,7 @@ import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.UsingParameters;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.exceptions.OkapiBadStepInputException;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
 import net.sf.okapi.common.resource.RawDocument;
 
@@ -175,18 +176,32 @@ public class XMLValidationStep extends BasePipelineStep {
 					} else if(params.getValidationType() == Parameters.VALIDATIONTYPE_RELAXNG) {
 						System.setProperty(SchemaFactory.class.getName() + ":" + 
 				    			XMLConstants.RELAXNG_NS_URI, "com.thaiopensource.relaxng.jaxp.XMLSyntaxSchemaFactory");
-						factory = SchemaFactory.newInstance(XMLConstants.RELAXNG_NS_URI);      
+						factory = SchemaFactory.newInstance(XMLConstants.RELAXNG_NS_URI);
+						if (params.getSchemaPath().length() <= 0) {
+							throw new OkapiBadStepInputException("Please specify a valid RelaxNG schema path");
+						}
 					}			    
-					URL schemaLocation; 
-					try {
-						// try true URL syntax first
-						schemaLocation = new URL(params.getSchemaPath());
-					} catch(MalformedURLException e) {
-						// URL parse failed must be a local file path
-						schemaLocation = new File(params.getSchemaPath()).toURI().toURL();
+					URL schemaLocation = null;
+					if (params.getSchemaPath().length() > 0) {
+						try {
+							// try true URL syntax first
+							schemaLocation = new URL(params.getSchemaPath());
+						} catch(MalformedURLException e) {
+							// URL parse failed must be a local file path
+							schemaLocation = new File(params.getSchemaPath()).toURI().toURL();
+						}
 					}
 					         
-				    Schema schema = factory.newSchema(schemaLocation);  
+				    Schema schema;
+				    if (schemaLocation == null) {
+				    	// the xml document specifies the schema internally
+				    	// only works for W3C schemas
+				    	schema = factory.newSchema();
+				    } else {
+				    	// user specified schema
+				    	schema = factory.newSchema(schemaLocation);
+				    }
+				      
 			        Validator validator = schema.newValidator();
 			        validator.setErrorHandler(new ValidatingErrorHandler(logger));
 				    validator.validate(xmlInput);
