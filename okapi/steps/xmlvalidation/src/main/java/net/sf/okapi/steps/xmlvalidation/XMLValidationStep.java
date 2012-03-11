@@ -23,12 +23,10 @@ package net.sf.okapi.steps.xmlvalidation;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URL;
 import java.util.logging.Logger;
 
 import javax.xml.XMLConstants;
-import javax.xml.bind.JAXBContext;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
@@ -40,19 +38,6 @@ import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 
-/*import org.iso_relax.verifier.VerifierConfigurationException;
-import org.iso_relax.verifier.VerifierFactory;
-import org.iso_relax.verifier.VerifierFilter;*/
-/*import com.sun.msv.verifier.ValidityViolation;
-import com.sun.msv.verifier.Verifier;*/
-
-import org.xml.sax.EntityResolver;
-import org.xml.sax.ErrorHandler;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
-import org.xml.sax.SAXParseException;
-import org.xml.sax.XMLReader;
-
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.UsingParameters;
@@ -60,6 +45,13 @@ import net.sf.okapi.common.Util;
 import net.sf.okapi.common.exceptions.OkapiBadStepInputException;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
 import net.sf.okapi.common.resource.RawDocument;
+
+import org.xml.sax.EntityResolver;
+import org.xml.sax.ErrorHandler;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
+import org.xml.sax.XMLReader;
 
 @UsingParameters(Parameters.class)
 public class XMLValidationStep extends BasePipelineStep {
@@ -80,11 +72,13 @@ public class XMLValidationStep extends BasePipelineStep {
 		xmlInputFact = null;
 	}
 	
+	@Override
 	public String getDescription () {
 		return "Validate XML documents."
 			+ " Expects: raw XML document. Sends back: raw XML document.";
 	}
 
+	@Override
 	public String getName () {
 		return "XML Validation";
 	}
@@ -265,6 +259,7 @@ class DTDResolver implements EntityResolver {
     	this.currentFileDir = currentFileDir;
 	}
 
+	@Override
 	public InputSource resolveEntity(String publicID, String systemID) throws SAXException {
 
 		//--check if the default dtd-location file is resolved--
