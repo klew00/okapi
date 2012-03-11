@@ -36,7 +36,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 
 	public static final int VALIDATIONTYPE_DTD = 0;
 	public static final int VALIDATIONTYPE_SCHEMA = 1;
-	//public static final int VALIDATIONTYPE_RELAXNG = 2;
+	public static final int VALIDATIONTYPE_RELAXNG = 2;
 	
 	private static String VALIDATE = "validate";
 	private static String SCHEMAPATH = "schemaPath";
@@ -121,11 +121,13 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 
 		String[] labels = {
 			"DTD",
-			"XML Schema"
+			"XML Schema",
+			"RelaxNG Schema"
 		};
 		String[] values = {
 			"0",
-			"1"
+			"1",
+			"2"
 		};
 		ListSelectionPart lsp = desc.addListSelectionPart(paramDesc.get(VALIDATIONTYPE), values);
 		lsp.setChoicesLabels(labels);
@@ -138,5 +140,4 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	
 		return desc;
 	}
-
 }
