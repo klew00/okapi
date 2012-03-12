@@ -523,25 +523,35 @@ public class TaggedFilterConfiguration {
 	public RULE_TYPE getConditionalElementRuleType(String tag, Map<String, String> attributes) {
 		RULE_TYPE type = getElementRuleTypeCandidate(tag.toLowerCase());		
 		
-		if (type != RULE_TYPE.RULE_NOT_FOUND) {		
+		if (type != RULE_TYPE.RULE_NOT_FOUND) {				
+			// make sure this is really an INLINE_EXCLUDED_ELEMENT rule - condition must apply
+			if (type == RULE_TYPE.INLINE_EXCLUDED_ELEMENT) {
+				if (doesElementRuleConditionApply(configReader.getRegexElementRule(tag.toLowerCase()), attributes)) {
+					return type;
+				} else if (hasDefinedInlineRule(tag.toLowerCase())) {
+					if (doesElementRuleConditionApply(configReader.getElementRule(tag.toLowerCase()), attributes)) {
+						return RULE_TYPE.INLINE_ELEMENT;
+					} else {
+						return RULE_TYPE.RULE_NOT_FOUND;
+					}						
+				} else {
+					return RULE_TYPE.RULE_NOT_FOUND;
+				}
+			}
+			
+			// short cut test - if the rule depends on a condition and there are no attributes skip
 			if (attributes.isEmpty() && 
 					configReader.getElementRule(tag.toLowerCase()).get(CONDITIONS) != null)  {
 				return RULE_TYPE.RULE_NOT_FOUND;
 			}
-			
-			if (type == RULE_TYPE.INLINE_EXCLUDED_ELEMENT) {
-				if (doesElementRuleConditionApply(configReader.getRegexElementRule(tag.toLowerCase()), attributes)) {
-					return type;
-				} else {
-					return RULE_TYPE.INLINE_ELEMENT;
-				}
-			}
-			
+						
+			// short cut test - if there are no conditions and no attributes the default rule applies
 			if (attributes.isEmpty() && 
 					configReader.getElementRule(tag.toLowerCase()).get(CONDITIONS) == null)  {
 				return type;
 			}
 			
+			// if we get this far just apply the condition and return the result
 			if (doesElementRuleConditionApply(configReader.getElementRule(tag.toLowerCase()), attributes)) {
 				return type;
 			} else {
@@ -661,11 +671,11 @@ public class TaggedFilterConfiguration {
 		String conditionalAttribute = null;
 		conditionalAttribute = (String) condition.get(0);
 
-		// we didn't find the conditional test attribute - we assume no
-		// extraction
-		if (attributes.get(conditionalAttribute.toLowerCase()) == null) {
-			return false;
-		}
+//		// we didn't find the conditional test attribute - we assume no
+//		// extraction
+//		if (attributes.get(conditionalAttribute.toLowerCase()) == null) {
+//			return false;
+//		}
 
 		// '=', '!=' or regex
 		String compareType = (String) condition.get(1);

@@ -145,8 +145,9 @@ public class HtmlFilter extends AbstractMarkupFilter {
 					|| getConfig().getElementRuleTypeCandidate(tag.getName()) == RULE_TYPE.INLINE_EXCLUDED_ELEMENT
 					|| (getEventBuilder().isInsideTextRun() && (tag
 							.getTagType() == StartTagType.COMMENT || tag
-							.getTagType() == StartTagType.XML_PROCESSING_INSTRUCTION)))
+							.getTagType() == StartTagType.XML_PROCESSING_INSTRUCTION))) {
 				inlineTag = true;
+			}
 
 			// if its an inline code let the handlers deal with it
 			if (getEventBuilder().isCurrentTextUnit() && !inlineTag) {
@@ -167,21 +168,33 @@ public class HtmlFilter extends AbstractMarkupFilter {
 		case INLINE_EXCLUDED_ELEMENT:
 		case INLINE_ELEMENT:
 			try {
-				currentState = getRuleState().popInlineRule();
-				ruleType = currentState.ruleType;				
+				currentState = getRuleState().peekInlineRule();
+				if (currentState.ruleName.equalsIgnoreCase(endTag.getName())) {
+					currentState = getRuleState().popInlineRule();
+					ruleType = currentState.ruleType;
+				} else {				
+					// must be a overlapping tags of some sort
+					// treat it as an inline anyway but don't pop stack
+					ruleType = RULE_TYPE.INLINE_ELEMENT;
+				}
 			} catch (EmptyStackException e) {
 				// empty stack means the inline tags are not wellformed.
 				// assume the tag is a valid inline tag - even if
 				// it doesn't have a mate
+				ruleType = RULE_TYPE.INLINE_ELEMENT;
 			}
 			break;
 		case ATTRIBUTES_ONLY:
 			// TODO: add a rule state for ATTRIBUTE_ONLY rules
 			break;
 		case GROUP_ELEMENT:
-			// must be wellformed - don't check for EmptyStackException
-			currentState = getRuleState().popGroupRule();
-			ruleType = currentState.ruleType;
+			try {
+				currentState = getRuleState().popGroupRule();
+				ruleType = currentState.ruleType;
+			} catch (EmptyStackException e) {
+				// treat as skeleton
+				ruleType = RULE_TYPE.RULE_NOT_FOUND;
+			}
 			break;
 		case EXCLUDED_ELEMENT:
 			// must be wellformed - don't check for EmptyStackException
@@ -189,24 +202,27 @@ public class HtmlFilter extends AbstractMarkupFilter {
 				currentState = getRuleState().popExcludedIncludedRule();
 				ruleType = currentState.ruleType;
 			} catch (EmptyStackException e) {
-				
+				// treat as skeleton
+				ruleType = RULE_TYPE.RULE_NOT_FOUND;
 			}
 			break;
 		case INCLUDED_ELEMENT:
-			// must be wellformed - don't check for EmptyStackException
-			currentState = getRuleState().popExcludedIncludedRule();
-			ruleType = currentState.ruleType;
+			try {
+				currentState = getRuleState().popExcludedIncludedRule();
+				ruleType = currentState.ruleType;
+			} catch (EmptyStackException e) {
+				// treat as skeleton
+				// treat as skeleton
+				ruleType = RULE_TYPE.RULE_NOT_FOUND;
+			}
 			break;
 		case TEXT_UNIT_ELEMENT:
 			try {
 				currentState = getRuleState().popTextUnitRule();
 				ruleType = currentState.ruleType;
 			} catch (EmptyStackException e) {
-				// empty stack means the text unit tags are not wellformed.
-				// we try our best to recover by ending the current TextUnit
-				// The EventBuilder should handle this case where there is an
-				// TextUnit end tag without a TextUnit. It will simply be turned
-				// into a DocumentPart
+				// treat as skeleton
+				ruleType = RULE_TYPE.RULE_NOT_FOUND;
 			}
 			break;
 		default:
@@ -217,8 +233,6 @@ public class HtmlFilter extends AbstractMarkupFilter {
 			// if the end tag doesn't match with what is on the stack then
 			// assume the default (non-conditional) rule
 			if (!currentState.ruleName.equalsIgnoreCase(endTag.getName())) {
-				ruleType = getConfig().getElementRuleTypeCandidate(endTag.getName());
-
 				String character = Integer.toString(endTag.getBegin());
 				LOGGER.log(Level.FINE, "End tag " + endTag.getName()
 						+ " and start tag " + currentState.ruleName

@@ -437,7 +437,14 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 	protected void preProcess(Segment segment) {
 		boolean isInsideTextRun = false;
 		if (segment instanceof Tag) {
-			isInsideTextRun = getConfig().getElementRuleTypeCandidate(((Tag) segment).getName()) == RULE_TYPE.INLINE_ELEMENT;
+			Tag tag = (Tag)segment;
+			if (getConfig().getElementRuleTypeCandidate(tag.getName()) == RULE_TYPE.INLINE_ELEMENT
+					|| getConfig().getElementRuleTypeCandidate(tag.getName()) == RULE_TYPE.INLINE_EXCLUDED_ELEMENT
+					|| (getEventBuilder().isInsideTextRun() && (tag
+							.getTagType() == StartTagType.COMMENT || tag
+							.getTagType() == StartTagType.XML_PROCESSING_INSTRUCTION))) {
+				isInsideTextRun = true;
+			}
 		}
 
 		// add buffered whitespace to the current translatable text
@@ -769,8 +776,8 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 	}
 
 	protected void updateStartTagRuleState(String tag, RULE_TYPE ruleType, String idValue) {
-		//RULE_TYPE r = getConfig().getElementRuleTypeCandidate(tag);
-		switch (ruleType) {	
+		RULE_TYPE r = getConfig().getElementRuleTypeCandidate(tag);
+		switch (r) {	
 		case INLINE_EXCLUDED_ELEMENT:
 		case INLINE_ELEMENT:
 			ruleState.pushInlineRule(tag, ruleType);
@@ -907,20 +914,7 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 
 		switch (ruleType) {
 		case INLINE_EXCLUDED_ELEMENT:
-			// only end code if there is one and it matches the start code
-			Code currentCode = eventBuilder.getCurrentCode();
-			String e  = "";
-			if (currentCode != null) {
-				// parse the start tag
-				Source source = new Source(currentCode.getData());
-				List<Element> es = source.getAllElements();
-				if (!es.isEmpty()) {
-					e = es.get(0).getName();
-				}
-				if (e.equals(endTag.toString())) {
-					eventBuilder.endCode(endTag.toString());
-				}
-			}
+			eventBuilder.endCode(endTag.toString());			
 			break;
 		case INLINE_ELEMENT:
 			// check to see if we are inside a inline run that is excluded 
