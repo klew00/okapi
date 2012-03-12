@@ -107,7 +107,7 @@ public class ExcelAnalyzer
 					if (segment instanceof Tag)
 					{
 						final Tag tag = (Tag) segment;
-						if (parameters.getTaggedConfig().getElementRuleType(tag.getName()).equals("ATTRIBUTES_ONLY"))
+						if (parameters.getTaggedConfig().getElementRuleTypeCandidate(tag.getName()).equals("ATTRIBUTES_ONLY"))
 						{
 							if (tag.getName().equals("dimension"))
 							{
@@ -213,7 +213,7 @@ public class ExcelAnalyzer
 					{
 						final Tag tag = (Tag) segment;
 //						if (parameters.getTaggedConfig().getMainRuleType(tag.getName()).equals("ATTRIBUTES_ONLY"))
-						if (tfc.getElementRuleType(tag.getName()) == RULE_TYPE.ATTRIBUTES_ONLY)
+						if (tfc.getElementRuleTypeCandidate(tag.getName()) == RULE_TYPE.ATTRIBUTES_ONLY)
 						{
 							if (tag.getName().equals("color"))
 							{
@@ -270,7 +270,7 @@ public class ExcelAnalyzer
 					{
 						final Tag tag = (Tag) segment;
 						sTagName = tag.getName();
-						rtRuleType = tfc.getElementRuleType(sTagName);
+						rtRuleType = tfc.getElementRuleTypeCandidate(sTagName);
 						if (tag.getTagType() == StartTagType.NORMAL ||
 												tag.getTagType() == StartTagType.UNREGISTERED)
 							// only if it's a start tag
@@ -377,7 +377,7 @@ public class ExcelAnalyzer
 					{
 						final Tag tag = (Tag) segment;
 						sTagName = tag.getName();
-						rtRuleType = tfc.getElementRuleType(sTagName);
+						rtRuleType = tfc.getElementRuleTypeCandidate(sTagName);
 						if (rtRuleType == RULE_TYPE.INLINE_ELEMENT)
 						{
 							if (tag.getName().equals("sst"))

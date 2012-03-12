@@ -20,7 +20,11 @@
 
 package net.sf.okapi.common;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -28,6 +32,9 @@ import java.util.regex.Pattern;
  * Collection of helper function for working with regular expressions.
  */
 public class RegexUtil {
+	
+	private static final Pattern QUOTED_AREA = Pattern.compile("\\\\Q(.+?)\\\\E");
+	private static final Pattern BACKREF_PATTERN = Pattern.compile("\\\\([1-9][0-9]*)");
 	
 	private static HashMap<String, Pattern> patternCache = new HashMap<String, Pattern>();
 
@@ -123,4 +130,92 @@ public class RegexUtil {
 		return matcher.matches();
 	}
 	
+	public static List<Range> getQuotedAreas(String regex) {
+		List<Range> quotedAreas = new ArrayList<Range>();
+		// Determine areas between \Q and \E
+		Matcher m = QUOTED_AREA.matcher(regex);
+		while(m.find()) {
+			quotedAreas.add(new Range(m.start(1), m.end(1) - 1));
+		}
+		return quotedAreas;
+	}
+	
+	private static boolean isQuotedArea(int pos, List<Range> quotedAreas) {
+		for (Range area : quotedAreas) {
+			if (area.contains(pos))	return true;
+		}
+		return false;
+	}
+	
+	public static int getGroupAtPos(String regex, int position) {
+		int group = 0;
+		int maxGroup = 0;
+		boolean ignoreNext = false;
+		List<Range> quotedAreas = getQuotedAreas(regex);
+		
+		String searchSt = regex.substring(0, position);
+		for (int i = 0; i < searchSt.length(); i++) {
+			if (ignoreNext) {
+				ignoreNext = false;
+				continue;
+			}
+			char ch = regex.charAt(i);
+			if (ch == '\\') {
+				ignoreNext = !isQuotedArea(i, quotedAreas);				
+			}				
+			else {				
+				if (ch == '(' && !ignoreNext) {
+					group = ++maxGroup;
+				}
+				// Group numbers are assigned based on left parenthesis
+				else if (ch == ')' && !ignoreNext) {
+					group--;
+				} 
+			}				
+		}
+		return group;
+	}
+	
+	/**
+	 * Adjust values in back references to capturing groups (like \1) of a given regex.
+	 * This method needs to be called when a new group is added to a regex,
+	 * and the regex contains back references to existing groups.
+	 * Values in the references having number equal or greater than groupNum, should
+	 * be increased by 1.
+	 * @param regex the given regex containing back references to capturing groups. 
+	 * @param groupNum the number of the new group.
+	 * @return the given regex with updated references.
+	 */
+	public static String updateGroupReferences(String regex, int groupNum) {
+		Matcher m = BACKREF_PATTERN.matcher(regex);
+		List<String> values = new ArrayList<String>();
+		
+		// Collect group values in a length-sorted list
+		while(m.find()) {
+			String n = m.group(1);
+			values.add(n);				
+		}
+		
+		// Sorted by string length, not by int value
+		Collections.sort(values, new Comparator<String>() {
+			@Override
+			public int compare(String o1, String o2) {
+				if (o1.length() < o2.length()) return 1;
+				if (o1.length() > o2.length()) return -1;
+				return 0;
+			}				
+		});
+		
+		// Replace group numbers starting from the longest to shortest to not replace 
+		// parts of longer values
+		for (String value : values) {
+			int oldValue = Integer.valueOf(value);
+			if (oldValue < groupNum - 1) continue;
+			
+			int newValue = oldValue + 1;
+			regex = regex.replace("\\" + value, String.format("\\%d", newValue));
+		}
+		
+		return regex;
+	}
 }

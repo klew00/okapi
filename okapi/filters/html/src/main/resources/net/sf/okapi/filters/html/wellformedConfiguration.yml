@@ -375,6 +375,10 @@ elements:
     ruleTypes: [INLINE]
   
   # Excluded elements
+  '.*':
+    ruleTypes: [EXCLUDE]
+    conditions: [translate, EQUALS, 'no']
+    
   style:
     ruleTypes: [EXCLUDE]
   

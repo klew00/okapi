@@ -921,6 +921,102 @@ public class TextFragmentTest {
 		f.removeCode(c);
 		assertEquals("[b]AB[/b]C", f.toText());
 	}
+	
+	@Test
+	public void testRenumberCodes() {
+		
+		// 11A1122AA2233B3344BB44		
+		// 0123456789012345678901
+		// 0         1         2
+		
+		TextFragment tf = new TextFragment();
+		tf.append(TagType.OPENING, "(1", "[(1]", 1);
+		tf.append("A");		
+		tf.append(TagType.CLOSING, "1)", "[1)]", 1);
+		tf.append(TagType.OPENING, "(2", "[(2]", 2);
+		tf.append("AA");
+		tf.append(TagType.CLOSING, "2)", "[2)]", 2);
+		tf.append(TagType.OPENING, "(3", "[(3]", 3);
+		tf.append("B");		
+		tf.append(TagType.CLOSING, "3)", "[3)]", 3);
+		tf.append(TagType.OPENING, "(4", "[(4]", 4);
+		tf.append("BB");
+		tf.append(TagType.CLOSING, "4)", "[4)]", 4);
+		tf.changeToCode(7, 9, TagType.PLACEHOLDER, "x");
+		tf.changeToCode(18, 20, TagType.PLACEHOLDER, "x");
+		
+		GenericContent fmt = new GenericContent();
+		fmt.setContent(tf);
+		assertEquals("<b1/>A<e1/><b2/><5/><e2/><b3/>B<e3/><b4/><6/><e4/>", 
+				fmt.toString());
+		
+		tf.renumberCodes();
+		assertEquals("[(1]A[1)][(2]AA[2)][(3]B[3)][(4]BB[4)]", tf.toText());
+		assertEquals("<b1/>A<e1/><b2/><3/><e2/><b4/>B<e4/><b5/><6/><e5/>", 
+				//                                     |             |
+				fmt.toString());
+		assertEquals(10, tf.codes.size());
+		
+		assertEquals(1, tf.codes.get(0).id);
+		assertEquals(1, tf.codes.get(1).id);
+		assertEquals(2, tf.codes.get(2).id);
+		assertEquals(3, tf.codes.get(3).id);
+		assertEquals(2, tf.codes.get(4).id);
+		assertEquals(4, tf.codes.get(5).id);
+		assertEquals(4, tf.codes.get(6).id);
+		assertEquals(5, tf.codes.get(7).id);
+		assertEquals(5, tf.codes.get(8).id);
+		assertEquals(6, tf.codes.get(9).id);
+		
+		fmt = new GenericContent();
+		fmt.setContent(tf);
+		assertEquals("<b1/>A<e1/><b2/><3/><e2/><b4/>B<e4/><b5/><6/><e5/>", fmt.toString());
+		assertEquals("<b1/>A<e1/><b2/><x3/><e2/><b4/>B<e4/><b5/><x6/><e5/>", fmt.fromFragmentToLetterCoded(tf));
+		
+		tf = new TextFragment();
+		tf.append(TagType.OPENING, "(4", "[(4]", 4);
+		tf.append("A");		
+		tf.append(TagType.CLOSING, "4)", "[4)]", 4);
+		tf.append(TagType.OPENING, "(2", "[(2]", 2);
+		tf.append("AA");
+		tf.append(TagType.CLOSING, "2)", "[2)]", 2);
+		tf.append(TagType.OPENING, "(1", "[(1]", 1);
+		tf.append("B");		
+		tf.append(TagType.CLOSING, "1)", "[1)]", 1);
+		tf.append(TagType.OPENING, "(3", "[(3]", 3);
+		tf.append("BB");
+		tf.append(TagType.CLOSING, "3)", "[3)]", 3);
+		tf.changeToCode(7, 9, TagType.PLACEHOLDER, "x");
+		tf.changeToCode(18, 20, TagType.PLACEHOLDER, "x");
+		
+		fmt = new GenericContent();
+		fmt.setContent(tf);
+		assertEquals("<b4/>A<e4/><b2/><5/><e2/><b1/>B<e1/><b3/><6/><e3/>", 
+				fmt.toString());
+		
+		tf.renumberCodes();
+		assertEquals("[(4]A[4)][(2]AA[2)][(1]B[1)][(3]BB[3)]", tf.toText());
+		assertEquals("<b1/>A<e1/><b2/><3/><e2/><b4/>B<e4/><b5/><6/><e5/>", 
+				//                                     |             |
+				fmt.toString());
+		assertEquals(10, tf.codes.size());
+		
+		assertEquals(1, tf.codes.get(0).id);
+		assertEquals(1, tf.codes.get(1).id);
+		assertEquals(2, tf.codes.get(2).id);
+		assertEquals(3, tf.codes.get(3).id);
+		assertEquals(2, tf.codes.get(4).id);
+		assertEquals(4, tf.codes.get(5).id);
+		assertEquals(4, tf.codes.get(6).id);
+		assertEquals(5, tf.codes.get(7).id);
+		assertEquals(5, tf.codes.get(8).id);
+		assertEquals(6, tf.codes.get(9).id);
+		
+		fmt = new GenericContent();
+		fmt.setContent(tf);
+		assertEquals("<b1/>A<e1/><b2/><3/><e2/><b4/>B<e4/><b5/><6/><e5/>", fmt.toString());
+		assertEquals("<b1/>A<e1/><b2/><x3/><e2/><b4/>B<e4/><b5/><x6/><e5/>", fmt.fromFragmentToLetterCoded(tf));
+	}
 
 	/**
 	 * Makes a fragment <code>[b]A[br/]B[/b]C<code>

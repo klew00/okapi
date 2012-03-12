@@ -42,7 +42,7 @@ import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.lib.segmentation.LanguageMap;
-import net.sf.okapi.lib.segmentation.Rule;
+import net.sf.okapi.lib.segmentation.RuleInfo;
 import net.sf.okapi.lib.segmentation.SRXDocument;
 
 import org.junit.Before;
@@ -242,7 +242,7 @@ public class SegmentationTest {
 	public void testTrimOptionsSettingFromFile () throws URISyntaxException {
 		SRXDocument srxDoc = new SRXDocument();
 		// Trim options are 'true' in this file (inverse of default)
-		URL url = SegmentationTest.class.getResource("/Test01.srx");
+		URL url = SegmentationTest.class.getResource("/defaultSegmentation.srx");
 		srxDoc.loadRules(url.toURI().getPath());
 		ISegmenter segter = srxDoc.compileLanguageRules(LocaleId.ENGLISH, null);
 		segter.computeSegments(" a ");

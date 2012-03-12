@@ -269,14 +269,8 @@ public class SentenceAlignerStep extends BasePipelineStep implements IObserver {
 		
 		// remove leading and trailing whitespace in the aligned TextUnit 
 		// for both source and target
-		for (TextPart p : alignedTextUnit.getSource().getSegments()) {
-			p.text.ltrim();
-			p.text.rtrim();
-		}
-		for (TextPart p : alignedTextUnit.getTarget(targetLocale).getSegments()) {
-			p.text.ltrim();
-			p.text.rtrim();
-		}
+		TextUnitUtil.trimSegments(alignedTextUnit.getSource());
+		TextUnitUtil.trimSegments(alignedTextUnit.getTarget(targetLocale));
 		
 		// align codes betwen source and target and 
 		// copy source code data to corresponding target codes		

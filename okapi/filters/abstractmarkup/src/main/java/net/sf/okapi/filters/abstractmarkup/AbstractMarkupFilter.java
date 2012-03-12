@@ -47,9 +47,9 @@ import net.htmlparser.jericho.StartTag;
 import net.htmlparser.jericho.StartTagType;
 import net.htmlparser.jericho.StreamedSource;
 import net.htmlparser.jericho.Tag;
-
 import net.sf.okapi.common.BOMNewlineEncodingDetector;
 import net.sf.okapi.common.Event;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.MimeTypeMapper;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.exceptions.OkapiBadFilterInputException;
@@ -60,14 +60,14 @@ import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filters.PropertyTextUnitPlaceholder;
 import net.sf.okapi.common.filters.PropertyTextUnitPlaceholder.PlaceholderAccessType;
 import net.sf.okapi.common.filters.SubFilterEventConverter;
-import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Ending;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextFragment;
-import net.sf.okapi.common.resource.ITextUnit;
+import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.common.skeleton.GenericSkeletonPart;
 import net.sf.okapi.filters.abstractmarkup.ExtractionRuleState.RuleType;
@@ -433,7 +433,14 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 	protected void preProcess(Segment segment) {
 		boolean isInsideTextRun = false;
 		if (segment instanceof Tag) {
-			isInsideTextRun = getConfig().getElementRuleType(((Tag) segment).getName()) == RULE_TYPE.INLINE_ELEMENT;
+			Tag tag = (Tag)segment;
+			if (getConfig().getElementRuleTypeCandidate(tag.getName()) == RULE_TYPE.INLINE_ELEMENT
+					|| getConfig().getElementRuleTypeCandidate(tag.getName()) == RULE_TYPE.INLINE_EXCLUDED_ELEMENT
+					|| (getEventBuilder().isInsideTextRun() && (tag
+							.getTagType() == StartTagType.COMMENT || tag
+							.getTagType() == StartTagType.XML_PROCESSING_INSTRUCTION))) {
+				isInsideTextRun = true;
+			}
 		}
 
 		// add buffered whitespace to the current translatable text
@@ -765,7 +772,7 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 	}
 
 	protected void updateStartTagRuleState(String tag, RULE_TYPE ruleType, String idValue) {
-		RULE_TYPE r = getConfig().getElementRuleType(tag);
+		RULE_TYPE r = getConfig().getElementRuleTypeCandidate(tag);
 		switch (r) {	
 		case INLINE_EXCLUDED_ELEMENT:
 		case INLINE_ELEMENT:
@@ -799,7 +806,7 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 	}
 	
 	protected RULE_TYPE updateEndTagRuleState(EndTag endTag) {
-		RULE_TYPE ruleType = getConfig().getElementRuleType(endTag.getName());
+		RULE_TYPE ruleType = getConfig().getElementRuleTypeCandidate(endTag.getName());
 		RuleType currentState = null;
 
 		switch (ruleType) {
@@ -903,7 +910,7 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 
 		switch (ruleType) {
 		case INLINE_EXCLUDED_ELEMENT:
-			eventBuilder.endCode(endTag.toString());
+			eventBuilder.endCode(endTag.toString());			
 			break;
 		case INLINE_ELEMENT:
 			// check to see if we are inside a inline run that is excluded 

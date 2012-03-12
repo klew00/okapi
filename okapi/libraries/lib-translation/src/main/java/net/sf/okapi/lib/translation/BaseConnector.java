@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2010-2011 by the Okapi Framework contributors
+  Copyright (C) 2010-2012 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -28,6 +28,7 @@ import java.util.logging.Logger;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.annotation.AltTranslation;
 import net.sf.okapi.common.annotation.AltTranslationsAnnotation;
 import net.sf.okapi.common.query.IQuery;
 import net.sf.okapi.common.query.QueryResult;
@@ -52,6 +53,7 @@ public abstract class BaseConnector implements IQuery {
 	protected QueryResult result;
 	protected int current = -1;
 	private int weight;
+	private int noQueryThreshold = 101;
 
 	@Override
 	public LocaleId getSourceLanguage () {
@@ -169,6 +171,17 @@ public abstract class BaseConnector implements IQuery {
 			// Skip segments with no text
 			if ( !srcSeg.text.hasText(false) ) continue;
 			
+			// Check for existing candidates
+			// So we optionally do not query resources if it's not needed
+			Segment ts = null;
+			if ( trgCont.hasBeenSegmented() ) {
+				ts = trgSegs.get(srcSeg.getId());
+				if ( hasAlreadyCandidate(ts, null) ) continue;
+			}
+			else {
+				if ( hasAlreadyCandidate(null, trgCont) ) continue;
+			}
+		
 			// Do the query for the source segment
 			query(srcSeg.text);
 			// Then process each result
@@ -180,8 +193,8 @@ public abstract class BaseConnector implements IQuery {
 				TextUnitUtil.copySrcCodeDataToMatchingTrgCodes(srcSeg.text, qr.target, true, false, null, tu);
 
 				if ( trgCont.hasBeenSegmented() ) {
-					// Get corresponding target segment
-					Segment ts = trgSegs.get(srcSeg.getId());
+					// Get corresponding target segment is done already
+					// Create it if needed
 					if ( ts == null ) {
 						ts = new Segment(srcSeg.id, new TextFragment(""));
 						trgSegs.append(ts);
@@ -204,6 +217,25 @@ public abstract class BaseConnector implements IQuery {
 	}
 	
 	/**
+	 * Checks if the segment or container has already a translation candidate
+	 * with a score equal or above a given value. 
+	 * @param seg the segment entry (or null to use the container, or if there is no segment)
+	 * @param tc the container entry (or null to use the segment)
+	 * @return true if the entry has at least one candidate with a score equal or above the given threshold.
+	 */
+	private boolean hasAlreadyCandidate (Segment seg,
+		TextContainer tc)
+	{
+		AltTranslationsAnnotation ann = null;
+		if ( seg != null ) ann = seg.getAnnotation(AltTranslationsAnnotation.class);
+		else if ( tc != null ) ann = tc.getAnnotation(AltTranslationsAnnotation.class);
+		if ( ann == null ) return false;
+		AltTranslation alt = ann.getFirst();
+		if ( alt == null ) return false;
+		return (alt.getCombinedScore() >= noQueryThreshold);
+	}
+	
+	/**
 	 * Slow default implementation using leverage(TextUnit).
 	 * Override in sub-class if you want a custom batchLeverage
 	 * @param tus list of the text units to process.
@@ -214,7 +246,17 @@ public abstract class BaseConnector implements IQuery {
 			leverage(tu);
 		}
 	}
+
+	@Override
+	public void setNoQueryThreshold (int noQueryThreshold) {
+		this.noQueryThreshold = noQueryThreshold;
+	}
 	
+	@Override
+	public int getNoQueryThreshold () {
+		return noQueryThreshold;
+	}
+
 	/**
 	 * Call this method inside the overriding {@link #leverage(ITextUnit)} method
 	 * of the derived class, if that class offers a fast {@link #batchQuery(List)} method.
@@ -237,13 +279,33 @@ public abstract class BaseConnector implements IQuery {
 	protected void batchLeverageUsingBatchQuery (List<ITextUnit> tuList) {
 		// Gather all fragments in a list
 		ArrayList<TextFragment> frags = new ArrayList<TextFragment>();
+		ArrayList<String> fragsIds = new ArrayList<String>();
+		
 		for ( ITextUnit tu : tuList ) {
 			// Skip non-translatable
 			if ( !tu.isTranslatable() ) continue;
+			
+			// Check if we need to query
+			ISegments trgSegs = null;
+			TextContainer trgCont = tu.getTarget(getTargetLanguage()); // Null if it does not exists
+			if ( trgCont != null ) trgSegs = trgCont.getSegments();
+			
 			// We assume here that if there is a target content it match the segmentation of the source
 			// Create an empty target (or return existing target)
 			for ( Segment srcSeg : tu.getSource().getSegments() ) {
+				
+				// Check for existing candidates
+				// So we optionally do not query resources if it's not needed
+				if (( trgSegs != null ) && trgCont.hasBeenSegmented() ) {
+					Segment ts = trgSegs.get(srcSeg.getId());
+					if ( hasAlreadyCandidate(ts, null) ) continue;
+				}
+				else {
+					if ( hasAlreadyCandidate(null, trgCont) ) continue;
+				}
+				
 				frags.add(srcSeg.text);
+				fragsIds.add(tu.getId()+"_"+srcSeg.getId());
 			}
 		}
 		
@@ -260,6 +322,11 @@ public abstract class BaseConnector implements IQuery {
 			TextContainer trgCont = tu.createTarget(getTargetLanguage(), false, IResource.COPY_SEGMENTATION);
 			ISegments trgSegs = trgCont.getSegments();
 			for ( Segment srcSeg : tu.getSource().getSegments() ) {
+				
+				// Check if this entry was queried
+				if ( !fragsIds.contains(tu.getId()+"_"+srcSeg.getId()) ) {
+					continue;
+				}
 			
 				// Get the list of translation for that segment
 				List<QueryResult> resList = allResults.get(++transIndex);

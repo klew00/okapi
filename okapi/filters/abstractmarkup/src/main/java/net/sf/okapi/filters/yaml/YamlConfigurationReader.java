@@ -36,6 +36,7 @@ import java.util.regex.PatternSyntaxException;
 
 import org.yaml.snakeyaml.Yaml;
 
+@SuppressWarnings({ "unchecked", "rawtypes" })
 public class YamlConfigurationReader {
 	private static final String REGEX_META_CHARS_REGEX = "[\\(\\[\\{\\^\\$\\|\\]\\}\\)\\?\\*\\+]+";
 	private static final Pattern REGEX_META_CHARS_PATTERN = Pattern.compile(REGEX_META_CHARS_REGEX);
@@ -61,14 +62,12 @@ public class YamlConfigurationReader {
 	/**
 	 * Default Tagged Configuration
 	 */
-	@SuppressWarnings("unchecked")
 	public YamlConfigurationReader() {
 		yaml = new Yaml();
 		config = (Map) yaml.load("collapse_whitespace: false\nassumeWellformed: true");
 		initialize();
 	}
 
-	@SuppressWarnings("unchecked")
 	public YamlConfigurationReader(URL configurationPathAsResource) {
 		try {
 			yaml = new Yaml();
@@ -81,7 +80,6 @@ public class YamlConfigurationReader {
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	public YamlConfigurationReader(File configurationFile) {
 		try {
 			yaml = new Yaml();
@@ -92,14 +90,12 @@ public class YamlConfigurationReader {
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	public YamlConfigurationReader(String configurationScript) {
 		yaml = new Yaml();
 		config = (Map) yaml.load(configurationScript);
 		initialize();
 	}
 	
-	@SuppressWarnings("unchecked")
 	private void initialize() {
 		elementRules = new HashMap<String, Object>();
 		attributeRules = new HashMap<String, Object>();
@@ -125,7 +121,6 @@ public class YamlConfigurationReader {
 		return yaml.dump(config);
 	}
 
-	@SuppressWarnings("unchecked")
 	/**
 	 * Find element or attribute rules
 	 */
@@ -143,7 +138,6 @@ public class YamlConfigurationReader {
 		return rules;
 	}
 
-	@SuppressWarnings("unchecked")
 	/*
 	 * Find element rules only (including regex)
 	 */
@@ -162,7 +156,15 @@ public class YamlConfigurationReader {
 		return rule;
 	}
 
-	@SuppressWarnings("unchecked")
+	/**
+	 * Non regex element rules only
+	 * @param ruleName rule name (aka tag name)
+	 * @return true if there is a matched non-regex rule
+	 */
+	public Map getNonRegexElementRule(String ruleName) {
+		return (Map)elementRules.get(ruleName);
+	}
+	
 	/*
 	 * Find regex element rules only
 	 */
@@ -180,7 +182,6 @@ public class YamlConfigurationReader {
 		return rule;
 	}
 
-	@SuppressWarnings("unchecked")
 	/*
 	 * Find attribute rules only (including regex)
 	 */
@@ -199,7 +200,6 @@ public class YamlConfigurationReader {
 		return rule;
 	}
 
-	@SuppressWarnings("unchecked")
 	/*
 	 * Find attribute rules only (including regex)
 	 */
@@ -230,12 +230,10 @@ public class YamlConfigurationReader {
 		config.put(property, value);
 	}
 
-	@SuppressWarnings("unchecked")
 	public void addElementRule(String ruleName, Map rule) {
 		elementRules.putAll(rule);
 	}
 
-	@SuppressWarnings("unchecked")
 	public void addAttributeRule(String ruleName, Map rule) {
 		attributeRules.putAll(rule);
 	}

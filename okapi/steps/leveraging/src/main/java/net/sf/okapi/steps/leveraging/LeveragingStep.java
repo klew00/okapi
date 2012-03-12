@@ -189,6 +189,7 @@ public class LeveragingStep extends BasePipelineStep {
 		
 		// Else: initialize the global variables
 		qm = new QueryManager();
+		qm.setNoQueryThreshold(params.getNoQueryThreshold());
 		qm.setThreshold(params.getThreshold());
 		qm.setRootDirectory(rootDir);
 		

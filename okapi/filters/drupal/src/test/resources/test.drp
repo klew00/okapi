@@ -3,7 +3,10 @@ user=ysavourel
 password=#BeNcStreXNhdm91cmVs
 sourceLocale=en
 targetLocale=en
-9	yes
+neutralLikeSource=yes
+12	no
+11	yes
+10	no
+9	no
 8	no
 3	no
-1	yes

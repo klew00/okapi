@@ -7,7 +7,6 @@ import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.annotation.IAnnotation;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
 import net.sf.okapi.common.resource.DocumentPart;
-import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.StartDocument;
 
 public class DocumentPartLogger extends BasePipelineStep {
@@ -48,7 +47,7 @@ public class DocumentPartLogger extends BasePipelineStep {
 	
 	@Override
 	protected Event handleEndBatch(Event event) {
-		logger.fine(sb.toString());
+		logger.info(sb.toString());
 		return super.handleEndBatch(event);
 	}
 	

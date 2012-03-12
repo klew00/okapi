@@ -21,6 +21,7 @@
 package net.sf.okapi.common;
 
 import java.util.Arrays;
+import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
@@ -380,5 +381,14 @@ public final class StringUtil {
 		if (end > len) end = len;
 		if (start > end) return null;
 		return string.substring(start, end);
+	}
+	
+	public static String charsToString(Set<Character> set) {
+		char[] chars = new char[set.size()];
+		int i = 0;
+		for (Character ch : set) {
+			chars[i++] = ch;
+		}
+		return String.valueOf(chars);
 	}
 }

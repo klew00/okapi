@@ -322,7 +322,7 @@ public class DrupalFilter implements IFilter {
 	private boolean prepareNode (NodeInfo info) {
 		logger.info("Node: " + info.getNid() + " " + info.getType());
 		// Get the node
-		Node node = cli.getNode(info.getNid());
+		Node node = cli.getNode(info.getNid(), proj.getSourceLocale().toString(), proj.getNeutralLikeSource());
 		
 		subDocId = info.getNid();
 		StartSubDocument ssd = new StartSubDocument(docId, subDocId);

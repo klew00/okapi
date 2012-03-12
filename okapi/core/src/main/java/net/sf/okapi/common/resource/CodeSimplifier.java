@@ -267,17 +267,24 @@ public class CodeSimplifier {
 		//System.out.println(TextUnitUtil.toText(tf));
 		
 		if (removeLeadingTrailingCodes && res != null) {
-			TextFragment leadingMarkers = new TextFragment();
-			TextFragment trailingMarkers = new TextFragment();
+			boolean hasLeading = !Util.isEmpty(res[0]);
+			boolean hasTrailing = !Util.isEmpty(res[1]);
 			
-			res[0] = TextUnitUtil.extractSegMarkers(leadingMarkers, res[0], true);
-			res[1] = TextUnitUtil.extractSegMarkers(trailingMarkers, res[1], true);
+			if (hasLeading) {
+				TextFragment leadingMarkers = new TextFragment();
+				res[0] = TextUnitUtil.extractSegMarkers(leadingMarkers, res[0], true);
+				tf.insert(0, leadingMarkers);
+			}
 			
-			tf.insert(0, leadingMarkers);
-			tf.append(trailingMarkers);
+			if (hasTrailing) {
+				TextFragment trailingMarkers = new TextFragment();
+				res[1] = TextUnitUtil.extractSegMarkers(trailingMarkers, res[1], true);
+				tf.append(trailingMarkers);
+			}
 		}
 		//System.out.println(TextUnitUtil.toText(tf));
 		TextUnitUtil.restoreSegmentation(tc, tf);
+		TextUnitUtil.convertTextParts(tc);
 //		System.out.println(res[0]);
 //		System.out.println(res[1]);
 		

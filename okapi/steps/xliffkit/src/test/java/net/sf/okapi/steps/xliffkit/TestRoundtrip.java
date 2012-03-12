@@ -1,5 +1,8 @@
 package net.sf.okapi.steps.xliffkit;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
@@ -39,9 +42,10 @@ public class TestRoundtrip {
 		String midPath = pathBase + "testRoundtrip.xliff.kit";
 		String outPath = pathBase + "out/";
 		
-		EventListBuilderStep elb = new EventListBuilderStep();
+		EventListBuilderStep elb1 = new EventListBuilderStep();
+		EventListBuilderStep elb2 = new EventListBuilderStep();
 		
-		new XPipeline(
+		XPipeline pl = new XPipeline(
 				"Test pipeline for XLIFFKitWriterStep",
 				new XBatch(
 						new XBatchItem(
@@ -51,7 +55,7 @@ public class TestRoundtrip {
 								FRFR)
 						),
 				new RawDocumentToFilterEventsStep(new OpenXMLFilter()),
-				elb,
+				elb1,
 				//new TextUnitLogger(),
 				new XPipelineStep(
 						new XLIFFKitWriterStep(),								
@@ -60,10 +64,13 @@ public class TestRoundtrip {
 						new XParameter("message", "This document is a part of the test t-kit, generated from net.sf.okapi.steps.xliffkit.writer.testPackageFormat()"),
 						//new XParameter("outputURI", this.getClass().getResource("draft4.xliff.kit").toURI().toString()))
 						new XParameter("outputURI", new File(midPath).toURI().toString()))
-		).execute();
+		);
+		assertEquals(3, pl.getSteps().size());
+		pl.execute();
 		
-		List<Event> list1 = elb.getList();
-		
+		List<Event> list1 = elb1.getList();
+		assertTrue(new File(midPath).exists());
+				
 		new XPipeline(
 				"Test pipeline for XLIFFKitReaderStep",
 				new XBatch(
@@ -76,12 +83,12 @@ public class TestRoundtrip {
 								ENUS)
 						),
 				new XLIFFKitReaderStep(),
-				elb,
+				elb2,
 				new TextUnitLogger(),
 				new EventLogger()
 		).execute();
 		
-		List<Event> list2 = elb.getList();
+		List<Event> list2 = elb2.getList();
 		
 		if ( !FilterTestDriver.compareEvents(list1, list2, true) ) {
 			throw new RuntimeException("Events are different for " + inPath);

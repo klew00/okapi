@@ -31,8 +31,10 @@ import net.sf.okapi.common.uidescription.SpinInputPart;
 public class Parameters extends BaseParameters implements IEditorDescriptionProvider {
 
 	private static final String FUZZYTHRESHOLD = "fuzzyThreshold";
+	private static final String MAXHITS = "maxHits";
 	
 	private int fuzzyThreshold;
+	private int maxHits;
 	
 	public Parameters () {
 		reset();
@@ -40,6 +42,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	
 	public void reset() {
 		fuzzyThreshold = 100;
+		maxHits = 20;
 	}
 	
 	@Override
@@ -47,12 +50,14 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		reset();
 		buffer.fromString(data);
 		fuzzyThreshold = buffer.getInteger(FUZZYTHRESHOLD, fuzzyThreshold);
+		maxHits = buffer.getInteger(MAXHITS, maxHits);
 	}
 	
 	@Override
 	public String toString() {
 		buffer.reset();
 		buffer.setInteger(FUZZYTHRESHOLD, fuzzyThreshold);
+		buffer.setInteger(MAXHITS, maxHits);
 		return buffer.toString();
 	}
 	
@@ -68,6 +73,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	public ParametersDescription getParametersDescription () {
 		ParametersDescription desc = new ParametersDescription(this);
 		desc.add(FUZZYTHRESHOLD, "Fuzzy threshold (1-100)", "Fuzzy threshold for fuzzy repetitions. Leave 100 for exact repetitions only.");
+		desc.add(MAXHITS, "Max hits", "Maximum number of exact and fuzzy repetitions to keep track of for every segment.");
 		return desc;
 	}
 	
@@ -75,8 +81,18 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	public EditorDescription createEditorDescription(ParametersDescription paramDesc) {
 		EditorDescription desc = new EditorDescription("Repetition Analysis");		
 		SpinInputPart sip = desc.addSpinInputPart(paramDesc.get(FUZZYTHRESHOLD));
+		SpinInputPart sip2 = desc.addSpinInputPart(paramDesc.get(MAXHITS));
 		sip.setRange(1, 100);		
+		sip2.setRange(1, 100);
 		return desc;
+	}
+
+	public int getMaxHits() {
+		return maxHits;
+	}
+
+	public void setMaxHits(int maxHits) {
+		this.maxHits = maxHits;
 	}
 
 }

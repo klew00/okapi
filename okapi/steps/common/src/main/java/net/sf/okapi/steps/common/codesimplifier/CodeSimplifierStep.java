@@ -71,6 +71,7 @@ public class CodeSimplifierStep extends BasePipelineStep {
 		TextUnitUtil.simplifyCodes(tu, params.getRemoveLeadingTrailingCodes() && 
 				tu.getSkeleton() instanceof GenericSkeleton);
 		
+		//TextUnitUtil.convertTextParts(tu.getSource());
 		return super.handleTextUnit(event);
 	}
 }

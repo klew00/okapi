@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009-2010 by the Okapi Framework contributors
+  Copyright (C) 2009-2012 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -62,6 +62,8 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 	private IHelp help;
 	private Composite mainComposite;
 	private IContext context;
+	private Label stNoQueryThreshold;
+	private Spinner spnNoQueryThreshold;
 	private Label stThreshold;
 	private Spinner spnThreshold;
 	private Button chkDowngradeIBM;
@@ -198,6 +200,15 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		gdTmp.horizontalSpan = 2;
 		pnlConnector.setLayoutData(gdTmp);
 		
+		stNoQueryThreshold = new Label(mainComposite, SWT.NONE);
+		stNoQueryThreshold.setText("Do not query if there is already a candidate with a score equals to or above:");
+		
+		spnNoQueryThreshold = new Spinner(mainComposite, SWT.BORDER);
+		spnNoQueryThreshold.setMinimum(0);
+		spnNoQueryThreshold.setMaximum(101); // Allow 101 to allow to always query
+		spnNoQueryThreshold.setIncrement(1);
+		spnNoQueryThreshold.setPageIncrement(10);
+
 		stThreshold = new Label(mainComposite, SWT.NONE);
 		stThreshold.setText("Accept matches that are equal or above this score:");
 		
@@ -342,6 +353,8 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 	private void updateOptionsDisplay () {
 		boolean enabled = chkLeverage.getSelection();
 		pnlConnector.setEnabled(enabled);
+		stNoQueryThreshold.setEnabled(enabled);
+		spnNoQueryThreshold.setEnabled(enabled);
 		stThreshold.setEnabled(enabled);
 		spnThreshold.setEnabled(enabled);
 		chkDowngradeIBM.setEnabled(enabled);
@@ -392,6 +405,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 	private void setData () {
 		chkLeverage.setSelection(params.getLeverage());
 		pnlConnector.setData(params.getResourceClassName(), params.getResourceParameters());
+		spnNoQueryThreshold.setSelection(params.getNoQueryThreshold());
 		spnThreshold.setSelection(params.getThreshold());
 		chkDowngradeIBM.setSelection(params.getDowngradeIdenticalBestMatches());
 		chkFillTarget.setSelection(params.getFillTarget());
@@ -433,6 +447,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		
 		params.setResourceClassName(pnlConnector.getConnectorClass());
 		params.setResourceParameters(pnlConnector.getConnectorParameters());
+		params.setNoQueryThreshold(spnNoQueryThreshold.getSelection());
 		params.setThreshold(spnThreshold.getSelection());
 		params.setDowngradeIdenticalBestMatches(chkDowngradeIBM.getSelection());
 		params.setFillTarget(chkFillTarget.getSelection());

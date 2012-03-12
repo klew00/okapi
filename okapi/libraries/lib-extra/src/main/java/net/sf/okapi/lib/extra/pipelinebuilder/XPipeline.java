@@ -58,14 +58,31 @@ public class XPipeline extends net.sf.okapi.common.pipeline.Pipeline implements 
 		this(description, type, true, steps);
 	}
 	
-	private XPipeline(String description, XPipelineType type, boolean buildPipeline, IPipelineStep... steps) {
+	private XPipeline(String description, XPipelineType type, boolean buildPipeline, 
+			IPipelineStep... steps) {
 		stepImpl.setDescription(description);
 		this.type = type;
 		
 		for (IPipelineStep step : steps) {
 			if (step instanceof XPipelineStep) {
-				if (((XPipelineStep) step).getStep() == null) continue; // Do not insert
+				if (((XPipelineStep) step).getStep() == null) continue; // Do not insert an empty step
 			}
+			else if (step instanceof IPipeline) {
+				if (step instanceof XPipeline) {
+					XPipeline pl = (XPipeline) step;
+					if (pl.type == XPipelineType.PARALLEL) {
+						this.addStep(step); // Parallel pipeline is inserted as one step, regardless of how many steps its branches contain 
+						continue;
+					}
+				}
+				else { // Either a sequential XPipeline, or another IPipeline 
+					IPipeline pl = (IPipeline) step; 
+					for (IPipelineStep s : pl.getSteps()) {
+						this.addStep(s);
+					}
+				}
+			}
+
 			this.addStep(step);
 		}
 		
@@ -105,7 +122,7 @@ public class XPipeline extends net.sf.okapi.common.pipeline.Pipeline implements 
 			if (step instanceof XPipelineStep)
 				pd.addStep(((XPipelineStep) step).getStep());
 			else
-				pd.addStep(step);
+				if (step != null) pd.addStep(step);
 		
 		if (fcMapper == null) {
 			fcMapper = new FilterConfigurationMapper();

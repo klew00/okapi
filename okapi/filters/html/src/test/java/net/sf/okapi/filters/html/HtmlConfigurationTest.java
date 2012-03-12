@@ -45,17 +45,12 @@ public class HtmlConfigurationTest {
 				.getResource("/net/sf/okapi/filters/html/nonwellformedConfiguration.yml");
 		TaggedFilterConfiguration rules = new TaggedFilterConfiguration(url);
 		assertTrue(rules.isRuleType("title", TaggedFilterConfiguration.RULE_TYPE.ATTRIBUTE_TRANS));
-		assertEquals(rules.getElementRuleType("title"),
-				TaggedFilterConfiguration.RULE_TYPE.TEXT_UNIT_ELEMENT);
-		assertEquals(rules.getElementRuleType("abbr"),
-				TaggedFilterConfiguration.RULE_TYPE.INLINE_ELEMENT);
-		assertEquals(rules.getElementRuleType("area"),
-				TaggedFilterConfiguration.RULE_TYPE.ATTRIBUTES_ONLY);
-		assertEquals(rules.getElementRuleType("script"),
-				TaggedFilterConfiguration.RULE_TYPE.EXCLUDED_ELEMENT);
+		assertEquals(TaggedFilterConfiguration.RULE_TYPE.TEXT_UNIT_ELEMENT, rules.getElementRuleTypeCandidate("title"));
+		assertEquals(TaggedFilterConfiguration.RULE_TYPE.INLINE_EXCLUDED_ELEMENT, rules.getElementRuleTypeCandidate("abbr"));
+		assertEquals(TaggedFilterConfiguration.RULE_TYPE.ATTRIBUTES_ONLY, rules.getElementRuleTypeCandidate("area"));
+		assertEquals(TaggedFilterConfiguration.RULE_TYPE.EXCLUDED_ELEMENT, rules.getElementRuleTypeCandidate("script"));
 		assertTrue(rules.isRuleType("pre", TaggedFilterConfiguration.RULE_TYPE.PRESERVE_WHITESPACE));
-		assertEquals(rules.getElementRuleType("meta"),
-				TaggedFilterConfiguration.RULE_TYPE.ATTRIBUTES_ONLY);
+		assertEquals(TaggedFilterConfiguration.RULE_TYPE.ATTRIBUTES_ONLY, rules.getElementRuleTypeCandidate("meta"));
 	}
 
 	@Test
@@ -92,7 +87,7 @@ public class HtmlConfigurationTest {
 		TaggedFilterConfiguration rules = new TaggedFilterConfiguration(url);
 
 		assertTrue(rules.isRuleType("pre", TaggedFilterConfiguration.RULE_TYPE.PRESERVE_WHITESPACE));
-		assertEquals(rules.getElementRuleType("style"),
+		assertEquals(rules.getElementRuleTypeCandidate("style"),
 				TaggedFilterConfiguration.RULE_TYPE.EXCLUDED_ELEMENT);
 		assertTrue(rules.isRuleType("pre", TaggedFilterConfiguration.RULE_TYPE.PRESERVE_WHITESPACE));
 		assertFalse(rules.isRuleType("stylesheet",
