@@ -22,10 +22,14 @@ public abstract class AbstractSubFilterAdapter implements IFilter {
 	SubFilterEventConverter converter;
 	
 	public AbstractSubFilterAdapter(IFilter filter, FilterState state) {
-		this.filter = filter;
 		this.state = state;
+		this.filter = filter;
 		this.converter = new SubFilterEventConverter(state.getParentId(),
 				state.getStartSkeleton(), state.getEndSkeleton());
+	}
+	
+	protected void setFilter(IFilter filter) {
+		this.filter = filter;
 	}
 
 	@Override

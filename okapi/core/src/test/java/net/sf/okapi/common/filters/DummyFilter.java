@@ -281,4 +281,9 @@ public class DummyFilter implements IFilter {
 		return list;
 	}
 
+	@Override
+	public boolean isSubfilter() {
+		return false;
+	}
+
 }
