@@ -4,7 +4,7 @@ import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 
-public class StartSubFilter extends BaseReferenceable {
+public class StartSubFilter extends StartGroup {
 	// from sub document (no multiple inheritance in Java :-))
 	private String encoding;
 	private boolean isMultilingual;
@@ -21,8 +21,7 @@ public class StartSubFilter extends BaseReferenceable {
 	 * @param parentId The identifier of the parent resource for this sub filter.
 	 */
 	public StartSubFilter(String parentId) {
-		super();
-		this.parentId = parentId;
+		super(parentId);
 	}
 
 	/**
@@ -31,11 +30,9 @@ public class StartSubFilter extends BaseReferenceable {
 	 * @param parentId the identifier of the parent resource for this sub filter.
 	 * @param id the identifier of this sub filter.
 	 */
-	public StartSubFilter(String parentId,
-		String id)
+	public StartSubFilter(String parentId, String id)
 	{
-		super();
-		this.parentId = parentId;
+		super(parentId);
 		this.id = id;
 	}
 	

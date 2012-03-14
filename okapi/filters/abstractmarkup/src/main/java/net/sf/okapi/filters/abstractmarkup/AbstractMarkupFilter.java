@@ -56,6 +56,8 @@ import net.sf.okapi.common.exceptions.OkapiBadFilterInputException;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.filters.AbstractFilter;
 import net.sf.okapi.common.filters.EventBuilder;
+import net.sf.okapi.common.filters.FilterState;
+import net.sf.okapi.common.filters.FilterState.FILTER_STATE;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filters.PropertyTextUnitPlaceholder;
 import net.sf.okapi.common.filters.PropertyTextUnitPlaceholder.PlaceholderAccessType;
@@ -101,8 +103,8 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 	private EventBuilder eventBuilder;
 	private RawDocument currentRawDocument;
 	private ExtractionRuleState ruleState; 
-	private IFilter cdataSubfilter; 
-	private IFilter pcdataSubfilter;
+	private CdataSubFilter cdataSubfilter; 
+	private PcdataSubFilter pcdataSubfilter;
 	private String currentId;
 	private boolean documentEncoding;
 	private String currentDocName;
@@ -394,16 +396,18 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 		// initialize cdata sub-filter
 		TaggedFilterConfiguration config = getConfig(); 
 		if (config != null && config.getGlobalCDATASubfilter() != null) {
-			cdataSubfilter = getFilterConfigurationMapper().createFilter(
+			IFilter cdataFilter = getFilterConfigurationMapper().createFilter(
 					getConfig().getGlobalCDATASubfilter(), cdataSubfilter); 
 			getEncoderManager().mergeMappings(cdataSubfilter.getEncoderManager());
+			cdataSubfilter = new CdataSubFilter(cdataFilter);
 		}
 		
 		// intialize pcdata sub-filter
 		if (config != null && config.getGlobalPCDATASubfilter() != null) {
 			String subfilterName = getConfig().getGlobalPCDATASubfilter();
-			pcdataSubfilter = getFilterConfigurationMapper().createFilter(subfilterName, pcdataSubfilter); 
+			IFilter pcdataFilter = getFilterConfigurationMapper().createFilter(subfilterName, pcdataSubfilter); 
 			getEncoderManager().mergeMappings(pcdataSubfilter.getEncoderManager());
+			pcdataSubfilter = new PcdataSubFilter(pcdataFilter);
 		}
 	}
 
@@ -578,33 +582,19 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 			addToDocumentPart(tag.toString());
 		} else { // Content to extract
 			if (cdataSubfilter != null) {				
+				cdataSubfilter.close();				
 				String parentId = eventBuilder.findMostRecentParentId();
-				cdataSubfilter.close();
-				
 				parentId = (parentId == null ? getDocumentId().getLastId() : parentId); 
-				SubFilterEventConverter converter = 
-					new SubFilterEventConverter(parentId, 
-							new GenericSkeleton("<![CDATA["), 
-							new GenericSkeleton("]]>"));
-			
-				// TODO: only AbstractFilter subclasses can be used as subfilters!!!
-				((AbstractFilter)cdataSubfilter).setParentId(parentId);
+				FilterState s = new FilterState(FILTER_STATE.STANDALONE_TEXTUNIT, 
+						parentId, 
+						new GenericSkeleton("<![CDATA["), 
+						new GenericSkeleton("]]>"));
+				s.setParentTextUnitName(eventBuilder.findMostRecentTextUnitName());
+				cdataSubfilter.setState(s);
 				cdataSubfilter.open(new RawDocument(cdataWithoutMarkers, getSrcLoc()));	
-				int tuChildCount = 0;
 				while (cdataSubfilter.hasNext()) {
-					Event event = converter.convertEvent(cdataSubfilter.next());
+					Event event = cdataSubfilter.next();
 					eventBuilder.addFilterEvent(event);
-					// subfiltered textunits inherit any name from a parent TU
-					if (event.isTextUnit()) {
-						if (event.getTextUnit().getName() == null) {
-							String parentName = eventBuilder.findMostRecentTextUnitName();
-							// we need to add a child id so each tu name is unique for this subfiltered content
-							if (parentName != null) {
-								parentName = parentName + "-" + Integer.toString(++tuChildCount); 
-							}
-							event.getTextUnit().setName(parentName);
-						}
-					}
 				}			
 				cdataSubfilter.close();			
 			} else {
@@ -940,9 +930,9 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 				// remove the TextUnit we have accumulated since the start tag
 				ITextUnit pcdata = popTempEvent().getTextUnit();
 				
-				String parentId = eventBuilder.findMostRecentParentId();
 				pcdataSubfilter.close();
-				
+
+				String parentId = eventBuilder.findMostRecentParentId();
 				parentId = (parentId == null ? getDocumentId().getLastId() : parentId); 
 				SubFilterEventConverter converter = new SubFilterEventConverter(parentId,
 						// the first GenericSkekeletonPart should be the start tag

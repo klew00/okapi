@@ -24,12 +24,38 @@ public abstract class AbstractSubFilterAdapter implements IFilter {
 	public AbstractSubFilterAdapter(IFilter filter, FilterState state) {
 		this.state = state;
 		this.filter = filter;
-		this.converter = new SubFilterEventConverter(state.getParentId(),
+		if (this.state != null) {
+			this.converter = new SubFilterEventConverter(state.getParentId(),
 				state.getStartSkeleton(), state.getEndSkeleton());
+		}
 	}
 	
-	protected void setFilter(IFilter filter) {
+	public AbstractSubFilterAdapter(IFilter filter) {
+		this(filter, null);
+	}
+	
+	public void setFilter(IFilter filter) {
 		this.filter = filter;
+	}
+
+	public IFilter getFilter() {
+		return filter;
+	}
+
+	public void setState(FilterState state) {
+		this.state = state;
+	}
+
+	public FilterState getState() {
+		return state;
+	}
+
+	public SubFilterEventConverter getConverter() {
+		return converter;
+	}
+
+	public void setConverter(SubFilterEventConverter converter) {
+		this.converter = converter;
 	}
 
 	@Override
@@ -64,8 +90,12 @@ public abstract class AbstractSubFilterAdapter implements IFilter {
 
 	@Override
 	public Event next() {
-		Event e = filter.next();		
-		return converter.convertEvent(e);
+		Event e = filter.next();
+		if (converter != null) {
+			return converter.convertEvent(e);
+		} else {
+			return e;
+		}
 	}
 
 	@Override

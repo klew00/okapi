@@ -9,4 +9,8 @@ public class PcdataSubFilter extends AbstractSubFilterAdapter {
 	public PcdataSubFilter(IFilter filter, FilterState state) {
 		super(filter, state);
 	}
+
+	public PcdataSubFilter(IFilter filter) {
+		super(filter);
+	}
 }

@@ -12,7 +12,7 @@ import net.sf.okapi.common.ISkeleton;
  */
 public class FilterState {
 	public enum FILTER_STATE {
-		INSIDE_TAG, INSIDE_TEXTUNIT, INSIDE_ATTRIBUTE
+		INSIDE_TAG, INSIDE_TEXTUNIT, INSIDE_ATTRIBUTE, STANDALONE_TEXTUNIT
 	}
 
 	private FILTER_STATE state;
