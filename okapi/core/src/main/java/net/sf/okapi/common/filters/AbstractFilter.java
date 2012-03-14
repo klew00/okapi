@@ -151,6 +151,7 @@ public abstract class AbstractFilter implements IFilter {
 		return configList.remove(getConfiguration(configId));
 	}
 
+	@Override
 	public List<FilterConfiguration> getConfigurations() {
 		List<FilterConfiguration> configs = new ArrayList<FilterConfiguration>();
 
@@ -161,10 +162,12 @@ public abstract class AbstractFilter implements IFilter {
 		return configs;
 	}
 
+	@Override
 	public void setFilterConfigurationMapper(IFilterConfigurationMapper fcMapper) {
 		this.fcMapper = fcMapper;
 	}
 
+	@Override
 	public EncoderManager getEncoderManager() {
 		if (encoderManager == null) {
 			encoderManager = new EncoderManager();
@@ -306,6 +309,7 @@ public abstract class AbstractFilter implements IFilter {
 	 * 
 	 * @return the mime type
 	 */
+	@Override
 	public String getMimeType() {
 		return mimeType;
 	}
@@ -348,10 +352,12 @@ public abstract class AbstractFilter implements IFilter {
 		this.filterWriter = filterWriter;
 	}
 
+	@Override
 	public ISkeletonWriter createSkeletonWriter() {
 		return new GenericSkeletonWriter();
 	}
 
+	@Override
 	public IFilterWriter createFilterWriter() {
 		if (filterWriter != null) {
 			return filterWriter;
@@ -407,10 +413,12 @@ public abstract class AbstractFilter implements IFilter {
 		this.name = name;
 	}
 
+	@Override
 	public String getName() {
 		return name;
 	}
 
+	@Override
 	public String getDisplayName() {
 		return displayName;
 	}
