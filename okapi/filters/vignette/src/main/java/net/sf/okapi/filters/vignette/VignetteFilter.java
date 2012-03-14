@@ -816,7 +816,7 @@ public class VignetteFilter implements IFilter {
 		}
 		else {
 			subFilter = fcMapper.createFilter(partConfiguration, subFilter);
-			encoderManager.mergeMappings(subFilter.getEncoderManager());
+			encoderManager.mergeMappings(subFilter.getEncoderManager());			
 			subFilter.close();
 			groupId.createId(); // Create new Id for this group
 			if ( subFilter instanceof AbstractMarkupFilter ) { // For IdGenerator try-out
