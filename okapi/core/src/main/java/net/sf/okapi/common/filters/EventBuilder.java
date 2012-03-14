@@ -118,12 +118,10 @@ public class EventBuilder {
 				event = filterEvents.remove(0);
 				if (event.getEventType() == EventType.END_DOCUMENT) {
 					done = true;
-				}
+				}				
 				// handle case if called by a subfilter
-				if (subFilter && event.getEventType() == EventType.END_GROUP) {
-					if (event.getEndGroup().getAnnotation(SubFilterAnnotation.class) != null) {
+				if (subFilter && event.isEndSubfilter()) {					
 						done = true;
-					}
 				}
 				return event;
 			}

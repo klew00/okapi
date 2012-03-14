@@ -24,10 +24,11 @@ import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.ISkeleton;
 import net.sf.okapi.common.IdGenerator;
+import net.sf.okapi.common.resource.EndSubfilter;
 import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.StartGroup;
-import net.sf.okapi.common.resource.StartSubFilter;
+import net.sf.okapi.common.resource.StartSubfilter;
 
 /**
  * Helper class to start and stop a sub-filter called from a parent filter.
@@ -87,7 +88,7 @@ public class SubFilterEventConverter {
 		// and end document to end group
 		switch (event.getEventType()) {
 		case START_DOCUMENT:
-			StartSubFilter startSubFilter = new StartSubFilter(parentId, groupIdGenerator.createId());
+			StartSubfilter startSubFilter = new StartSubfilter(parentId, groupIdGenerator.createId());
 			startSubFilter.setMimeType(((StartDocument) event.getResource()).getMimeType());
 			startSubFilter.setSkeleton(startGroupSkeleton);
 			startSubFilter.setName(IFilter.SUB_FILTER + ((StartDocument) event.getResource()).getName());			
@@ -95,9 +96,9 @@ public class SubFilterEventConverter {
 			break;
 
 		case END_DOCUMENT:
-			Ending endGroup = new Ending(groupIdGenerator.getLastId());
-			endGroup.setSkeleton(endGroupSkeleton);
-			event = new Event(EventType.END_GROUP, endGroup);
+			EndSubfilter endSubfilter = new EndSubfilter(groupIdGenerator.getLastId());
+			endSubfilter.setSkeleton(endGroupSkeleton);
+			event = new Event(EventType.END_GROUP, endSubfilter);
 			break;
 
 		default:
