@@ -16,12 +16,12 @@ import net.sf.okapi.common.skeleton.ISkeletonWriter;
  * @author Jim Hargrave
  *
  */
-public abstract class AbstractSubFilterAdapter implements IFilter {
+public class BaseSubFilterAdapter implements IFilter {
 	IFilter filter;
 	FilterState state;
 	SubFilterEventConverter converter;
 	
-	public AbstractSubFilterAdapter(IFilter filter, FilterState state) {
+	public BaseSubFilterAdapter(IFilter filter, FilterState state) {
 		this.state = state;
 		this.filter = filter;
 		if (this.state != null) {
@@ -30,7 +30,7 @@ public abstract class AbstractSubFilterAdapter implements IFilter {
 		}
 	}
 	
-	public AbstractSubFilterAdapter(IFilter filter) {
+	public BaseSubFilterAdapter(IFilter filter) {
 		this(filter, null);
 	}
 	

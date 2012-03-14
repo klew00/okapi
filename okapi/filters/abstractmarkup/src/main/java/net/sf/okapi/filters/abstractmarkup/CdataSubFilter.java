@@ -1,11 +1,11 @@
 package net.sf.okapi.filters.abstractmarkup;
 
 import net.sf.okapi.common.Event;
-import net.sf.okapi.common.filters.AbstractSubFilterAdapter;
+import net.sf.okapi.common.filters.BaseSubFilterAdapter;
 import net.sf.okapi.common.filters.FilterState;
 import net.sf.okapi.common.filters.IFilter;
 
-public class CdataSubFilter extends AbstractSubFilterAdapter {
+public class CdataSubFilter extends BaseSubFilterAdapter {
 	private int tuChildCount;
 
 	public CdataSubFilter(IFilter filter, FilterState state) {

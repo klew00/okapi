@@ -98,7 +98,6 @@ public class VignetteFilter implements IFilter {
 	private boolean hasNext;
 	private EncoderManager encoderManager;
 	private BufferedReader reader;
-	@SubFilter()
 	private IFilter subFilter;
 	private LocaleId srcLoc;
 	private LocaleId trgLoc;

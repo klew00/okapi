@@ -20,9 +20,10 @@
 
 package net.sf.okapi.filters.vignette;
 
-import net.sf.okapi.common.filters.SubFilterAnnotation;
+import net.sf.okapi.common.resource.EndSubfilter;
 import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.StartGroup;
+import net.sf.okapi.common.resource.StartSubfilter;
 import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
 
 public class VignetteSkeletonWriter extends GenericSkeletonWriter {
@@ -34,7 +35,7 @@ public class VignetteSkeletonWriter extends GenericSkeletonWriter {
 		}
 		
 		String tmp = super.processStartGroup(resource);
-		if ( resource.getAnnotation(SubFilterAnnotation.class) != null ) {
+		if ( resource instanceof StartSubfilter ) {
 			tmp += "<![CDATA[";
 		}
 		return tmp;
@@ -47,7 +48,7 @@ public class VignetteSkeletonWriter extends GenericSkeletonWriter {
 		}
 
 		String tmp = super.processEndGroup(resource);
-		if ( resource.getAnnotation(SubFilterAnnotation.class) != null ) {
+		if ( resource instanceof EndSubfilter ) {
 			tmp += "]]>";
 		}
 		return tmp;
