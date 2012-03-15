@@ -395,7 +395,7 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 		if (config != null && config.getGlobalCDATASubfilter() != null) {
 			IFilter cdataFilter = getFilterConfigurationMapper().createFilter(
 					getConfig().getGlobalCDATASubfilter(), cdataSubfilter); 
-			getEncoderManager().mergeMappings(cdataSubfilter.getEncoderManager());
+			getEncoderManager().mergeMappings(cdataFilter.getEncoderManager());
 			cdataSubfilter = new BaseSubFilterAdapter(cdataFilter);
 		}
 		
@@ -403,7 +403,7 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 		if (config != null && config.getGlobalPCDATASubfilter() != null) {
 			String subfilterName = getConfig().getGlobalPCDATASubfilter();
 			IFilter pcdataFilter = getFilterConfigurationMapper().createFilter(subfilterName, pcdataSubfilter); 
-			getEncoderManager().mergeMappings(pcdataSubfilter.getEncoderManager());
+			getEncoderManager().mergeMappings(pcdataFilter.getEncoderManager());
 			pcdataSubfilter = new PcdataSubFilter(pcdataFilter);
 		}
 	}

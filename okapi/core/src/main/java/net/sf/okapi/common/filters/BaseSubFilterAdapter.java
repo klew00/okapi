@@ -31,7 +31,8 @@ public class BaseSubFilterAdapter implements IFilter {
 	}
 	
 	public BaseSubFilterAdapter(IFilter filter) {
-		this(filter, null);
+		this.filter = filter;
+		tuChildCount = 0;
 	}
 		
 	public void setFilter(IFilter filter) {
