@@ -43,12 +43,12 @@ import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.exceptions.OkapiBadFilterInputException;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.exceptions.OkapiUnsupportedEncodingException;
-import net.sf.okapi.common.filters.AbstractFilter;
+import net.sf.okapi.common.filters.BaseSubFilterAdapter;
 import net.sf.okapi.common.filters.FilterConfiguration;
+import net.sf.okapi.common.filters.FilterState;
+import net.sf.okapi.common.filters.FilterState.FILTER_STATE;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filters.IFilterConfigurationMapper;
-import net.sf.okapi.common.filters.SubFilter;
-import net.sf.okapi.common.filters.SubFilterEventConverter;
 import net.sf.okapi.common.filterwriter.GenericFilterWriter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.resource.Ending;
@@ -95,8 +95,7 @@ public class PropertiesFilter implements IFilter {
 	private boolean hasUTF8BOM;
 	private EncoderManager encoderManager;
 	private LocaleId srcLocale;
-	@SubFilter
-	private IFilter subfilter;
+	private BaseSubFilterAdapter subfilter;
 	private IFilterConfigurationMapper fcMapper;
 
 	public PropertiesFilter() {
@@ -306,10 +305,11 @@ public class PropertiesFilter implements IFilter {
 
 		// Set up sub-filter if required
 		if ( !Util.isEmpty(params.getSubfilter()) ) {
-			subfilter = fcMapper.createFilter(params.getSubfilter(), subfilter);
-			if (subfilter == null) {
+			IFilter sf = fcMapper.createFilter(params.getSubfilter(), subfilter);
+			if (sf == null) {
 				throw new OkapiBadFilterInputException("Unkown subfilter: " + params.getSubfilter());
 			}
+			subfilter = new BaseSubFilterAdapter(sf);
 		}
 	}
 
@@ -594,39 +594,29 @@ public class PropertiesFilter implements IFilter {
 			String afterSkeleton) {
 		// reset filter for good measure
 		subfilter.close();
-
-		SubFilterEventConverter converter = new SubFilterEventConverter(parentId,
-				new GenericSkeleton(beforeSkeleton), new GenericSkeleton(afterSkeleton));
-
-		// TODO: only AbstractFilter subclasses can be used as subfilters!!!
-		((AbstractFilter) subfilter).setParentId(parentId);
+		FilterState s = new FilterState(FILTER_STATE.INSIDE_TEXTUNIT, 
+				parentId, new  GenericSkeleton(beforeSkeleton), new  GenericSkeleton(afterSkeleton));
+		
+		subfilter.setState(s);
 		subfilter.open(new RawDocument(parentTu.getSource().toString(), srcLocale));
 
 		// if this is an html or xmlstream filter then set inline code
 		// rules used to parse Java property codes
 		if (subfilter.getName().startsWith("okf_html")
 				|| subfilter.getName().startsWith("okf_xmlstream")) {
-			AbstractMarkupEventBuilder eb = (AbstractMarkupEventBuilder)((AbstractMarkupFilter)subfilter).getEventBuilder();
+			AbstractMarkupEventBuilder eb = (AbstractMarkupEventBuilder)((AbstractMarkupFilter)subfilter.getFilter()).getEventBuilder();
 			eb.initializeCodeFinder(params.isUseCodeFinder(), params.getCodeFinder().getRules());
 		}
 
-		int tuChildCount = 0;
 		while (subfilter.hasNext()) {
-			Event e = converter.convertEvent(subfilter.next());
-			// subfiltered TU's inherit the property key (TU name)
-			if (e.isTextUnit()) {
-				ITextUnit stu = e.getTextUnit();
-				if (stu.getName() == null) {
-					String parentName = parentTu.getName();
-					// we need to add a child id so each tu name is unique for this subfiltered content
-					if (parentName != null) {
-						parentName = parentName + "-" + Integer.toString(++tuChildCount); 
-					}
-					stu.setName(parentName);
-				}
-			}
+			Event e = subfilter.next();
 			queue.add(e);
 		}
 		subfilter.close();
+	}
+
+	@Override
+	public boolean isSubfilter() {
+		return false;
 	}
 }

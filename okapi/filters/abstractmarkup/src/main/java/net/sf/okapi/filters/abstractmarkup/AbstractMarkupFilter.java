@@ -54,6 +54,7 @@ import net.sf.okapi.common.MimeTypeMapper;
 import net.sf.okapi.common.exceptions.OkapiBadFilterInputException;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.filters.AbstractFilter;
+import net.sf.okapi.common.filters.BaseSubFilterAdapter;
 import net.sf.okapi.common.filters.EventBuilder;
 import net.sf.okapi.common.filters.FilterState;
 import net.sf.okapi.common.filters.FilterState.FILTER_STATE;
@@ -99,7 +100,7 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 	private EventBuilder eventBuilder;
 	private RawDocument currentRawDocument;
 	private ExtractionRuleState ruleState; 
-	private CdataSubFilter cdataSubfilter; 
+	private BaseSubFilterAdapter cdataSubfilter; 
 	private PcdataSubFilter pcdataSubfilter;
 	private String currentId;
 	private boolean documentEncoding;
@@ -395,7 +396,7 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 			IFilter cdataFilter = getFilterConfigurationMapper().createFilter(
 					getConfig().getGlobalCDATASubfilter(), cdataSubfilter); 
 			getEncoderManager().mergeMappings(cdataSubfilter.getEncoderManager());
-			cdataSubfilter = new CdataSubFilter(cdataFilter);
+			cdataSubfilter = new BaseSubFilterAdapter(cdataFilter);
 		}
 		
 		// intialize pcdata sub-filter

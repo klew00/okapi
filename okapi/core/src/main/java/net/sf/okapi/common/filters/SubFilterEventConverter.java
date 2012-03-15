@@ -25,9 +25,7 @@ import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.ISkeleton;
 import net.sf.okapi.common.IdGenerator;
 import net.sf.okapi.common.resource.EndSubfilter;
-import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.StartDocument;
-import net.sf.okapi.common.resource.StartGroup;
 import net.sf.okapi.common.resource.StartSubfilter;
 
 /**
