@@ -596,7 +596,7 @@ public class PropertiesFilter implements IFilter {
 		subfilter.close();
 		FilterState s = new FilterState(FILTER_STATE.INSIDE_TEXTUNIT, 
 				parentId, new  GenericSkeleton(beforeSkeleton), new  GenericSkeleton(afterSkeleton));
-		
+		s.setParentTextUnitName(parentTu.getName());
 		subfilter.setState(s);
 		subfilter.open(new RawDocument(parentTu.getSource().toString(), srcLocale));
 

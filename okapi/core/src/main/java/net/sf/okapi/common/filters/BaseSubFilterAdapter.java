@@ -99,15 +99,17 @@ public class BaseSubFilterAdapter implements IFilter {
 	@Override
 	public Event next() {
 		Event e = converter.convertEvent(filter.next());
-		// subfiltered textunits inherit any name from a parent TU
-		if (e.isTextUnit()) {
-			if (e.getTextUnit().getName() == null) {
-				String parentName = getState().getParentTextUnitName();
-				// we need to add a child id so each tu name is unique for this subfiltered content
-				if (parentName != null) {
-					parentName = parentName + "-" + Integer.toString(++tuChildCount); 
+		if (getState().getParentTextUnitName() != null) {
+			// subfiltered textunits inherit any name from a parent TU
+			if (e.isTextUnit()) {
+				if (e.getTextUnit().getName() == null) {
+					String parentName = getState().getParentTextUnitName();
+					// we need to add a child id so each tu name is unique for this subfiltered content
+					if (parentName != null) {
+						parentName = parentName + "-" + Integer.toString(++tuChildCount); 
+					}
+					e.getTextUnit().setName(parentName);
 				}
-				e.getTextUnit().setName(parentName);
 			}
 		}
 		return e;
