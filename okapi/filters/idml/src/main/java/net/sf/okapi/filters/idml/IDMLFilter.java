@@ -730,4 +730,9 @@ public class IDMLFilter implements IFilter {
 		}
 	}
 
+	@Override
+	public boolean isSubfilter() {
+		return false;
+	}
+
 }

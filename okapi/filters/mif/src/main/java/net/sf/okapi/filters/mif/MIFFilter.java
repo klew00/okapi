@@ -2438,6 +2438,11 @@ public class MIFFilter implements IFilter {
 		stream.unread(buffer, (n-unread), unread);
 		return stream;
 	}
+
+	@Override
+	public boolean isSubfilter() {
+		return false;
+	}
 	
 //	private Object[] guessEncoding (InputStream input)
 //		throws IOException

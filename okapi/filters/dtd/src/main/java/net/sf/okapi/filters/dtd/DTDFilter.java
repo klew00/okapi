@@ -431,4 +431,9 @@ public class DTDFilter implements IFilter {
 		charEntities.put("apos", '\'');
 	}
 
+	@Override
+	public boolean isSubfilter() {
+		return false;
+	}
+
 }

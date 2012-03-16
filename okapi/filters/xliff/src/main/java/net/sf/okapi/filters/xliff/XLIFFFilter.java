@@ -1520,4 +1520,8 @@ public class XLIFFFilter implements IFilter {
 		return true;
 	}
 
+	@Override
+	public boolean isSubfilter() {
+		return false;
+	}
 }

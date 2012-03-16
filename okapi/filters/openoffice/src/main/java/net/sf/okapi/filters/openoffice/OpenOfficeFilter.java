@@ -316,4 +316,9 @@ public class OpenOfficeFilter implements IFilter {
 		return null; // Should not get here
 	}
 
+	@Override
+	public boolean isSubfilter() {
+		return false;
+	}
+
 }

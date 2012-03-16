@@ -372,4 +372,9 @@ public class DrupalFilter implements IFilter {
 		nextEventInField();
 		return true;
 	}
+
+	@Override
+	public boolean isSubfilter() {
+		return false;
+	}
 }
