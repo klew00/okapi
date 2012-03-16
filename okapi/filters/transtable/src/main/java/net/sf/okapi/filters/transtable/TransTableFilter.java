@@ -406,5 +406,10 @@ public class TransTableFilter implements IFilter {
 		}
 		return res;
 	}
+
+	@Override
+	public boolean isSubfilter() {
+		return false;
+	}
 	
 }
