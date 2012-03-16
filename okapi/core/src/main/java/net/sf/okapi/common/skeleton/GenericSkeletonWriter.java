@@ -36,6 +36,7 @@ import net.sf.okapi.common.filterwriter.ILayerProvider;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.DocumentPart;
+import net.sf.okapi.common.resource.EndSubfilter;
 import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.INameable;
 import net.sf.okapi.common.resource.IReferenceable;
@@ -44,6 +45,7 @@ import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.StartGroup;
 import net.sf.okapi.common.resource.StartSubDocument;
+import net.sf.okapi.common.resource.StartSubfilter;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextPart;
@@ -188,6 +190,16 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 			return "";
 		}
 		return getString((GenericSkeleton)resource.getSkeleton(), 1);
+	}
+	
+	@Override
+	public String processStartSubfilter (StartSubfilter resource) {
+		return processStartGroup(resource);
+	}
+	
+	@Override
+	public String processEndSubfilter (EndSubfilter resource) {
+		return processEndGroup(resource);
 	}
 	
 	@Override

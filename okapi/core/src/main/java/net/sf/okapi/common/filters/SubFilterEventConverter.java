@@ -90,13 +90,13 @@ public class SubFilterEventConverter {
 			startSubFilter.setMimeType(((StartDocument) event.getResource()).getMimeType());
 			startSubFilter.setSkeleton(startGroupSkeleton);
 			startSubFilter.setName(IFilter.SUB_FILTER + ((StartDocument) event.getResource()).getName());			
-			event = new Event(EventType.START_GROUP, startSubFilter);
+			event = new Event(EventType.START_SUBFILTER, startSubFilter);
 			break;
 
 		case END_DOCUMENT:
 			EndSubfilter endSubfilter = new EndSubfilter(groupIdGenerator.getLastId());
 			endSubfilter.setSkeleton(endGroupSkeleton);
-			event = new Event(EventType.END_GROUP, endSubfilter);
+			event = new Event(EventType.END_SUBFILTER, endSubfilter);
 			break;
 
 		default:

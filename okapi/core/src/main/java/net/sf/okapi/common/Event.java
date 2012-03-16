@@ -180,12 +180,7 @@ public class Event {
 	 * @return true if {@link Group} and {@link StartSubfilter}, false otherwise
 	 */
 	public boolean isStartSubfilter () {
-		if (filterEventType == EventType.START_GROUP) {
-			if (resource instanceof StartSubfilter) {
-				return true;
-			}
-		}		
-		return false;
+		return (filterEventType == EventType.START_SUBFILTER);
 	}
 	
 	/**
@@ -194,12 +189,7 @@ public class Event {
 	 * @return true if {@link Group} and {@link StartSubfilter}, false otherwise
 	 */
 	public boolean isEndSubfilter () {
-		if (filterEventType == EventType.END_GROUP) {
-			if (resource instanceof EndSubfilter) {
-				return true;
-			}
-		}		
-		return false;
+		return (filterEventType == EventType.END_SUBFILTER);
 	}
 	
 	/**

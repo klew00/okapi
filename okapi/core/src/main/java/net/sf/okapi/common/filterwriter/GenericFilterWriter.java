@@ -40,12 +40,14 @@ import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.exceptions.OkapiFileNotFoundException;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.DocumentPart;
+import net.sf.okapi.common.resource.EndSubfilter;
 import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.MultiEvent;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.StartGroup;
 import net.sf.okapi.common.resource.StartSubDocument;
 import net.sf.okapi.common.resource.ITextUnit;
+import net.sf.okapi.common.resource.StartSubfilter;
 import net.sf.okapi.common.skeleton.ISkeletonWriter;
 
 /**
@@ -189,6 +191,12 @@ public class GenericFilterWriter implements IFilterWriter {
 					handleEvent(e);
 				}
 				break;
+			case START_SUBFILTER:
+				processStartSubfilter((StartSubfilter)event.getResource());
+				break;
+			case END_SUBFILTER:
+				processEndSubfilter((EndSubfilter)event.getResource());
+				break;
 			}
 		}
 		catch ( FileNotFoundException e ) {
@@ -244,6 +252,14 @@ public class GenericFilterWriter implements IFilterWriter {
 
 	private void processDocumentPart (DocumentPart resource) throws IOException {
 		writer.write(skelWriter.processDocumentPart(resource));
+	}
+	
+	private void processStartSubfilter (StartSubfilter resource) throws IOException {
+		writer.write(skelWriter.processStartSubfilter(resource));
+	}
+
+	private void processEndSubfilter (EndSubfilter resource) throws IOException {
+		writer.write(skelWriter.processEndSubfilter(resource));
 	}
 
 	@Override

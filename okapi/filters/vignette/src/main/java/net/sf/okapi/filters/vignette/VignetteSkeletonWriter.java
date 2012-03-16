@@ -29,29 +29,20 @@ import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
 public class VignetteSkeletonWriter extends GenericSkeletonWriter {
 
 	@Override
-	public String processStartGroup (StartGroup resource) {
+	public String processStartSubfilter (StartSubfilter resource) {		
 		if ( resource.isReferent() || ( storageStack.size() > 0 )) {
-			return super.processStartGroup(resource);
+			return super.processStartSubfilter(resource);
 		}
 		
-		String tmp = super.processStartGroup(resource);
-		if ( resource instanceof StartSubfilter ) {
-			tmp += "<![CDATA[";
-		}
-		return tmp;
+		return "<![CDATA[";
 	}
 	
 	@Override
-	public String processEndGroup (Ending resource) {
+	public String processEndSubfilter (EndSubfilter resource) {
 		if ( storageStack.size() > 0 ) {
-			return super.processEndGroup(resource);
+			return super.processEndSubfilter(resource);
 		}
 
-		String tmp = super.processEndGroup(resource);
-		if ( resource instanceof EndSubfilter ) {
-			tmp += "]]>";
-		}
-		return tmp;
+		return "]]>";
 	}
-
 }

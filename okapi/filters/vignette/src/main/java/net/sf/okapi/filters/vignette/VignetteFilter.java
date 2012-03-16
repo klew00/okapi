@@ -841,7 +841,7 @@ public class VignetteFilter implements IFilter {
 				sg.setType("x-"+partName);
 				sg.setMimeType(sd.getMimeType());
 				sg.setSkeleton(sd.getSkeleton());
-				queue.add(new Event(EventType.START_GROUP, sg));
+				queue.add(new Event(EventType.START_SUBFILTER, sg));
 				
 				while ( subFilter.hasNext() ) {
 					event = subFilter.next();
@@ -855,7 +855,7 @@ public class VignetteFilter implements IFilter {
 				// Change the END_DOCUMENT to END_GROUP
 				EndSubfilter ending = new EndSubfilter(groupId.createId());
 				ending.setSkeleton(event.getResource().getSkeleton());
-				queue.add(new Event(EventType.END_GROUP, ending));
+				queue.add(new Event(EventType.END_SUBFILTER, ending));
 			}
 		}
 	}
