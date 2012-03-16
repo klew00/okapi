@@ -478,5 +478,11 @@ public class BasePlainTextFilter extends AbstractLineFilter {
 		
 	}
 
+	@Override
+	public boolean isSubfilter() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
 }	
 	
