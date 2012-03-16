@@ -40,6 +40,7 @@ import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.DocumentPart;
+import net.sf.okapi.common.resource.EndSubfilter;
 import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.INameable;
 import net.sf.okapi.common.resource.Property;
@@ -49,6 +50,7 @@ import net.sf.okapi.common.resource.ISegments;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.StartGroup;
 import net.sf.okapi.common.resource.StartSubDocument;
+import net.sf.okapi.common.resource.StartSubfilter;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.ITextUnit;
@@ -682,6 +684,13 @@ public class FilterTestDriver {
 				break;
 			case END_GROUP:
 				tmp.append(skelWriter.processEndGroup((Ending) event.getResource()));
+				break;
+			case START_SUBFILTER:
+				StartSubfilter startSubfilter = (StartSubfilter) event.getResource();
+				tmp.append(skelWriter.processStartSubfilter(startSubfilter));
+				break;
+			case END_SUBFILTER:
+				tmp.append(skelWriter.processEndSubfilter((EndSubfilter) event.getResource()));
 				break;
 			}
 		}
