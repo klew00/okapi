@@ -42,6 +42,7 @@ import net.sf.okapi.common.resource.INameable;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.StartGroup;
 import net.sf.okapi.common.resource.StartSubDocument;
+import net.sf.okapi.common.resource.StartSubfilter;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.TextUnit;
@@ -138,6 +139,19 @@ public class EventBuilder {
 	 */
 	public void addFilterEvent(Event event) {		
 		switch (event.getEventType()) {
+		case START_SUBFILTER:
+			if (isCurrentTextUnit()) {
+				StartSubfilter ssf = event.getStartSubfilter();
+				ssf.setIsReferent(true);
+				Code c = new Code(TagType.PLACEHOLDER, ssf.getName(), TextFragment.makeRefMarker(ssf.getId()));
+				c.setReferenceFlag(true);
+				startCode(c);
+				endCode();
+				referencableFilterEvents.add(event);
+			} else {
+				filterEvents.add(event);
+			}
+			break;
 		case START_GROUP:
 			if (isCurrentTextUnit()) {
 				StartGroup sg = event.getStartGroup();

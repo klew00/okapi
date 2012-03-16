@@ -315,7 +315,9 @@ public class FilterTestDriver {
 			break;
 
 		case END_SUBFILTER:
-			if (!compareIResource(manual.getResource(), generated.getResource(), includeSkeleton)) {
+			EndSubfilter esf1 = (EndSubfilter) manual.getResource();
+			EndSubfilter esf2 = (EndSubfilter) generated.getResource();
+			if (!compareIResource(esf1, esf2, includeSkeleton)) {
 				return false;
 			}
 			break;
