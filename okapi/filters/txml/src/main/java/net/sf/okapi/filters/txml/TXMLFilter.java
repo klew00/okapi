@@ -734,5 +734,10 @@ public class TXMLFilter implements IFilter {
 			throw new OkapiIOException(e);
 		}
 	}
+
+	@Override
+	public boolean isSubfilter() {
+		return false;
+	}
 	
 }

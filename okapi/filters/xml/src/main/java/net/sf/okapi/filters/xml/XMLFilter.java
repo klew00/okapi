@@ -828,4 +828,9 @@ public class XMLFilter implements IFilter {
 		return true;
 	}
 
+	@Override
+	public boolean isSubfilter() {
+		return false;
+	}
+
 }

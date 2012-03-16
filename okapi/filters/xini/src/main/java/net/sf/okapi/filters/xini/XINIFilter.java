@@ -162,4 +162,9 @@ public class XINIFilter implements IFilter {
 		return new XINIWriter();
 	}
 
+	@Override
+	public boolean isSubfilter() {
+		return false;
+	}
+
 }
