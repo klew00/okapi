@@ -300,6 +300,25 @@ public class FilterTestDriver {
 			}
 			break;
 
+		case START_SUBFILTER:
+			StartSubfilter ssf1 = (StartSubfilter) manual.getResource();
+			StartSubfilter ssf2 = (StartSubfilter) generated.getResource();
+			if (!compareIResource(ssf1, ssf2, includeSkeleton)) {
+				return false;
+			}
+			if (!compareINameable(ssf1, ssf2)) {
+				return false;
+			}
+			if (ssf1.isReferent() != ssf2.isReferent()) {
+				return false;
+			}
+			break;
+
+		case END_SUBFILTER:
+			if (!compareIResource(manual.getResource(), generated.getResource(), includeSkeleton)) {
+				return false;
+			}
+			break;
 		case TEXT_UNIT:
 			ITextUnit tu = manual.getTextUnit();
 			if (!compareTextUnit(tu, generated.getTextUnit())) {
@@ -433,6 +452,8 @@ public class FilterTestDriver {
 		int endGroup = 0;
 		int startSubDoc = 0;
 		int endSubDoc = 0;
+		int startSubfilter = 0;
+		int endSubfilter = 0;
 
 		Event event;
 		while (filter.hasNext()) {
@@ -496,6 +517,20 @@ public class FilterTestDriver {
 					break;
 				System.out.println("---Document Part");
 				printResource((INameable) event.getResource());
+				printSkeleton(event.getResource());
+				break;
+			case START_SUBFILTER:
+				startSubfilter++;
+				if (displayLevel < 2)
+					break;
+				System.out.println("---Start Subfilter");
+				printSkeleton(event.getResource());
+				break;
+			case END_SUBFILTER:
+				endSubfilter++;
+				if (displayLevel < 2)
+					break;
+				System.out.println("---End Subfilter");
 				printSkeleton(event.getResource());
 				break;
 			}

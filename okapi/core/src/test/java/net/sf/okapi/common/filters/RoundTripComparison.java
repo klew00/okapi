@@ -211,6 +211,8 @@ public class RoundTripComparison {
 					break;
 				case START_GROUP:
 				case END_GROUP:
+				case START_SUBFILTER:
+				case END_SUBFILTER:
 				case TEXT_UNIT:
 					extraction1Events.add(event);
 					subDocEvents.add(subDocEvent);
@@ -249,6 +251,8 @@ public class RoundTripComparison {
 					break;
 				case START_GROUP:
 				case END_GROUP:
+				case START_SUBFILTER:
+				case END_SUBFILTER:
 				case TEXT_UNIT:
 					extraction2Events.add(event);
 					break;
@@ -292,6 +296,8 @@ public class RoundTripComparison {
 					break;
 				case START_GROUP:
 				case END_GROUP:
+				case START_SUBFILTER:
+				case END_SUBFILTER:
 				case TEXT_UNIT:
 					if (event.isTextUnit()) {
 						// Steps can modify the event, but we need to compare events as were from the filter, so we are cloning 
@@ -337,6 +343,8 @@ public class RoundTripComparison {
 					break;
 				case START_GROUP:
 				case END_GROUP:
+				case START_SUBFILTER:
+				case END_SUBFILTER:
 				case TEXT_UNIT:
 					extraction2Events.add(event);
 					break;
@@ -365,6 +373,8 @@ public class RoundTripComparison {
 					break;
 				case START_GROUP:
 				case END_GROUP:
+				case START_SUBFILTER:
+				case END_SUBFILTER:
 				case TEXT_UNIT:
 					extraction2Events.add(event);
 					break;

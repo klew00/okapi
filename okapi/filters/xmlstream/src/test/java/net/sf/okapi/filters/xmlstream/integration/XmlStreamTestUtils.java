@@ -13,11 +13,13 @@ import java.util.ArrayList;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.DocumentPart;
+import net.sf.okapi.common.resource.EndSubfilter;
 import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.StartGroup;
+import net.sf.okapi.common.resource.StartSubfilter;
 import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
 import net.sf.okapi.filters.xmlstream.XmlStreamFilter;
 
@@ -61,6 +63,14 @@ public final class XmlStreamTestUtils {
 			case END_GROUP:
 				Ending ending = (Ending) event.getResource();
 				tmp.append(writer.processEndGroup(ending));
+				break;
+			case START_SUBFILTER:
+				StartSubfilter startSubfilter = (StartSubfilter) event.getResource();
+				tmp.append(writer.processStartSubfilter(startSubfilter));
+				break;
+			case END_SUBFILTER:
+				EndSubfilter endSubfilter = (EndSubfilter) event.getResource();
+				tmp.append(writer.processEndSubfilter(endSubfilter));
 				break;
 			}
 		}
