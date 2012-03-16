@@ -1528,4 +1528,10 @@ public class RTFFilter implements IFilter {
 		}
 	}
 
+	@Override
+	public boolean isSubfilter() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
 }

@@ -517,5 +517,11 @@ public class RainbowKitFilter implements IFilter {
 		File file = new File(outputPath);
 		return file;
 	}
+
+	@Override
+	public boolean isSubfilter() {
+		// TODO Auto-generated method stub
+		return false;
+	}
 	
 }

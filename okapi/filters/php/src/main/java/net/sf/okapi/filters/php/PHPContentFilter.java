@@ -656,4 +656,10 @@ public class PHPContentFilter implements IFilter {
 		srcSkel = new GenericSkeleton();
 	}
 
+	@Override
+	public boolean isSubfilter() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
 }
