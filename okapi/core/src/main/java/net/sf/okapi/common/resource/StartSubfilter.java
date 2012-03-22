@@ -5,7 +5,7 @@ import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 
 public class StartSubfilter extends StartGroup {
-	// from sub document (no multiple inheritance in Java :-))
+	// from sub document
 	private String encoding;
 	private boolean isMultilingual;
 	private IParameters params;
