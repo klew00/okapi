@@ -74,6 +74,7 @@ class RepositoryPanel extends Composite {
 	private MenuItem miContextNewTM;
 	private MenuItem miContextOpen;
 	private MenuItem miContextEditTMOptions;
+	private MenuItem miContextIndexTM;
 	private MenuItem miContextImportFile;
 	private MenuItem miContextExportTM;
 	private MenuItem miContextDeleteTM;
@@ -157,6 +158,15 @@ class RepositoryPanel extends Composite {
             }
 		});
 		
+		miContextIndexTM = new MenuItem(contextMenu, SWT.PUSH);
+		rm.setCommand(miContextIndexTM, "repository.indextm"); //$NON-NLS-1$
+		miContextIndexTM.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				indexTM(null); // The selected TM
+            }
+		});
+
+		
 		new MenuItem(contextMenu, SWT.SEPARATOR);
 		
 		miContextImportFile = new MenuItem(contextMenu, SWT.PUSH);
@@ -206,6 +216,7 @@ class RepositoryPanel extends Composite {
 				miContextNewTM.setEnabled(isRepositoryOpen());
 				miContextOpen.setEnabled(n>-1);
 				miContextEditTMOptions.setEnabled(enabled);
+				miContextIndexTM.setEnabled(enabled && !repo.isServerMode()); // For now: Index is local only
 				miContextImportFile.setEnabled(enabled);
 				miContextExportTM.setEnabled(enabled);
 				miContextDeleteTM.setEnabled(enabled);
@@ -771,10 +782,6 @@ class RepositoryPanel extends Composite {
 			}
 			tp.showLog(); // Make sure to display the log
 			
-//			SplitTMForm dlg = new SplitTMForm(getShell(), repo, tmName, tp.getTmOptions().getSourceLocale());
-//			SplitterOptions options = dlg.showDialog();
-//			if ( options == null ) return;
-
 			// Start the import thread
 			ProgressCallback callback = new ProgressCallback(tp);
 			Indexer exp = new Indexer(callback, repo, tmName);

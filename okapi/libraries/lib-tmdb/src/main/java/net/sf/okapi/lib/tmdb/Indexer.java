@@ -21,12 +21,23 @@
 package net.sf.okapi.lib.tmdb;
 
 import java.sql.ResultSet;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 
+import org.apache.lucene.document.Field.Index;
+import org.apache.lucene.document.Field.Store;
+
+import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.lib.tmdb.IProgressCallback;
 import net.sf.okapi.lib.tmdb.ITm;
 import net.sf.okapi.lib.tmdb.DbUtil.PageMode;
+import net.sf.okapi.lib.tmdb.lucene.OField;
+import net.sf.okapi.lib.tmdb.lucene.OFields;
+import net.sf.okapi.lib.tmdb.lucene.OTranslationUnitInput;
+import net.sf.okapi.lib.tmdb.lucene.OTranslationUnitVariant;
+import net.sf.okapi.lib.tmdb.lucene.OWriter;
 
 public class Indexer implements Runnable {
 
@@ -57,18 +68,32 @@ public class Indexer implements Runnable {
 			
 			// Get the original TM and set it for iteration
 			tm = repo.openTm(tmName);
-			tm.setRecordFields(tm.getAvailableFields());
+			
+			List<String> locales = tm.getLocales();
+			String srcLoc = locales.get(0);
+			
+			ArrayList<String> fields = new ArrayList<String>();
+			String srcFn = DbUtil.TEXT_PREFIX+srcLoc;
+			fields.add(srcFn);
+			tm.setRecordFields(fields);
 			tm.setPageMode(PageMode.ITERATOR);
 
 			ia = repo.getIndexAccess();
+			OWriter writer = ia.getWriter();
+		    OField ofld = new OField("tm", tm.getUUID(), Index.NO, Store.NO);
+		    OFields oflds = new OFields();
+		    oflds.put("tm", ofld);
 			
 			IRecordSet rs = tm.getFirstPage();
 			while  (( rs != null ) && !canceled ) {
 				while ( rs.next() && !canceled ) {
 					totalCount++;
 			
-					//TODO
-					
+					String srcText = rs.getString(srcFn);
+				    OTranslationUnitVariant tuvSrc = new OTranslationUnitVariant(LocaleId.ENGLISH, new TextFragment(srcText));
+				    OTranslationUnitInput inputTu = new OTranslationUnitInput(String.valueOf(rs.getSegKey()), oflds);
+				    inputTu.add(tuvSrc);
+				    writer.index(inputTu);
 					
 					// Update UI from time to time
 					if ( (totalCount % 652) == 0 ) {
@@ -85,14 +110,17 @@ public class Indexer implements Runnable {
 					rs = tm.getNextPage();
 				}
 			}
+			writer.commit();
 			
 		}
 		catch ( Throwable e ) {
 			callback.logMessage(IProgressCallback.MSGTYPE_ERROR, e.getMessage());
 		}
 		finally {
-			if ( ia != null ) ia.close();
-			callback.endProcess(totalCount, true);
+			if ( ia != null ) {
+				ia.close();
+			}
+			callback.endProcess(totalCount, false);
 		}
 	}
 

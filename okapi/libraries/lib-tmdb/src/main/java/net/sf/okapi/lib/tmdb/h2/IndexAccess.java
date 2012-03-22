@@ -20,17 +20,19 @@
 
 package net.sf.okapi.lib.tmdb.h2;
 
+import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.lucene.store.Directory;
+import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.store.RAMDirectory;
 
-import net.sf.okapi.lib.tmdb.DbUtil.PageMode;
+import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.lib.tmdb.IIndexAccess;
-import net.sf.okapi.lib.tmdb.IRecordSet;
-import net.sf.okapi.lib.tmdb.ITm;
 import net.sf.okapi.lib.tmdb.lucene.OSeeker;
+import net.sf.okapi.lib.tmdb.lucene.OTmHit;
 import net.sf.okapi.lib.tmdb.lucene.OWriter;
 
 class IndexAccess implements IIndexAccess {
@@ -39,6 +41,7 @@ class IndexAccess implements IIndexAccess {
 	private OWriter writer;
 	private OSeeker seeker;
 	private boolean inMemory;
+	private List<OTmHit> hits;
 	
 	public IndexAccess (Repository store) {
 		try {
@@ -50,6 +53,14 @@ class IndexAccess implements IIndexAccess {
 			if ( inMemory ) {
 				idxDir = new RAMDirectory();
 			}
+			else { // Create the directory if needed
+				File file = new File(dir);
+				if ( !file.exists() ) {
+					file.mkdirs();
+				}
+				idxDir = FSDirectory.open(file);
+			}
+			
 			writer = new OWriter(idxDir, false);
 			seeker = new OSeeker(idxDir);
 		}
@@ -66,14 +77,13 @@ class IndexAccess implements IIndexAccess {
 
 	@Override
 	public int search (String codedText) {
-		// TODO Auto-generated method stub
-		return 0;
+		hits = seeker.searchFuzzy(new TextFragment(codedText), 45, 10, null, LocaleId.ENGLISH);
+		return hits.size();
 	}
 
 	@Override
-	public ArrayList<Long> getHits () {
-		// TODO Auto-generated method stub
-		return null;
+	public List<OTmHit> getHits () {
+		return hits;
 	}
 
 	@Override
@@ -86,6 +96,11 @@ class IndexAccess implements IIndexAccess {
 			seeker.close();
 			seeker = null;
 		}
+	}
+
+	@Override
+	public OWriter getWriter () {
+		return writer;
 	}
 
 }

@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2011 by the Okapi Framework contributors
+  Copyright (C) 2011-2012 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -33,8 +33,8 @@ public interface IProgressCallback extends IObservable {
 	/**
 	 * Notifies the end of the process.
 	 * @param count number of entries processed, or -1 to get no message.
-	 * @param updateRepositories true if the display of list of repositries needs to be updated,
-	 * null or fals otherwise.
+	 * @param updateRepositories true if the display of list of repositories needs to be updated,
+	 * null or false otherwise.
 	 */
 	public void endProcess (long count,
 		Boolean updateRepositories);

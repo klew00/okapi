@@ -384,5 +384,11 @@ public class Repository implements IRepository {
 		//TODO: TM index access
 		return null;
 	}
+
+	@Override
+	public boolean isServerMode () {
+		// MongoDB is always access in server mode
+		return true;
+	}
 	
 }

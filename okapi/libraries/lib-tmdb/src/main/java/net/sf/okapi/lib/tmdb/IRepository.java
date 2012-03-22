@@ -97,6 +97,12 @@ public interface IRepository {
 	 * @return true if this repository is shared.
 	 */
 	public boolean isShared ();
+	
+	/**
+	 * Indicates if this repository is accessed in server mode.
+	 * @return true if this repository is accessed in server mode.
+	 */
+	public boolean isServerMode ();
 
 	/**
 	 * Get a unique instance of the object allowing to access the TM index for this repository.

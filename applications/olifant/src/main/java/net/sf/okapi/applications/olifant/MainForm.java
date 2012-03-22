@@ -103,6 +103,7 @@ public class MainForm {
 	private MenuItem miEntriesDelete;
 	private MenuItem miRefresh;
 	private MenuItem miEditSearch;
+	private MenuItem miEntriesQuery;
 	private MenuItem miTMNew;
 	private MenuItem miTMClose;
 	private MenuItem miTMSplit;
@@ -434,6 +435,7 @@ public class MainForm {
 		miRefresh.setEnabled(active);
 		
 		miEditSearch.setEnabled(active);
+		miEntriesQuery.setEnabled(active);
 		
 		miTMNew.setEnabled(repoPanel.isRepositoryOpen());
 		miTMClose.setEnabled(active);
@@ -706,6 +708,15 @@ public class MainForm {
 		miEditSearch.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
 				currentTP.searchAndReplace(true);
+            }
+		});
+		
+		
+		miEntriesQuery = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(miEntriesQuery, "entries.query"); //$NON-NLS-1$
+		miEntriesQuery.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				currentTP.query();
             }
 		});
 		

@@ -46,6 +46,7 @@ public class Repository implements IRepository {
 	private Connection  conn = null;
 	private String name;
 	private boolean shared = false;
+	private boolean serverMode = false;
 	private IndexAccess ia = null;
 	private String idxDirectory = null;
 
@@ -77,6 +78,7 @@ public class Repository implements IRepository {
 			// Initialize the driver
 			Class.forName("org.h2.Driver");
 			boolean exist = false;
+			this.serverMode = serverMode;
 			
 			if ( path == null ) {
 				// Open the connection, this creates the DB if none exists
@@ -654,6 +656,11 @@ public class Repository implements IRepository {
 	 */
 	String getDirectory () {
 		return idxDirectory;
+	}
+
+	@Override
+	public boolean isServerMode () {
+		return serverMode;
 	}
 
 }
