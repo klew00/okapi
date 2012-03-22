@@ -35,6 +35,7 @@ import net.sf.okapi.lib.tmdb.Exporter;
 import net.sf.okapi.lib.tmdb.IRepository;
 import net.sf.okapi.lib.tmdb.ITm;
 import net.sf.okapi.lib.tmdb.Importer;
+import net.sf.okapi.lib.tmdb.Indexer;
 import net.sf.okapi.lib.tmdb.Splitter;
 import net.sf.okapi.lib.tmdb.SplitterOptions;
 import net.sf.okapi.lib.ui.editor.InputDocumentDialog;
@@ -740,6 +741,43 @@ class RepositoryPanel extends Composite {
 			// Start the import thread
 			ProgressCallback callback = new ProgressCallback(tp);
 			Splitter exp = new Splitter(callback, repo, tmName, options);
+			tp.startThread(new Thread(exp));
+		}
+		catch ( Throwable e ) {
+			Dialogs.showError(getShell(), "Error while splitting.\n"+e.getMessage(), null);
+		}
+	}
+
+
+	void indexTM (String tmName) {
+		try {
+			// If tmName is null use the current selection
+			if ( tmName == null ) {
+				int n = tmList.getSelectionIndex();
+				if ( n < 0 ) return;
+				tmName = tmList.getItem(n);
+			}
+			
+			// Get the Tab and TM data
+			TmPanel tp = mainForm.findTmTab(tmName, true);
+			if ( tp == null ) {
+				ITm tm = repo.openTm(tmName);
+				TMOptions opt = options.getItem(tm.getUUID(), true);
+				tp = mainForm.addTmTabEmpty(tm, opt);
+				if ( tp == null ) return;
+				// Now the tab should exist
+				mainForm.findTmTab(tmName, true);
+				tp.resetTmDisplay();
+			}
+			tp.showLog(); // Make sure to display the log
+			
+//			SplitTMForm dlg = new SplitTMForm(getShell(), repo, tmName, tp.getTmOptions().getSourceLocale());
+//			SplitterOptions options = dlg.showDialog();
+//			if ( options == null ) return;
+
+			// Start the import thread
+			ProgressCallback callback = new ProgressCallback(tp);
+			Indexer exp = new Indexer(callback, repo, tmName);
 			tp.startThread(new Thread(exp));
 		}
 		catch ( Throwable e ) {

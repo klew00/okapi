@@ -97,5 +97,11 @@ public interface IRepository {
 	 * @return true if this repository is shared.
 	 */
 	public boolean isShared ();
+
+	/**
+	 * Get a unique instance of the object allowing to access the TM index for this repository.
+	 * @return an interface to the TM index for this repository.
+	 */
+	public IIndexAccess getIndexAccess ();
 	
 }
