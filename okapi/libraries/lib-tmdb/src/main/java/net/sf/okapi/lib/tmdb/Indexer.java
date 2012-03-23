@@ -115,9 +115,6 @@ public class Indexer implements Runnable {
 			callback.logMessage(IProgressCallback.MSGTYPE_ERROR, e.getMessage());
 		}
 		finally {
-			if ( ia != null ) {
-				ia.close();
-			}
 			callback.endProcess(totalCount, false);
 		}
 	}

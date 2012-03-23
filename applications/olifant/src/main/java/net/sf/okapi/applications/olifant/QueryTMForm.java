@@ -24,12 +24,15 @@ import java.util.List;
 
 import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.UIUtil;
+import net.sf.okapi.lib.tmdb.DbUtil;
 import net.sf.okapi.lib.tmdb.IIndexAccess;
 import net.sf.okapi.lib.tmdb.IRepository;
 import net.sf.okapi.lib.tmdb.ITm;
 import net.sf.okapi.lib.tmdb.lucene.OTmHit;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ControlAdapter;
+import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Rectangle;
@@ -39,6 +42,9 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.TableColumn;
+import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 
 class QueryTMForm {
@@ -47,6 +53,7 @@ class QueryTMForm {
 	private final ITm tm;
 	private final Text edQuery;
 	private final Button btQuery;
+	private final Table table;
 
 	public QueryTMForm (Shell parent,
 		ITm tm)
@@ -63,7 +70,7 @@ class QueryTMForm {
 		
 		edQuery = new Text(shell, SWT.BORDER);
 		GridData gdTmp = new GridData(GridData.FILL_HORIZONTAL);
-		gdTmp.widthHint = 300;
+		gdTmp.widthHint = 500;
 		edQuery.setLayoutData(gdTmp);
 		
 		btQuery = UIUtil.createGridButton(shell, SWT.PUSH, "Search", UIUtil.BUTTON_DEFAULT_WIDTH, 1);
@@ -73,6 +80,40 @@ class QueryTMForm {
 				search();
 			}
 		});
+
+		// Creates the table
+		table = new Table(shell, SWT.BORDER | SWT.MULTI | SWT.FULL_SELECTION | SWT.V_SCROLL);
+		table.setHeaderVisible(true);
+		table.setLinesVisible(true);
+		gdTmp = new GridData(GridData.FILL_BOTH);
+		gdTmp.heightHint = 100;
+		table.setLayoutData(gdTmp);
+
+		table.addControlListener(new ControlAdapter() {
+		    public void controlResized(ControlEvent e) {
+		    	try {
+		    		table.setRedraw(false);
+		    		Rectangle rect = table.getClientArea();
+		    		int keyColWidth = table.getColumn(0).getWidth();
+		    		int scoreColWidth = table.getColumn(1).getWidth();
+		    		table.getColumn(2).setWidth(rect.width-(keyColWidth+scoreColWidth));
+		    	}
+		    	finally {
+		    		table.setRedraw(true);
+		    	}
+		    }
+		});
+		
+		// Create the table columns
+		TableColumn col = new TableColumn(table, SWT.NONE);
+		col.setText(DbUtil.SEGKEY_NAME);
+		col.setWidth(90);
+		col = new TableColumn(table, SWT.NONE);
+		col.setText("Score");
+		col.setWidth(80);
+		col = new TableColumn(table, SWT.NONE);
+		col.setText("Text");
+		col.setWidth(200);
 
 		shell.setDefaultButton(btQuery);
 		
@@ -99,21 +140,28 @@ class QueryTMForm {
 				edQuery.setFocus();
 				return;
 			}
+			
 			btQuery.setEnabled(false);
+			table.removeAll();
 			
 			IRepository repo = tm.getRepository();
 			IIndexAccess ia = repo.getIndexAccess();
-			
-			String msg = "No match found.";
-			if ( ia.search(text, tm.getUUID()) > 0 ) {
-				List<OTmHit> res = ia.getHits();
-				msg = String.format("Best match (%f), SegKey=%s", res.get(0).getScore(), res.get(0).getSegKey());
+
+			int count = ia.search(text, tm.getUUID());
+			if ( count == 0 ) {
+				TableItem ti = new TableItem(table, SWT.NONE);
+				ti.setText(2, "<No match found>");
+				return;
 			}
 			
-			MessageBox dlg = new MessageBox(shell, SWT.ICON_INFORMATION);
-			dlg.setMessage(msg);
-			dlg.setText("Query results");
-			dlg.open();
+			// Else: fill the table
+			List<OTmHit> res = ia.getHits();
+			for ( OTmHit hit : res ) {
+				TableItem ti = new TableItem(table, SWT.NONE);
+				ti.setText(hit.getSegKey());
+				ti.setText(1, String.format("%f", hit.getScore()));
+				ti.setText(2, hit.getTu().toString());
+			}
 		}
 		catch ( Throwable e ) {
 			Dialogs.showError(shell, "Error when searching:\n"+e.getMessage(), null);
