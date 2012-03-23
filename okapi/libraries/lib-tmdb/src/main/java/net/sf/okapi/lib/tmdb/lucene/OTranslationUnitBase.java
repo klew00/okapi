@@ -20,6 +20,8 @@
 
 package net.sf.okapi.lib.tmdb.lucene;
 
+import net.sf.okapi.lib.tmdb.DbUtil;
+
 /**
  * All files in this package are based on the files by @author HaslamJD and @author HARGRAVEJE in the okapi-tm-pensieve project amd in most cases there are only minor changes.
  */
@@ -28,28 +30,32 @@ package net.sf.okapi.lib.tmdb.lucene;
  * @author fliden
  *
  */
-public abstract class OTranslationUnitBase{
+public abstract class OTranslationUnitBase {
 
-	public static final String DEFAULT_ID_NAME = "segKey";
+	public static final String DEFAULT_ID_NAME = DbUtil.SEGKEY_NAME;
 	private OFields fields;
 	private OField id;
 
-	public OTranslationUnitBase(OField id) {
+	public OTranslationUnitBase (OField id) {
 		fields = new OFields();
 		this.id = id;
 	}
 	
-	public OTranslationUnitBase(String idValue) {
+	public OTranslationUnitBase (String idValue) {
 		fields = new OFields();
 		this.id = new OField(DEFAULT_ID_NAME, idValue);
 	}
 	
-	public OTranslationUnitBase(OField id, OFields fields) {
+	public OTranslationUnitBase (OField id,
+		OFields fields)
+	{
 		this.fields = fields;
 		this.id = id;
 	}
 	
-	public OTranslationUnitBase(String idValue, OFields fields) {
+	public OTranslationUnitBase (String idValue,
+		OFields fields)
+	{
 		this.fields = fields;
 		this.id = new OField(DEFAULT_ID_NAME, idValue);
 	}
@@ -58,7 +64,7 @@ public abstract class OTranslationUnitBase{
 	 * Return the id field
 	 * @return
 	 */
-	public OField getId() {
+	public OField getId () {
 		return id;
 	}
 	
@@ -66,7 +72,7 @@ public abstract class OTranslationUnitBase{
 	 * Return the value of the id field
 	 * @return
 	 */
-	public String getIdValue() {
+	public String getIdValue () {
 		return id.getValue();
 	}
 	
@@ -74,7 +80,7 @@ public abstract class OTranslationUnitBase{
 	 * Return the value of the id field
 	 * @return
 	 */
-	public String getIdName() {
+	public String getIdName () {
 		return id.getName();
 	}
 	
@@ -82,7 +88,7 @@ public abstract class OTranslationUnitBase{
 	 * Gets the fields
 	 * @return the fields
 	 */
-	public OFields getFields() {
+	public OFields getFields () {
 		return fields;
 	}
 
@@ -90,7 +96,7 @@ public abstract class OTranslationUnitBase{
 	 * Sets all fields at once and replaces any existing fields.
 	 * @param fields the fields to set
 	 */
-	public void setFields(OFields fields) {
+	public void setFields (OFields fields) {
 		this.fields = fields;
 	}
 
@@ -99,7 +105,7 @@ public abstract class OTranslationUnitBase{
 	 * @param name the name for the field we want
 	 * @return the field for a give field name
 	 */
-	public OField getField(String name) {
+	public OField getField (String name) {
 		return fields.get(name);
 	}
 	
@@ -107,7 +113,7 @@ public abstract class OTranslationUnitBase{
 	 * Sets the field for a give field name field
 	 * @param field the field we want set
 	 */
-	public void setField(OField field) {
+	public void setField (OField field) {
 		fields.put(field.getName(), field);
 	}
 	
@@ -115,7 +121,8 @@ public abstract class OTranslationUnitBase{
 	 * Sets the field for a give field name field
 	 * @param name the name for the field we want to delete
 	 */
-	public void deleteField(String name) {
+	public void deleteField (String name) {
 		fields.remove(name);
 	}
+
 }

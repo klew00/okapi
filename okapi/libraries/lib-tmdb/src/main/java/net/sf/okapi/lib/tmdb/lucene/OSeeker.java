@@ -31,7 +31,6 @@ import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.query.MatchType;
 import net.sf.okapi.common.resource.Code;
@@ -190,8 +189,12 @@ public class OSeeker {
 		return indexReader;
 	}
 
-	private List<OTmHit> getTopHits(Query query, OFields fields, LocaleId locale, String idName) throws IOException {
-		
+	private List<OTmHit> getTopHits(Query query,
+		OFields fields,
+		String locale,
+		String idName)
+		throws IOException
+	{
 		IndexSearcher is = getIndexSearcher();
 		QueryWrapperFilter filter = null;
 		int maxHits = 0;
@@ -251,26 +254,30 @@ public class OSeeker {
 	 * @throws IllegalArgumentException
 	 *             If threshold is greater than 100 or less than 0
 	 */
-	public List<OTmHit> searchFuzzy(TextFragment searchFrag, int threshold, int max, OFields fields, LocaleId locale, String idName) {
-
+	public List<OTmHit> searchFuzzy(TextFragment searchFrag,
+		int threshold,
+		int max,
+		OFields fields,
+		String locale,
+		String idName)
+	{
 		float searchThreshold = (float) threshold;
-		if (threshold < 0)
-			searchThreshold = 0.0f;
-		if (threshold > 100)
-			searchThreshold = 100.0f;
+		if ( threshold < 0 ) searchThreshold = 0.0f;
+		if ( threshold > 100 ) searchThreshold = 100.0f;
 
 		String queryText = searchFrag.getText();
 
-		String keyIndexField = DbUtil.TEXT_PREFIX+locale.toString();
-		Locale javaLoc = locale.toJavaLocale();
+		String keyIndexField = DbUtil.TEXT_PREFIX+locale;
+		Locale javaLoc = new Locale(locale);
 		
 		//--todo change from default depending--
 		// create basic ngram analyzer to tokenize query
 		
 		TokenStream queryTokenStream;
-		if(javaLoc.getLanguage() == Locale.ENGLISH.getLanguage()){
+		if ( javaLoc.getLanguage() == Locale.ENGLISH.getLanguage() ) {
 			queryTokenStream = defaultFuzzyAnalyzer.tokenStream(keyIndexField, new StringReader(queryText));			
-		}else{
+		}
+		else {
 			queryTokenStream = new NgramAnalyzer(javaLoc, 4).tokenStream(keyIndexField, new StringReader(queryText));
 		}
 		
@@ -280,14 +287,15 @@ public class OSeeker {
 		
 		try {
 			queryTokenStream.reset();
-			while (queryTokenStream.incrementToken()) {
+			while ( queryTokenStream.incrementToken() ) {
 				//Term t = new Term(keyIndexField, new String(termAtt.buffer()));
 				Term t = new Term(keyIndexField, termAtt.toString());
 				fQuery.add(t);
 			}
 			queryTokenStream.end();
 			queryTokenStream.close();
-		} catch (IOException e) {
+		}
+		catch ( IOException e ) {
 			throw new OkapiIOException(e.getMessage(), e);
 		}
 
@@ -303,7 +311,12 @@ public class OSeeker {
 	 * @param locale
 	 * @return
 	 */
-	public List<OTmHit> searchFuzzy(TextFragment searchFrag, int threshold, int max, OFields fields, LocaleId locale) {
+	public List<OTmHit> searchFuzzy(TextFragment searchFrag,
+		int threshold,
+		int max,
+		OFields fields,
+		String locale)
+	{
 		return searchFuzzy(searchFrag, threshold, max, fields, locale, OTranslationUnitResult.DEFAULT_ID_NAME);
 	}
 
@@ -311,14 +324,20 @@ public class OSeeker {
 	 * Search for fuzzy matches and adjust hit type and score based on differences with whitespace, codes and casing.
 	 * 
 	 * @param max the maximum number of hits to return.
-	 * @param threshold the minumum score to return (between 0.0 and 1.0)
+	 * @param threshold the minimum score to return (between 0.0 and 1.0)
 	 * @param query the query
 	 * @param queryFrag the text fragment for the query.
 	 * @param metadata any associated attributes to use for filter.
 	 * @return the list of hits found for the given arguments (never null).
 	 */
-	List<OTmHit> getFuzzyHits(int max, float threshold, Query query, TextFragment queryFrag, OFields fields, LocaleId locale, String idName) {
-		
+	List<OTmHit> getFuzzyHits(int max,
+		float threshold,
+		Query query,
+		TextFragment queryFrag,
+		OFields fields,
+		String locale,
+		String idName)
+	{
 		List<OTmHit> tmHitCandidates;
 		List<OTmHit> tmHitsToRemove = new LinkedList<OTmHit>();
 		List<Code> queryCodes = queryFrag.getCodes();
@@ -405,8 +424,13 @@ public class OSeeker {
 	 * @param srcCodes the source codes to re-use.
 	 * @return a new translation unit for the given document.
 	 */
-	private OTranslationUnitResult createTranslationUnit(Document doc, String resultCodedText, List<Code> resultCodes, OFields fields, LocaleId locale, String idName) {
-
+	private OTranslationUnitResult createTranslationUnit(Document doc,
+		String resultCodedText,
+		List<Code> resultCodes,
+		OFields fields,
+		String locale,
+		String idName)
+	{
 		//--RESULT TRANSLATION UNIT--
 		TextFragment resultFrag = new TextFragment();
 		resultFrag.setCodedText(resultCodedText, resultCodes, false);

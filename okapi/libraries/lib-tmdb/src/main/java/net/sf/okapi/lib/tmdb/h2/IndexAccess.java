@@ -24,6 +24,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
+import org.apache.lucene.document.Field.Index;
+import org.apache.lucene.document.Field.Store;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.store.RAMDirectory;
@@ -31,6 +33,8 @@ import org.apache.lucene.store.RAMDirectory;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.lib.tmdb.IIndexAccess;
+import net.sf.okapi.lib.tmdb.lucene.OField;
+import net.sf.okapi.lib.tmdb.lucene.OFields;
 import net.sf.okapi.lib.tmdb.lucene.OSeeker;
 import net.sf.okapi.lib.tmdb.lucene.OTmHit;
 import net.sf.okapi.lib.tmdb.lucene.OWriter;
@@ -76,8 +80,13 @@ class IndexAccess implements IIndexAccess {
 	}
 
 	@Override
-	public int search (String codedText) {
-		hits = seeker.searchFuzzy(new TextFragment(codedText), 45, 10, null, LocaleId.ENGLISH);
+	public int search (String codedText,
+		String tmUUID)
+	{
+		OFields searchFields = new OFields();
+	    searchFields.put("tm", new OField("tm", tmUUID, Index.NO, Store.NO));
+		
+		hits = seeker.searchFuzzy(new TextFragment(codedText), 45, 10, searchFields, "EN");
 		return hits.size();
 	}
 

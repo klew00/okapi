@@ -20,15 +20,12 @@
 
 package net.sf.okapi.lib.tmdb;
 
-import java.sql.ResultSet;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 
 import org.apache.lucene.document.Field.Index;
 import org.apache.lucene.document.Field.Store;
 
-import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.lib.tmdb.IProgressCallback;
 import net.sf.okapi.lib.tmdb.ITm;
@@ -80,19 +77,20 @@ public class Indexer implements Runnable {
 
 			ia = repo.getIndexAccess();
 			OWriter writer = ia.getWriter();
-		    OField ofld = new OField("tm", tm.getUUID(), Index.NO, Store.NO);
-		    OFields oflds = new OFields();
-		    oflds.put("tm", ofld);
+		    OFields searchFields = new OFields();
+		    searchFields.put("tm", new OField("tm", tm.getUUID(), Index.NOT_ANALYZED, Store.NO));
 			
 			IRecordSet rs = tm.getFirstPage();
 			while  (( rs != null ) && !canceled ) {
 				while ( rs.next() && !canceled ) {
 					totalCount++;
+
+					OTranslationUnitInput inputTu = new OTranslationUnitInput(String.valueOf(rs.getSegKey()), searchFields);
 			
 					String srcText = rs.getString(srcFn);
-				    OTranslationUnitVariant tuvSrc = new OTranslationUnitVariant(LocaleId.ENGLISH, new TextFragment(srcText));
-				    OTranslationUnitInput inputTu = new OTranslationUnitInput(String.valueOf(rs.getSegKey()), oflds);
+				    OTranslationUnitVariant tuvSrc = new OTranslationUnitVariant("EN", new TextFragment(srcText));
 				    inputTu.add(tuvSrc);
+				    
 				    writer.index(inputTu);
 					
 					// Update UI from time to time

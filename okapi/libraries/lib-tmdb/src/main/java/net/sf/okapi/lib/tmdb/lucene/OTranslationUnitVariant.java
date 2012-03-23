@@ -20,11 +20,11 @@
 
 package net.sf.okapi.lib.tmdb.lucene;
 
-import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.TextFragment;
 
 /**
- * All files in this package are based on the files by @author HaslamJD and @author HARGRAVEJE in the okapi-tm-pensieve project amd in most cases there are only minor changes.
+ * All files in this package are based on the files by @author HaslamJD and @author HARGRAVEJE 
+ * in the okapi-tm-pensieve project and in most cases there are only minor changes.
  */
 
 /**
@@ -32,7 +32,7 @@ import net.sf.okapi.common.resource.TextFragment;
  * @author HaslamJD
  */
 public class OTranslationUnitVariant {
-    private LocaleId language;
+    private String language;
     private TextFragment content;
 
     /**
@@ -45,7 +45,7 @@ public class OTranslationUnitVariant {
      * @param language the language of the TUV
      * @param content the content of the TUV
      */
-    public OTranslationUnitVariant(LocaleId language,
+    public OTranslationUnitVariant(String language,
     	TextFragment content)
     {
         this.language = language;
@@ -60,11 +60,11 @@ public class OTranslationUnitVariant {
         this.content = content;
     }
 
-    public LocaleId getLanguage () {
+    public String getLanguage () {
         return language;
     }
 
-    public void setLocale (LocaleId locale) {
+    public void setLocale (String locale) {
         this.language = locale;
     }
 

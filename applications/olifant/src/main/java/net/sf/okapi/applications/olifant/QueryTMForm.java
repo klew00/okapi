@@ -105,9 +105,9 @@ class QueryTMForm {
 			IIndexAccess ia = repo.getIndexAccess();
 			
 			String msg = "No match found.";
-			if ( ia.search(text) > 0 ) {
+			if ( ia.search(text, tm.getUUID()) > 0 ) {
 				List<OTmHit> res = ia.getHits();
-				msg = String.format("Best match (%f) = segId %s", res.get(0).getScore(), res.get(0).getSegKey());
+				msg = String.format("Best match (%f), SegKey=%s", res.get(0).getScore(), res.get(0).getSegKey());
 			}
 			
 			MessageBox dlg = new MessageBox(shell, SWT.ICON_INFORMATION);

@@ -32,7 +32,8 @@ public interface IIndexAccess {
 	
 	public void close ();
 	
-	public int search (String codedText);
+	public int search (String codedText,
+		String tmUUID);
 	
 	public List<OTmHit> getHits ();
 	

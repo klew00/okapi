@@ -235,36 +235,36 @@ public class DbUtil {
 	    return res;
 	}
 	
-	public static OTranslationUnitInput getFieldsAsIndexable(String id, LinkedHashMap<String, Object> segMap){
-		
+	public static OTranslationUnitInput getFieldsAsIndexable (String id,
+		LinkedHashMap<String, Object> segMap)
+	{
 		OTranslationUnitInput inTu = new OTranslationUnitInput(id);
 	
-		for (String fieldname : segMap.keySet()) {
-			
+		for ( String fieldname : segMap.keySet() ) {
 			//skip codes they will be added below
-			if(fieldname.startsWith(DbUtil.CODES_PREFIX)){
+			if ( fieldname.startsWith(DbUtil.CODES_PREFIX) ) {
 				continue;
 			}
 			
 			//indexable field
-			if(fieldname.startsWith(DbUtil.TEXT_PREFIX)){
-				
-				String lang = DbUtil.getFieldLocale(fieldname);
-				LocaleId loc = DbUtil.fromOlifantLocaleCode(lang);
+			if ( fieldname.startsWith(DbUtil.TEXT_PREFIX) ) {
+				String loc = DbUtil.getFieldLocale(fieldname);
 				String text = (String) segMap.get(fieldname);
 				
 				TextFragment tf;
 				
 				//ANY CORRESPONDING CODES
-				if (segMap.containsKey(DbUtil.CODES_PREFIX+lang)){
-					String codes = (String) segMap.get(DbUtil.CODES_PREFIX+lang);
+				if ( segMap.containsKey(DbUtil.CODES_PREFIX+loc) ) {
+					String codes = (String) segMap.get(DbUtil.CODES_PREFIX+loc);
 					tf = new TextFragment(text, Code.stringToCodes(codes));
-				}else{
+				}
+				else {
 					tf = new TextFragment(text);
 				}
 				
 				inTu.add(new OTranslationUnitVariant(loc, tf));
-			}else{
+			}
+			else {
 				inTu.setField(new OField(fieldname, (String)segMap.get(fieldname)));
 			}
 		}

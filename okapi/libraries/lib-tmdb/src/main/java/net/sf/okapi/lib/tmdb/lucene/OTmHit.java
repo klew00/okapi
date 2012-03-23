@@ -131,7 +131,7 @@ public class OTmHit implements Comparable<OTmHit> {
 	 * Set the document id for the TmHit. This is usually the Lucene document id.  
 	 * @param docId
 	 */
-	public void setDocId(int docId) {
+	public void setDocId (int docId) {
 		this.docId = docId;
 	}
 
@@ -139,15 +139,15 @@ public class OTmHit implements Comparable<OTmHit> {
 	 * Get the document id for the TmHit. This is usually the Lucene document id.
 	 * @return integer specifying the TmHit's document id.
 	 */
-	public int getDocId() {
+	public int getDocId () {
 		return docId;
 	}
 
-	public String getSegKey(){
-		return this.segKey;
+	public String getSegKey () {
+		return segKey;
 	}
 	
-	public void setSegKey(String segKey) {
+	public void setSegKey (String segKey) {
 		this.segKey = segKey;
 	}
 	
@@ -158,11 +158,10 @@ public class OTmHit implements Comparable<OTmHit> {
 	 * 
 	 * @param other - the TmHit we are comparing against.
 	 */
-	public int compareTo(OTmHit other) {
+	public int compareTo (OTmHit other) {
 		final int EQUAL = 0;
 
-		if (this == other)
-			return EQUAL;
+		if ( this == other ) return EQUAL;
 
 		String thisSource = this.tu.getResult().getContent().toText();
 		String otherSource = other.tu.getResult().getContent().toText();
