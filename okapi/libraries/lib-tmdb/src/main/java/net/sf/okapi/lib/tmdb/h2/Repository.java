@@ -35,6 +35,7 @@ import java.util.UUID;
 
 import net.sf.okapi.common.Util;
 import net.sf.okapi.lib.tmdb.DbUtil;
+import net.sf.okapi.lib.tmdb.IIndexAccess;
 import net.sf.okapi.lib.tmdb.IRepository;
 import net.sf.okapi.lib.tmdb.ITm;
 
@@ -45,6 +46,9 @@ public class Repository implements IRepository {
 	private Connection  conn = null;
 	private String name;
 	private boolean shared = false;
+	private boolean serverMode = false;
+	private IndexAccess ia = null;
+	private String idxDirectory = null;
 
 	static public void delete (String path) {
 		String pathNoExt = path;
@@ -74,6 +78,7 @@ public class Repository implements IRepository {
 			// Initialize the driver
 			Class.forName("org.h2.Driver");
 			boolean exist = false;
+			this.serverMode = serverMode;
 			
 			if ( path == null ) {
 				// Open the connection, this creates the DB if none exists
@@ -104,9 +109,10 @@ public class Repository implements IRepository {
 				}
 			}
 	
+			stm = conn.createStatement();
 			if ( !exist ) {
+				// Store the location of the directory
 				// Create the source table
-				stm = conn.createStatement();
 				stm.execute("CREATE TABLE REPO ("
 					+ "NAME INTEGER,"
 					+ "DESCRIPTION VARCHAR"
@@ -118,6 +124,13 @@ public class Repository implements IRepository {
 					+ "DESCRIPTION VARCHAR"
 					+ ")");
 			}
+			// Get the work directory
+			ResultSet rs = stm.executeQuery("CALL DATABASE_PATH()");
+			if ( rs.next() ) {
+				idxDirectory = rs.getString(1);
+				if ( idxDirectory != null ) idxDirectory += ".idx";
+			}
+			
 		}
 		catch ( SQLException e ) {
 			throw new RuntimeException(e);
@@ -150,6 +163,10 @@ public class Repository implements IRepository {
 			if ( conn != null ) {
 				conn.close();
 				conn = null;
+			}
+			if ( ia != null ) {
+				ia.close();
+				ia = null;
 			}
 			name = null;
 		}
@@ -624,5 +641,26 @@ public class Repository implements IRepository {
 			}
 		}
 	}
-	
+
+	@Override
+	public IIndexAccess getIndexAccess () {
+		if ( ia == null ) {
+			ia = new IndexAccess(this);
+		}
+		return ia;
+	}
+
+	/**
+	 * Gets the directory name to use for the index.
+	 * @return the directory name to use for the index, or null if this is a in-memory repository.
+	 */
+	String getDirectory () {
+		return idxDirectory;
+	}
+
+	@Override
+	public boolean isServerMode () {
+		return serverMode;
+	}
+
 }

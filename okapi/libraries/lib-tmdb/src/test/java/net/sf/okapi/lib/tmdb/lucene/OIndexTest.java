@@ -27,15 +27,15 @@ import org.junit.Test;
 
 public class OIndexTest {
 
-	OWriter tmWriter;
+    static final String locEN = DbUtil.toOlifantLocaleCode(LocaleId.ENGLISH);
+    static final String locFR = DbUtil.toOlifantLocaleCode(LocaleId.FRENCH);
+    static final String locES = DbUtil.toOlifantLocaleCode(LocaleId.SPANISH);
+
+    OWriter tmWriter;
 	OSeeker tmSeeker;
 	IndexWriter writer;
 	Directory dir;
 	
-	LocaleId locEN = LocaleId.fromString("EN");
-	LocaleId locFR = LocaleId.fromString("FR");
-	LocaleId locES = LocaleId.fromString("ES");
-
 	String enText = "Text EN 1";
 	String frText = "Text FR 1";
 	String esText = "Text ES 1";

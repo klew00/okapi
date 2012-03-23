@@ -21,6 +21,8 @@ package net.sf.okapi.lib.tmdb.lucene;
 
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.TextFragment;
+import net.sf.okapi.lib.tmdb.DbUtil;
+
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.RAMDirectory;
 
@@ -47,10 +49,14 @@ public class OSeekerTest  {
     //static final Directory DIR = new RAMDirectory();
 	Directory DIR;
 	
-    static final OTranslationUnitVariant TARGET = new OTranslationUnitVariant(LocaleId.fromString("FR"), new TextFragment("target text"));
+    static final String locEN = DbUtil.toOlifantLocaleCode(LocaleId.ENGLISH);
+    static final String locFR = DbUtil.toOlifantLocaleCode(LocaleId.FRENCH);
+    static final String locES = DbUtil.toOlifantLocaleCode(LocaleId.SPANISH);
+	static final OTranslationUnitVariant TARGET = new OTranslationUnitVariant(locFR, new TextFragment("target text"));
     static final String STR = "watch out for the killer rabbit";
     OSeeker seeker;
     List<OTmHit> tmhits;
+
 
     @Before
     public void setUp() throws IOException {
@@ -69,36 +75,36 @@ public class OSeekerTest  {
     public void shortEntries () throws Exception {
         OWriter writer = getWriter();
         OTranslationUnitInput inputTu = new OTranslationUnitInput("1");
-        inputTu.add(new OTranslationUnitVariant(LocaleId.fromString("EN"), new TextFragment("abcd")));
-        inputTu.add(new OTranslationUnitVariant(LocaleId.fromString("FR"), new TextFragment("efgh")));
-        inputTu.add(new OTranslationUnitVariant(LocaleId.fromString("ES"), new TextFragment("ijkl")));
+        inputTu.add(new OTranslationUnitVariant(locEN, new TextFragment("abcd")));
+        inputTu.add(new OTranslationUnitVariant(locFR, new TextFragment("efgh")));
+        inputTu.add(new OTranslationUnitVariant(locES, new TextFragment("ijkl")));
         
         inputTu.setField(new OField("category", "first"));
         
         writer.index(inputTu);
         
         inputTu = new OTranslationUnitInput("2");
-        inputTu.add(new OTranslationUnitVariant(LocaleId.fromString("EN"), new TextFragment("abc")));
-        inputTu.add(new OTranslationUnitVariant(LocaleId.fromString("FR"), new TextFragment("def")));
-        inputTu.add(new OTranslationUnitVariant(LocaleId.fromString("ES"), new TextFragment("ghi")));
+        inputTu.add(new OTranslationUnitVariant(locEN, new TextFragment("abc")));
+        inputTu.add(new OTranslationUnitVariant(locFR, new TextFragment("def")));
+        inputTu.add(new OTranslationUnitVariant(locES, new TextFragment("ghi")));
         writer.index(inputTu);
         
         inputTu = new OTranslationUnitInput("3");
-        inputTu.add(new OTranslationUnitVariant(LocaleId.fromString("EN"), new TextFragment("am")));
-        inputTu.add(new OTranslationUnitVariant(LocaleId.fromString("FR"), new TextFragment("bm")));
-        inputTu.add(new OTranslationUnitVariant(LocaleId.fromString("ES"), new TextFragment("cm")));
+        inputTu.add(new OTranslationUnitVariant(locEN, new TextFragment("am")));
+        inputTu.add(new OTranslationUnitVariant(locFR, new TextFragment("bm")));
+        inputTu.add(new OTranslationUnitVariant(locES, new TextFragment("cm")));
         writer.index(inputTu);
         
         inputTu = new OTranslationUnitInput("4");
-        inputTu.add(new OTranslationUnitVariant(LocaleId.fromString("EN"), new TextFragment("zq")));
-        inputTu.add(new OTranslationUnitVariant(LocaleId.fromString("FR"), new TextFragment("zr")));
-        inputTu.add(new OTranslationUnitVariant(LocaleId.fromString("ES"), new TextFragment("zs")));
+        inputTu.add(new OTranslationUnitVariant(locEN, new TextFragment("zq")));
+        inputTu.add(new OTranslationUnitVariant(locFR, new TextFragment("zr")));
+        inputTu.add(new OTranslationUnitVariant(locES, new TextFragment("zs")));
         writer.index(inputTu);
         
         inputTu = new OTranslationUnitInput("5");
-        inputTu.add(new OTranslationUnitVariant(LocaleId.fromString("EN"), new TextFragment("zqq")));
-        inputTu.add(new OTranslationUnitVariant(LocaleId.fromString("FR"), new TextFragment("zrr")));
-        inputTu.add(new OTranslationUnitVariant(LocaleId.fromString("ES"), new TextFragment("zss")));
+        inputTu.add(new OTranslationUnitVariant(locEN, new TextFragment("zqq")));
+        inputTu.add(new OTranslationUnitVariant(locFR, new TextFragment("zrr")));
+        inputTu.add(new OTranslationUnitVariant(locES, new TextFragment("zss")));
         writer.index(inputTu);
         
         writer.close();
@@ -108,53 +114,53 @@ public class OSeekerTest  {
         //include existing category
         OFields searchfields = new OFields();
         searchfields.put("category", new OField("category", "first"));
-        list = seeker.searchFuzzy(new TextFragment("abcd"), 100, 1, searchfields, LocaleId.fromString("EN"));
+        list = seeker.searchFuzzy(new TextFragment("abcd"), 100, 1, searchfields, locEN);
         assertEquals("number of docs found", 1, list.size());        
 
         OTmHit hit = list.get(0);
-        assertEquals("id name", "segKey", hit.getTu().getIdName());
+        assertEquals("id name", DbUtil.SEGKEY_NAME, hit.getTu().getIdName());
         assertEquals("id value", "1", hit.getTu().getIdValue());
         assertEquals("number of additional fields", 1, hit.getTu().getFields().size());
 
         //include missing category
         searchfields = new OFields();
         searchfields.put("category", new OField("category", "second"));
-        list = seeker.searchFuzzy(new TextFragment("abcd"), 100, 1, searchfields, LocaleId.fromString("EN"));
+        list = seeker.searchFuzzy(new TextFragment("abcd"), 100, 1, searchfields, locEN);
         assertEquals("number of docs found", 0, list.size());
         
-        list = seeker.searchFuzzy(new TextFragment("abcd"), 100, 1, null, LocaleId.fromString("EN"));
+        list = seeker.searchFuzzy(new TextFragment("abcd"), 100, 1, null, locEN);
         assertEquals("number of docs found", 1, list.size());
-        list = seeker.searchFuzzy(new TextFragment("efgh"), 100, 1, null, LocaleId.fromString("FR"));
+        list = seeker.searchFuzzy(new TextFragment("efgh"), 100, 1, null, locFR);
         assertEquals("number of docs found", 1, list.size());
-        list = seeker.searchFuzzy(new TextFragment("ijkl"), 100, 1, null, LocaleId.fromString("ES"));
-        assertEquals("number of docs found", 1, list.size());
-        
-        list = seeker.searchFuzzy(new TextFragment("abc"), 100, 1, null, LocaleId.fromString("EN"));
-        assertEquals("number of docs found", 1, list.size());
-        list = seeker.searchFuzzy(new TextFragment("def"), 100, 1, null, LocaleId.fromString("FR"));
-        assertEquals("number of docs found", 1, list.size());
-        list = seeker.searchFuzzy(new TextFragment("ghi"), 100, 1, null, LocaleId.fromString("ES"));
+        list = seeker.searchFuzzy(new TextFragment("ijkl"), 100, 1, null, locES);
         assertEquals("number of docs found", 1, list.size());
         
-        list = seeker.searchFuzzy(new TextFragment("zqq"), 100, 1, null, LocaleId.fromString("EN"));
+        list = seeker.searchFuzzy(new TextFragment("abc"), 100, 1, null, locEN);
         assertEquals("number of docs found", 1, list.size());
-        list = seeker.searchFuzzy(new TextFragment("zrr"), 100, 1, null, LocaleId.fromString("FR"));
+        list = seeker.searchFuzzy(new TextFragment("def"), 100, 1, null, locFR);
         assertEquals("number of docs found", 1, list.size());
-        list = seeker.searchFuzzy(new TextFragment("zss"), 100, 1, null, LocaleId.fromString("ES"));
+        list = seeker.searchFuzzy(new TextFragment("ghi"), 100, 1, null, locES);
+        assertEquals("number of docs found", 1, list.size());
+        
+        list = seeker.searchFuzzy(new TextFragment("zqq"), 100, 1, null, locEN);
+        assertEquals("number of docs found", 1, list.size());
+        list = seeker.searchFuzzy(new TextFragment("zrr"), 100, 1, null, locFR);
+        assertEquals("number of docs found", 1, list.size());
+        list = seeker.searchFuzzy(new TextFragment("zss"), 100, 1, null, locES);
         assertEquals("number of docs found", 1, list.size());
 
-        list = seeker.searchFuzzy(new TextFragment("am"), 100, 1, null, LocaleId.fromString("EN"));
+        list = seeker.searchFuzzy(new TextFragment("am"), 100, 1, null, locEN);
         assertEquals("number of docs found", 1, list.size());
-        list = seeker.searchFuzzy(new TextFragment("bm"), 100, 1, null, LocaleId.fromString("FR"));
+        list = seeker.searchFuzzy(new TextFragment("bm"), 100, 1, null, locFR);
         assertEquals("number of docs found", 1, list.size());
-        list = seeker.searchFuzzy(new TextFragment("cm"), 100, 1, null, LocaleId.fromString("ES"));
+        list = seeker.searchFuzzy(new TextFragment("cm"), 100, 1, null, locES);
         assertEquals("number of docs found", 1, list.size());
         
-        list = seeker.searchFuzzy(new TextFragment("zq"), 100, 1, null, LocaleId.fromString("EN"));
+        list = seeker.searchFuzzy(new TextFragment("zq"), 100, 1, null, locEN);
         assertEquals("number of docs found", 1, list.size());
-        list = seeker.searchFuzzy(new TextFragment("zr"), 100, 1, null, LocaleId.fromString("FR"));
+        list = seeker.searchFuzzy(new TextFragment("zr"), 100, 1, null, locFR);
         assertEquals("number of docs found", 1, list.size());
-        list = seeker.searchFuzzy(new TextFragment("zs"), 100, 1, null, LocaleId.fromString("ES"));
+        list = seeker.searchFuzzy(new TextFragment("zs"), 100, 1, null, locES);
         assertEquals("number of docs found", 1, list.size());
     }
 
@@ -163,18 +169,18 @@ public class OSeekerTest  {
         OWriter writer = getWriter();
         OTranslationUnitInput inputTu = new OTranslationUnitInput("1");
         
-        inputTu.add(new OTranslationUnitVariant(LocaleId.fromString("EN"), new TextFragment("abcdef")));
-        inputTu.add(new OTranslationUnitVariant(LocaleId.fromString("FR"), new TextFragment("ghijkl")));
-        inputTu.add(new OTranslationUnitVariant(LocaleId.fromString("ES"), new TextFragment("mnopqr")));
+        inputTu.add(new OTranslationUnitVariant(locEN, new TextFragment("abcdef")));
+        inputTu.add(new OTranslationUnitVariant(locFR, new TextFragment("ghijkl")));
+        inputTu.add(new OTranslationUnitVariant(locES, new TextFragment("mnopqr")));
         writer.index(inputTu);
         writer.close();
 
         List<OTmHit> list;
-        list = seeker.searchFuzzy(new TextFragment("abCdef"), 100, 1, null, LocaleId.fromString("EN"));
+        list = seeker.searchFuzzy(new TextFragment("abCdef"), 100, 1, null, locEN);
         assertEquals("number of docs found", 0, list.size());
-        list = seeker.searchFuzzy(new TextFragment("ghIjkl"), 100, 1, null, LocaleId.fromString("FR"));
+        list = seeker.searchFuzzy(new TextFragment("ghIjkl"), 100, 1, null, locFR);
         assertEquals("number of docs found", 0, list.size());
-        list = seeker.searchFuzzy(new TextFragment("mnOpqr"), 100, 1, null, LocaleId.fromString("ES"));
+        list = seeker.searchFuzzy(new TextFragment("mnOpqr"), 100, 1, null, locES);
         assertEquals("number of docs found", 0, list.size());
     }
 

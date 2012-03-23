@@ -293,9 +293,9 @@
 		   <fileset dir="../shared/licenses" includes="**/jericho-*"/>
 		</copy>
 
-		<property name="dep003" value="${mavenStore}/org/yaml/snakeyaml/1.8"/>
+		<property name="dep003" value="${mavenStore}/org/yaml/snakeyaml/1.10"/>
 		<fileset id="list.contents" dir="${dep003}"
-		 includes="**/snakeyaml-1.8.jar"/>
+		 includes="**/snakeyaml-1.10.jar"/>
 		<property name="jar003" refid="list.contents"/>
 		<echo file="tmpJars" append="yes"> ${jar003}</echo>
 		<copy todir="${distLib}" file="${dep003}/${jar003}"/>

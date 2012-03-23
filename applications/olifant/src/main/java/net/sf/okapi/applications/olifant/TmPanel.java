@@ -902,6 +902,17 @@ class TmPanel extends Composite implements IObserver, ISegmentEditorUser {
 		}
 	}
 	
+	void query () {
+		saveEntry();
+		try {
+			QueryTMForm dlg = new QueryTMForm(getShell(), tm);
+			dlg.showDialog();
+		}
+		catch ( Throwable e ) {
+			Dialogs.showError(getShell(), "Error with query.\n"+e.getMessage(), null);
+		}
+	}
+	
 	/**
 	 * Saves the modifications in the current page into the back-end.
 	 */
