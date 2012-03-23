@@ -33,6 +33,8 @@ public interface IIndexAccess {
 	public void close ();
 	
 	public int search (String codedText,
+		int threshold,
+		int maxHits,
 		String tmUUID);
 	
 	public List<OTmHit> getHits ();
