@@ -65,7 +65,10 @@ public class XPipeline extends net.sf.okapi.common.pipeline.Pipeline implements 
 		
 		for (IPipelineStep step : steps) {
 			if (step instanceof XPipelineStep) {
-				if (((XPipelineStep) step).getStep() == null) continue; // Do not insert an empty step
+				if (((XPipelineStep) step).getStep() == null) 
+					continue; // Do not insert an empty step
+				else
+					this.addStep(step);	
 			}
 			else if (step instanceof IPipeline) {
 				if (step instanceof XPipeline) {
@@ -73,6 +76,11 @@ public class XPipeline extends net.sf.okapi.common.pipeline.Pipeline implements 
 					if (pl.type == XPipelineType.PARALLEL) {
 						this.addStep(step); // Parallel pipeline is inserted as one step, regardless of how many steps its branches contain 
 						continue;
+					}
+					else {
+						for (IPipelineStep s : pl.getSteps()) {
+							this.addStep(s);
+						}	
 					}
 				}
 				else { // Either a sequential XPipeline, or another IPipeline 
@@ -82,8 +90,9 @@ public class XPipeline extends net.sf.okapi.common.pipeline.Pipeline implements 
 					}
 				}
 			}
-
-			this.addStep(step);
+			else
+				this.addStep(step);
+			
 		}
 		
 		if (buildPipeline)

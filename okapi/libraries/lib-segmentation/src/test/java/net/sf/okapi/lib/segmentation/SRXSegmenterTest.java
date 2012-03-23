@@ -257,6 +257,42 @@ public class SRXSegmenterTest {
 		assertEquals("Part 1. Part 2. Part 3.", tu.getVariantSources().get(LocaleId.FRENCH).getLastContent().toText());
 	}
 	
+	@Test
+	public void testICUSpecificPatterns () {
+		SRXDocument doc = new SRXDocument();
+		LanguageMap langMap = new LanguageMap(".*", "default");
+		doc.addLanguageMap(langMap);
+		// Add the rules
+		ArrayList<Rule> langRules = new ArrayList<Rule>();
+		langRules.add(new Rule("\\w", "\\s", true));
+		langRules.add(new Rule("\\d", "\\s", true));
+		langRules.add(new Rule("\\N{WAVE DASH}", "\\s", true));
+		langRules.add(new Rule("z", "\\x{0608}", true));
+		doc.addLanguageRule("default", langRules);
+		// Create the segmenter
+		ISegmenter segmenter = doc.compileLanguageRules(LocaleId.ENGLISH, null);
+		
+		assertEquals(2, segmenter.computeSegments("e ")); // e + space
+		assertEquals(2, segmenter.computeSegments("e\u00a0")); // e + nbsp
+		assertEquals(2, segmenter.computeSegments("e\u1680")); // e + Ogham space
+		assertEquals(2, segmenter.computeSegments("\u0104 ")); // A-ogonek + space
+		assertEquals(2, segmenter.computeSegments("\u0104\u00a0")); // A-ogonek + nbsp
+		assertEquals(2, segmenter.computeSegments("\u0104\u1680")); // A-ogonek + Ogham space
+
+		assertEquals(2, segmenter.computeSegments("1 ")); // 1 + space
+		assertEquals(2, segmenter.computeSegments("\u0b66 ")); // Oryia zero + space
+		assertEquals(2, segmenter.computeSegments("\uff19 ")); // Full-width 9 + space
+		assertEquals(2, segmenter.computeSegments("1\u1680")); // 1 + Ogham space
+		assertEquals(2, segmenter.computeSegments("\u0b66\u1680")); // Oryia zero + Ogham space
+		assertEquals(2, segmenter.computeSegments("\uff19\u1680")); // Full-width 9 + Ogham space
+		
+		assertEquals(2, segmenter.computeSegments("\u301c\u1680")); // wave-dash + Ogham space
+
+		assertEquals(2, segmenter.computeSegments("z\u0608")); // z + Arabic ray
+
+		assertEquals(1, segmenter.computeSegments("\u20ac\u1680")); // Euro + Ogham space -> no break
+	}
+	
 	private ISegmenter createSegmenterWithRules (LocaleId locId) {
 		SRXDocument doc = new SRXDocument();
 		LanguageMap langMap = new LanguageMap(".*", "default");

@@ -33,6 +33,7 @@ import com.mongodb.DBObject;
 import com.mongodb.Mongo;
 import com.mongodb.MongoException;
 import net.sf.okapi.lib.tmdb.DbUtil;
+import net.sf.okapi.lib.tmdb.IIndexAccess;
 import net.sf.okapi.lib.tmdb.IRepository;
 import net.sf.okapi.lib.tmdb.ITm;
 
@@ -376,6 +377,18 @@ public class Repository implements IRepository {
 	@Override
 	public boolean isShared () {
 		return true; // Always in shared mode
+	}
+
+	@Override
+	public IIndexAccess getIndexAccess () {
+		//TODO: TM index access
+		return null;
+	}
+
+	@Override
+	public boolean isServerMode () {
+		// MongoDB is always access in server mode
+		return true;
 	}
 	
 }

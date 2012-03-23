@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2011-2012 by the Okapi Framework contributors
+  Copyright (C) 2012 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -20,30 +20,23 @@
 
 package net.sf.okapi.lib.tmdb;
 
-import net.sf.okapi.common.observer.IObservable;
+import java.util.List;
 
-public interface IProgressCallback extends IObservable {
+import net.sf.okapi.lib.tmdb.lucene.OTmHit;
+import net.sf.okapi.lib.tmdb.lucene.OWriter;
 
-	public static final int MSGTYPE_WARNING = 1;
-	public static final int MSGTYPE_ERROR = 2;
-	public static final int MSGTYPE_INFO = 3;
+/**
+ * Provides implementation-agnostic access to an Olifant TM index.
+ */
+public interface IIndexAccess {
 	
-	public void startProcess (String text);
+	public void close ();
 	
-	/**
-	 * Notifies the end of the process.
-	 * @param count number of entries processed, or -1 to get no message.
-	 * @param updateRepositories true if the display of list of repositories needs to be updated,
-	 * null or false otherwise.
-	 */
-	public void endProcess (long count,
-		Boolean updateRepositories);
-
-	public boolean updateProgress (long count);
+	public int search (String codedText,
+		String tmUUID);
 	
-	public boolean logMessage (int type,
-		String text);
+	public List<OTmHit> getHits ();
 	
-	public boolean isCanceled ();
+	public OWriter getWriter ();
 
 }

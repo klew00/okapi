@@ -25,7 +25,6 @@ import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.resource.Code;
@@ -46,7 +45,8 @@ import org.apache.lucene.store.Directory;
 import org.apache.lucene.util.Version;
 
 /**
- * All files in this package are based on the files by @author HaslamJD and @author HARGRAVEJE in the okapi-tm-pensieve project amd in most cases there are only minor changes.
+ * All files in this package are based on the files by @author HaslamJD and @author HARGRAVEJE 
+ * in the okapi-tm-pensieve project and in most cases there are only minor changes.
  */
 
 /**
@@ -265,7 +265,7 @@ public class OWriter {
 		//SET TARGETS
 		for (OTranslationUnitVariant variant : tu.getVariants()) {
 			
-			LocaleId locale = variant.getLanguage();
+			String locale = variant.getLanguage();
 			TextFragment content = variant.getContent();
 
 			//--skipt empty-- and log--
@@ -275,9 +275,9 @@ public class OWriter {
 			} 
 			
 			//TODO check locale string--
-			String keyIndexField = DbUtil.TEXT_PREFIX+locale.toString();
-			String keyExactField = "EXACT_"+DbUtil.TEXT_PREFIX+locale.toString();
-			String keyCodesField = DbUtil.CODES_PREFIX+locale.toString();
+			String keyIndexField = DbUtil.TEXT_PREFIX+locale;
+			String keyExactField = "EXACT_"+DbUtil.TEXT_PREFIX+locale;
+			String keyCodesField = DbUtil.CODES_PREFIX+locale;
 
 			doc.add(createRawCodedTextField(keyExactField, content, Field.Store.YES, Field.Index.NOT_ANALYZED));
 			// ANALYZED_NO_NORMS: We don't need Lucene to manage this for us, we will implement our own scoring and

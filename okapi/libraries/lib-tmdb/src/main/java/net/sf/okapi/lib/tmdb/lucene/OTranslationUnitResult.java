@@ -74,7 +74,7 @@ public class OTranslationUnitResult extends OTranslationUnitBase{
 
 	@Override
 	public String toString() {
-		return "Result: " + getResult().getContent().toText();
+		return getResult().getContent().toText();
 
 	}
 }
