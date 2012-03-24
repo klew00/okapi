@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2011 by the Okapi Framework contributors
+  Copyright (C) 2011-2012 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -40,6 +40,11 @@ public class TXMLSegAnnotation implements IAnnotation {
 	
 	public boolean hasWSAfter () {
 		return (value.indexOf('a') > -1);
+	}
+	
+	@Override
+	public String toString () {
+		return value;
 	}
 
 }

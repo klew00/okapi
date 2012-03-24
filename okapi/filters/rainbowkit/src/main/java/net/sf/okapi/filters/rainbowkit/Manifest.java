@@ -612,4 +612,9 @@ public class Manifest implements IAnnotation {
 		tempTmDir = Util.ensureSeparator(tempPackageRoot + tmSubDir, false);
 	}
 
+	@Override
+	public String toString () {
+		return projectId + "_" + packageId;
+	}
+
 }
