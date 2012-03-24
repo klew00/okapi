@@ -91,7 +91,11 @@ distribution.</p>
 	<li>Library:<ul>
 	<li>Fixed duplicated ID values in TextFragment.insert() when the inserted 
 	fragment had overlaps.</li>
-	<li>Segmenter now uses ICU to implement SRX.</li>
+	<li>Segmenter now uses ICU to implement SRX.<br>
+	<b>Important: This may affect segmentation with your existing SRX files. For 
+	example \w now matches also accented letters (the normal Java \w does not). 
+	See <a href="http://www.opentag.com/okapi/wiki/index.php?title=SRX_and_Java">
+	SRX and Java</a> for details.</b></li>
 </ul>
 	</li>
 </ul>
