@@ -230,4 +230,9 @@ public class MergingInfo implements IAnnotation {
 		return info;
 	}
 
+	@Override
+	public String toString () {
+		return String.format("docId=%d type=%s", docId, this.extractionType);
+	}
+
 }

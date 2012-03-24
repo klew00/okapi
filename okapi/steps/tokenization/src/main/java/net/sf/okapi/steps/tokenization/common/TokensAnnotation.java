@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2008-2012 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -31,35 +31,38 @@ import net.sf.okapi.steps.tokenization.tokens.Tokens;
 
 public class TokensAnnotation implements IAnnotation {
 
-	private Tokens tokens = new Tokens ();
+	private Tokens tokens = new Tokens();
 
-	public TokensAnnotation(Tokens tokens) {
-		
+	public TokensAnnotation (Tokens tokens) {
 		super();
 		this.tokens = tokens;
 	}
 
-	public void setTokens(Tokens tokens) {
-		
+	public void setTokens (Tokens tokens) {
 		this.tokens = tokens;
 	}
 
-	public Tokens getTokens() {
-		
+	public Tokens getTokens () {
 		return tokens;
 	} 
 	
-	public Tokens getFilteredList(String... tokenTypes) {
-		
+	public Tokens getFilteredList (String... tokenTypes) {
 		if (tokens == null) return getTokens(); // return all
-		
 		return tokens.getFilteredList(tokenTypes);
 	}
 
-	public void addTokens(Tokens tokens) {
-		
+	public void addTokens (Tokens tokens) {
 		this.tokens.addAll(tokens);
-		
 		// TODO Handle overlapping and duplicate ranges for the same token type
+	}
+	
+	@Override
+	public String toString () {
+		StringBuilder sb = new StringBuilder();
+		for ( Token token : tokens ) {
+			if ( sb.length()>0 ) sb.append(" ");
+			sb.append(token.toString());
+		}
+		return sb.toString();
 	}
 }
