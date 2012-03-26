@@ -235,9 +235,9 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		chkUseCustomTransformer.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				edFactoryClass.setEnabled(chkUseCustomTransformer.getSelection());
-//				edFactoryClass.setText("net.sf.saxon.TransformerFactoryImpl"); // default for XSLT 2.0
+				edFactoryClass.setText("net.sf.saxon.TransformerFactoryImpl"); // default for XSLT 2.0
 				edXpathFactoryClass.setEnabled(chkUseCustomTransformer.getSelection());
-//				edXpathFactoryClass.setText("net.sf.saxon.xpath.XPathFactoryImpl"); // default for XSLT 2.0
+				edXpathFactoryClass.setText("net.sf.saxon.xpath.XPathFactoryImpl"); // default for XSLT 2.0
 			}
 		});
 		
