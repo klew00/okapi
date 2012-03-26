@@ -81,12 +81,14 @@ class IndexAccess implements IIndexAccess {
 
 	@Override
 	public int search (String codedText,
+		int threshold,
+		int maxHits,
 		String tmUUID)
 	{
 		OFields searchFields = new OFields();
 	    searchFields.put("tm", new OField("tm", tmUUID, Index.NO, Store.NO));
 		
-		hits = seeker.searchFuzzy(new TextFragment(codedText), 45, 10, searchFields, "EN");
+		hits = seeker.searchFuzzy(new TextFragment(codedText), threshold, maxHits, searchFields, "EN");
 		return hits.size();
 	}
 

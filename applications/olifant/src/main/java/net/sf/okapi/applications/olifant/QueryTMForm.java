@@ -40,8 +40,8 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
@@ -54,23 +54,28 @@ class QueryTMForm {
 	private final Text edQuery;
 	private final Button btQuery;
 	private final Table table;
+	private final Spinner spThreshold;
 
 	public QueryTMForm (Shell parent,
 		ITm tm)
 	{
 		shell = new Shell(parent, SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.APPLICATION_MODAL);
-		shell.setText("Query TM (TEMPORARY)");
+		shell.setText("Query TM");
 		UIUtil.inheritIcon(shell, parent);
-		shell.setLayout(new GridLayout(1, false));
+		shell.setLayout(new GridLayout(3, false));
 
 		this.tm = tm;
 
 		Label label = new Label(shell, SWT.NONE);
 		label.setText("Source text to query:");
+		GridData gdTmp = new GridData();
+		gdTmp.horizontalSpan = 3;
+		label.setLayoutData(gdTmp);
 		
 		edQuery = new Text(shell, SWT.BORDER);
-		GridData gdTmp = new GridData(GridData.FILL_HORIZONTAL);
-		gdTmp.widthHint = 500;
+		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+		gdTmp.horizontalSpan = 3;
+		gdTmp.widthHint = 550;
 		edQuery.setLayoutData(gdTmp);
 		
 		btQuery = UIUtil.createGridButton(shell, SWT.PUSH, "Search", UIUtil.BUTTON_DEFAULT_WIDTH, 1);
@@ -80,13 +85,23 @@ class QueryTMForm {
 				search();
 			}
 		});
+		
+		label = new Label(shell,SWT.NONE);
+		label.setText("Threshold:");
+		
+		spThreshold = new Spinner(shell, SWT.BORDER);
+		spThreshold.setMaximum(100);
+		spThreshold.setMinimum(1);
+		spThreshold.setPageIncrement(10);
+		spThreshold.setSelection(50);
 
 		// Creates the table
 		table = new Table(shell, SWT.BORDER | SWT.MULTI | SWT.FULL_SELECTION | SWT.V_SCROLL);
 		table.setHeaderVisible(true);
 		table.setLinesVisible(true);
 		gdTmp = new GridData(GridData.FILL_BOTH);
-		gdTmp.heightHint = 100;
+		gdTmp.heightHint = 200;
+		gdTmp.horizontalSpan = 3;
 		table.setLayoutData(gdTmp);
 
 		table.addControlListener(new ControlAdapter() {
@@ -147,7 +162,7 @@ class QueryTMForm {
 			IRepository repo = tm.getRepository();
 			IIndexAccess ia = repo.getIndexAccess();
 
-			int count = ia.search(text, tm.getUUID());
+			int count = ia.search(text, spThreshold.getSelection(), 20, tm.getUUID());
 			if ( count == 0 ) {
 				TableItem ti = new TableItem(table, SWT.NONE);
 				ti.setText(2, "<No match found>");

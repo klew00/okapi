@@ -101,6 +101,7 @@ class TmPanel extends Composite implements IObserver, ISegmentEditorUser {
 	private TMOptions opt;
 	private SearchAndReplaceForm sarForm;
 	private SearchAndReplaceOptions sarOptions;
+	private QueryTMForm queryForm;
 	private FilterOptions fltOptions;
 	private LinkedHashMap<String, Boolean> sortOrder;
 
@@ -637,6 +638,9 @@ class TmPanel extends Composite implements IObserver, ISegmentEditorUser {
 
 	@Override
 	public void dispose () {
+		if ( queryForm != null ) {
+			queryForm = null;
+		}
 		tm = null;
 		super.dispose();
 	}
@@ -905,8 +909,11 @@ class TmPanel extends Composite implements IObserver, ISegmentEditorUser {
 	void query () {
 		saveEntry();
 		try {
-			QueryTMForm dlg = new QueryTMForm(getShell(), tm);
-			dlg.showDialog();
+			if ( queryForm == null ) {
+				queryForm = new QueryTMForm(getShell(), tm);
+			}
+			queryForm.showDialog();
+			queryForm = null; // temporary
 		}
 		catch ( Throwable e ) {
 			Dialogs.showError(getShell(), "Error with query.\n"+e.getMessage(), null);
