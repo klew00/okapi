@@ -160,13 +160,13 @@ public class XSLTransformStep extends BasePipelineStep {
 		catch ( Throwable e ) {
 			throw new OkapiIOException("Error in XSLT input.\n" + e.getMessage(), e);
 		}
-		finally {
+//		finally {
 			// Make sure to reset the original property
-			if ( params.useCustomTransformer ) {
-				System.setProperty(FACTORY_PROP, originalProcessor);
-				System.setProperty(XPATH_PROP, originalXpathProcessor);
-			}
-		}
+//			if ( params.useCustomTransformer ) {
+//				System.setProperty(FACTORY_PROP, originalProcessor);
+//				System.setProperty(XPATH_PROP, originalXpathProcessor);
+//			}
+//  	}
 		
 		return event;
 	}
@@ -230,6 +230,15 @@ public class XSLTransformStep extends BasePipelineStep {
 		return event;
 	}
 
+	@Override
+	protected Event handleEndBatch(Event event) {
+		if ( params.useCustomTransformer ) {
+			System.setProperty(FACTORY_PROP, originalProcessor);
+			System.setProperty(XPATH_PROP, originalXpathProcessor);
+		}
+		return event;
+	}
+	
 	private void fillParameters () {
 		trans.clearParameters();
 		String value = null;
