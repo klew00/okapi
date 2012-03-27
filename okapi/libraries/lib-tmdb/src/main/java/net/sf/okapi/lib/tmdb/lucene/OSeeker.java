@@ -74,7 +74,7 @@ public class OSeeker {
 	private final static int MIN_MAX_HITS = 500;
 	// TODO: externalize penalties in the future
 	private static float SINGLE_CODE_DIFF_PENALTY = 0.5f;
-	private static float WHITESPACE_OR_CASE_PENALTY = 2.0f;
+	private static float WHITESPACE_OR_CASE_PENALTY = 1.0f;
 
 	// maxTopDocuments = indexReader.maxDoc * MAX_HITS_CONSTANT
 	private int maxTopDocuments;
@@ -369,19 +369,20 @@ public class OSeeker {
 
 				// These are 100%, adjust match type and penalize for whitespace
 				// and case difference
-				if (score >= 100.0f && tmCodedText.equals(queryFrag.getCodedText())) {
+				if ( score >= 100.0f && tmCodedText.equals(queryFrag.getCodedText()) ) {
 					matchType = MatchType.EXACT;
-				} else if (score >= 100.0f && sourceTextOnly.equals(queryFrag.getText())) {
+				}
+				else if ( score >= 100.0f && sourceTextOnly.equals(queryFrag.getText()) ) {
 					matchType = MatchType.EXACT_TEXT_ONLY;
-				} else if (score >= 100.0f) {
+				}
+				else if ( score >= 100.0f ) {
 					// must be a whitespace or case difference
 					score -= WHITESPACE_OR_CASE_PENALTY;
 				}
-
 				// code penalty
-				if (queryCodes.size() != tmCodes.size()) {
-					score -= (SINGLE_CODE_DIFF_PENALTY * (float) Math.abs(queryCodes.size()
-							- (float) tmCodes.size()));
+				if ( queryCodes.size() != tmCodes.size() ) {
+					score -= (SINGLE_CODE_DIFF_PENALTY
+						* (float)Math.abs(queryCodes.size()-tmCodes.size()));
 				}
 
 				tmHit.setScore(score);
@@ -389,7 +390,7 @@ public class OSeeker {
 
 				// check if the penalties have pushed the match below threshold
 				// add any such hits to a list for later removal
-				if (tmHit.getScore() < threshold) {
+				if ( tmHit.getScore() < threshold ) {
 					tmHitsToRemove.add(tmHit);
 				}
 			}
