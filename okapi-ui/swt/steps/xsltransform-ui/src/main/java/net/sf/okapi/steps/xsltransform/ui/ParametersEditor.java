@@ -65,6 +65,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 	private Parameters params;
 	private Button chkUseCustomTransformer;
 	private Text edFactoryClass;
+	private Text edXpathFactoryClass;
 	private Text edXsltPath;
 	private Text edParameters;
 	private IHelp help;
@@ -234,6 +235,9 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		chkUseCustomTransformer.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				edFactoryClass.setEnabled(chkUseCustomTransformer.getSelection());
+				edFactoryClass.setText("net.sf.saxon.TransformerFactoryImpl"); // default for XSLT 2.0
+				edXpathFactoryClass.setEnabled(chkUseCustomTransformer.getSelection());
+				edXpathFactoryClass.setText("net.sf.saxon.xpath.XPathFactoryImpl"); // default for XSLT 2.0
 			}
 		});
 		
@@ -241,7 +245,12 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		gdTmp.horizontalSpan = 4;
 		edFactoryClass.setLayoutData(gdTmp);
-	}
+
+		edXpathFactoryClass = new Text(mainComposite, SWT.BORDER);
+		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+		gdTmp.horizontalSpan = 4;
+		edXpathFactoryClass.setLayoutData(gdTmp);
+}
 	
 	private boolean showDialog () {
 		shell.open();
@@ -255,10 +264,12 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 	private void setData () {
 		chkUseCustomTransformer.setSelection(params.useCustomTransformer);
 		edFactoryClass.setText(params.factoryClass);
+		edXpathFactoryClass.setText(params.xpathClass);
 		edXsltPath.setText(params.getXsltPath());
 		ConfigurationString tmp = new ConfigurationString(params.paramList);
 		edParameters.setText(tmp.toString());
 		edFactoryClass.setEnabled(chkUseCustomTransformer.getSelection());
+		edXpathFactoryClass.setEnabled(chkUseCustomTransformer.getSelection());
 	}
 
 	private boolean saveData () {
@@ -273,11 +284,13 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 				edFactoryClass.setFocus();
 				return false;
 			}
+			// If no Xpath factory is chosen, the default one will be used
 		}
 
 		params.useCustomTransformer = chkUseCustomTransformer.getSelection();
 		if ( params.useCustomTransformer ) {
 			params.factoryClass = edFactoryClass.getText();
+			params.xpathClass = edXpathFactoryClass.getText();
 		}
 
 		params.setXsltPath(edXsltPath.getText());
