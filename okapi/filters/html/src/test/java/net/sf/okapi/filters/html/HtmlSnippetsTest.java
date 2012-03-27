@@ -14,6 +14,7 @@ import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.beans.EventSetDescriptor;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -420,6 +421,41 @@ public class HtmlSnippetsTest {
 		"</tr>" +
 		"</tbody></table>";
 		assertEquals(snippet, generateOutput(getEvents(snippet), snippet, locEN));
+	}
+	
+	@Test
+	public void testTranslateAttribute() {
+		String snippet = "<p>text with a <span translate='no'>no-translation part</span> and more.</p>";
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		assertEquals("text with a  and more.", tu.getSource().getFirstContent().toString());
+		tu = FilterTestDriver.getTextUnit(getEvents(snippet), 2);
+		assertNull(tu);
+	}
+	
+	//@Test
+	public void testPBlockTranslateAttribute() {
+		String snippet = "<p translate='no'>no trans</p><p>Text <span translate='no'>no-trans</span></p>";
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		assertEquals("Text ", tu.getSource().getFirstContent().toString());
+		tu = FilterTestDriver.getTextUnit(getEvents(snippet), 2);
+		assertNull(tu);
+	}
+	
+	@Test
+	public void testDivBlockTranslateAttribute() {
+		String snippet = "<div translate='no'>no trans</div><p>Text <span translate='no'>no-trans</span></p>";
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		assertEquals("Text ", tu.getSource().getFirstContent().toString());
+		tu = FilterTestDriver.getTextUnit(getEvents(snippet), 2);
+		assertNull(tu);
+	}
+	
+	//@Test
+	public void testDivBlockExcludeIncludeTranslateAttribute() {
+		String snippet = "<div translate='no'>no <div translate='yes'>trans</div></div>";
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		assertNotNull(tu);
+		assertEquals("trans", tu.getSource().getFirstContent().toString());
 	}
 	
 	private ArrayList<Event> getEventsDefault(String snippet) {
