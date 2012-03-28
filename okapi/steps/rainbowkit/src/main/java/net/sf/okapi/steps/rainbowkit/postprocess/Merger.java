@@ -37,13 +37,13 @@ import net.sf.okapi.common.exceptions.OkapiBadFilterInputException;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filters.IFilterConfigurationMapper;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.MultiEvent;
 import net.sf.okapi.common.resource.PipelineParameters;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextContainer;
-import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.TextUnitUtil;
 import net.sf.okapi.filters.rainbowkit.Manifest;
 import net.sf.okapi.filters.rainbowkit.MergingInfo;
@@ -241,7 +241,7 @@ public class Merger {
 		if (Util.isEmpty(this.overrideOutputPath)) {
 			return manifest.getMergeDirectory() + info.getRelativeTargetPath();
 		} else {
-			return this.overrideOutputPath + info.getRelativeTargetPath();
+			return Util.ensureSeparator(overrideOutputPath, false) + info.getRelativeTargetPath();
 		}
 	}
 

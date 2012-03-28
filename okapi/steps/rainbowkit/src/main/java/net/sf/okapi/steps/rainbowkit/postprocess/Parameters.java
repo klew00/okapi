@@ -25,6 +25,7 @@ import net.sf.okapi.common.EditorFor;
 import net.sf.okapi.common.ParametersDescription;
 import net.sf.okapi.common.uidescription.EditorDescription;
 import net.sf.okapi.common.uidescription.IEditorDescriptionProvider;
+import net.sf.okapi.common.uidescription.TextInputPart;
 
 @EditorFor(Parameters.class)
 public class Parameters extends BaseParameters implements IEditorDescriptionProvider {
@@ -111,7 +112,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		desc.add(PRESERVESEGMENTATION, "Preserve the segmentation for the next steps", null);
 		desc.add(RETURNRAWDOCUMENT, "Return raw documents instead of filter events", null);
 		desc.add(FORCETARGETLOCALE, "Specify the target locale from the tool instead of the manifest", null);
-		desc.add(OVERRIDEOUTPUTPATH, "Override output path", null);
+		desc.add(OVERRIDEOUTPUTPATH, "Override the output path (leave empty to use the path from the manifest)", null);
 		return desc;
 	}
 
@@ -121,7 +122,8 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		desc.addCheckboxPart(paramDesc.get(PRESERVESEGMENTATION));
 		desc.addCheckboxPart(paramDesc.get(RETURNRAWDOCUMENT));
 		desc.addCheckboxPart(paramDesc.get(FORCETARGETLOCALE));
-		desc.addTextInputPart(paramDesc.get(OVERRIDEOUTPUTPATH));
+		TextInputPart tip = desc.addTextInputPart(paramDesc.get(OVERRIDEOUTPUTPATH));
+		tip.setAllowEmpty(true);
 		return desc;
 	}
 
