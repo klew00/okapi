@@ -32,10 +32,12 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	static final String PRESERVESEGMENTATION = "preserveSegmentation"; //$NON-NLS-1$
 	static final String RETURNRAWDOCUMENT = "returnRawDocument"; //$NON-NLS-1$
 	static final String FORCETARGETLOCALE = "forceTargetLocale"; //$NON-NLS-1$
+	static final String OVERRIDEOUTPUTPATH = "overrideOutputPath"; //$NON-NLS-1$
 	
 	private boolean preserveSegmentation;
 	private boolean returnRawDocument;
 	private boolean forceTargetLocale;
+	private String overrideOutputPath;
 
 	public Parameters () {
 		reset();
@@ -48,6 +50,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		preserveSegmentation = false;
 		returnRawDocument= false;
 		forceTargetLocale = false;
+		this.overrideOutputPath = "";
 	}
 
 	@Override
@@ -57,6 +60,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		preserveSegmentation = buffer.getBoolean(PRESERVESEGMENTATION, preserveSegmentation);
 		returnRawDocument = buffer.getBoolean(RETURNRAWDOCUMENT, returnRawDocument);
 		forceTargetLocale = buffer.getBoolean(FORCETARGETLOCALE, forceTargetLocale);
+		overrideOutputPath = buffer.getString(OVERRIDEOUTPUTPATH);
 	}
 
 	@Override
@@ -65,6 +69,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		buffer.setBoolean(PRESERVESEGMENTATION, preserveSegmentation);
 		buffer.setBoolean(RETURNRAWDOCUMENT, returnRawDocument);
 		buffer.setBoolean(FORCETARGETLOCALE, forceTargetLocale);
+		buffer.setString(OVERRIDEOUTPUTPATH, overrideOutputPath);
 		return buffer.toString();
 	}
 
@@ -91,13 +96,22 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	public void setForceTargetLocale (boolean forceTargetLocale) {
 		this.forceTargetLocale = forceTargetLocale;
 	}
-	
+
+	public String getOverrideOutputPath() {
+		return overrideOutputPath;
+	}
+
+	public void setOverrideOutputPath(String overrideOutputPath) {
+		this.overrideOutputPath = overrideOutputPath;
+	}
+
 	@Override
 	public ParametersDescription getParametersDescription () {
 		ParametersDescription desc = new ParametersDescription(this);
 		desc.add(PRESERVESEGMENTATION, "Preserve the segmentation for the next steps", null);
 		desc.add(RETURNRAWDOCUMENT, "Return raw documents instead of filter events", null);
 		desc.add(FORCETARGETLOCALE, "Specify the target locale from the tool instead of the manifest", null);
+		desc.add(OVERRIDEOUTPUTPATH, "Override output path", null);
 		return desc;
 	}
 
@@ -107,6 +121,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		desc.addCheckboxPart(paramDesc.get(PRESERVESEGMENTATION));
 		desc.addCheckboxPart(paramDesc.get(RETURNRAWDOCUMENT));
 		desc.addCheckboxPart(paramDesc.get(FORCETARGETLOCALE));
+		desc.addTextInputPart(paramDesc.get(OVERRIDEOUTPUTPATH));
 		return desc;
 	}
 

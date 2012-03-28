@@ -185,6 +185,7 @@ public class FilterEventToXiniTransformer {
 		field.setFieldID(currentFieldId);
 		field.setExternalID(tu.getId());
 		field.setLabel(tu.getName());
+		currentElementId += 10;
 		return field;
 	}
 
