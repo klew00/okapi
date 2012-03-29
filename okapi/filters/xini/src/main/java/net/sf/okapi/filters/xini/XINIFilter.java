@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2011-2012 by the Okapi Framework contributors
+  Copyright (C) 2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -27,6 +27,7 @@ import java.util.List;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.MimeTypeMapper;
+import net.sf.okapi.common.UsingParameters;
 import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.IFilter;
@@ -36,30 +37,20 @@ import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
 import net.sf.okapi.common.skeleton.ISkeletonWriter;
 
+@UsingParameters(Parameters.class)
 public class XINIFilter implements IFilter {
-	
+	private Parameters params;
 	private EncoderManager encoderManager;
 	private XINIReader reader;
 	private LinkedList<Event> queue;
-	private String relDocName;
 	
 	public XINIFilter () {
+		params = new Parameters();
 		queue = new LinkedList<Event>();
-	}
-
-	/**
-	 * For TKit merging only!
-	 * 
-	 * @param relDocName The relative path if the original document. Used to extract only the pages related to this document.
-	 */
-	public XINIFilter(String relDocName) {
-		this();
-		this.relDocName = relDocName;
 	}
 
 	@Override
 	public void cancel () {
-		//TODO
 	}
 
 	@Override
@@ -92,9 +83,15 @@ public class XINIFilter implements IFilter {
 			MimeTypeMapper.XINI_MIME_TYPE,
 			getClass().getName(),
 			"XINI",
-			"Configuration for XINI documents from ONTRAM.",
+			"Configuration for XINI documents from ONTRAM",
 			null,
 			".xini;"));
+		list.add(new FilterConfiguration(getName()+"-noOutputSegmentation",
+				MimeTypeMapper.XINI_MIME_TYPE,
+				getClass().getName(),
+				"XINI (no output segmentation)",
+				"Configuration for XINI documents from ONTRAM (fields in the output are not segmented)",
+				"noOutputSegmentation.fprm"));
 		return list;
 	}
 
@@ -109,7 +106,7 @@ public class XINIFilter implements IFilter {
 
 	@Override
 	public IParameters getParameters () {
-		return null; // No parameters
+		return params;
 	}
 
 	@Override
@@ -134,14 +131,10 @@ public class XINIFilter implements IFilter {
 		close();
 		
 		// get events
-		reader = new XINIReader();
+		reader = new XINIReader(params);
 		reader.open(input);
-		if (relDocName == null) {
-			queue.addAll(reader.getFilterEvents());
-		}
-		else {
-			queue.addAll(reader.getFilterEvents(relDocName));
-		}
+		// XINI is an input file for the pipeline
+		queue.addAll(reader.getFilterEvents());
 	}
 
 	@Override
@@ -150,21 +143,20 @@ public class XINIFilter implements IFilter {
 
 	@Override
 	public void setParameters (IParameters params) {
-		// No parameters
+		this.params = (Parameters)params;
 	}
 
 	public ISkeletonWriter createSkeletonWriter() {
-		//TODO
 		return new GenericSkeletonWriter();
 	}
 
 	public IFilterWriter createFilterWriter () {
-		return new XINIWriter();
+		return new XINIWriter(params);
 	}
 
 	@Override
 	public boolean isSubfilter() {
 		return false;
 	}
-
 }
+

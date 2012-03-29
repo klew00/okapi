@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009-2011 by the Okapi Framework contributors
+  Copyright (C) 2009-2012 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -46,6 +46,7 @@ import net.sf.okapi.common.resource.RawDocument;
 public class XSLTransformStep extends BasePipelineStep {
 
 	private static final String FACTORY_PROP = "javax.xml.transform.TransformerFactory";
+	private static final String XPATH_PROP =  "javax.xml.xpath.XPathFactory";
 	private static final String VAR_SRCLANG = "${srcLang}"; 
 	private static final String VAR_TRGLANG = "${trgLang}"; 
 	private static final String VAR_INPUTPATH = "${inputPath}"; 
@@ -71,11 +72,13 @@ public class XSLTransformStep extends BasePipelineStep {
 	private RawDocument input2;
 	private RawDocument input3;
 	private String originalProcessor;
+	private String originalXpathProcessor;
 	
 	public XSLTransformStep () {
 		params = new Parameters();
 		trans = null;
 		originalProcessor = System.getProperty(FACTORY_PROP);
+		originalXpathProcessor = System.getProperty(XPATH_PROP);		
 	}
 	
 	@Override
@@ -143,6 +146,8 @@ public class XSLTransformStep extends BasePipelineStep {
 			// Create an instance of TransformerFactory
 			if ( params.useCustomTransformer ) {
 				System.setProperty(FACTORY_PROP, params.factoryClass);
+				if (!Util.isEmpty(params.xpathClass))
+					System.setProperty(XPATH_PROP, params.xpathClass);
 			}
 			javax.xml.transform.TransformerFactory fact
 				= javax.xml.transform.TransformerFactory.newInstance();
@@ -155,12 +160,13 @@ public class XSLTransformStep extends BasePipelineStep {
 		catch ( Throwable e ) {
 			throw new OkapiIOException("Error in XSLT input.\n" + e.getMessage(), e);
 		}
-		finally {
+//		finally {
 			// Make sure to reset the original property
-			if ( params.useCustomTransformer ) {
-				System.setProperty(FACTORY_PROP, originalProcessor);
-			}
-		}
+//			if ( params.useCustomTransformer ) {
+//				System.setProperty(FACTORY_PROP, originalProcessor);
+//				System.setProperty(XPATH_PROP, originalXpathProcessor);
+//			}
+//  	}
 		
 		return event;
 	}
@@ -192,8 +198,7 @@ public class XSLTransformStep extends BasePipelineStep {
 			// Create the output
 			File outFile;
 			if ( isLastOutputStep() ) {
-				outFile = new File(outputURI);
-				Util.createDirectories(outFile.getAbsolutePath());
+				outFile = rawDoc.createOutputFile(outputURI);
 			}
 			else {
 				try {
@@ -210,6 +215,9 @@ public class XSLTransformStep extends BasePipelineStep {
 			// Apply the template
 			trans.transform(xmlInput, result);
 			
+			// Make sure to rename the temporary output if needed
+			rawDoc.finalizeOutput();
+			
 			// Create the new raw-document resource
 			event.setResource(new RawDocument(outFile.toURI(), "UTF-8", 
 				rawDoc.getSourceLocale(), rawDoc.getTargetLocale()));
@@ -224,6 +232,15 @@ public class XSLTransformStep extends BasePipelineStep {
 		return event;
 	}
 
+	@Override
+	protected Event handleEndBatch(Event event) {
+		if ( params.useCustomTransformer ) {
+			System.setProperty(FACTORY_PROP, originalProcessor);
+			System.setProperty(XPATH_PROP, originalXpathProcessor);
+		}
+		return event;
+	}
+	
 	private void fillParameters () {
 		trans.clearParameters();
 		String value = null;
