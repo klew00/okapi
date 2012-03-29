@@ -198,8 +198,7 @@ public class XSLTransformStep extends BasePipelineStep {
 			// Create the output
 			File outFile;
 			if ( isLastOutputStep() ) {
-				outFile = new File(outputURI);
-				Util.createDirectories(outFile.getAbsolutePath());
+				outFile = rawDoc.createOutputFile(outputURI);
 			}
 			else {
 				try {
@@ -215,6 +214,9 @@ public class XSLTransformStep extends BasePipelineStep {
 			
 			// Apply the template
 			trans.transform(xmlInput, result);
+			
+			// Make sure to rename the temporary output if needed
+			rawDoc.finalizeOutput();
 			
 			// Create the new raw-document resource
 			event.setResource(new RawDocument(outFile.toURI(), "UTF-8", 
