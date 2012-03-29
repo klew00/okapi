@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2011-2012 by the Okapi Framework contributors
+  Copyright (C) 2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -18,7 +18,7 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.filters.xini;
+package net.sf.okapi.filters.xini.rainbowkit;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -36,14 +36,13 @@ import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
 import net.sf.okapi.common.skeleton.ISkeletonWriter;
 
-public class XINIFilter implements IFilter {
-	
+public class XINIRainbowkitFilter implements IFilter {
 	private EncoderManager encoderManager;
-	private XINIReader reader;
+	private XINIRainbowkitReader reader;
 	private LinkedList<Event> queue;
 	private String relDocName;
 	
-	public XINIFilter () {
+	public XINIRainbowkitFilter () {
 		queue = new LinkedList<Event>();
 	}
 
@@ -52,14 +51,13 @@ public class XINIFilter implements IFilter {
 	 * 
 	 * @param relDocName The relative path if the original document. Used to extract only the pages related to this document.
 	 */
-	public XINIFilter(String relDocName) {
+	public XINIRainbowkitFilter(String relDocName) {
 		this();
 		this.relDocName = relDocName;
 	}
 
 	@Override
 	public void cancel () {
-		//TODO
 	}
 
 	@Override
@@ -72,12 +70,12 @@ public class XINIFilter implements IFilter {
 
 	@Override
 	public String getName () {
-		return "okf_xini";
+		return "okf_rainbowkitxini";
 	}
 
 	@Override
 	public String getDisplayName () {
-		return "XINI Filter";
+		return "XINI RainbowKit Filter";
 	}
 
 	@Override
@@ -91,10 +89,9 @@ public class XINIFilter implements IFilter {
 		list.add(new FilterConfiguration(getName(),
 			MimeTypeMapper.XINI_MIME_TYPE,
 			getClass().getName(),
-			"XINI",
-			"Configuration for XINI documents from ONTRAM.",
-			null,
-			".xini;"));
+			"XINI (Rainbow T-Kit)",
+			"Configuration for XINI documents from ONTRAM T-Kits.",
+			null));
 		return list;
 	}
 
@@ -109,7 +106,7 @@ public class XINIFilter implements IFilter {
 
 	@Override
 	public IParameters getParameters () {
-		return null; // No parameters
+		return null;
 	}
 
 	@Override
@@ -134,14 +131,10 @@ public class XINIFilter implements IFilter {
 		close();
 		
 		// get events
-		reader = new XINIReader();
+		reader = new XINIRainbowkitReader();
 		reader.open(input);
-		if (relDocName == null) {
-			queue.addAll(reader.getFilterEvents());
-		}
-		else {
-			queue.addAll(reader.getFilterEvents(relDocName));
-		}
+		// Reading the T-Kit
+		queue.addAll(reader.getFilterEvents(relDocName));
 	}
 
 	@Override
@@ -150,16 +143,14 @@ public class XINIFilter implements IFilter {
 
 	@Override
 	public void setParameters (IParameters params) {
-		// No parameters
 	}
 
 	public ISkeletonWriter createSkeletonWriter() {
-		//TODO
 		return new GenericSkeletonWriter();
 	}
 
 	public IFilterWriter createFilterWriter () {
-		return new XINIWriter();
+		return new XINIRainbowkitWriter();
 	}
 
 }

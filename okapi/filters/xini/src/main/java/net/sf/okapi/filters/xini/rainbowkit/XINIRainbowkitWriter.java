@@ -18,7 +18,7 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.filters.xini;
+package net.sf.okapi.filters.xini.rainbowkit;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -34,14 +34,14 @@ import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.skeleton.ISkeletonWriter;
 
-public class XINIWriter extends FilterEventToXiniTransformer implements IFilterWriter {
+public class XINIRainbowkitWriter extends FilterEventToXiniTransformer implements IFilterWriter {
 
 	private EncoderManager encodingManager;
 	private IParameters params;
 	private String xiniPath;
 	private String nextPageName;
 
-	public XINIWriter() {
+	public XINIRainbowkitWriter() {
 		
 	}
 
@@ -55,7 +55,7 @@ public class XINIWriter extends FilterEventToXiniTransformer implements IFilterW
 
 	@Override
 	public String getName() {
-		return "XINIWriter";
+		return "XINIRainbowKitWriter";
 	}
 
 	@Override
