@@ -61,28 +61,29 @@ public class SeekerTest  {
 
     @Test
     public void testShortEntries () throws Exception {
-    	String tmId = "tmId1_";
-    	TmEntry entry = new TmEntry("1", tmId, locEN, "Text EN 1", null);
+    	String tmId1 = "tmId1_";
+    	String tmId2 = "tmId2_";
+    	TmEntry entry = new TmEntry("1", tmId1, locEN, "Text EN 1", null);
     	entry.addVariant(new Variant(locFR, "efgh", null));
     	entry.addVariant(new Variant(locES, "ijkl", null));
         writer.index(entry);
         
-    	entry = new TmEntry("2", tmId, locEN, "Engineering & Testing", null);
+    	entry = new TmEntry("2", tmId1, locEN, "Engineering & Testing", null);
     	entry.addVariant(new Variant(locFR, "def", null));
     	entry.addVariant(new Variant(locES, "ghi", null));
         writer.index(entry);
         
-    	entry = new TmEntry("3", tmId, locEN, "am", null);
+    	entry = new TmEntry("3", tmId2, locEN, "am", null);
     	entry.addVariant(new Variant(locFR, "bm", null));
     	entry.addVariant(new Variant(locES, "cm", null));
         writer.index(entry);
         
-    	entry = new TmEntry("4", tmId, locEN, "zq", null);
+    	entry = new TmEntry("4", tmId2, locEN, "zq", null);
     	entry.addVariant(new Variant(locFR, "zr", null));
     	entry.addVariant(new Variant(locES, "zs", null));
         writer.index(entry);
         
-    	entry = new TmEntry("5", tmId, locEN, "zqq", null);
+    	entry = new TmEntry("5", tmId1, locEN, "zqq", null);
     	entry.addVariant(new Variant(locFR, "zrr", null));
     	entry.addVariant(new Variant(locES, "zss", null));
         writer.index(entry);
@@ -91,14 +92,17 @@ public class SeekerTest  {
         
         List<TmHit> list;
         
-        list = seeker.searchFuzzy("Text EN 1", null, tmId, null, 80, 1, locEN);
+        list = seeker.searchFuzzy("Text EN 1", null, tmId1, locEN, 1, 80, null);
         assertEquals(1, list.size());        
         TmHit hit = list.get(0);
         assertEquals("tmId1_1", hit.getId());
         assertEquals("Text EN 1", hit.getVariant().getGenericTextField().stringValue());
         assertTrue(100.0==hit.getScore());
 
-        list = seeker.searchFuzzy("Engineering & Testing", null, tmId, null, 10, 1, locEN);
+        list = seeker.searchFuzzy("Text EN 1", null, tmId2, locEN, 1, 80, null);
+        assertEquals(0, list.size()); // Not in tmId2
+
+        list = seeker.searchFuzzy("Engineering & Testing", null, tmId1, locEN, 1, 70, null);
         assertEquals(1, list.size());
         hit = list.get(0);
         assertEquals("tmId1_2", hit.getId());

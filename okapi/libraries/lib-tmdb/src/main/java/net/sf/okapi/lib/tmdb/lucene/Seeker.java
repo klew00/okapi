@@ -31,6 +31,7 @@ import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.sf.okapi.common.Util;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.query.MatchType;
 import net.sf.okapi.lib.search.lucene.analysis.NgramAnalyzer;
@@ -120,24 +121,21 @@ public class Seeker {
 		return indexDir;
 	}
 
-	/**
-	 * Add all the additional fields to the query
-	 * @param fields
-	 * @param q
-	 * @return
-	 */
 	private BooleanQuery createQuery (Fields fields,
-		Query q)
+		BooleanQuery prevQuery)
 	{
+		// Anything to add?
+		if ( Util.isEmpty(fields) ) return prevQuery;
+		// If yes, create a new query
 		BooleanQuery bQuery = new BooleanQuery();
-		if ( q != null ) {
-			bQuery.add(q, BooleanClause.Occur.MUST);
+		if ( prevQuery != null ) {
+			// Add the existing one if needed
+			bQuery.add(prevQuery, BooleanClause.Occur.MUST);
 		}
-		if ( fields != null ) {
-			for (Field field : fields.values() ) {
-				bQuery.add(new TermQuery(new Term(field.name(), field.stringValue())),
-					BooleanClause.Occur.MUST);
-			}
+		// Add the terms
+		for (Field field : fields.values() ) {
+			bQuery.add(new TermQuery(new Term(field.name(), field.stringValue())),
+				BooleanClause.Occur.MUST);
 		}
 		return bQuery;
 	}
@@ -199,29 +197,28 @@ public class Seeker {
 	}
 
 	private List<TmHit> getTopHits (Query query,
-		String locale,
 		String tmId,
+		String locale,
 		Fields metadata)
 		throws IOException
 	{
 		IndexSearcher is = getIndexSearcher();
-		QueryWrapperFilter filter = null;
 		int maxHits = 0;
 		List<TmHit> tmHitCandidates = new ArrayList<TmHit>(maxTopDocuments);
 
 		String gtextFName = TmEntry.GTEXT_PREFIX+locale;
 		String codesFName = TmEntry.CODES_PREFIX+locale;
-		
+
+		// Set filter data (TM id and other fields)
+		QueryWrapperFilter filter = null;
 		BooleanQuery bq = null;
-		// Set the TM if needed
 		if ( tmId != null ) {
 			bq = new BooleanQuery();
 			bq.add(new TermQuery(new Term(TmEntry.TMID_FIELDNAME, tmId)), BooleanClause.Occur.MUST);
 		}
-//TODO: check, does tmId really taken into account here?		
-		// Create a filter based on the specified metadata as needed
-		if (( metadata != null ) && !metadata.isEmpty() ) {
-			filter = new QueryWrapperFilter(createQuery(metadata, bq));
+		bq = createQuery(metadata, bq);
+		if ( bq != null ) {
+			filter = new QueryWrapperFilter(bq);
 		}
 
 		// Collect hits in increments of maxTopDocuments until we have all the possible candidate hits
@@ -257,10 +254,10 @@ public class Seeker {
 	public List<TmHit> searchFuzzy (String genericText,
 		String codesAsString,
 		String tmId,
-		Fields fields,
-		int threshold,
+		String locale,
 		int max,
-		String locale)
+		int threshold,
+		Fields metadata)
 	{
 		float searchThreshold = (float)threshold;
 		if ( threshold < 0 ) searchThreshold = 0.0f;
@@ -298,14 +295,14 @@ public class Seeker {
 			throw new OkapiIOException(e.getMessage(), e);
 		}
 
-		return getFuzzyHits(fQuery, genericText, codesAsString, locale, tmId, max, searchThreshold, fields);
+		return getFuzzyHits(fQuery, genericText, codesAsString, tmId, locale, max, searchThreshold, metadata);
 	}
 	
-	List<TmHit> getFuzzyHits (Query query,
+	private List<TmHit> getFuzzyHits (Query query,
 		String genericText,
 		String codesAsString,
-		String locale,
 		String tmId,
+		String locale,
 		int max,
 		float threshold,
 		Fields metadata)
@@ -314,7 +311,7 @@ public class Seeker {
 		List<TmHit> tmHitsToRemove = new LinkedList<TmHit>();
 
 		try {
-			tmHitCandidates = getTopHits(query, locale, tmId, metadata);
+			tmHitCandidates = getTopHits(query, tmId, locale, metadata);
 			
 			for ( TmHit tmHit : tmHitCandidates ) {
 				

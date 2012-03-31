@@ -20,8 +20,6 @@
 
 package net.sf.okapi.applications.olifant;
 
-import java.awt.Color;
-
 import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.UIUtil;
 import net.sf.okapi.lib.tmdb.DbUtil;
@@ -202,7 +200,7 @@ class QueryTMForm implements ISegmentEditorUser {
 			IRepository repo = tm.getRepository();
 			IIndexAccess ia = repo.getIndexAccess();
 
-			int count = ia.search(text, cbLocales.getText(), spThreshold.getSelection(), 20, tm.getUUID());
+			int count = ia.search(text, null, tm.getUUID(), cbLocales.getText(), 50, spThreshold.getSelection());
 			if ( count == 0 ) {
 				stCount.setText("<No match found>");
 				return;

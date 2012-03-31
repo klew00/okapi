@@ -33,10 +33,11 @@ public interface IIndexAccess {
 	public void close ();
 	
 	public int search (String codedText,
+		String codesAsString,
+		String tmUUID,
 		String locale,
-		int threshold,
 		int maxHits,
-		String tmUUID);
+		int threshold);
 	
 	public List<TmHit> getHits ();
 	

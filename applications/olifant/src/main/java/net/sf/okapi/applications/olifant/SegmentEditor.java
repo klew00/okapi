@@ -210,8 +210,8 @@ class SegmentEditor {
 	}
 	
 	private void saveTextWithShortCodes () {
-		String text = edit.getText();
-		Matcher m = SHORTCODES.matcher(text);
+//		String text = edit.getText();
+//		Matcher m = SHORTCODES.matcher(text);
 
 		if ( Util.isEmpty(codesAsText) ) return; // Nothing to check
 		
