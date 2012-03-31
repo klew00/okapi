@@ -97,7 +97,7 @@ public class MergingStep extends BasePipelineStep {
 		}
 		
 		// Create the merger (for each new manifest)
-		boolean alwaysForceTargetLocale = info.getExtractionType() == Manifest.EXTRACTIONTYPE_ONTRAM;
+		boolean alwaysForceTargetLocale = Manifest.EXTRACTIONTYPE_ONTRAM.equals(info.getExtractionType());
 		LocaleId targetLocaleToUse;
 		if ( params.getForceTargetLocale() || alwaysForceTargetLocale) {
 			targetLocaleToUse = targetLocale;
