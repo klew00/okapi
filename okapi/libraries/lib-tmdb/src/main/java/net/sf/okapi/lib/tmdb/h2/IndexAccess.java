@@ -24,26 +24,21 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-import org.apache.lucene.document.Field.Index;
-import org.apache.lucene.document.Field.Store;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.store.RAMDirectory;
 
-import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.lib.tmdb.IIndexAccess;
-import net.sf.okapi.lib.tmdb.lucene.OField;
-import net.sf.okapi.lib.tmdb.lucene.OFields;
-import net.sf.okapi.lib.tmdb.lucene.OSeeker;
-import net.sf.okapi.lib.tmdb.lucene.OTmHit;
-import net.sf.okapi.lib.tmdb.lucene.OWriter;
+import net.sf.okapi.lib.tmdb.lucene.Seeker;
+import net.sf.okapi.lib.tmdb.lucene.TmHit;
+import net.sf.okapi.lib.tmdb.lucene.Writer;
 
 class IndexAccess implements IIndexAccess {
 
-	private OWriter writer;
-	private OSeeker seeker;
+	private Writer writer;
+	private Seeker seeker;
 	private boolean inMemory;
-	private List<OTmHit> hits;
+	private List<TmHit> hits;
 	
 	public IndexAccess (Repository store) {
 		try {
@@ -62,8 +57,8 @@ class IndexAccess implements IIndexAccess {
 				idxDir = FSDirectory.open(file);
 			}
 			
-			writer = new OWriter(idxDir, false);
-			seeker = new OSeeker(writer.getIndexWriter());
+			writer = new Writer(idxDir, false);
+			seeker = new Seeker(writer.getIndexWriter());
 		}
 		catch (IOException e) {
 			throw new RuntimeException("Error creating the index access object:\n"+e.getMessage(), e);
@@ -78,36 +73,34 @@ class IndexAccess implements IIndexAccess {
 
 	@Override
 	public int search (String codedText,
+		String locale,
 		int threshold,
 		int maxHits,
 		String tmUUID)
 	{
-		OFields searchFields = new OFields();
-	    searchFields.put("tm", new OField("tm", tmUUID, Index.NO, Store.NO));
-		
-		hits = seeker.searchFuzzy(new TextFragment(codedText), threshold, maxHits, searchFields, "EN");
+		hits = seeker.searchFuzzy(codedText, null, tmUUID, null, threshold, maxHits, locale);
 		return hits.size();
 	}
 
 	@Override
-	public List<OTmHit> getHits () {
+	public List<TmHit> getHits () {
 		return hits;
 	}
 
 	@Override
 	public void close () {
-		if ( writer != null ) {
-			writer.close();
-			writer = null;
-		}
 		if ( seeker != null ) {
 			seeker.close();
 			seeker = null;
 		}
+		if ( writer != null ) {
+			writer.close();
+			writer = null;
+		}
 	}
 
 	@Override
-	public OWriter getWriter () {
+	public Writer getWriter () {
 		return writer;
 	}
 

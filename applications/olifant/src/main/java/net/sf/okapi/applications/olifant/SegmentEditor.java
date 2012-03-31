@@ -50,10 +50,18 @@ class SegmentEditor {
 	private boolean fullCodesMode;
 	private Pattern currentCodes;
 	private String codesAsText;
-	
+
 	public SegmentEditor (Composite parent,
 		int flags,
 		ISegmentEditorUser p_caller)
+	{
+		this(parent, flags, p_caller, null);
+	}
+	
+	public SegmentEditor (Composite parent,
+		int flags,
+		ISegmentEditorUser p_caller,
+		GridData gridData)
 	{
 		if ( flags < 0 ) { // Use the default styles if requested
 			flags = SWT.WRAP | SWT.V_SCROLL | SWT.BORDER;
@@ -61,8 +69,10 @@ class SegmentEditor {
 		caller = p_caller;
 		
 		edit = new StyledText(parent, flags);
-		GridData gdTmp = new GridData(GridData.FILL_BOTH);
-		edit.setLayoutData(gdTmp);
+		if ( gridData == null ) {
+			gridData = new GridData(GridData.FILL_BOTH);
+		}
+		edit.setLayoutData(gridData);
 		
 		fullCodesMode = false;
 		currentCodes = SHORTCODES;
@@ -75,7 +85,7 @@ class SegmentEditor {
 		    	  Matcher m = currentCodes.matcher(text);
 		    	  while ( m.find() ) {
 		    		  ranges.add(new StyleRange(m.start(), m.end()-m.start(),
-		    			  edit.getDisplay().getSystemColor(SWT.COLOR_GRAY),
+		    			  edit.getDisplay().getSystemColor(SWT.COLOR_BLUE),
 		    			  null));
 		    	  }		    	  
 		    	  if ( !ranges.isEmpty() ) {

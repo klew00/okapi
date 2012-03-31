@@ -21,34 +21,29 @@
 package net.sf.okapi.lib.tmdb;
 
 import java.util.ArrayList;
-import java.util.List;
 
-import org.apache.lucene.document.Field.Index;
-import org.apache.lucene.document.Field.Store;
-
-import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.lib.tmdb.IProgressCallback;
 import net.sf.okapi.lib.tmdb.ITm;
 import net.sf.okapi.lib.tmdb.DbUtil.PageMode;
-import net.sf.okapi.lib.tmdb.lucene.OField;
-import net.sf.okapi.lib.tmdb.lucene.OFields;
-import net.sf.okapi.lib.tmdb.lucene.OTranslationUnitInput;
-import net.sf.okapi.lib.tmdb.lucene.OTranslationUnitVariant;
-import net.sf.okapi.lib.tmdb.lucene.OWriter;
+import net.sf.okapi.lib.tmdb.lucene.TmEntry;
+import net.sf.okapi.lib.tmdb.lucene.Writer;
 
 public class Indexer implements Runnable {
 
 	private final IProgressCallback callback;
 	private final IRepository repo;
 	private final String tmName;
+	private final String locale;
 	
 	public Indexer (IProgressCallback progressCallback,
 		IRepository repo,
-		String tmName)
+		String tmName,
+		String locale)
 	{
 		this.callback = progressCallback;
 		this.repo = repo;
 		this.tmName = tmName;
+		this.locale = locale;
 	}
 	
 	@Override
@@ -59,39 +54,28 @@ public class Indexer implements Runnable {
 		IIndexAccess ia = null;
 		
 		try {
-			callback.startProcess("Indexing TM...");
-			
-			//=== Split entries
+			callback.startProcess(String.format("Indexing %s for %s...", tmName, locale));
 			
 			// Get the original TM and set it for iteration
 			tm = repo.openTm(tmName);
 			
-			List<String> locales = tm.getLocales();
-			String srcLoc = locales.get(0);
-			
 			ArrayList<String> fields = new ArrayList<String>();
-			String srcFn = DbUtil.TEXT_PREFIX+srcLoc;
+			String srcFn = DbUtil.TEXT_PREFIX+locale;
 			fields.add(srcFn);
 			tm.setRecordFields(fields);
 			tm.setPageMode(PageMode.ITERATOR);
 
 			ia = repo.getIndexAccess();
-			OWriter writer = ia.getWriter();
-		    OFields searchFields = new OFields();
-		    searchFields.put("tm", new OField("tm", tm.getUUID(), Index.NOT_ANALYZED, Store.NO));
+			Writer writer = ia.getWriter();
 			
 			IRecordSet rs = tm.getFirstPage();
 			while  (( rs != null ) && !canceled ) {
 				while ( rs.next() && !canceled ) {
 					totalCount++;
 
-					OTranslationUnitInput inputTu = new OTranslationUnitInput(String.valueOf(rs.getSegKey()), searchFields);
-			
-					String srcText = rs.getString(srcFn);
-				    OTranslationUnitVariant tuvSrc = new OTranslationUnitVariant("EN", new TextFragment(srcText));
-				    inputTu.add(tuvSrc);
-				    
-				    writer.index(inputTu);
+					//TODO: get the codes too!!!
+					TmEntry entry = new TmEntry(String.valueOf(rs.getSegKey()), tm.getUUID(), locale, rs.getString(srcFn), null); 
+				    writer.index(entry);
 					
 					// Update UI from time to time
 					if ( (totalCount % 652) == 0 ) {

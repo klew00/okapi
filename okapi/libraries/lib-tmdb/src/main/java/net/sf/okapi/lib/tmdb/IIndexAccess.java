@@ -22,8 +22,8 @@ package net.sf.okapi.lib.tmdb;
 
 import java.util.List;
 
-import net.sf.okapi.lib.tmdb.lucene.OTmHit;
-import net.sf.okapi.lib.tmdb.lucene.OWriter;
+import net.sf.okapi.lib.tmdb.lucene.TmHit;
+import net.sf.okapi.lib.tmdb.lucene.Writer;
 
 /**
  * Provides implementation-agnostic access to an Olifant TM index.
@@ -33,12 +33,13 @@ public interface IIndexAccess {
 	public void close ();
 	
 	public int search (String codedText,
+		String locale,
 		int threshold,
 		int maxHits,
 		String tmUUID);
 	
-	public List<OTmHit> getHits ();
+	public List<TmHit> getHits ();
 	
-	public OWriter getWriter ();
+	public Writer getWriter ();
 
 }

@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2010 by the Okapi Framework contributors
+  Copyright (C) 2012 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it
   under the terms of the GNU Lesser General Public License as published by
@@ -22,19 +22,10 @@ package net.sf.okapi.lib.tmdb.lucene;
 
 import java.util.HashMap;
 
-/**
- * All files in this package are based on the files by @author HaslamJD and @author HARGRAVEJE in the okapi-tm-pensieve project amd in most cases there are only minor changes.
- */
+import org.apache.lucene.document.Field;
 
-/**
- * @author fliden
- *
- */
-public class OFields extends HashMap<String, OField> {
+public class Fields extends HashMap<String, Field> {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -2108271841969567434L;
+	private static final long serialVersionUID = 4668102486020823677L;
 
 }

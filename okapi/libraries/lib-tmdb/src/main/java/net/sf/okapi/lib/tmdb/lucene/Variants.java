@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2012 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it
   under the terms of the GNU Lesser General Public License as published by
@@ -20,42 +20,10 @@
 
 package net.sf.okapi.lib.tmdb.lucene;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
 
-/**
- * All files in this package are based on the files by @author HaslamJD and @author HARGRAVEJE in the okapi-tm-pensieve project amd in most cases there are only minor changes.
- */
+public class Variants extends HashMap<String, Variant> {
 
-/**
- * Represents a Unit of Translation.
- */
-public class OTranslationUnitInput extends OTranslationUnitBase {
-	
-	private List<OTranslationUnitVariant> variants = new ArrayList<OTranslationUnitVariant>();
-	
-	public OTranslationUnitInput(OField id) {
-		super(id);
-	}
-	
-	public OTranslationUnitInput(String idValue) {
-		super(idValue);
-	}
-	
-	public OTranslationUnitInput(OField id, OFields fields) {
-		super(id, fields);
-	}
-	
-	public OTranslationUnitInput(String idValue, OFields fields) {
-		super(idValue, fields);
-	}
+	private static final long serialVersionUID = 4668102486020823677L;
 
-	public List<OTranslationUnitVariant> getVariants(){
-		return variants;
-	}
-
-	public void add(OTranslationUnitVariant tuv){
-		variants.add(tuv);
-	}
-	
 }

@@ -910,7 +910,7 @@ class TmPanel extends Composite implements IObserver, ISegmentEditorUser {
 		saveEntry();
 		try {
 			if ( queryForm == null ) {
-				queryForm = new QueryTMForm(getShell(), tm);
+				queryForm = new QueryTMForm(getShell(), tm, opt.getSourceLocale());
 			}
 			queryForm.showDialog();
 			queryForm = null; // temporary
