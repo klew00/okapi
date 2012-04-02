@@ -24,16 +24,20 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.ui.UIUtil;
+import net.sf.okapi.lib.ui.editor.TextOptions;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ExtendedModifyEvent;
 import org.eclipse.swt.custom.ExtendedModifyListener;
+import org.eclipse.swt.custom.ST;
 import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.custom.VerifyKeyListener;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.VerifyEvent;
+import org.eclipse.swt.graphics.TextStyle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 
@@ -43,13 +47,15 @@ class SegmentEditor {
 	private static final Pattern REALCODES = Pattern.compile("<(bpt|ept|ph|it|ut).*?>(.*?)</\\1>");
 
 	private final ISegmentEditorUser caller;
+	private final TextStyle codeStyle;
 
 	private int column = -1;
 	private StyledText edit;
 	private boolean modified;
 	private boolean fullCodesMode;
 	private Pattern currentCodes;
-	private String codesAsText;
+	private String codesAsString;
+	private TextOptions textOptions;
 
 	public SegmentEditor (Composite parent,
 		int flags,
@@ -68,11 +74,29 @@ class SegmentEditor {
 		}
 		caller = p_caller;
 		
+		codeStyle = new TextStyle();
+		codeStyle.foreground = parent.getDisplay().getSystemColor(SWT.COLOR_RED);
+		codeStyle.borderStyle = SWT.BORDER_DASH;
+		
 		edit = new StyledText(parent, flags);
 		if ( gridData == null ) {
 			gridData = new GridData(GridData.FILL_BOTH);
 		}
 		edit.setLayoutData(gridData);
+		
+		edit.setMargins(2, 2, 2, 2);
+
+		// Set some keys
+		edit.setKeyBinding(SWT.CTRL|'a', ST.SELECT_ALL);
+//		// Disable Cut/Copy/Paste commands to override them
+//		edit.setKeyBinding(SWT.CTRL|'c', SWT.NULL);
+//		edit.setKeyBinding(SWT.CTRL|'v', SWT.NULL);
+//		edit.setKeyBinding(SWT.SHIFT|SWT.DEL, SWT.NULL);
+//		edit.setKeyBinding(SWT.SHIFT|SWT.INSERT, SWT.NULL);
+		
+		// Create a copy of the default text field options for the source
+		textOptions = new TextOptions(parent.getDisplay(), edit, 3);
+		textOptions.applyTo(edit);
 		
 		fullCodesMode = false;
 		currentCodes = SHORTCODES;
@@ -84,9 +108,10 @@ class SegmentEditor {
 		    	  java.util.List<StyleRange> ranges = new java.util.ArrayList<StyleRange>();
 		    	  Matcher m = currentCodes.matcher(text);
 		    	  while ( m.find() ) {
-		    		  ranges.add(new StyleRange(m.start(), m.end()-m.start(),
-		    			  edit.getDisplay().getSystemColor(SWT.COLOR_BLUE),
-		    			  null));
+					StyleRange sr = new StyleRange(codeStyle);
+					sr.start = m.start();
+					sr.length = m.end()-m.start();
+					ranges.add(sr);
 		    	  }		    	  
 		    	  if ( !ranges.isEmpty() ) {
 		    		  edit.replaceStyleRanges(0, text.length(),
@@ -100,10 +125,13 @@ class SegmentEditor {
 			@Override
 			public void verifyKey (VerifyEvent e) {
 				if ( e.keyCode == 13 ) {
+					e.doit = false;
+					if ( !validateContent() ) {
+						return; // No call to the user: Fix the error first
+					}
 					if ( caller.returnFromEdit(true) ) {
 						setModified(false);
 					}
-					e.doit = false;
 				}
 				else if ( e.keyCode == SWT.ESC ) {
 					caller.returnFromEdit(false);
@@ -122,79 +150,97 @@ class SegmentEditor {
 			}
 		});
 		
-//		edit.addVerifyKeyListener(new VerifyKeyListener() {
+//		edit.addVerifyKeyListener (new VerifyKeyListener() {
 //			@Override
 //			public void verifyKey(VerifyEvent e) {
-//				if ( e.stateMask == SWT.ALT ) {
+//				if ( e.stateMask == SWT.CTRL ) {
 //					switch ( e.keyCode ) {
-//					case SWT.ARROW_RIGHT:
-//						selectNextCode(edit.getCaretOffset(), true);
-//						e.doit = false;
-//						break;
-//					case SWT.ARROW_LEFT:
-//						selectPreviousCode(edit.getCaretOffset(), true);
-//						e.doit = false;
-//						break;
-////					case SWT.ARROW_DOWN: // Target-mode command
-////						setNextSourceCode();
-////						e.doit = false;
-////						break;
-////					case SWT.ARROW_UP: // Target-mode command
-////						setPreviousSourceCode();
-////						e.doit = false;
-////						break;
 //					}
-//				}
-//				else if ( e.stateMask == SWT.CTRL ) {
-//					switch ( e.keyCode ) {
-////					case 'd':
-////						cycleDisplayMode();
-////						e.doit = false;
-////						break;
-////					case 'c':
-////						copyToClipboard(edit.getSelection());
-////						e.doit = false;
-////						break;
-////					case 'v':
-////						pasteFromClipboard();
-////						e.doit = false;
-////						break;
-//					case ' ':
-//						placeText("\u00a0");
-//						e.doit = false;
-//						break;
-//					}
-//				}
-////				else if ( e.stateMask == SWT.SHIFT ) {
-////					switch ( e.keyCode ) {
-////					case SWT.DEL:
-////						cutToClipboard(edit.getSelection());
-////						e.doit = false;
-////						break;
-////					case SWT.INSERT:
-////						pasteFromClipboard();
-////						e.doit = false;
-////						break;
-////					}
-////				}
-//				else if ( e.keyCode == SWT.DEL ){
-//					int i = 0;
 //				}
 //			}
 //		});
+
+//		edit.addVerifyKeyListener(new VerifyKeyListener() {
+//		@Override
+//		public void verifyKey(VerifyEvent e) {
+//			if ( e.stateMask == SWT.ALT ) {
+//				switch ( e.keyCode ) {
+//				case SWT.ARROW_RIGHT:
+//					selectNextCode(edit.getCaretOffset(), true);
+//					e.doit = false;
+//					break;
+//				case SWT.ARROW_LEFT:
+//					selectPreviousCode(edit.getCaretOffset(), true);
+//					e.doit = false;
+//					break;
+////				case SWT.ARROW_DOWN: // Target-mode command
+////					setNextSourceCode();
+////					e.doit = false;
+////					break;
+////				case SWT.ARROW_UP: // Target-mode command
+////					setPreviousSourceCode();
+////					e.doit = false;
+////					break;
+//				}
+//			}
+//			else if ( e.stateMask == SWT.CTRL ) {
+//				switch ( e.keyCode ) {
+////				case 'd':
+////					cycleDisplayMode();
+////					e.doit = false;
+////					break;
+////				case 'c':
+////					copyToClipboard(edit.getSelection());
+////					e.doit = false;
+////					break;
+////				case 'v':
+////					pasteFromClipboard();
+////					e.doit = false;
+////					break;
+//				case ' ':
+//					placeText("\u00a0");
+//					e.doit = false;
+//					break;
+//				}
+//			}
+////			else if ( e.stateMask == SWT.SHIFT ) {
+////				switch ( e.keyCode ) {
+////				case SWT.DEL:
+////					cutToClipboard(edit.getSelection());
+////					e.doit = false;
+////					break;
+////				case SWT.INSERT:
+////					pasteFromClipboard();
+////					e.doit = false;
+////					break;
+////				}
+////			}
+//			else if ( e.keyCode == SWT.DEL ){
+//				int i = 0;
+//			}
+//		}
+//	});
 		
 	}
+	
+	@Override
+	protected void finalize () {
+		dispose();
+	}
 
+	public void dispose () {
+		if ( textOptions != null ) {
+			textOptions.dispose();
+			textOptions = null;
+		}
+		UIUtil.disposeTextStyle(codeStyle);
+	}
+	
 	public void setFullCodesMode (boolean fullCodesMode) {
 		// Save and validate text in current mode
-		if ( fullCodesMode ) {
-			saveTextWithFullCodes();
-		}
-		else {
-			saveTextWithShortCodes();
-		}
+		if ( !validateContent() ) return; // Do not change if there is an error
 
-		// Set the new mode and its text
+		// Set the new mode and the associated pattern
 		this.fullCodesMode = fullCodesMode;
 		if ( fullCodesMode ) {
 			currentCodes = REALCODES;
@@ -203,6 +249,20 @@ class SegmentEditor {
 			currentCodes = SHORTCODES;
 		}
 		edit.append(""); // Make a modification to trigger the re-parsing
+	}
+
+	private boolean validateContent () {
+		if ( !modified ) return true;
+		
+		// Save and validate text in current mode
+		if ( fullCodesMode ) {
+			saveTextWithFullCodes();
+		}
+		else {
+			saveTextWithShortCodes();
+		}
+		
+		return true;
 	}
 	
 	private void saveTextWithFullCodes () {
@@ -213,7 +273,7 @@ class SegmentEditor {
 //		String text = edit.getText();
 //		Matcher m = SHORTCODES.matcher(text);
 
-		if ( Util.isEmpty(codesAsText) ) return; // Nothing to check
+		if ( Util.isEmpty(codesAsString) ) return; // Nothing to check
 		
 	}
 
@@ -242,7 +302,7 @@ class SegmentEditor {
 
 	public void clear () {
 		edit.setText("");
-		codesAsText = null;
+		codesAsString = null;
 		modified = false;
 	}
 	
@@ -257,16 +317,16 @@ class SegmentEditor {
 	/**
 	 * Sets the text of the field, and its originating column.
 	 * @param text the text
-	 * @param codesAsText the codes as text
+	 * @param codesAsString the codes as a string (can be null if there are no codes)
 	 * @param column the column. Use -1 for no column, -2 for not changing the current one.
 	 */
 	public void setText (String text,
-		String codesAsText,
+		String codesAsString,
 		int column)
 	{
 		if ( column != -2 ) this.column = column;
 		edit.setEnabled(text != null);
-		this.codesAsText = codesAsText;
+		this.codesAsString = codesAsString;
 		if ( text == null ) {
 			edit.setText("");
 		}
@@ -277,6 +337,7 @@ class SegmentEditor {
 	}
 
 	public String getText () {
+		validateContent(); 
 		return edit.getText();
 	}
 

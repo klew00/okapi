@@ -168,6 +168,9 @@ class QueryTMForm implements ISegmentEditorUser {
 			if ( !shell.getDisplay().readAndDispatch() )
 				shell.getDisplay().sleep();
 		}
+		
+		seQuery.dispose();
+		seMatch.dispose();
 	}
 
 	private void displayCurrentMatch () {
@@ -179,7 +182,7 @@ class QueryTMForm implements ISegmentEditorUser {
 		else {
 			TableItem ti = table.getItem(n);
 			seMatch.setText(ti.getText(2), null, -1);
-			stCount.setText(String.format("Match %d of %d", n+1, table.getItemCount()));
+			stCount.setText(String.format("Match %d of %d  ", n+1, table.getItemCount()));
 		}
 	}
 	
@@ -188,14 +191,14 @@ class QueryTMForm implements ISegmentEditorUser {
 			String text = seQuery.getText();
 			if ( text.trim().isEmpty() ) {
 				Dialogs.showError(shell, "You must enter a text to query.", null);
-				//TODO edQuery.setFocus();
+				seQuery.setFocus();
 				return;
 			}
 			
 			btQuery.setEnabled(false);
 			table.removeAll();
-			stCount.setText("Searching...");
-			seMatch.setText(null, null, -1);
+			stCount.setText("Searching...  ");
+			seMatch.clear();
 			
 			IRepository repo = tm.getRepository();
 			IIndexAccess ia = repo.getIndexAccess();
@@ -214,6 +217,7 @@ class QueryTMForm implements ISegmentEditorUser {
 				ti.setText(1, String.format("%f", hit.getScore()));
 				ti.setText(2, hit.getVariant().getGenericTextField().stringValue());
 			}
+			// Select the first match as the current one
 			table.select(0);
 			displayCurrentMatch();			
 		}
