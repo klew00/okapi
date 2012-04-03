@@ -20,15 +20,31 @@ import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.exceptions.OkapiBadFilterParametersException;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.resource.RawDocument;
+import net.sf.okapi.filters.xini.jaxb.Element;
+import net.sf.okapi.filters.xini.jaxb.Field;
+import net.sf.okapi.filters.xini.jaxb.INITD;
+import net.sf.okapi.filters.xini.jaxb.INITR;
+import net.sf.okapi.filters.xini.jaxb.Page;
+import net.sf.okapi.filters.xini.jaxb.Seg;
+import net.sf.okapi.filters.xini.jaxb.TD;
+import net.sf.okapi.filters.xini.jaxb.TR;
 import net.sf.okapi.filters.xini.jaxb.TextContent;
 import net.sf.okapi.filters.xini.jaxb.Xini;
+import net.sf.okapi.filters.xini.jaxb.Element.ElementContent;
 
-public class XiniTestHelper implements Serializable {
+public class XINIFilterTestHelper implements Serializable {
+
 	private static Pattern STARTING_TAG = Pattern.compile("<(\\w+ [^>]+?)(/?)>");
 	private static Pattern ATTRIBUTES = Pattern.compile("\\w+?=\".*?\"");
+	private XINIFilter filter;
+	private LocaleId locEN;
+	private LocaleId locDE;
 	private Marshaller m;
 
-	public XiniTestHelper() {
+	public XINIFilterTestHelper() {
+		filter =  new XINIFilter();
+		locEN = LocaleId.fromString("en");
+		locDE = LocaleId.fromString("de");
 		JAXBContext jc;
 		try {
 			jc = JAXBContext.newInstance(Xini.class.getPackage().getName());
@@ -104,12 +120,12 @@ public class XiniTestHelper implements Serializable {
 		catch (UnsupportedEncodingException e) {
 			throw new RuntimeException(e);
 		}
-		
+
 		int beginOffset = serializedSeg.indexOf(">") + 1;
 		int endOffset = serializedSeg.lastIndexOf("<");
-		
+
 		serializedSeg = serializedSeg.substring(beginOffset, endOffset);
-		
+
 		return serializedSeg;
 	}
 
@@ -117,6 +133,37 @@ public class XiniTestHelper implements Serializable {
 		if (content.startsWith("<?xml"))
 			content = content.substring(content.indexOf(">") + 1);
 		return content;
+	}
+
+	public String getStartSnippet() {
+		return 	getStartSnippetXiniMain() +
+				"		<Page PageID=\"1\">" +
+				"			<Elements>" +
+				"				<Element ElementID=\"10\" Size=\"50\">" +
+				"					<ElementContent>";
+	}
+
+	public String getStartSnippetXiniMain() {
+		return 	"<?xml version=\"1.0\" ?>" +
+				"<Xini SchemaVersion=\"1.0\" xsi:noNamespaceSchemaLocation=\"http://www.ontram.com/xsd/xini.xsd\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" +
+				"	<Main>";
+	}
+
+	public String getEndSnippet() {
+		return 	"					</ElementContent>" +
+				"				</Element>" +
+				"			</Elements>" +
+				"		</Page>" +
+				"	</Main>" +
+				"</Xini>";
+	}
+
+	public List<Event> toEvents(String snippet) {
+		return toEvents(snippet, filter, locEN, locDE);
+	}
+
+	public Xini toXini(List<Event> events) {
+		return toXini(events, filter);
 	}
 
 	public Xini toXini(List<Event> events, IFilter filter) {
@@ -132,7 +179,7 @@ public class XiniTestHelper implements Serializable {
 		return writer.getXini();
 	}
 
-	public List<Event> toEvents(String snippet, IFilter filter, LocaleId inputLoc, LocaleId outputLoc) {
+	private List<Event> toEvents(String snippet, IFilter filter, LocaleId inputLoc, LocaleId outputLoc) {
 		ArrayList<Event> list = new ArrayList<Event>();
 		filter.open(new RawDocument(snippet, inputLoc, outputLoc));
 		while (filter.hasNext()) {
@@ -141,5 +188,74 @@ public class XiniTestHelper implements Serializable {
 		}
 		filter.close();
 		return list;
+	}
+
+	public List<INITR> getINITableRowsByPageIdAndElementId(Xini xini, int pageId, int elementId) {
+		return getElementContentByPageIdAndElementId(xini, pageId, elementId).getINITable().getTR();
+	}
+
+	public List<TR> getTableRowsByPageIdAndElementId(Xini xini, int pageId, int elementId) {
+		return getElementContentByPageIdAndElementId(xini, pageId, elementId).getTable().getTR();
+	}
+
+	public ElementContent getElementContentByPageIdAndElementId(Xini xini, int pageId, int elementId) {
+		for (Page eachPage : xini.getMain().getPage()) {
+			if (eachPage.getPageID() == pageId) {
+				for (Element eachElement : eachPage.getElements().getElement()) {
+					if (eachElement.getElementID() == elementId) {
+						return eachElement.getElementContent();
+					}
+				}
+			}
+		}
+		return null;
+	}
+
+	public String getSegContentBySegId(TD td, int segId) {
+		Seg seg = getSegBySegId(td, segId);
+		return contentOf(seg);
+	}
+
+	public Seg getSegBySegId(TD td, int segId) {
+		return td.getSeg().get(segId);
+	}
+
+	public String getSegContentBySegId(INITD td, int segId) {
+		Seg seg = getSegBySegId(td, segId);
+		return contentOf(seg);
+	}
+
+	public Seg getSegBySegId(INITD td, int segId) {
+		return td.getSeg().get(segId);
+	}
+
+	public String contentOf(TextContent tc) {
+		return serializeTextContent(tc);
+	}
+
+	public List<Field> getFieldsByPageIdAndElementId(Xini xini, int pageId, int elementId) {
+		for (Page eachPage : xini.getMain().getPage()) {
+			if (eachPage.getPageID() == pageId) {
+				for (Element eachElement : eachPage.getElements().getElement()) {
+					if (eachElement.getElementID() == elementId) {
+						return eachElement.getElementContent().getFields().getField();
+					}
+				}
+			}
+		}
+		return new ArrayList<Field>();
+	}
+
+	public String getSegContentBySegId(Field field, int segId) {
+		Seg seg = getSegBySegId(field, segId);
+		return contentOf(seg);
+	}
+
+	public Seg getSegBySegId(Field field, int segId) {
+		for (Seg each: field.getSeg()) {
+			if (each.getSegID() == segId)
+				return each;
+		}
+		return null;
 	}
 }

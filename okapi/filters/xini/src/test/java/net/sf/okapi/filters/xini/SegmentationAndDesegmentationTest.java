@@ -7,7 +7,6 @@ import java.util.List;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.LocaleId;
-import net.sf.okapi.filters.xini.jaxb.INITR;
 import net.sf.okapi.filters.xini.jaxb.Seg;
 import net.sf.okapi.filters.xini.jaxb.Xini;
 import net.sf.okapi.steps.segmentation.Parameters;
@@ -28,13 +27,13 @@ import org.junit.Test;
  * correct example: 'Sentence1. Sentence2.' -> 2 segments after segmentation
  * wrong example: 'Sentence1. sentence2.' -> 1 segment after segmentation
  */
-public class SegmentationTest {
+public class SegmentationAndDesegmentationTest {
 
 	private XINIFilter filter = new XINIFilter();
 	private LocaleId locEN = LocaleId.fromString("en");
 	private LocaleId locDE = LocaleId.fromString("de");
 	private StepHelper segmentizer;
-	private XiniTestHelper xiniHelper = new XiniTestHelper();
+	private XINIFilterTestHelper xiniHelper = new XINIFilterTestHelper();
 	private String startSnippetForTable =
 		"<?xml version=\"1.0\" ?>" +
 		"<Xini SchemaVersion=\"1.0\" xsi:noNamespaceSchemaLocation=\"http://www.ontram.com/xsd/xini.xsd\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" +
@@ -108,7 +107,10 @@ public class SegmentationTest {
 
 		List<Seg> segsOfFirstField = doSegmentation(xiniSnippet);
 
+		assertEquals(1, segsOfFirstField.size());
+
 		Seg firstSeg = segsOfFirstField.get(0);
+
 		checkContent(firstSeg, "<sub>Don't break. Don't</sub><i> break these sentences. Apart.</i>");
 	}
 
@@ -174,6 +176,18 @@ public class SegmentationTest {
 
 		assertEquals(1, segsOfFirstField.size());
 		checkContent(firstSeg, "<ph ID=\"1\" type=\"style\">A Sentence.</ph>");
+	}
+
+	@Test
+	public void placeholderDoesntChangeWithDifferentPlacholderType() {
+		String segSnippet = "<Seg SegID=\"0\"><ph type=\"memory100\" ID=\"1\">A Sentence.</ph></Seg>";
+		String xiniSnippet = startSnippet + segSnippet + endSnippet;
+
+		List<Seg> segsOfFirstField = doSegmentation(xiniSnippet);
+		Seg firstSeg = segsOfFirstField.get(0);
+
+		assertEquals(1, segsOfFirstField.size());
+		checkContent(firstSeg, "<ph ID=\"1\" type=\"memory100\">A Sentence.</ph>");
 	}
 
 	@Test
@@ -348,7 +362,7 @@ public class SegmentationTest {
                 "<Seg TrailingSpacer=\" \" SegmentIDBeforeSegmentation=\"0\" SegID=\"1\">Sentence 2.</Seg>" +
                 "<Seg TrailingSpacer=\" \" SegmentIDBeforeSegmentation=\"0\" SegID=\"2\">Sentence 3.</Seg>";
 		String xiniSnippet = startSnippet + segSnippet + endSnippet;
-		
+
 		((net.sf.okapi.filters.xini.Parameters)filter.getParameters()).setUseOkapiSegmentation(false);
 
 		List<Seg> segsOfFirstField = doDesegmentation(xiniSnippet);
@@ -358,11 +372,24 @@ public class SegmentationTest {
 		checkContent(firstSeg, " Sentence 1. Sentence 2. Sentence 3. ");
 	}
 
-	private List<INITR> getRowsOfFirstTable(Xini segmentizedXini) {
-		List<INITR> segsOfFirstTable = segmentizedXini.getMain().getPage().get(0)
-		.getElements().getElement().get(0).getElementContent()
-		.getINITable().getTR();
-		return segsOfFirstTable;
+	@Test
+	public void desegmentizedXiniHasOriginalSegmentIDsRestored() {
+		String segSnippet = "<Seg SegmentIDBeforeSegmentation=\"0\" SegID=\"0\">Sentence 1.</Seg>" +
+                "<Seg SegmentIDBeforeSegmentation=\"0\" SegID=\"1\">Sentence 2.</Seg>" +
+                "<Seg SegmentIDBeforeSegmentation=\"1\" SegID=\"2\">Sentence 3.</Seg>";
+		String xiniSnippet = startSnippet + segSnippet + endSnippet;
+
+		((net.sf.okapi.filters.xini.Parameters)filter.getParameters()).setUseOkapiSegmentation(false);
+
+		List<Seg> segsOfFirstField = doDesegmentation(xiniSnippet);
+		assertEquals(2, segsOfFirstField.size());
+
+		Seg firstSeg = segsOfFirstField.get(0);
+		Seg secondSeg = segsOfFirstField.get(1);
+		checkContent(firstSeg, "Sentence 1.Sentence 2.");
+		checkContent(secondSeg, "Sentence 3.");
+		assertEquals(0, firstSeg.getSegID());
+		assertEquals(1, secondSeg.getSegID());
 	}
 
 	private List<Seg> getSegListOfFirstField(Xini segmentizedXini){
@@ -385,15 +412,15 @@ public class SegmentationTest {
 	}
 
 	private Xini makeSegmentizedXiniFrom(String xiniSnippet) {
-		List<Event> before = toEvents(xiniSnippet);
-		List<Event> segmentized = segmentize(before);
-		Xini segmentizedXini = toXini(segmentized);
+		List<Event> before = xiniHelper.toEvents(xiniSnippet);
+		List<Event> segmentized = segmentizer.process(before);
+		Xini segmentizedXini = xiniHelper.toXini(segmentized);
 		return segmentizedXini;
 	}
 
 	private Xini makeDesegmentizedXiniFrom(String xiniSnippet) {
-		List<Event> events = toEvents(xiniSnippet);
-		Xini segmentizedXini = toXini(events);
+		List<Event> events = xiniHelper.toEvents(xiniSnippet);
+		Xini segmentizedXini = xiniHelper.toXini(events, filter);
 		return segmentizedXini;
 	}
 
@@ -430,17 +457,5 @@ public class SegmentationTest {
 	private void checkTrailingSpacer(Seg seg, String expectedTrailSpacer){
 		String trailSpacerFirstSeg = seg.getTrailingSpacer();
 		assertEquals(expectedTrailSpacer, trailSpacerFirstSeg);
-	}
-
-	private List<Event> segmentize(List<Event> events) {
-		return segmentizer.process(events);
-	}
-
-	private List<Event> toEvents(String snippet) {
-		return xiniHelper.toEvents(snippet, filter, locEN, locDE);
-	}
-
-	private Xini toXini(List<Event> events) {
-		return xiniHelper.toXini(events, filter);
 	}
 }
