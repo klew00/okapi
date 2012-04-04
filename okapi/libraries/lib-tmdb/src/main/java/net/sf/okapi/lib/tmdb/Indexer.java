@@ -21,6 +21,7 @@
 package net.sf.okapi.lib.tmdb;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import net.sf.okapi.lib.tmdb.IProgressCallback;
 import net.sf.okapi.lib.tmdb.ITm;
@@ -34,16 +35,27 @@ public class Indexer implements Runnable {
 	private final IRepository repo;
 	private final String tmName;
 	private final String locale;
+	private final List<String> metaFields;
 	
+	/**
+	 * Creates the indexer object.
+	 * @param progressCallback the callback object for the progress.
+	 * @param repo the repository of the TM to index.
+	 * @param tmName the name of the TM to index.
+	 * @param locale the Olifant locale name of the locale to index.
+	 * @param metaFields the list of the TM columns to use as metadata (can be null).
+	 */
 	public Indexer (IProgressCallback progressCallback,
 		IRepository repo,
 		String tmName,
-		String locale)
+		String locale,
+		List<String> metaFields)
 	{
 		this.callback = progressCallback;
 		this.repo = repo;
 		this.tmName = tmName;
 		this.locale = locale;
+		this.metaFields = metaFields;
 	}
 	
 	@Override
@@ -74,7 +86,18 @@ public class Indexer implements Runnable {
 					totalCount++;
 
 					//TODO: get the codes too!!!
-					TmEntry entry = new TmEntry(String.valueOf(rs.getSegKey()), tm.getUUID(), locale, rs.getString(srcFn), null); 
+					// Create the entry
+					TmEntry entry = new TmEntry(String.valueOf(rs.getSegKey()), tm.getUUID(), locale, rs.getString(srcFn), null);
+					// Add any metadata field
+					if ( metaFields != null ) {
+						for ( String fn : metaFields ) {
+							String value = rs.getString(fn);
+							if ( value != null ) {
+								entry.setAttribute(fn, value);
+							}
+						}
+					}
+					// Index the entry
 				    writer.index(entry);
 					
 					// Update UI from time to time

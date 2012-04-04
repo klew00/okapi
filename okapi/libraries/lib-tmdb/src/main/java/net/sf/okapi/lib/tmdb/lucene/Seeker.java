@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -121,11 +122,11 @@ public class Seeker {
 		return indexDir;
 	}
 
-	private BooleanQuery createQuery (Fields fields,
+	private BooleanQuery createQuery (HashMap<String, String> attributes,
 		BooleanQuery prevQuery)
 	{
 		// Anything to add?
-		if ( Util.isEmpty(fields) ) return prevQuery;
+		if ( Util.isEmpty(attributes) ) return prevQuery;
 		// If yes, create a new query
 		BooleanQuery bQuery = new BooleanQuery();
 		if ( prevQuery != null ) {
@@ -133,8 +134,8 @@ public class Seeker {
 			bQuery.add(prevQuery, BooleanClause.Occur.MUST);
 		}
 		// Add the terms
-		for (Field field : fields.values() ) {
-			bQuery.add(new TermQuery(new Term(field.name(), field.stringValue())),
+		for (String name : attributes.keySet() ) {
+			bQuery.add(new TermQuery(new Term(name, attributes.get(name))),
 				BooleanClause.Occur.MUST);
 		}
 		return bQuery;
@@ -199,7 +200,7 @@ public class Seeker {
 	private List<TmHit> getTopHits (Query query,
 		String tmId,
 		String locale,
-		Fields metadata)
+		HashMap<String, String> attributes)
 		throws IOException
 	{
 		IndexSearcher is = getIndexSearcher();
@@ -216,7 +217,7 @@ public class Seeker {
 			bq = new BooleanQuery();
 			bq.add(new TermQuery(new Term(TmEntry.TMID_FIELDNAME, tmId)), BooleanClause.Occur.MUST);
 		}
-		bq = createQuery(metadata, bq);
+		bq = createQuery(attributes, bq);
 		if ( bq != null ) {
 			filter = new QueryWrapperFilter(bq);
 		}
@@ -257,7 +258,7 @@ public class Seeker {
 		String locale,
 		int max,
 		int threshold,
-		Fields metadata)
+		HashMap<String, String> attributes)
 	{
 		float searchThreshold = (float)threshold;
 		if ( threshold < 0 ) searchThreshold = 0.0f;
@@ -295,7 +296,7 @@ public class Seeker {
 			throw new OkapiIOException(e.getMessage(), e);
 		}
 
-		return getFuzzyHits(fQuery, genericText, codesAsString, tmId, locale, max, searchThreshold, metadata);
+		return getFuzzyHits(fQuery, genericText, codesAsString, tmId, locale, max, searchThreshold, attributes);
 	}
 	
 	private List<TmHit> getFuzzyHits (Query query,
@@ -305,13 +306,13 @@ public class Seeker {
 		String locale,
 		int max,
 		float threshold,
-		Fields metadata)
+		HashMap<String, String> attributes)
 	{
 		List<TmHit> tmHitCandidates;
 		List<TmHit> tmHitsToRemove = new LinkedList<TmHit>();
 
 		try {
-			tmHitCandidates = getTopHits(query, tmId, locale, metadata);
+			tmHitCandidates = getTopHits(query, tmId, locale, attributes);
 			
 			for ( TmHit tmHit : tmHitCandidates ) {
 				

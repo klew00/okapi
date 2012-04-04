@@ -33,6 +33,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 
 public class SeekerTest  {
@@ -73,9 +74,12 @@ public class SeekerTest  {
     	entry.addVariant(new Variant(locES, "ghi", null));
         writer.index(entry);
         
-    	entry = new TmEntry("3", tmId2, locEN, "am", null);
+    	entry = new TmEntry("3", tmId2, locEN, "Text in EN", null);
     	entry.addVariant(new Variant(locFR, "bm", null));
     	entry.addVariant(new Variant(locES, "cm", null));
+    	String attr1name = "attr1";
+    	String attr1Value = "attr1ValueABC";
+    	entry.setAttribute(attr1name, attr1Value);
         writer.index(entry);
         
     	entry = new TmEntry("4", tmId2, locEN, "zq", null);
@@ -108,6 +112,23 @@ public class SeekerTest  {
         assertEquals("tmId1_2", hit.getId());
         assertEquals("Engineering & Testing", hit.getVariant().getGenericTextField().stringValue());
         assertTrue(100.0==hit.getScore());
+
+        // Match with attribute
+        HashMap<String, String> attributes = new HashMap<String, String>();
+        attributes.put(attr1name, attr1Value);
+        list = seeker.searchFuzzy("Text in EN", null, tmId2, locEN, 1, 70, attributes);
+        assertEquals(1, list.size());
+        hit = list.get(0);
+        assertEquals("tmId2_3", hit.getId());
+        assertEquals("Text in EN", hit.getVariant().getGenericTextField().stringValue());
+        assertTrue(100.0==hit.getScore());
+
+        // No match because the attribute does not match
+        attributes.clear();
+        attributes.put(attr1name, "some value");
+        list = seeker.searchFuzzy("Text in EN", null, tmId2, locEN, 1, 70, attributes);
+        assertEquals(0, list.size());
+
         
 //        //include missing category
 //        searchfields = new OFields();

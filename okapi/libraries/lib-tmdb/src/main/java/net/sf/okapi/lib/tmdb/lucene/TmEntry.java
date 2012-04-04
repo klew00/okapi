@@ -20,6 +20,8 @@
 
 package net.sf.okapi.lib.tmdb.lucene;
 
+import net.sf.okapi.common.Util;
+
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.Field.Index;
 import org.apache.lucene.document.Field.Store;
@@ -37,6 +39,7 @@ public class TmEntry {
 	private Field segKeyField;
 	private Field tmIdField;
 	private Variants variants;
+	private Fields attributes;
 
 	public TmEntry (String segKey,
 		String tmId,
@@ -89,6 +92,22 @@ public class TmEntry {
 
 	public Variant getVariant (String locale) {
 		return variants.get(locale);
+	}
+	
+	public void setAttribute (String name,
+		String value)
+	{
+		if ( attributes == null ) attributes = new Fields();
+		Field field = new Field(name, value, Store.YES, Index.NOT_ANALYZED);
+		attributes.put(field.name(), field);
+	}
+
+	public Fields getAttributes () {
+		return attributes;
+	}
+
+	public boolean hasAttribute () {
+		return !Util.isEmpty(attributes);
 	}
 
 }

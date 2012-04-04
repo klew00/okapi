@@ -213,6 +213,14 @@ public class Writer {
 			count++;
 		}
 		if ( count == 0 ) return null;
+		
+		// Set the metadata fields
+		if ( entry.hasAttribute() ) {
+			for ( Field field : entry.getAttributes().values() ) {
+				doc.add(field);
+			}
+		}
+		
 		return doc;
 	}
 

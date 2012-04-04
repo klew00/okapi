@@ -786,9 +786,18 @@ class RepositoryPanel extends Composite {
 			}
 			tp.showLog(); // Make sure to display the log
 			
+			// Ask confirmation
+			MessageBox dlg = new MessageBox(getShell(), SWT.ICON_QUESTION | SWT.YES | SWT.NO | SWT.CANCEL);
+			dlg.setMessage(String.format("This command will index the text for '%s' of the TM '%s'.\nDo you want to proceed?",
+				opt.getSourceLocale(), tmName));
+			dlg.setText("TM Indexing");
+			if ( dlg.open() != SWT.YES ) {
+				return; // Cancel or no.
+			}
+			
 			// Start the import thread
 			ProgressCallback callback = new ProgressCallback(tp);
-			Indexer exp = new Indexer(callback, repo, tmName, opt.getSourceLocale());
+			Indexer exp = new Indexer(callback, repo, tmName, opt.getSourceLocale(), null);
 			tp.startThread(new Thread(exp));
 		}
 		catch ( Throwable e ) {
