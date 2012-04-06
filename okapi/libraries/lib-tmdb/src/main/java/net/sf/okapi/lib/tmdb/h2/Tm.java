@@ -237,6 +237,11 @@ public class Tm implements ITm {
 	}
 
 	@Override
+	public void setIndexInfo (String indexInfo) {
+		store.updateIndexInfo(uuid, indexInfo);
+	}
+	
+	@Override
 	public String getName () {
 		return name;
 	}

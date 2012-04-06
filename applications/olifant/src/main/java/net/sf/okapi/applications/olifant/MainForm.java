@@ -111,6 +111,7 @@ public class MainForm {
 	private MenuItem miTMRename;
 	private MenuItem miTMEditColumns;
 	private MenuItem miTMEditLocales;
+	private MenuItem miTMManageIndex;
 	private MenuItem miTMEditProperties;
 	private MenuItem miShowHideThirdField;
 	private MenuItem miShowHideFieldList;
@@ -447,6 +448,7 @@ public class MainForm {
 		miTMRename.setEnabled(active);
 		miTMEditColumns.setEnabled(active);
 		miTMEditLocales.setEnabled(active);
+		miTMManageIndex.setEnabled(active);
 		miTMEditProperties.setEnabled(active);
 		
 		toolBar.update(currentTP);
@@ -768,6 +770,14 @@ public class MainForm {
 		miTMEditLocales.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
 				currentTP.editLocales();
+            }
+		});
+		
+		miTMManageIndex = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(miTMManageIndex, "tm.manageindex"); //$NON-NLS-1$
+		miTMManageIndex.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				repoPanel.indexTM(currentTP.getTm().getName());
             }
 		});
 		

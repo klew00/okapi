@@ -68,6 +68,12 @@ public interface ITm {
 	 * @return the index information for this TM, or null if this TM is not indexed
 	 */
 	public String getIndexInfo ();
+	
+	/**
+	 * sets the index information for this TM.
+	 * @param indexInfo the index information for this TM (can be null).
+	 */
+	public void setIndexInfo (String indexInfo);
 
 	/**
 	 * Gets whether or not this TM has an associated index for searching fuzzy matches.

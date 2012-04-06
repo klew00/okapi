@@ -111,6 +111,10 @@ public class Indexer implements Runnable {
 				}
 			}
 			writer.commit();
+			
+			// Now: update the index information in the TM database
+			tm.setIndexInfo(DbUtil.indexInfoToString(fields));
+			
 		}
 		catch ( Throwable e ) {
 			callback.logMessage(IProgressCallback.MSGTYPE_ERROR, e.getMessage());

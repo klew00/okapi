@@ -20,6 +20,7 @@
 
 package net.sf.okapi.lib.tmdb;
 
+import java.util.HashMap;
 import java.util.List;
 
 import net.sf.okapi.lib.tmdb.lucene.TmHit;
@@ -37,7 +38,8 @@ public interface IIndexAccess {
 		String tmUUID,
 		String locale,
 		int maxHits,
-		int threshold);
+		int threshold,
+		HashMap<String, String> attributes);
 	
 	public List<TmHit> getHits ();
 	

@@ -22,6 +22,7 @@ package net.sf.okapi.lib.tmdb.h2;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 
 import org.apache.lucene.store.Directory;
@@ -77,9 +78,10 @@ class IndexAccess implements IIndexAccess {
 		String tmUUID,
 		String locale,
 		int maxHits,
-		int threshold)
+		int threshold,
+		HashMap<String, String> attributes)
 	{
-		hits = seeker.searchFuzzy(codedText, codesAsString, tmUUID, locale, maxHits, threshold, null);
+		hits = seeker.searchFuzzy(codedText, codesAsString, tmUUID, locale, maxHits, threshold, attributes);
 		return hits.size();
 	}
 

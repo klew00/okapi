@@ -21,17 +21,13 @@
 package net.sf.okapi.applications.olifant;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import net.sf.okapi.common.Util;
-import net.sf.okapi.common.ui.ClosePanel;
 import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.OKCancelPanel;
 import net.sf.okapi.common.ui.UIUtil;
 import net.sf.okapi.lib.tmdb.DbUtil;
-import net.sf.okapi.lib.tmdb.IRepository;
 import net.sf.okapi.lib.tmdb.ITm;
 
 import org.eclipse.swt.SWT;
@@ -52,14 +48,10 @@ class IndexForm {
 	private final Table tblTextFields;
 	private final Table tblAttrFields;
 	private List<String> fieldsToIndex;
-	private ITm tm;
-	private IRepository repo;
 
 	IndexForm (Shell parent,
 		ITm tm)
 	{
-		this.tm = tm;
-		this.repo = tm.getRepository();
 		shell = new Shell(parent, SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.APPLICATION_MODAL);
 		shell.setText("Index Managment");
 		UIUtil.inheritIcon(shell, parent);
@@ -84,12 +76,7 @@ class IndexForm {
 		tblAttrFields.setLayoutData(gdTmp);
 		
 		// Get the index info
-		ArrayList<String> fields = null;
-		String tmp = tm.getIndexInfo();
-		if ( !Util.isEmpty(tmp) ) {
-			String[] tmpList = tmp.split("\t");
-			fields = new ArrayList<String>(Arrays.asList(tmpList));
-		}
+		List<String> fields = DbUtil.indexInfoFromString(tm.getIndexInfo());
 
 		// Fill the lists
 		for ( String fn : tm.getAvailableFields() ) {

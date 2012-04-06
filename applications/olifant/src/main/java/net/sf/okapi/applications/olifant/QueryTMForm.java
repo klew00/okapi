@@ -20,6 +20,8 @@
 
 package net.sf.okapi.applications.olifant;
 
+import java.util.HashMap;
+
 import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.UIUtil;
 import net.sf.okapi.lib.tmdb.DbUtil;
@@ -55,7 +57,9 @@ class QueryTMForm implements ISegmentEditorUser {
 	private final Table table;
 	private final Spinner spThreshold;
 	private final Combo cbLocales;
+	private final Button btAttributes;
 	private final Label stCount;
+	private HashMap<String, String> attributes;
 
 	public QueryTMForm (Shell parent,
 		ITm tm,
@@ -64,18 +68,19 @@ class QueryTMForm implements ISegmentEditorUser {
 		shell = new Shell(parent, SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.APPLICATION_MODAL);
 		shell.setText("Query TM");
 		UIUtil.inheritIcon(shell, parent);
-		shell.setLayout(new GridLayout(5, false));
+		shell.setLayout(new GridLayout(6, false));
 
 		this.tm = tm;
+		attributes = new HashMap<String, String>();
 
 		Label label = new Label(shell, SWT.NONE);
 		label.setText("Text to query:");
 		GridData gdTmp = new GridData();
-		gdTmp.horizontalSpan = 5;
+		gdTmp.horizontalSpan = 6;
 		label.setLayoutData(gdTmp);
 		
 		gdTmp = new GridData(GridData.FILL_BOTH);
-		gdTmp.horizontalSpan = 5;
+		gdTmp.horizontalSpan = 6;
 		gdTmp.widthHint = 550;
 		gdTmp.heightHint = 70;
 		seQuery = new SegmentEditor(shell, -1, this, gdTmp);
@@ -101,13 +106,21 @@ class QueryTMForm implements ISegmentEditorUser {
 		cbLocales.add(sourceLocale);
 		cbLocales.select(0);
 		
+		btAttributes = new Button(shell, SWT.PUSH);
+		updateAttributesDisplay();
+		btAttributes.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				editAttributes();
+			}
+		});
+		
 		stCount = new Label(shell, SWT.RIGHT);
 		gdTmp = new GridData(GridData.HORIZONTAL_ALIGN_END);
 		gdTmp.widthHint = 130;
 		stCount.setLayoutData(gdTmp);
 
 		gdTmp = new GridData(GridData.FILL_BOTH);
-		gdTmp.horizontalSpan = 5;
+		gdTmp.horizontalSpan = 6;
 		gdTmp.heightHint = 70;
 		seMatch = new SegmentEditor(shell, -1, this, gdTmp);
 		seMatch.setEditable(false);
@@ -118,7 +131,7 @@ class QueryTMForm implements ISegmentEditorUser {
 		table.setLinesVisible(true);
 		gdTmp = new GridData(GridData.FILL_BOTH);
 		gdTmp.heightHint = 200;
-		gdTmp.horizontalSpan = 5;
+		gdTmp.horizontalSpan = 6;
 		table.setLayoutData(gdTmp);
 
 		table.addControlListener(new ControlAdapter() {
@@ -186,6 +199,24 @@ class QueryTMForm implements ISegmentEditorUser {
 		}
 	}
 	
+	private void editAttributes () {
+		try {
+			QueryAttributesForm dlg = new QueryAttributesForm(shell, tm, attributes);
+			HashMap<String, String> newAttrs = dlg.showDialog();
+			if ( newAttrs == null ) return; // Cancel
+			// Else: set the new list
+			attributes = newAttrs;
+			updateAttributesDisplay();
+		}
+		catch ( Throwable e ) {
+			Dialogs.showError(shell, "Error editing attributes:\n"+e.getMessage(), null);
+		}
+	}
+	
+	private void updateAttributesDisplay () {
+		btAttributes.setText(String.format("Attributes (%d)...", attributes.size()));
+	}
+	
 	private void search () {
 		try {
 			String text = seQuery.getText();
@@ -203,7 +234,8 @@ class QueryTMForm implements ISegmentEditorUser {
 			IRepository repo = tm.getRepository();
 			IIndexAccess ia = repo.getIndexAccess();
 
-			int count = ia.search(text, null, tm.getUUID(), cbLocales.getText(), 50, spThreshold.getSelection());
+			int count = ia.search(text, null, tm.getUUID(), cbLocales.getText(), 50,
+				spThreshold.getSelection(), attributes);
 			if ( count == 0 ) {
 				stCount.setText("<No match found>");
 				return;

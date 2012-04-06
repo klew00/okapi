@@ -246,6 +246,32 @@ public class Repository implements IRepository {
 		return res;
 	}
 	
+	void updateIndexInfo (String uuid,
+		String indexInfo)
+	{
+		PreparedStatement pstm = null;
+		try {
+			pstm = conn.prepareStatement("UPDATE TMLIST SET INDEXINFO=? WHERE UUID=?");
+			pstm.setString(1, indexInfo);
+			pstm.setString(2, uuid);
+			pstm.executeUpdate();
+		}
+		catch ( SQLException e ) {
+			throw new RuntimeException(e);
+		}
+		finally {
+			try {
+				if ( pstm != null ) {
+					pstm.close();
+					pstm = null;
+				}
+			}
+			catch ( SQLException e ) {
+				throw new RuntimeException(e);
+			}
+		}
+	}
+	
 	@Override
 	public ITm openTm (String name) {
 		ITm tm = null;
@@ -311,11 +337,12 @@ public class Repository implements IRepository {
 				+ ")");
 			
 			// Update the TMLIST
-			pstm = conn.prepareStatement("INSERT INTO TMLIST (UUID,NAME,DESCRIPTION) VALUES(?,?,?)");
+			pstm = conn.prepareStatement("INSERT INTO TMLIST (UUID,NAME,DESCRIPTION,INDEXINFO) VALUES(?,?,?,?)");
 			uuid = UUID.randomUUID().toString();
 			pstm.setString(1, uuid);
 			pstm.setString(2, name);
 			pstm.setString(3, description);
+			pstm.setString(4, null);
 			pstm.executeUpdate();
 			tm = new Tm(this, uuid, name);
 		}

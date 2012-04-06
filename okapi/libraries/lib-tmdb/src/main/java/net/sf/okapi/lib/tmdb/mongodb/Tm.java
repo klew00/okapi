@@ -106,6 +106,11 @@ public class Tm implements ITm {
 	}
 
 	@Override
+	public void setIndexInfo (String indexInfo) {
+		//TODO: save the index info
+	}
+	
+	@Override
 	public boolean getHasIndex () {
 		//TODO: implement index
 		return false;

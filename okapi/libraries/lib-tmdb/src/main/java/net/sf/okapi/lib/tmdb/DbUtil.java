@@ -22,6 +22,7 @@ package net.sf.okapi.lib.tmdb;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 
@@ -230,6 +231,37 @@ public class DbUtil {
 	    	else tuFields.put(fn, value);
 	    }
 	    return res;
+	}
+
+	/**
+	 * Converts the index information stored in the TM from its string format to 
+	 * a list of field names.
+	 * @param data the stored string.
+	 * @return the resulting list of fields, or null if the string was null or empty.
+	 */
+	public static List<String> indexInfoFromString (String data) {
+		ArrayList<String> fields = null;
+		if ( !Util.isEmpty(data) ) {
+			String[] tmpList = data.split("\t");
+			fields = new ArrayList<String>(Arrays.asList(tmpList));
+		}
+		return fields;
+	}
+	
+	/**
+	 * Converts the index information stored in the TM from its list form
+	 * to the string to store.
+	 * @param data the list to convert.
+	 * @return the string to store, or null or the list was null or empty.
+	 */
+	public static String indexInfoToString (List<String> data) {
+		StringBuilder tmp = new StringBuilder();
+		if ( Util.isEmpty(data) ) return null;
+		for ( String fn : data ) {
+			if ( tmp.length() > 0 ) tmp.append("\t");
+			tmp.append(fn);
+		}
+		return tmp.toString();
 	}
 	
 }
