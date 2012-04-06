@@ -231,6 +231,12 @@ public class Tm implements ITm {
 	}
 
 	@Override
+	public String getIndexInfo () {
+		String res[] = store.getTmData(uuid);
+		return res[2];
+	}
+
+	@Override
 	public String getName () {
 		return name;
 	}

@@ -42,18 +42,24 @@ public class TmEntry {
 	private Fields attributes;
 
 	public TmEntry (String segKey,
-		String tmId,
-		String locale,
-		String genericText,
-		String codesAsString)
+		String tmId)
 	{
 		idField = new Field(ID_FIELDNAME, tmId+segKey, Store.YES, Index.NOT_ANALYZED);
 		tmIdField = new Field(TMID_FIELDNAME, tmId, Store.YES, Index.NOT_ANALYZED);
 		segKeyField = new Field(SEGKEY_FIELDNAME, segKey, Store.YES, Index.NOT_ANALYZED);
 		variants = new Variants();
+	}
+	
+	public TmEntry (String segKey,
+		String tmId,
+		String locale,
+		String genericText,
+		String codesAsString)
+	{
+		this(segKey, tmId);
 		variants.put(locale, new Variant(locale, genericText, codesAsString));
 	}
-
+	
 	public String getId () {
 		return idField.stringValue();
 	}
@@ -94,9 +100,15 @@ public class TmEntry {
 		return variants.get(locale);
 	}
 	
+	/**
+	 * Sets an attribute
+	 * @param name the name of the attribute.
+	 * @param value the value of the attribute. If the value is null, no new attribute is set.
+	 */
 	public void setAttribute (String name,
 		String value)
 	{
+		if ( value == null ) return;
 		if ( attributes == null ) attributes = new Fields();
 		Field field = new Field(name, value, Store.YES, Index.NOT_ANALYZED);
 		attributes.put(field.name(), field);

@@ -124,7 +124,8 @@ public class Repository implements IRepository {
 				stm.execute("CREATE TABLE TMLIST ("
 					+ "UUID VARCHAR,"
 					+ "NAME VARCHAR,"
-					+ "DESCRIPTION VARCHAR"
+					+ "DESCRIPTION VARCHAR,"
+					+ "INDEXINFO VARCHAR"
 					+ ")");
 			}
 			// Get the work directory
@@ -215,17 +216,18 @@ public class Repository implements IRepository {
 	}
 
 	String[] getTmData (String uuid) {
-		String[] res = new String[2];
+		String[] res = new String[3];
 		Statement stm = null;
 		try {
 			stm = conn.createStatement();
-			ResultSet result = stm.executeQuery("SELECT NAME, DESCRIPTION FROM TMLIST WHERE UUID='"+uuid+"'");
+			ResultSet result = stm.executeQuery("SELECT NAME, DESCRIPTION, INDEXINFO FROM TMLIST WHERE UUID='"+uuid+"'");
 			if ( !result.first() ) {
 				// Invalid TM key
 				throw new RuntimeException(String.format("Invalid TM uuid '%s'.", uuid));
 			}
 			res[0] = result.getString(1);
 			res[1] = result.getString(2);
+			res[2] = result.getString(3);
 		}
 		catch ( SQLException e ) {
 			throw new RuntimeException(e);

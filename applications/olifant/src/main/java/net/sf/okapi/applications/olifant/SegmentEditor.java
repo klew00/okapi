@@ -37,6 +37,7 @@ import org.eclipse.swt.custom.VerifyKeyListener;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.VerifyEvent;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.TextStyle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
@@ -56,6 +57,7 @@ class SegmentEditor {
 	private Pattern currentCodes;
 	private String codesAsString;
 	private TextOptions textOptions;
+	private Color bgColor;
 
 	public SegmentEditor (Composite parent,
 		int flags,
@@ -74,9 +76,10 @@ class SegmentEditor {
 		}
 		caller = p_caller;
 		
+		bgColor = new Color(parent.getDisplay(), 255, 204, 153); //204, 255, 204);
 		codeStyle = new TextStyle();
-		codeStyle.foreground = parent.getDisplay().getSystemColor(SWT.COLOR_RED);
-		codeStyle.borderStyle = SWT.BORDER_DASH;
+		codeStyle.background = bgColor;
+		//codeStyle.borderStyle = SWT.BORDER_DASH;
 		
 		edit = new StyledText(parent, flags);
 		if ( gridData == null ) {
@@ -232,6 +235,10 @@ class SegmentEditor {
 		if ( textOptions != null ) {
 			textOptions.dispose();
 			textOptions = null;
+		}
+		if ( bgColor != null ) {
+			bgColor.dispose();
+			bgColor = null;
 		}
 		UIUtil.disposeTextStyle(codeStyle);
 	}

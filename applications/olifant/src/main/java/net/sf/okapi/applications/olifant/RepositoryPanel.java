@@ -770,11 +770,11 @@ class RepositoryPanel extends Composite {
 			}
 			
 			// Get the Tab and TM data
-			TMOptions opt;
+			ITm tm;
 			TmPanel tp = mainForm.findTmTab(tmName, true);
 			if ( tp == null ) {
-				ITm tm = repo.openTm(tmName);
-				opt = options.getItem(tm.getUUID(), true);
+				tm = repo.openTm(tmName);
+				TMOptions opt = options.getItem(tm.getUUID(), true);
 				tp = mainForm.addTmTabEmpty(tm, opt);
 				if ( tp == null ) return;
 				// Now the tab should exist
@@ -782,22 +782,20 @@ class RepositoryPanel extends Composite {
 				tp.resetTmDisplay();
 			}
 			else {
-				opt = tp.getTmOptions();
+				tm = tp.getTm();
 			}
 			tp.showLog(); // Make sure to display the log
-			
-			// Ask confirmation
-			MessageBox dlg = new MessageBox(getShell(), SWT.ICON_QUESTION | SWT.YES | SWT.NO | SWT.CANCEL);
-			dlg.setMessage(String.format("This command will index the text for '%s' of the TM '%s'.\nDo you want to proceed?",
-				opt.getSourceLocale(), tmName));
-			dlg.setText("TM Indexing");
-			if ( dlg.open() != SWT.YES ) {
-				return; // Cancel or no.
-			}
+
+			// prompt the user for information
+			IndexForm dlg = new IndexForm(getShell(), tm);
+			java.util.List<String> fields = dlg.showDialog();
+			if ( fields == null ) return;
+
+//TODO: use the string indexInfo
 			
 			// Start the import thread
 			ProgressCallback callback = new ProgressCallback(tp);
-			Indexer exp = new Indexer(callback, repo, tmName, opt.getSourceLocale(), null);
+			Indexer exp = new Indexer(callback, repo, tmName, fields);
 			tp.startThread(new Thread(exp));
 		}
 		catch ( Throwable e ) {

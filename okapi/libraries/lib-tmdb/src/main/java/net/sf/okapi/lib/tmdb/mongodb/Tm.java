@@ -100,6 +100,12 @@ public class Tm implements ITm {
 	}
 	
 	@Override
+	public String getIndexInfo () {
+		// TODO: get the index information
+		return null;
+	}
+
+	@Override
 	public boolean getHasIndex () {
 		//TODO: implement index
 		return false;

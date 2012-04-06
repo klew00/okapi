@@ -20,13 +20,13 @@
 
 package net.sf.okapi.lib.tmdb;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.okapi.lib.tmdb.IProgressCallback;
 import net.sf.okapi.lib.tmdb.ITm;
 import net.sf.okapi.lib.tmdb.DbUtil.PageMode;
 import net.sf.okapi.lib.tmdb.lucene.TmEntry;
+import net.sf.okapi.lib.tmdb.lucene.Variant;
 import net.sf.okapi.lib.tmdb.lucene.Writer;
 
 public class Indexer implements Runnable {
@@ -34,28 +34,26 @@ public class Indexer implements Runnable {
 	private final IProgressCallback callback;
 	private final IRepository repo;
 	private final String tmName;
-	private final String locale;
-	private final List<String> metaFields;
+	private final List<String> fields;
 	
 	/**
 	 * Creates the indexer object.
 	 * @param progressCallback the callback object for the progress.
 	 * @param repo the repository of the TM to index.
 	 * @param tmName the name of the TM to index.
+	 * @param fields list of the text fields to index and attributes to store. 
 	 * @param locale the Olifant locale name of the locale to index.
 	 * @param metaFields the list of the TM columns to use as metadata (can be null).
 	 */
 	public Indexer (IProgressCallback progressCallback,
 		IRepository repo,
 		String tmName,
-		String locale,
-		List<String> metaFields)
+		List<String> fields)
 	{
 		this.callback = progressCallback;
 		this.repo = repo;
 		this.tmName = tmName;
-		this.locale = locale;
-		this.metaFields = metaFields;
+		this.fields = fields;
 	}
 	
 	@Override
@@ -66,14 +64,12 @@ public class Indexer implements Runnable {
 		IIndexAccess ia = null;
 		
 		try {
-			callback.startProcess(String.format("Indexing %s for %s...", tmName, locale));
+			callback.startProcess(String.format("Indexing %s...", tmName));
 			
 			// Get the original TM and set it for iteration
 			tm = repo.openTm(tmName);
 			
-			ArrayList<String> fields = new ArrayList<String>();
-			String srcFn = DbUtil.TEXT_PREFIX+locale;
-			fields.add(srcFn);
+			// Set the list of the fields to fetch from the database
 			tm.setRecordFields(fields);
 			tm.setPageMode(PageMode.ITERATOR);
 
@@ -84,17 +80,16 @@ public class Indexer implements Runnable {
 			while  (( rs != null ) && !canceled ) {
 				while ( rs.next() && !canceled ) {
 					totalCount++;
-
-					//TODO: get the codes too!!!
 					// Create the entry
-					TmEntry entry = new TmEntry(String.valueOf(rs.getSegKey()), tm.getUUID(), locale, rs.getString(srcFn), null);
-					// Add any metadata field
-					if ( metaFields != null ) {
-						for ( String fn : metaFields ) {
-							String value = rs.getString(fn);
-							if ( value != null ) {
-								entry.setAttribute(fn, value);
-							}
+					TmEntry entry = new TmEntry(String.valueOf(rs.getSegKey()), tm.getUUID());
+					// Add the fields to index and attributes to store
+					for ( String fn : fields ) {
+						if ( fn.startsWith(DbUtil.TEXT_PREFIX) ) {
+							String loc = DbUtil.getFieldLocale(fn);
+							entry.addVariant(new Variant(loc, rs.getString(fn), null)); //TODO: get the codesasString too!!
+						}
+						else {
+							entry.setAttribute(fn, rs.getString(fn));
 						}
 					}
 					// Index the entry
