@@ -182,13 +182,23 @@ public class Writer {
 		}
 	}
 	
-	public void delete (Field idField) {
-		delete(idField.stringValue());
+	public void delete (String fieldName,
+		String fieldValue)
+	{
+		try {
+			indexWriter.deleteDocuments(new Term(fieldName, fieldValue));
+		}
+		catch ( CorruptIndexException e ) {
+			throw new OkapiIOException("Error deleting an index entry from the TM. Corrupted index.", e);
+		}
+		catch ( IOException e ) {
+			throw new OkapiIOException("Error deleting an index entry from the TM.", e);
+		}
 	}
 	
 // TODO: same as index with overwrite???
 	public void update (TmEntry entry) {
-		delete(entry.getIdField());
+		delete(entry.getIdField().stringValue());
 		index(entry);
 	}
 

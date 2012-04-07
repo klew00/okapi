@@ -71,6 +71,7 @@ class QueryAttributesForm {
 		(new TableColumn(table, SWT.NONE)).setText("Field");
 		(new TableColumn(table, SWT.NONE)).setText("Value to Match");
 		GridData gdTmp = new GridData(GridData.FILL_BOTH);
+		gdTmp.heightHint = 150;
 		table.setLayoutData(gdTmp);
 		
 		table.addControlListener(new ControlAdapter() {

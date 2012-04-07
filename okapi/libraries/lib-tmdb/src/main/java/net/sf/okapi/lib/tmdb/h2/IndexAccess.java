@@ -31,6 +31,7 @@ import org.apache.lucene.store.RAMDirectory;
 
 import net.sf.okapi.lib.tmdb.IIndexAccess;
 import net.sf.okapi.lib.tmdb.lucene.Seeker;
+import net.sf.okapi.lib.tmdb.lucene.TmEntry;
 import net.sf.okapi.lib.tmdb.lucene.TmHit;
 import net.sf.okapi.lib.tmdb.lucene.Writer;
 
@@ -105,6 +106,11 @@ class IndexAccess implements IIndexAccess {
 	@Override
 	public Writer getWriter () {
 		return writer;
+	}
+
+	@Override
+	public void deleteTMIndex (String uuid) {
+		writer.delete(TmEntry.TMID_FIELDNAME, uuid);
 	}
 
 }

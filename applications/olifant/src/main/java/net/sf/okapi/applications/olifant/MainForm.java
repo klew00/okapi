@@ -781,6 +781,8 @@ public class MainForm {
             }
 		});
 		
+		new MenuItem(dropMenu, SWT.SEPARATOR);
+
 		miTMEditProperties = new MenuItem(dropMenu, SWT.PUSH);
 		rm.setCommand(miTMEditProperties, "tm.properties"); //$NON-NLS-1$
 		miTMEditProperties.addSelectionListener(new SelectionAdapter() {

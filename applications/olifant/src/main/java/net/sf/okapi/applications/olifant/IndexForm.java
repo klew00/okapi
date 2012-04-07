@@ -53,7 +53,7 @@ class IndexForm {
 		ITm tm)
 	{
 		shell = new Shell(parent, SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.APPLICATION_MODAL);
-		shell.setText("Index Managment");
+		shell.setText("Index");
 		UIUtil.inheritIcon(shell, parent);
 		shell.setLayout(new GridLayout());
 
@@ -69,6 +69,7 @@ class IndexForm {
 
 		tblTextFields = new Table(group, SWT.CHECK | SWT.BORDER | SWT.V_SCROLL | SWT.FULL_SELECTION);
 		GridData gdTmp = new GridData(GridData.FILL_BOTH);
+		gdTmp.heightHint = 180;
 		tblTextFields.setLayoutData(gdTmp);
 		
 		tblAttrFields = new Table(group, SWT.CHECK | SWT.BORDER | SWT.V_SCROLL | SWT.FULL_SELECTION);

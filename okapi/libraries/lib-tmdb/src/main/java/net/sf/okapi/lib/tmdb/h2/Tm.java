@@ -919,6 +919,24 @@ public class Tm implements ITm {
 			if ( tmp.length() > 0 ) {
 				stm.execute(tmp.toString());
 			}
+			
+			// Check if the index needs to be updated
+			List<String> fields = DbUtil.indexInfoFromString(getIndexInfo());
+			if ( !Util.isEmpty(fields) ) {
+				ArrayList<String> toRemove = new ArrayList<String>();
+				for ( String fn : fields ) {
+					String loc = DbUtil.getFieldLocale(fn);
+					if ( loc == null ) continue;
+					if ( loc.equals(currentCode) ) {
+						toRemove.add(fn);
+					}
+				}
+				if ( !toRemove.isEmpty() ) {
+					fields.removeAll(toRemove);
+					setIndexInfo(DbUtil.indexInfoToString(fields));
+				}
+				
+			}
 		}
 		catch ( SQLException e ) {
 			throw new RuntimeException(e);
@@ -1134,6 +1152,17 @@ public class Tm implements ITm {
 				throw new RuntimeException(e);
 			}
 		}
+		
+		// Check if the index needs to be updated
+		List<String> fields = DbUtil.indexInfoFromString(getIndexInfo());
+		if ( !Util.isEmpty(fields) ) {
+			if ( fields.contains(currentFullName) ) {
+				fields.remove(currentFullName);
+				setIndexInfo(DbUtil.indexInfoToString(fields));
+			}
+			
+		}
+		
 	}
 
 	@Override

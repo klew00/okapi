@@ -33,6 +33,7 @@ import net.sf.okapi.common.ui.ResourceManager;
 import net.sf.okapi.common.ui.UIUtil;
 import net.sf.okapi.lib.tmdb.DbUtil;
 import net.sf.okapi.lib.tmdb.Exporter;
+import net.sf.okapi.lib.tmdb.IIndexAccess;
 import net.sf.okapi.lib.tmdb.IRepository;
 import net.sf.okapi.lib.tmdb.ITm;
 import net.sf.okapi.lib.tmdb.Importer;
@@ -522,7 +523,9 @@ class RepositoryPanel extends Composite {
 			if ( tmList.getItemCount() > 0 ) {
 				int selection = 0; // First by default
 				if ( selectedTmName != null ) {
-					selection = tmpList.indexOf(selectedTmName);
+					if ( !selectedTmName.isEmpty() ) {
+						selection = tmpList.indexOf(selectedTmName);
+					}
 				}
 				if ( selection < 0 ) {
 					selection = tmList.getItemCount()-1; 
@@ -797,7 +800,11 @@ class RepositoryPanel extends Composite {
 			java.util.List<String> fields = dlg.showDialog();
 			if ( fields == null ) return;
 
-//TODO: use the string indexInfo
+			if ( fields.isEmpty() ) {
+				IIndexAccess ia = repo.getIndexAccess();
+				ia.deleteTMIndex(tm.getUUID());
+				return;
+			}
 			
 			// Start the import thread
 			ProgressCallback callback = new ProgressCallback(tp);
@@ -805,7 +812,7 @@ class RepositoryPanel extends Composite {
 			tp.startThread(new Thread(exp));
 		}
 		catch ( Throwable e ) {
-			Dialogs.showError(getShell(), "Error while splitting.\n"+e.getMessage(), null);
+			Dialogs.showError(getShell(), "Error while indexing.\n"+e.getMessage(), null);
 		}
 	}
 

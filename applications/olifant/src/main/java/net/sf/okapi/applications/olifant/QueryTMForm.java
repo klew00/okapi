@@ -22,6 +22,7 @@ package net.sf.okapi.applications.olifant;
 
 import java.util.HashMap;
 
+import net.sf.okapi.common.Util;
 import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.UIUtil;
 import net.sf.okapi.lib.tmdb.DbUtil;
@@ -103,7 +104,14 @@ class QueryTMForm implements ISegmentEditorUser {
 		spThreshold.setSelection(50);
 		
 		cbLocales = new Combo(shell, SWT.SIMPLE | SWT.DROP_DOWN | SWT.READ_ONLY);
-		cbLocales.add(sourceLocale);
+		java.util.List<String> tmpList = DbUtil.indexInfoFromString(tm.getIndexInfo());
+		if ( !Util.isEmpty(tmpList) ) {
+			for ( String fn : tmpList ) {
+				if ( fn.startsWith(DbUtil.TEXT_PREFIX) ) {
+					cbLocales.add(DbUtil.getFieldLocale(fn));
+				}
+			}
+		}
 		cbLocales.select(0);
 		
 		btAttributes = new Button(shell, SWT.PUSH);
@@ -160,7 +168,7 @@ class QueryTMForm implements ISegmentEditorUser {
 		col.setText(DbUtil.SEGKEY_NAME);
 		col.setWidth(90);
 		col = new TableColumn(table, SWT.NONE);
-		col.setText("Score");
+		col.setText("Similarity");
 		col.setWidth(80);
 		col = new TableColumn(table, SWT.NONE);
 		col.setText("Text");

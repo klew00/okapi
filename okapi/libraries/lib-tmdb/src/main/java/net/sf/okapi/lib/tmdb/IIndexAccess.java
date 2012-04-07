@@ -45,4 +45,5 @@ public interface IIndexAccess {
 	
 	public Writer getWriter ();
 
+	public void deleteTMIndex (String uuid);
 }
