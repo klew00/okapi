@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2008-2012 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -30,6 +30,9 @@ import net.sf.okapi.common.ParametersString;
 
 public class Parameters extends net.sf.okapi.filters.table.base.Parameters {
 
+	final public static int ESCAPING_MODE_DUPLICATION = 1;
+	final public static int ESCAPING_MODE_BACKSLASH = 2;
+	
 	/**
 	 * Symbol or a string separating fields in a row. <p>
 	 * Default: , (comma)
@@ -47,7 +50,12 @@ public class Parameters extends net.sf.okapi.filters.table.base.Parameters {
 	/**
 	 * True if qualifiers should be dropped, and shouldn't go into the text units
 	 */
-	public boolean removeQualifiers = true; 
+	public boolean removeQualifiers = true;
+	
+	/**
+	 * The way qualifiers in the original text are escaped
+	 */
+	public int escapingMode = ESCAPING_MODE_DUPLICATION;
 
 	@Override
 	protected void parameters_load(ParametersString buffer) {
@@ -57,6 +65,7 @@ public class Parameters extends net.sf.okapi.filters.table.base.Parameters {
 		fieldDelimiter = buffer.getString("fieldDelimiter", ""); 
 		textQualifier = buffer.getString("textQualifier", "");
 		removeQualifiers = buffer.getBoolean("removeQualifiers", true);
+		escapingMode = buffer.getInteger("escapingMode", ESCAPING_MODE_DUPLICATION);
 	}
 
 	@Override
@@ -67,6 +76,7 @@ public class Parameters extends net.sf.okapi.filters.table.base.Parameters {
 		fieldDelimiter = ",";
 		textQualifier = "\"";
 		removeQualifiers = true;
+		escapingMode = ESCAPING_MODE_DUPLICATION;
 	}
 
 	@Override
@@ -77,8 +87,7 @@ public class Parameters extends net.sf.okapi.filters.table.base.Parameters {
 		buffer.setString("fieldDelimiter", fieldDelimiter);
 		buffer.setString("textQualifier", textQualifier);
 		buffer.setBoolean("removeQualifiers", removeQualifiers);
+		buffer.setInteger("escapingMode", escapingMode);
 	}
-
-
 	
 }

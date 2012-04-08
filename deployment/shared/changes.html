@@ -1,4 +1,4 @@
-﻿<html>
+﻿﻿<html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>Okapi Changes Log</title>
@@ -44,6 +44,17 @@ distribution.</p>
 	not loaded properly.</li>
 </ul>
 	</li>
+	<li>Table Filter:<ul>
+	<li>Added handling of 2 escaping modes for qualifiers in CSV files:<br>
+	- by duplication of the qualifier (e.g. "translate=""yes""")<br> 
+	- by backslash escaping (e.g. "translate=\"yes\"")</li>
+	<li>Added a new parameter to CSV filter: int escapingMode<br>
+	int ESCAPING_MODE_DUPLICATION = 1 (default)<br>
+	int ESCAPING_MODE_BACKSLASH = 2<br>
+	</li>
+	<li>Added the "CSV escaping mode" group to the parameters editor.</li>
+	<li>Fixed a bug with disabling CSV-related elements in the parameters editor.</li>
+</ul>
 	<li>TS Filter:<ul>
 	<li>Fixed the default rule for Java inline code so escaped is supported.</li>
 </ul>
