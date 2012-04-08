@@ -63,8 +63,7 @@ class QueryTMForm implements ISegmentEditorUser {
 	private HashMap<String, String> attributes;
 
 	public QueryTMForm (Shell parent,
-		ITm tm,
-		String sourceLocale)
+		ITm tm)
 	{
 		shell = new Shell(parent, SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.APPLICATION_MODAL);
 		shell.setText("Query TM");

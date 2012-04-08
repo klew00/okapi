@@ -910,7 +910,7 @@ class TmPanel extends Composite implements IObserver, ISegmentEditorUser {
 		saveEntry();
 		try {
 			if ( queryForm == null ) {
-				queryForm = new QueryTMForm(getShell(), tm, opt.getSourceLocale());
+				queryForm = new QueryTMForm(getShell(), tm);
 			}
 			queryForm.showDialog();
 			queryForm = null; // temporary
@@ -1040,6 +1040,10 @@ class TmPanel extends Composite implements IObserver, ISegmentEditorUser {
 				
 				updateCurrentEntry();
 				statusBar.setPage(tm.getCurrentPage(), tm.getPageCount());
+			}
+			else {
+				updateCurrentEntry();
+				statusBar.setPage(-1, tm.getPageCount());
 			}
 		}
 		catch ( Throwable e ) {

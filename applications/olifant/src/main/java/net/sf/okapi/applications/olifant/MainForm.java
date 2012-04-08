@@ -81,6 +81,10 @@ public class MainForm {
 
 	private static final String HELP_USAGE = "Olifant - Usage"; //$NON-NLS-1$
 	
+	static final String FILEFILTER_TEXT = "TMX and Translation Files\tAll Files (*.*)";
+	static final String FILEFILTER_EXTS = "*.tmx;*.xlf;*.po;*.ttx;*.ts;*.rtf\t*.*";
+
+	
 	private Shell shell;
 	private UserConfiguration config;
 	private ResourceManager rm;
@@ -928,7 +932,8 @@ public class MainForm {
 	private void openFile (String[] paths) {
 		try {
 			if ( paths == null ) {
-				paths = Dialogs.browseFilenames(shell, "Open Files in New TMs", true, null, null, null);
+				paths = Dialogs.browseFilenames(shell, "Open Files in New TMs", true, null,
+					FILEFILTER_TEXT, FILEFILTER_EXTS);
 			}
 			if ( paths == null ) return;
 			boolean acceptAll = false;

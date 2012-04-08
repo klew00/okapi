@@ -277,7 +277,7 @@ class RepositoryPanel extends Composite {
 		}
 		finally {
 			mainForm.getStatusBar().setInfo("", false);
-			resetRepositoryUI(tmName);
+			resetRepositoryUI("");
 		}
 	}
 	
@@ -423,7 +423,7 @@ class RepositoryPanel extends Composite {
 			TMOptions opt = options.getItem(tm.getUUID(), true);
 			
 			tmList.add(tm.getName());
-			resetRepositoryUI(null);
+			resetRepositoryUI(tm.getName());
 			TmPanel tp = mainForm.addTmTabEmpty(tm, opt);
 			if ( fillTm && ( tp != null )) {
 				tp.resetTmDisplay();
@@ -638,7 +638,8 @@ class RepositoryPanel extends Composite {
 			}
 
 			// Get the file to import
-			String[] paths = Dialogs.browseFilenames(getShell(), "Import File into "+tmName, false, null, null, null);
+			String[] paths = Dialogs.browseFilenames(getShell(), "Import File into "+tmName, false, null,
+				MainForm.FILEFILTER_TEXT, MainForm.FILEFILTER_EXTS);
 			if ( paths == null ) return;
 			
 			InputDocumentDialog dlg = new InputDocumentDialog(getShell(), "Document to import into "+tmName,
