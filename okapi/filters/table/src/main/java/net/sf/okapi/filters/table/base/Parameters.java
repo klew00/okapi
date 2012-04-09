@@ -59,7 +59,7 @@ public class Parameters extends net.sf.okapi.filters.plaintext.base.Parameters {
 	final public static int TRIM_ALL = 2;
 		
 	/**
-	 * Number of the line (1-based) containing filed names (column captions).<p>
+	 * Number of the line (1-based) containing field names (column captions).<p>
 	 * Default: 1
 	 */
 	public int columnNamesLineNum;
