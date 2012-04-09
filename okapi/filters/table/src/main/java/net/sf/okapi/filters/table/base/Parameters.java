@@ -60,13 +60,13 @@ public class Parameters extends net.sf.okapi.filters.plaintext.base.Parameters {
 		
 	/**
 	 * Number of the line (1-based) containing field names (column captions).<p>
-	 * Default: 1
+	 * Default: 0
 	 */
 	public int columnNamesLineNum;
 	
 	/**
 	 * Number of the line (1-based) where actual data start after the header.<p>
-	 * Default: 2
+	 * Default: 1
 	 */
 	public int valuesStartLineNum;
 	
