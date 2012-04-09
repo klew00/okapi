@@ -701,6 +701,8 @@ public class MainForm {
             }
 		});
 		
+		new MenuItem(dropMenu, SWT.SEPARATOR);
+
 		miRefresh = new MenuItem(dropMenu, SWT.PUSH);
 		rm.setCommand(miRefresh, "entries.refresh"); //$NON-NLS-1$
 		miRefresh.addSelectionListener(new SelectionAdapter() {
@@ -709,6 +711,8 @@ public class MainForm {
             }
 		});
 		
+		new MenuItem(dropMenu, SWT.SEPARATOR);
+
 		miEditSearch = new MenuItem(dropMenu, SWT.PUSH);
 		rm.setCommand(miEditSearch, "edit.search"); //$NON-NLS-1$
 		miEditSearch.addSelectionListener(new SelectionAdapter() {

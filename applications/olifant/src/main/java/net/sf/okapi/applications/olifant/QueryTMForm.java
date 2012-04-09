@@ -58,6 +58,7 @@ class QueryTMForm implements ISegmentEditorUser {
 	private final Table table;
 	private final Spinner spThreshold;
 	private final Combo cbLocales;
+	private final Spinner spMaxHits;
 	private final Button btAttributes;
 	private final Label stCount;
 	private HashMap<String, String> attributes;
@@ -66,21 +67,21 @@ class QueryTMForm implements ISegmentEditorUser {
 		ITm tm)
 	{
 		shell = new Shell(parent, SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.APPLICATION_MODAL);
-		shell.setText("Query TM");
+		shell.setText("Query Matches");
 		UIUtil.inheritIcon(shell, parent);
-		shell.setLayout(new GridLayout(6, false));
+		shell.setLayout(new GridLayout(8, false));
 
 		this.tm = tm;
 		attributes = new HashMap<String, String>();
 
 		Label label = new Label(shell, SWT.NONE);
-		label.setText("Text to query:");
+		label.setText("Text to match:");
 		GridData gdTmp = new GridData();
-		gdTmp.horizontalSpan = 6;
+		gdTmp.horizontalSpan = 8;
 		label.setLayoutData(gdTmp);
 		
 		gdTmp = new GridData(GridData.FILL_BOTH);
-		gdTmp.horizontalSpan = 6;
+		gdTmp.horizontalSpan = 8;
 		gdTmp.widthHint = 550;
 		gdTmp.heightHint = 70;
 		seQuery = new SegmentEditor(shell, -1, this, gdTmp);
@@ -103,6 +104,9 @@ class QueryTMForm implements ISegmentEditorUser {
 		spThreshold.setSelection(50);
 		
 		cbLocales = new Combo(shell, SWT.SIMPLE | SWT.DROP_DOWN | SWT.READ_ONLY);
+		gdTmp = new GridData();
+		gdTmp.widthHint = 80;
+		cbLocales.setLayoutData(gdTmp);
 		java.util.List<String> tmpList = DbUtil.indexInfoFromString(tm.getIndexInfo());
 		if ( !Util.isEmpty(tmpList) ) {
 			for ( String fn : tmpList ) {
@@ -112,6 +116,15 @@ class QueryTMForm implements ISegmentEditorUser {
 			}
 		}
 		cbLocales.select(0);
+		
+		label = new Label(shell,SWT.NONE);
+		label.setText("Maxinum hits:");
+		
+		spMaxHits = new Spinner(shell, SWT.BORDER);
+		spMaxHits.setMaximum(500);
+		spMaxHits.setMinimum(1);
+		spMaxHits.setPageIncrement(10);
+		spMaxHits.setSelection(100);
 		
 		btAttributes = new Button(shell, SWT.PUSH);
 		updateAttributesDisplay();
@@ -127,7 +140,7 @@ class QueryTMForm implements ISegmentEditorUser {
 		stCount.setLayoutData(gdTmp);
 
 		gdTmp = new GridData(GridData.FILL_BOTH);
-		gdTmp.horizontalSpan = 6;
+		gdTmp.horizontalSpan = 8;
 		gdTmp.heightHint = 70;
 		seMatch = new SegmentEditor(shell, -1, this, gdTmp);
 		seMatch.setEditable(false);
@@ -138,7 +151,7 @@ class QueryTMForm implements ISegmentEditorUser {
 		table.setLinesVisible(true);
 		gdTmp = new GridData(GridData.FILL_BOTH);
 		gdTmp.heightHint = 200;
-		gdTmp.horizontalSpan = 6;
+		gdTmp.horizontalSpan = 8;
 		table.setLayoutData(gdTmp);
 
 		table.addControlListener(new ControlAdapter() {
@@ -241,7 +254,7 @@ class QueryTMForm implements ISegmentEditorUser {
 			IRepository repo = tm.getRepository();
 			IIndexAccess ia = repo.getIndexAccess();
 
-			int count = ia.search(text, null, tm.getUUID(), cbLocales.getText(), 50,
+			int count = ia.search(text, null, tm.getUUID(), cbLocales.getText(), spMaxHits.getSelection(),
 				spThreshold.getSelection(), attributes);
 			if ( count == 0 ) {
 				stCount.setText("<No match found>");

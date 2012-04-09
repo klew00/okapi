@@ -41,9 +41,11 @@ class IndexAccess implements IIndexAccess {
 	private Seeker seeker;
 	private boolean inMemory;
 	private List<TmHit> hits;
+	private Repository store;
 	
 	public IndexAccess (Repository store) {
 		try {
+			this.store = store;
 			Directory idxDir = null;
 			// Get the location from the repository instance
 			String dir = store.getDirectory();
@@ -111,6 +113,8 @@ class IndexAccess implements IIndexAccess {
 	@Override
 	public void deleteTMIndex (String uuid) {
 		writer.delete(TmEntry.TMID_FIELDNAME, uuid);
+		// Now: update the index information in the TM database
+		store.updateIndexInfo(uuid, null);
 	}
 
 }
