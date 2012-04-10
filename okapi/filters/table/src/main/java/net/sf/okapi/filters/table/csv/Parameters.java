@@ -34,13 +34,13 @@ public class Parameters extends net.sf.okapi.filters.table.base.Parameters {
 	final public static int ESCAPING_MODE_BACKSLASH = 2;
 	
 	/**
-	 * Symbol or a string separating fields in a row. <p>
+	 * Character separating fields in a row. <p>
 	 * Default: , (comma)
 	 */
 	public String fieldDelimiter;
 	
 	/** 
-	 * Symbol or a string before and after field value to allow special characters inside the field. 
+	 * Character before and after field value to allow field delimiters inside the field. 
 	 * For instance, this field will not be broken into parts: "Field, containing comma, \", "" and \n".
 	 * The qualifiers are not included in translation units.<p>  
 	 * Default: " (quotation mark)
@@ -53,7 +53,7 @@ public class Parameters extends net.sf.okapi.filters.table.base.Parameters {
 	public boolean removeQualifiers = true;
 	
 	/**
-	 * The way qualifiers in the original text are escaped
+	 * The way qualifiers in the original text are escaped.
 	 */
 	public int escapingMode = ESCAPING_MODE_DUPLICATION;
 
