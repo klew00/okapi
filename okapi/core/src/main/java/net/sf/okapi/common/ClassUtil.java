@@ -22,7 +22,9 @@ package net.sf.okapi.common;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.net.MalformedURLException;
 import java.net.URISyntaxException;
+import java.net.URL;
 
 /**
  * Collection of helper functions for working with classes.
