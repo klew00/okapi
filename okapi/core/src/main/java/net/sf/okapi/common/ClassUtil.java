@@ -22,7 +22,9 @@ package net.sf.okapi.common;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.net.MalformedURLException;
 import java.net.URISyntaxException;
+import java.net.URL;
 
 /**
  * Collection of helper functions for working with classes.
@@ -360,13 +362,25 @@ public class ClassUtil {
 	throws SecurityException, NoSuchMethodException, IllegalArgumentException, 
 		InstantiationException, IllegalAccessException, InvocationTargetException, ClassNotFoundException {
 	
-	if (Util.isEmpty(className))
-		throw new IllegalArgumentException(MSG_EMPTY_CLASSNAME);
-	
-	if (classLoader == null)
-		throw new IllegalArgumentException(MSG_NULL_LOADER);
-	
-	Class<?> ref = classLoader.loadClass(className); 		
-	return ref.cast(instantiateClass(ref, constructorParameters));
-}
+		if (Util.isEmpty(className))
+			throw new IllegalArgumentException(MSG_EMPTY_CLASSNAME);
+		
+		if (classLoader == null)
+			throw new IllegalArgumentException(MSG_NULL_LOADER);
+		
+		Class<?> ref = classLoader.loadClass(className); 		
+		return ref.cast(instantiateClass(ref, constructorParameters));
+	}
+
+	/**
+	 * Gets a full path of a given resource. 
+	 * @param cls Class containing the given resource.
+	 * @param resourceName Name of the given resource. Should be prefixed with a leading slash ("/name.ext") 
+	 * if the resource is located in the class root. If the resource is located in the same
+	 * package as the class, then no leading slash is needed ("name.ext"). 
+	 * @return Full path of the given resource.
+	 */
+	public static String getResourcePath(Class<?> cls, String resourceName) {
+		return cls.getResource(resourceName).getPath();
+	}
 }
