@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2010 by the Okapi Framework contributors
+  Copyright (C) 2008-2012 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -95,6 +95,7 @@ public class SRXDocument {
 	private boolean oneSegmentIncludesAll;
 	private boolean trimLeadingWS;
 	private boolean trimTrailingWS;
+	private boolean useJavaRegex;
 	private String version = "2.0";
 	private String warning;
 	private String sampleText;
@@ -198,6 +199,7 @@ public class SRXDocument {
 		oneSegmentIncludesAll = false; // Extension
 		trimLeadingWS = false; // Extension
 		trimTrailingWS = false; // Extension
+		useJavaRegex = false; // Extension
 
 		sampleText = "Mr. Holmes is from the U.K. not the U.S. <B>Is Dr. Watson from there too?</B> Yes: both are.<BR/>";
 		sampleLanguage = "en";
@@ -289,6 +291,22 @@ public class SRXDocument {
 			oneSegmentIncludesAll = value;
 			modified = true;
 		}
+	}
+
+	/**
+	 * Indicates if this document has rules that are defined for the Java regular expression engine (vs ICU).
+	 * @return true if the rules are for the Java regular expression engine, false if they are for ICU.
+	 */
+	public boolean useJavaRegex () {
+		return useJavaRegex;
+	}
+	
+	/**
+	 * Sets the indicator that tells if this document has rules that are defined for the Java regular expression engine (vs ICU).
+	 * @param useJavaRegex true if the rules should be treated as Java regular expression, false for ICU.
+	 */
+	public void setUseJavaRegex (boolean useJavaRegex) {
+		this.useJavaRegex = useJavaRegex;
 	}
 
 	/**
@@ -571,7 +589,7 @@ public class SRXDocument {
 		segmenter.setCascade(cascade);
 		segmenter.setOptions(segmentSubFlows, includeStartCodes,
 			includeEndCodes, includeIsolatedCodes, 	oneSegmentIncludesAll,
-			trimLeadingWS, trimTrailingWS);
+			trimLeadingWS, trimTrailingWS, useJavaRegex);
 		
 		for ( LanguageMap langMap : langMaps ) {
 			if ( Pattern.matches(langMap.pattern, languageCode.toString()) ) {
@@ -614,7 +632,7 @@ public class SRXDocument {
 		icuRegex = segmenter.getICURegex();
 		segmenter.setOptions(segmentSubFlows, includeStartCodes,
 			includeEndCodes, includeIsolatedCodes, oneSegmentIncludesAll,
-			trimLeadingWS, trimTrailingWS);
+			trimLeadingWS, trimTrailingWS, useJavaRegex);
 		compileRules(segmenter, ruleName);
 		segmenter.setLanguage(LocaleId.EMPTY);
 		return segmenter;
@@ -835,6 +853,9 @@ public class SRXDocument {
 				
 				tmp = elem2.getAttribute("trimTrailingWhitespaces");
 				if ( tmp.length() > 0 ) trimTrailingWS = "yes".equals(tmp);
+
+				tmp = elem2.getAttribute("useJavaRegex");
+				if ( tmp.length() > 0 ) useJavaRegex = "yes".equals(tmp);
 			}
 
 			// Extension: sample
@@ -1039,7 +1060,9 @@ public class SRXDocument {
 				writer.writeAttributeString("trimLeadingWhitespaces",
 					(trimLeadingWS ? "yes" : "no"));
 				writer.writeAttributeString("trimTrailingWhitespaces",
-					(trimTrailingWS ? "yes" : "no"));
+						(trimTrailingWS ? "yes" : "no"));
+				writer.writeAttributeString("useJavaRegex",
+						(useJavaRegex ? "yes" : "no"));
 				writer.writeEndElementLineBreak(); // okpsrx:options
 
 				writer.writeStartElement(NSPREFIX_OKPSRX+":sample");
