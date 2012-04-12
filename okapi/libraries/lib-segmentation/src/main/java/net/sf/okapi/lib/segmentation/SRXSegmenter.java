@@ -47,7 +47,7 @@ public class SRXSegmenter implements ISegmenter {
 	private boolean oneSegmentIncludesAll; // Extension
 	private boolean trimLeadingWS; // Extension
 	private boolean trimTrailingWS; // Extension
-	private boolean useJavaRegex;
+	private boolean useJavaRegex; // Extension
 	private boolean trimCodes; // Extension
 	private ArrayList<CompiledRule> rules;
 	private Pattern maskRule; // Extension
@@ -230,7 +230,7 @@ public class SRXSegmenter implements ISegmenter {
 		// Build the list of split positions
 		// Get the coded text for the whole content
 		String codedText = container.getCodedText();
-		icuRegex.processText(codedText, rules);
+		if (!useJavaRegex) icuRegex.processText(codedText, rules);
 
 		splits = new TreeMap<Integer, Boolean>();
 		Matcher m;
@@ -244,14 +244,15 @@ public class SRXSegmenter implements ISegmenter {
 				// Already a match: Per SRX algorithm, we use the first one only
 				// see http://www.gala-global.org/oscarStandards/srx/srx20.html#Struct_classdefinitions
 				if ( splits.containsKey(n) ) continue;
-				if (!icuRegex.verifyPos(n, rule, m)) continue;
+				if (!useJavaRegex && !icuRegex.verifyPos(n, rule, m)) continue;
 				
 				// Else add a split marker
 				splits.put(n, rule.isBreak);
 			}
 		}
 		
-		codedText = container.getCodedText(); // restore codedText after word breaks
+		if (!useJavaRegex) 
+			codedText = container.getCodedText(); // restore codedText after word breaks
 		
 		// Set the additional split positions for mask-rules
 		if ( maskRule != null ) {

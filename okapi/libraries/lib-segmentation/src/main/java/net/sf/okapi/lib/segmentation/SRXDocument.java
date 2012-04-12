@@ -659,30 +659,47 @@ public class SRXDocument {
 				
 				if (hasICURules) icuRegex.setHasICURules(true);
 				
-				if ( rule.before.endsWith(NOAUTO)) {
-					// If the rule.before ends with NOAUTO, then we do not put pattern for in-line codes
-					pattern = "(" +
-						WrapBeforePart(rule.before.substring(0,
-							rule.before.length()-NOAUTO.length()), hasICURules) +
-							")(" + WrapAfterPart(rule.after, hasICURules) + ")";
+				if (useJavaRegex) {
+					if ( rule.before.endsWith(NOAUTO)) {
+						// If the rule.before ends with NOAUTO, then we do not put pattern for in-line codes
+						pattern = "("+rule.before.substring(0, rule.before.length()-NOAUTO.length())
+							+")("+rule.after+")";
+					}
+					else {
+						// The compiled rule is made of two groups: the pattern before and the pattern after
+						// the break. A special pattern for in-line codes is also added transparently.
+						pattern = "("+rule.before+AUTO_INLINECODES+")("+rule.after+")";
+					}
 				}
 				else {
-					// The compiled rule is made of two groups: the pattern before and the pattern after
-					// the break. A special pattern for in-line codes is also added transparently.
-					pattern = "(" + WrapBeforePart(rule.before, hasICURules)	+
-							AUTO_INLINECODES + ")(" + 
-							WrapAfterPart(rule.after, hasICURules) + ")";
+					if ( rule.before.endsWith(NOAUTO)) {
+						// If the rule.before ends with NOAUTO, then we do not put pattern for in-line codes
+						pattern = "(" +
+							WrapBeforePart(rule.before.substring(0,
+								rule.before.length()-NOAUTO.length()), hasICURules) +
+								")(" + WrapAfterPart(rule.after, hasICURules) + ")";
+					}
+					else {
+						// The compiled rule is made of two groups: the pattern before and the pattern after
+						// the break. A special pattern for in-line codes is also added transparently.
+						pattern = "(" + WrapBeforePart(rule.before, hasICURules)	+
+								AUTO_INLINECODES + ")(" + 
+								WrapAfterPart(rule.after, hasICURules) + ")";
+					}
 				}
 				// Replace special markers ANYCODES by inline code pattern
 				pattern = pattern.replace(ANYCODE, INLINECODE_PATTERN);
 				
-				// We need to increase the numbers by 1 as we add the 
-				// before-break group to the rule
-				pattern = RegexUtil.updateGroupReferences(pattern, 1);				
-				if (hasICURules) {
-					pattern = icuRegex.processRule(pattern);
-				}				
-				//pattern = pattern.replaceAll(Placeholder.AREA_MARKERS, "");
+				if (!useJavaRegex) {
+					// We need to increase the numbers by 1 as we add the 
+					// before-break group to the rule
+					pattern = RegexUtil.updateGroupReferences(pattern, 1);				
+					if (hasICURules) {
+						pattern = icuRegex.processRule(pattern);
+					}				
+					//pattern = pattern.replaceAll(Placeholder.AREA_MARKERS, "");
+				}
+				
 				// Compile and add the rule
 				segmenter.addRule(new CompiledRule(pattern, rule.isBreak));
 			}
