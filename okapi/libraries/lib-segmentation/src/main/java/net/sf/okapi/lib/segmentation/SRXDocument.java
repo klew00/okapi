@@ -303,10 +303,13 @@ public class SRXDocument {
 	
 	/**
 	 * Sets the indicator that tells if this document has rules that are defined for the Java regular expression engine (vs ICU).
-	 * @param useJavaRegex true if the rules should be treated as Java regular expression, false for ICU.
+	 * @param value true if the rules should be treated as Java regular expression, false for ICU.
 	 */
-	public void setUseJavaRegex (boolean useJavaRegex) {
-		this.useJavaRegex = useJavaRegex;
+	public void setUseJavaRegex (boolean value) {
+		if ( value != useJavaRegex ) {
+			useJavaRegex = value;
+			modified = true;
+		}
 	}
 
 	/**
