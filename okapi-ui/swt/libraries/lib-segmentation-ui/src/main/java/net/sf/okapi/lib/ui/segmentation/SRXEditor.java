@@ -458,7 +458,7 @@ public class SRXEditor {
 		rm.setCommand(menuItem, "file.new"); //$NON-NLS-1$
 		menuItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
-				newSRXDocument(0, true);
+				newSRXDocument(1, true);
             }
 		});
 		
