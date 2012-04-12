@@ -34,6 +34,8 @@ import net.sf.okapi.filters.xini.jaxb.Element.ElementContent;
 
 public class XINIFilterTestHelper implements Serializable {
 
+	private static final long serialVersionUID = 1L;
+	
 	private static Pattern STARTING_TAG = Pattern.compile("<(\\w+ [^>]+?)(/?)>");
 	private static Pattern ATTRIBUTES = Pattern.compile("\\w+?=\".*?\"");
 	private XINIFilter filter;

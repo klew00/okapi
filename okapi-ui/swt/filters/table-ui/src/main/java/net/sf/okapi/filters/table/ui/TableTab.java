@@ -23,7 +23,6 @@ package net.sf.okapi.filters.table.ui;
 import net.sf.okapi.common.ui.abstracteditor.IDialogPage;
 import net.sf.okapi.common.ui.abstracteditor.SWTUtil;
 import net.sf.okapi.filters.table.base.Parameters;
-import net.sf.okapi.filters.table.csv.CommaSeparatedValuesFilter;
 import net.sf.okapi.lib.extra.filters.CompoundFilterParameters;
 
 import org.eclipse.swt.SWT;
