@@ -19,6 +19,24 @@
             <groupId>net.sf.okapi.lib</groupId>
             <artifactId>okapi-lib-segmentation</artifactId>
             <version>${project.version}</version>
-        </dependency>        
+        </dependency>
+        <dependency>
+	  		<groupId>net.sf.okapi.lib</groupId>
+	  		<artifactId>okapi-lib-extra</artifactId>
+	  		<version>${project.version}</version>
+	  		<scope>test</scope>
+        </dependency>
+        <dependency>
+	  		<groupId>net.sf.okapi.filters</groupId>
+	  		<artifactId>okapi-filter-xml</artifactId>
+	  		<version>${project.version}</version>
+	  		<scope>test</scope>
+	  	</dependency>
+  	<dependency>
+  		<groupId>net.sf.okapi.steps</groupId>
+  		<artifactId>okapi-step-common</artifactId>
+  		<version>${project.version}</version>
+  		<scope>test</scope>
+  	</dependency>        
     </dependencies>
 </project>
