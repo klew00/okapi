@@ -252,39 +252,33 @@
 		</delete>
 	</target>
 
-	<!-- Olifant -->
+	<!-- Olifant 
 	<target name="olifant">
-		<!-- Prepare tmp dir for creating the jar -->
 		<delete includeEmptyDirs="true" failonerror="false">
 			<fileset dir="${tmp}"/>
 		</delete>
 		<mkdir dir="${tmp}"/>
 
-		<!-- Copy classes -->
 		<copy todir="${tmp}">
 			<fileset dir="../../applications/olifant/target/classes"/>
 		</copy>
 		
-		<!-- Create the manifest file -->
 		<manifest file="${tmp}/MANIFEST.MF">
 			<attribute name="Implementation-Title" value="olifant"/>
 			<attribute name="Implementation-Version" value="${olifantStamp}"/>
 			<attribute name="Main-Class" value="net.sf.okapi.applications.olifant.Main"/>
-			<!-- Note the reference to the UI library to allow access to parameters editors
-			when the tool is used in the UI-enabled distribution -->
 			<attribute name="Class-Path" value="${okapilibJar} ${okapilibuiJar}"/>
   		</manifest>
 		
-		<!-- Create the jar file -->
 		<jar jarfile="${distLib}/olifant.jar" basedir="${tmp}"
 		 manifest="${tmp}/MANIFEST.MF"
 		 excludes="MANIFEST.MF" />
 
-		<!-- Clean up -->
 		<delete includeEmptyDirs="true" failonerror="false">
 			<fileset dir="${tmp}"/>
 		</delete>
 	</target>
+	-->
 
 	<!-- CheckMate -->
 	<target name="checkmate">
@@ -348,7 +342,7 @@
 		 excludes="MANIFEST.MF" />
 
 		<copy todir="${dist}" overwrite="true">
-			<fileset dir="data/okapi-apps/${platform}" includes="**/**"/>
+			<fileset dir="data/okapi-apps/${platform}" includes="**/**" excludes="**/olifant.*,**/Olifant.app/**"/>
 		</copy>
 
 		<!-- Copy shared resources -->
@@ -406,6 +400,6 @@
 		</zip>
 	</target>
 
-	<target name="all" depends="init, okapiLibUI, checkmate, ratel, olifant, rainbow, noWinStuff, winStuff, zipWin, zipLinuxMac"/>
+	<target name="all" depends="init, okapiLibUI, checkmate, ratel, rainbow, noWinStuff, winStuff, zipWin, zipLinuxMac"/>
 
 </project>
