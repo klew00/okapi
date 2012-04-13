@@ -153,4 +153,10 @@ public class XINIRainbowkitFilter implements IFilter {
 		return new XINIRainbowkitWriter();
 	}
 
+	@Override
+	public boolean isSubfilter() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
 }
