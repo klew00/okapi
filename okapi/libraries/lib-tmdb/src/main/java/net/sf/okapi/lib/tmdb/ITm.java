@@ -104,6 +104,13 @@ public interface ITm {
 	public void setRecordFields (List<String> names);
 	
 	/**
+	 * Gets the first column of the record fields of a page that is a codes field.
+	 * @return the first column of the record fields of a page that is a codes field.
+	 * Columns numbers start at one. Return 0 if there are no codes fields.
+	 */
+	public int getFirstCodesFieldColumn ();
+	
+	/**
 	 * Sets the sort order in which the records should be retrieved with {@link #getNextPage()}
 	 * or other paging methods.
 	 * @param fields list of the fields to sort on. The first on is the primary field,

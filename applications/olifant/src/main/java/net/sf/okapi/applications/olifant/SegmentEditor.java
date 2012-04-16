@@ -20,10 +20,12 @@
 
 package net.sf.okapi.applications.olifant;
 
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.ui.UIUtil;
 import net.sf.okapi.lib.ui.editor.TextOptions;
 
@@ -56,6 +58,7 @@ class SegmentEditor {
 	private boolean fullCodesMode;
 	private Pattern currentCodes;
 	private String codesAsString;
+	private List<Code> codes;
 	private TextOptions textOptions;
 	private Color bgColor;
 
@@ -276,11 +279,17 @@ class SegmentEditor {
 		
 	}
 	
+	private void toFullcodes () {
+		if ( codes == null ) {
+			
+		}
+	}
+	
 	private void saveTextWithShortCodes () {
 //		String text = edit.getText();
 //		Matcher m = SHORTCODES.matcher(text);
 
-		if ( Util.isEmpty(codesAsString) ) return; // Nothing to check
+//		if ( codesAsString.isEmpty() ) return; // Nothing to check
 		
 	}
 
@@ -310,6 +319,7 @@ class SegmentEditor {
 	public void clear () {
 		edit.setText("");
 		codesAsString = null;
+		codes = null;
 		modified = false;
 	}
 	
@@ -334,6 +344,7 @@ class SegmentEditor {
 		if ( column != -2 ) this.column = column;
 		edit.setEnabled(text != null);
 		this.codesAsString = codesAsString;
+		codes = null;
 		if ( text == null ) {
 			edit.setText("");
 		}

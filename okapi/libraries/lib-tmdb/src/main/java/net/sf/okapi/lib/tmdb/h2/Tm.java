@@ -51,6 +51,7 @@ public class Tm implements ITm {
 	private PreparedStatement pstmGet;
 	private List<String> recordFields;
 	private ArrayList<String> codesFields;
+	private int firstCodesColumn;
 	
 	private DbUtil.PageMode pageMode = PageMode.EDITOR;
 	private long limit = 500;
@@ -271,6 +272,7 @@ public class Tm implements ITm {
 			}
 			
 			codesFields = null;
+			firstCodesColumn = 0;
 			// Check if we have at least one field that is TU-level
 			boolean hasTUField = false;
 			if ( recordFields != null ) {
@@ -315,11 +317,12 @@ public class Tm implements ITm {
 			}
 			
 			// Add the codes fields if needed
-//			if ( codesFields != null ) {
-//				for ( String name : codesFields ) {
-//					tmp.append(", "+segTable+".\""+name+"\"");
-//				}
-//			}
+			if ( codesFields != null ) {
+				for ( String name : codesFields ) {
+					tmp.append(", "+segTable+".\""+name+"\"");
+				}
+				firstCodesColumn = 2 + recordFields.size();
+			}
 			
 			// Complete the query
 			if ( hasTUField ) {
@@ -1252,6 +1255,11 @@ public class Tm implements ITm {
 		filterRoot = root;
 		updateName(name);
 		needPagingRefresh = true;
+	}
+
+	@Override
+	public int getFirstCodesFieldColumn() {
+		return firstCodesColumn;
 	}
 	
 }

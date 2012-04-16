@@ -887,4 +887,10 @@ public class Tm implements ITm {
 		return query;
 	}
 
+	@Override
+	public int getFirstCodesFieldColumn() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
 }

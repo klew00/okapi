@@ -97,7 +97,9 @@ class TmPanel extends Composite implements IObserver, ISegmentEditorUser {
 	private Thread workerThread;
 	private MainForm mainForm;
 	private int srcCol; // Column in the table that holds the source text, use -1 for none, 0-based, 1=SegKey+Flag
+	private String srcFn; // Source field name
 	private int trgCol; // Column in the table that holds the target text, use -1 for none, 0-based, 1=SegKey+Flag
+	private String trgFn; // target field name
 	private TMOptions opt;
 	private SearchAndReplaceForm sarForm;
 	private SearchAndReplaceOptions sarOptions;
@@ -523,12 +525,14 @@ class TmPanel extends Composite implements IObserver, ISegmentEditorUser {
 		
 		// Update the new source column and field
 		opt.setSourceLocale(mainForm.getToolBar().getSource());
-		newSrc = opt.getVisibleFields().indexOf(DbUtil.TEXT_PREFIX+opt.getSourceLocale());
+		srcFn = DbUtil.TEXT_PREFIX+opt.getSourceLocale();
+		newSrc = opt.getVisibleFields().indexOf(srcFn);
 		newSrc = (newSrc > -1 ? newSrc+1 : newSrc); // Columns are 1-based
 		
 		// Update the new target column and field
 		opt.setTargetLocale(mainForm.getToolBar().getTarget());
-		newTrg = opt.getVisibleFields().indexOf(DbUtil.TEXT_PREFIX+opt.getTargetLocale());
+		trgFn = DbUtil.TEXT_PREFIX+opt.getTargetLocale();
+		newTrg = opt.getVisibleFields().indexOf(trgFn);
 		newTrg = (newTrg > -1 ? newTrg+1 : newTrg); // Columns are 1-based
 
 		// Make sure the current entry is saved 
@@ -726,8 +730,8 @@ class TmPanel extends Composite implements IObserver, ISegmentEditorUser {
 			else {
 				TableItem ti = table.getItem(n);
 				editPanel.setFields(
-					srcCol==-1 ? null : ti.getText(srcCol), null, srcCol,
-					trgCol==-1 ? null : ti.getText(trgCol), null, trgCol);
+					srcCol==-1 ? null : ti.getText(srcCol), (String)ti.getData(srcFn), srcCol,
+					trgCol==-1 ? null : ti.getText(trgCol), (String)ti.getData(trgFn), trgCol);
 			}
 			previousRow = currentRow;
 			currentRow = n;
@@ -1016,9 +1020,19 @@ class TmPanel extends Composite implements IObserver, ISegmentEditorUser {
 				item.setText(0, String.format("%d", rs.getLong(ITm.SEGKEY_FIELD)));
 				item.setChecked(rs.getBoolean(ITm.FLAG_FIELD));
 				item.setData(0); // Modified flag
-				for ( int i=0; i<opt.getVisibleFields().size(); i++ ) {
-					// +2 because the result set has always seg-key and flag (and 1-based index)
+				int i = 0;
+				for ( String fn : opt.getVisibleFields() ) {
+					// +3 because the result set has always seg-key and flag and it's a 1-based index
 					item.setText(i+1, rs.getString(i+3)==null ? "" : rs.getString(i+3));
+					// Attach the codes field if the column is a text field
+					if ( fn.startsWith(DbUtil.TEXT_PREFIX) ) {
+						// Use only +1 here because 
+						// First codes filed is 1-based already and counts all fields (including key and flag)
+						String loc = DbUtil.getFieldLocale(fn);
+						String codes = rs.getString(DbUtil.CODES_PREFIX+loc);
+						item.setData(fn, rs.getString(DbUtil.CODES_PREFIX+loc));
+					}
+					i++;
 				}
 			}
 			if ( table.getItemCount() > 0 ) {
