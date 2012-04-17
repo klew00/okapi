@@ -89,6 +89,7 @@ public class EventLogger extends BasePipelineStep {
 		case START_SUBDOCUMENT:
 		case START_GROUP:		
 		case START_BATCH_ITEM:
+		case START_SUBFILTER:
 			if (!increasing) sb.append("\n");
 			printEvent(event);
 			indent++; 
@@ -100,6 +101,7 @@ public class EventLogger extends BasePipelineStep {
 		case END_GROUP:
 		case END_BATCH:
 		case END_BATCH_ITEM:
+		case END_SUBFILTER:
 			if (indent > 0) indent--;
 			increasing = false;
 			printEvent(event);

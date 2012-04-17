@@ -834,7 +834,7 @@ public class VignetteFilter implements IFilter {
 			else {
 				subFilter.open(new RawDocument(data, srcLoc));
 					
-				// Change the START_DOCUMENT to START_GROUP
+				// Change the START_DOCUMENT to START_SUBFILTER
 				Event event = subFilter.next(); // START_DOCUMENT
 				StartDocument sd = (StartDocument)event.getResource();
 				StartSubfilter sg = new StartSubfilter(subDocId.getLastId(), groupId.getLastId()); // Group id already created
@@ -852,7 +852,7 @@ public class VignetteFilter implements IFilter {
 				}
 				subFilter.close();
 	
-				// Change the END_DOCUMENT to END_GROUP
+				// Change the END_DOCUMENT to END_SUBFILTER
 				EndSubfilter ending = new EndSubfilter(groupId.createId());
 				ending.setSkeleton(event.getResource().getSkeleton());
 				queue.add(new Event(EventType.END_SUBFILTER, ending));
