@@ -23,7 +23,22 @@ distribution.</p>
 </ul>
 <h2>Changes from M16 to M17-SNAPSHOT</h2>
 <ul>
-	<li>None yet</li>
+	<li>Filters:<ul>
+	<li>XLIFF Filter:<ul>
+	<li>Fixed issue #218 where file name was missing from XML parsing error 
+	(Patch from Mihai).</li>
+	<li>Fixed issue #219 where empty &lt;target&gt; where not created instead of being 
+	created empty (Patch from Mihai)</li>
+</ul>
+	</li>
+</ul>
+	</li>
+	<li>Libraries:<ul>
+	<li>Moved the XLIFF 2.0 library (okapi-lib-xliff package) to a separate 
+	project (<a href="http://code.google.com/p/okapi-xliff-toolkit/">http://code.google.com/p/okapi-xliff-toolkit/</a>).<br>
+	Dependent modules are now using the maven2 repository to get the jar.</li>
+</ul>
+	</li>
 </ul>
 <h2>Changes from M15 to M16</h2>
 <ul>

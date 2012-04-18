@@ -1,9 +1,0 @@
-Manifest-Version: 1.0
-Export-Package: net.sf.okapi.lib.xliff;uses:="org.oasisopen.xliff.v2,j
- avax.xml.namespace,javax.xml.stream",org.oasisopen.xliff.v2;uses:="ne
- t.sf.okapi.lib.xliff"
-Bundle-Name: Okapi Library for XLIFF 2
-Bundle-ManifestVersion: 2
-Bundle-SymbolicName: net.sf.okapi.lib.okapi-lib-xliff
-Import-Package: javax.xml.namespace,javax.xml.stream
-

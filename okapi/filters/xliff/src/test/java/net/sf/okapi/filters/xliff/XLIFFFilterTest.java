@@ -344,6 +344,41 @@ public class XLIFFFilterTest {
 	}
 
 	@Test
+	public void testEmptyTarget () {
+		String snippet = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+			+ "<xliff version=\"1.2\">"
+			+ "<file source-language=\"en\" target-language=\"fr\" datatype=\"x-test\" original=\"file.ext\">"
+			+ "<body>"
+			+ "<trans-unit id=\"1\">"
+			+ "<source>t1</source>"
+			+ "<target></target>"
+			+ "</trans-unit>"
+			+ "</body>"
+			+ "</file></xliff>";
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		TextContainer cont = tu.getTarget(locFR);
+		assertEquals("[t1]", fmt.printSegmentedContent(tu.getSource(), true));
+		assertEquals("[]", fmt.printSegmentedContent(cont, true));
+	}
+
+	@Test
+	public void testNoTarget () {
+		String snippet = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+			+ "<xliff version=\"1.2\">"
+			+ "<file source-language=\"en\" target-language=\"fr\" datatype=\"x-test\" original=\"file.ext\">"
+			+ "<body>"
+			+ "<trans-unit id=\"1\">"
+			+ "<source>t1</source>"
+			+ "</trans-unit>"
+			+ "</body>"
+			+ "</file></xliff>";
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		assertEquals("[t1]", fmt.printSegmentedContent(tu.getSource(), true));
+		TextContainer cont = tu.getTarget(locFR);
+		assertNull(cont);
+	}
+
+	@Test
 	public void testCREntity () {
 		String snippet = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
 			+ "<xliff version=\"1.2\">"
