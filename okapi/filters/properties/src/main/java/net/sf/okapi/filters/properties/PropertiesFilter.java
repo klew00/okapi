@@ -35,6 +35,7 @@ import net.sf.okapi.common.BOMNewlineEncodingDetector;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.IdGenerator;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.MimeTypeMapper;
 import net.sf.okapi.common.UsingParameters;
@@ -87,6 +88,7 @@ public class PropertiesFilter implements IFilter {
 	private long lineSince;
 	private long position;
 	private int tuId;
+	private IdGenerator idGenerator;
 	private Pattern keyConditionPattern;
 	private String lineBreak;
 	private int parseState = 0;
@@ -209,7 +211,7 @@ public class PropertiesFilter implements IFilter {
 					}
 
 					// Queue up subfilter events
-					processWithSubfilter(tuRes.getId(), tuRes, beforeSkeleton, afterSkeleton);
+					processWithSubfilter(tuRes.getName(), tuRes, beforeSkeleton, afterSkeleton);
 					
 					return queue.poll();
 				}
@@ -276,6 +278,7 @@ public class PropertiesFilter implements IFilter {
 
 		// Initializes the variables
 		tuId = 0;
+		idGenerator = new IdGenerator(null); // Restart ID generation for every new document
 		lineNumber = 0;
 		lineSince = 0;
 		position = 0;
@@ -467,6 +470,8 @@ public class PropertiesFilter implements IFilter {
 
 				if (extract) {
 					tuRes = new TextUnit(String.valueOf(++tuId), unescape(value));
+					//tuRes = new TextUnit(String.valueOf(idGenerator.createId()), unescape(value));
+					
 					tuRes.setName(key);
 					tuRes.setMimeType(MimeTypeMapper.PROPERTIES_MIME_TYPE);
 					tuRes.setPreserveWhitespaces(true);
@@ -595,7 +600,8 @@ public class PropertiesFilter implements IFilter {
 		// reset filter for good measure
 		subfilter.close();
 		FilterState s = new FilterState(FILTER_STATE.INSIDE_TEXTUNIT, 
-				parentId, new  GenericSkeleton(beforeSkeleton), new  GenericSkeleton(afterSkeleton));
+				parentId, new  GenericSkeleton(beforeSkeleton), 
+				new  GenericSkeleton(afterSkeleton), idGenerator);
 		s.setParentTextUnitName(parentTu.getName());
 		subfilter.setState(s);
 		subfilter.open(new RawDocument(parentTu.getSource().toString(), srcLocale));

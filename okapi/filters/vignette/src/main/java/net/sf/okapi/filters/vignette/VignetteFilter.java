@@ -823,7 +823,7 @@ public class VignetteFilter implements IFilter {
 			if ( subFilter.getFilter() instanceof AbstractMarkupFilter ) { // For IdGenerator try-out
 				// The root id of is made of: rootId + subDocId + groupId
 				FilterState state = new FilterState(FILTER_STATE.STANDALONE_TEXTUNIT, 
-						subDocId.getLastId(), null, null); 
+						subDocId.getLastId(), null, null, null); 
 				subFilter.setState(state);
 				subFilter.open(new RawDocument(data, srcLoc));
 				while ( subFilter.hasNext() ) {

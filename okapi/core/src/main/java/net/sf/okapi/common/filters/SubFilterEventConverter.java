@@ -25,6 +25,7 @@ import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.ISkeleton;
 import net.sf.okapi.common.IdGenerator;
 import net.sf.okapi.common.resource.EndSubfilter;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.StartSubfilter;
 
@@ -35,9 +36,14 @@ import net.sf.okapi.common.resource.StartSubfilter;
 public class SubFilterEventConverter {
 
 	private String parentId;
-	private IdGenerator groupIdGenerator;
+	private IdGenerator idGenerator;
+	private IdGenerator docIdGenerator;
 	private ISkeleton startGroupSkeleton;
 	private ISkeleton endGroupSkeleton;
+	// Every time we initiate a sub-filter, the root for its events increases to provide 
+	// a unique root for every sub-filter
+	//private static SynchronizedValue<Integer> count = new SynchronizedValue<Integer>(0);
+	//private static ConcurrentHashMap<Thread, Integer> counts = new ConcurrentHashMap<Thread, Integer>();
 
 	/**
 	 * Creates a new SubFilterEventConverter object.
@@ -47,10 +53,7 @@ public class SubFilterEventConverter {
 	 */
 	public SubFilterEventConverter(String parentId, ISkeleton startGroupSkeleton,
 			ISkeleton endGroupSkeleton) {
-		this.groupIdGenerator = new IdGenerator(parentId);
-		this.parentId = parentId;
-		this.startGroupSkeleton = startGroupSkeleton;
-		this.endGroupSkeleton = endGroupSkeleton;
+		this(parentId, startGroupSkeleton, endGroupSkeleton, null);
 	}
 
 	/**
@@ -62,18 +65,15 @@ public class SubFilterEventConverter {
 	 */
 	public SubFilterEventConverter(String parentId, ISkeleton startGroupSkeleton,
 			ISkeleton endGroupSkeleton, IdGenerator idGenerator) {
-		idGenerator.reset(parentId);
-		this.groupIdGenerator = idGenerator; 
+		this.idGenerator = idGenerator;
+		docIdGenerator = idGenerator == null ? new IdGenerator(null, parentId + "_") : idGenerator; 
 		this.parentId = parentId;
 		this.startGroupSkeleton = startGroupSkeleton;
 		this.endGroupSkeleton = endGroupSkeleton;
 	}
 	
-	public SubFilterEventConverter(String parentId) {
-		this.groupIdGenerator = new IdGenerator(parentId); 
-		this.parentId = parentId;
-		this.startGroupSkeleton = null;
-		this.endGroupSkeleton = null;
+	public SubFilterEventConverter(String parentId, IdGenerator idGenerator) {
+		this(parentId, null, null, idGenerator);
 	}
 
 	/**
@@ -86,17 +86,26 @@ public class SubFilterEventConverter {
 		// and end document to end group
 		switch (event.getEventType()) {
 		case START_DOCUMENT:
-			StartSubfilter startSubFilter = new StartSubfilter(parentId, groupIdGenerator.createId());
+			StartSubfilter startSubFilter = new StartSubfilter(parentId, docIdGenerator.createId());
 			startSubFilter.setMimeType(((StartDocument) event.getResource()).getMimeType());
 			startSubFilter.setSkeleton(startGroupSkeleton);
-			startSubFilter.setName(IFilter.SUB_FILTER + ((StartDocument) event.getResource()).getName());			
+			//startSubFilter.setName(IFilter.SUB_FILTER + ((StartDocument) event.getResource()).getName());			
+			startSubFilter.setName(IFilter.SUB_FILTER + parentId);
 			event = new Event(EventType.START_SUBFILTER, startSubFilter);
 			break;
 
 		case END_DOCUMENT:
-			EndSubfilter endSubfilter = new EndSubfilter(groupIdGenerator.getLastId());
+			EndSubfilter endSubfilter = new EndSubfilter(docIdGenerator.getLastId());
 			endSubfilter.setSkeleton(endGroupSkeleton);
 			event = new Event(EventType.END_SUBFILTER, endSubfilter);
+			break;
+			
+		case TEXT_UNIT:
+			if (idGenerator != null) { // otherwise no conversion needed
+				ITextUnit tu = event.getTextUnit();			
+				tu.setId(idGenerator.createId() + "_" + tu.getId());
+				//tu.setName(groupIdGenerator.createId() + "_" + tu.getName());
+			}			
 			break;
 
 		default:
@@ -105,4 +114,19 @@ public class SubFilterEventConverter {
 
 		return event;
 	}
+
+//	public static void connect() {
+//		counts.put(Thread.currentThread(), 0);		
+//	}
+//
+//	public static void disconnect() {
+//		counts.remove(Thread.currentThread());
+//	}
+//	
+//	private static String getPrefix() {
+//		Thread curThread = Thread.currentThread();
+//		int count = counts.contains(curThread) ? counts.get(curThread) : 0;
+//		counts.put(curThread, count++);
+//		return Integer.toHexString(count);
+//	}
 }

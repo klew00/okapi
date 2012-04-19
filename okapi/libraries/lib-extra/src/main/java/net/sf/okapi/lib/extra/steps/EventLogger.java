@@ -26,9 +26,11 @@ import java.util.logging.Logger;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
+import net.sf.okapi.common.resource.EndSubfilter;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.StartSubDocument;
 //import net.sf.okapi.steps.xliffkit.common.persistence.sessions.OkapiJsonSession;
+import net.sf.okapi.common.resource.StartSubfilter;
 
 public class EventLogger extends BasePipelineStep {
 
@@ -62,6 +64,9 @@ public class EventLogger extends BasePipelineStep {
 				break;
 			case START_SUBDOCUMENT:
 				res +=  "  " + ((StartSubDocument) event.getResource()).getName();
+				break;
+			case START_SUBFILTER:
+				res +=  "  " + ((StartSubfilter) event.getResource()).getName();
 				break;
 //			case TEXT_UNIT:
 //				if ("30".equals(event.getResource().getId()))

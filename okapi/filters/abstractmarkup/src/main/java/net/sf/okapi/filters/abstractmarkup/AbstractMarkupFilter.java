@@ -585,7 +585,8 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 				FilterState s = new FilterState(FILTER_STATE.STANDALONE_TEXTUNIT, 
 						parentId, 
 						new GenericSkeleton("<![CDATA["), 
-						new GenericSkeleton("]]>"));
+						new GenericSkeleton("]]>"),
+						null);
 				s.setParentTextUnitName(eventBuilder.findMostRecentTextUnitName());
 				cdataSubfilter.setState(s);
 				cdataSubfilter.open(new RawDocument(cdataWithoutMarkers, getSrcLoc()));	
@@ -934,7 +935,8 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 				FilterState s = new FilterState(FILTER_STATE.INSIDE_TEXTUNIT, 
 						parentId, 
 						new GenericSkeleton(((GenericSkeleton)pcdata.getSkeleton()).getFirstPart().toString()), 
-						new GenericSkeleton(endTag.toString()));
+						new GenericSkeleton(endTag.toString()),
+						null);
 				s.setParentTextUnitName(eventBuilder.findMostRecentTextUnitName());
 				pcdataSubfilter.setState(s);
 				pcdataSubfilter.open(new RawDocument(pcdata.getSource().toString(), getSrcLoc()));

@@ -1,6 +1,7 @@
 package net.sf.okapi.common.filters;
 
 import net.sf.okapi.common.ISkeleton;
+import net.sf.okapi.common.IdGenerator;
 
 /**
  * 
@@ -20,13 +21,16 @@ public class FilterState {
 	private String parentTextUnitName;
 	private ISkeleton startSkeleton;
 	private ISkeleton endSkeleton;
+	private IdGenerator idGenerator;
 
 	public FilterState(FILTER_STATE state, String parentId,
-			ISkeleton startSkeleton, ISkeleton endSkeleton) {
+			ISkeleton startSkeleton, ISkeleton endSkeleton,
+			IdGenerator idGenerator) {
 		this.state = state;
 		this.parentId = parentId;
 		this.startSkeleton = startSkeleton;
 		this.endSkeleton = endSkeleton;
+		this.idGenerator = idGenerator;
 	}
 
 	public FilterState() {
@@ -71,5 +75,13 @@ public class FilterState {
 
 	public void setEndSkeleton(ISkeleton endSkeleton) {
 		this.endSkeleton = endSkeleton;
+	}
+
+	public IdGenerator getIdGenerator() {
+		return idGenerator;
+	}
+
+	public void setIdGenerator(IdGenerator idGenerator) {
+		this.idGenerator = idGenerator;
 	}
 }
