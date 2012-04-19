@@ -436,7 +436,7 @@
 		<property name="dep025Version" value="0.17-SNAPSHOT"/>
 		<property name="dep025" value="${mavenStore}/net/sf/okapi/lib/okapi-lib-xliff/${dep025Version}"/>
 		<fileset id="list.contents" dir="${dep025}"
-		 includes="**/*.jar"/>
+		 includes="**/okapi-lib-xliff-${dep025Version}.jar"/>
 		<property name="jar025" refid="list.contents"/>
 		<echo file="tmpJars" append="yes"> ${jar025}</echo>
 		<copy todir="${distLib}" file="${dep025}/${jar025}"/>
