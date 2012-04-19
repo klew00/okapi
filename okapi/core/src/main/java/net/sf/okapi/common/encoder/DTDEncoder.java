@@ -185,7 +185,7 @@ public class DTDEncoder implements IEncoder {
 		String value)
 	{
 		// PROP_ENCODING: Same value in native
-		// PROP_LANGUGE: Same value in native
+		// PROP_LANGUAGE: Same value in native
 		return value;
 	}
 

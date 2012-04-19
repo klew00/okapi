@@ -23,11 +23,10 @@ public class BaseSubFilterAdapter implements IFilter {
 	private SubFilterEventConverter converter;
 	private int tuChildCount;
 	
-	public BaseSubFilterAdapter(IFilter filter, FilterState state) {
-		this.state = state;
+	public BaseSubFilterAdapter(IFilter filter, FilterState state) {		
 		this.filter = filter;
 		tuChildCount = 0;
-		intializeSubfilterConverter();
+		setState(state);
 	}
 	
 	public BaseSubFilterAdapter(IFilter filter) {
@@ -73,15 +72,17 @@ public class BaseSubFilterAdapter implements IFilter {
 
 	@Override
 	public void open(RawDocument input) {
+		//SubFilterEventConverter.connect();
 		filter.open(input);
-		intializeSubfilterConverter();
+		//intializeSubfilterConverter();
 		tuChildCount = 0;
 	}
 
 	@Override
 	public void open(RawDocument input, boolean generateSkeleton) {
+		//SubFilterEventConverter.connect();
 		filter.open(input, generateSkeleton);
-		intializeSubfilterConverter();
+		//intializeSubfilterConverter();
 		tuChildCount = 0;
 	}
 
@@ -89,6 +90,7 @@ public class BaseSubFilterAdapter implements IFilter {
 	public void close() {
 		filter.close();
 		tuChildCount = 0;
+		//SubFilterEventConverter.disconnect();
 	}
 
 	@Override
@@ -98,21 +100,32 @@ public class BaseSubFilterAdapter implements IFilter {
 
 	@Override
 	public Event next() {
-		Event e = converter.convertEvent(filter.next());
-		if (getState().getParentTextUnitName() != null) {
+		Event e = filter.next();
+		String parentName = getState().getParentTextUnitName();
+		if (parentName != null) {
 			// subfiltered textunits inherit any name from a parent TU
 			if (e.isTextUnit()) {
-				if (e.getTextUnit().getName() == null) {
-					String parentName = getState().getParentTextUnitName();
-					// we need to add a child id so each tu name is unique for this subfiltered content
-					if (parentName != null) {
-						parentName = parentName + "-" + Integer.toString(++tuChildCount); 
-					}
-					e.getTextUnit().setName(parentName);
+//				if (e.getTextUnit().getName() == null) {
+//					String parentName = getState().getParentTextUnitName();
+//					// we need to add a child id so each tu name is unique for this subfiltered content
+//					if (parentName != null) {
+//						parentName = parentName + "-" + Integer.toString(++tuChildCount); 
+//					}
+//					e.getTextUnit().setName(parentName);
+//				}
+				// Always prefix tu name with the parent name								
+				String name = e.getTextUnit().getName(); 
+				
+				if (name == null) {
+					name = Integer.toString(++tuChildCount);
 				}
+				
+				parentName = parentName + "-" + name;				
+				e.getTextUnit().setName(parentName);
 			}
 		}
-		return e;
+		
+		return converter.convertEvent(e);
 	}
 
 	@Override
@@ -168,7 +181,7 @@ public class BaseSubFilterAdapter implements IFilter {
 	private void intializeSubfilterConverter() {
 		try {
 			this.converter = new SubFilterEventConverter(state.getParentId(),
-				state.getStartSkeleton(), state.getEndSkeleton());
+				state.getStartSkeleton(), state.getEndSkeleton(), state.getIdGenerator());
 		} catch (NullPointerException e) {
 			throw new OkapiBadFilterInputException("FilterState not set. Cannot intialize subfilter converter");
 		}

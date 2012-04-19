@@ -20,12 +20,16 @@
 
 package net.sf.okapi.filters.properties;
 
+import java.io.File;
+import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.okapi.common.Event;
+import net.sf.okapi.common.EventType;
+import net.sf.okapi.common.TestUtil;
 import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.Property;
@@ -78,9 +82,11 @@ public class PropertiesFilterTest {
 		list.add(new InputDocument(url.toURI().getPath(), "okf_properties@Test03.fprm"));
 		url = PropertiesFilterTest.class.getResource("/Test04.properties");
 		list.add(new InputDocument(url.toURI().getPath(), "okf_properties@Test04.fprm"));
+		url = PropertiesFilterTest.class.getResource("/issue_216.properties");
+		list.add(new InputDocument(url.toURI().getPath(), "issue_216.fprm"));
 	
 		RoundTripComparison rtc = new RoundTripComparison();
-		assertTrue(rtc.executeCompare(filter, list, "UTF-8", locEN, locFR));
+		assertTrue(rtc.executeCompare(filter, list, "UTF-8", locEN, locFR, "out"));
 	}
 
 	@Test
@@ -317,6 +323,67 @@ public class PropertiesFilterTest {
 		p.setSubfilter(null);
 		filter.setParameters(p);
 		assertTrue(rtc.executeCompare(filter, list, "UTF-8", locEN, locFR));
+	}
+	
+	@Test
+	public void testIdGeneration_defaultConfig() throws IOException, URISyntaxException {		
+		URL url = PropertiesFilterTest.class.getResource("/issue_216.properties");
+		List<Event> list = getEvents(TestUtil.getFileAsString(new File(url.toURI())));
+		assertEquals(5, list.size());
+		assertEquals(EventType.START_DOCUMENT, list.get(0).getEventType());
+		assertEquals(EventType.TEXT_UNIT, list.get(1).getEventType());
+		assertEquals(EventType.TEXT_UNIT, list.get(2).getEventType());
+		assertEquals(EventType.TEXT_UNIT, list.get(3).getEventType());
+		assertEquals(EventType.END_DOCUMENT, list.get(4).getEventType());
+	}
+	
+	@Test
+	public void testIdGeneration_subfiltersConfig() throws IOException, URISyntaxException {		
+		URL url = PropertiesFilterTest.class.getResource("/issue_216.properties");
+		URL paramsURL = PropertiesFilterTest.class.getResource("/issue_216.fprm");
+		
+		Parameters params = new Parameters();
+		params.load(paramsURL.toURI(), false);
+		filter.setParameters(params);
+		
+		List<Event> list = getEvents(TestUtil.getFileAsString(new File(url.toURI())));
+		assertEquals(26, list.size());
+		
+		assertEquals(EventType.START_DOCUMENT, list.get(0).getEventType());
+		
+		assertEquals(EventType.START_SUBFILTER, list.get(1).getEventType());
+		assertEquals(EventType.START_SUBFILTER, list.get(9).getEventType());
+		assertEquals(EventType.START_SUBFILTER, list.get(17).getEventType());
+		
+		assertEquals(EventType.END_SUBFILTER, list.get(8).getEventType());
+		assertEquals(EventType.END_SUBFILTER, list.get(16).getEventType());
+		assertEquals(EventType.END_SUBFILTER, list.get(24).getEventType());
+		
+		assertEquals(EventType.TEXT_UNIT, list.get(3).getEventType());
+		assertEquals("2_tu1", list.get(3).getTextUnit().getId());
+		assertEquals("someKey1-one-id", list.get(3).getTextUnit().getName());
+		
+		assertEquals(EventType.TEXT_UNIT, list.get(5).getEventType());
+		assertEquals("3_tu2", list.get(5).getTextUnit().getId());
+		assertEquals("someKey1-two-id", list.get(5).getTextUnit().getName());
+		
+		assertEquals(EventType.TEXT_UNIT, list.get(11).getEventType());
+		assertEquals("5_tu1", list.get(11).getTextUnit().getId());
+		assertEquals("someKey2-1", list.get(11).getTextUnit().getName());
+		
+		assertEquals(EventType.TEXT_UNIT, list.get(13).getEventType());
+		assertEquals("6_tu2", list.get(13).getTextUnit().getId());
+		assertEquals("someKey2-two-id", list.get(13).getTextUnit().getName());
+		
+		assertEquals(EventType.TEXT_UNIT, list.get(19).getEventType());
+		assertEquals("8_tu1", list.get(19).getTextUnit().getId());
+		assertEquals("someKey3-1", list.get(19).getTextUnit().getName());
+		
+		assertEquals(EventType.TEXT_UNIT, list.get(21).getEventType());
+		assertEquals("9_tu2", list.get(21).getTextUnit().getId());
+		assertEquals("someKey3-2", list.get(21).getTextUnit().getName());
+		
+		assertEquals(EventType.END_DOCUMENT, list.get(25).getEventType());
 	}
 	
 	private ArrayList<Event> getEvents(String snippet) {
