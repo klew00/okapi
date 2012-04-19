@@ -1241,10 +1241,5 @@ public class TTXFilter implements IFilter {
 		}
 		return false;
 	}
-
-	@Override
-	public boolean isSubfilter() {
-		return false;
-	}
 	
 }

@@ -328,9 +328,4 @@ public class TransifexFilter implements IFilter {
 		return true;
 	}
 
-	@Override
-	public boolean isSubfilter() {
-		return false;
-	}
-
 }

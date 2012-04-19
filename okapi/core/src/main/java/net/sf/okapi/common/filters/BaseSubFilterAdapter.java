@@ -173,11 +173,6 @@ public class BaseSubFilterAdapter implements IFilter {
 		return filter.getConfigurations();
 	}
 
-	@Override
-	public boolean isSubfilter() {
-		return true;
-	}
-	
 	private void intializeSubfilterConverter() {
 		try {
 			this.converter = new SubFilterEventConverter(state.getParentId(),

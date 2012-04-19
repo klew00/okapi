@@ -153,10 +153,6 @@ public class XINIFilter implements IFilter {
 	public IFilterWriter createFilterWriter () {
 		return new XINIWriter(params);
 	}
-
-	@Override
-	public boolean isSubfilter() {
-		return false;
-	}
+	
 }
 

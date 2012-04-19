@@ -209,10 +209,4 @@ public class PensieveFilter implements IFilter {
 	public void setParameters (IParameters params) {
 	}
 
-	@Override
-	public boolean isSubfilter() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
 }

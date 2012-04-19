@@ -272,11 +272,5 @@ public class RegexPlainTextFilter extends AbstractBaseFilter {
 		return regexParams.getRules().get(0);
 	}
 
-	@Override
-	public boolean isSubfilter() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
 }	
 	

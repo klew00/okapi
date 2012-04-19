@@ -1519,9 +1519,5 @@ public class XLIFFFilter implements IFilter {
 		queue.add(new Event(EventType.END_GROUP, ending));
 		return true;
 	}
-
-	@Override
-	public boolean isSubfilter() {
-		return false;
-	}
+	
 }

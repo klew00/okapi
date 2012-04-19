@@ -373,8 +373,4 @@ public class DrupalFilter implements IFilter {
 		return true;
 	}
 
-	@Override
-	public boolean isSubfilter() {
-		return false;
-	}
 }

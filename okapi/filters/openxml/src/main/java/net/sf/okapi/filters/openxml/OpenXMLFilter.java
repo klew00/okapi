@@ -981,11 +981,5 @@ public class OpenXMLFilter implements IFilter {
 	public boolean getBPreferenceTranslateWordAllStyles()
 	{
 		return bPreferenceTranslateWordAllStyles;
-	}
-
-	@Override
-	public boolean isSubfilter() {
-		// TODO Auto-generated method stub
-		return false;
-	}
+	}	
 }

@@ -345,9 +345,9 @@ public class RailsYamlFilter extends AbstractFilter {
 		// Start the EventBuilder
 		// create EventBuilder with document name as rootId
 		if (eventBuilder == null) {
-			eventBuilder = new YamlEventBuilder(getDocumentName(), isSubfilter());
+			eventBuilder = new YamlEventBuilder(getDocumentName(), this);
 		} else {
-			eventBuilder.reset(getDocumentName(), isSubfilter());
+			eventBuilder.reset(getDocumentName(), this);
 		}
 		
 		getEventBuilder().addFilterEvent(createStartFilterEvent());

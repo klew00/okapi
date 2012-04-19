@@ -159,11 +159,5 @@ public interface IFilter {
 	 * Gets the list of all predefined configurations for this filter. 
 	 * @return a list of the all predefined configurations for this filter.
 	 */
-	public List<FilterConfiguration> getConfigurations();
-	
-	/**
-	 * is this filter configured as a subfilter?
-	 * @return true if subfilter, false otherwise
-	 */
-	public boolean isSubfilter();
+	public List<FilterConfiguration> getConfigurations();	
 }
