@@ -892,10 +892,4 @@ public class POFilter implements IFilter {
  		return String.format(Res.getString("lineNumber"), lineNumber) + text;
  	}
 
-	@Override
-	public boolean isSubfilter() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
 }

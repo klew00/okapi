@@ -2439,11 +2439,6 @@ public class MIFFilter implements IFilter {
 		return stream;
 	}
 
-	@Override
-	public boolean isSubfilter() {
-		return false;
-	}
-	
 //	private Object[] guessEncoding (InputStream input)
 //		throws IOException
 //	{

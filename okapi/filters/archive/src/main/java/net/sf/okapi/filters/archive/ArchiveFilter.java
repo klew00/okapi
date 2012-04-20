@@ -396,9 +396,4 @@ public class ArchiveFilter implements IFilter {
 		return null; // Should not get here
 	}
 
-	@Override
-	public boolean isSubfilter() {
-		return false;
-	}
-
 }

@@ -620,9 +620,5 @@ public class PropertiesFilter implements IFilter {
 		}
 		subfilter.close();
 	}
-
-	@Override
-	public boolean isSubfilter() {
-		return false;
-	}
+	
 }

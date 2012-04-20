@@ -371,10 +371,5 @@ public class MosesTextFilter implements IFilter {
 		tf.setCodedText(sb.toString(), codes);
 		return tf;
 	}
-
-	@Override
-	public boolean isSubfilter() {
-		return false;
-	}
 	
 }

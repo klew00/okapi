@@ -85,14 +85,14 @@ public class EventBuilder {
 	 * Instantiates a new EventBuilder.
 	 */
 	public EventBuilder() {
-		reset(null, false);
+		reset(null, null);
 	}
 
 	/**
 	 * Instantiates a new EventBuilder with a root ID.
 	 */
-	public EventBuilder(String rootId, boolean subFilter) {
-		reset(rootId, subFilter);
+	public EventBuilder(String rootId, IFilter filter) {
+		reset(rootId, filter);
 	}
 
 	/**
@@ -455,9 +455,10 @@ public class EventBuilder {
 	/**
 	 * Reset {@link IFilter} for a new input. Callers should reset the EventBuilder for each input.
 	 */
-	public void reset(String rootId, boolean subFilter) {
+	public void reset(String rootId, IFilter filter) {
 		this.rootId = rootId;
-		this.subFilter = subFilter;
+		this.subFilter = filter != null && 
+				filter instanceof BaseSubFilterAdapter; // All sub-filters subclass from this class
 		groupId = new IdGenerator(rootId, IdGenerator.START_GROUP);		
 		textUnitId = new IdGenerator(rootId, IdGenerator.TEXT_UNIT);
 		documentPartId = new IdGenerator(rootId, IdGenerator.DOCUMENT_PART);

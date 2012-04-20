@@ -439,8 +439,4 @@ public abstract class AbstractFilter implements IFilter {
 		this.parentId = parentId;
 	}
 	
-	@Override
-	public boolean isSubfilter() {
-		return false;
-	}
 }

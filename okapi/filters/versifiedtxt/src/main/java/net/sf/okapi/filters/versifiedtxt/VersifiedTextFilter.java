@@ -196,7 +196,7 @@ public class VersifiedTextFilter extends AbstractFilter {
 		if (eventBuilder == null) {
 			eventBuilder = new EventBuilder();
 		} else {
-			eventBuilder.reset(null, isSubfilter());
+			eventBuilder.reset(null, this);
 		}
 	}
 

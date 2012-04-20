@@ -156,8 +156,4 @@ public class StubFilter implements IFilter {
 		}
     }
 
-	@Override
-	public boolean isSubfilter() {
-		return false;
-	}
 }

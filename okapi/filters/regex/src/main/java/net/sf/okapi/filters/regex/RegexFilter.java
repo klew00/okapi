@@ -710,10 +710,4 @@ public class RegexFilter implements IFilter {
 		return false;
 	}
 
-	@Override
-	public boolean isSubfilter() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
 }

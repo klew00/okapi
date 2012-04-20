@@ -25,6 +25,7 @@ import java.util.regex.Pattern;
 
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.EventBuilder;
+import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filters.InlineCodeFinder;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.TextFragment;
@@ -42,8 +43,8 @@ public class AbstractMarkupEventBuilder extends EventBuilder {
 	private boolean useCodeFinder = false;
 	private InlineCodeFinder codeFinder;
 	
-	public AbstractMarkupEventBuilder(String rootId, boolean subFilter) {
-		super(rootId, subFilter);		
+	public AbstractMarkupEventBuilder(String rootId, IFilter filter) {
+		super(rootId, filter);		
 		codeFinder = new InlineCodeFinder();
 	}
 	

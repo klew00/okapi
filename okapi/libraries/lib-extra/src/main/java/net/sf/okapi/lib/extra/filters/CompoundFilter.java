@@ -374,10 +374,5 @@ public class CompoundFilter extends AbstractBaseFilter {
 		// TODO Auto-generated method stub
 		
 	}
-
-	@Override
-	public boolean isSubfilter() {
-		return false;
-	}
 	
 }
