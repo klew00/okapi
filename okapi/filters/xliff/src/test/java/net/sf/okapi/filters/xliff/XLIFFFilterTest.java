@@ -922,6 +922,50 @@ public class XLIFFFilterTest {
 	}
 
 	
+	@Test
+	public void testTargetStateCoordOutput () {
+		String snippet = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+			+ "<xliff version=\"1.2\">"
+			+ "<file source-language=\"en\" target-language=\"fr\" datatype=\"x-test\" original=\"file.ext\">"
+			+ "<body>"
+			+ "<trans-unit id=\"1\">"
+			+ "<source>en</source><target state=\"abc\" coord=\"1;2;3;4\">fr</target>"
+			+ "</trans-unit>"
+			+ "</body>"
+			+ "</file></xliff>";
+		List<Event> list = getEvents(snippet);
+
+		// Check the initial value
+		ITextUnit tu = FilterTestDriver.getTextUnit(list, 1);
+		Property prop1 = tu.getTargetProperty(locFR, "state");
+		assertNotNull(prop1);
+		assertEquals("abc", prop1.getValue());
+		Property prop2 = tu.getTargetProperty(locFR, Property.COORDINATES);
+		assertNotNull(prop2);
+		assertEquals("1;2;3;4", prop2.getValue());
+		// Verify the output (no change)
+		assertEquals(snippet, FilterTestDriver.generateOutput(list,
+			locFR, filter.createSkeletonWriter(), filter.getEncoderManager()));
+
+		// Change the value but this property is read-only
+		prop1.setValue("xyz");
+		prop2.setValue("4;3;2;1");
+
+		String expected = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+			+ "<xliff version=\"1.2\">"
+			+ "<file source-language=\"en\" target-language=\"fr\" datatype=\"x-test\" original=\"file.ext\">"
+			+ "<body>"
+			+ "<trans-unit id=\"1\">"
+//TODO:			+ "<source>en</source><target state=\"xyz\" coord=\"4;3;2;1\">fr</target>"
+			+ "<source>en</source><target state=\"abc\" coord=\"1;2;3;4\">fr</target>"
+			+ "</trans-unit>"
+			+ "</body>"
+			+ "</file></xliff>";
+		assertEquals(expected, FilterTestDriver.generateOutput(list,
+			locFR, filter.createSkeletonWriter(), filter.getEncoderManager()));
+		
+	}
+
 
 	@Test
 	public void testDefaultInfo () {
