@@ -1800,7 +1800,15 @@ public class TextUnitUtil {
 	private static void setParts(TextContainer tc, TextPart... parts) {
 		tc.clear();
 		for (TextPart part : parts) {
-			append(tc, part);
+			if (part.isSegment()) {
+				// Segments.validateSegmentId(seg) changes seg id, we don't want it
+				String id = ((Segment)part).getId();
+				append(tc, part);
+				((Segment)part).forceId(id);
+			}
+			else {
+				append(tc, part);
+			}			
 		}
 		// Check parts
 		if (tc.get(0).isSegment() != parts[0].isSegment()) {
