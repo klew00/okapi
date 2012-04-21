@@ -886,13 +886,12 @@ public class XLIFFFilter implements IFilter {
 			// Get the target itself
 			skel.addContentPlaceholder(tu, trgLang);
 			tc = processContent("target", false);
-			if ( !tc.isEmpty() ) {
-				if ( !preserveSpaces.peek() ) {
-					tc.unwrap(true, false);
-				}
-				tu.setPreserveWhitespaces(preserveSpaces.peek());
-				tu.setTarget(trgLang, tc);
+			// Set the target, even if it's an empty one.
+			if ( !preserveSpaces.peek() ) {
+				tc.unwrap(true, false);
 			}
+			tu.setPreserveWhitespaces(preserveSpaces.peek());
+			tu.setTarget(trgLang, tc);
 			
 			// Set the target properties (after the target container has been set
 			if ( stateValue != null ) {
