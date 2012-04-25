@@ -31,6 +31,7 @@ import net.sf.okapi.steps.rainbowkit.common.BasePackageWriter;
 public class POPackageWriter extends BasePackageWriter {
 
 	private POWriter writer;
+	private String rawDocPath;
 
 	public POPackageWriter () {
 		super(Manifest.EXTRACTIONTYPE_PO);
@@ -48,29 +49,33 @@ public class POPackageWriter extends BasePackageWriter {
 		super.processStartDocument(event);
 		
 		writer = new POWriter();
-		Parameters params = (Parameters)writer.getParameters();
-		params.setOutputGeneric(true);
+		Parameters wparams = (Parameters)writer.getParameters();
+		wparams.setOutputGeneric(true);
 		
 		writer.setMode(true, false, true);
 		writer.setOptions(manifest.getTargetLocale(), "UTF-8");
 		
 		MergingInfo item = manifest.getItem(docId);
-		String path = manifest.getTempSourceDirectory() + item.getRelativeInputPath() + ".po";
-		writer.setOutput(path);
-		
+		rawDocPath = manifest.getTempSourceDirectory() + item.getRelativeInputPath() + ".po";
+		writer.setOutput(rawDocPath);
+
 		writer.handleEvent(event);
 	}
 	
 	@Override
-	protected void processEndDocument (Event event) {
+	protected Event processEndDocument (Event event) {
 		writer.handleEvent(event);
 		if ( writer != null ) {
 			writer.close();
 			writer = null;
 		}
 		
-		// Call the base method, in case there is something common to do
-		super.processEndDocument(event);
+		if ( params.getSendOutput() ) {
+			return super.creatRawDocumentEventSet(rawDocPath, "UTF-8", manifest.getSourceLocale(), manifest.getTargetLocale());
+		}
+		else {
+			return event;
+		}
 	}
 
 	@Override

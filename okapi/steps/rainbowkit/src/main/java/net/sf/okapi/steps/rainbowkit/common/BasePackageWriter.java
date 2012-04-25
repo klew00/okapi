@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2010-2011 by the Okapi Framework contributors
+  Copyright (C) 2010-2012 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -22,9 +22,12 @@ package net.sf.okapi.steps.rainbowkit.common;
 
 import java.io.File;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
 
 import net.sf.okapi.common.Event;
+import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
@@ -34,7 +37,10 @@ import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.filters.FilterConfigurationMapper;
 import net.sf.okapi.common.filterwriter.TMXWriter;
 import net.sf.okapi.common.resource.ISegments;
+import net.sf.okapi.common.resource.MultiEvent;
+import net.sf.okapi.common.resource.PipelineParameters;
 import net.sf.okapi.common.resource.Property;
+import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
@@ -53,6 +59,7 @@ public abstract class BasePackageWriter implements IPackageWriter {
 	protected int docId;
 	protected String extractionType;
 	protected ISkeletonWriter skelWriter;
+	protected boolean supporstOneOutputPerInput = true;
 	
 	protected TMXWriter tmxWriterApproved;
 	protected String tmxPathApproved;
@@ -145,7 +152,9 @@ public abstract class BasePackageWriter implements IPackageWriter {
 			processStartDocument(event);
 			break;
 		case END_DOCUMENT:
-			processEndDocument(event);
+			// This method return an event becuase it may need to be modified with info
+			// only the writer has (output file)
+			event = processEndDocument(event);
 			break;
 		case START_SUBDOCUMENT:
 			processStartSubDocument(event);
@@ -166,8 +175,28 @@ public abstract class BasePackageWriter implements IPackageWriter {
 			processDocumentPart(event);
 			break;
 		}
-		// This writer is not supposed to change the event, so we return the same
-		return event;
+
+		// Update the returned event if needed
+		if ( supporstOneOutputPerInput && params.getSendOutput() ) {
+			switch ( event.getEventType() ) {
+			case START_DOCUMENT:
+			case START_SUBDOCUMENT:
+			case START_GROUP:
+			case END_SUBDOCUMENT:
+			case END_GROUP:
+			case DOCUMENT_PART:
+			case TEXT_UNIT:
+				return Event.NOOP_EVENT;
+			case END_DOCUMENT:
+				// This event was possibly changed by the concrete implementation of the writer
+				return event;
+			default:
+				return event;
+			}
+		}
+		else {
+			return event;
+		}
 	}
 
 	@Override
@@ -359,9 +388,7 @@ public abstract class BasePackageWriter implements IPackageWriter {
 		Util.copyFile(inputPath, outputPath, false);
 	}
 
-	protected void processEndDocument (Event event) {
-		// Do nothing by default
-	}
+	protected abstract Event processEndDocument (Event event);
 
 	protected void processStartSubDocument (Event event) {
 		// Do nothing by default
@@ -461,5 +488,33 @@ public abstract class BasePackageWriter implements IPackageWriter {
 			}
 		}
 	}
-	
+
+	@Override
+	public void setSupporstOneOutputPerInput (boolean supporstOneOutputPerInput) {
+		this.supporstOneOutputPerInput = supporstOneOutputPerInput;
+	}
+
+	protected Event creatRawDocumentEventSet (String inputPath,
+		String defaultEncoding,
+		LocaleId srcLoc,
+		LocaleId trgLoc)
+	{
+		// Create the raw-document
+		RawDocument rawDoc = new RawDocument(new File(inputPath).toURI(), defaultEncoding, srcLoc, trgLoc);
+		// Create the list of events to send
+		List<Event> list = new ArrayList<Event>();
+		// Change the pipeline parameters for the raw-document-related data
+		PipelineParameters pp = new PipelineParameters();
+		pp.setOutputURI(rawDoc.getInputURI()); // Use same name as this output for now
+		pp.setSourceLocale(rawDoc.getSourceLocale());
+		pp.setTargetLocale(rawDoc.getTargetLocale());
+		pp.setOutputEncoding(rawDoc.getEncoding()); // Use same as the output document
+		pp.setInputRawDocument(rawDoc);
+		// Add the event to the list
+		list.add(new Event(EventType.PIPELINE_PARAMETERS, pp));
+		// Add raw-document related events
+		list.add(new Event(EventType.RAW_DOCUMENT, rawDoc));
+		// Return the list as a multiple-event event
+		return new Event(EventType.MULTI_EVENT, new MultiEvent(list));
+	}
 }

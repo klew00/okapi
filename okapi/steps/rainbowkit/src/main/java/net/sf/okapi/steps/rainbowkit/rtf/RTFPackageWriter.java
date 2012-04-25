@@ -28,6 +28,8 @@ import net.sf.okapi.steps.rainbowkit.common.BasePackageWriter;
 public class RTFPackageWriter extends BasePackageWriter {
 
 	private RTFLayerWriter layerWriter;
+	private String rawDocPath;
+	private String encoding;
 
 	public RTFPackageWriter () {
 		super(Manifest.EXTRACTIONTYPE_RTF);
@@ -44,16 +46,24 @@ public class RTFPackageWriter extends BasePackageWriter {
 	protected void processStartDocument (Event event) {
 		super.processStartDocument(event);
 		MergingInfo item = manifest.getItem(docId);
-		String path = manifest.getTempSourceDirectory() + item.getRelativeInputPath() + ".rtf";
-		layerWriter = new RTFLayerWriter(skelWriter, path, manifest.getTargetLocale(), item.getTargetEncoding());
+		rawDocPath = manifest.getTempSourceDirectory() + item.getRelativeInputPath() + ".rtf";
+		encoding = item.getTargetEncoding();
+		layerWriter = new RTFLayerWriter(skelWriter, rawDocPath, manifest.getTargetLocale(), encoding);
 		layerWriter.writeEvent(event);
 	}
 	
 	@Override
-	protected void processEndDocument (Event event) {
+	protected Event processEndDocument (Event event) {
 		layerWriter.writeEvent(event);
-		// Call the base method, in case there is something common to do
-		super.processEndDocument(event);
+		close();
+		
+		if ( params.getSendOutput() ) {
+			return super.creatRawDocumentEventSet(rawDocPath, encoding,
+				manifest.getSourceLocale(), manifest.getTargetLocale());
+		}
+		else {
+			return event;
+		}
 	}
 
 	@Override

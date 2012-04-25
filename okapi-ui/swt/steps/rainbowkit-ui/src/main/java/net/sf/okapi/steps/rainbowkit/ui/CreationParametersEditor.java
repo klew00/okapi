@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2010-2011 by the Okapi Framework contributors
+  Copyright (C) 2010-2012 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -74,6 +74,7 @@ public class CreationParametersEditor implements IParametersEditor, ISWTEmbeddab
 	private ArrayList<IParameters> optStrings;
 	private ArrayList<String> optMoreInfo;
 	private IContext context;
+	private Button chkSendOutput;
 	
 	public boolean edit (IParameters params,
 		boolean readOnly,
@@ -319,9 +320,15 @@ public class CreationParametersEditor implements IParametersEditor, ISWTEmbeddab
 		edDescription = new Text(cmpTmp, SWT.BORDER | SWT.MULTI | SWT.WRAP | SWT.V_SCROLL);
 		edDescription.setEditable(false);
 		gdTmp = new GridData(GridData.FILL_BOTH);
-		gdTmp.heightHint = 60;
+		gdTmp.heightHint = 50;
 		gdTmp.horizontalSpan = 2;		
 		edDescription.setLayoutData(gdTmp);
+		
+		chkSendOutput = new Button(cmpTmp, SWT.CHECK);
+		chkSendOutput.setText("Send the prepared files to the next step");
+		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+		gdTmp.horizontalSpan = 2;
+		chkSendOutput.setLayoutData(gdTmp);
 
 		//--- Location tab
 		
@@ -472,13 +479,14 @@ public class CreationParametersEditor implements IParametersEditor, ISWTEmbeddab
 		edPackageName.setText(params.getPackageName());
 		btCreateZip.setSelection(params.getCreateZip());
 
+		chkSendOutput.setSelection(params.getSendOutput());
 		String current = params.getWriterClass();
 		int n = 0;
 		for ( String str : writers ) {
 			if ( str.equals(current) ) break; // Found it
 			else n++;
 		}
-		lbTypes.setSelection(n);
+		lbTypes.select(n);
 		IParameters p = optStrings.get(n);
 		if ( p != null ) {
 			p.fromString(params.getWriterOptions());
@@ -512,6 +520,9 @@ public class CreationParametersEditor implements IParametersEditor, ISWTEmbeddab
 		else {
 			params.setWriterOptions(null);
 		}
+
+		params.setSendOutput(chkSendOutput.getSelection());
+		
 		result = true;
 		return result;
 	}

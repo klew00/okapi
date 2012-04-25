@@ -32,7 +32,8 @@ import net.sf.okapi.filters.transtable.Parameters;
 public class TablePackageWriter extends BasePackageWriter {
 
 	private TransTableWriter writer;
-
+	private String rawDocPath;
+	
 	public TablePackageWriter () {
 		super(Manifest.EXTRACTIONTYPE_TABLE);
 	}
@@ -59,22 +60,23 @@ public class TablePackageWriter extends BasePackageWriter {
 		writer.setOptions(manifest.getTargetLocale(), "UTF-8");
 		
 		MergingInfo item = manifest.getItem(docId);
-		String path = manifest.getTempSourceDirectory() + item.getRelativeInputPath() + ".txt";
-		writer.setOutput(path);
-		
+		rawDocPath = manifest.getTempSourceDirectory() + item.getRelativeInputPath() + ".txt";
+		writer.setOutput(rawDocPath);
 		writer.handleEvent(event);
 	}
 	
 	@Override
-	protected void processEndDocument (Event event) {
+	protected Event processEndDocument (Event event) {
 		writer.handleEvent(event);
-		if ( writer != null ) {
-			writer.close();
-			writer = null;
-		}
+		close();
 		
-		// Call the base method, in case there is something common to do
-		super.processEndDocument(event);
+		if ( params.getSendOutput() ) {
+			return super.creatRawDocumentEventSet(rawDocPath, "UTF-8",
+				manifest.getSourceLocale(), manifest.getTargetLocale());
+		}
+		else {
+			return event;
+		}
 	}
 
 	@Override

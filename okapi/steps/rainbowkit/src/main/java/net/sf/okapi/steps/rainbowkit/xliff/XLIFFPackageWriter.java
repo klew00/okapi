@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2010-2011 by the Okapi Framework contributors
+  Copyright (C) 2010-2012 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -34,6 +34,7 @@ public class XLIFFPackageWriter extends BasePackageWriter {
 
 	private boolean preSegmented = false;
 	private boolean forOmegat = false;
+	private String rawDocPath;
 
 	public XLIFFPackageWriter () {
 		super(Manifest.EXTRACTIONTYPE_XLIFF);
@@ -66,8 +67,8 @@ public class XLIFFPackageWriter extends BasePackageWriter {
 
 		writer.setOptions(manifest.getTargetLocale(), "UTF-8");
 		MergingInfo item = manifest.getItem(docId);
-		String path = manifest.getTempSourceDirectory() + item.getRelativeInputPath() + ".xlf";
-		writer.setOutput(path); // Not really used, but doesn't hurt just in case
+		rawDocPath = manifest.getTempSourceDirectory() + item.getRelativeInputPath() + ".xlf";
+		writer.setOutput(rawDocPath); // Not really used, but doesn't hurt just in case
 
 		// Set the writer's options
 		Options options = new Options();
@@ -93,19 +94,25 @@ public class XLIFFPackageWriter extends BasePackageWriter {
 		writer.setIncludeNoTranslate(options.getIncludeNoTranslate());
 		
 		StartDocument sd = event.getStartDocument();
-		writer.create(path, null, manifest.getSourceLocale(), manifest.getTargetLocale(),
+		writer.create(rawDocPath, null, manifest.getSourceLocale(), manifest.getTargetLocale(),
 			sd.getMimeType(), item.getRelativeInputPath(), null);
 	}
 	
 	@Override
-	protected void processEndDocument (Event event) {
+	protected Event processEndDocument (Event event) {
 		if ( writer != null ) {
 			writer.handleEvent(event);
 			writer.close();
 			writer = null;
 		}
 
-		super.processEndDocument(event);
+		if ( params.getSendOutput() ) {
+			return super.creatRawDocumentEventSet(rawDocPath, "UTF-8",
+				manifest.getSourceLocale(), manifest.getTargetLocale());
+		}
+		else {
+			return event;
+		}
 	}
 
 	@Override

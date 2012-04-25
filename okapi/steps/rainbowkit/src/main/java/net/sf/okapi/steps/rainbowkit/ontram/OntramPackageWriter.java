@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2011 by the Okapi Framework contributors
+  Copyright (C) 2011-2012 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -31,13 +31,14 @@ public class OntramPackageWriter extends BasePackageWriter {
 
 	private XINIRainbowkitWriter writer;
 
-	public OntramPackageWriter() {
+	public OntramPackageWriter () {
 		super(Manifest.EXTRACTIONTYPE_ONTRAM);
 		writer = new XINIRainbowkitWriter();
+		setSupporstOneOutputPerInput(false);
 	}
 
 	@Override
-	protected void processStartBatch() {
+	protected void processStartBatch () {
 		manifest.setSubDirectories("original", "xini", "xini", "translated", null, false);
 		setTMXInfo(false, null, false, false);
 
@@ -50,7 +51,7 @@ public class OntramPackageWriter extends BasePackageWriter {
 	}
 
 	@Override
-	protected void processStartDocument(Event event) {
+	protected void processStartDocument (Event event) {
 		super.processStartDocument(event);
 		
 		MergingInfo info = manifest.getItem(docId);
@@ -61,7 +62,7 @@ public class OntramPackageWriter extends BasePackageWriter {
 	}
 	
 	@Override
-	protected void processEndBatch() {
+	protected void processEndBatch () {
 		super.processEndBatch();
 
 		writer.writeXINI();
@@ -89,4 +90,11 @@ public class OntramPackageWriter extends BasePackageWriter {
 	public String getName() {
 		return getClass().getName();
 	}
+
+	@Override
+	protected Event processEndDocument (Event event) {
+		// Does not support one output per input
+		return event;
+	}
+
 }

@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2011 by the Okapi Framework contributors
+  Copyright (C) 2008-2012 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -32,6 +32,7 @@ public class Parameters extends BaseParameters {
 	static final String MESSAGE = "message"; //$NON-NLS-1$
 	static final String OUTPUTMANIFEST = "outputManifest"; //$NON-NLS-1$
 	static final String CREATEZIP = "createZip"; //$NON-NLS-1$
+	static final String SENDOUTPUT = "sendOutput"; //$NON-NLS-1$
 	
 	private String writerClass;
 	private String writerOptions;
@@ -40,6 +41,7 @@ public class Parameters extends BaseParameters {
 	private String message;
 	private boolean outputManifest;
 	private boolean createZip;
+	private boolean sendOutput;
 
 	public Parameters () {
 		reset();
@@ -55,6 +57,7 @@ public class Parameters extends BaseParameters {
 		message = "";
 		outputManifest = true;
 		createZip = false;
+		sendOutput = false;
 	}
 
 	@Override
@@ -65,6 +68,7 @@ public class Parameters extends BaseParameters {
 		writerOptions = buffer.getGroup(WRITEROPTIONS);
 		packageName = buffer.getString(PACKAGENAME, packageName);
 		packageDirectory = buffer.getString(PACKAGEDIRECTORY, packageDirectory);
+		sendOutput = buffer.getBoolean(SENDOUTPUT, sendOutput);
 		// Internal
 		message = buffer.getString(MESSAGE, message);
 		outputManifest = buffer.getBoolean(OUTPUTMANIFEST, outputManifest);
@@ -78,6 +82,7 @@ public class Parameters extends BaseParameters {
 		buffer.setGroup(WRITEROPTIONS, writerOptions);
 		buffer.setParameter(PACKAGENAME, packageName);
 		buffer.setParameter(PACKAGEDIRECTORY, packageDirectory);
+		buffer.setBoolean(SENDOUTPUT, sendOutput);
 		// Internal
 		buffer.setParameter(MESSAGE, message);
 		buffer.setParameter(OUTPUTMANIFEST, outputManifest);
@@ -133,12 +138,20 @@ public class Parameters extends BaseParameters {
 		this.outputManifest = outputManifest;
 	}
 
-	public boolean getCreateZip() {
+	public boolean getCreateZip () {
 		return createZip;
 	}
 
 	public void setCreateZip(boolean createZip) {
 		this.createZip = createZip;
+	}
+
+	public boolean getSendOutput () {
+		return sendOutput;
+	}
+
+	public void setSendOutput (boolean sendOutput) {
+		this.sendOutput = sendOutput;
 	}
 
 }
