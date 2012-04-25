@@ -174,9 +174,12 @@ public class XINIReader {
 		startGroup.setProperty(new Property(XINIProperties.PAGE_ID.value(), pageId + ""));
 
 		events.add(new Event(EventType.START_GROUP, startGroup));
+		
+		if (page.getElements() != null) {
 
-		for (Element element : page.getElements().getElement()) {
-			events.addAll(processElement(element));
+			for (Element element : page.getElements().getElement()) {
+				events.addAll(processElement(element));
+			}
 		}
 
 		Ending ending = new Ending(idGen.createId());
