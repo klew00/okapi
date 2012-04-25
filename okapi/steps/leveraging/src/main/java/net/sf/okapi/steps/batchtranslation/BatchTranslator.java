@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009-2011 by the Okapi Framework contributors
+  Copyright (C) 2009-2012 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -22,6 +22,7 @@ package net.sf.okapi.steps.batchtranslation;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Locale;
@@ -67,6 +68,7 @@ public class BatchTranslator {
 	private Parameters params;
 	private ITmWriter tmWriter;
 	private TMXWriter tmxWriter;
+	private RawDocument tmxRawDocHelper;
 	private LocaleId srcLoc;
 	private LocaleId trgLoc;
 	private int subDocId;
@@ -110,6 +112,8 @@ public class BatchTranslator {
 			tmxWriter.writeEndDocument();
 			tmxWriter.close();
 			tmxWriter = null;
+			// Make sure we restore the final filename if we used a temporary filename
+			tmxRawDocHelper.finalizeOutput();
 		}
 		if ( existingTm != null ) {
 			existingTm.close();
@@ -137,9 +141,15 @@ public class BatchTranslator {
 	// Call this method at the first document
 	private void initialize () {
 		if ( params.getMakeTMX() ) {
+			// Resolve the variables
 			String tmxOutputPath = Util.fillRootDirectoryVariable(params.getTmxPath(), rootDir);
 			tmxOutputPath = LocaleId.replaceVariables(tmxOutputPath, srcLoc, trgLoc);
-			tmxWriter = new TMXWriter(tmxOutputPath);
+			// Make sure we use a temporary file if needed
+			URI tmxOutputURI = new File(tmxOutputPath).toURI();
+			tmxRawDocHelper = new RawDocument(tmxOutputURI, "UTF-8", srcLoc, trgLoc, "okf_tmx");
+			File tmxOutputFile = tmxRawDocHelper.createOutputFile(tmxOutputURI);
+			tmxWriter = new TMXWriter(tmxOutputFile.getAbsolutePath());
+
 			tmxWriter.writeStartDocument(srcLoc, trgLoc, getClass().getCanonicalName(), "1", "sentence",
 				(params.getMarkAsMT() ? "MT-based" : null), "unknown");
 		}
