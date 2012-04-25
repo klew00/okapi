@@ -1778,8 +1778,13 @@ public class TextUnitUtil {
 									d.id, start, d.position));
 					}
 					else {
-						if (start <= d.relPos)
-							list.add(new Segment(d.id, new TextFragment(d.context.getData().substring(start, d.relPos))));
+						if (start <= d.relPos) {
+							//list.add(new Segment(d.id, new TextFragment(d.context.getData().substring(start, d.relPos))));
+							TextFragment tf2 = new TextFragment();
+							tf2.append(new Code(d.context.tagType, d.context.type, d.context.getData().substring(start, d.relPos)));
+							Segment newSeg = new Segment(d.id, tf2);							
+							list.add(newSeg);
+						}							
 						else
 							LOGGER.warning(String.format("Cannot create the segment %s - incorrect range: (%d - %d)", 
 									d.id, start, d.relPos));
@@ -1809,8 +1814,13 @@ public class TextUnitUtil {
 							LOGGER.warning(String.format("Cannot create a text part - incorrect range: (%d - %d)", start, d.position));
 					}
 					else {
-						if (start <= d.relPos)
-							list.add(new TextPart(new TextFragment(d.context.getData().substring(start, d.relPos))));
+						if (start <= d.relPos) {
+							// list.add(new TextPart(new TextFragment(d.context.getData().substring(start, d.relPos))));
+							TextFragment tf2 = new TextFragment();
+							tf2.append(new Code(d.context.tagType, d.context.type, d.context.getData().substring(start, d.relPos)));
+							TextPart newTp = new TextPart(tf2);							
+							list.add(newTp);
+						}							
 						else
 							LOGGER.warning(String.format("Cannot create a text part - incorrect range: (%d - %d)", start, d.relPos));
 					}						
