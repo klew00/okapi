@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2009-2012 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -41,6 +41,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	private static final String TMDIRECTORY = "tmDirectory";
 	private static final String MAKETMX = "makeTMX";
 	private static final String TMXPATH = "tmxPath";
+	private static final String SENDTMX = "sendTMX";
 	private static final String BLOCKSIZE = "blockSize";
 	private static final String CHECKEXISTINGTM = "checkExistingTm";
 	private static final String EXISTINGTM = "existingTm";
@@ -54,6 +55,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	private String tmDirectory;
 	private boolean makeTMX;
 	private String tmxPath;
+	private boolean sendTMX;
 	private int blockSize;
 	private boolean checkExistingTm;
 	private String existingTm;
@@ -102,6 +104,14 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 
 	public void setTmxPath (String tmxPath) {
 		this.tmxPath = tmxPath;
+	}
+
+	public boolean getSendTMX () {
+		return sendTMX;
+	}
+
+	public void setSendTMX (boolean sendTMX) {
+		this.sendTMX = sendTMX;
 	}
 
 	public boolean getMakeTM () {
@@ -168,6 +178,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		tmDirectory = "";
 		makeTMX = false;
 		tmxPath = "";
+		sendTMX = false;
 		blockSize = 1000;
 		checkExistingTm = false;
 		existingTm = "";
@@ -185,6 +196,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		tmDirectory = buffer.getString(TMDIRECTORY, tmDirectory);
 		makeTMX = buffer.getBoolean(MAKETMX, makeTMX);
 		tmxPath = buffer.getString(TMXPATH, tmxPath);
+		sendTMX = buffer.getBoolean(SENDTMX, sendTMX);
 		blockSize = buffer.getInteger(BLOCKSIZE, blockSize);
 		checkExistingTm = buffer.getBoolean(CHECKEXISTINGTM, checkExistingTm);
 		existingTm = buffer.getString(EXISTINGTM, existingTm);
@@ -202,6 +214,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		buffer.setString(TMDIRECTORY, tmDirectory);
 		buffer.setBoolean(MAKETMX, makeTMX);
 		buffer.setString(TMXPATH, tmxPath);
+		buffer.setBoolean(SENDTMX, sendTMX);
 		buffer.setInteger(BLOCKSIZE, blockSize);
 		buffer.setBoolean(CHECKEXISTINGTM, checkExistingTm);
 		buffer.setString(EXISTINGTM, existingTm);
@@ -223,6 +236,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		desc.add(TMDIRECTORY, "", "Location of the TM to create or use");
 		desc.add(MAKETMX, "Create the following TMX document:", null);
 		desc.add(TMXPATH, "", "Full path of the new TMX document to create");
+		desc.add(SENDTMX, "Send the TMX document to the next step", null);
 		desc.add(CHECKEXISTINGTM, "Check for existing entries in an existing Pensieve TM:", null);
 		desc.add(EXISTINGTM, "", "Location of the TM to lookup");
 		return desc;
@@ -261,6 +275,8 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		pip.setBrowseFilters("TMX Documents (*.tmx)\tAll Files (*.*)", "*.tmx\t*.*");
 		pip.setMasterPart(cbp, true);
 		pip.setWithLabel(false);
+		CheckboxPart cbp2 = desc.addCheckboxPart(paramDesc.get(SENDTMX));
+		cbp2.setMasterPart(cbp, true);
 		
 		cbp = desc.addCheckboxPart(paramDesc.get(CHECKEXISTINGTM));
 		fip = desc.addFolderInputPart(paramDesc.get(EXISTINGTM), "TM Directory");

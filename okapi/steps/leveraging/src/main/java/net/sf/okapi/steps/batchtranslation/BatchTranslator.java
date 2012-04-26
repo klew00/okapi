@@ -23,6 +23,7 @@ package net.sf.okapi.steps.batchtranslation;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Locale;
@@ -33,6 +34,7 @@ import net.htmlparser.jericho.Element;
 import net.htmlparser.jericho.HTMLElementName;
 import net.htmlparser.jericho.Source;
 import net.sf.okapi.common.Event;
+import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.ISegmenter;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
@@ -40,6 +42,8 @@ import net.sf.okapi.common.XMLWriter;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filters.IFilterConfigurationMapper;
 import net.sf.okapi.common.filterwriter.TMXWriter;
+import net.sf.okapi.common.resource.MultiEvent;
+import net.sf.okapi.common.resource.PipelineParameters;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextContainer;
@@ -68,7 +72,7 @@ public class BatchTranslator {
 	private Parameters params;
 	private ITmWriter tmWriter;
 	private TMXWriter tmxWriter;
-	private RawDocument tmxRawDocHelper;
+	private RawDocument tmxRawDoc;
 	private LocaleId srcLoc;
 	private LocaleId trgLoc;
 	private int subDocId;
@@ -113,7 +117,7 @@ public class BatchTranslator {
 			tmxWriter.close();
 			tmxWriter = null;
 			// Make sure we restore the final filename if we used a temporary filename
-			tmxRawDocHelper.finalizeOutput();
+			tmxRawDoc.finalizeOutput();
 		}
 		if ( existingTm != null ) {
 			existingTm.close();
@@ -126,7 +130,7 @@ public class BatchTranslator {
 		initDone = false;
 	}
 
-	public void endBatch () {
+	public Event endBatch () {
 		LOGGER.info("");
 		if ( currentTm != null ) {
 			LOGGER.info(String.format("Total matches from TM being built = %d", totalInternalMatches));
@@ -136,6 +140,24 @@ public class BatchTranslator {
 		
 		// Then close all files/TMs
 		closeAll();
+		
+		// Create a multi-event for sending the TMX document
+		List<Event> list = new ArrayList<Event>();
+		// Change the pipeline parameters for the raw-document-related data
+		PipelineParameters pp = new PipelineParameters();
+		pp.setOutputURI(tmxRawDoc.getInputURI()); // Use same name as this output for now
+		pp.setSourceLocale(tmxRawDoc.getSourceLocale());
+		pp.setTargetLocale(tmxRawDoc.getTargetLocale());
+		pp.setOutputEncoding(tmxRawDoc.getEncoding()); // Use same as the output document
+		pp.setInputRawDocument(tmxRawDoc);
+		// Add the event to the list
+		list.add(new Event(EventType.PIPELINE_PARAMETERS, pp));
+		// Add raw-document related events
+		list.add(new Event(EventType.START_BATCH_ITEM));
+		list.add(new Event(EventType.RAW_DOCUMENT, tmxRawDoc));
+		list.add(new Event(EventType.END_BATCH_ITEM));
+		// Return the list as a multiple-event event
+		return new Event(EventType.MULTI_EVENT, new MultiEvent(list));
 	}
 
 	// Call this method at the first document
@@ -146,8 +168,8 @@ public class BatchTranslator {
 			tmxOutputPath = LocaleId.replaceVariables(tmxOutputPath, srcLoc, trgLoc);
 			// Make sure we use a temporary file if needed
 			URI tmxOutputURI = new File(tmxOutputPath).toURI();
-			tmxRawDocHelper = new RawDocument(tmxOutputURI, "UTF-8", srcLoc, trgLoc, "okf_tmx");
-			File tmxOutputFile = tmxRawDocHelper.createOutputFile(tmxOutputURI);
+			tmxRawDoc = new RawDocument(tmxOutputURI, "UTF-8", srcLoc, trgLoc, "okf_tmx");
+			File tmxOutputFile = tmxRawDoc.createOutputFile(tmxOutputURI);
 			tmxWriter = new TMXWriter(tmxOutputFile.getAbsolutePath());
 
 			tmxWriter.writeStartDocument(srcLoc, trgLoc, getClass().getCanonicalName(), "1", "sentence",
