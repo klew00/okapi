@@ -29,7 +29,7 @@ import net.sf.okapi.common.Util;
 public class Parameters extends BaseParameters {
 
 	static public String SUPPORTFILE_SEP = "\t"; // Separator between two support file entries
-	static public String SUPPORTFILEDEST_SEP = ">"; // Separator between the file pattern and its destination
+	static public String SUPPORTFILEDEST_SEP = ";"; // Separator between the file pattern and its destination
 	static public String SUPPORTFILE_SAMENAME = "<same>"; // Marker to indicate to use the same file name
 	
 	static final String WRITERCLASS = "writerClass"; //$NON-NLS-1$

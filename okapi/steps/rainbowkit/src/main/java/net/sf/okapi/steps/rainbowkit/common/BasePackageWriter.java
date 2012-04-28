@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
+import net.sf.okapi.common.DefaultFilenameFilter;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
@@ -544,22 +545,29 @@ public abstract class BasePackageWriter implements IPackageWriter {
 
 			// Decode the origin
 			//TODO apply variables
-			if ( !new File(origin).exists() ) {
-				// This origin file does not exist, skip it
-				logger.warning(String.format("The support document '%s' does not exist.", origin));
+			String pattern = Util.getFilename(origin, true);
+			String origDir = Util.getDirectoryName(origin);
+			
+			File dir = new File(Util.getDirectoryName(origin));
+			File[] files = dir.listFiles(new DefaultFilenameFilter(pattern, false));
+			if ( files == null ) {
+				logger.warning(String.format("Invalid list of files for '%s'", origin));
 				continue;
 			}
-			String origFn = Util.getFilename(origin, true);
-
-			// Decode the destination
-			String destFn = Util.getFilename(destination, true);
-			if ( destFn.equalsIgnoreCase(Parameters.SUPPORTFILE_SAMENAME) ) {
-				destFn = origFn;
-			}
-			String dir = Util.getDirectoryName(destination);
-			String destPath = manifest.getTempPackageRoot() + (dir.isEmpty() ? "" : dir+"/") + destFn;
 			
-			Util.copyFile(origin, destPath, false);
+			for ( File file : files ) {
+				String origFn = Util.getFilename(file.getAbsolutePath(), true);
+
+				// Decode the destination
+				String destFn = Util.getFilename(destination, true);
+				if ( destFn.equalsIgnoreCase(Parameters.SUPPORTFILE_SAMENAME) ) {
+					destFn = origFn;
+				}
+				String destDir = Util.getDirectoryName(destination);
+				String destPath = manifest.getTempPackageRoot() + (destDir.isEmpty() ? "" : destDir+"/") + destFn;
+			
+				Util.copyFile(origDir+"/"+origFn, destPath, false);
+			}
 			
 		}
 	}
