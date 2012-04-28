@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2008-2012 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -22,54 +22,52 @@ package net.sf.okapi.common;
 
 import java.io.File;
 import java.io.FilenameFilter;
+import java.util.regex.Pattern;
 
 /**
- * Implements a default filename filter that supports filtering by extensions
- * and an optional by prefix of the filename.
+ * Implements a default filename filter that supports filtering by wild-cards like ("myFile*.*").
  */
 public class DefaultFilenameFilter implements FilenameFilter {
 
-	private String extension;
-	private String prefix;
+	private Pattern pattern;
 	
 	/**
+	 * Creates a new DefaultFilenameFilter object for a given pattern.
+	 * @param pattern to filter on.
+	 * You can use ? to match any single character and * to match any multiple characters.
+	 * The pattern is not case-sensitive ("test.*" and "TeSt.*" give the same results)
+	 */
+	public DefaultFilenameFilter (String mask,
+		boolean caseSensitive)
+	{
+		if ( mask == null ) throw new NullPointerException("Mask of the filename cannot be null.");
+		mask = mask.replace('.', '\b');
+		mask = mask.replace("*", ".*");
+		mask = mask.replace('?', '.');
+		mask = mask.replace("\b", "\\.");
+		if ( caseSensitive ) pattern = Pattern.compile(mask);
+		else pattern = Pattern.compile(mask, Pattern.CASE_INSENSITIVE);
+	}
+
+	/**
 	 * Creates a new DefaultFilenameFilter object with a given extension value.
+	 * This constructor is for backward compatibility and is equivalent to calling
+	 * <code>DefaultFilenameFilter("*"+extension, false)</code> 
 	 * @param extension the extension to filter on.
 	 */
 	public DefaultFilenameFilter (String extension) {
-		this.extension = extension;
+		this("*"+extension, false);
 	}
-
-	/**
-	 * Creates a new DefaultFilenameFilter object with given extension and
-	 * prefix values. Both must be true for the file to be accepted by the filter.
-	 * @param prefix the prefix to filter on
-	 * @param extension the extension to filter on.
-	 */
-	public DefaultFilenameFilter (String prefix,
-		String extension)
-	{
-		this.prefix = prefix;
-		this.extension = extension;
-	}
-
+	
 	/**
 	 * Accept or reject a given filename.
-	 * @return true if the filename is accepted. 
+	 * @return true if the filename is accepted. If the value is null, the method returns false. 
 	 */
 	public boolean accept (File directory,
 		String fileName)
 	{
-		boolean bOK = true;
-		if ( fileName != null ) {
-			if ( extension != null ) {
-				bOK &= extension.equalsIgnoreCase(Util.getExtension(fileName));
-			}
-			if ( prefix != null ) {
-				bOK &= fileName.startsWith(prefix);
-			}
-		}
-		return bOK;
+		if ( fileName == null ) return false;
+		return pattern.matcher(fileName).matches();
 	}
 
 }

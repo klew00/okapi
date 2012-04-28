@@ -20,6 +20,7 @@
 
 package net.sf.okapi.steps.rainbowkit.ui;
 
+import java.io.File;
 import java.util.ArrayList;
 
 import net.sf.okapi.common.EditorFor;
@@ -444,6 +445,7 @@ public class CreationParametersEditor implements IParametersEditor, ISWTEmbeddab
 			btRemoveAncilFile.setText("Discard");
 			edAncilOrigin.setEnabled(true);
 			edAncilDestination.setEnabled(true);
+			edAncilDestination.setText(File.separator+Parameters.SUPPORTFILE_SAMENAME);
 			edAncilOrigin.setFocus();
 		}
 		catch ( Throwable e ) {
