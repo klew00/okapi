@@ -152,7 +152,7 @@ public abstract class BasePackageWriter implements IPackageWriter {
 			processStartDocument(event);
 			break;
 		case END_DOCUMENT:
-			// This method return an event becuase it may need to be modified with info
+			// This method return an event because it may need to be modified with info
 			// only the writer has (output file)
 			event = processEndDocument(event);
 			break;
@@ -297,7 +297,7 @@ public abstract class BasePackageWriter implements IPackageWriter {
 
 	protected void processEndBatch () {
 		if ( params.getOutputManifest() ) {
-			manifest.save(null);
+			manifest.save(manifest.getTempPackageRoot());
 		}
 
 		if ( tmxWriterApproved != null ) {
@@ -335,6 +335,8 @@ public abstract class BasePackageWriter implements IPackageWriter {
 				file.delete();
 			}
 		}
+		
+		copySupportMaterial();
 	}
 
 	protected void processStartBatchItem () {
@@ -516,5 +518,49 @@ public abstract class BasePackageWriter implements IPackageWriter {
 		list.add(new Event(EventType.RAW_DOCUMENT, rawDoc));
 		// Return the list as a multiple-event event
 		return new Event(EventType.MULTI_EVENT, new MultiEvent(list));
+	}
+	
+	protected void copySupportMaterial () {
+		// Get the list of files to copy
+		String data = params.getSupportFiles();
+		if ( Util.isEmpty(data) ) return;
+		List<String> list = params.convertSupportFilesToList(data);
+		
+		for ( String item : list ) {
+			// Decode the item (pattern/destination
+			int n = item.indexOf(Parameters.SUPPORTFILEDEST_SEP);
+			String origin, destination = "";
+			if ( n == -1 ) {
+				origin = item;
+			}
+			else {
+				origin = item.substring(0, n);
+				destination = item.substring(n+1);
+			}
+			// Empty destination defaults to the package root and the same filename
+			if ( destination.isEmpty() ) {
+				destination = "/"+Parameters.SUPPORTFILE_SAMENAME;
+			}
+
+			// Decode the origin
+			//TODO apply variables
+			if ( !new File(origin).exists() ) {
+				// This origin file does not exist, skip it
+				logger.warning(String.format("The support document '%s' does not exist.", origin));
+				continue;
+			}
+			String origFn = Util.getFilename(origin, true);
+
+			// Decode the destination
+			String destFn = Util.getFilename(destination, true);
+			if ( destFn.equalsIgnoreCase(Parameters.SUPPORTFILE_SAMENAME) ) {
+				destFn = origFn;
+			}
+			String dir = Util.getDirectoryName(destination);
+			String destPath = manifest.getTempPackageRoot() + (dir.isEmpty() ? "" : dir+"/") + destFn;
+			
+			Util.copyFile(origin, destPath, false);
+			
+		}
 	}
 }
