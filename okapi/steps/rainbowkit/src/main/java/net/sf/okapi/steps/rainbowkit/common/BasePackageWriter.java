@@ -61,6 +61,8 @@ public abstract class BasePackageWriter implements IPackageWriter {
 	protected String extractionType;
 	protected ISkeletonWriter skelWriter;
 	protected boolean supporstOneOutputPerInput = true;
+	protected String inputRootDir;
+	protected String rootDir;
 	
 	protected TMXWriter tmxWriterApproved;
 	protected String tmxPathApproved;
@@ -101,13 +103,16 @@ public abstract class BasePackageWriter implements IPackageWriter {
 	public void setBatchInformation (String packageRoot,
 		LocaleId srcLoc,
 		LocaleId trgLoc,
-		String inputRoot,
+		String inputRootDir,
+		String rootDir,
 		String packageId,
 		String projectId,
 		String creatorParams,
 		String tempPackageRoot)
 	{
-		manifest.setInformation(packageRoot, srcLoc, trgLoc, inputRoot,
+		this.inputRootDir = inputRootDir;
+		this.rootDir = rootDir;
+		manifest.setInformation(packageRoot, srcLoc, trgLoc, inputRootDir,
 			packageId, projectId, creatorParams, tempPackageRoot);
 	}
 
@@ -526,9 +531,10 @@ public abstract class BasePackageWriter implements IPackageWriter {
 		String data = params.getSupportFiles();
 		if ( Util.isEmpty(data) ) return;
 		List<String> list = params.convertSupportFilesToList(data);
-		
+
+		// For each item in the list of supported material
 		for ( String item : list ) {
-			// Decode the item (pattern/destination
+			// Decode the item (pattern/destination)
 			int n = item.indexOf(Parameters.SUPPORTFILEDEST_SEP);
 			String origin, destination = "";
 			if ( n == -1 ) {
@@ -542,9 +548,17 @@ public abstract class BasePackageWriter implements IPackageWriter {
 			if ( destination.isEmpty() ) {
 				destination = "/"+Parameters.SUPPORTFILE_SAMENAME;
 			}
+			
+			// Resolve variables for destination
+			// Not supported as the destination is a relative path: destination = Util.fillRootDirectoryVariable(destination, rootDir);
+			// Not supported as the destination is a relative path: destination = Util.fillInputRootDirectoryVariable(destination, inputRootDir);
+			destination = LocaleId.replaceVariables(destination, manifest.getSourceLocale(), manifest.getTargetLocale());
 
+			// Resolve the variables for the origin
+			origin = Util.fillRootDirectoryVariable(origin, rootDir);
+			origin = Util.fillInputRootDirectoryVariable(origin, inputRootDir);
+			origin = LocaleId.replaceVariables(origin, manifest.getSourceLocale(), manifest.getTargetLocale());
 			// Decode the origin
-			//TODO apply variables
 			String pattern = Util.getFilename(origin, true);
 			String origDir = Util.getDirectoryName(origin);
 			

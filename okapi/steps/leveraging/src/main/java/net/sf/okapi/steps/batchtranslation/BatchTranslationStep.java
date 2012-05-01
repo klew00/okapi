@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2009-2012 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -27,7 +27,6 @@ import net.sf.okapi.common.filters.IFilterConfigurationMapper;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
 import net.sf.okapi.common.pipeline.annotations.StepParameterMapping;
 import net.sf.okapi.common.pipeline.annotations.StepParameterType;
-import net.sf.okapi.common.resource.PipelineParameters;
 import net.sf.okapi.common.resource.RawDocument;
 
 @UsingParameters(Parameters.class)
@@ -37,6 +36,7 @@ public class BatchTranslationStep extends BasePipelineStep {
 	private BatchTranslator trans;
 	private IFilterConfigurationMapper fcMapper;
 	private String rootDir;
+	private String inputRootDir;
 	private int batchInputCount;
 	private int itemCount;
 	private boolean sendTMX;
@@ -53,6 +53,11 @@ public class BatchTranslationStep extends BasePipelineStep {
 	@StepParameterMapping(parameterType = StepParameterType.ROOT_DIRECTORY)
 	public void setRootDirectory (String rootDir) {
 		this.rootDir = rootDir;
+	}
+	
+	@StepParameterMapping(parameterType = StepParameterType.INPUT_ROOT_DIRECTORY)
+	public void setInputRootDirectory (String inputRootDir) {
+		this.inputRootDir = inputRootDir;
 	}
 	
 	@StepParameterMapping(parameterType = StepParameterType.BATCH_INPUT_COUNT)
@@ -73,7 +78,7 @@ public class BatchTranslationStep extends BasePipelineStep {
 	protected Event handleStartBatch (Event event) {
 		sendTMX = params.getMakeTMX() && params.getSendTMX();
 		itemCount = 0;
-		trans = new BatchTranslator(fcMapper, params, rootDir);
+		trans = new BatchTranslator(fcMapper, params, rootDir, inputRootDir);
 		return event;
 	}
 	

@@ -90,14 +90,17 @@ public class BatchTranslator {
 	private int totalEntries;
 	private ISegmenter segmenter;
 	private String rootDir;
+	private String inputRootDir;
 
 	public BatchTranslator (IFilterConfigurationMapper fcMapper,
 		Parameters params,
-		String rootDir)
+		String rootDir,
+		String inputRootDir)
 	{
 		this.fcMapper = fcMapper;
 		this.params = params;
 		this.rootDir = rootDir;
+		this.inputRootDir = inputRootDir;
 		
 		if ( this.params == null ) {
 			this.params = new Parameters();
@@ -165,6 +168,7 @@ public class BatchTranslator {
 		if ( params.getMakeTMX() ) {
 			// Resolve the variables
 			String tmxOutputPath = Util.fillRootDirectoryVariable(params.getTmxPath(), rootDir);
+			tmxOutputPath = Util.fillInputRootDirectoryVariable(tmxOutputPath, inputRootDir);
 			tmxOutputPath = LocaleId.replaceVariables(tmxOutputPath, srcLoc, trgLoc);
 			// Make sure we use a temporary file if needed
 			URI tmxOutputURI = new File(tmxOutputPath).toURI();
@@ -193,6 +197,7 @@ public class BatchTranslator {
 		// Initialize existing TM if needed
 		if ( params.getCheckExistingTm() ) {
 			String existingTMPath = Util.fillRootDirectoryVariable(params.getExistingTm(), rootDir);
+			existingTMPath = Util.fillInputRootDirectoryVariable(existingTMPath, inputRootDir);
 			existingTMPath = LocaleId.replaceVariables(existingTMPath, srcLoc, trgLoc);
 			existingTm = TmSeekerFactory.createFileBasedTmSeeker(existingTMPath);
 		}
@@ -201,6 +206,7 @@ public class BatchTranslator {
 		if ( params.getSegment() ) {
 			SRXDocument srxDoc = new SRXDocument();
 			String srxPath = Util.fillRootDirectoryVariable(params.getSrxPath(), rootDir);
+			srxPath = Util.fillInputRootDirectoryVariable(srxPath, inputRootDir);
 			srxPath = LocaleId.replaceVariables(srxPath, srcLoc, trgLoc);
 			srxDoc.loadRules(srxPath);
 			//if ( srxDoc.hasWarning() ) logger.warning(srxDoc.getWarning());
@@ -246,6 +252,7 @@ public class BatchTranslator {
 			}
 			if ( params.getMakeTM() ) {
 				String tmDir = Util.fillRootDirectoryVariable(params.getTmDirectory(), rootDir);
+				tmDir = Util.fillInputRootDirectoryVariable(tmDir, inputRootDir);
 				tmDir = LocaleId.replaceVariables(tmDir, srcLoc, trgLoc);
 				Util.createDirectories(tmDir+File.separator);
 				//TODO: Move this check at the pensieve package level
@@ -442,6 +449,7 @@ public class BatchTranslator {
 			cmd = cmd.replace("${inputPath}", htmlSourceFile.getPath());
 			cmd = cmd.replace("${outputPath}", htmlTargetFile.getPath());
 			cmd = cmd.replace(Util.ROOT_DIRECTORY_VAR, rootDir);
+			cmd = cmd.replace(Util.INPUT_ROOT_DIRECTORY_VAR, inputRootDir);
 			
 			Locale loc = rawDoc.getSourceLocale().toJavaLocale();
 			cmd = cmd.replace("${srcLangName}", loc.getDisplayLanguage(Locale.ENGLISH));
