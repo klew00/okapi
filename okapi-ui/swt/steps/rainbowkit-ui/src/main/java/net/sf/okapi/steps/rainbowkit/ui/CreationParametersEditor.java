@@ -253,8 +253,8 @@ public class CreationParametersEditor implements IParametersEditor, ISWTEmbeddab
 		tabs = new TabFolder(mainComposite, SWT.NONE);
 		tabs.setLayout(new GridLayout());
 		GridData gdTmp = new GridData(GridData.FILL_BOTH);
-//		// Auto-size is too high, we need to fix it manually
-//		gdTmp.heightHint = 430;
+		// Auto-size is too high, we need to fix it manually
+		gdTmp.heightHint = 430;
 		tabs.setLayoutData(gdTmp);
 
 		//--- Output format tab
@@ -303,7 +303,7 @@ public class CreationParametersEditor implements IParametersEditor, ISWTEmbeddab
 		lbTypes.setData("9", "net.sf.okapi.steps.rainbowkit.table.TablePackageWriter");
 
 		gdTmp = new GridData(GridData.FILL_BOTH);
-		gdTmp.heightHint = 70;
+		gdTmp.heightHint = 50;
 		gdTmp.verticalSpan = 2;
 		lbTypes.setLayoutData(gdTmp);
 		lbTypes.addSelectionListener(new SelectionAdapter() {
@@ -337,8 +337,8 @@ public class CreationParametersEditor implements IParametersEditor, ISWTEmbeddab
 		
 		edDescription = new Text(cmpTmp, SWT.BORDER | SWT.MULTI | SWT.WRAP | SWT.V_SCROLL);
 		edDescription.setEditable(false);
-		gdTmp = new GridData(GridData.FILL_BOTH);
-		gdTmp.heightHint = 50;
+		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+		gdTmp.heightHint = 100;
 		gdTmp.horizontalSpan = 2;		
 		edDescription.setLayoutData(gdTmp);
 		
@@ -386,12 +386,13 @@ public class CreationParametersEditor implements IParametersEditor, ISWTEmbeddab
 		label.setText("List of the files to include in the package");
 
 		lbAncilList = new List(cmpTmp, SWT.BORDER | SWT.V_SCROLL);
-		lbAncilList.setLayoutData(new GridData(GridData.FILL_BOTH));
+		gdTmp = new GridData(GridData.FILL_BOTH);
+		gdTmp.heightHint = 100;
+		lbAncilList.setLayoutData(gdTmp);
 		
 		Composite cmpTmp2 = new Composite(cmpTmp, SWT.NONE);
 		cmpTmp2.setLayout(new GridLayout(3, false));
-		gdTmp = new GridData(GridData.FILL_BOTH);
-		gdTmp.verticalAlignment = GridData.VERTICAL_ALIGN_END;
+		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		cmpTmp2.setLayoutData(gdTmp);
 		
 		btAddAncilFile = UIUtil.createGridButton(cmpTmp2, SWT.PUSH, "Add...", UIUtil.BUTTON_DEFAULT_WIDTH, 1);
