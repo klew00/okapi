@@ -25,7 +25,6 @@ import java.util.regex.Pattern;
 
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.ui.UIUtil;
-import net.sf.okapi.lib.ui.editor.TextOptions;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ExtendedModifyEvent;

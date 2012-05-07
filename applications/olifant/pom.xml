@@ -26,11 +26,11 @@
 			<version>${project.version}</version>
 		</dependency>
 		
-		<dependency>
+<!--		<dependency>
 			<groupId>net.sf.okapi.lib</groupId>
 			<artifactId>okapi-lib-verification-ui</artifactId>
 			<version>${project.version}</version>
-		</dependency>
+		</dependency>-->
 
 		<dependency>
 			<groupId>net.sf.okapi.filters</groupId>

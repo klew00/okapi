@@ -29,6 +29,7 @@ import java.util.Collections;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.ui.Dialogs;
+import net.sf.okapi.common.ui.InputDocumentDialog;
 import net.sf.okapi.common.ui.ResourceManager;
 import net.sf.okapi.common.ui.UIUtil;
 import net.sf.okapi.lib.tmdb.DbUtil;
@@ -40,7 +41,6 @@ import net.sf.okapi.lib.tmdb.Importer;
 import net.sf.okapi.lib.tmdb.Indexer;
 import net.sf.okapi.lib.tmdb.Splitter;
 import net.sf.okapi.lib.tmdb.SplitterOptions;
-import net.sf.okapi.lib.ui.editor.InputDocumentDialog;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyAdapter;
