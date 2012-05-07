@@ -24,6 +24,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.ui.TextOptions;
 import net.sf.okapi.common.ui.UIUtil;
 
 import org.eclipse.swt.SWT;
