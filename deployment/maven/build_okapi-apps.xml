@@ -146,8 +146,6 @@
 			 excludes="**/META-INF/**"/>
 			<fileset dir="../../okapi-ui/swt/filters/mif-ui/target/classes"
 			 excludes="**/META-INF/**"/>
-			<fileset dir="../../okapi-ui/swt/filters/drupal-ui/target/classes"
-			 excludes="**/META-INF/**"/>
 
 			<!-- Libraries -->
 			<fileset dir="../../okapi-ui/swt/libraries/lib-segmentation-ui/target/classes"
