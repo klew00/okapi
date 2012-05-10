@@ -174,6 +174,7 @@ public class RTFFilter implements IFilter {
 	private String docName;
 	private int tuId;
 	private EncoderManager encoderManager;
+	private boolean canOutput = true;
 	
 	public RTFFilter () {
 		winCharsets = new Hashtable<Integer, String>();
@@ -340,6 +341,16 @@ public class RTFFilter implements IFilter {
 			null,
 			".rtf;"));
 		return list;
+	}
+	
+	/**
+	 * Set this option (for each input) to stripp any white spaces
+	 * before any text (e.g. the XML declaration).
+	 * @param value true to strip, false to behave normally.
+	 */
+	public void setStripWSBeforeTextStart (boolean value) {
+		// Prevent output before we reach actual text
+		canOutput = !value;
 	}
 	
 	public EncoderManager getEncoderManager () {
@@ -902,7 +913,21 @@ public class RTFFilter implements IFilter {
 				if ( cwCode == -1 ) {
 					if (( code == CW_PAR ) || ( code == CW_LINE )) {
 						//bParOrLine = true;
-						if ( ctxStack.peek().inText ) return 0;
+						if ( ctxStack.peek().inText ) {
+							// If needed check for stripping out white spaces before any text
+							// this will strip extra ws before the XML declaration
+							if ( !canOutput ) {
+								String tmp = text.toString();
+								if ( !tmp.trim().isEmpty() ) {
+									canOutput = true;
+								}
+								else {
+									continue;
+								}
+							}
+							// Non-strip mode
+							return 0;
+						}
 					}
 				}
 				else if ( code == cwCode ) {

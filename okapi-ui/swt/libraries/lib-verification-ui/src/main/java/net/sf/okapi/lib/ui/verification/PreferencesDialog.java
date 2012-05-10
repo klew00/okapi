@@ -23,8 +23,8 @@ package net.sf.okapi.lib.ui.verification;
 import net.sf.okapi.common.IHelp;
 import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.OKCancelPanel;
+import net.sf.okapi.common.ui.TextOptions;
 import net.sf.okapi.common.ui.UIUtil;
-import net.sf.okapi.lib.ui.editor.TextOptions;
 import net.sf.okapi.lib.ui.editor.TextOptionsPanel;
 
 import org.eclipse.swt.SWT;

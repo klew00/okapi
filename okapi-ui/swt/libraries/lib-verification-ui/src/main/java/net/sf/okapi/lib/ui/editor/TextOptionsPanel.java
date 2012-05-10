@@ -21,6 +21,7 @@
 package net.sf.okapi.lib.ui.editor;
 
 import net.sf.okapi.common.ui.Dialogs;
+import net.sf.okapi.common.ui.TextOptions;
 import net.sf.okapi.common.ui.UIUtil;
 
 import org.eclipse.swt.SWT;

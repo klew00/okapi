@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2010-2011 by the Okapi Framework contributors
+  Copyright (C) 2010-2012 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -20,6 +20,7 @@
 
 package net.sf.okapi.steps.rainbowkit.ui;
 
+import java.io.File;
 import java.util.ArrayList;
 
 import net.sf.okapi.common.EditorFor;
@@ -53,6 +54,8 @@ import org.eclipse.swt.widgets.Text;
 
 @EditorFor(Parameters.class)
 public class CreationParametersEditor implements IParametersEditor, ISWTEmbeddableParametersEditor {
+
+	private static String SEPARATOR = "  -->  ";
 	
 	private Shell shell;
 	private boolean result = false;
@@ -74,6 +77,13 @@ public class CreationParametersEditor implements IParametersEditor, ISWTEmbeddab
 	private ArrayList<IParameters> optStrings;
 	private ArrayList<String> optMoreInfo;
 	private IContext context;
+	private Button chkSendOutput;
+	private Text edAncilOrigin;
+	private Text edAncilDestination;
+	private Button btAddAncilFile;
+	private Button btRemoveAncilFile;
+	private List lbAncilList;
+	private boolean supportFileMode;
 	
 	public boolean edit (IParameters params,
 		boolean readOnly,
@@ -126,6 +136,9 @@ public class CreationParametersEditor implements IParametersEditor, ISWTEmbeddab
 
 	@Override
 	public String validateAndSaveParameters () {
+		if ( supportFileMode ) {
+			return null;
+		}
 		if ( !saveData() ) return null;
 		return params.toString();
 	}
@@ -151,7 +164,13 @@ public class CreationParametersEditor implements IParametersEditor, ISWTEmbeddab
 					if ( help != null ) help.showWiki("Translation Kit Creation Step");
 					return;
 				}
-				if ( e.widget.getData().equals("o") ) saveData();
+				if ( supportFileMode ) {
+					e.doit = false;
+					return;
+				}
+				if ( e.widget.getData().equals("o") ) {
+					saveData();
+				}
 				shell.close();
 			};
 		};
@@ -234,8 +253,8 @@ public class CreationParametersEditor implements IParametersEditor, ISWTEmbeddab
 		tabs = new TabFolder(mainComposite, SWT.NONE);
 		tabs.setLayout(new GridLayout());
 		GridData gdTmp = new GridData(GridData.FILL_BOTH);
-//		// Auto-size is too high, we need to fix it manually
-//		gdTmp.heightHint = 430;
+		// Auto-size is too high, we need to fix it manually
+		gdTmp.heightHint = 430;
 		tabs.setLayoutData(gdTmp);
 
 		//--- Output format tab
@@ -284,7 +303,7 @@ public class CreationParametersEditor implements IParametersEditor, ISWTEmbeddab
 		lbTypes.setData("9", "net.sf.okapi.steps.rainbowkit.table.TablePackageWriter");
 
 		gdTmp = new GridData(GridData.FILL_BOTH);
-		gdTmp.heightHint = 70;
+		gdTmp.heightHint = 50;
 		gdTmp.verticalSpan = 2;
 		lbTypes.setLayoutData(gdTmp);
 		lbTypes.addSelectionListener(new SelectionAdapter() {
@@ -318,10 +337,16 @@ public class CreationParametersEditor implements IParametersEditor, ISWTEmbeddab
 		
 		edDescription = new Text(cmpTmp, SWT.BORDER | SWT.MULTI | SWT.WRAP | SWT.V_SCROLL);
 		edDescription.setEditable(false);
-		gdTmp = new GridData(GridData.FILL_BOTH);
-		gdTmp.heightHint = 60;
+		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+		gdTmp.heightHint = 100;
 		gdTmp.horizontalSpan = 2;		
 		edDescription.setLayoutData(gdTmp);
+		
+		chkSendOutput = new Button(cmpTmp, SWT.CHECK);
+		chkSendOutput.setText("Send the prepared files to the next step");
+		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+		gdTmp.horizontalSpan = 2;
+		chkSendOutput.setLayoutData(gdTmp);
 
 		//--- Location tab
 		
@@ -348,6 +373,118 @@ public class CreationParametersEditor implements IParametersEditor, ISWTEmbeddab
 		
 		btCreateZip = new Button(cmpTmp, SWT.CHECK);
 		btCreateZip.setText("Create a ZIP file for the package");
+
+		//--- Support Material tab
+		
+		cmpTmp = new Composite(tabs, SWT.NONE);
+		cmpTmp.setLayout(new GridLayout(1, false));
+		tiTmp = new TabItem(tabs, SWT.NONE);
+		tiTmp.setText("Support Material");
+		tiTmp.setControl(cmpTmp);
+		
+		label = new Label(cmpTmp, SWT.NONE);
+		label.setText("List of the files to include in the package");
+
+		lbAncilList = new List(cmpTmp, SWT.BORDER | SWT.V_SCROLL);
+		gdTmp = new GridData(GridData.FILL_BOTH);
+		gdTmp.heightHint = 100;
+		lbAncilList.setLayoutData(gdTmp);
+		
+		Composite cmpTmp2 = new Composite(cmpTmp, SWT.NONE);
+		cmpTmp2.setLayout(new GridLayout(3, false));
+		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+		cmpTmp2.setLayoutData(gdTmp);
+		
+		btAddAncilFile = UIUtil.createGridButton(cmpTmp2, SWT.PUSH, "Add...", UIUtil.BUTTON_DEFAULT_WIDTH, 1);
+		btAddAncilFile.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				if ( supportFileMode ) endSupportFileMode(true);
+				else startSupportFileMode();
+			}
+		});
+
+		label = new Label(cmpTmp2, SWT.NONE);
+		label.setText("File(s) path");
+		
+		edAncilOrigin = new Text(cmpTmp2, SWT.BORDER);
+		edAncilOrigin.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+		btRemoveAncilFile = UIUtil.createGridButton(cmpTmp2, SWT.PUSH, "Remove", UIUtil.BUTTON_DEFAULT_WIDTH, 1);
+		btRemoveAncilFile.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				if ( supportFileMode ) endSupportFileMode(false);
+				else removeAncillaryFile();
+			}
+		});
+		
+		label = new Label(cmpTmp2, SWT.NONE);
+		label.setText("Destination");
+		
+		edAncilDestination = new Text(cmpTmp2, SWT.BORDER);
+		edAncilDestination.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+		endSupportFileMode(false);
+	}
+	
+	private void removeAncillaryFile () {
+		try {
+			int n = lbAncilList.getSelectionIndex();
+			if ( n == -1 ) return;
+			lbAncilList.remove(n);
+			if ( n >= lbAncilList.getItemCount() ) n = lbAncilList.getItemCount()-1;
+			lbAncilList.select(n);
+		}
+		catch ( Throwable e ) {
+			Dialogs.showError(shell, e.getMessage(), null);
+		}
+	}
+	
+	private void startSupportFileMode () {
+		try {
+			supportFileMode = true;
+			btAddAncilFile.setText("Accept");
+			btRemoveAncilFile.setText("Discard");
+			edAncilOrigin.setEnabled(true);
+			edAncilDestination.setEnabled(true);
+			edAncilDestination.setText(File.separator+Parameters.SUPPORTFILE_SAMENAME);
+			edAncilOrigin.setFocus();
+		}
+		catch ( Throwable e ) {
+			Dialogs.showError(shell, e.getMessage(), null);
+		}
+	}
+	
+	private boolean endSupportFileMode (boolean saveData) {
+		try {
+			if ( saveData ) {
+				String origin = edAncilOrigin.getText().trim();
+				if ( origin.isEmpty() ) {
+					Dialogs.showError(shell, "You must specify a file or a pattern.", null);
+					edAncilOrigin.setFocus();
+					return false;
+				}
+				String destination = edAncilDestination.getText().trim();
+				if ( destination.isEmpty() ) {
+					Dialogs.showError(shell, "You must specify a destination.", null);
+					edAncilDestination.setFocus();
+					return false;
+				}
+				lbAncilList.add(origin+SEPARATOR+destination);
+				lbAncilList.select(lbAncilList.getItemCount()-1);
+			}
+			btAddAncilFile.setText("Add...");
+			btRemoveAncilFile.setText("Remove");
+			edAncilOrigin.setEnabled(false);
+			edAncilOrigin.setText("");
+			edAncilDestination.setEnabled(false);
+			edAncilDestination.setText("");
+			supportFileMode = false;
+			return true;
+		}
+		catch ( Throwable e ) {
+			Dialogs.showError(shell, e.getMessage(), null);
+			return false;
+		}
 	}
 	
 	private void updatePackageType () {
@@ -472,16 +609,23 @@ public class CreationParametersEditor implements IParametersEditor, ISWTEmbeddab
 		edPackageName.setText(params.getPackageName());
 		btCreateZip.setSelection(params.getCreateZip());
 
+		chkSendOutput.setSelection(params.getSendOutput());
 		String current = params.getWriterClass();
 		int n = 0;
 		for ( String str : writers ) {
 			if ( str.equals(current) ) break; // Found it
 			else n++;
 		}
-		lbTypes.setSelection(n);
+		lbTypes.select(n);
 		IParameters p = optStrings.get(n);
 		if ( p != null ) {
 			p.fromString(params.getWriterOptions());
+		}
+		
+		// Support material
+		java.util.List<String> list = params.convertSupportFilesToList(params.getSupportFiles());
+		for ( String item : list ) {
+			lbAncilList.add(item.replace(Parameters.SUPPORTFILEDEST_SEP, SEPARATOR));
 		}
 		
 		updatePackageType();
@@ -512,6 +656,20 @@ public class CreationParametersEditor implements IParametersEditor, ISWTEmbeddab
 		else {
 			params.setWriterOptions(null);
 		}
+		
+		// Support material
+		ArrayList<String> list = new ArrayList<String>();
+		for ( String item : lbAncilList.getItems() ) {
+			list.add(item.replace(SEPARATOR, Parameters.SUPPORTFILEDEST_SEP));
+		}
+		String tmp = "";
+		if ( !list.isEmpty() ) {
+			tmp = params.convertSupportFilesToString(list);
+		}
+		params.setSupportFiles(tmp);
+
+		params.setSendOutput(chkSendOutput.getSelection());
+		
 		result = true;
 		return result;
 	}

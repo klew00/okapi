@@ -41,7 +41,13 @@ public class TextContainerBean extends PersistenceBean<TextContainer> {
 
 	@Override
 	protected TextContainer createObject(IPersistenceSession session) {
-		return new TextContainer();
+		List<TextPart> pts = new ArrayList<TextPart>(); 
+		for (FactoryBean partBean : parts) {
+			TextPart part = partBean.get(TextPart.class, session);
+			if (part != null)
+				pts.add(part);
+		}
+		return new TextContainer(pts.toArray(new TextPart[] {}));
 	}
 
 	@Override
@@ -74,12 +80,6 @@ public class TextContainerBean extends PersistenceBean<TextContainer> {
 		
 		for (FactoryBean annotationBean : annotations.getItems())
 			obj.setAnnotation(annotationBean.get(IAnnotation.class, session));
-		
-		for (FactoryBean partBean : parts) {
-			TextPart part = partBean.get(TextPart.class, session);
-			if (part != null)
-				obj.append(part, true);
-		}			
 		
 		obj.setHasBeenSegmentedFlag(segApplied);
 	}

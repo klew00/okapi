@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2011 by the Okapi Framework contributors
+  Copyright (C) 2011-2012 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -30,6 +30,7 @@ import net.sf.okapi.steps.rainbowkit.common.BasePackageWriter;
 public class VersifiedPackageWriter extends BasePackageWriter {
 
 	private VersifiedTextWriter writer;
+	private String rawDocPath;
 
 	public VersifiedPackageWriter() {
 		super(Manifest.EXTRACTIONTYPE_VERSIFIED);
@@ -50,22 +51,23 @@ public class VersifiedPackageWriter extends BasePackageWriter {
 		writer.setOptions(manifest.getTargetLocale(), "UTF-8");
 
 		MergingInfo item = manifest.getItem(docId);
-		String path = manifest.getTempSourceDirectory() + item.getRelativeInputPath() + ".vrsz";
-		writer.setOutput(path);
-
+		rawDocPath = manifest.getTempSourceDirectory() + item.getRelativeInputPath() + ".vrsz";
+		writer.setOutput(rawDocPath);
 		writer.handleEvent(event);
 	}
 
 	@Override
-	protected void processEndDocument(Event event) {
+	protected Event processEndDocument(Event event) {
 		writer.handleEvent(event);
-		if (writer != null) {
-			writer.close();
-			writer = null;
-		}
+		close();
 
-		// Call the base method, in case there is something common to do
-		super.processEndDocument(event);
+		if ( params.getSendOutput() ) {
+			return super.creatRawDocumentEventSet(rawDocPath, "UTF-8",
+				manifest.getSourceLocale(), manifest.getTargetLocale());
+		}
+		else {
+			return event;
+		}
 	}
 
 	@Override

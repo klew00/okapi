@@ -54,6 +54,53 @@ public class XINIFilterMetainformationTest {
 	}
 
 	@Test
+	public void emptyPageDoesntCauseNullPointerException() throws JAXBException {
+		String snippet =
+			helper.getStartSnippetXiniMain() +
+		"		<Page PageID=\"1\">" +
+		"			<PageName>Page Title</PageName>" +
+		"		</Page>" +
+		"	</Main>" +
+		"</Xini>";
+
+		Xini xini = helper.toXini(helper.toEvents(snippet));
+
+		Page page = xini.getMain().getPage().get(0);
+		assertEquals(1, page.getPageID());
+		assertEquals("Page Title", page.getPageName());
+
+		assertEquals(null, page.getElements());
+	}
+
+	@Test
+	public void emptyFieldDoesntCauseNullPointerException() throws JAXBException {
+		String snippet =
+			helper.getStartSnippetXiniMain() +
+		"		<Page PageID=\"1\">" +
+		"			<Elements>" +
+		"				<Element ElementID=\"10\">" +
+		"					<ElementContent>" +
+		"						<Fields>" +
+		"							<Field FieldID=\"0\">" +
+		"							</Field>" +
+		"						</Fields>" +
+		"					</ElementContent>" +
+		"				</Element>" +
+		"			</Elements>" +
+		"		</Page>" +
+		"	</Main>" +
+		"</Xini>";
+
+		Xini xini = helper.toXini(helper.toEvents(snippet));
+
+		Page page = xini.getMain().getPage().get(0);
+		
+		Field field = page.getElements().getElement().get(0).getElementContent().getFields().getField().get(0);
+
+		assertEquals(0, field.getSegAndTrans().size());
+	}
+
+	@Test
 	public void pageAndElementIsPreserved() throws JAXBException {
 		String snippet =
 			helper.getStartSnippetXiniMain() +

@@ -44,6 +44,7 @@ public class TransifexPackageWriter extends BasePackageWriter {
 
 	public TransifexPackageWriter () {
 		super(Manifest.EXTRACTIONTYPE_TRANSIFEX);
+		setSupporstOneOutputPerInput(false);
 	}
 	
 	@Override
@@ -200,20 +201,11 @@ public class TransifexPackageWriter extends BasePackageWriter {
 	}
 	
 	@Override
-	protected void processEndDocument (Event event) {
+	protected Event processEndDocument (Event event) {
 		potWriter.handleEvent(event);
 		trgWriter.handleEvent(event);
-		if ( potWriter != null ) {
-			potWriter.close();
-			potWriter = null;
-		}
-		if ( trgWriter != null ) {
-			trgWriter.close();
-			trgWriter = null;
-		}
-		
-		// Call the base method, in case there is something common to do
-		super.processEndDocument(event);
+		close();
+		return event;
 	}
 
 	@Override

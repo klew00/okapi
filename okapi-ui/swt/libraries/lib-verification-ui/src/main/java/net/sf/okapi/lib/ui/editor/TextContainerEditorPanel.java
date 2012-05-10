@@ -33,6 +33,7 @@ import net.sf.okapi.common.resource.TextPart;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.InputDialog;
+import net.sf.okapi.common.ui.TextOptions;
 import net.sf.okapi.common.ui.UIUtil;
 
 import org.eclipse.swt.SWT;

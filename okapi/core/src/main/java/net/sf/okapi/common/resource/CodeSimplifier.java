@@ -234,6 +234,13 @@ public class CodeSimplifier {
 			
 			// Check leading and trailing codes if requested
 			if ( removeLeadingTrailingCodes ) {
+				// Change segmentation markers from opening/closing to placeholder type
+				// to be able to remove them to skeleton
+//				for (Code code : tf.getCodes()) {
+//					code.setTagType(TagType.PLACEHOLDER);
+//				}
+//				tf.setCodedText(tf.getCodedText().replace((char) TextFragment.MARKER_OPENING, 
+//						(char) TextFragment.MARKER_ISOLATED));
 				return removeLeadingTrailingCodes(tf, maxIterations);
 			}
 			else {
@@ -284,6 +291,7 @@ public class CodeSimplifier {
 		}
 		//System.out.println(TextUnitUtil.toText(tf));
 		TextUnitUtil.restoreSegmentation(tc, tf);
+		//System.out.println(TextUnitUtil.restoreSegmentation(tc, tf));
 		TextUnitUtil.convertTextParts(tc);
 //		System.out.println(res[0]);
 //		System.out.println(res[1]);
@@ -471,7 +479,11 @@ public class CodeSimplifier {
 				
 				if(cn.adjacentNext && peekCn.adjacentPrev){
 					
-					if(cn.code.getTagType() == TagType.PLACEHOLDER || peekCn.code.getTagType() == TagType.PLACEHOLDER ){
+//					// We can merge a placehorder-type code with another code of any type, 
+//					// and both codes cannot contain seg boundary markers altogether (either one can)
+					if ((cn.code.getTagType() == TagType.PLACEHOLDER || 
+							peekCn.code.getTagType() == TagType.PLACEHOLDER ) 
+						&& canJoin(cn.code, peekCn.code)){
 						
 						//TODO: Possibly update it to direct where the PH should be added, open or closing. 
 						//      Possibly do two runs one forward and one backwards.
@@ -490,6 +502,24 @@ public class CodeSimplifier {
 		return merges++;
 	}
 		
+	private boolean canJoin(Code code1, Code code2) {
+//		boolean ss1 = TextUnitUtil.hasSegStartMarker(code1);				
+		boolean ss2 = TextUnitUtil.hasSegStartMarker(code2);
+		
+		boolean se1 = TextUnitUtil.hasSegEndMarker(code1);
+//		boolean se2 = TextUnitUtil.hasSegEndMarker(code2);
+//		
+//		boolean ts1 = TextUnitUtil.hasTpStartMarker(code1);
+//		boolean ts2 = TextUnitUtil.hasTpStartMarker(code2);
+//		
+//		boolean te1 = TextUnitUtil.hasTpEndMarker(code1);	
+//		boolean te2 = TextUnitUtil.hasTpEndMarker(code2);
+				
+		boolean dontJoin = (se1 && ss2);
+		
+		return !dontJoin;
+	}
+
 	/*
 	 * Simplifies the isolated tags
 	 */

@@ -32,6 +32,7 @@ import net.sf.okapi.common.Util;
  * Converts Microsoft's LCID to Okapi LocaleId back and forth.
  * @see <a href="http://msdn.microsoft.com/en-us/library/cc233968%28PROT.10%29.aspx">Microsoft LCID Structure</a>
  * @see <a href="http://msdn.microsoft.com/en-us/library/a9eac961-e77d-41a6-90a5-ce1a8b0cdb9c%28v=PROT.10%29#id8">LCID List</a>
+ * @see <a href="http://msdn.microsoft.com/en-us/library/cc233982%28PROT.10%29.aspx">Microsoft LCID Structure</a> 
  */
 public class LCIDUtil {
 
@@ -105,8 +106,9 @@ public class LCIDUtil {
 			Logger.getLogger(LCIDUtil.class.getName()).warning(String.format("Unregistered LCID: 0x%04x %s\n", lcid, tag));
 			return;
 		}
+		tag = new LocaleId(tag).toString();
 		descr.tag = tag;
-		lcidLookup.put(new LocaleId(tag).toString(), descr);
+		lcidLookup.put(tag, descr);
 	}
 	
 	static {
@@ -136,7 +138,7 @@ public class LCIDUtil {
 		registerLCID("Azeri (Cyrillic)", "Azerbaijan", 0x082c);
 		registerLCID("Azeri (Latin)", "Azerbaijan", 0x042c);
 		registerLCID("Bashkir", "Russia", 0x046d);
-		registerLCID("Basque", "(Basque)", 0x042d);
+		registerLCID("Basque", "Spain", 0x042d);
 		registerLCID("Belarusian", "Belarus", 0x0423);
 		registerLCID("Bengali", "India", 0x0445);
 		registerLCID("Bengali", "Bangladesh", 0x0845);
@@ -513,18 +515,25 @@ public class LCIDUtil {
 		registerTag(0x0001, "ar");
 		registerTag(0x0002, "bg");
 		registerTag(0x0003, "ca");
-		registerTag(0x0004, "zh-Hans");
-		registerTag(0x7c04, "zh-Hant");
+		registerTag(0x0004, "zh");		
 		registerTag(0x0005, "cs");
 		registerTag(0x0006, "da");
+		registerTag(0x0007, "de");		
 		registerTag(0x0008, "el");
+		registerTag(0x0009, "en");
+		registerTag(0x000a, "es");
 		registerTag(0x000b, "fi");
+		registerTag(0x000c, "fr");
 		registerTag(0x000d, "he");
 		registerTag(0x000e, "hu");
 		registerTag(0x000f, "is");
+		registerTag(0x0010, "it");
 		registerTag(0x0011, "ja");
 		registerTag(0x0012, "ko");
+		registerTag(0x0013, "nl");
+		registerTag(0x0014, "nb");
 		registerTag(0x0015, "pl");
+		registerTag(0x0016, "pt");
 		registerTag(0x0017, "rm");
 		registerTag(0x0018, "ro");
 		registerTag(0x0019, "ru");
@@ -551,6 +560,7 @@ public class LCIDUtil {
 		registerTag(0x002e, "hsb");
 		registerTag(0x002f, "mk");
 		registerTag(0x0032, "tn");
+		//registerTag(0x0033, "ven");
 		registerTag(0x0034, "xh");
 		registerTag(0x0035, "zu");
 		registerTag(0x0036, "af");
@@ -622,11 +632,13 @@ public class LCIDUtil {
 		registerTag(0x0402, "bg-BG");
 		registerTag(0x0403, "ca-ES");
 		registerTag(0x0404, "zh-TW");
+		//registerTag(0x0004, "zh-Hans");
+		registerTag(0x7c04, "zh-Hant");
 		registerTag(0x0405, "cs-CZ");
-		registerTag(0x0406, "da-DK");
+		registerTag(0x0406, "da-DK");		
 		registerTag(0x0407, "de-DE");
-		registerTag(0x0408, "el-GR");
-		registerTag(0x0409, "en-US");
+		registerTag(0x0408, "el-GR");		
+		registerTag(0x0409, "en-US");		
 		registerTag(0x040A, "es-ES_tradnl");
 		registerTag(0x040B, "fi-FI");
 		registerTag(0x040C, "fr-FR");
@@ -662,6 +674,7 @@ public class LCIDUtil {
 		registerTag(0x042A, "vi-VN");
 		registerTag(0x042B, "hy-AM");
 		registerTag(0x042C, "az-Latn-AZ");
+		registerTag(0x042D, "eu-ES");
 		registerTag(0x042E, "wen-DE");
 		registerTag(0x042F, "mk-MK");
 		registerTag(0x0430, "st-ZA");
@@ -975,4 +988,11 @@ public class LCIDUtil {
 		return new LocaleId(getTag(lcid));
 	}
 
+	public static HashMap<Integer, LCIDDescr> getTagLookup() {
+		return tagLookup;
+	}
+
+	public static HashMap<String, LCIDDescr> getLcidLookup() {
+		return lcidLookup;
+	}
 }

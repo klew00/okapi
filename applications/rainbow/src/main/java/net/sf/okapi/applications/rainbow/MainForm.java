@@ -2412,16 +2412,6 @@ public class MainForm { //implements IParametersProvider {
 				net.sf.okapi.filters.transifex.ui.ProjectDialog dlg = new net.sf.okapi.filters.transifex.ui.ProjectDialog();
 				dlg.edit(shell, txprj, false);
 			}
-			else if ( ext.equalsIgnoreCase(net.sf.okapi.filters.drupal.Project.PROJECT_EXTENSION) ) {
-				// Use the Drupal project editor if it's a Drupal project file
-				saveSurfaceData(); // Make sure we have the correct source/target locales
-				net.sf.okapi.filters.drupal.Project drprj = new net.sf.okapi.filters.drupal.Project();
-				BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(file), "UTF-8"));
-				drprj.read(br, prj.getSourceLanguage(), prj.getTargetLanguage());
-				drprj.setPath(file.getCanonicalPath());
-				net.sf.okapi.filters.drupal.ui.ProjectDialog dlg = new net.sf.okapi.filters.drupal.ui.ProjectDialog();
-				dlg.edit(shell, drprj, false);
-			}
 			else { // Other types of file
 				Program.launch(file.getCanonicalPath());
 			}

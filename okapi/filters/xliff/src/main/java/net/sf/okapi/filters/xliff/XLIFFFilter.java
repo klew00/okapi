@@ -881,7 +881,7 @@ public class XLIFFFilter implements IFilter {
 			//TODO: Need to standardize target-state properties
 			String stateValue = reader.getAttributeValue(null, "state");
 			// Get the coord attribute if available
-			String coordValue = reader.getAttributeValue(null, Property.COORDINATES);
+			String coordValue = reader.getAttributeValue(null, "coord");
 
 			// Get the target itself
 			skel.addContentPlaceholder(tu, trgLang);
@@ -893,13 +893,13 @@ public class XLIFFFilter implements IFilter {
 			tu.setPreserveWhitespaces(preserveSpaces.peek());
 			tu.setTarget(trgLang, tc);
 			
-			// Set the target properties (after the target container has been set
+			// Set the target properties (after the target container has been set)
 			if ( stateValue != null ) {
-				tu.setTargetProperty(trgLang, new Property("state", stateValue, true));
+				tu.setTargetProperty(trgLang, new Property("state", stateValue, true)); // Read-only for now
 			}
 		
 			if ( coordValue != null ) {
-				tu.setTargetProperty(trgLang, new Property(Property.COORDINATES, coordValue, false));
+				tu.setTargetProperty(trgLang, new Property(Property.COORDINATES, coordValue, true)); // Read-only for now
 			}
 
 			if ( approved > -1 ) {

@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2010-2011 by the Okapi Framework contributors
+  Copyright (C) 2010-2012 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -37,7 +37,8 @@ public interface IPackageWriter extends IFilterWriter {
 	public void setBatchInformation (String packageRoot,
 		LocaleId srcLoc,
 		LocaleId trgLoc,
-		String inputRoot,
+		String inputRootDir,
+		String rootDir,
 		String packageId,
 		String projectId,
 		String creatorParams,
@@ -51,6 +52,8 @@ public interface IPackageWriter extends IFilterWriter {
 		String outputEncoding,
 		ISkeletonWriter skelWriter);
 
-	public String getMainOutputPath ();
+	//public String getMainOutputPath ();
 
+	public void setSupporstOneOutputPerInput (boolean supporstOneOutputPerInput);
+	
 }

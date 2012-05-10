@@ -56,16 +56,16 @@ public class TextUnitUtil {
 	private static final String TP_END = "$tp_end$";
 	
 	// Regex patterns for marker search
-	private static final Pattern SEG_REGEX = Pattern.compile("\\[#\\$(.+?)\\@\\%\\$seg_start\\$\\](.*?)\\[#\\$(\\1)\\@\\%\\$seg_end\\$\\]");
-	private static final Pattern SEG_START_REGEX = Pattern.compile("\\[#\\$(.+?)\\@\\%\\$seg_start\\$\\]");
-	private static final Pattern SEG_END_REGEX = Pattern.compile("\\[#\\$(.+?)\\@\\%\\$seg_end\\$\\]");
+	private static final Pattern SEG_REGEX = Pattern.compile("\\[#\\$([A-Za-z_\\-0-9]+?)\\@\\%\\$seg_start\\$\\](.*?)\\[#\\$(\\1)\\@\\%\\$seg_end\\$\\]");
+	private static final Pattern SEG_START_REGEX = Pattern.compile("\\[#\\$([A-Za-z_\\-0-9]+?)\\@\\%\\$seg_start\\$\\]");
+	private static final Pattern SEG_END_REGEX = Pattern.compile("\\[#\\$([A-Za-z_\\-0-9]+?)\\@\\%\\$seg_end\\$\\]");
 	
 	private static final Pattern TP_REGEX = Pattern.compile("\\$tp_start\\$(.*?)\\$tp_end\\$");
 	private static final Pattern TP_START_REGEX = Pattern.compile("\\$tp_start\\$");
 	private static final Pattern TP_END_REGEX = Pattern.compile("\\$tp_end\\$");	
 	
 	private static final Pattern ANY_SEG_TP_REGEX = 
-		Pattern.compile("\\[#\\$(.+?)\\@\\%\\$seg_start\\$\\]|\\[#\\$(.+?)\\@\\%\\$seg_end\\$\\]|\\$tp_start\\$|\\$tp_end\\$");
+		Pattern.compile("\\[#\\$([A-Za-z_\\-0-9]+?)\\@\\%\\$seg_start\\$\\]|\\[#\\$([A-Za-z_\\-0-9]+?)\\@\\%\\$seg_end\\$\\]|\\$tp_start\\$|\\$tp_end\\$");
 	
 	private static final char FOO = '\u0001';
 	private static final Pattern PLAIN_TEXT_REGEX = Pattern.compile(String.format("[^%s]+", FOO));
@@ -1319,6 +1319,23 @@ public class TextUnitUtil {
 			else {
 				tf.append(new Code(TagType.PLACEHOLDER, "tp", TP_END));
 			}
+			
+//			if (part.isSegment()) {
+//				seg = (Segment)part;
+//				tf.append(new Code(TagType.OPENING, "seg", TextFragment.makeRefMarker(seg.getId(), SEG_START)));
+//			}
+//			else {
+//				tf.append(new Code(TagType.OPENING, "tp", TP_START));
+//			}
+//			
+//			tf.append(part.getContent());
+//			
+//			if (part.isSegment()) {
+//				tf.append(new Code(TagType.CLOSING, "seg", TextFragment.makeRefMarker(seg.getId(), SEG_END)));
+//			}
+//			else {
+//				tf.append(new Code(TagType.CLOSING, "tp", TP_END));
+//			}
 		}
 		return tf;
 	}		
@@ -1416,6 +1433,26 @@ public class TextUnitUtil {
 		}
 		
 		return removeFromOriginal ? matcher.replaceAll("") : original;
+	}
+	
+	public static boolean hasSegOrTpMarker(Code code) {
+		return ANY_SEG_TP_REGEX.matcher(code.data).find();
+	}
+	
+	public static boolean hasSegStartMarker(Code code) {
+		return SEG_START_REGEX.matcher(code.data).find();
+	}
+	
+	public static boolean hasSegEndMarker(Code code) {
+		return SEG_END_REGEX.matcher(code.data).find();
+	}
+	
+	public static boolean hasTpStartMarker(Code code) {
+		return TP_START_REGEX.matcher(code.data).find();
+	}
+	
+	public static boolean hasTpEndMarker(Code code) {
+		return TP_END_REGEX.matcher(code.data).find();
 	}
 	
 	private enum TokenType {
@@ -1741,8 +1778,13 @@ public class TextUnitUtil {
 									d.id, start, d.position));
 					}
 					else {
-						if (start <= d.relPos)
-							list.add(new Segment(d.id, new TextFragment(d.context.getData().substring(start, d.relPos))));
+						if (start <= d.relPos) {
+							//list.add(new Segment(d.id, new TextFragment(d.context.getData().substring(start, d.relPos))));
+							TextFragment tf2 = new TextFragment();
+							tf2.append(new Code(d.context.tagType, d.context.type, d.context.getData().substring(start, d.relPos)));
+							Segment newSeg = new Segment(d.id, tf2);							
+							list.add(newSeg);
+						}							
 						else
 							LOGGER.warning(String.format("Cannot create the segment %s - incorrect range: (%d - %d)", 
 									d.id, start, d.relPos));
@@ -1772,8 +1814,13 @@ public class TextUnitUtil {
 							LOGGER.warning(String.format("Cannot create a text part - incorrect range: (%d - %d)", start, d.position));
 					}
 					else {
-						if (start <= d.relPos)
-							list.add(new TextPart(new TextFragment(d.context.getData().substring(start, d.relPos))));
+						if (start <= d.relPos) {
+							// list.add(new TextPart(new TextFragment(d.context.getData().substring(start, d.relPos))));
+							TextFragment tf2 = new TextFragment();
+							tf2.append(new Code(d.context.tagType, d.context.type, d.context.getData().substring(start, d.relPos)));
+							TextPart newTp = new TextPart(tf2);							
+							list.add(newTp);
+						}							
 						else
 							LOGGER.warning(String.format("Cannot create a text part - incorrect range: (%d - %d)", start, d.relPos));
 					}						
@@ -1800,7 +1847,15 @@ public class TextUnitUtil {
 	private static void setParts(TextContainer tc, TextPart... parts) {
 		tc.clear();
 		for (TextPart part : parts) {
-			append(tc, part);
+			if (part.isSegment()) {
+				// Segments.validateSegmentId(seg) changes seg id, we don't want it
+				String id = ((Segment)part).getId();
+				append(tc, part);
+				((Segment)part).forceId(id);
+			}
+			else {
+				append(tc, part);
+			}			
 		}
 		// Check parts
 		if (tc.get(0).isSegment() != parts[0].isSegment()) {
