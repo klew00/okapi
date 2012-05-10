@@ -18,7 +18,6 @@
         <module>checkmate</module>
         <module>serval</module> <!-- For TM debug -->
         <module>longhorn</module>
-        <module>olifant</module>
         <!-- For now: to launch it separately after the ant build
         <module>integration-tests</module>-->
     </modules>

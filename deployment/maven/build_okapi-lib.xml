@@ -164,8 +164,6 @@
 			 excludes="**/META-INF/**"/>
 			<fileset dir="../../okapi/libraries/lib-gtt/target/classes"
 			 excludes="**/META-INF/**"/>
-			<fileset dir="../../okapi/libraries/lib-tmdb/target/classes"
-			 excludes="**/META-INF/**"/>
 			
 			<!-- tm -->
 			<fileset dir="../../okapi/tm/simpletm/target/classes"
