@@ -49,15 +49,15 @@ public class GenericContentTest {
 		assertEquals("t1<1><2><3/>t2</2></1>t3", fmt.setContent(tf2).toString());
 	}
 	
-	@Test
-	public void testFromNumericCodedToFragment1 () {
-		TextFragment tf = createTextFragment();
-		String gtext = fmt.setContent(tf).toString();
-		assertEquals("t1<1><2><3/>t2</2></1>t3", gtext);
-		// Reconstruct it
-		TextFragment tf2 = fmt.fromNumericCodedToFragment(gtext, tf.getCodes(), false);
-		assertEquals("t1<1><2><3/>t2</2></1>t3", fmt.setContent(tf2).toString());
-	}
+//	@Test
+//	public void testFromNumericCodedToFragment1 () {
+//		TextFragment tf = createTextFragment();
+//		String gtext = fmt.setContent(tf).toString();
+//		assertEquals("t1<1><2><3/>t2</2></1>t3", gtext);
+//		// Reconstruct it
+//		TextFragment tf2 = fmt.fromNumericCodedToFragment(gtext, tf.getCodes(), false);
+//		assertEquals("t1<1><2><3/>t2</2></1>t3", fmt.setContent(tf2).toString());
+//	}
 	
 //	@Test
 //	public void testFromNumericCodedToFragment2 () {

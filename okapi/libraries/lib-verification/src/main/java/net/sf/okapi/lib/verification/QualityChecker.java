@@ -84,7 +84,7 @@ class QualityChecker {
 		ltConn = null;
 		if ( params.getCheckWithLT() ) {
 			ltConn = new LanguageToolConnector();
-			ltConn.initialize(targetLocale, params.getServerURL(), params.translateLTMsg,
+			ltConn.initialize(targetLocale, sourceLocale, params.getServerURL(), params.translateLTMsg,
 				params.ltBilingualMode, params.ltTranslationSource, params.ltTranslationTarget,
 				params.ltTranslationServiceKey);
 		}
