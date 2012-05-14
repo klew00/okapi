@@ -46,6 +46,7 @@ public class LanguageToolConnector {
 
 	private ArrayList<Issue> issues;
 	private String lang;
+	private String motherTongue;
 	private String serverUrl;
 	private DocumentBuilder docBuilder;
 	private IQuery mt;
@@ -67,6 +68,7 @@ public class LanguageToolConnector {
 	}
 
 	public void initialize (LocaleId locId,
+		LocaleId motherLocId, 
 		String serverUrl,
 		boolean translateLTMsg,
 		boolean bilingualMode,
@@ -76,6 +78,7 @@ public class LanguageToolConnector {
 	{
 		//TODO: Better mapping to LT language codes
 		lang = locId.getLanguage();
+		motherTongue = motherLocId.getLanguage();
 		// Set the server URL
 		if ( !serverUrl.endsWith("/") ) serverUrl += "/";
 		this.serverUrl = serverUrl;
@@ -112,9 +115,10 @@ public class LanguageToolConnector {
 		URL url;
 		try {
 			if ( bilingualMode ) {
-				url = new URL(serverUrl + String.format("?language=%s&text=%s&srctext=%s", lang,
+				url = new URL(serverUrl + String.format("?language=%s&text=%s&srctext=%s&motherTongue=%s", lang,
 					URLEncoder.encode(ctext, "UTF-8"),
-					URLEncoder.encode(srcSeg.text.getCodedText(), "UTF-8")));
+					URLEncoder.encode(srcSeg.text.getCodedText(), "UTF-8"),
+					motherTongue));
 			}
 			else {
 				url = new URL(serverUrl + String.format("?language=%s&text=%s", lang,

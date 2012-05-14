@@ -43,6 +43,7 @@ public class Parameters extends BaseParameters {
 	private static final String EMPTYTARGET = "emptyTarget";
 	private static final String EMPTYSOURCE = "emptySource";
 	private static final String TARGETSAMEASSOURCE = "targetSameAsSource";
+	private static final String TARGETSAMEASSOURCE_FORSAMELANGUAGE = "targetSameAsSourceForSameLanguage";
 	private static final String TARGETSAMEASSOURCE_WITHCODES = "targetSameAsSourceWithCodes";
 	private static final String CODEDIFFERENCE = "codeDifference";
 	private static final String GUESSOPENCLOSE = "guessOpenClose";
@@ -96,6 +97,7 @@ public class Parameters extends BaseParameters {
 	boolean emptyTarget;
 	boolean emptySource;
 	boolean targetSameAsSource;
+	boolean targetSameAsSourceForSameLanguage;
 	boolean targetSameAsSourceWithCodes;
 	boolean codeDifference;
 	boolean guessOpenClose;
@@ -371,6 +373,14 @@ public class Parameters extends BaseParameters {
 		this.targetSameAsSource = targetSameAsSource;
 	}
 
+	public boolean getTargetSameAsSourceForSameLanguage () {
+		return targetSameAsSourceForSameLanguage;
+	}
+
+	public void setTargetSameAsSourceForSameLanguage (boolean targetSameAsSourceForSameLanguage) {
+		this.targetSameAsSourceForSameLanguage = targetSameAsSourceForSameLanguage;
+	}
+
 	public boolean getTargetSameAsSourceWithCodes () {
 		return targetSameAsSourceWithCodes;
 	}
@@ -510,6 +520,7 @@ public class Parameters extends BaseParameters {
 		emptyTarget = true;
 		emptySource = true;
 		targetSameAsSource = true;
+		targetSameAsSourceForSameLanguage = false;
 		targetSameAsSourceWithCodes = true;
 		codeDifference = true;
 		guessOpenClose = true;
@@ -524,7 +535,7 @@ public class Parameters extends BaseParameters {
 		saveSession = true;
 		sessionPath = Util.ROOT_DIRECTORY_VAR+"/qa-session"+QualityCheckSession.FILE_EXTENSION;
 		doubledWord = true;
-		doubledWordExceptions = "sie;vous";
+		doubledWordExceptions = "sie;vous;nous";
 		corruptedCharacters = true;
 		scope = SCOPE_ALL;
 		
@@ -606,6 +617,7 @@ public class Parameters extends BaseParameters {
 		emptyTarget = buffer.getBoolean(EMPTYTARGET, emptyTarget);
 		emptySource = buffer.getBoolean(EMPTYSOURCE, emptySource);
 		targetSameAsSource = buffer.getBoolean(TARGETSAMEASSOURCE, targetSameAsSource);
+		targetSameAsSourceForSameLanguage = buffer.getBoolean(TARGETSAMEASSOURCE_FORSAMELANGUAGE, targetSameAsSourceForSameLanguage);
 		targetSameAsSourceWithCodes = buffer.getBoolean(TARGETSAMEASSOURCE_WITHCODES, targetSameAsSourceWithCodes);
 		codeDifference = buffer.getBoolean(CODEDIFFERENCE, codeDifference);
 		guessOpenClose = buffer.getBoolean(GUESSOPENCLOSE, guessOpenClose);
@@ -684,6 +696,7 @@ public class Parameters extends BaseParameters {
 		buffer.setBoolean(EMPTYTARGET, emptyTarget);
 		buffer.setBoolean(EMPTYSOURCE, emptySource);
 		buffer.setBoolean(TARGETSAMEASSOURCE, targetSameAsSource);
+		buffer.setBoolean(TARGETSAMEASSOURCE_FORSAMELANGUAGE, targetSameAsSourceForSameLanguage);
 		buffer.setBoolean(TARGETSAMEASSOURCE_WITHCODES, targetSameAsSourceWithCodes);
 		buffer.setBoolean(CODEDIFFERENCE, codeDifference);
 		buffer.setBoolean(GUESSOPENCLOSE, guessOpenClose);
