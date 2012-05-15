@@ -40,6 +40,7 @@
 		<module>examples/java</module>
 		<module>tikal</module>
 		<module>integration-tests</module>
+		<module>memory-resource-tests</module>
 		<module>deployment/okapi-lib</module>
 	</modules>
 	<dependencies>
