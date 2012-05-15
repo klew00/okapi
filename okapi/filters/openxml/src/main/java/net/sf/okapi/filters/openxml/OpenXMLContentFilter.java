@@ -162,6 +162,7 @@ public class OpenXMLContentFilter extends AbstractMarkupFilter {
 	
 	public OpenXMLContentFilter() {
 		super(); // 1-6-09
+		close();
 		setMimeType(MimeTypeMapper.XML_MIME_TYPE);
 		setFilterWriter(createFilterWriter());
 		tsExcludeWordStyles = new TreeSet<String>();
