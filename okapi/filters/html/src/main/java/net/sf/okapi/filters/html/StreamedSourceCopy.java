@@ -65,13 +65,14 @@ class StreamedSourceCopy {
 		
 		// make a new source copy with tidied tags and add any missing meta tags
 		Writer writer = null;
+		StreamedSource streamedSource = null;
 		try {
 			if (input.getEncoding() == RawDocument.UNKOWN_ENCODING) {
 				// set detected encoding (this could be incorrect)
 				input.setEncoding(encoding);
 			}
 
-			StreamedSource streamedSource = new StreamedSource(input.getReader());
+			streamedSource = new StreamedSource(input.getReader());
 						
 			// output BOM if needed
 			if (hasBOM) {
@@ -152,6 +153,9 @@ class StreamedSourceCopy {
 		}
 		finally {
 			input.close();
+			if (streamedSource != null) {
+				streamedSource.close();
+			}
 			if (writer != null)
 				try {
 					writer.close();
