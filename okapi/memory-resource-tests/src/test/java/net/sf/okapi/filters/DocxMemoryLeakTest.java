@@ -1,4 +1,4 @@
-package net.sf.okapi.common.pipeline;
+package net.sf.okapi.filters;
 
 import java.io.File;
 import java.net.URI;
@@ -37,7 +37,7 @@ public class DocxMemoryLeakTest {
 //		SegmentationStep ss = new SegmentationStep();
 //		Parameters sp = (Parameters)ss.getParameters();
 //		sp.setSourceSrxPath(new File(getUri("/test.srx")).getAbsolutePath());
-//		driver.addStep(ss);initialize
+//		driver.addStep(ss);
 									
 		return driver;
 	}
@@ -56,7 +56,8 @@ public class DocxMemoryLeakTest {
 			rd.setFilterConfigId("okf_openxml");
 			pd.addBatchItem(rd, (new File("genericOutput.txt")).toURI(), "UTF-8");
 			pd.processBatch();
-			pd.clearItems();				
+			pd.clearItems();			
+			System.out.println(i);
 		}				
 	}
 }
