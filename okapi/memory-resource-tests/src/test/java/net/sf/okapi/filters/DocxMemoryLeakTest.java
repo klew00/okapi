@@ -10,8 +10,6 @@ import net.sf.okapi.common.filters.FilterConfigurationMapper;
 import net.sf.okapi.common.pipelinedriver.PipelineDriver;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.steps.common.RawDocumentToFilterEventsStep;
-import net.sf.okapi.steps.segmentation.Parameters;
-import net.sf.okapi.steps.segmentation.SegmentationStep;
 
 public class DocxMemoryLeakTest {
 
@@ -32,13 +30,7 @@ public class DocxMemoryLeakTest {
 		PipelineDriver driver = new PipelineDriver();
 		driver.setFilterConfigurationMapper(fcMapper);
 
-		driver.addStep(new RawDocumentToFilterEventsStep());
-		
-		SegmentationStep ss = new SegmentationStep();
-		Parameters sp = (Parameters)ss.getParameters();
-		sp.setSourceSrxPath(new File(getUri("/test.srx")).getAbsolutePath());
-		driver.addStep(ss);
-									
+		driver.addStep(new RawDocumentToFilterEventsStep());	
 		return driver;
 	}
 	
