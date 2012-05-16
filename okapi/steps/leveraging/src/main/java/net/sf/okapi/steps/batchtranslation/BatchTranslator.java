@@ -373,7 +373,7 @@ public class BatchTranslator {
 			}
 		}
 		catch ( Throwable e ) {
-			throw new RuntimeException(String.format("Error when processing a file.\nSource='%s'\nTarget='%s'",
+			throw new RuntimeException(String.format("Error when processing a file.\nSource='%s'\nTarget='%s'\n"+e.getMessage(),
 				htmlSourceFile.toURI(), htmlTargetFile.toURI()), e);
 		}
 		finally {

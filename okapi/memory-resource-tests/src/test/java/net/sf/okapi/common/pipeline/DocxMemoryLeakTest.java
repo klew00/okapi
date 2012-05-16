@@ -56,7 +56,8 @@ public class DocxMemoryLeakTest {
 			rd.setFilterConfigId("okf_openxml");
 			pd.addBatchItem(rd, (new File("genericOutput.txt")).toURI(), "UTF-8");
 			pd.processBatch();
-			pd.clearItems();				
+			pd.clearItems();
+			System.out.println(i);
 		}				
 	}
 }
