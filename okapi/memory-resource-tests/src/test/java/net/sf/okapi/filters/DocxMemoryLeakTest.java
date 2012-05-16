@@ -15,7 +15,6 @@ public class DocxMemoryLeakTest {
 
 	private static FilterConfigurationMapper fcMapper;	
 	private static LocaleId locEN = LocaleId.fromString("EN");
-	private static LocaleId locES = LocaleId.fromString("ES");
 
 	public static void setUp() throws Exception {
 		// Create the mapper
@@ -29,7 +28,6 @@ public class DocxMemoryLeakTest {
 		// Create the driver
 		PipelineDriver driver = new PipelineDriver();
 		driver.setFilterConfigurationMapper(fcMapper);
-
 		driver.addStep(new RawDocumentToFilterEventsStep());	
 		return driver;
 	}

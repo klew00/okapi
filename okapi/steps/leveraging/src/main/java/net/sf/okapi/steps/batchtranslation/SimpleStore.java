@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2009-2012 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -36,8 +36,15 @@ import net.sf.okapi.common.resource.TextFragment;
  */
 class SimpleStore {
 
-	DataOutputStream dos = null;
-	DataInputStream dis = null;
+	/**
+	 * maximum number of characters per writing block.
+	 * This is less than MAXINT because the maximum is really in UTF-8 bytes and
+	 * we can have 1 char = several bytes in many cases, so there is soom room built-in.
+	 */
+	private static int MAXBLOCKLEN = 40000;
+
+	private DataOutputStream dos = null;
+	private DataInputStream dis = null;
 
 	public void close () {
 		try {
@@ -81,8 +88,8 @@ class SimpleStore {
 	 */
 	public void write (TextFragment tf) {
 		try {
-			dos.writeUTF(tf.getCodedText());
-			dos.writeUTF(Code.codesToString(tf.getCodes()));
+			writeLongString(tf.getCodedText());
+			writeLongString(Code.codesToString(tf.getCodes()));
 		}
 		catch ( IOException e ) {
 			throw new RuntimeException("Error while writing.", e);
@@ -95,8 +102,8 @@ class SimpleStore {
 	 */
 	public TextFragment readNext () {
 		try {
-			String codedText = dis.readUTF();
-			String tmp = dis.readUTF();
+			String codedText = readLongString();
+			String tmp = readLongString();
 			TextFragment tf = new TextFragment(codedText, Code.stringToCodes(tmp));
 			return tf;
 		}
@@ -108,4 +115,39 @@ class SimpleStore {
 		}
 	}
 	
+	private void writeLongString (String data)
+		throws IOException
+	{
+		int r = (data.length() % MAXBLOCKLEN);
+		int n = (data.length() / MAXBLOCKLEN);
+		int count = n + ((r > 0) ? 1 : 0);
+		
+		dos.writeInt(count); // Number of blocks
+		int pos = 0;
+
+		// Write the full blocks
+		for ( int i=0; i<n; i++ ) {
+			dos.writeUTF(data.substring(pos, pos+MAXBLOCKLEN));
+			pos += MAXBLOCKLEN;
+		}
+		// Write the remaining text
+		if ( r > 0 ) {
+			dos.writeUTF(data.substring(pos));
+		}
+	}
+	
+	private String readLongString ()
+		throws IOException
+	{
+		int count = dis.readInt();
+		if ( count == 0 ) return "";
+		if ( count == 1 ) return dis.readUTF();
+		// Else: read the multiple blocks
+		StringBuilder tmp = new StringBuilder();
+		for ( int i=0; i<count; i++ ) {
+			tmp.append(dis.readUTF());
+		}
+		return tmp.toString();
+	}
+		
 }
