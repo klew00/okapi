@@ -532,15 +532,6 @@ public class RawDocument implements IResource {
 			}
 		}	
 	}
-	
-	/**
-	 * To prevent possible resource and memory leaks we allow automated closing
-	 * of any created resources.
-	 */
-	@Override
-	protected void finalize() throws Throwable {
-		close();
-	}
 
 	public Annotations getAnnotations() {
 		return (annotations == null) ? new Annotations() : annotations;
