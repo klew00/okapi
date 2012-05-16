@@ -509,6 +509,17 @@ public class RawDocument implements IResource {
 		
 			}
 		}		
+		if (inputStream != null) {
+			try {
+				inputStream.close();
+				// help free up resources
+				inputStream = null;
+			} catch (IOException e) {
+				LOGGER.log(Level.WARNING,
+				"Error closing the inputStream created by RawDocument.", e);
+		
+			}
+		}		
 		if (reader != null) {
 			try {
 				reader.close();
@@ -519,7 +530,16 @@ public class RawDocument implements IResource {
 				"Error closing the reader created by RawDocument.", e);
 		
 			}
-		}		
+		}	
+	}
+	
+	/**
+	 * To prevent possible resource and memory leaks we allow automated closing
+	 * of any created resources.
+	 */
+	@Override
+	protected void finalize() throws Throwable {
+		close();
 	}
 
 	public Annotations getAnnotations() {
