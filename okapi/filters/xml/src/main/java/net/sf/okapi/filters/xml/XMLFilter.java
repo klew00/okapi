@@ -93,6 +93,7 @@ public class XMLFilter implements IFilter {
 	private boolean hasUTF8BOM;
 	private EncoderManager encoderManager;
 	private TermsAnnotation terms;
+	private RawDocument input;
 
 	public XMLFilter () {
 		params = new Parameters();
@@ -103,6 +104,9 @@ public class XMLFilter implements IFilter {
 	}
 
 	public void close () {
+		if (input != null) {
+			input.close();
+		}
 	}
 
 	public ISkeletonWriter createSkeletonWriter () {
@@ -227,6 +231,7 @@ public class XMLFilter implements IFilter {
 	{
 		close();
 		// Initializes the variables
+		this.input = input;
 		canceled = false;
 		tuId = 0;
 		otherId = new IdGenerator(null, "o");
