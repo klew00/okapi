@@ -184,8 +184,7 @@ public abstract class AbstractParametersEditor implements IParametersEditor, Lis
 			public void widgetSelected(SelectionEvent e) {
 
 				if (e.widget.getData().equals("h")) { // Help
-					if (help != null)
-						help.showTopic(this, "index");
+					if ( help != null ) help.showWiki(getWikiPage());
 					return;
 				} else if (e.widget.getData().equals("o")) { // OK
 
@@ -780,4 +779,13 @@ public abstract class AbstractParametersEditor implements IParametersEditor, Lis
 		if (logger != null)
 			logger.log(level, text);
 	}
+
+	/**
+	 * Returns the Okapi wiki page to open when clicking on the Help button.
+	 * @return the page to open.
+	 */
+	protected String getWikiPage () {
+		return null;
+	}
+	
 }

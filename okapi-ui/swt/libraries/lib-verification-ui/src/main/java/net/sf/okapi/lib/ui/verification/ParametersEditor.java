@@ -94,6 +94,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 	private Button chkEmptyTarget;
 	private Button chkEmptySource;
 	private Button chkTargetSameAsSource;
+	private Button chkTargetSameAsSourceForSameLanguage;
 	private Button chkTargetSameAsSourceWithCodes;
 	private Composite mainComposite;
 	private TextAndBrowsePanel pnlOutputPath;
@@ -328,12 +329,19 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		chkTargetSameAsSource.setText("Warn if a target segment is the same as its source (for segments with text)");
 		chkTargetSameAsSource.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
+				updateTargetSameAsSourceForSameLanguage();
 				updateTargetSameAsSourceWithCodes();
 			};
 		});
 		chkTargetSameAsSource.setLayoutData(new GridData());
 
 		final int horizIndent = 16;
+		chkTargetSameAsSourceForSameLanguage = new Button(grpSeg, SWT.CHECK);
+		chkTargetSameAsSourceForSameLanguage.setText("Verify for same language family (i.e. en vs. en-GB, or fr-FR vs. fr-CA)");
+		gdTmp = new GridData();
+		gdTmp.horizontalIndent = horizIndent;
+		chkTargetSameAsSourceForSameLanguage.setLayoutData(gdTmp);
+
 		chkTargetSameAsSourceWithCodes = new Button(grpSeg, SWT.CHECK);
 		chkTargetSameAsSourceWithCodes.setText("Include the codes in the comparison");
 		gdTmp = new GridData();
@@ -1246,6 +1254,10 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 	}
 
 	
+	private void updateTargetSameAsSourceForSameLanguage () {
+		chkTargetSameAsSourceForSameLanguage.setEnabled(chkTargetSameAsSource.getSelection());
+	}
+
 	private void updateTargetSameAsSourceWithCodes () {
 		chkTargetSameAsSourceWithCodes.setEnabled(chkTargetSameAsSource.getSelection());
 	}
@@ -1314,6 +1326,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		chkEmptyTarget.setSelection(params.getEmptyTarget());
 		chkEmptySource.setSelection(params.getEmptySource());
 		chkTargetSameAsSource.setSelection(params.getTargetSameAsSource());
+		chkTargetSameAsSourceForSameLanguage.setSelection(params.getTargetSameAsSourceForSameLanguage());
 		chkTargetSameAsSourceWithCodes.setSelection(params.getTargetSameAsSourceWithCodes());
 		chkCheckWithLT.setSelection(params.getCheckWithLT());
 		edServerURL.setText(params.getServerURL());
@@ -1357,6 +1370,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		chkBetweenCodes.setSelection(params.getBetweenCodes());
 		
 		setPatternsData(params.getPatterns());
+		updateTargetSameAsSourceForSameLanguage();
 		updateTargetSameAsSourceWithCodes();
 		updatePatterns();
 		updateDoubledWord();
@@ -1526,6 +1540,9 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		params.setDoubledWord(chkDoubledWord.getSelection());
 		params.setDoubledWordExceptions(edDoubledWordExceptions.getText());
 		params.setCorruptedCharacters(chkCorruptedChars.getSelection());
+		if ( chkTargetSameAsSourceForSameLanguage.isEnabled() ) {
+			params.setTargetSameAsSourceForSameLanguage(chkTargetSameAsSourceForSameLanguage.getSelection());
+		}
 		if ( chkTargetSameAsSourceWithCodes.isEnabled() ) {
 			params.setTargetSameAsSourceWithCodes(chkTargetSameAsSourceWithCodes.getSelection());
 		}

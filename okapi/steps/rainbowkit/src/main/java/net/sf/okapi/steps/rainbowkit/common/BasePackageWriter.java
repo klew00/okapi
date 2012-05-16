@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
+import net.sf.okapi.common.DefaultFilenameFilter;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
@@ -60,6 +61,8 @@ public abstract class BasePackageWriter implements IPackageWriter {
 	protected String extractionType;
 	protected ISkeletonWriter skelWriter;
 	protected boolean supporstOneOutputPerInput = true;
+	protected String inputRootDir;
+	protected String rootDir;
 	
 	protected TMXWriter tmxWriterApproved;
 	protected String tmxPathApproved;
@@ -100,13 +103,16 @@ public abstract class BasePackageWriter implements IPackageWriter {
 	public void setBatchInformation (String packageRoot,
 		LocaleId srcLoc,
 		LocaleId trgLoc,
-		String inputRoot,
+		String inputRootDir,
+		String rootDir,
 		String packageId,
 		String projectId,
 		String creatorParams,
 		String tempPackageRoot)
 	{
-		manifest.setInformation(packageRoot, srcLoc, trgLoc, inputRoot,
+		this.inputRootDir = inputRootDir;
+		this.rootDir = rootDir;
+		manifest.setInformation(packageRoot, srcLoc, trgLoc, inputRootDir,
 			packageId, projectId, creatorParams, tempPackageRoot);
 	}
 
@@ -152,7 +158,7 @@ public abstract class BasePackageWriter implements IPackageWriter {
 			processStartDocument(event);
 			break;
 		case END_DOCUMENT:
-			// This method return an event becuase it may need to be modified with info
+			// This method return an event because it may need to be modified with info
 			// only the writer has (output file)
 			event = processEndDocument(event);
 			break;
@@ -219,6 +225,7 @@ public abstract class BasePackageWriter implements IPackageWriter {
 	protected void processStartBatch () {
 		docId = 0;
 		initializeTMXWriters();
+		copySupportMaterial();
 	}
 	
 	protected void setTMXInfo (boolean generate,
@@ -297,7 +304,7 @@ public abstract class BasePackageWriter implements IPackageWriter {
 
 	protected void processEndBatch () {
 		if ( params.getOutputManifest() ) {
-			manifest.save(null);
+			manifest.save(manifest.getTempPackageRoot());
 		}
 
 		if ( tmxWriterApproved != null ) {
@@ -516,5 +523,65 @@ public abstract class BasePackageWriter implements IPackageWriter {
 		list.add(new Event(EventType.RAW_DOCUMENT, rawDoc));
 		// Return the list as a multiple-event event
 		return new Event(EventType.MULTI_EVENT, new MultiEvent(list));
+	}
+	
+	protected void copySupportMaterial () {
+		// Get the list of files to copy
+		String data = params.getSupportFiles();
+		if ( Util.isEmpty(data) ) return;
+		List<String> list = params.convertSupportFilesToList(data);
+
+		// For each item in the list of supported material
+		for ( String item : list ) {
+			// Decode the item (pattern/destination)
+			int n = item.indexOf(Parameters.SUPPORTFILEDEST_SEP);
+			String origin, destination = "";
+			if ( n == -1 ) {
+				origin = item;
+			}
+			else {
+				origin = item.substring(0, n);
+				destination = item.substring(n+1);
+			}
+			// Empty destination defaults to the package root and the same filename
+			if ( destination.isEmpty() ) {
+				destination = "/"+Parameters.SUPPORTFILE_SAMENAME;
+			}
+			
+			// Resolve variables for destination
+			// Not supported as the destination is a relative path: destination = Util.fillRootDirectoryVariable(destination, rootDir);
+			// Not supported as the destination is a relative path: destination = Util.fillInputRootDirectoryVariable(destination, inputRootDir);
+			destination = LocaleId.replaceVariables(destination, manifest.getSourceLocale(), manifest.getTargetLocale());
+
+			// Resolve the variables for the origin
+			origin = Util.fillRootDirectoryVariable(origin, rootDir);
+			origin = Util.fillInputRootDirectoryVariable(origin, inputRootDir);
+			origin = LocaleId.replaceVariables(origin, manifest.getSourceLocale(), manifest.getTargetLocale());
+			// Decode the origin
+			String pattern = Util.getFilename(origin, true);
+			String origDir = Util.getDirectoryName(origin);
+			
+			File dir = new File(Util.getDirectoryName(origin));
+			File[] files = dir.listFiles(new DefaultFilenameFilter(pattern, false));
+			if ( files == null ) {
+				logger.warning(String.format("Invalid list of files for '%s'", origin));
+				continue;
+			}
+			
+			for ( File file : files ) {
+				String origFn = Util.getFilename(file.getAbsolutePath(), true);
+
+				// Decode the destination
+				String destFn = Util.getFilename(destination, true);
+				if ( destFn.equalsIgnoreCase(Parameters.SUPPORTFILE_SAMENAME) ) {
+					destFn = origFn;
+				}
+				String destDir = Util.getDirectoryName(destination);
+				String destPath = manifest.getTempPackageRoot() + (destDir.isEmpty() ? "" : destDir+"/") + destFn;
+			
+				Util.copyFile(origDir+"/"+origFn, destPath, false);
+			}
+			
+		}
 	}
 }

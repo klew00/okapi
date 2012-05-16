@@ -172,7 +172,7 @@ public class ExtractionStep extends BasePipelineStep {
 			}
 			
 			writer.setBatchInformation(resolvedOutputDir, srcLoc, trgLoc, inputRootDir,
-				packageId, projectId, params.getWriterOptions(), tempPackageRoot);
+				rootDir, packageId, projectId, params.getWriterOptions(), tempPackageRoot);
 		}
 		catch ( InstantiationException e ) {
 			throw new RuntimeException("Error creating writer class.", e);

@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2009-2012 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -33,10 +33,13 @@ import net.sf.okapi.common.resource.RawDocument;
 public class BatchTranslationStep extends BasePipelineStep {
 
 	private Parameters params;
-	private boolean isDone;
 	private BatchTranslator trans;
 	private IFilterConfigurationMapper fcMapper;
 	private String rootDir;
+	private String inputRootDir;
+	private int batchInputCount;
+	private int itemCount;
+	private boolean sendTMX;
 
 	public BatchTranslationStep () {
 		params = new Parameters();
@@ -52,6 +55,16 @@ public class BatchTranslationStep extends BasePipelineStep {
 		this.rootDir = rootDir;
 	}
 	
+	@StepParameterMapping(parameterType = StepParameterType.INPUT_ROOT_DIRECTORY)
+	public void setInputRootDirectory (String inputRootDir) {
+		this.inputRootDir = inputRootDir;
+	}
+	
+	@StepParameterMapping(parameterType = StepParameterType.BATCH_INPUT_COUNT)
+	public void setBatchInputCount (int batchInputCount) {
+		this.batchInputCount = batchInputCount;
+	}
+	
 	public String getName () {
 		return "Batch Translation";
 	}
@@ -62,38 +75,44 @@ public class BatchTranslationStep extends BasePipelineStep {
 	}
 	
 	@Override
-	public boolean isDone () {
-		return isDone;
-	}
-
-	@Override
 	protected Event handleStartBatch (Event event) {
-		isDone = true;
-		trans = new BatchTranslator(fcMapper, params, rootDir);
-		return event;
-	}
-	
-	@Override
-	protected Event handleEndBatch (Event event) {
-		if ( trans != null ) {
-			trans.endBatch();
-		}
+		sendTMX = params.getMakeTMX() && params.getSendTMX();
+		itemCount = 0;
+		trans = new BatchTranslator(fcMapper, params, rootDir, inputRootDir);
 		return event;
 	}
 	
 	@Override
 	protected Event handleStartBatchItem (Event event) {
-		// To get the raw document
-		isDone = false;
-		return event;
+		if ( sendTMX ) return Event.NOOP_EVENT;
+		else return event;
+	}
+
+	@Override
+	protected Event handleEndBatchItem (Event event) {
+		if ( sendTMX ) return Event.NOOP_EVENT;
+		else return event;
 	}
 
 	@Override
 	protected Event handleRawDocument (Event event) {
+		// Process this document
 		trans.processDocument((RawDocument)event.getResource());
-		// Can move on to the next step
-		isDone = true;
-		return event;
+		
+		// If this is the last document: execute the final process
+		itemCount++;
+		if ( itemCount >= batchInputCount ) {
+			if ( sendTMX ) {
+				return trans.endBatch();
+			}
+			else { // Don't use the multi-events, just send the input event
+				trans.endBatch();
+			}
+		}
+		
+		// Else: return the event
+		if ( sendTMX ) return Event.NOOP_EVENT;
+		else return event;
 	}
 
 	@Override

@@ -50,7 +50,7 @@ public class Editor extends FilterParametersEditor {
 
 	@Override
 	protected void createPages(TabFolder pageContainer) {
-		
+	
 		addPage("General", GeneralTab.class);
 		addPage("Options", OptionsTab.class);
 	}
@@ -58,6 +58,11 @@ public class Editor extends FilterParametersEditor {
 	@Override
 	protected void interop(Widget speaker) {
 		
+	}
+
+	@Override
+	protected String getWikiPage () {
+		return "Plain Text Filter";
 	}
 
 }

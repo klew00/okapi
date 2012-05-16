@@ -20,11 +20,18 @@
 
 package net.sf.okapi.steps.rainbowkit.creation;
 
+import java.util.List;
+
 import net.sf.okapi.common.BaseParameters;
+import net.sf.okapi.common.ListUtil;
 import net.sf.okapi.common.Util;
 
 public class Parameters extends BaseParameters {
 
+	static public String SUPPORTFILE_SEP = "\t"; // Separator between two support file entries
+	static public String SUPPORTFILEDEST_SEP = ";"; // Separator between the file pattern and its destination
+	static public String SUPPORTFILE_SAMENAME = "<same>"; // Marker to indicate to use the same file name
+	
 	static final String WRITERCLASS = "writerClass"; //$NON-NLS-1$
 	static final String WRITEROPTIONS = "writerOptions"; //$NON-NLS-1$
 	static final String PACKAGENAME = "packageName"; //$NON-NLS-1$
@@ -33,6 +40,7 @@ public class Parameters extends BaseParameters {
 	static final String OUTPUTMANIFEST = "outputManifest"; //$NON-NLS-1$
 	static final String CREATEZIP = "createZip"; //$NON-NLS-1$
 	static final String SENDOUTPUT = "sendOutput"; //$NON-NLS-1$
+	static final String SUPPORTFILES = "supportFiles"; //$NON-NLS-1$
 	
 	private String writerClass;
 	private String writerOptions;
@@ -42,6 +50,13 @@ public class Parameters extends BaseParameters {
 	private boolean outputManifest;
 	private boolean createZip;
 	private boolean sendOutput;
+	/*List of the support files. The storage is done:
+	 * origin1>destination1\torigin2>destination2\t...
+	 * where origin is a path or path with pattern
+	 * and destination is a directory relative to the root of the package,
+	 * plus the file name, or <same> for the same filename
+	 */
+	private String supportFiles;
 
 	public Parameters () {
 		reset();
@@ -53,6 +68,7 @@ public class Parameters extends BaseParameters {
 		writerOptions = "";
 		packageName = "pack1";
 		packageDirectory = Util.INPUT_ROOT_DIRECTORY_VAR;
+		supportFiles = "";
 		// Internal
 		message = "";
 		outputManifest = true;
@@ -69,6 +85,7 @@ public class Parameters extends BaseParameters {
 		packageName = buffer.getString(PACKAGENAME, packageName);
 		packageDirectory = buffer.getString(PACKAGEDIRECTORY, packageDirectory);
 		sendOutput = buffer.getBoolean(SENDOUTPUT, sendOutput);
+		supportFiles = buffer.getString(SUPPORTFILES, supportFiles);
 		// Internal
 		message = buffer.getString(MESSAGE, message);
 		outputManifest = buffer.getBoolean(OUTPUTMANIFEST, outputManifest);
@@ -83,6 +100,7 @@ public class Parameters extends BaseParameters {
 		buffer.setParameter(PACKAGENAME, packageName);
 		buffer.setParameter(PACKAGEDIRECTORY, packageDirectory);
 		buffer.setBoolean(SENDOUTPUT, sendOutput);
+		buffer.setString(SUPPORTFILES, supportFiles);
 		// Internal
 		buffer.setParameter(MESSAGE, message);
 		buffer.setParameter(OUTPUTMANIFEST, outputManifest);
@@ -130,6 +148,14 @@ public class Parameters extends BaseParameters {
 		this.packageDirectory = packageDirectory;
 	}
 	
+	public String getSupportFiles () {
+		return supportFiles;
+	}
+
+	public void setSupportFiles (String supportFiles) {
+		this.supportFiles = supportFiles;
+	}
+	
 	public boolean getOutputManifest () {
 		return outputManifest;
 	}
@@ -154,4 +180,11 @@ public class Parameters extends BaseParameters {
 		this.sendOutput = sendOutput;
 	}
 
+	public List<String> convertSupportFilesToList (String data) {
+		return ListUtil.stringAsList(data, SUPPORTFILE_SEP);
+	}
+	
+	public String convertSupportFilesToString (List<String> list) {
+		return ListUtil.listAsString(list, SUPPORTFILE_SEP);
+	}
 }

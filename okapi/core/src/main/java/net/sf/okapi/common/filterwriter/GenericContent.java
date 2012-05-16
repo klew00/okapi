@@ -313,21 +313,21 @@ public class GenericContent {
 		fragment.setCodedText(tmp.toString(), allowCodeDeletion);
 	}
 
-	/**
-	 * Creates a new fragment from a numeric-codes text and corresponding codes.
-	 * <p>A numeric-coded text is like "&lt;1>text&lt;2/>&lt;/1>&lt;b3/>".
-	 * @param genericText the text to convert.
-	 * @param codes the codes to use with the coded text.
-	 * @param allowCodeDeletion true to allow the deletion of some codes.
-	 * @return the new fragment created from the text.
-	 */
-	public TextFragment fromNumericCodedToFragment (String genericText,
-		List<Code> codes,
-		boolean allowCodeDeletion)
-	{
-		TextFragment tf = new TextFragment("", codes);
-		updateFragment(genericText, tf, false);
-		return tf;
+//	/**
+//	 * Creates a new fragment from a numeric-codes text and corresponding codes.
+//	 * <p>A numeric-coded text is like "&lt;1>text&lt;2/>&lt;/1>&lt;b3/>".
+//	 * @param genericText the text to convert.
+//	 * @param codes the codes to use with the coded text.
+//	 * @param allowCodeDeletion true to allow the deletion of some codes.
+//	 * @return the new fragment created from the text.
+//	 */
+//	public TextFragment fromNumericCodedToFragment (String genericText,
+//		List<Code> codes,
+//		boolean allowCodeDeletion)
+//	{
+//		TextFragment tf = new TextFragment("", codes);
+//		updateFragment(genericText, tf, false);
+//		return tf;
 //		
 //		if ( genericText == null )
 //			throw new NullPointerException("Parameter genericText cannot be null");
@@ -411,7 +411,7 @@ public class GenericContent {
 //		TextFragment tf = new TextFragment();
 //		tf.setCodedText(tmp.toString(), codes, allowCodeDeletion);
 //		return tf;
-	}
+//	}
 	
 	/**
 	 * Converts a letter-coded text to a fragment.

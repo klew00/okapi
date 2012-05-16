@@ -392,6 +392,54 @@ public class SegmentationAndDesegmentationTest {
 		assertEquals(1, secondSeg.getSegID());
 	}
 
+	@Test
+	public void segmentsMergedIfPreviousSegmentHasSurroundingTag() {
+		String segSnippet = 
+			"<Seg SegmentIDBeforeSegmentation=\"0\" SegID=\"0\"><b>Part 1.</b></Seg>" +
+			"<Seg SegmentIDBeforeSegmentation=\"0\" SegID=\"1\">Part 2.</Seg>";
+		String xiniSnippet = startSnippet + segSnippet + endSnippet;
+
+		((net.sf.okapi.filters.xini.Parameters)filter.getParameters()).setUseOkapiSegmentation(false);
+
+		List<Seg> segsOfFirstField = doDesegmentation(xiniSnippet);
+
+		Seg firstSeg = segsOfFirstField.get(0);
+		checkContent(firstSeg, "<b>Part 1.</b>Part 2.");
+
+	}
+
+	@Test
+	public void segmentsMergedIfNextSegmentHasSurroundingTag() {
+		String segSnippet = 
+			"<Seg SegmentIDBeforeSegmentation=\"0\" SegID=\"0\">Part 1.</Seg>" +
+			"<Seg SegmentIDBeforeSegmentation=\"0\" SegID=\"1\"><b>Part 2.</b></Seg>";
+		String xiniSnippet = startSnippet + segSnippet + endSnippet;
+
+		((net.sf.okapi.filters.xini.Parameters)filter.getParameters()).setUseOkapiSegmentation(false);
+
+		List<Seg> segsOfFirstField = doDesegmentation(xiniSnippet);
+
+		Seg firstSeg = segsOfFirstField.get(0);
+		checkContent(firstSeg, "Part 1.<b>Part 2.</b>");
+
+	}
+
+	@Test
+	public void segmentsMergedIfBothSegmentsHaveSurroundingTag() {
+		String segSnippet = 
+			"<Seg SegmentIDBeforeSegmentation=\"0\" SegID=\"0\"><b>Part 1.</b></Seg>" +
+			"<Seg SegmentIDBeforeSegmentation=\"0\" SegID=\"1\"><b>Part 2.</b></Seg>";
+		String xiniSnippet = startSnippet + segSnippet + endSnippet;
+
+		((net.sf.okapi.filters.xini.Parameters)filter.getParameters()).setUseOkapiSegmentation(false);
+
+		List<Seg> segsOfFirstField = doDesegmentation(xiniSnippet);
+
+		Seg firstSeg = segsOfFirstField.get(0);
+		checkContent(firstSeg, "<b>Part 1.</b><b>Part 2.</b>");
+
+	}
+
 	private List<Seg> getSegListOfFirstField(Xini segmentizedXini){
 		List<Seg> segList = segmentizedXini.getMain().getPage().get(0)
 		.getElements().getElement().get(0).getElementContent()

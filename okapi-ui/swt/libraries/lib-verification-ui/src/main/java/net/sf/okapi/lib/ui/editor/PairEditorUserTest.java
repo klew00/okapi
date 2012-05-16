@@ -42,6 +42,7 @@ import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.ui.Dialogs;
+import net.sf.okapi.common.ui.InputDocumentDialog;
 import net.sf.okapi.virtualdb.IVDocument;
 import net.sf.okapi.virtualdb.IVRepository;
 import net.sf.okapi.virtualdb.IVTextUnit;
