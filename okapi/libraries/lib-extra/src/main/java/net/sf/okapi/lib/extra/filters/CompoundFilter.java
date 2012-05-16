@@ -50,6 +50,7 @@ public class CompoundFilter extends AbstractBaseFilter {
 	private LinkedList<IFilter> subFilters = new LinkedList<IFilter>();
 	
 	private IFilter activeSubFilter = null;
+	private RawDocument input;
 	
 	public IFilter getActiveSubFilter() {
 		
@@ -275,7 +276,9 @@ public class CompoundFilter extends AbstractBaseFilter {
 	}
 
 	public void close() {
-		
+		if (input != null) {
+			input.close();
+		}
 		if (activeSubFilter != null) activeSubFilter.close();
 	}
 
@@ -310,6 +313,7 @@ public class CompoundFilter extends AbstractBaseFilter {
 	public void open(RawDocument input) {
 		
 //		updateSubfilter();
+		this.input = input;
 		if (activeSubFilter != null) activeSubFilter.open(input);
 	}
 

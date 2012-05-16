@@ -22,7 +22,7 @@ public class TableMemoryLeakTest {
 		// Fill it with the default configurations of several filters
 		fcMapper.addConfigurations("net.sf.okapi.filters.openxml.OpenXMLFilter");
 		fcMapper.addConfigurations("net.sf.okapi.filters.xml.XMLFilter");
-		fcMapper.addConfigurations("net.sf.okapi.filters.table.csv.CommaSeparatedValuesFilter");
+		fcMapper.addConfigurations("net.sf.okapi.filters.table.TableFilter");
 	}
 
 	private static PipelineDriver simplePipeline() throws Exception {
