@@ -51,6 +51,7 @@ public class PipelineParameters implements IResource {
 	private String rootDirectory;
 	private String inputRootDirectory;
 	private Object uiParent;
+	private int batchInputCount = -1;
 
 	/**
 	 * Creates a new empty ParametersEvent object.
@@ -203,6 +204,14 @@ public class PipelineParameters implements IResource {
 	
 	public Object getUIParent () {
 		return uiParent;
+	}
+
+	public void setBatchInputCount (int batchInputCount) {
+		this.batchInputCount = batchInputCount;
+	}
+	
+	public int getBatchInputCount () {
+		return batchInputCount;
 	}
 
 }
