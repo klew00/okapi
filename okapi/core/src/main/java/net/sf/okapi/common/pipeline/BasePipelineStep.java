@@ -351,6 +351,10 @@ public abstract class BasePipelineStep implements IPipelineStep {
 						method.invoke(param.getStep(), pp.getUIParent());
 					}
 					break;
+				case BATCH_INPUT_COUNT:
+					if ( pp.getBatchInputCount() != -1 ) {
+						method.invoke(param.getStep(), pp.getBatchInputCount());
+					}
 				}
 			}
 		}

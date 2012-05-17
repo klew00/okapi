@@ -153,6 +153,8 @@ public class BatchTranslator {
 		pp.setTargetLocale(tmxRawDoc.getTargetLocale());
 		pp.setOutputEncoding(tmxRawDoc.getEncoding()); // Use same as the output document
 		pp.setInputRawDocument(tmxRawDoc);
+		pp.setFilterConfigurationId(tmxRawDoc.getFilterConfigId());
+		pp.setBatchInputCount(1); // Only one input file now
 		// Add the event to the list
 		list.add(new Event(EventType.PIPELINE_PARAMETERS, pp));
 		// Add raw-document related events
