@@ -11,7 +11,7 @@ import net.sf.okapi.common.pipelinedriver.PipelineDriver;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.steps.common.RawDocumentToFilterEventsStep;
 
-public class TableMemoryLeakTest {
+public class PlainTextMemoryLeakTest {
 
 	private static FilterConfigurationMapper fcMapper;	
 	private static LocaleId locEN = LocaleId.fromString("EN");
@@ -22,7 +22,7 @@ public class TableMemoryLeakTest {
 		// Fill it with the default configurations of several filters
 		fcMapper.addConfigurations("net.sf.okapi.filters.openxml.OpenXMLFilter");
 		fcMapper.addConfigurations("net.sf.okapi.filters.xml.XMLFilter");
-		fcMapper.addConfigurations("net.sf.okapi.filters.table.TableFilter");
+		fcMapper.addConfigurations("net.sf.okapi.filters.plaintext.PlainTextFilter");
 	}
 
 	private static PipelineDriver simplePipeline() throws Exception {
@@ -34,7 +34,7 @@ public class TableMemoryLeakTest {
 	}
 	
 	private static URI getUri(String fileName) throws URISyntaxException {
-		URL url = TableMemoryLeakTest.class.getResource(fileName);
+		URL url = PlainTextMemoryLeakTest.class.getResource(fileName);
 		return url.toURI();
 	}
 		
@@ -43,8 +43,8 @@ public class TableMemoryLeakTest {
 		
 		PipelineDriver pd = simplePipeline();
 		for (int i = 0; i <= 10000000L; i++) {
-			RawDocument rd = new RawDocument(getUri("/table/test2cols.csv"), "UTF-8", locEN);
-			rd.setFilterConfigId("okf_table_csv");
+			RawDocument rd = new RawDocument(getUri("/plaintext/lgpl.txt"), "UTF-8", locEN);
+			rd.setFilterConfigId("okf_plaintext");
 			pd.addBatchItem(rd, (new File("genericOutput.txt")).toURI(), "UTF-8");
 			pd.processBatch();
 			pd.clearItems();
