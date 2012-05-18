@@ -84,7 +84,7 @@ class QualityChecker {
 		ltConn = null;
 		if ( params.getCheckWithLT() ) {
 			ltConn = new LanguageToolConnector();
-			ltConn.initialize(targetLocale, params.getServerURL(), params.translateLTMsg,
+			ltConn.initialize(targetLocale, sourceLocale, params.getServerURL(), params.translateLTMsg,
 				params.ltBilingualMode, params.ltTranslationSource, params.ltTranslationTarget,
 				params.ltTranslationServiceKey);
 		}
@@ -230,26 +230,28 @@ class QualityChecker {
 
 			// Check for target is the same as source, if requested
 			if ( params.getTargetSameAsSource() ) {
-				if ( hasMeaningfullText(srcSeg.text) ) {
-					if ( srcSeg.text.compareTo(trgSeg.text, params.getTargetSameAsSourceWithCodes()) == 0 ) {
-						// Is the string of the cases where target should be the same? (URL, etc.)
-						boolean warn = true;
-						if ( patterns != null ) {
-							for ( PatternItem item : patterns ) {
-								String ctext = srcSeg.text.getCodedText();
-								if ( item.enabled && item.target.equals(PatternItem.SAME) ) {
-									Matcher m = item.getSourcePattern().matcher(ctext);
-									if ( m.find() ) {
-										warn = !ctext.equals(m.group());
-										break;
+				if ( params.getTargetSameAsSourceForSameLanguage() || !srcLoc.sameLanguageAs(trgLoc) ) {
+					if ( hasMeaningfullText(srcSeg.text) ) {
+						if ( srcSeg.text.compareTo(trgSeg.text, params.getTargetSameAsSourceWithCodes()) == 0 ) {
+							// Is the string of the cases where target should be the same? (URL, etc.)
+							boolean warn = true;
+							if ( patterns != null ) {
+								for ( PatternItem item : patterns ) {
+									String ctext = srcSeg.text.getCodedText();
+									if ( item.enabled && item.target.equals(PatternItem.SAME) ) {
+										Matcher m = item.getSourcePattern().matcher(ctext);
+										if ( m.find() ) {
+											warn = !ctext.equals(m.group());
+											break;
+										}
 									}
 								}
 							}
-						}
-						if ( warn ) {
-							reportIssue(IssueType.TARGET_SAME_AS_SOURCE, tu, srcSeg.getId(),
-								"Translation is the same as the source.",
-								0, -1, 0, -1, Issue.SEVERITY_MEDIUM, srcSeg.toString(), trgSeg.toString(), null);
+							if ( warn ) {
+								reportIssue(IssueType.TARGET_SAME_AS_SOURCE, tu, srcSeg.getId(),
+									"Translation is the same as the source.",
+									0, -1, 0, -1, Issue.SEVERITY_MEDIUM, srcSeg.toString(), trgSeg.toString(), null);
+							}
 						}
 					}
 				}

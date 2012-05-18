@@ -190,7 +190,7 @@ public class MultistepPipelineTest {
 		driver.clearSteps();
 	}
 
-	//FIXME: segmenter throws an exception @Test
+	@Test
 	public void segmentationPipeline() throws URISyntaxException {			
 		driver.addStep(new RawDocumentToFilterEventsStep());
 		SegmentationStep ss = new SegmentationStep();

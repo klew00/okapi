@@ -153,6 +153,8 @@ public class BatchTranslator {
 		pp.setTargetLocale(tmxRawDoc.getTargetLocale());
 		pp.setOutputEncoding(tmxRawDoc.getEncoding()); // Use same as the output document
 		pp.setInputRawDocument(tmxRawDoc);
+		pp.setFilterConfigurationId(tmxRawDoc.getFilterConfigId());
+		pp.setBatchInputCount(1); // Only one input file now
 		// Add the event to the list
 		list.add(new Event(EventType.PIPELINE_PARAMETERS, pp));
 		// Add raw-document related events
@@ -373,7 +375,7 @@ public class BatchTranslator {
 			}
 		}
 		catch ( Throwable e ) {
-			throw new RuntimeException(String.format("Error when processing a file.\nSource='%s'\nTarget='%s'",
+			throw new RuntimeException(String.format("Error when processing a file.\nSource='%s'\nTarget='%s'\n"+e.getMessage(),
 				htmlSourceFile.toURI(), htmlTargetFile.toURI()), e);
 		}
 		finally {

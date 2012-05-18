@@ -189,6 +189,10 @@ public class OpenXMLFilter implements IFilter {
 		catch (IOException e) {
 			throw new OkapiIOException("Error closing zipped output file.");
 		}
+		
+		if (openXMLContentFilter != null) {
+			openXMLContentFilter.close(); 
+		}
 	}
 
 	/**

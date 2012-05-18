@@ -225,6 +225,7 @@ public abstract class BasePackageWriter implements IPackageWriter {
 	protected void processStartBatch () {
 		docId = 0;
 		initializeTMXWriters();
+		copySupportMaterial();
 	}
 	
 	protected void setTMXInfo (boolean generate,
@@ -341,8 +342,6 @@ public abstract class BasePackageWriter implements IPackageWriter {
 				file.delete();
 			}
 		}
-		
-		copySupportMaterial();
 	}
 
 	protected void processStartBatchItem () {
