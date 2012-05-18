@@ -33,6 +33,7 @@ public class CdataSubfilterWithRegexTest {
 		
 		fcMapper = new FilterConfigurationMapper();
 		fcMapper.addConfigurations("net.sf.okapi.filters.html.HtmlFilter");
+		fcMapper.addConfigurations("net.sf.okapi.filters.xmlstream.XMLStreamFilter");
 		fcMapper.setCustomConfigurationsDirectory(root);
         fcMapper.addCustomConfiguration("okf_html@spaces_freemarker_regex");
         fcMapper.addCustomConfiguration("okf_html@spaces_freemarker_no_regex");
@@ -58,4 +59,12 @@ public class CdataSubfilterWithRegexTest {
 		assertTrue(rtc.executeCompare(xmlStreamFilter, list, "UTF-8", locEN, locEN));
 	}
 
+	//@Test
+	public void testDoubleExtractionWithoutSubfilter() throws URISyntaxException, MalformedURLException {
+		xmlStreamFilter.setParametersFromURL(XmlStreamFilter.class.getResource("/okf_html@spaces_freemarker_regex.fprm"));
+		RoundTripComparison rtc = new RoundTripComparison();
+		ArrayList<InputDocument> list = new ArrayList<InputDocument>();
+		list.add(new InputDocument(root + "freemarker.html", null));
+		assertTrue(rtc.executeCompare(xmlStreamFilter, list, "UTF-8", locEN, locEN));
+	}
 }
