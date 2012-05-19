@@ -33,7 +33,7 @@ public class CdataSubfilterWithRegexTest {
 		
 		fcMapper = new FilterConfigurationMapper();
 		fcMapper.addConfigurations("net.sf.okapi.filters.html.HtmlFilter");
-		fcMapper.addConfigurations("net.sf.okapi.filters.xmlstream.XMLStreamFilter");
+		fcMapper.addConfigurations("net.sf.okapi.filters.xmlstream.XmlStreamFilter");
 		fcMapper.setCustomConfigurationsDirectory(root);
         fcMapper.addCustomConfiguration("okf_html@spaces_freemarker_regex");
         fcMapper.addCustomConfiguration("okf_html@spaces_freemarker_no_regex");
