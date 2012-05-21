@@ -86,6 +86,10 @@ distribution.</p>
 	constructor with extension only should be backward compatible.</li>
 	<li>Added getWikiPage() method to the AbstractParametersEditor.</li>
 	<li>Added batch input count support for the Pipeline Parameters event.</li>
+	<li>Fixed issue #233. (Patch from Shane Perry): Changed default placeHolderMode to true in 
+	XLIFFWriter. This affects the direct users of the class, indirect users 
+	(like kit creations have this setting defined by the parameters). Tikal has 
+	also been updated to force its own mode rather than rely on the default.</li>
 </ul>
 	</li>
 </ul>
