@@ -337,7 +337,7 @@ public class XLIFF2PackageWriter extends BasePackageWriter {
 				xSeg.setId(srcSeg.getId());
 				
 				// Applies TU-level translatable property to each segment
-				xSeg.setTranslatable(tu.isTranslatable());
+				xSeg.getTranslate(tu.isTranslatable());
 				
 				// Target
 				if ( trgSegs != null ) {
