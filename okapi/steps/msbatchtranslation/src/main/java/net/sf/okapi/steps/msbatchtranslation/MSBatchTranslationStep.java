@@ -169,6 +169,8 @@ public class MSBatchTranslationStep extends BasePipelineStep {
 		case DOCUMENT_PART:
 		case START_GROUP:
 		case END_GROUP:
+		case START_SUBFILTER:
+		case END_SUBFILTER:
 			// Store and possibly trigger
 			return storeAndPossiblyProcess(event, false);
 		// Events that force the trigger if needed

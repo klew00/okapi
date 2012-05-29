@@ -52,9 +52,11 @@ import net.sf.okapi.filters.yaml.TaggedFilterConfiguration;
 import net.sf.okapi.filters.yaml.TaggedFilterConfiguration.RULE_TYPE;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.DocumentPart;
+import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.RawDocument;
+import net.sf.okapi.common.resource.StartSubfilter;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
@@ -201,6 +203,9 @@ public class OpenXMLContentFilter extends AbstractMarkupFilter {
 			} else if (event.getEventType() == EventType.START_GROUP
 					|| event.getEventType() == EventType.END_GROUP) {
 	//			assertTrue(event.getResource() instanceof StartGroup || event.getResource() instanceof Ending);
+			} else if (event.getEventType() == EventType.START_SUBFILTER
+					|| event.getEventType() == EventType.END_SUBFILTER) {
+	//				assertTrue(event.getResource() instanceof StartSubfilter || event.getResource() instanceof Ending);
 			}
 			if (etyp.equals("START"))
 				LOGGER.log(Level.FINEST,"\n");

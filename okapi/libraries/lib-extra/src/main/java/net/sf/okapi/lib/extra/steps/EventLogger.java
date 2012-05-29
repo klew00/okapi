@@ -27,6 +27,7 @@ import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
 import net.sf.okapi.common.resource.EndSubfilter;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.StartSubDocument;
 //import net.sf.okapi.steps.xliffkit.common.persistence.sessions.OkapiJsonSession;
@@ -58,6 +59,7 @@ public class EventLogger extends BasePipelineStep {
 			case TEXT_UNIT:
 				//res = "  " + event.getResource().getId();
 				res = String.format("  [%s]", event.getResource().getId());
+				res +=  "  " + ((ITextUnit) event.getResource()).getName();
 				break;
 			case START_DOCUMENT:
 				res +=  "  " + ((StartDocument) event.getResource()).getName();
@@ -92,7 +94,7 @@ public class EventLogger extends BasePipelineStep {
 			sb = new StringBuilder("\n\n");
 		case START_DOCUMENT:
 		case START_SUBDOCUMENT:
-		case START_GROUP:		
+		case START_GROUP:
 		case START_BATCH_ITEM:
 		case START_SUBFILTER:
 			if (!increasing) sb.append("\n");

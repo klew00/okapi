@@ -176,6 +176,8 @@ public class ZipFilterWriter implements IFilterWriter {
 		case TEXT_UNIT:
 		case START_GROUP:
 		case END_GROUP:
+		case START_SUBFILTER:
+		case END_SUBFILTER:
 			subDocWriter.handleEvent(event);
 			break;
 		case CANCELED:

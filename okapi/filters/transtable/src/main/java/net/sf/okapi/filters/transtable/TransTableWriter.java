@@ -173,9 +173,11 @@ public class TransTableWriter implements IFilterWriter {
 			processEndSubDocument();
 			break;
 		case START_GROUP:
+		case START_SUBFILTER:
 			processStartGroup(event);
 			break;
 		case END_GROUP:
+		case END_SUBFILTER:
 			processEndGroup(event);
 			break;
 		case TEXT_UNIT:

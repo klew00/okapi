@@ -60,6 +60,21 @@ public class XMLEncoder implements IEncoder {
 	private boolean escapeLineBreak = false;
 	private int quoteMode = 1;
 	
+	public XMLEncoder(String encoding, String lineBreak,
+			boolean escapeGT, boolean escapeNbsp, boolean escapeLineBreak,
+			int quoteMode) {
+		super();
+		this.escapeGT = escapeGT;
+		this.escapeNbsp = escapeNbsp;
+		this.escapeLineBreak = escapeLineBreak;
+		this.quoteMode = quoteMode;
+		setOptions(null, encoding, lineBreak);
+	}
+
+	public XMLEncoder() {
+		super();
+	}
+
 	/**
 	 * Sets the options for this encoder. This encoder supports the following
 	 * parameters:

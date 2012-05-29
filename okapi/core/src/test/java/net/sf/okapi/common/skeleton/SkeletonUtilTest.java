@@ -25,10 +25,10 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.encoder.EncoderManager;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextFragment;
-import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.TextUnit;
 
 import org.junit.Test;
@@ -1200,5 +1200,74 @@ public class SkeletonUtilTest {
 		
 		writer.processStartDocument(ESES, "UTF-8", null, new EncoderManager(), sd);
 		assertEquals("text before_text_text after", writer.processTextUnit(tu1));		
+	}
+	
+	@Test
+	public void testSplitSkeleton() {
+		ITextUnit tu = new TextUnit("tu1");		
+		GenericSkeleton skel = new GenericSkeleton();
+		tu.setSkeleton(skel);
+		
+		skel.add("part 1");
+		skel.add("part 2");
+		skel.add("part 3");
+		skel.addContentPlaceholder(tu);
+		skel.add("part 4");
+		skel.add("part 5");
+		
+		GenericSkeleton[] parts = SkeletonUtil.splitSkeleton(skel);
+		assertEquals(2, parts.length);
+		assertEquals("part 1part 2part 3", parts[0].toString());
+		assertEquals("part 4part 5", parts[1].toString());
+	}
+	
+	@Test
+	public void testSplitSkeleton2() {
+		ITextUnit tu = new TextUnit("tu1");		
+		GenericSkeleton skel = new GenericSkeleton();
+		tu.setSkeleton(skel);
+		
+		skel.add("part 1");
+		skel.add("part 2");
+		skel.add("part 3");
+		skel.addContentPlaceholder(tu);
+		
+		GenericSkeleton[] parts = SkeletonUtil.splitSkeleton(skel);
+		assertEquals(2, parts.length);
+		assertEquals("part 1part 2part 3", parts[0].toString());
+		assertEquals("", parts[1].toString());
+	}
+	
+	@Test
+	public void testSplitSkeleton3() {
+		ITextUnit tu = new TextUnit("tu1");		
+		GenericSkeleton skel = new GenericSkeleton();
+		tu.setSkeleton(skel);
+		
+		skel.addContentPlaceholder(tu);
+		skel.add("part 1");
+		skel.add("part 2");
+		skel.add("part 3");
+				
+		GenericSkeleton[] parts = SkeletonUtil.splitSkeleton(skel);
+		assertEquals(2, parts.length);
+		assertEquals("", parts[0].toString());
+		assertEquals("part 1part 2part 3", parts[1].toString());		
+	}
+	
+	@Test
+	public void testSplitSkeleton4() {
+		ITextUnit tu = new TextUnit("tu1");		
+		GenericSkeleton skel = new GenericSkeleton();
+		tu.setSkeleton(skel);
+		
+		skel.add("part 1");
+		skel.add("part 2");
+		skel.add("part 3");
+		
+		GenericSkeleton[] parts = SkeletonUtil.splitSkeleton(skel);
+		assertEquals(2, parts.length);
+		assertEquals("part 1part 2part 3", parts[0].toString());
+		assertEquals("", parts[1].toString());
 	}
 }

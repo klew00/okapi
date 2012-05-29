@@ -30,6 +30,7 @@ import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.StartGroup;
 import net.sf.okapi.common.resource.ITextUnit;
+import net.sf.okapi.common.resource.StartSubDocument;
 import net.sf.okapi.common.resource.StartSubfilter;
 
 /**
@@ -164,6 +165,15 @@ public class Event {
 	public boolean isStartDocument () {
 		return (filterEventType == EventType.START_DOCUMENT);
 	}
+	
+	/**
+	 * Convenience method to tell if this Event carries a {@link StartSubDocument}
+	 * 
+	 * @return true if {@link StartSubDocument}, false otherwise
+	 */
+	public boolean isStartSubDocument () {
+		return (filterEventType == EventType.START_SUBDOCUMENT);
+	}
 
 	/**
 	 * Convenience method to tell if this Event is a MULTI_EVENT
@@ -282,6 +292,23 @@ public class Event {
 			return (RawDocument) resource;
 		}
 		throw new OkapiUnexpectedResourceTypeException("Event resource is not a RawDocument");
+	}
+	
+	/**
+	 * Convenience method returns the {@link IResource} as a {@link StartSubDocument}. The
+	 * caller should confirm the {@link Event} type using isStartSubDocument before calling
+	 * this method.
+	 * 
+	 * @return the {@link StartSubDocument}
+	 * 
+	 * @throws OkapiUnexpectedResourceTypeException
+	 *             if the {@link IResource} is not a {@link StartSubDocument}
+	 */
+	public StartSubDocument getStartSubDocument() {
+		if ( isStartSubDocument() ) {
+			return (StartSubDocument) resource;
+		}
+		throw new OkapiUnexpectedResourceTypeException("Event resource is not a StartSubDocument");
 	}
 	
 	/**

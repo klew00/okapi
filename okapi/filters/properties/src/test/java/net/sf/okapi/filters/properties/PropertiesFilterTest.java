@@ -34,10 +34,12 @@ import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.ITextUnit;
+import net.sf.okapi.filters.html.HtmlFilter;
 import net.sf.okapi.filters.properties.PropertiesFilter;
 import net.sf.okapi.common.filters.DefaultFilters;
 import net.sf.okapi.common.filters.FilterConfigurationMapper;
 import net.sf.okapi.common.filters.FilterTestDriver;
+import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filters.IFilterConfigurationMapper;
 import net.sf.okapi.common.filters.InputDocument;
 import net.sf.okapi.common.filters.RoundTripComparison;
@@ -296,6 +298,18 @@ public class PropertiesFilterTest {
 	}
 	
 	@Test
+	public void testHtmlOutput () {
+//		Parameters p = (Parameters)filter.getParameters();
+//		p.setSubfilter("okf_html");
+		String snippet = "Key1=<b>Text with &amp;=amp test</b>";
+		String result = FilterTestDriver.generateOutput(getEvents2(snippet),
+			filter.getEncoderManager(), locEN);
+		assertEquals(snippet, result);
+//		p.setSubfilter(null);
+//		filter.setParameters(p);
+	}
+	
+	@Test
 	public void testWithSubfilterWithEmbeddedEscapedMessagePH() {
 		Parameters p = (Parameters)filter.getParameters();
 		p.setSubfilter("okf_html");
@@ -347,47 +361,72 @@ public class PropertiesFilterTest {
 		filter.setParameters(params);
 		
 		List<Event> list = getEvents(TestUtil.getFileAsString(new File(url.toURI())));
-		assertEquals(26, list.size());
+		assertEquals(29, list.size());
 		
 		assertEquals(EventType.START_DOCUMENT, list.get(0).getEventType());
 		
 		assertEquals(EventType.START_SUBFILTER, list.get(1).getEventType());
-		assertEquals(EventType.START_SUBFILTER, list.get(9).getEventType());
-		assertEquals(EventType.START_SUBFILTER, list.get(17).getEventType());
+		assertEquals("someKey1_ssf1", list.get(1).getStartSubfilter().getId());
+		assertEquals("sub-filter:someKey1", list.get(1).getStartSubfilter().getName());		
+		
+		assertEquals(EventType.START_SUBFILTER, list.get(10).getEventType());
+		assertEquals("someKey2_ssf2", list.get(10).getStartSubfilter().getId());
+		assertEquals("sub-filter:someKey2", list.get(10).getStartSubfilter().getName());
+		
+		assertEquals(EventType.START_SUBFILTER, list.get(19).getEventType());
+		assertEquals("someKey3_ssf3", list.get(19).getStartSubfilter().getId());
+		assertEquals("sub-filter:someKey3", list.get(19).getStartSubfilter().getName());
 		
 		assertEquals(EventType.END_SUBFILTER, list.get(8).getEventType());
-		assertEquals(EventType.END_SUBFILTER, list.get(16).getEventType());
-		assertEquals(EventType.END_SUBFILTER, list.get(24).getEventType());
+		assertEquals(EventType.END_SUBFILTER, list.get(17).getEventType());
+		assertEquals(EventType.END_SUBFILTER, list.get(26).getEventType());
 		
 		assertEquals(EventType.TEXT_UNIT, list.get(3).getEventType());
-		assertEquals("2_tu1", list.get(3).getTextUnit().getId());
-		assertEquals("someKey1-one-id", list.get(3).getTextUnit().getName());
+		assertEquals("someKey1_tu1", list.get(3).getTextUnit().getId());
+		assertEquals("one-id", list.get(3).getTextUnit().getName());
 		
 		assertEquals(EventType.TEXT_UNIT, list.get(5).getEventType());
-		assertEquals("3_tu2", list.get(5).getTextUnit().getId());
-		assertEquals("someKey1-two-id", list.get(5).getTextUnit().getName());
+		assertEquals("someKey1_tu2", list.get(5).getTextUnit().getId());
+		assertEquals("two-id", list.get(5).getTextUnit().getName());
 		
-		assertEquals(EventType.TEXT_UNIT, list.get(11).getEventType());
-		assertEquals("5_tu1", list.get(11).getTextUnit().getId());
-		assertEquals("someKey2-1", list.get(11).getTextUnit().getName());
+		assertEquals(EventType.TEXT_UNIT, list.get(12).getEventType());
+		assertEquals("someKey2_tu1", list.get(12).getTextUnit().getId());
+		assertEquals("someKey2_2", list.get(12).getTextUnit().getName());
 		
-		assertEquals(EventType.TEXT_UNIT, list.get(13).getEventType());
-		assertEquals("6_tu2", list.get(13).getTextUnit().getId());
-		assertEquals("someKey2-two-id", list.get(13).getTextUnit().getName());
-		
-		assertEquals(EventType.TEXT_UNIT, list.get(19).getEventType());
-		assertEquals("8_tu1", list.get(19).getTextUnit().getId());
-		assertEquals("someKey3-1", list.get(19).getTextUnit().getName());
+		assertEquals(EventType.TEXT_UNIT, list.get(14).getEventType());
+		assertEquals("someKey2_tu2", list.get(14).getTextUnit().getId());
+		assertEquals("two-id", list.get(14).getTextUnit().getName());
 		
 		assertEquals(EventType.TEXT_UNIT, list.get(21).getEventType());
-		assertEquals("9_tu2", list.get(21).getTextUnit().getId());
-		assertEquals("someKey3-2", list.get(21).getTextUnit().getName());
+		assertEquals("someKey3_tu1", list.get(21).getTextUnit().getId());
+		assertEquals("someKey3_2", list.get(21).getTextUnit().getName());
 		
-		assertEquals(EventType.END_DOCUMENT, list.get(25).getEventType());
+		assertEquals(EventType.TEXT_UNIT, list.get(23).getEventType());
+		assertEquals("someKey3_tu2", list.get(23).getTextUnit().getId());
+		assertEquals("someKey3_4", list.get(23).getTextUnit().getName());
+		
+		assertEquals(EventType.END_DOCUMENT, list.get(28).getEventType());
 	}
 	
 	private ArrayList<Event> getEvents(String snippet) {
 		ArrayList<Event> list = new ArrayList<Event>();
+		filter.open(new RawDocument(snippet, locEN));
+		while (filter.hasNext()) {
+			Event event = filter.next();
+			if (event.isMultiEvent()) {
+				for (Event e : event.getMultiEvent()) {
+					list.add(e);
+				}
+			}
+			list.add(event);
+		}
+		filter.close();
+		return list;
+	}
+	
+	private ArrayList<Event> getEvents2(String snippet) {
+		ArrayList<Event> list = new ArrayList<Event>();
+		IFilter filter = new HtmlFilter();
 		filter.open(new RawDocument(snippet, locEN));
 		while (filter.hasNext()) {
 			Event event = filter.next();

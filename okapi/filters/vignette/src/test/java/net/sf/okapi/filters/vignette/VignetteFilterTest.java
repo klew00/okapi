@@ -158,7 +158,7 @@ public class VignetteFilterTest {
 		ArrayList<InputDocument> list = new ArrayList<InputDocument>();
 		list.add(new InputDocument(root+"Test01.xml", null));
 		RoundTripComparison rtc = new RoundTripComparison();
-		assertTrue(rtc.executeCompare(filter, list, "UTF-8", locENUS, locESES, ""));
+		assertTrue(rtc.executeCompare(filter, list, "UTF-8", locENUS, locESES, "out"));
 	}
 	
 	private String createSimpleDoc () {

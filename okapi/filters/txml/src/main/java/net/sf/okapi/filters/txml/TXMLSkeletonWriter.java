@@ -244,22 +244,22 @@ public class TXMLSkeletonWriter extends GenericSkeletonWriter {
 //		
 //		tmp.append("<target>");
 //
-//		if ( layer != null ) {
+//		if ( getLayer() != null ) {
 //			if ( altTrans != null ) {
 //				// This is an entry with source and target
-//				tmp.append(layer.endCode());
-//				tmp.append(layer.startSegment());
+//				tmp.append(getLayer().endCode());
+//				tmp.append(getLayer().startSegment());
 //				tmp.append(processFragment(srcFrag, 1));
-//				tmp.append(layer.midSegment(altTrans.getScore()));
+//				tmp.append(getLayer().midSegment(altTrans.getScore()));
 //				tmp.append(processFragment(trgFrag, 0));
-//				tmp.append(layer.endSegment());
-//				tmp.append(layer.startCode());
+//				tmp.append(getLayer().endSegment());
+//				tmp.append(getLayer().startCode());
 //			}
 //			else {
 //				// Write target only
-//				tmp.append(layer.endCode()); 
+//				tmp.append(getLayer().endCode()); 
 //				tmp.append(processFragment(trgFrag, 0));
-//				tmp.append(layer.startCode()); 
+//				tmp.append(getLayer().startCode()); 
 //			}
 //		}
 //		else {
@@ -317,14 +317,14 @@ public class TXMLSkeletonWriter extends GenericSkeletonWriter {
 	private String expandCode (Code code,
 		int context)
 	{
-		if ( layer != null ) {
+		if ( getLayer() != null ) {
 			if ( context == 0 ) { // Parent is text -> codes are inline
-				return layer.startInline() 
-					+ layer.encode(code.getOuterData(), 2)
-					+ layer.endInline();
+				return getLayer().startInline() 
+					+ getLayer().encode(code.getOuterData(), 2)
+					+ getLayer().endInline();
 			}
 			else {
-				return layer.encode(code.getOuterData(), 1);
+				return getLayer().encode(code.getOuterData(), 1);
 			}
 		}
 		// Else: no layer

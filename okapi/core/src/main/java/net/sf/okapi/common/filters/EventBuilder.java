@@ -139,20 +139,29 @@ public class EventBuilder {
 	 */
 	public void addFilterEvent(Event event) {		
 		switch (event.getEventType()) {
-		case START_SUBFILTER:
-			if (isCurrentTextUnit()) {
-				StartSubfilter ssf = event.getStartSubfilter();
-				ssf.setIsReferent(true);
-				Code c = new Code(TagType.PLACEHOLDER, ssf.getName(), TextFragment.makeRefMarker(ssf.getId()));
-				c.setReferenceFlag(true);
-				startCode(c);
-				endCode();
-				referencableFilterEvents.add(event);
-			} else {
-				filterEvents.add(event);
-			}
-			break;
+//		case START_SUBFILTER:
+//			if (isCurrentTextUnit()) {
+//				StartSubfilter ssf = event.getStartSubfilter();
+//				if (ssf == null) break;
+//				
+//				SubFilter sf = ssf.getSubfilter();
+//				if (sf == null) break;
+//				
+////				ssf.setIsReferent(true);
+////				Code c = new Code(TagType.PLACEHOLDER, ssf.getName(), TextFragment.makeRefMarker(ssf.getId()));
+////				c.setReferenceFlag(true);				
+//				
+//				Code c = ssf.getSubfilter().createRefCode();
+//				startCode(c);
+//				endCode();
+//				referencableFilterEvents.add(event);
+//			} else {
+//				filterEvents.add(event);
+//			}
+//			break;
+		
 		case START_GROUP:
+		case START_SUBFILTER:
 			if (isCurrentTextUnit()) {
 				StartGroup sg = event.getStartGroup();
 				sg.setIsReferent(true);
@@ -173,6 +182,12 @@ public class EventBuilder {
 			filterEvents.add(event);
 			break;
 		}		
+	}
+	
+	public void addFilterEvents(List<Event> events) {
+		for (Event event : events) {
+			filterEvents.add(event);
+		}
 	}
 	
 	/**
@@ -220,7 +235,12 @@ public class EventBuilder {
 				if (fe.getEventType() == EventType.START_GROUP) {
 					StartGroup sg = (StartGroup) fe.getResource();
 					endGroup((GenericSkeleton) sg.getSkeleton());
-				} else if (fe.getEventType() == EventType.TEXT_UNIT) {
+				}
+				else if (fe.getEventType() == EventType.START_SUBFILTER) {
+					StartSubfilter sf = (StartSubfilter) fe.getResource();
+					endGroup((GenericSkeleton) sf.getSkeleton());
+				}
+				else if (fe.getEventType() == EventType.TEXT_UNIT) {
 					endTextUnit();
 				}
 			}
@@ -262,6 +282,19 @@ public class EventBuilder {
 	public boolean isCurrentGroup() {
 		Event e = peekTempEvent();
 		if (e != null && e.getEventType() == EventType.START_GROUP) {
+			return true;
+		}
+		return false;
+	}
+	
+	/**
+	 * Is the current buffered {@link Event} a {@link StartSubfilter}?
+	 * 
+	 * @return true, if current {@link Event} is a {@link StartSubfilter}
+	 */
+	public boolean isCurrentSubfilter() {
+		Event e = peekTempEvent();
+		if (e != null && e.getEventType() == EventType.START_SUBFILTER) {
 			return true;
 		}
 		return false;
@@ -319,6 +352,24 @@ public class EventBuilder {
 		
 		return null;	
 	}
+	
+	public String findMostRecentParentName() {	
+		if (isCurrentComplexTextUnit()) {
+			return peekMostRecentTextUnit().getName(); 
+		}
+		
+		if (isCurrentGroup()) {
+			StartGroup parentGroup = peekMostRecentGroup();			
+			return parentGroup.getName();
+		}
+		
+		StartSubDocument parentSubDocument = peekMostRecentSubDocument();
+		if (parentSubDocument != null) {
+			return parentSubDocument.getName();
+		}
+		
+		return null;	
+	}
 
 	/**
 	 * Find in our buffered queue the most recent TextUnit
@@ -339,7 +390,7 @@ public class EventBuilder {
 	}
 	
 	/**
-	 * Peek at the most recently created {@link StartGroup}.
+	 * Peek at the most recently created {@link StartGroup} or {@link StartSubfilter}.
 	 * 
 	 * @return the filter event
 	 */
@@ -351,7 +402,8 @@ public class EventBuilder {
 		int lastIndex = tempFilterEventStack.size() - 1;
 		for (int i = lastIndex; i >= 0; i--) {
 			Event fe = tempFilterEventStack.get(i);
-			if (fe.getEventType() == EventType.START_GROUP) {
+			if (fe.getEventType() == EventType.START_GROUP ||
+					fe.getEventType() == EventType.START_SUBFILTER) {
 				StartGroup g = (StartGroup) fe.getResource();
 				return g;
 			}
@@ -458,7 +510,7 @@ public class EventBuilder {
 	public void reset(String rootId, IFilter filter) {
 		this.rootId = rootId;
 		this.subFilter = filter != null && 
-				filter instanceof BaseSubFilterAdapter; // All sub-filters subclass from this class
+				filter instanceof SubFilter; // All sub-filters subclass from this class
 		groupId = new IdGenerator(rootId, IdGenerator.START_GROUP);		
 		textUnitId = new IdGenerator(rootId, IdGenerator.TEXT_UNIT);
 		documentPartId = new IdGenerator(rootId, IdGenerator.DOCUMENT_PART);

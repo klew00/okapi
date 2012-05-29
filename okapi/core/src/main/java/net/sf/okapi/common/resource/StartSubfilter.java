@@ -1,151 +1,109 @@
+/*===========================================================================
+  Copyright (C) 2008-2012 by the Okapi Framework contributors
+-----------------------------------------------------------------------------
+  This library is free software; you can redistribute it and/or modify it 
+  under the terms of the GNU Lesser General Public License as published by 
+  the Free Software Foundation; either version 2.1 of the License, or (at 
+  your option) any later version.
+
+  This library is distributed in the hope that it will be useful, but 
+  WITHOUT ANY WARRANTY; without even the implied warranty of 
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser 
+  General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General Public License 
+  along with this library; if not, write to the Free Software Foundation, 
+  Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+
+  See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
+===========================================================================*/
+
 package net.sf.okapi.common.resource;
 
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.encoder.IEncoder;
+import net.sf.okapi.common.filters.SubFilterSkeletonWriter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
+import net.sf.okapi.common.skeleton.ISkeletonWriter;
+
 
 public class StartSubfilter extends StartGroup {
-	// from sub document
-	private String encoding;
-	private boolean isMultilingual;
-	private IParameters params;
-	private IFilterWriter filterWriter;
-	private boolean hasUTF8BOM;
-	private String lineBreak;
 	
-	// new for sub filter
-	private boolean useParentEncoder;
+	private StartDocument startDoc;
+	//private SubFilter subFilter;
+	private SubFilterSkeletonWriter skelWriter;
+	private IEncoder parentEncoder;
 
-	/**
-	 * Creates a new {@link StartSubfilter} object.
-	 * @param parentId The identifier of the parent resource for this sub filter.
-	 */
-	public StartSubfilter(String parentId) {
-		super(parentId);
-	}
+//	/**
+//	 * Creates a new {@link StartSubfilter} object.
+//	 * @param parentId The identifier of the parent resource for this sub filter.
+//	 * @param startDoc The StartDocument resource of the subfilter.
+//	 */
+//	public StartSubfilter(SubFilter subFilter, StartDocument startDoc) {
+//		super(startDoc.getName(), null, false); // Not referenced by default
+//		this.startDoc = startDoc;
+//		this.subFilter = subFilter;
+//	}
 
 	/**
 	 * Creates a new {@link StartSubfilter} object with the identifier of the group's parent
 	 * and the group's identifier.
-	 * @param parentId the identifier of the parent resource for this sub filter.
 	 * @param id the identifier of this sub filter.
+	 * @param startDoc The StartDocument resource of the subfilter.
+	 * @param parentEncoder2 
 	 */
-	public StartSubfilter(String parentId, String id)
-	{
-		super(parentId);
-		this.id = id;
+	public StartSubfilter(String id, StartDocument startDoc, IEncoder parentEncoder) {
+		super(startDoc.getName(), null, false); // Not referenced by default
+		this.startDoc = startDoc;
+		this.parentEncoder = parentEncoder;
+		setId(id);		
 	}
 	
-	private LocaleId locale;
-	/**
-	 * @return the locale
-	 */
 	public LocaleId getLocale() {
-		return locale;
+		return startDoc.getLocale();
 	}
-
-	/**
-	 * @param locale the locale to set
-	 */
-	public void setLocale(LocaleId locale) {
-		this.locale = locale;
-	}
-
-	/**
-	 * @return the encoding
-	 */
+	
 	public String getEncoding() {
-		return encoding;
+		return startDoc.getEncoding();
 	}
-
-	/**
-	 * @param encoding the encoding to set
-	 */
-	public void setEncoding(String encoding) {
-		this.encoding = encoding;
-	}
-
-	/**
-	 * @return the isMultilingual
-	 */
+	
 	public boolean isMultilingual() {
-		return isMultilingual;
+		return startDoc.isMultilingual();
 	}
-
-	/**
-	 * @param isMultilingual the isMultilingual to set
-	 */
-	public void setMultilingual(boolean isMultilingual) {
-		this.isMultilingual = isMultilingual;
+	
+	public IParameters getFilterParameters() {
+		return startDoc.getFilterParameters();
 	}
-
-	/**
-	 * @return the params
-	 */
-	public IParameters getParams() {
-		return params;
-	}
-
-	/**
-	 * @param params the params to set
-	 */
-	public void setParams(IParameters params) {
-		this.params = params;
-	}
-
-	/**
-	 * @return the filterWriter
-	 */
+	
 	public IFilterWriter getFilterWriter() {
-		return filterWriter;
+		return startDoc.getFilterWriter();
 	}
-
-	/**
-	 * @param filterWriter the filterWriter to set
-	 */
-	public void setFilterWriter(IFilterWriter filterWriter) {
-		this.filterWriter = filterWriter;
+	
+	public boolean hasUTF8BOM() {
+		return startDoc.hasUTF8BOM();
 	}
-
-	/**
-	 * @return the hasUTF8BOM
-	 */
-	public boolean isHasUTF8BOM() {
-		return hasUTF8BOM;
-	}
-
-	/**
-	 * @param hasUTF8BOM the hasUTF8BOM to set
-	 */
-	public void setHasUTF8BOM(boolean hasUTF8BOM) {
-		this.hasUTF8BOM = hasUTF8BOM;
-	}
-
-	/**
-	 * @return the lineBreak
-	 */
+	
 	public String getLineBreak() {
-		return lineBreak;
+		return startDoc.getLineBreak();
 	}
 
-	/**
-	 * @param lineBreak the lineBreak to set
-	 */
-	public void setLineBreak(String lineBreak) {
-		this.lineBreak = lineBreak;
+	public StartDocument getStartDoc() {
+		return startDoc;
 	}
 
-	/**
-	 * @return the useParentEncoder
-	 */
-	public boolean isUseParentEncoder() {
-		return useParentEncoder;
+	public SubFilterSkeletonWriter getSkeletonWriter() {
+		return skelWriter;
 	}
 
-	/**
-	 * @param useParentEncoder the useParentEncoder to set
-	 */
-	public void setUseParentEncoder(boolean useParentEncoder) {
-		this.useParentEncoder = useParentEncoder;
-	}	
+	public ISkeletonWriter createSkeletonWriter(StartSubfilter resource,
+			LocaleId outputLocale, String outputEncoding) {
+		this.skelWriter = new SubFilterSkeletonWriter(this);
+		return this.skelWriter.setOptions(outputLocale, outputEncoding, this);
+	}
+
+	public IEncoder getParentEncoder() {
+		return parentEncoder;
+	}
+	
 }

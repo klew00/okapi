@@ -17,6 +17,7 @@ import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.StartGroup;
 import net.sf.okapi.common.resource.ITextUnit;
+import net.sf.okapi.common.resource.StartSubfilter;
 import net.sf.okapi.filters.html.HtmlFilter;
 
 public class HtmlUtils {
@@ -42,6 +43,8 @@ public class HtmlUtils {
 				assertTrue(event.getResource() instanceof DocumentPart);
 			} else if (event.getEventType() == EventType.START_GROUP || event.getEventType() == EventType.END_GROUP) {
 				assertTrue(event.getResource() instanceof StartGroup || event.getResource() instanceof Ending);
+			} else if (event.getEventType() == EventType.START_SUBFILTER || event.getEventType() == EventType.END_SUBFILTER) {
+				assertTrue(event.getResource() instanceof StartSubfilter || event.getResource() instanceof Ending);
 			}
 			System.out.print(event.getEventType().toString() + ": ");
 			if (event.getResource() != null) {
@@ -70,6 +73,8 @@ public class HtmlUtils {
 					assertTrue(event.getResource() instanceof DocumentPart);
 				} else if (event.getEventType() == EventType.START_GROUP || event.getEventType() == EventType.END_GROUP) {
 					assertTrue(event.getResource() instanceof StartGroup || event.getResource() instanceof Ending);
+				} else if (event.getEventType() == EventType.START_SUBFILTER || event.getEventType() == EventType.END_SUBFILTER) {
+					assertTrue(event.getResource() instanceof StartSubfilter || event.getResource() instanceof Ending);
 				}
 				System.out.print(event.getEventType().toString() + ": ");
 				if (event.getResource() != null) {

@@ -60,7 +60,7 @@ public class OpenXMLContentSkeletonWriter extends GenericSkeletonWriter {
 	public final static int MSEXCELCOMMENT=5; // DWH 5-13-09
 	public final static int MSWORDDOCPROPERTIES=6; // DWH 5-25-09
 	private int configurationType; // DWH 4-10-09
-	private ILayerProvider layer;
+	//private ILayerProvider layer;
 	private EncoderManager internalEncoderManager; // The encoderManager of the super class is not used
 	private int nTextBoxLevel=0; // DWH 10-27-09
 	private boolean bInBlankText=false; // DWH 10-27-09
@@ -109,15 +109,15 @@ public class OpenXMLContentSkeletonWriter extends GenericSkeletonWriter {
 				sTuff = text; // DWH 5-22-09
 				if ( internalEncoderManager == null ) // DWH 5-22-09 whole if-else: encode first
 				{
-					if ( layer != null )
-						sTuff = layer.encode(text, context);
+					if ( getLayer() != null )
+						sTuff = getLayer().encode(text, context);
 				}
 				else
 				{	
-					if ( layer == null )
+					if ( getLayer() == null )
 						sTuff = internalEncoderManager.encode(text, context);
 					else
-						sTuff = layer.encode(internalEncoderManager.encode(sTuff, context), context);
+						sTuff = getLayer().encode(internalEncoderManager.encode(sTuff, context), context);
 				}
 				if (context==1) // DWH 5-22-09 add unencoded tags if needed
 				{
@@ -199,19 +199,19 @@ public class OpenXMLContentSkeletonWriter extends GenericSkeletonWriter {
 					int cp = text.codePointAt(i);
 					i++; // Skip low-surrogate
 					if ( internalEncoderManager == null ) {
-						if ( layer == null ) {
+						if ( getLayer() == null ) {
 							tmp.append(new String(Character.toChars(cp)));
 						}
 						else {
-							tmp.append(layer.encode(cp, context));
+							tmp.append(getLayer().encode(cp, context));
 						}
 					}
 					else {
-						if ( layer == null ) {
+						if ( getLayer() == null ) {
 							tmp.append(internalEncoderManager.encode(cp, context));
 						}
 						else {
-							tmp.append(layer.encode(
+							tmp.append(getLayer().encode(
 									internalEncoderManager.encode(cp, context),
 								context));
 						}
@@ -219,19 +219,19 @@ public class OpenXMLContentSkeletonWriter extends GenericSkeletonWriter {
 				}
 				else { // Non-supplemental case
 					if ( internalEncoderManager == null ) {
-						if ( layer == null ) {
+						if ( getLayer() == null ) {
 							tmp.append(ch);
 						}
 						else {
-							tmp.append(layer.encode(ch, context));
+							tmp.append(getLayer().encode(ch, context));
 						}
 					}
 					else {
-						if ( layer == null ) {
+						if ( getLayer() == null ) {
 							tmp.append(internalEncoderManager.encode(ch, context));
 						}
 						else {
-							tmp.append(layer.encode(
+							tmp.append(getLayer().encode(
 									internalEncoderManager.encode(ch, context),
 								context));
 						}
@@ -254,19 +254,19 @@ public class OpenXMLContentSkeletonWriter extends GenericSkeletonWriter {
 		return(s); // DWH 5-14-09 no encoding is necessary for tags
 /*
 		if ( internalEncoderManager == null ) {
-			if ( layer == null ) {
+			if ( getLayer() == null ) {
 				return s; // DWH 4-8-09 replaced tf.toString() with sTuff
 			}
 			else {
-				return layer.encode(s, context); // DWH 4-8-09 replaced tf.toString() with sTuff
+				return getLayer().encode(s, context); // DWH 4-8-09 replaced tf.toString() with sTuff
 			}
 		}
 		else {
-			if ( layer == null ) {
+			if ( getLayer() == null ) {
 				return internalEncoderManager.encode(s, context); // DWH 4-8-09 replaced tf.toString() with sTuff
 			}
 			else {
-				return layer.encode(
+				return getLayer().encode(
 					internalEncoderManager.encode(s, context), context); // DWH 4-8-09 replaced tf.toString() with sTuff
 			}
 		}

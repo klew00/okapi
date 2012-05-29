@@ -98,11 +98,11 @@ public class XLIFFSkeletonWriter extends GenericSkeletonWriter {
 		
 		// If it is not a reference marker, just use the data
 		if ( !part.toString().startsWith(TextFragment.REFMARKER_START) ) {
-			if ( layer == null ) {
+			if ( getLayer() == null ) {
 				return part.toString();
 			}
 			else {
-				return layer.encode(part.toString(), context);
+				return getLayer().encode(part.toString(), context);
 			}
 		}
 		
@@ -196,7 +196,7 @@ public class XLIFFSkeletonWriter extends GenericSkeletonWriter {
 		
 		// Process the target content: either with or without segments
 		// With layers: treat non-segmented translatable entries with existing target as segmented
-		if ( doSegments || (( layer != null ) && tu.isTranslatable() && !trgCont.equals(srcCont) )) {
+		if ( doSegments || (( getLayer() != null ) && tu.isTranslatable() && !trgCont.equals(srcCont) )) {
 			return getSegmentedOutput(srcCont, trgCont, locToUse, context);
 		}
 		else {
@@ -322,19 +322,19 @@ public class XLIFFSkeletonWriter extends GenericSkeletonWriter {
 			tf = cont.getUnSegmentedContentCopy();
 		}
 		// Apply the layer if there is one
-		if ( layer == null ) {
+		if ( getLayer() == null ) {
 			return getContent(tf, locToUse, context);
 		}
 		else {
 			switch ( context ) {
 			case 1:
-				return layer.endCode()
+				return getLayer().endCode()
 					+ getContent(tf, locToUse, 0)
-					+ layer.startCode();
+					+ getLayer().startCode();
 			case 2:
-				return layer.endInline()
+				return getLayer().endInline()
 					+ getContent(tf, locToUse, 0)
-					+ layer.startInline();
+					+ getLayer().startInline();
 			default:
 				return getContent(tf, locToUse, context);
 			}
@@ -366,36 +366,36 @@ public class XLIFFSkeletonWriter extends GenericSkeletonWriter {
 				// Opening marker
 				tmp.append(String.format("<mrk mid=\"%s\" mtype=\"seg\">", trgSeg.id));
 				// Write the segment (note: srcSeg can be null)
-				if ( layer == null ) {
+				if ( getLayer() == null ) {
 					// If no layer: just write the target
 					tmp.append(getContent(trgSeg.text, locToUse, context));
 				}
 				else { // If layer: write the bilingual entry
 					switch ( context ) {
 					case 1:
-						tmp.append(layer.endCode()
-							+ layer.startSegment()
+						tmp.append(getLayer().endCode()
+							+ getLayer().startSegment()
 							+ ((srcSeg==null) ? "" : getContent(srcSeg.text, locToUse, 0))
-							+ layer.midSegment(lev)
+							+ getLayer().midSegment(lev)
 							+ getContent(trgSeg.text, locToUse, 0)
-							+ layer.endSegment()
-							+ layer.startCode());
+							+ getLayer().endSegment()
+							+ getLayer().startCode());
 						break;
 					case 2:
-						tmp.append(layer.endInline()
-							+ layer.startSegment()
+						tmp.append(getLayer().endInline()
+							+ getLayer().startSegment()
 							+ ((srcSeg==null) ? "" : getContent(srcSeg.text, locToUse, 0))
-							+ layer.midSegment(lev)
+							+ getLayer().midSegment(lev)
 							+ getContent(trgSeg.text, locToUse, 0)
-							+ layer.endSegment()
-							+ layer.startInline());
+							+ getLayer().endSegment()
+							+ getLayer().startInline());
 						break;
 					default:
-						tmp.append(layer.startSegment()
+						tmp.append(getLayer().startSegment()
 							+ ((srcSeg==null) ? "" : getContent(srcSeg.text, locToUse, 0))
-							+ layer.midSegment(lev)
+							+ getLayer().midSegment(lev)
 							+ getContent(trgSeg.text, locToUse, 0)
-							+ layer.endSegment());
+							+ getLayer().endSegment());
 						break;
 					}
 				}
@@ -502,12 +502,12 @@ public class XLIFFSkeletonWriter extends GenericSkeletonWriter {
 		
 		// Return the native value if possible
 		if ( encoderManager == null ) {
-			if ( layer == null ) return value;
-			else return layer.encode(value, context); //TODO: context correct??
+			if ( getLayer() == null ) return value;
+			else return getLayer().encode(value, context); //TODO: context correct??
 		}
 		else {
-			if ( layer == null ) return encoderManager.toNative(name, value);
-			else return layer.encode(encoderManager.toNative(name, value), context);
+			if ( getLayer() == null ) return encoderManager.toNative(name, value);
+			else return getLayer().encode(encoderManager.toNative(name, value), context);
 		}
 	}
 

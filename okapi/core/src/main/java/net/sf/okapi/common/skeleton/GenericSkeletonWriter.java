@@ -29,17 +29,19 @@ import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.ISkeleton;
+import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.ReversedIterator;
 import net.sf.okapi.common.annotation.AltTranslation;
 import net.sf.okapi.common.annotation.AltTranslationsAnnotation;
 import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.filterwriter.ILayerProvider;
-import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.EndSubfilter;
 import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.INameable;
 import net.sf.okapi.common.resource.IReferenceable;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.StartDocument;
@@ -49,7 +51,6 @@ import net.sf.okapi.common.resource.StartSubfilter;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextPart;
-import net.sf.okapi.common.resource.ITextUnit;
 
 /**
  * Implements ISkeletonWriter for the GenericSkeleton skeleton. 
@@ -60,7 +61,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 	
 	protected LocaleId inputLoc;
 	protected LocaleId outputLoc;
-	protected ILayerProvider layer;
+	private ILayerProvider layer;
 	protected EncoderManager encoderManager;
 	protected Stack<StorageList> storageStack;
 	protected boolean isMultilingual;
@@ -73,6 +74,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 	private LinkedHashMap<String, Referent> referents;
 	protected String outputEncoding;
 	private int referentCopies = 1; // Number of copies to have for the referents (min=1)
+	private ISkeletonWriter sfWriter; // sub-filter skeleton writer
 
 //	private boolean segmentReferents = false;
 	
@@ -89,6 +91,8 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 
 	@Override
 	public void close () {
+		sfWriter = null;
+		
 		if ( referents != null ) {
 			referents.clear();
 			referents = null;
@@ -117,6 +121,9 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 		EncoderManager encoderManager,
 		StartDocument resource)
 	{
+		if (sfWriter != null) {
+			return sfWriter.processStartDocument(outputLocale, outputEncoding, layer, encoderManager, resource);
+		}
 		referents = new LinkedHashMap<String, Referent>();
 		storageStack = new Stack<StorageList>();
 
@@ -144,11 +151,17 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 
 	@Override
 	public String processEndDocument (Ending resource) {
+		if (sfWriter != null) {
+			return sfWriter.processEndDocument(resource);
+		}
 		return getString((GenericSkeleton)resource.getSkeleton(), 1);
 	}
 
 	@Override
 	public String processStartSubDocument (StartSubDocument resource) {
+		if (sfWriter != null) {
+			return sfWriter.processStartSubDocument(resource);
+		}
 		if ( storageStack.size() > 0 ) {
 			storageStack.peek().add(resource);
 			return "";
@@ -158,6 +171,9 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 
 	@Override
 	public String processEndSubDocument (Ending resource) {
+		if (sfWriter != null) {
+			return sfWriter.processEndSubDocument(resource);
+		}
 		if ( storageStack.size() > 0 ) {
 			storageStack.peek().add(resource);
 			return "";
@@ -179,31 +195,43 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 			storageStack.push(sl);
 			return "";
 		}
+		if (sfWriter != null) {
+			return sfWriter.processStartGroup(resource);
+		}
 		return getString((GenericSkeleton)resource.getSkeleton(), 1);
 	}
 	
 	@Override
-	public String processEndGroup (Ending resource) {
+	public String processEndGroup (Ending resource) {		
 		if ( storageStack.size() > 0 ) {
 			storageStack.peek().add(resource);
 			storageStack.pop();
 			return "";
+		}
+		if (sfWriter != null) {
+			return sfWriter.processEndGroup(resource);
 		}
 		return getString((GenericSkeleton)resource.getSkeleton(), 1);
 	}
 	
 	@Override
 	public String processStartSubfilter (StartSubfilter resource) {
+		sfWriter = resource.createSkeletonWriter(resource, outputLoc, outputEncoding);
 		return processStartGroup(resource);
 	}
 	
 	@Override
-	public String processEndSubfilter (EndSubfilter resource) {
-		return processEndGroup(resource);
+	public String processEndSubfilter (EndSubfilter resource) {		
+		String res = processEndGroup(resource);
+		sfWriter = null;
+		return res;
 	}
 	
 	@Override
 	public String processTextUnit (ITextUnit resource) {
+		if (sfWriter != null) {
+			return sfWriter.processTextUnit(resource);
+		}
 		if ( resource.isReferent() ) {
 			referents.put(resource.getId(), new Referent(resource, referentCopies));
 			return "";
@@ -217,6 +245,9 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 
 	@Override
 	public String processDocumentPart (DocumentPart resource) {
+		if (sfWriter != null) {
+			return sfWriter.processDocumentPart(resource);
+		}
 		if ( resource.isReferent() ) {
 			referents.put(resource.getId(), new Referent(resource, referentCopies));
 			return "";
@@ -978,10 +1009,11 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 			else if ( ref instanceof ITextUnit ) {
 				tmp.replace(start, end, getString((ITextUnit)ref, locToUse, 2));
 			}
+			// TODO seems GenericSkeletonPart is not IReferenceable, others are
 			else if ( ref instanceof GenericSkeletonPart ) {
 				tmp.replace(start, end, getString((GenericSkeletonPart)ref, 2));
 			}
-			else if ( ref instanceof StorageList ) { // == StartGroup
+			else if ( ref instanceof StorageList ) { // == StartGroup or StartSubfilter
 				tmp.replace(start, end, getString((StorageList)ref, locToUse, 2));
 			}
 			else { // DocumentPart, StartDocument, StartSubDocument 
@@ -996,23 +1028,41 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 		int context)
 	{
 		StringBuilder tmp = new StringBuilder();
-		// Treat the skeleton of this list
-		tmp.append(getString((GenericSkeleton)list.getSkeleton(), context));		
-		// Then treat the list itself
-		for ( IResource res : list ) {
-			if ( res instanceof ITextUnit ) {
-				tmp.append(getString((ITextUnit)res, locToUse, context));
-			}
-			else if ( res instanceof StorageList ) {
-				tmp.append(getString((StorageList)res, locToUse, context));
-			}
-			else if ( res instanceof DocumentPart ) {
-				tmp.append(getString((GenericSkeleton)res.getSkeleton(), context));
-			}
-			else if ( res instanceof Ending ) {
-				tmp.append(getString((GenericSkeleton)res.getSkeleton(), context));
+		
+		if (list.getStartGroup() instanceof StartSubfilter) {
+			tmp.append(getString((GenericSkeleton)list.getSkeleton(), context));
+			
+			StartSubfilter ssf = (StartSubfilter) list.getStartGroup();
+			tmp.append(ssf.getSkeletonWriter().getEncodedOutput());
+			
+			// Looking for the last Ending to write its skeleton
+			for ( IResource res : new ReversedIterator<IResource>(list) ) {
+				if ( res instanceof Ending ) {
+					tmp.append(getString((GenericSkeleton)res.getSkeleton(), context));
+					break;
+				}
 			}
 		}
+		else {
+			// Treat the skeleton of this list
+			tmp.append(getString((GenericSkeleton)list.getSkeleton(), context));		
+			// Then treat the list itself
+			for ( IResource res : list ) {
+				if ( res instanceof ITextUnit ) {
+					tmp.append(getString((ITextUnit)res, locToUse, context));
+				}
+				else if ( res instanceof StorageList ) {
+					tmp.append(getString((StorageList)res, locToUse, context));
+				}
+				else if ( res instanceof DocumentPart ) {
+					tmp.append(getString((GenericSkeleton)res.getSkeleton(), context));
+				}
+				else if ( res instanceof Ending ) {
+					tmp.append(getString((GenericSkeleton)res.getSkeleton(), context));
+				}
+			}
+		}
+		
 		return tmp.toString();
 	}
 	
@@ -1099,6 +1149,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 					}
 					break;
 				case START_GROUP:
+				case START_SUBFILTER:
 					if ( ((StartGroup)resource).isReferent() ) {
 						StorageList sl = new StorageList((StartGroup)resource);
 						referents.put(sl.getId(), new Referent(sl, referentCopies));
@@ -1109,5 +1160,9 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 				}
 			}
 		}
+	}
+
+	protected ILayerProvider getLayer() {
+		return layer;
 	}
 }

@@ -209,6 +209,8 @@ public class ResourceSimplifier {
 		case END_SUBDOCUMENT:
 		case START_GROUP:
 		case END_GROUP:
+		case START_SUBFILTER:
+		case END_SUBFILTER:
 			// Referents are sent to the GSW cache and are accessed there as refs are processed.
 			// Here we deal with non-referents only.
 			// The original event (the skeleton should be deleted) precedes in the resulting multi-event DPs/TUs 

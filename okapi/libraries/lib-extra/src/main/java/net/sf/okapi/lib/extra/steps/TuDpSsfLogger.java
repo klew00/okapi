@@ -5,12 +5,13 @@ import java.util.logging.Logger;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
+import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.EndSubfilter;
 import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.StartSubfilter;
 
-public class TuSsfLogger extends BasePipelineStep {
+public class TuDpSsfLogger extends BasePipelineStep {
 
 	private final Logger logger = Logger.getLogger(getClass().getName());
 	private StringBuilder sb;
@@ -46,12 +47,12 @@ public class TuSsfLogger extends BasePipelineStep {
 		return super.handleTextUnit(event);
 	}
 	
-//	@Override
-//	protected Event handleDocumentPart(Event event) {
-//		DocumentPart dp = event.getDocumentPart();
-//		sb.append(DocumentPartLogger.getDpInfo(dp, srcLoc));
-//		return super.handleDocumentPart(event);
-//	}
+	@Override
+	protected Event handleDocumentPart(Event event) {
+		DocumentPart dp = event.getDocumentPart();
+		sb.append(DocumentPartLogger.getDpInfo(dp, srcLoc));
+		return super.handleDocumentPart(event);
+	}
 	
 	@Override
 	protected Event handleStartSubfilter(Event event) {

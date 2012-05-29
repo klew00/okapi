@@ -81,6 +81,8 @@ public class ResourceSimplifierStep extends BasePipelineStep {
 		case END_SUBDOCUMENT:
 		case START_GROUP:
 		case END_GROUP:
+		case START_SUBFILTER:
+		case END_SUBFILTER:
 		case TEXT_UNIT:
 		case DOCUMENT_PART:
 			return simplifier.convert(event);

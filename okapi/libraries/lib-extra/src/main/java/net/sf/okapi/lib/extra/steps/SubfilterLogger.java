@@ -4,13 +4,14 @@ import java.util.logging.Logger;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.Util;
 import net.sf.okapi.common.annotation.IAnnotation;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
+import net.sf.okapi.common.resource.EndSubfilter;
 import net.sf.okapi.common.resource.StartDocument;
-import net.sf.okapi.common.resource.StartGroup;
 import net.sf.okapi.common.resource.StartSubfilter;
 
-public class StartSubfilterLogger extends BasePipelineStep {
+public class SubfilterLogger extends BasePipelineStep {
 
 	private final Logger logger = Logger.getLogger(getClass().getName());
 	private StringBuilder sb;
@@ -114,15 +115,61 @@ public class StartSubfilterLogger extends BasePipelineStep {
 			}
 		}		
 		
+		sb.append("             locale: " + ssf.getLocale());
+		sb.append("\n             encoding: " + ssf.getEncoding());
+		sb.append("\n             isMultilingual: " + (ssf.isMultilingual() ? "true" : "false"));
+		sb.append("\n             params: " + (ssf.getFilterParameters() != null ? ssf.getFilterParameters().getClass().getName() : "null"));
+		sb.append("\n             filterWriter: " + (ssf.getFilterWriter() != null ? ssf.getFilterWriter().getClass().getName() : "null"));
+		sb.append("\n             hasUTF8BOM: " + (ssf.hasUTF8BOM() ? "true" : "false"));
+		//sb.append("\n             lineBreak: " + ssf.getLineBreak().replaceAll("\\n", "\\\\n".replaceAll("\\r", "\\\\r")));
+		sb.append("\n             lineBreak: " + logLinebreak(ssf.getLineBreak()));
+		sb.append("\n");
+		
 		if (ssf.getSkeleton() != null) {
 			sb.append(String.format("      Skeleton: %s", ssf.getSkeleton().toString()));
 			sb.append("\n");
 		}
 	}
 	
+	private static void fillSB2(StringBuilder sb, EndSubfilter esf, LocaleId srcLoc) {
+		sb.append(String.format("esf [id=%s]", esf.getId()));		
+		sb.append("\n");
+		
+		if (esf.getAnnotations() != null) {
+//			sb.append("             ");
+//			sb.append("Source annotations:");
+//			sb.append("\n");
+			for (IAnnotation annot : esf.getAnnotations()) {
+				sb.append("                    ");
+				sb.append(annot.getClass().getName());
+				sb.append(" ");
+				sb.append(annot.toString());
+				sb.append("\n");
+			}		
+		}		
+		
+		if (esf.getSkeleton() != null) {
+			sb.append(String.format("      Skeleton: %s", esf.getSkeleton().toString()));
+			sb.append("\n");
+		}
+	}
+	
+	private static String logLinebreak(String lineBreak) {
+		if ((Util.LINEBREAK_DOS).equals(lineBreak)) return "\\r\\n";
+		else if ((Util.LINEBREAK_MAC).equals(lineBreak)) return "\\r";
+		else if ((Util.LINEBREAK_UNIX).equals(lineBreak)) return "\\n";
+		return null;
+	}
+
 	public static String getSsfInfo(StartSubfilter ssf, LocaleId srcLoc) {
 		StringBuilder sb = new StringBuilder();
 		fillSB(sb, ssf, srcLoc);
+		return sb.toString();
+	}
+	
+	public static String getEsfInfo(EndSubfilter esf, LocaleId srcLoc) {
+		StringBuilder sb = new StringBuilder();
+		fillSB2(sb, esf, srcLoc);
 		return sb.toString();
 	}
 }

@@ -108,6 +108,8 @@ public class TMImportStep extends BasePipelineStep {
 		case END_SUBDOCUMENT:
 		case START_GROUP:
 		case END_GROUP:
+		case START_SUBFILTER:
+		case END_SUBFILTER:
 			writer.handleEvent(event);
 			break;
 

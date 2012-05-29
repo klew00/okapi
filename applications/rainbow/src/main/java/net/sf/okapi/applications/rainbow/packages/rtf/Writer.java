@@ -166,9 +166,11 @@ public class Writer extends BaseWriter {
 				processEndSubDocument((Ending)event.getResource());
 				break;
 			case START_GROUP:
+			case START_SUBFILTER:
 				processStartGroup((StartGroup)event.getResource());
 				break;
 			case END_GROUP:
+			case END_SUBFILTER:
 				processEndGroup((Ending)event.getResource());
 				break;
 			case TEXT_UNIT:

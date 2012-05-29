@@ -20,41 +20,27 @@
 
 package net.sf.okapi.lib.beans.v1;
 
-import net.sf.okapi.common.IParameters;
-import net.sf.okapi.common.filterwriter.IFilterWriter;
+import net.sf.okapi.common.encoder.IEncoder;
 import net.sf.okapi.common.resource.BaseNameable;
+import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.StartSubfilter;
 import net.sf.okapi.lib.persistence.IPersistenceSession;
 import net.sf.okapi.lib.persistence.beans.FactoryBean;
 
 public class StartSubfilterBean extends StartGroupBean {
 
-	private String encoding;
-	private boolean isMultilingual;
-	private FactoryBean params = new FactoryBean();
-	private FactoryBean filterWriter = new FactoryBean();
-	private boolean hasUTF8BOM;
-	private String lineBreak;
+	private StartDocumentBean startDoc = new StartDocumentBean();
+	private FactoryBean parentEncoder = new FactoryBean();
 	
 	@Override
 	protected StartSubfilter createObject(IPersistenceSession session) {
-		return new StartSubfilter(getParentId(), getId());
+		return new StartSubfilter(getId(), startDoc.get(StartDocument.class, session),
+				parentEncoder.get(IEncoder.class, session));
 	}
 
 	@Override
 	protected void setObject(BaseNameable obj, IPersistenceSession session) {
 		super.setObject(obj, session);
-	
-		if (obj instanceof StartSubfilter) {
-			StartSubfilter ssf = (StartSubfilter) obj;
-			
-			ssf.setEncoding(encoding);
-			ssf.setMultilingual(isMultilingual);
-			ssf.setParams(params.get(IParameters.class, session));
-			ssf.setFilterWriter(filterWriter.get(IFilterWriter.class, session));
-			ssf.setHasUTF8BOM(hasUTF8BOM);
-			ssf.setLineBreak(lineBreak);
-		}
 	}
 
 	@Override
@@ -62,63 +48,24 @@ public class StartSubfilterBean extends StartGroupBean {
 		super.fromObject(obj, session);
 		
 		if (obj instanceof StartSubfilter) {
-			StartSubfilter ssf = (StartSubfilter) obj;
-			
-			encoding = ssf.getEncoding();
-			isMultilingual = ssf.isMultilingual();
-			params.set(ssf.getParams(), session);
-			filterWriter.set(ssf.getFilterWriter(), session);
-			hasUTF8BOM = ssf.isHasUTF8BOM();
-			lineBreak = ssf.getLineBreak();
+			StartSubfilter ssf = (StartSubfilter) obj;			
+			startDoc.set(ssf.getStartDoc(), session);
 		}
 	}
 
-	public String getEncoding() {
-		return encoding;
+	public StartDocumentBean getStartDoc() {
+		return startDoc;
 	}
 
-	public void setEncoding(String encoding) {
-		this.encoding = encoding;
+	public void setStartDoc(StartDocumentBean startDoc) {
+		this.startDoc = startDoc;
 	}
 
-	public boolean isMultilingual() {
-		return isMultilingual;
+	public FactoryBean getParentEncoder() {
+		return parentEncoder;
 	}
 
-	public void setMultilingual(boolean isMultilingual) {
-		this.isMultilingual = isMultilingual;
+	public void setParentEncoder(FactoryBean parentEncoder) {
+		this.parentEncoder = parentEncoder;
 	}
-
-	public FactoryBean getParams() {
-		return params;
-	}
-
-	public void setParams(FactoryBean params) {
-		this.params = params;
-	}
-
-	public FactoryBean getFilterWriter() {
-		return filterWriter;
-	}
-
-	public void setFilterWriter(FactoryBean filterWriter) {
-		this.filterWriter = filterWriter;
-	}
-
-	public boolean isHasUTF8BOM() {
-		return hasUTF8BOM;
-	}
-
-	public void setHasUTF8BOM(boolean hasUTF8BOM) {
-		this.hasUTF8BOM = hasUTF8BOM;
-	}
-
-	public String getLineBreak() {
-		return lineBreak;
-	}
-
-	public void setLineBreak(String lineBreak) {
-		this.lineBreak = lineBreak;
-	}
-
 }

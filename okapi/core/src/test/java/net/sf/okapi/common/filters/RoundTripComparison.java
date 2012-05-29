@@ -23,6 +23,7 @@ package net.sf.okapi.common.filters;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.UnsupportedEncodingException;
+import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -106,6 +107,7 @@ public class RoundTripComparison {
 		LocaleId trgLoc,
 		String dirSuffix)
 	{
+		if (Util.isEmpty(dirSuffix)) throw new InvalidParameterException("dirSuffix cannot be empty - an attempt to override the source file will be rejected and source file will be compared with itself returning always true");
 		//return executeCompare(filter, inputDocs, defaultEncoding, srcLoc, trgLoc, dirSuffix, (IPipelineStep[]) null);
 		this.filter = filter;
 		this.defaultEncoding = defaultEncoding;
