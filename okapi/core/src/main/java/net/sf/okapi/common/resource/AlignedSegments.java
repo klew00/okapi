@@ -38,8 +38,6 @@ import net.sf.okapi.common.ReversedIterator;
 import net.sf.okapi.common.exceptions.OkapiMisAlignmentException;
 
 /**
- * EXPERIMENTAL implementation, Do not use yet.
- * <p>
  * Provides a standard implementation of the IAlignedSegments interface that
  * works with variant sources.
  * <p>
@@ -293,7 +291,7 @@ public class AlignedSegments implements IAlignedSegments {
     
 	@Override
 	public Segment getCorrespondingTarget(Segment seg, LocaleId trgLoc) {
-		return getCorrespondingSource(seg, trgLoc, IAlignedSegments.MODIFY_SOURCE_AND_ASSOCIATED_TARGET, 
+		return getCorrespondingTarget(seg, trgLoc, IAlignedSegments.MODIFY_SOURCE_AND_ASSOCIATED_TARGET, 
 					IAlignedSegments.COPY_TO_NONE);
 	}
 
@@ -309,7 +307,7 @@ public class AlignedSegments implements IAlignedSegments {
         //Based on TextUnitUtil.createMultilingualTextUnit(...)
 
         //Note: this implementation will wipe out any content that exists for this locale
-        //TODO check that this is the desired behaviour for this method.
+        //TODO check that this is the desired behavior for this method.
 
         TextContainer src;
         TextContainer trg;

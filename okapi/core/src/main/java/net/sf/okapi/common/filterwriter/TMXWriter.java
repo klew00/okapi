@@ -21,6 +21,7 @@
 package net.sf.okapi.common.filterwriter;
 
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
@@ -30,6 +31,7 @@ import net.sf.okapi.common.XMLWriter;
 import net.sf.okapi.common.annotation.AltTranslation;
 import net.sf.okapi.common.annotation.AltTranslationsAnnotation;
 import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.resource.IAlignedSegments;
 import net.sf.okapi.common.resource.ISegments;
 import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextContainer;
@@ -618,24 +620,47 @@ public class TMXWriter {
     public void writeTUFull (ITextUnit item) {
     	if ( item == null ) {
     		throw new NullPointerException();
-    	}
-    	itemCount++;
-
+    	}    	    	    	
+    	// FIXME:
     	// In a TU, each target may have a different source-corresponding segmentation
-    	// The way TMX is written here, we assume that all targets match the current source segmentation
-
+    	// but we assume that the trgLoc source variant will be used only rather than
+    	// write another TU if the source target segmentation or alignment changes for
+    	// a locale
+    	
+    	itemCount++;
+    	
     	String tuid = item.getName();
     	if ( Util.isEmpty(tuid) ) {
     		tuid = String.format("autoID%d", itemCount);
     	}
-
-    	TextContainer srcCont = item.getSource();
+    	
+    	IAlignedSegments alignedSegments = item.getAlignedSegments();   
+    	// getVariantSources().get(trgLoc) returns defaultSource if there are no variants
+    	TextContainer srcCont = item.getVariantSources().get(trgLoc);
     	Set<LocaleId> locales = item.getTargetLocales();
 		Set<String> names = item.getPropertyNames();
+		
+		if ( srcCont.isEmpty() ) {
+			boolean nothingToWrite = true;
+			for ( LocaleId loc : locales ) {    			
+        		TextContainer trgCont = item.getTarget(loc);
+        		if (!trgCont.isEmpty()) {
+        			// we have at least one non-empty target
+        			nothingToWrite = false;
+        		}
+			}
+			if (nothingToWrite) {
+				return;
+			}			
+		}				
 
+		// get iterator on source variant segments
+		Iterator<Segment> variantSegments = alignedSegments.iterator(trgLoc);
+		
 		// For each segment: write a separate TU
-		for ( Segment srcSeg : srcCont.getSegments() ) {
-    		
+		while (variantSegments.hasNext()) {
+			Segment srcSeg = variantSegments.next();
+			
     		// Write start TU
     		writer.writeStartElement("tu");
     		if ( srcCont.contentIsOneSegment() ) {
@@ -670,10 +695,8 @@ public class TMXWriter {
     		// Write each target TUV
     		for ( LocaleId loc : locales ) {
     			Segment trgSeg = null;
-        		TextContainer trgCont = item.getTarget(loc);
-        		if ( trgCont != null ) {
-        			trgSeg = trgCont.getSegments().get(srcSeg.id);
-        		}
+        		TextContainer trgCont = item.getTarget(loc);        		
+        		trgSeg = alignedSegments.getCorrespondingTarget(srcSeg, loc);
         		// Write target only if we have one corresponding to the source segment
         		if ( trgSeg != null ) {
         			writeTUV(trgSeg.text, loc, trgCont);

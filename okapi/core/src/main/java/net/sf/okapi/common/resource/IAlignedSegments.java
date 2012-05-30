@@ -29,8 +29,6 @@ import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.exceptions.OkapiMisAlignmentException;
 
 /**
- * EXPERIMENTAL interface, Do not use yet.
- * <p>
  * Provides the methods to access all the source and target {@link Segment}s of a
  * {@link ITextUnit}.</p>
  * <p>
