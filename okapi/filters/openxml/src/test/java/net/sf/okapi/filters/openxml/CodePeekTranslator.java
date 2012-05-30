@@ -24,6 +24,7 @@ import java.util.logging.Logger;
 import java.util.logging.Level;
 
 import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.encoder.EncoderContext;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.filters.openxml.AbstractTranslator;
@@ -246,7 +247,7 @@ public class CodePeekTranslator extends AbstractTranslator {
 		String s,ss="";
 		int len;
 		char carrot;
-		s = expandCodeContent(code, locENUS, 1);
+		s = expandCodeContent(code, locENUS, EncoderContext.SKELETON);
 		len = s.length();
 		for(int i=0; i<len; i++)
 		{

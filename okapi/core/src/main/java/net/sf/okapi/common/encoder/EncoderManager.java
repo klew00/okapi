@@ -168,7 +168,7 @@ public class EncoderManager implements IEncoder {
 	 */
 	@Override
 	public String encode (String text,
-		int context)
+			EncoderContext context)
 	{
 		if ( encoder != null ) return encoder.encode(text, context);
 		else return text;
@@ -184,7 +184,7 @@ public class EncoderManager implements IEncoder {
 	 */
 	@Override
 	public String encode (char value,
-		int context)
+			EncoderContext context)
 	{
 		if ( encoder != null ) return encoder.encode(value, context);
 		else return String.valueOf(value); 
@@ -200,7 +200,7 @@ public class EncoderManager implements IEncoder {
 	 */
 	@Override
 	public String encode (int codePoint,
-		int context)
+			EncoderContext context)
 	{
 		if ( encoder != null ) return encoder.encode(codePoint, context);
 		else {

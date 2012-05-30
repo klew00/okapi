@@ -33,6 +33,7 @@ import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.ReversedIterator;
 import net.sf.okapi.common.annotation.AltTranslation;
 import net.sf.okapi.common.annotation.AltTranslationsAnnotation;
+import net.sf.okapi.common.encoder.EncoderContext;
 import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.filterwriter.ILayerProvider;
 import net.sf.okapi.common.resource.Code;
@@ -146,7 +147,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 			allowEmptyOutputTarget = prm.getBoolean(ALLOWEMPTYOUTPUTTARGET);
 		}
 		
-		return getString((GenericSkeleton)resource.getSkeleton(), 1);
+		return getString((GenericSkeleton)resource.getSkeleton(), EncoderContext.SKELETON);
 	}
 
 	@Override
@@ -154,7 +155,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 		if (sfWriter != null) {
 			return sfWriter.processEndDocument(resource);
 		}
-		return getString((GenericSkeleton)resource.getSkeleton(), 1);
+		return getString((GenericSkeleton)resource.getSkeleton(), EncoderContext.SKELETON);
 	}
 
 	@Override
@@ -166,7 +167,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 			storageStack.peek().add(resource);
 			return "";
 		}
-		return getString((GenericSkeleton)resource.getSkeleton(), 1);
+		return getString((GenericSkeleton)resource.getSkeleton(), EncoderContext.SKELETON);
 	}
 
 	@Override
@@ -178,7 +179,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 			storageStack.peek().add(resource);
 			return "";
 		}
-		return getString((GenericSkeleton)resource.getSkeleton(), 1);
+		return getString((GenericSkeleton)resource.getSkeleton(), EncoderContext.SKELETON);
 	}
 	
 	@Override
@@ -198,7 +199,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 		if (sfWriter != null) {
 			return sfWriter.processStartGroup(resource);
 		}
-		return getString((GenericSkeleton)resource.getSkeleton(), 1);
+		return getString((GenericSkeleton)resource.getSkeleton(), EncoderContext.SKELETON);
 	}
 	
 	@Override
@@ -211,7 +212,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 		if (sfWriter != null) {
 			return sfWriter.processEndGroup(resource);
 		}
-		return getString((GenericSkeleton)resource.getSkeleton(), 1);
+		return getString((GenericSkeleton)resource.getSkeleton(), EncoderContext.SKELETON);
 	}
 	
 	@Override
@@ -240,7 +241,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 			storageStack.peek().add(resource);
 			return "";
 		}
-		return getString(resource, outputLoc, 1);
+		return getString(resource, outputLoc, EncoderContext.SKELETON);
 	}
 
 	@Override
@@ -256,11 +257,11 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 			storageStack.peek().add(resource);
 			return "";
 		}
-		return getString((GenericSkeleton)resource.getSkeleton(), 1);
+		return getString((GenericSkeleton)resource.getSkeleton(), EncoderContext.SKELETON);
 	}
 	
 	protected String getString (ISkeleton skeleton,
-		int context)
+			EncoderContext context)
 	{
 		if ( skeleton == null ) return "";
 		StringBuilder tmp = new StringBuilder();
@@ -271,7 +272,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 	}
 	
 	protected String getString (GenericSkeletonPart part,
-		int context)
+			EncoderContext context)
 	{
 		// If it is not a reference marker, just use the data
 		//if ( !part.data.toString().startsWith(TextFragment.REFMARKER_START) ) {
@@ -327,11 +328,11 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 			// Set the locToUse and the contextToUse parameters
 			// If locToUse==null: it's source, so use output locale for monolingual
 			LocaleId locToUse = (part.locId==null) ? outputLoc : part.locId;
-			int contextToUse = context;
+			EncoderContext contextToUse = context;
 			if ( isMultilingual ) {
 				locToUse = part.locId;
 				// If locToUse==null: it's source, so not text in multilingual
-				contextToUse = (locToUse==null) ? 0 : context;
+				contextToUse = (locToUse==null) ? EncoderContext.TEXT : context;
 			}
 			
 			// If a parent if set, it's a reference to the content of the resource
@@ -379,7 +380,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 	protected String getString (INameable ref,
 		String propName,
 		LocaleId locToUse,
-		int context)
+		EncoderContext context)
 	{
 		if ( ref == null ) {
 			logger.warning(String.format("Null reference for '%s'.", propName));
@@ -411,7 +412,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 	 */
 	protected String getString (ITextUnit tu,
 		LocaleId locToUse,
-		int context)
+		EncoderContext context)
 	{
 		GenericSkeleton skel = (GenericSkeleton)tu.getSkeleton();
 		if ( skel == null ) { // No skeleton
@@ -436,7 +437,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 	 */
 	protected String getContent (ITextUnit tu,
 		LocaleId locToUse,
-		int context)
+		EncoderContext context)
 	{
 		// Update the encoder from the TU's MIME type
 		if ( encoderManager != null ) {
@@ -470,7 +471,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 		// Now trgCont is either the available target or the source (fall-back case)
 
 		if ( !tu.isTranslatable() ) {
-			context = 0; // Keep skeleton context
+			context = EncoderContext.TEXT; // Keep skeleton context
 		}
 		
 		if ( srcCont.hasBeenSegmented() || !srcCont.contentIsOneSegment()
@@ -489,13 +490,13 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 		}
 		else {
 			switch ( context ) {
-			case 1:
+			case SKELETON:
 				return layer.endCode()
-					+ getContent(tf, locToUse, 0)
+					+ getContent(tf, locToUse, EncoderContext.TEXT)
 					+ layer.startCode();
-			case 2:
+			case INLINE:
 				return layer.endInline()
-					+ getContent(tf, locToUse, 0)
+					+ getContent(tf, locToUse, EncoderContext.TEXT)
 					+ layer.startInline();
 			default:
 				return getContent(tf, locToUse, context);
@@ -507,7 +508,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 	private String getSegmentedText (TextContainer srcCont,
 		TextContainer trgCont,
 		LocaleId locToUse,
-		int context,
+		EncoderContext context,
 		boolean isReferent)
 	{
 		StringBuilder tmp = new StringBuilder();
@@ -555,29 +556,29 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 				}
 				else { // If layer: write the bilingual entry
 					switch ( context ) {
-					case 1:
+					case SKELETON:
 						tmp.append(layer.endCode()
 							+ layer.startSegment()
-							+ ((srcSeg==null) ? "" : getContent(srcSeg.text, locToUse, 0))
+							+ ((srcSeg==null) ? "" : getContent(srcSeg.text, locToUse, EncoderContext.TEXT))
 							+ layer.midSegment(lev)
-							+ getContent(trgFrag, locToUse, 0)
+							+ getContent(trgFrag, locToUse, EncoderContext.TEXT)
 							+ layer.endSegment()
 							+ layer.startCode());
 						break;
-					case 2:
+					case INLINE:
 						tmp.append(layer.endInline()
 							+ layer.startSegment()
-							+ ((srcSeg==null) ? "" : getContent(srcSeg.text, locToUse, 0))
+							+ ((srcSeg==null) ? "" : getContent(srcSeg.text, locToUse, EncoderContext.TEXT))
 							+ layer.midSegment(lev)
-							+ getContent(trgFrag, locToUse, 0)
+							+ getContent(trgFrag, locToUse, EncoderContext.TEXT)
 							+ layer.endSegment()
 							+ layer.startInline());
 						break;
 					default:
 						tmp.append(layer.startSegment()
-							+ ((srcSeg==null) ? "" : getContent(srcSeg.text, locToUse, 0))
+							+ ((srcSeg==null) ? "" : getContent(srcSeg.text, locToUse, EncoderContext.TEXT))
 							+ layer.midSegment(lev)
-							+ getContent(trgFrag, locToUse, 0)
+							+ getContent(trgFrag, locToUse, EncoderContext.TEXT)
 							+ layer.endSegment());
 						break;
 					}
@@ -884,7 +885,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 	 */
 	public String getContent (TextFragment tf,
 		LocaleId locToUse,
-		int context)
+		EncoderContext context)
 	{
 		// Output simple text
 		if ( !tf.hasCode() ) {
@@ -979,12 +980,12 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 	
 	protected String expandCodeContent (Code code,
 		LocaleId locToUse,
-		int context)
+		EncoderContext context)
 	{ // this needs to be protected, not private, for OpenXML
 		String codeTmp = code.getOuterData();
 		if ( layer != null ) {
 			codeTmp = layer.startInline() 
-				+ layer.encode(codeTmp, 2)
+				+ layer.encode(codeTmp, EncoderContext.INLINE)
 				+ layer.endInline();
 		}
 		if ( !code.hasReference() ) {
@@ -1004,20 +1005,20 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 			}
 			else if ( propName != null ) {
 				tmp.replace(start, end,
-					getPropertyValue((INameable)ref, propName, locToUse, 2));
+					getPropertyValue((INameable)ref, propName, locToUse, EncoderContext.INLINE));
 			}
 			else if ( ref instanceof ITextUnit ) {
-				tmp.replace(start, end, getString((ITextUnit)ref, locToUse, 2));
+				tmp.replace(start, end, getString((ITextUnit)ref, locToUse, EncoderContext.INLINE));
 			}
 			// TODO seems GenericSkeletonPart is not IReferenceable, others are
 			else if ( ref instanceof GenericSkeletonPart ) {
-				tmp.replace(start, end, getString((GenericSkeletonPart)ref, 2));
+				tmp.replace(start, end, getString((GenericSkeletonPart)ref, EncoderContext.INLINE));
 			}
 			else if ( ref instanceof StorageList ) { // == StartGroup or StartSubfilter
-				tmp.replace(start, end, getString((StorageList)ref, locToUse, 2));
+				tmp.replace(start, end, getString((StorageList)ref, locToUse, EncoderContext.INLINE));
 			}
 			else { // DocumentPart, StartDocument, StartSubDocument 
-				tmp.replace(start, end, getString((GenericSkeleton)((IResource)ref).getSkeleton(), 2));
+				tmp.replace(start, end, getString((GenericSkeleton)((IResource)ref).getSkeleton(), EncoderContext.INLINE));
 			}
 		}
 		return tmp.toString();
@@ -1025,7 +1026,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 	
 	protected String getString (StorageList list,
 		LocaleId locToUse,
-		int context)
+		EncoderContext context)
 	{
 		StringBuilder tmp = new StringBuilder();
 		
@@ -1069,7 +1070,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 	protected String getPropertyValue (INameable resource,
 		String name,
 		LocaleId locToUse,
-		int context)
+		EncoderContext context)
 	{
 		// Update the encoder from the TU's MIME type
 		if ( encoderManager != null ) {

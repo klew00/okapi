@@ -21,6 +21,7 @@
 package net.sf.okapi.common.filters;
 
 import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.encoder.EncoderContext;
 import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.encoder.IEncoder;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
@@ -84,7 +85,7 @@ public class SubFilterSkeletonWriter implements ISkeletonWriter {
 	@Override
 	public String processEndDocument(Ending resource) {
 		if (resource == GET_OUTPUT) {
-			return parentEncoder == null ? sb.toString() : parentEncoder.encode(sb.toString(), 0);
+			return parentEncoder == null ? sb.toString() : parentEncoder.encode(sb.toString(), EncoderContext.TEXT);
 		}
 		else {
 			sb.append(skelWriter.processEndDocument(resource));

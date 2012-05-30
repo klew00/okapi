@@ -115,7 +115,7 @@ public class XMLEncoder implements IEncoder {
 
 	@Override
 	public String encode (String text, 
-		int context)
+			EncoderContext context)
 	{
 		if ( text == null ) return "";
 		
@@ -202,7 +202,7 @@ public class XMLEncoder implements IEncoder {
 
 	@Override
 	public String encode (char value,
-		int context)
+			EncoderContext context)
 	{
 		switch ( value ) {
 		case '<':
@@ -251,7 +251,7 @@ public class XMLEncoder implements IEncoder {
 
 	@Override
 	public String encode (int value,
-		int context)
+			EncoderContext context)
 	{
 		switch ( value ) {
 		case '<':

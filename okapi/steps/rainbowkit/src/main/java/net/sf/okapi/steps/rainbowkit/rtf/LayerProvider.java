@@ -25,6 +25,7 @@ import java.nio.charset.CharsetEncoder;
 
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.encoder.EncoderContext;
 import net.sf.okapi.common.filterwriter.ILayerProvider;
 
 public class LayerProvider implements ILayerProvider {
@@ -70,31 +71,31 @@ public class LayerProvider implements ILayerProvider {
 	// Context: 0=in text, 1=in skeleton, 2=in inline
 	@Override
 	public String encode (String text,
-		int context)
+			EncoderContext context)
 	{
 		// Context here can be used for lineBreak type
-		return Util.escapeToRTF(text, true, context, outputEncoder);
+		return Util.escapeToRTF(text, true, context.ordinal(), outputEncoder);
 	}
 
 	@Override
 	public String encode (char value,
-		int context)
+			EncoderContext context)
 	{
 		// Context here can be used for lineBreak type
-		return Util.escapeToRTF(String.valueOf(value), true, context, outputEncoder);
+		return Util.escapeToRTF(String.valueOf(value), true, context.ordinal(), outputEncoder);
 	}
 
 	@Override
 	public String encode (int value,
-		int context)
+			EncoderContext context)
 	{
 		// Context here can be used for lineBreak type
 		if ( Character.isSupplementaryCodePoint(value) ) {
 			return Util.escapeToRTF(new String(Character.toChars(value)),
-				true, context, outputEncoder);
+				true, context.ordinal(), outputEncoder);
 		}
 		return Util.escapeToRTF(String.valueOf((char)value),
-			true, context, outputEncoder);
+			true, context.ordinal(), outputEncoder);
 	}
 
 	@Override

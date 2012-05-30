@@ -28,6 +28,7 @@ import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.annotation.AltTranslation;
 import net.sf.okapi.common.annotation.AltTranslationsAnnotation;
+import net.sf.okapi.common.encoder.EncoderContext;
 import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.filterwriter.ILayerProvider;
 import net.sf.okapi.common.filterwriter.XLIFFContent;
@@ -85,7 +86,7 @@ public class XLIFFSkeletonWriter extends GenericSkeletonWriter {
 	
 	@Override
 	protected String getString (GenericSkeletonPart part,
-		int context)
+			EncoderContext context)
 	{
 		// Check for the seg-source special case
 		if ( part.toString().startsWith(SEGSOURCEMARKER) ) {
@@ -123,11 +124,11 @@ public class XLIFFSkeletonWriter extends GenericSkeletonWriter {
 		// Set the locToUse and the contextToUse parameters
 		// If locToUse==null: it's source, so use output locale for monolingual
 		LocaleId locToUse = (part.getLocale()==null) ? outputLoc : part.getLocale();
-		int contextToUse = context;
+		EncoderContext contextToUse = context;
 		if ( isMultilingual ) {
 			locToUse = part.getLocale();
 			// If locToUse==null: it's source, so not text in multilingual
-			contextToUse = (locToUse==null) ? 0 : context;
+			contextToUse = (locToUse==null) ? EncoderContext.TEXT : context;
 		}
 		
 		// If a parent if set, it's a reference to the content of the resource
@@ -163,7 +164,7 @@ public class XLIFFSkeletonWriter extends GenericSkeletonWriter {
 	@Override
 	protected String getContent (ITextUnit tu,
 		LocaleId locToUse,
-		int context)
+		EncoderContext context)
 	{
 		// Update the encoder from the TU's MIME type
 		if ( encoderManager != null ) {
@@ -171,7 +172,7 @@ public class XLIFFSkeletonWriter extends GenericSkeletonWriter {
 		}
 		
 		if ( !tu.isTranslatable() ) {
-			context = 0; // Keep skeleton context
+			context = EncoderContext.TEXT; // Keep skeleton context
 		}
 		
 		// Get the source container
@@ -223,13 +224,13 @@ public class XLIFFSkeletonWriter extends GenericSkeletonWriter {
 				tmp.append(String.format("<mrk mid=\"%s\" mtype=\"seg\">", srcSeg.id));
 				// Write the segment (note: srcSeg can be null)
 				// If no layer or layer: just write the target
-				tmp.append(getContent(srcSeg.text, null, 1));
+				tmp.append(getContent(srcSeg.text, null, EncoderContext.SKELETON));
 				// Closing marker
 				tmp.append("</mrk>");
 			}
 			else { // Normal text fragment
 				// Target fragment is used
-				tmp.append(getContent(part.text, null, 1));
+				tmp.append(getContent(part.text, null, EncoderContext.SKELETON));
 			}
 		}
 		
@@ -311,7 +312,7 @@ public class XLIFFSkeletonWriter extends GenericSkeletonWriter {
 	
 	private String getUnsegmentedOutput (TextContainer cont,
 		LocaleId locToUse,
-		int context)
+		EncoderContext context)
 	{
 		TextFragment tf = null;
 		if ( cont.contentIsOneSegment() ) {
@@ -327,13 +328,13 @@ public class XLIFFSkeletonWriter extends GenericSkeletonWriter {
 		}
 		else {
 			switch ( context ) {
-			case 1:
+			case SKELETON:
 				return getLayer().endCode()
-					+ getContent(tf, locToUse, 0)
+					+ getContent(tf, locToUse, EncoderContext.TEXT)
 					+ getLayer().startCode();
-			case 2:
+			case INLINE:
 				return getLayer().endInline()
-					+ getContent(tf, locToUse, 0)
+					+ getContent(tf, locToUse, EncoderContext.TEXT)
 					+ getLayer().startInline();
 			default:
 				return getContent(tf, locToUse, context);
@@ -345,7 +346,7 @@ public class XLIFFSkeletonWriter extends GenericSkeletonWriter {
 	private String getSegmentedOutput (TextContainer srcCont,
 		TextContainer trgCont,
 		LocaleId locToUse,
-		int context)
+		EncoderContext context)
 	{
 		StringBuilder tmp = new StringBuilder();
 
@@ -372,29 +373,29 @@ public class XLIFFSkeletonWriter extends GenericSkeletonWriter {
 				}
 				else { // If layer: write the bilingual entry
 					switch ( context ) {
-					case 1:
+					case SKELETON:
 						tmp.append(getLayer().endCode()
 							+ getLayer().startSegment()
-							+ ((srcSeg==null) ? "" : getContent(srcSeg.text, locToUse, 0))
+							+ ((srcSeg==null) ? "" : getContent(srcSeg.text, locToUse, EncoderContext.TEXT))
 							+ getLayer().midSegment(lev)
-							+ getContent(trgSeg.text, locToUse, 0)
+							+ getContent(trgSeg.text, locToUse, EncoderContext.TEXT)
 							+ getLayer().endSegment()
 							+ getLayer().startCode());
 						break;
-					case 2:
+					case INLINE:
 						tmp.append(getLayer().endInline()
 							+ getLayer().startSegment()
-							+ ((srcSeg==null) ? "" : getContent(srcSeg.text, locToUse, 0))
+							+ ((srcSeg==null) ? "" : getContent(srcSeg.text, locToUse, EncoderContext.TEXT))
 							+ getLayer().midSegment(lev)
-							+ getContent(trgSeg.text, locToUse, 0)
+							+ getContent(trgSeg.text, locToUse, EncoderContext.TEXT)
 							+ getLayer().endSegment()
 							+ getLayer().startInline());
 						break;
 					default:
 						tmp.append(getLayer().startSegment()
-							+ ((srcSeg==null) ? "" : getContent(srcSeg.text, locToUse, 0))
+							+ ((srcSeg==null) ? "" : getContent(srcSeg.text, locToUse, EncoderContext.TEXT))
 							+ getLayer().midSegment(lev)
-							+ getContent(trgSeg.text, locToUse, 0)
+							+ getContent(trgSeg.text, locToUse, EncoderContext.TEXT)
 							+ getLayer().endSegment());
 						break;
 					}
@@ -435,7 +436,7 @@ public class XLIFFSkeletonWriter extends GenericSkeletonWriter {
 	protected String getPropertyValue (INameable resource,
 		String name,
 		LocaleId locToUse,
-		int context)
+		EncoderContext context)
 	{
 		// Update the encoder from the TU's MIME type
 		if ( encoderManager != null ) {

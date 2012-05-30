@@ -29,6 +29,7 @@ import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.ISkeleton;
 import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.encoder.EncoderContext;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.IReferenceable;
@@ -374,7 +375,7 @@ public class ResourceSimplifier {
 			if (tu.isReferent()) {
 				// Referenced TU, we got here from recursion (see *** below)
 				if (!hasGenericSkeleton) {
-					newSkel.add(writer.getString(tu, trgLoc, 1));
+					newSkel.add(writer.getString(tu, trgLoc, EncoderContext.SKELETON));
 					return;
 				}
 				// Otherwise the skeleton is analyzed below
@@ -389,7 +390,7 @@ public class ResourceSimplifier {
 						if (code.hasReference()) {
 							// Resolve reference(s) with GSW, replace the original data
 							if (resolveCodeRefs)
-								code.setData(writer.expandCodeContent(code, trgLoc, 0));
+								code.setData(writer.expandCodeContent(code, trgLoc, EncoderContext.TEXT));
 						}
 					}
 				}
@@ -418,7 +419,7 @@ public class ResourceSimplifier {
 		for (GenericSkeletonPart part : parts) {
 			if (SkeletonUtil.isText(part)) {
 				//newSkel.add(part.toString());
-				newSkel.add(writer.getString(part, 1));
+				newSkel.add(writer.getString(part, EncoderContext.SKELETON));
 			}				
 			else if (SkeletonUtil.isReference(part)) {
 				flushSkeleton(resId, ++dpCounter, me);				
@@ -435,7 +436,7 @@ public class ResourceSimplifier {
 			}
 			else if (SkeletonUtil.isValuePlaceholder(part, resource)) {
 				// For both isMultilingual true/false
-				newSkel.add(writer.getString(part, 1));
+				newSkel.add(writer.getString(part, EncoderContext.SKELETON));
 			}
 			else if (SkeletonUtil.isExtSourcePlaceholder(part, resource)) {
 				checkExtParent(part.getParent(), resId);
@@ -448,7 +449,7 @@ public class ResourceSimplifier {
 			else if (SkeletonUtil.isExtValuePlaceholder(part, resource)) {
 				// For both isMultilingual true/false
 				checkExtParent(part.getParent(), resId);
-				newSkel.add(writer.getString(part, 1));
+				newSkel.add(writer.getString(part, EncoderContext.SKELETON));
 			}
 		}
 		flushSkeleton(resId, ++dpCounter, me); // Flush remaining skeleton tail
@@ -458,7 +459,7 @@ public class ResourceSimplifier {
 			MultiEvent me, String resId, int tuCounter, int dpCounter) {
 		if (isMultilingual) {
 			if (part.parent instanceof ITextUnit)
-				newSkel.add(writer.getContent((ITextUnit)part.parent, null, 0)); // Source goes to skeleton
+				newSkel.add(writer.getContent((ITextUnit)part.parent, null, EncoderContext.TEXT)); // Source goes to skeleton
 			else {
 				logger.warning("The self-reference must be a text-unit: " + resId);
 				newSkel.add(part.parent.toString());
@@ -479,7 +480,7 @@ public class ResourceSimplifier {
 		}
 		else {
 			//newSkel.add(writer.getContent((TextUnit) resource, trgLoc, 1));
-			newSkel.add(writer.getContent((ITextUnit)resource, part.getLocale(), 1));			
+			newSkel.add(writer.getContent((ITextUnit)resource, part.getLocale(), EncoderContext.SKELETON));			
 		}
 	}
 	

@@ -12,8 +12,8 @@ public class CDATAEncoder extends DefaultEncoder {
 	}
 
 	@Override
-	public String encode(String text, int context) {
-		return context == 0 ? 
+	public String encode(String text, EncoderContext context) {
+		return context == EncoderContext.TEXT ? 
 				String.format("<![CDATA[%s]]>", super.encode(text, context)) :					
 				super.encode(text, context);
 	}

@@ -46,6 +46,7 @@ import net.sf.okapi.common.UsingParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.annotation.AltTranslation;
 import net.sf.okapi.common.annotation.AltTranslationsAnnotation;
+import net.sf.okapi.common.encoder.EncoderContext;
 import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.filters.FilterConfiguration;
@@ -699,10 +700,10 @@ public class TTXFilter implements IFilter {
 				// Use the skeleton writer processFragment() to get the output
 				// so any outer data is generated.
 				if ( srcCont.contentIsOneSegment() ) {
-					skel.append(skelWriter.processFragment(srcCont.getFirstContent(), 1));
+					skel.append(skelWriter.processFragment(srcCont.getFirstContent(), EncoderContext.SKELETON));
 				}
 				else { // Merge all if there is more than one segment
-					skel.append(skelWriter.processFragment(srcCont.getUnSegmentedContentCopy(), 1));
+					skel.append(skelWriter.processFragment(srcCont.getUnSegmentedContentCopy(), EncoderContext.SKELETON));
 				}
 				tu = null;
 				return false; // No return from filter

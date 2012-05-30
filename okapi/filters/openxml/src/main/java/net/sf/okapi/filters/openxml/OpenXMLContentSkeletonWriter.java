@@ -22,13 +22,13 @@ package net.sf.okapi.filters.openxml; // DWH 4-8-09
 
 import java.util.List;
 
-import net.sf.okapi.common.encoder.EncoderManager;
-import net.sf.okapi.common.filterwriter.ILayerProvider;
 import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.MimeTypeMapper;
+import net.sf.okapi.common.encoder.EncoderContext;
+import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.Property;
-import net.sf.okapi.common.MimeTypeMapper;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
 
@@ -90,10 +90,10 @@ public class OpenXMLContentSkeletonWriter extends GenericSkeletonWriter {
 	 * @param context same as context variable in GenericFilterWriter
 	 * @return text with all of the codes expanded and blank text surrounded
 	 */
-@Override
+	@Override
 	public String getContent (TextFragment tf,
 		LocaleId langToUse,
-		int context)
+		EncoderContext context)
 	{
 		String sTuff; // DWH 4-8-09
 //		String text=tf.toString(); // DWH 5-18-09 commented 10-27-09
@@ -119,7 +119,7 @@ public class OpenXMLContentSkeletonWriter extends GenericSkeletonWriter {
 					else
 						sTuff = getLayer().encode(internalEncoderManager.encode(sTuff, context), context);
 				}
-				if (context==1) // DWH 5-22-09 add unencoded tags if needed
+				if (context==EncoderContext.SKELETON) // DWH 5-22-09 add unencoded tags if needed
 				{
 					bHasBlankInText = ((text.indexOf(' ')>-1) || (text.indexOf('\u00A0')>-1)); // DWH 5-28-09
 					if (bHasBlankInText)
@@ -132,7 +132,7 @@ public class OpenXMLContentSkeletonWriter extends GenericSkeletonWriter {
 						text = sTuff;
 				}
 //				else if (context-nTextBoxLevel==1 && configurationType==MSWORD) // DWH 10-27-09 nTextBoxLevel
-				else if (context==nTextBoxLevel+1 && context-nContentDepth==0 && configurationType==MSWORD) // DWH 10-27-09 nTextBoxLevel
+				else if (context.ordinal()==nTextBoxLevel+1 && context.ordinal()-nContentDepth==0 && configurationType==MSWORD) // DWH 10-27-09 nTextBoxLevel
 				{ // context has to be one more than nTextBoxLevel; if more, it is in an attribute
 				  
 					bHasBlankInText = ((text.indexOf(' ')>-1) || (text.indexOf('\u00A0')>-1)); // DWH 5-28-09
@@ -181,7 +181,7 @@ public class OpenXMLContentSkeletonWriter extends GenericSkeletonWriter {
 			default:
 				if (!bInBlankText && (nSurroundingCodes<=0))
 				{
-					if (context==1) { // DWH 4-13-09 whole if
+					if (context==EncoderContext.SKELETON) { // DWH 4-13-09 whole if
 						bInBlankText = true;
 						if (configurationType==MSWORD)
 							tmp.append(encody("<w:r><w:t xml:space=\"preserve\">",context));
@@ -189,7 +189,7 @@ public class OpenXMLContentSkeletonWriter extends GenericSkeletonWriter {
 							tmp.append(encody("<a:r><a:t>",context));
 					}
 //					else if (context-nTextBoxLevel==1 && configurationType==MSWORD) // DWH 10-27-09
-					else if (context==nTextBoxLevel+1 && context-nContentDepth==0 && configurationType==MSWORD) // DWH 10-27-09
+					else if (context.ordinal()==nTextBoxLevel+1 && context.ordinal()-nContentDepth==0 && configurationType==MSWORD) // DWH 10-27-09
 					{ // only add codes around blank text if context is one above nTextBoxLevel, otherwise inside attributes
 						bInBlankText = true;
 						tmp.append(encody("<w:r><w:t xml:space=\"preserve\">",context));						
@@ -249,7 +249,7 @@ public class OpenXMLContentSkeletonWriter extends GenericSkeletonWriter {
 	 * @return context same as context variable in getContent in GenericSkeletonWriter
 	 * @param s string to be expanded
 	 */
-	private String encody(String s, int context)
+	private String encody(String s, EncoderContext context)
 	{
 		return(s); // DWH 5-14-09 no encoding is necessary for tags
 /*
@@ -276,18 +276,18 @@ public class OpenXMLContentSkeletonWriter extends GenericSkeletonWriter {
 	{
 		this.nTextBoxLevel = nTextBoxLevel;
 	}
-	private StringBuilder blankEnd(int context, int nSurroundingCodes, StringBuilder tmp)
+	private StringBuilder blankEnd(EncoderContext context, int nSurroundingCodes, StringBuilder tmp)
 	{
 		if (bInBlankText && (nSurroundingCodes<=0))
 		{
-			if (context==1) { // DWH 4-13-09 whole if
+			if (context==EncoderContext.SKELETON) { // DWH 4-13-09 whole if
 				bInBlankText = false;
 				if (configurationType==MSWORD)
 					tmp.append(encody("</w:t></w:r>",context));
 				else if (configurationType==MSPOWERPOINT)
 					tmp.append(encody("</a:t></a:r>",context));
 			}
-			else if (context==nTextBoxLevel+1 && context-nContentDepth==0 && configurationType==MSWORD)
+			else if (context.ordinal()==nTextBoxLevel+1 && context.ordinal()-nContentDepth==0 && configurationType==MSWORD)
 //			else if (context-nTextBoxLevel==1 && configurationType==MSWORD)
 			{ // each TextBox only adds 1 to context
 			  // nContentDepth is how embedded the text is
@@ -299,7 +299,7 @@ public class OpenXMLContentSkeletonWriter extends GenericSkeletonWriter {
 	}
 	protected String getContent (ITextUnit tu,
 			LocaleId locToUse,
-			int context) 
+			EncoderContext context) 
 	{
 		String result;
 		Property prop = tu.getProperty("TextBoxLevel");

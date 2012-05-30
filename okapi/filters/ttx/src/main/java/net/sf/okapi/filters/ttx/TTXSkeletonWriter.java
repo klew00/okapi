@@ -24,6 +24,7 @@ import net.sf.okapi.common.MimeTypeMapper;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.annotation.AltTranslation;
 import net.sf.okapi.common.annotation.AltTranslationsAnnotation;
+import net.sf.okapi.common.encoder.EncoderContext;
 import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.ITextUnit;
@@ -60,7 +61,7 @@ public class TTXSkeletonWriter extends GenericSkeletonWriter {
 		GenericSkeleton skel = (GenericSkeleton)tu.getSkeleton();
 		if ( skel != null ) {
 			if ( skel.getParts().size() > 1 ) {
-				tmp.append(getString(skel.getParts().get(0), 1));
+				tmp.append(getString(skel.getParts().get(0), EncoderContext.SKELETON));
 			}
 		}
 		
@@ -107,11 +108,11 @@ public class TTXSkeletonWriter extends GenericSkeletonWriter {
 				}
 				else {
 // This should never be called now					
-					tmp.append(processFragment(part.getContent(), 0)); // Normal text
+					tmp.append(processFragment(part.getContent(), EncoderContext.TEXT)); // Normal text
 				}
 			}
 			else { // Inter-segment parts
-				tmp.append(processFragment(part.getContent(), 1));
+				tmp.append(processFragment(part.getContent(), EncoderContext.SKELETON));
 			}
 		}
 
@@ -148,7 +149,7 @@ public class TTXSkeletonWriter extends GenericSkeletonWriter {
 		}
 		
 		tmp.append(String.format("<Tuv Lang=\"%s\">", srcLangCode));
-		tmp.append(processFragment(srcFrag, 1));
+		tmp.append(processFragment(srcFrag, EncoderContext.SKELETON));
 		tmp.append("</Tuv>");
 		
 		tmp.append(String.format("<Tuv Lang=\"%s\">", trgLangCode));
@@ -158,21 +159,21 @@ public class TTXSkeletonWriter extends GenericSkeletonWriter {
 				// This is an entry with source and target
 				tmp.append(getLayer().endCode());
 				tmp.append(getLayer().startSegment());
-				tmp.append(processFragment(srcFrag, 1));
+				tmp.append(processFragment(srcFrag, EncoderContext.SKELETON));
 				tmp.append(getLayer().midSegment(altTrans.getCombinedScore()));
-				tmp.append(processFragment(trgFrag, 0));
+				tmp.append(processFragment(trgFrag, EncoderContext.TEXT));
 				tmp.append(getLayer().endSegment());
 				tmp.append(getLayer().startCode());
 			}
 			else {
 				// Write target only
 				tmp.append(getLayer().endCode()); 
-				tmp.append(processFragment(trgFrag, 0));
+				tmp.append(processFragment(trgFrag, EncoderContext.TEXT));
 				tmp.append(getLayer().startCode()); 
 			}
 		}
 		else {
-			tmp.append(processFragment(trgFrag, 0));
+			tmp.append(processFragment(trgFrag, EncoderContext.TEXT));
 		}
 		
 		tmp.append("</Tuv>");
@@ -201,7 +202,7 @@ public class TTXSkeletonWriter extends GenericSkeletonWriter {
 	 * @return the output string.
 	 */
 	protected String processFragment (TextFragment frag,
-		int context)
+			EncoderContext context)
 	{
 		StringBuilder tmp = new StringBuilder();
 		String text = frag.getCodedText();
@@ -224,16 +225,16 @@ public class TTXSkeletonWriter extends GenericSkeletonWriter {
 	}
 
 	private String expandCode (Code code,
-		int context)
+			EncoderContext context)
 	{
 		if ( getLayer() != null ) {
-			if ( context == 0 ) { // Parent is text -> codes are inline
+			if ( context == EncoderContext.TEXT ) { // Parent is text -> codes are inline
 				return getLayer().startInline() 
-					+ getLayer().encode(code.getOuterData(), 2)
+					+ getLayer().encode(code.getOuterData(), EncoderContext.INLINE)
 					+ getLayer().endInline();
 			}
 			else {
-				return getLayer().encode(code.getOuterData(), 1);
+				return getLayer().encode(code.getOuterData(), EncoderContext.SKELETON);
 			}
 		}
 		// Else: no layer

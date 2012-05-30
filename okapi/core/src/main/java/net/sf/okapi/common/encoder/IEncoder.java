@@ -48,7 +48,7 @@ public interface IEncoder {
 	 * @param context the context of the text: 0=text, 1=skeleton, 2=inline.
 	 * @return the encoded text.
 	 */
-	public String encode (String text, int context);
+	public String encode (String text, EncoderContext context);
 	
 	/**
 	 * Encodes a given code-point with this encoding. If this method is called from
@@ -60,7 +60,7 @@ public interface IEncoder {
 	 * @return the encoded character (as a string since it can be now made up of
 	 * more than one character).
 	 */
-	public String encode (int codePoint, int context);
+	public String encode (int codePoint, EncoderContext context);
 	
 	/**
 	 * Encodes a given character with this encoding.
@@ -69,7 +69,7 @@ public interface IEncoder {
 	 * @return the encoded character 9as a string since it can be now made up of
 	 * more than one character).
 	 */
-	public String encode (char value, int context);
+	public String encode (char value, EncoderContext context);
 	
 	/**
 	 * Converts any property values from its standard representation to

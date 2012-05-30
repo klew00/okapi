@@ -40,21 +40,21 @@ public class POEncoder implements IEncoder {
 
 	@Override
 	public String encode (String text,
-		int context)
+			EncoderContext context)
 	{
 		return text;
 	}
 
 	@Override
 	public String encode (char value,
-		int context)
+			EncoderContext context)
 	{
 		return String.valueOf(value);
 	}
 
 	@Override
 	public String encode (int value,
-		int context)
+			EncoderContext context)
 	{
 		if ( Character.isSupplementaryCodePoint(value) ) {
 			return new String(Character.toChars(value));

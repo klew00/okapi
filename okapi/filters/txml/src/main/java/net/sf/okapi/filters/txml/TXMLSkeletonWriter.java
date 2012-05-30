@@ -22,6 +22,7 @@ package net.sf.okapi.filters.txml;
 
 import net.sf.okapi.common.annotation.AltTranslation;
 import net.sf.okapi.common.annotation.AltTranslationsAnnotation;
+import net.sf.okapi.common.encoder.EncoderContext;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.Segment;
@@ -52,7 +53,7 @@ public class TXMLSkeletonWriter extends GenericSkeletonWriter {
 		// The skeleton for the TU has three parts: before, reference and after
 		// Process the first part
 		GenericSkeleton skel = (GenericSkeleton)tu.getSkeleton();
-		tmp.append(getString(skel.getParts().get(0), 1));
+		tmp.append(getString(skel.getParts().get(0), EncoderContext.SKELETON));
 		
 		TextContainer srcCont = tu.getSource();
 		ensureTxmlPattern(srcCont);
@@ -116,7 +117,7 @@ public class TXMLSkeletonWriter extends GenericSkeletonWriter {
 						// Not an original segment, but first one
 						// Or original segment did have a ws before
 						tmp.append("<ws>");
-						tmp.append(processFragment(part.getContent(), 1));
+						tmp.append(processFragment(part.getContent(), EncoderContext.SKELETON));
 						tmp.append("</ws>");
 					}
 				}
@@ -124,7 +125,7 @@ public class TXMLSkeletonWriter extends GenericSkeletonWriter {
 			
 			// Now output the segment source and target
 			tmp.append("<source>");
-			tmp.append(processFragment(srcSeg.getContent(), 1));
+			tmp.append(processFragment(srcSeg.getContent(), EncoderContext.SKELETON));
 			tmp.append("</source>");
 
 			// Do we have a part after the segment?
@@ -137,7 +138,7 @@ public class TXMLSkeletonWriter extends GenericSkeletonWriter {
 						// Not an original segment (any position)
 						// Or original segment did have a ws after
 						tmp.append("<ws>");
-						tmp.append(processFragment(part.getContent(), 1));
+						tmp.append(processFragment(part.getContent(), EncoderContext.SKELETON));
 						tmp.append("</ws>");
 					}
 					i++; // This part is done
@@ -147,7 +148,7 @@ public class TXMLSkeletonWriter extends GenericSkeletonWriter {
 			// Output the target (if any)
 			if ( trgSeg != null ) {
 				tmp.append("<target>");
-				tmp.append(processFragment(trgSeg.getContent(), 0));
+				tmp.append(processFragment(trgSeg.getContent(), EncoderContext.TEXT));
 				tmp.append("</target>");
 			}
 
@@ -156,7 +157,7 @@ public class TXMLSkeletonWriter extends GenericSkeletonWriter {
 		}
 
 		// Process the last skeleton part (the third)
-		tmp.append(getString(skel.getParts().get(2), 1));
+		tmp.append(getString(skel.getParts().get(2), EncoderContext.SKELETON));
 
 		// Done
 		return tmp.toString();
@@ -292,7 +293,7 @@ public class TXMLSkeletonWriter extends GenericSkeletonWriter {
 	 * @return the output string.
 	 */
 	protected String processFragment (TextFragment frag,
-		int context)
+			EncoderContext context)
 	{
 		StringBuilder tmp = new StringBuilder();
 		String text = frag.getCodedText();
@@ -315,16 +316,16 @@ public class TXMLSkeletonWriter extends GenericSkeletonWriter {
 	}
 
 	private String expandCode (Code code,
-		int context)
+			EncoderContext context)
 	{
 		if ( getLayer() != null ) {
-			if ( context == 0 ) { // Parent is text -> codes are inline
+			if ( context == EncoderContext.TEXT ) { // Parent is text -> codes are inline
 				return getLayer().startInline() 
-					+ getLayer().encode(code.getOuterData(), 2)
+					+ getLayer().encode(code.getOuterData(), EncoderContext.INLINE)
 					+ getLayer().endInline();
 			}
 			else {
-				return getLayer().encode(code.getOuterData(), 1);
+				return getLayer().encode(code.getOuterData(), EncoderContext.SKELETON);
 			}
 		}
 		// Else: no layer
