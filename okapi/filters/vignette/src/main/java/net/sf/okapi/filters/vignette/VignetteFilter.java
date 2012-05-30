@@ -177,12 +177,13 @@ public class VignetteFilter implements IFilter {
 			getClass().getName(),
 			"Vignette Export/Import Content",
 			"Default Vignette Export/Import Content configuration."));
-//		list.add(new FilterConfiguration(
-//				getName() + "-cdata",
-//				MimeTypeMapper.XML_MIME_TYPE,
-//				getClass().getName(),
-//				"Vignette Export/Import Content (CDATA in valueCLOB)",
-//				"Vignette Export/Import Content configuration for CDATA in valueCLOB."));
+		list.add(new FilterConfiguration(
+				getName() + "-cdata",
+				MimeTypeMapper.XML_MIME_TYPE,
+				getClass().getName(),
+				"Vignette Export/Import Content (CDATA)",
+				"Vignette files with CDATA sections.",
+				"cdata.fprm"));
 		return list;
 	}
 
@@ -805,7 +806,8 @@ public class VignetteFilter implements IFilter {
 		n = content.indexOf("<", n+1); // Start of value-type element
 		// Meta characters are escaped so we can just do this: 
 		res[0] = content.indexOf(">", n)+1;
-		res[1] = content.indexOf("<", res[0]);
+		String name = content.substring(n + 1, res[0] - 1);
+		res[1] = content.indexOf("</" + name, res[0]); // Not to stumble at tags in CDATA
 		return res;
 	}
 	
@@ -828,9 +830,11 @@ public class VignetteFilter implements IFilter {
 			filter = fcMapper.createFilter(partConfiguration, filter);
 			//encoderManager.mergeMappings(filter.getEncoderManager());
 			//IEncoder encoder = encoderManager.getEncoder();
-			
-			//IEncoder encoder = new XMLEncoder("UTF-8", lineBreak, true, false, false, 1);
-			IEncoder encoder = new CDATAEncoder("UTF-8", lineBreak);
+						
+			IEncoder encoder = params.getUseCDATA() ? 
+					new CDATAEncoder("UTF-8", lineBreak) :
+					new XMLEncoder("UTF-8", lineBreak, true, false, false, 1);
+					
 			subFilter = new SubFilter(filter, 
 					encoder, ++sectionIndex, partName, partName);
 			
