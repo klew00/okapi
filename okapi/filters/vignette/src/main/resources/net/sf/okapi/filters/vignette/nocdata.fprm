@@ -4,6 +4,6 @@ partsConfigurations=default, okf_html, okf_html, default, default, okf_html, def
 sourceId=SOURCE_ID
 localeId=LOCALE_ID
 monolingual.b=false
-useCDATA.b=true
+useCDATA.b=false
 quoteModeDefined.b=true
 quoteMode.i=0
