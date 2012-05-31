@@ -24,9 +24,6 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import net.sf.okapi.common.Util;
-import net.sf.okapi.common.encoder.EncoderContext;
-import net.sf.okapi.common.encoder.EncoderManager;
-import net.sf.okapi.common.encoder.IEncoder;
 import net.sf.okapi.common.filters.EventBuilder;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filters.InlineCodeFinder;
@@ -45,17 +42,10 @@ public class AbstractMarkupEventBuilder extends EventBuilder {
 		
 	private boolean useCodeFinder = false;
 	private InlineCodeFinder codeFinder;
-	private EncoderManager encoderManager;
-	private String encoding;
-	private String lineBreak;
 	
-	public AbstractMarkupEventBuilder(String rootId, IFilter subFilter, 
-			EncoderManager encoderManager, String encoding, String lineBreak) {
-		super(rootId, subFilter);		
+	public AbstractMarkupEventBuilder(String rootId, IFilter filter) {
+		super(rootId, filter);		
 		codeFinder = new InlineCodeFinder();
-		this.encoderManager = encoderManager;
-		this.encoding = encoding;
-		this.lineBreak = lineBreak;
 	}
 	
 	/**
@@ -100,16 +90,13 @@ public class AbstractMarkupEventBuilder extends EventBuilder {
 		text.setCodedText(normalizeHtmlText(text.getCodedText(), false, textUnit.preserveWhitespaces()));
 		// Apply the in-line codes rules if needed
 		if ( useCodeFinder ) {
-			encoderManager.setDefaultOptions(null, encoding, lineBreak);
-			encoderManager.updateEncoder(textUnit.getMimeType());
-			IEncoder encoder = encoderManager.getEncoder();
 			codeFinder.process(text);
 			// Escape inline code content
 			List<Code> codes = text.getCodes();
 			for ( Code code : codes ) {
 				// Escape the data of the new inline code (and only them)
-				if ( code.getType().equals(InlineCodeFinder.TAGTYPE) ) {										
-					code.setData(encoder.encode(code.getData(), EncoderContext.SKELETON));
+				if ( code.getType().equals(InlineCodeFinder.TAGTYPE) ) { 
+					code.setData(Util.escapeToXML(code.getData(), 0, false, null));
 				}
 			}
 			
