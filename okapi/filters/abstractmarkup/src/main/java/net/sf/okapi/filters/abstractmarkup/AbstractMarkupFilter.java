@@ -373,7 +373,8 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 	protected void startFilter() {
 		// order of execution matters
 		if (eventBuilder == null) {
-			eventBuilder = new AbstractMarkupEventBuilder(getParentId(), this);
+			eventBuilder = new AbstractMarkupEventBuilder(getParentId(), 
+					this, getEncoderManager(), getEncoding(), getNewlineType());
 			eventBuilder.setMimeType(getMimeType());
 		} else {
 			eventBuilder.reset(getParentId(), this);

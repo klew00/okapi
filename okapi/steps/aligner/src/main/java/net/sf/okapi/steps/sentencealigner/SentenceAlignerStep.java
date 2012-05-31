@@ -268,11 +268,11 @@ public class SentenceAlignerStep extends BasePipelineStep implements IObserver {
 		}
 		
 		// remove leading and trailing whitespace in the aligned TextUnit 
-		// for both source and target
-		TextUnitUtil.trimSegments(alignedTextUnit.getSource());
+		// for both source and target		
+		TextUnitUtil.trimSegments(alignedTextUnit.getVariantSources().get(targetLocale));
 		TextUnitUtil.trimSegments(alignedTextUnit.getTarget(targetLocale));
 		
-		// align codes betwen source and target and 
+		// align codes between source and target and 
 		// copy source code data to corresponding target codes		
 		IAlignedSegments segments = alignedTextUnit.getAlignedSegments();
 		for (Segment s : segments) {
@@ -284,11 +284,10 @@ public class SentenceAlignerStep extends BasePipelineStep implements IObserver {
 		// Send the aligned TU to the TMX file
 		if (params.isGenerateTMX()) {
 			tmx.writeTUFull(alignedTextUnit);
-		} else { // Otherwise send each aligned TextUnit downstream
-			return new Event(EventType.TEXT_UNIT, alignedTextUnit);
 		}
-
-		return sourceEvent;
+	
+		// pass on the aligned (possibly partially aligned)
+		return new Event(EventType.TEXT_UNIT, alignedTextUnit);
 	}
 
 	private void initializeFilter() {

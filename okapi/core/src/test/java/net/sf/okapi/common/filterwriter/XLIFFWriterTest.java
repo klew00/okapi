@@ -30,6 +30,7 @@ import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.TestUtil;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.ITextUnit;
+import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.resource.TextUnit;
 
 import org.junit.Before;
@@ -111,6 +112,55 @@ public class XLIFFWriterTest {
 			+ "<body>\n"
 			+ "<trans-unit id=\"tu1\">\n"
 			+ "<source xml:lang=\"en\">src1 with &lt;></source>\n"
+			+ "</trans-unit>\n"
+			+ "</body>\n</file>\n</xliff>\n", result);
+	}
+
+	@Test
+	public void testTextWithDefaultCodes ()
+		throws IOException
+	{
+		writer.create(root+"out.xlf", null, locEN, null, null, "original.ext", null);
+		ITextUnit tu = new TextUnit("tu1");
+		tu.getSource().getFirstSegment().getContent().append(TagType.OPENING, "z", "<z>");
+		tu.getSource().getFirstSegment().getContent().append("s1");
+		tu.getSource().getFirstSegment().getContent().append(TagType.CLOSING, "z", "</z>");
+		tu.getSource().getFirstSegment().getContent().append(TagType.PLACEHOLDER, "br", "<br/>");
+		writer.writeTextUnit(tu);
+		writer.close();
+
+		String result = readFile(root+"out.xlf");
+		assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+			+ "<xliff version=\"1.2\" xmlns=\"urn:oasis:names:tc:xliff:document:1.2\" xmlns:okp=\"okapi-framework:xliff-extensions\">\n"
+			+ "<file original=\"original.ext\" source-language=\"en\" datatype=\"x-undefined\">\n"
+			+ "<body>\n"
+			+ "<trans-unit id=\"tu1\">\n"
+			+ "<source xml:lang=\"en\"><g id=\"1\">s1</g><x id=\"2\"/></source>\n"
+			+ "</trans-unit>\n"
+			+ "</body>\n</file>\n</xliff>\n", result);
+	}
+
+	@Test
+	public void testTextWithEncapsulatedCodes ()
+		throws IOException
+	{
+		writer.setPlaceholderMode(false);
+		writer.create(root+"out.xlf", null, locEN, null, null, "original.ext", null);
+		ITextUnit tu = new TextUnit("tu1");
+		tu.getSource().getFirstSegment().getContent().append(TagType.OPENING, "z", "<z>");
+		tu.getSource().getFirstSegment().getContent().append("s1");
+		tu.getSource().getFirstSegment().getContent().append(TagType.CLOSING, "z", "</z>");
+		tu.getSource().getFirstSegment().getContent().append(TagType.PLACEHOLDER, "br", "<br/>");
+		writer.writeTextUnit(tu);
+		writer.close();
+
+		String result = readFile(root+"out.xlf");
+		assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+			+ "<xliff version=\"1.2\" xmlns=\"urn:oasis:names:tc:xliff:document:1.2\" xmlns:okp=\"okapi-framework:xliff-extensions\">\n"
+			+ "<file original=\"original.ext\" source-language=\"en\" datatype=\"x-undefined\">\n"
+			+ "<body>\n"
+			+ "<trans-unit id=\"tu1\">\n"
+			+ "<source xml:lang=\"en\"><bpt id=\"1\">&lt;z></bpt>s1<ept id=\"1\">&lt;/z></ept><ph id=\"2\">&lt;br/></ph></source>\n"
 			+ "</trans-unit>\n"
 			+ "</body>\n</file>\n</xliff>\n", result);
 	}

@@ -12,7 +12,9 @@ import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.pipeline.EventObserver;
 import net.sf.okapi.common.pipeline.Pipeline;
 import net.sf.okapi.common.resource.RawDocument;
+import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.filters.plaintext.PlainTextFilter;
+import net.sf.okapi.filters.tmx.TmxFilter;
 import net.sf.okapi.steps.common.RawDocumentToFilterEventsStep;
 import net.sf.okapi.steps.sentencealigner.SentenceAlignerStep;
 
@@ -25,6 +27,9 @@ public class SentenceAlignStepTest {
 	private Pipeline pipeline;
 	private SentenceAlignerStep aligner;
 	private EventObserver eventObserver;
+	private Pipeline tmxPipeline;
+	private SentenceAlignerStep tmxAligner;
+	private EventObserver tmxEventObserver;
 
 	@Before
 	public void setUp() throws Exception {
@@ -53,9 +58,38 @@ public class SentenceAlignStepTest {
 		pipeline.addStep(aligner);
 	}
 
+	@Before
+	public void setUpTmx() throws Exception {
+		// create pipeline
+		tmxPipeline = new Pipeline();
+		tmxEventObserver = new EventObserver();
+		tmxPipeline.addObserver(tmxEventObserver);
+
+		// add filter step
+		IFilter tmxFilter = new TmxFilter();
+		tmxPipeline.addStep(new RawDocumentToFilterEventsStep(tmxFilter));
+
+		// add aligner step
+		tmxAligner = new SentenceAlignerStep();
+
+		Parameters p = new Parameters();
+		p.setGenerateTMX(false);
+		p.setSegmentTarget(true);
+		p.setSegmentSource(true);
+		p.setUseCustomTargetRules(false);
+		p.setOutputOneTOneMatchesOnly(true);
+		tmxAligner.setParameters(p);
+		
+		FilterConfigurationMapper fcMapper = new FilterConfigurationMapper();
+		fcMapper.addConfigurations("net.sf.okapi.filters.tmx.TmxFilter");
+		tmxAligner.setFilterConfigurationMapper(fcMapper);
+		tmxPipeline.addStep(tmxAligner);
+	}
+	
 	@After
 	public void tearDown() throws Exception {
 		pipeline.destroy();
+		tmxPipeline.destroy();
 	}
 
 	@Test
@@ -113,13 +147,13 @@ public class SentenceAlignStepTest {
 		Event tue = el.remove(0);
 		assertEquals("The First Darlek  \tEmpire has written: \"The simplest statement we know of is the " +
 				"statement of Davross himself, namely, that the members of the empire should destroy " +
-				"'all life forms,' which is understood to mean universal destruction." 
-				,tue.getTextUnit().getSource().getSegments().get(0).toString());
+				"'all life forms,' which is understood to mean universal destruction.",
+				tue.getTextUnit().getAlignedSegments().getSource(0, LocaleId.PORTUGUESE).toString());
 		assertEquals(
 				"No one is justified " +
 				"in making any other statement than this\" (First Darlek Empire letter, Mar. 12, 3035; see " +
 				"also DE 11:4).",
-				tue.getTextUnit().getSource().getSegments().get(1).toString());
+				tue.getTextUnit().getAlignedSegments().getSource(1, LocaleId.PORTUGUESE).toString());
 		assertEquals(EventType.TEXT_UNIT, tue.getEventType());
 		assertEquals(EventType.END_DOCUMENT, el.remove(0).getEventType());
 		assertEquals(EventType.END_BATCH_ITEM, el.remove(0).getEventType());
@@ -154,14 +188,68 @@ public class SentenceAlignStepTest {
 		Event tue = el.remove(0);
 		assertEquals("The First Darlek Empire has written: \"The simplest statement we know of is the " +
 				"statement of Davross himself, namely, that the members of the empire should destroy " +
-				"'all life forms,' which is understood to mean universal destruction." 
-				,tue.getTextUnit().getSource().getSegments().get(0).toString());
+				"'all life forms,' which is understood to mean universal destruction." ,
+				tue.getTextUnit().getAlignedSegments().getSource(0, LocaleId.PORTUGUESE).toString());
 		assertEquals(
 				"No one is justified " +
 				"in making any other statement than this\" (First Darlek Empire letter, Mar. 12, 3035; see " +
 				"also DE 11:4).",
-				tue.getTextUnit().getSource().getSegments().get(1).toString());
+				tue.getTextUnit().getAlignedSegments().getSource(1, LocaleId.PORTUGUESE).toString());
 		assertEquals(EventType.TEXT_UNIT, tue.getEventType());
+		assertEquals(EventType.END_DOCUMENT, el.remove(0).getEventType());
+		assertEquals(EventType.END_BATCH_ITEM, el.remove(0).getEventType());
+		assertEquals(EventType.END_BATCH, el.remove(0).getEventType());
+	}
+	
+	@Test
+	public void sentenceAlignOnetoOneOnly() throws URISyntaxException {
+		URL url = SentenceAlignStepTest.class.getResource("/one_to_one1.tmx");
+		RawDocument in = new RawDocument(url.toURI(), "UTF-8", LocaleId.ENGLISH, LocaleId.FRENCH);
+		in.setFilterConfigId("okf_tmx");
+
+		tmxAligner.setSourceLocale(LocaleId.ENGLISH);
+		tmxAligner.setTargetLocale(LocaleId.FRENCH);
+		
+		tmxPipeline.startBatch();
+		tmxPipeline.process(in);
+		tmxPipeline.endBatch();
+
+		// There are no one to one alignments so we see no aligned segments
+		List<Event> el = tmxEventObserver.getResult();
+		assertEquals(EventType.START_BATCH, el.remove(0).getEventType());
+		assertEquals(EventType.START_BATCH_ITEM, el.remove(0).getEventType());
+		assertEquals(EventType.START_DOCUMENT, el.remove(0).getEventType());
+		assertEquals(EventType.DOCUMENT_PART, el.remove(0).getEventType());
+		Event tue = el.remove(0);
+		TextContainer srcCont = tue.getTextUnit().getVariantSources().get(LocaleId.FRENCH); 
+		assertTrue(srcCont.isEmpty());
+		assertEquals(EventType.END_DOCUMENT, el.remove(0).getEventType());
+		assertEquals(EventType.END_BATCH_ITEM, el.remove(0).getEventType());
+		assertEquals(EventType.END_BATCH, el.remove(0).getEventType());
+	}
+	
+	@Test
+	public void sentenceAlignOnetoOneOnlyTwo() throws URISyntaxException {
+		URL url = SentenceAlignStepTest.class.getResource("/one_to_one2.tmx");
+		RawDocument in = new RawDocument(url.toURI(), "UTF-8", LocaleId.ENGLISH, LocaleId.FRENCH);
+		in.setFilterConfigId("okf_tmx");
+
+		tmxAligner.setSourceLocale(LocaleId.ENGLISH);
+		tmxAligner.setTargetLocale(LocaleId.FRENCH);
+		
+		tmxPipeline.startBatch();
+		tmxPipeline.process(in);
+		tmxPipeline.endBatch();
+
+		// There are no one to one alignments so we see no TU's
+		List<Event> el = tmxEventObserver.getResult();
+		assertEquals(EventType.START_BATCH, el.remove(0).getEventType());
+		assertEquals(EventType.START_BATCH_ITEM, el.remove(0).getEventType());
+		assertEquals(EventType.START_DOCUMENT, el.remove(0).getEventType());
+		assertEquals(EventType.DOCUMENT_PART, el.remove(0).getEventType());
+		Event tue = el.remove(0);
+		TextContainer srcCont = tue.getTextUnit().getVariantSources().get(LocaleId.FRENCH); 
+		assertFalse(srcCont.isEmpty());
 		assertEquals(EventType.END_DOCUMENT, el.remove(0).getEventType());
 		assertEquals(EventType.END_BATCH_ITEM, el.remove(0).getEventType());
 		assertEquals(EventType.END_BATCH, el.remove(0).getEventType());

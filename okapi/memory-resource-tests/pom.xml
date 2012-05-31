@@ -60,7 +60,7 @@
 		<dependency>
 			<groupId>net.sf.okapi.lib</groupId>
 			<artifactId>okapi-lib-extra</artifactId>
-			<version>0.17-SNAPSHOT</version>
+			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>net.sf.okapi.steps</groupId>
@@ -101,7 +101,12 @@
 			<groupId>net.sf.okapi.connectors</groupId>
 			<artifactId>okapi-connector-pensieve</artifactId>
 			<version>${project.version}</version>
-		</dependency>
+		</dependency>		
+		<dependency>
+			<groupId>net.sf.okapi.steps</groupId>
+			<artifactId>okapi-step-scopingreport</artifactId>
+			<version>${project.version}</version>
+		</dependency>		
 	</dependencies>
 	<build>
 		<plugins>

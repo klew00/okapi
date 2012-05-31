@@ -92,7 +92,8 @@ public class XLIFFWriter implements IFilterWriter {
 	private boolean useSourceForTranslated = false;
 
 	private boolean escapeGt = false;
-	private boolean placeholderMode = false;
+	private boolean placeholderMode = true;
+	
 	private boolean includeNoTranslate = true;
 	private boolean setApprovedAsNoTranslate = false;
 	private boolean copySource = true;
@@ -656,9 +657,6 @@ public class XLIFFWriter implements IFilterWriter {
 		// fwOutputPath was set before
 		create(fwOutputPath, null, resource.getLocale(), trgLoc, resource.getMimeType(), resource.getName(), null);
 
-		// Output options for IFilterWriter mode
-		placeholderMode = true;
-		
 		// Additional variables specific to IFilterWriter mode
 		fwInputEncoding = resource.getEncoding();
 		IParameters params = resource.getFilterParameters();

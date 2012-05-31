@@ -1494,6 +1494,7 @@ public class Main {
 		// Filter events to raw document final step (using the XLIFF writer)
 		FilterEventsWriterStep fewStep = new FilterEventsWriterStep();
 		XLIFFWriter writer = new XLIFFWriter();
+		writer.setPlaceholderMode(true);
 		writer.setCopySource(extOptCopy);
 		writer.setIncludeAltTrans(extOptAltTrans);
 		fewStep.setFilterWriter(writer);
