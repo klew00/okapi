@@ -36,6 +36,8 @@ public class Parameters extends BaseParameters {
 	public static final String DEFAULT_PARAMETERS = "default.yml";
 	public static final String DITA_PARAMETERS = "dita.yml";
 	public static final String PROPERTY_XML_PARAMETERS = "javaPropertiesXml.yml";
+	public static final String XML_ESCAPED_HTML = "xml_esc_html.yml";
+	public static final String IDD_ESCAPED_HTML = "idd_esc_html.yml";	
 			
 	private TaggedFilterConfiguration taggedConfig;
 
