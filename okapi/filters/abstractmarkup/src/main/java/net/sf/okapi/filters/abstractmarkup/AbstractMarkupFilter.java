@@ -51,6 +51,7 @@ import net.sf.okapi.common.BOMNewlineEncodingDetector;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.MimeTypeMapper;
+import net.sf.okapi.common.encoder.XMLEncoder;
 import net.sf.okapi.common.exceptions.OkapiBadFilterInputException;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.filters.AbstractFilter;
@@ -950,7 +951,8 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 			// if a pcdata subfilter is configured let it do the processsing
 			if (pcdataFilter != null && isInsideTextRun()) {		
 				// remove the TextUnit we have accumulated since the start tag
-				ITextUnit pcdata = popTempEvent().getTextUnit();
+				//ITextUnit pcdata = popTempEvent().getTextUnit();
+				ITextUnit pcdata = peekTempEvent().getTextUnit();
 				
 //				pcdataSubfilter.close();
 
@@ -958,13 +960,25 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 //				parentId = (parentId == null ? getDocumentId().getLastId() : parentId);
 				
 				String parentId = eventBuilder.findMostRecentParentId();
-				if (parentId == null) parentId = getDocumentId().getLastId();
+				if (parentId == null) {
+					parentId = pcdata.getId();
+				}
+				if (parentId == null) {
+					parentId = getDocumentId().getLastId();
+				}
 				
 				String parentName = eventBuilder.findMostRecentParentName();
+				if (parentName == null) parentName = pcdata.getType(); // tag name
 				if (parentName == null) parentName = getDocumentId().getLastId();
 				
-				PcdataSubFilter pcdataSubfilter = new PcdataSubFilter(pcdataFilter, 
-						getEncoderManager().getEncoder(), ++pcdataSectionIndex, parentId, parentName);
+//				PcdataSubFilter pcdataSubfilter = new PcdataSubFilter(pcdataFilter, 
+//						new XMLEncoder(getEncoding(), getNewlineType(), true, true, false, 1), 
+//						++pcdataSectionIndex, parentId, parentName);
+				
+				SubFilter pcdataSubfilter = new SubFilter(pcdataFilter, 
+						new XMLEncoder(getEncoding(), getNewlineType(), true, true, false, 0), 
+						++pcdataSectionIndex, parentId, parentName);
+				
 //				FilterState s = new FilterState(FILTER_STATE.INSIDE_TEXTUNIT, 
 //						parentId, 
 //						new GenericSkeleton(((GenericSkeleton)pcdata.getSkeleton()).getFirstPart().toString()), 
@@ -979,7 +993,10 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 //				}			
 //				pcdataSubfilter.close();
 				eventBuilder.addFilterEvents(pcdataSubfilter.getEvents(new RawDocument(pcdata.getSource().toString(), getSrcLoc())));
+				// Clear source as we will parse it with the subfilter (skeleton remains)
+				pcdata.getSource().clear();
 				addToTextUnit(pcdataSubfilter.createRefCode()); 
+				endTextUnit(new GenericSkeleton(endTag.toString()));
 			} else {
 				endTextUnit(new GenericSkeleton(endTag.toString()));
 			}

@@ -178,12 +178,12 @@ public class VignetteFilter implements IFilter {
 			"Vignette Export/Import Content",
 			"Default Vignette Export/Import Content configuration."));
 		list.add(new FilterConfiguration(
-				getName() + "-cdata",
+				getName() + "-nocdata",
 				MimeTypeMapper.XML_MIME_TYPE,
 				getClass().getName(),
-				"Vignette Export/Import Content (CDATA)",
-				"Vignette files with CDATA sections.",
-				"cdata.fprm"));
+				"Vignette Export/Import Content (escaped HTML)",
+				"Vignette files without CDATA sections.",
+				"nocdata.fprm"));
 		return list;
 	}
 

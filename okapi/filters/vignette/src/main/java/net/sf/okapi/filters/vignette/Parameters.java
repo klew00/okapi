@@ -128,7 +128,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		sourceId = "SOURCE_ID";
 		localeId = "LOCALE_ID";
 		monolingual = false;
-		useCDATA = false;
+		useCDATA = true;
 	}
 
 	@Override

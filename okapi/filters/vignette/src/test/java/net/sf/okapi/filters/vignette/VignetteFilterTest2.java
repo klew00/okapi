@@ -56,7 +56,7 @@ public class VignetteFilterTest2 {
 		FilterConfigurationMapper fcMapper = new FilterConfigurationMapper();
 		fcMapper.addConfigurations("net.sf.okapi.filters.html.HtmlFilter");
 		fcMapper.addConfigurations(VignetteFilter.class.getName());
-		filter = (VignetteFilter) fcMapper.createFilter("okf_vignette-cdata");
+		filter = (VignetteFilter) fcMapper.createFilter("okf_vignette-nocdata");
 		filter.setFilterConfigurationMapper(fcMapper);
 		root = TestUtil.getParentDir(this.getClass(), "/Test01.xml");
 	}
@@ -91,7 +91,7 @@ public class VignetteFilterTest2 {
 		String expected = "<importProject>"
 			+ "<importContentInstance><contentInstance>"
 			+ "<attribute name=\"SMCCONTENT-CONTENT-ID\"><valueString>id1ES</valueString></attribute>"
-			+ "<attribute name=\"SMCCONTENT-BODY\"><valueCLOB><![CDATA[<p>ENtext</p>]]></valueCLOB></attribute>"
+			+ "<attribute name=\"SMCCONTENT-BODY\"><valueCLOB>&lt;p&gt;ENtext&lt;/p&gt;</valueCLOB></attribute>"
 			+ "<attribute name=\"SOURCE_ID\"><valueString>id1</valueString></attribute>"
 			+ "<attribute name=\"LOCALE_ID\"><valueString>es_ES</valueString></attribute>"
 			+ "</contentInstance></importContentInstance>"
@@ -126,7 +126,7 @@ public class VignetteFilterTest2 {
 			// ES id1
 			+ "<importContentInstance><contentInstance>"
 			+ "<attribute name=\"SMCCONTENT-CONTENT-ID\"><valueString>id1ES</valueString></attribute>"
-			+ "<attribute name=\"SMCCONTENT-BODY\"><valueCLOB><![CDATA[EN-id1]]></valueCLOB></attribute>"
+			+ "<attribute name=\"SMCCONTENT-BODY\"><valueCLOB>EN-id1</valueCLOB></attribute>"
 			+ "<attribute name=\"SOURCE_ID\"><valueString>id1</valueString></attribute>"
 			+ "<attribute name=\"LOCALE_ID\"><valueString>es_ES</valueString></attribute>"
 			+ "</contentInstance></importContentInstance>"
@@ -141,7 +141,7 @@ public class VignetteFilterTest2 {
 			// ES id2
 			+ "<importContentInstance><contentInstance>"
 			+ "<attribute name=\"SMCCONTENT-CONTENT-ID\"><valueString>id2ES</valueString></attribute>"
-			+ "<attribute name=\"SMCCONTENT-BODY\"><valueCLOB><![CDATA[EN-id2]]></valueCLOB></attribute>"
+			+ "<attribute name=\"SMCCONTENT-BODY\"><valueCLOB>EN-id2</valueCLOB></attribute>"
 			+ "<attribute name=\"SOURCE_ID\"><valueString>id2</valueString></attribute>"
 			+ "<attribute name=\"LOCALE_ID\"><valueString>es_ES</valueString></attribute>"
 			+ "</contentInstance></importContentInstance>"
