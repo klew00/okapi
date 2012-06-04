@@ -110,6 +110,8 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 	
 	static {
 		Config.ConvertNonBreakingSpaces = false;
+		Config.IsHTMLEmptyElementTagRecognised = true;
+		Config.ConvertNonBreakingSpaces = false;
 		Config.NewLine = BOMNewlineEncodingDetector.NewlineType.LF.toString();
 		Config.LoggerProvider = LoggerProvider.JAVA;
 		//Config.CurrentCompatibilityMode = Config.CompatibilityMode.XHTML;
