@@ -51,7 +51,7 @@ public class StartSubfilter extends StartGroup {
 	 * and the group's identifier.
 	 * @param id the identifier of this sub filter.
 	 * @param startDoc The StartDocument resource of the subfilter.
-	 * @param parentEncoder2 
+	 * @param parentEncoder
 	 */
 	public StartSubfilter(String id, StartDocument startDoc, IEncoder parentEncoder) {
 		super(startDoc.getName(), null, false); // Not referenced by default
