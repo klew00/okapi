@@ -40,6 +40,7 @@ import net.sf.okapi.common.MimeTypeMapper;
 import net.sf.okapi.common.UsingParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.annotation.TermsAnnotation;
+import net.sf.okapi.common.encoder.EncoderContext;
 import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.encoder.IEncoder;
 import net.sf.okapi.common.exceptions.OkapiIOException;
@@ -631,7 +632,7 @@ public class XMLFilter implements IFilter {
 						//TODO: We should use the proper output encoding here, not force UTF-8, but we do not know it
 						cfEncoder.setOptions(params, "utf-8", lineBreak);
 					}
-					code.setData(cfEncoder.encode(code.getData(), 0));
+					code.setData(cfEncoder.encode(code.getData(), EncoderContext.TEXT));
 				}
 			}
 		}
@@ -776,7 +777,7 @@ public class XMLFilter implements IFilter {
 							//TODO: We should use the proper output encoding here, not force UTF-8, but we do not know it
 							cfEncoder.setOptions(params, "utf-8", lineBreak);
 						}
-						code.setData(cfEncoder.encode(code.getData(), 0));
+						code.setData(cfEncoder.encode(code.getData(), EncoderContext.TEXT));
 					}
 				}
 			}
