@@ -43,7 +43,7 @@ import net.sf.okapi.common.ui.MRUList;
 import net.sf.okapi.common.ui.ResourceManager;
 import net.sf.okapi.common.ui.TextOptions;
 import net.sf.okapi.common.ui.UIUtil;
-import net.sf.okapi.common.ui.UserConfiguration;
+import net.sf.okapi.common.UserConfiguration;
 import net.sf.okapi.lib.verification.IQualityCheckEditor;
 import net.sf.okapi.lib.verification.Issue;
 import net.sf.okapi.lib.verification.IssueComparator;
