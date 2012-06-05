@@ -146,6 +146,7 @@ public class MainForm { //implements IParametersProvider {
 	public static final String OPT_LOGLEVEL = "logLevel"; //$NON-NLS-1$
 	public static final String OPT_ALWAYSOPENLOG = "alwaysOpenLog"; //$NON-NLS-1$
 	public static final String OPT_DROPINSDIR = "dropinsDir"; //$NON-NLS-1$
+	public static final String OPT_PARAMSDIR = "paramsDir"; //$NON-NLS-1$
 	public static final String OPT_USEUSERDEFAULTS = "useUserDefaults"; //$NON-NLS-1$
 	public static final String OPT_SOURCELOCALE = "sourceLocale"; //$NON-NLS-1$
 	public static final String OPT_SOURCEENCODING = "sourceEncoding"; //$NON-NLS-1$
@@ -2131,6 +2132,13 @@ public class MainForm { //implements IParametersProvider {
 			tmp = config.getProperty(OPT_TARGETENCODING);
 			if ( !Util.isEmpty(tmp) ) prj.setTargetEncoding(tmp);
 			prj.isModified = false; // User defaults are not modifications
+		}
+		
+		// Set custom parameters folder
+		String tmp = config.getProperty(OPT_PARAMSDIR);
+		if ( !Util.isEmpty(tmp) ){
+			prj.setCustomParametersFolder(tmp);
+			prj.setUseCustomParametersFolder(true);
 		}
 		
 		customFilterConfigsNeedUpdate = true;

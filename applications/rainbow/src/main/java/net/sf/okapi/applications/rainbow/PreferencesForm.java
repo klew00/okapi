@@ -54,6 +54,7 @@ class PreferencesForm {
 	private Combo cbLogLevel;
 	private UserConfiguration config;
 	private TextAndBrowsePanel pnlDropinsDir;
+	private TextAndBrowsePanel pnlParamsDir;
 
 	PreferencesForm (Shell p_Parent,
 		IHelp helpParam)
@@ -114,7 +115,7 @@ class PreferencesForm {
 		grpTmp.setText("Plugins Location");
 		grpTmp.setLayoutData(new GridData(GridData.FILL_BOTH));
 		grpTmp.setLayout(new GridLayout(1, false));
-		
+
 		label = new Label(grpTmp, SWT.NONE);
 		label.setText("Enter the directory for the plugins (leave empty to use the default)");
 		pnlDropinsDir = new TextAndBrowsePanel(grpTmp, SWT.NONE, true);
@@ -123,6 +124,19 @@ class PreferencesForm {
 		gdTmp.minimumWidth = 500;
 		pnlDropinsDir.setLayoutData(gdTmp);
 
+		grpTmp = new Group(shell, SWT.NONE);
+		grpTmp.setText("Default Custom Parameters Folder");
+		grpTmp.setLayoutData(new GridData(GridData.FILL_BOTH));
+		grpTmp.setLayout(new GridLayout(1, false));
+		
+		label = new Label(grpTmp, SWT.NONE);
+		label.setText("Enter the directory for the parameters (leave empty to use the default)");
+		pnlParamsDir = new TextAndBrowsePanel(grpTmp, SWT.NONE, true);
+		pnlParamsDir.setTitle("Select the Parameters Location");
+		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+		gdTmp.minimumWidth = 500;
+		pnlParamsDir.setLayoutData(gdTmp);
+		
 		SelectionAdapter OKCancelActions = new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				if ( e.widget.getData().equals("h") ) { //$NON-NLS-1$
@@ -174,6 +188,12 @@ class PreferencesForm {
 			tmp = tmp.substring(0, tmp.length()-1);
 		}
 		pnlDropinsDir.setText(tmp);
+		
+		tmp = config.getProperty(MainForm.OPT_PARAMSDIR, "");
+		if ( tmp.endsWith("/") || tmp.endsWith("\\") ) {
+			tmp = tmp.substring(0, tmp.length()-1);
+		}
+		pnlParamsDir.setText(tmp);
 	}
 
 	private boolean saveData () {
@@ -196,6 +216,25 @@ class PreferencesForm {
 				}
 			}
 			config.setProperty(MainForm.OPT_DROPINSDIR, tmp);
+			
+			tmp = pnlParamsDir.getText().trim();
+			if ( tmp.length() > 0 ) {
+				if ( tmp.endsWith("/") || tmp.endsWith("\\") ) {
+					tmp = tmp.substring(0, tmp.length()-1);
+				}
+				File file = new File(tmp);
+				if ( !file.exists() ) {
+					Dialogs.showError(shell, "The directory for the parameters does not exists.", null);
+					pnlParamsDir.setFocus();
+					return false;
+				}
+				if ( !file.isDirectory() ) {
+					Dialogs.showError(shell, "The path for the parameters location is not a directory.", null);
+					pnlParamsDir.setFocus();
+					return false;
+				}
+			}
+			config.setProperty(MainForm.OPT_PARAMSDIR, tmp);
 			
 			config.setProperty(MainForm.OPT_ALWAYSOPENLOG, chkAlwaysOpenLog.getSelection());
 			config.setProperty(MainForm.OPT_ALLOWDUPINPUT, chkAllowDuplicateInputs.getSelection());
