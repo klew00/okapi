@@ -41,7 +41,7 @@ public class CdataSubfilterWithRegexTest {
         xmlStreamFilter.setFilterConfigurationMapper(fcMapper);
 	}
 	
-	//@Test
+	@Test
 	public void testDoubleExtractionWithRegex() throws URISyntaxException, MalformedURLException {
 		xmlStreamFilter.setParametersFromURL(XmlStreamFilter.class.getResource("/okf_xmlstream@freemarker.fprm"));
 		RoundTripComparison rtc = new RoundTripComparison();
@@ -59,7 +59,7 @@ public class CdataSubfilterWithRegexTest {
 		assertTrue(rtc.executeCompare(xmlStreamFilter, list, "UTF-8", locEN, locEN));
 	}
 
-	//@Test
+	@Test
 	public void testDoubleExtractionWithoutSubfilter() throws URISyntaxException, MalformedURLException {
 		xmlStreamFilter.setParametersFromURL(XmlStreamFilter.class.getResource("/okf_html@spaces_freemarker_regex.fprm"));
 		RoundTripComparison rtc = new RoundTripComparison();
