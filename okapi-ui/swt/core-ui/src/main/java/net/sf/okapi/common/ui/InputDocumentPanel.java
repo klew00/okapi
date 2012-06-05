@@ -201,10 +201,6 @@ public class InputDocumentPanel extends Composite {
 	public void guessConfiguration () {
 		String ext = Util.getExtension(edDocument.getText());
 		FilterConfiguration fc = fcMapper.getDefaultConfigurationFromExtension(ext);
-		// Special case for TTX: not the normal default
-		if ( ext.equalsIgnoreCase(".ttx") ) {
-			fc = fcMapper.getConfiguration("okf_ttx-noForcedTuv");
-		}
 		if ( fc != null ) {
 			edConfigId.setText(fc.configId);
 		}
