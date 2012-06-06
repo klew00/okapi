@@ -980,12 +980,14 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 							
 							// escape the skeleton parts
 							GenericSkeleton s = (GenericSkeleton)tu.getSkeleton();
-							for (GenericSkeletonPart p : s.getParts()) {
-								if (p.getParent() == null) {
-									p.setData(Util.escapeToXML(p.getData().toString(), 0, true, null));
-								}
-							}							
-							tu.setSkeleton(s);
+							if (s != null) {
+								for (GenericSkeletonPart p : s.getParts()) {
+									if (p.getParent() == null) {
+										p.setData(Util.escapeToXML(p.getData().toString(), 0, true, null));
+									}
+								}							
+								tu.setSkeleton(s);
+							}
 							
 							// now escape all the code content
 							List<Code> codes = tu.getSource().getFirstContent().getCodes();
