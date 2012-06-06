@@ -178,7 +178,7 @@ public class GenericContentTest {
 		tf.append("A");
 		tf.append(TagType.OPENING, "b1", "[b1]");
 		tf.append("B");
-		//tf.append(TagType.CLOSING, "b1", "[/b1]");
+		tf.append(TagType.CLOSING, "b1", "[/b1]");
 		
 		TextFragment tf2 = new TextFragment("", tf.getClonedCodes());
 		fmt.updateFragment("<1/>ZZ<2>QQ</2>", tf2, false);
