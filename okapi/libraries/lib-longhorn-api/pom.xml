@@ -25,5 +25,10 @@
             <artifactId>resteasy-jaxrs</artifactId>
             <version>2.0.1.GA</version>
         </dependency>
+		<dependency>
+			<groupId>commons-lang</groupId>
+			<artifactId>commons-lang</artifactId>
+			<version>2.6</version>
+		</dependency>
     </dependencies>
 </project>

@@ -27,6 +27,7 @@ import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.List;
 
 import net.sf.okapi.lib.longhornapi.LonghornFile;
 import net.sf.okapi.lib.longhornapi.LonghornProject;
@@ -34,6 +35,7 @@ import net.sf.okapi.lib.longhornapi.impl.rest.RESTFile.Filetype;
 
 import org.apache.commons.httpclient.methods.multipart.FilePart;
 import org.apache.commons.httpclient.methods.multipart.Part;
+import org.apache.commons.lang.StringUtils;
 
 /**
  * Implementation of {@link LonghornProject} for Longhorn's RESTful interface.
@@ -126,6 +128,22 @@ public class RESTProject implements LonghornProject {
 	}
 
 	@Override
+	public void executePipeline(final String sourceLanguage,
+			final List<String> targetLanguages) throws NullPointerException {
+		if (sourceLanguage == null || targetLanguages == null)
+			throw new NullPointerException();
+
+		try {
+			Util.post(this.getProjectURI() + "/tasks/execute/" + sourceLanguage +
+					"?targets=" + StringUtils.join(targetLanguages, "&targets="), null);
+		}
+		catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+
+	}
+
+	@Override
 	public ArrayList<LonghornFile> getInputFiles() {
 		try {
 			ArrayList<String> filenames = Util.getList(projUri + "/inputFiles");
@@ -172,8 +190,11 @@ public class RESTProject implements LonghornProject {
 	}
 
 	@Override
-	public InputStream getOutputFilesAsZip() {
-		//TODO check if any files are available
+	public InputStream getOutputFilesAsZip() throws IllegalStateException {
+		if (getOutputFiles().isEmpty()) {
+			// An empty list of files can't be zipped, so throw an exception
+			throw new IllegalStateException("There are no output files available.");
+		}
 		try {
 			URI remoteFile = new URI(projUri + "/outputFiles.zip");
 			return remoteFile.toURL().openStream();

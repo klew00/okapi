@@ -68,6 +68,18 @@ public class RESTFile implements LonghornFile {
 	}
 
 	@Override
+	public InputStream openStreamToZip() {
+		
+		try {
+			final URI remoteFile = new URI(project.getProjectURI() + "/outputFilesZipped/" + relativePath + ".zip");
+			return remoteFile.toURL().openStream();
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@Override
 	public String getRelativePath() {
 		return relativePath;
 	}
