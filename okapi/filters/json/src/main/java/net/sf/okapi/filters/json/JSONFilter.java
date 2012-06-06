@@ -478,7 +478,7 @@ public class JSONFilter implements IFilter {
 		skel.append(inputText.substring(startRead, startString+1).replace("\n", lineBreak));
 		skel.addContentPlaceholder(tu);
 		if ( endString < current ) {
-			skel.append(inputText.substring(endString, current+1).replace("\n", lineBreak));
+			skel.append(inputText.substring(endString, current).replace("\n", lineBreak));
 		}
 		tu.setSkeleton(skel);
 		tu.setMimeType(MIMETYPE);

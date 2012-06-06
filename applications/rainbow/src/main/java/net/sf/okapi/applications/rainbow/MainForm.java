@@ -2139,6 +2139,7 @@ public class MainForm { //implements IParametersProvider {
 		if ( !Util.isEmpty(tmp) ){
 			prj.setCustomParametersFolder(tmp);
 			prj.setUseCustomParametersFolder(true);
+			prj.isModified = false; // User defaults are not modifications
 		}
 		
 		customFilterConfigsNeedUpdate = true;
