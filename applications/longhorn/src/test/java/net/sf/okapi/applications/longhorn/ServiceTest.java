@@ -141,6 +141,15 @@ public class ServiceTest {
 			assertTrue(outputFile.length() > 0);
 			outputFile.delete();
 		}
+		
+		// also check if output files can be fetched as a zip file
+		InputStream zippedOutputFiles = proj.getOutputFilesAsZip();
+		assertNotNull(zippedOutputFiles);
+		
+		// check if fetching single files as a zip also works
+		LonghornFile firstOutputFile = outputFiles.get(0);
+		InputStream zippedFile = firstOutputFile.openStreamToZip();
+		assertNotNull(zippedFile);
 
 		//
 		// Delete project
