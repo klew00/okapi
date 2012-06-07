@@ -396,12 +396,7 @@ public final class Util {
 					}
 				}
 				else { // ASCII chars
-					if (Character.isISOControl(ch)) {
-						sbTmp.append(String.format("&#x%x;", text.codePointAt(i)));
-					}
-					else {
-						sbTmp.append(ch);
-					}
+					sbTmp.append(text.charAt(i));
 				}
 				continue;
 			}

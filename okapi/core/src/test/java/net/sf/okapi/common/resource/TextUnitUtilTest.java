@@ -561,25 +561,20 @@ public class TextUnitUtilTest {
 		String[] res = TextUnitUtil.simplifyCodes(tc, true);		
 		assertEquals("<x/><x/><a><x/>The plan of</a><b><x/></b><c>happiness</c><d><x/></d><x/>", tc.toString());
 		assertNotNull(res);
-		assertEquals("<x11/><x12/>   ", res[0]);
-		assertEquals("<x23/><x24/>", res[1]);
+		assertEquals(null, res[0]);
+		assertEquals(null, res[1]);
 		
-		assertEquals(5, tc.count());
-		assertTrue(tc.get(0).isSegment());
-		assertFalse(tc.get(1).isSegment());
+		assertEquals(3, tc.count());
+		assertFalse(tc.get(0).isSegment());
+		assertTrue(tc.get(1).isSegment());
 		assertFalse(tc.get(2).isSegment());
-		assertFalse(tc.get(3).isSegment());
-		assertTrue(tc.get(4).isSegment());
 		
-		assertEquals("[seg 1]", tc.get(0).toString());
-		assertEquals("<x13/><x14/>", tc.get(1).toString());
-		assertEquals("<x21/><x22/>", tc.get(2).toString());
-		assertEquals("<x21/><x22/>", tc.get(2).toString());
-		assertEquals("   ", tc.get(3).toString());
-		assertEquals("[seg 2]", tc.get(4).toString());
+		assertEquals("<x/><x/><a><x/>", tc.get(0).toString());
+		assertEquals("The plan of</a><b><x/></b><c>happiness", tc.get(1).toString());
+		assertEquals("</c><d><x/></d><x/>", tc.get(2).toString());
 		
 		ISegments segs = tc.getSegments();
-		assertEquals(2, segs.count());
+		assertEquals(1, segs.count());
 	}
 	
 	@Test
