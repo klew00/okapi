@@ -230,7 +230,7 @@ public abstract class AbstractLineFilter extends AbstractBaseFilter {
 		}
 				
 		try {
-			reader.mark(1024); // Mark line start (needed for 1-line files, reader.ready() returns false before the first read)
+			reader.mark(1024); // Mark line start (needed for one-line files, reader.ready() returns false before the first read)
 		} 
 		catch (IOException e) {
 		} 
@@ -531,9 +531,14 @@ public abstract class AbstractLineFilter extends AbstractBaseFilter {
 		
 		if (!reader.markSupported()) return "";
 		
-		reader.reset(); // Seek the last marked position
-		String st = reader.readLine();
-		
+		String st = null;
+		try {
+			reader.reset(); // Seek the last marked position
+			st = reader.readLine();
+		} catch (Exception e) {
+			return "";
+		}
+				
 		if (st == null) return "";
 		
 		reader.reset(); // Seek the last marked position

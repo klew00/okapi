@@ -989,5 +989,59 @@ public class CodeSimplifierTest {
 		simplifier.simplifyAll(tf, true);		
 		assertEquals(".", fmt.setContent(tf).toString());
 	}
+	
+	@Test
+	public void testCodeReduction51 () {
+		TextFragment tf = new TextFragment();
+		tf.append(TagType.OPENING, "a", "<a>");		
+		tf.append("The plan of");
+		tf.append(TagType.CLOSING, "a", "</a>");
+		
+		tf.append(TagType.OPENING, "b", "<b>");
+		tf.append(TagType.PLACEHOLDER, "x1", "<x/>");
+		tf.append(TagType.CLOSING, "b", "</b>");
+		
+		tf.append(TagType.OPENING, "c", "<c>");
+		tf.append("happiness");
+		tf.append(TagType.CLOSING, "c", "</c>");
+		
+		tf.append(TagType.OPENING, "d", "<d>");
+		tf.append(TagType.PLACEHOLDER, "x2", "<x/>");
+		tf.append(TagType.CLOSING, "d", "</d>");
+		
+		assertEquals("<1>The plan of</1><2><3/></2><4>happiness</4><5><6/></5>", fmt.setContent(tf).toString());
+		simplifier.simplifyAll(tf, true);		
+		assertEquals("<1>The plan of</1><3>happiness</3>", fmt.setContent(tf).toString());
+	}
 
+	@Test
+	public void testCodeReduction52 () {
+		TextFragment tf = new TextFragment();
+		tf.append(TagType.PLACEHOLDER, "x1", "<x/>");
+		tf.append(TagType.PLACEHOLDER, "x2", "<x/>");
+		tf.append(TagType.OPENING, "a", "<a>");
+		tf.append(TagType.PLACEHOLDER, "x3", "<x/>");
+		tf.append("The plan of");
+		tf.append(TagType.CLOSING, "a", "</a>");
+		
+		tf.append(TagType.OPENING, "b", "<b>");
+		tf.append(TagType.PLACEHOLDER, "x4", "<x/>");
+		tf.append(TagType.CLOSING, "b", "</b>");
+		
+		tf.append(TagType.OPENING, "c", "<c>");
+		tf.append("happiness");
+		tf.append(TagType.CLOSING, "c", "</c>");
+		
+		tf.append(TagType.OPENING, "d", "<d>");
+		tf.append(TagType.PLACEHOLDER, "x5", "<x/>");
+		tf.append(TagType.CLOSING, "d", "</d>");
+		tf.append(TagType.PLACEHOLDER, "x6", "<x/>");
+		
+		assertEquals("<1/><2/><3><4/>The plan of</3><5><6/></5><7>happiness</7><8><9/></8><10/>", fmt.setContent(tf).toString());
+		String[] res = simplifier.simplifyAll(tf, true);		
+		assertEquals("<1>The plan of</1><3>happiness</3>", fmt.setContent(tf).toString());
+		assertEquals(2, res.length);
+		assertEquals(null, res[0]);
+		assertEquals(null, res[1]);
+	}
 }

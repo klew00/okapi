@@ -533,6 +533,56 @@ public class TextUnitUtilTest {
 	}
 	
 	@Test
+	public void testSimplifyCodes_segmentedTU6() {
+		TextFragment tf = new TextFragment();
+		tf.append(TagType.PLACEHOLDER, "x1", "<x/>");
+		tf.append(TagType.PLACEHOLDER, "x2", "<x/>");
+		tf.append(TagType.OPENING, "a", "<a>");
+		tf.append(TagType.PLACEHOLDER, "x3", "<x/>");
+		tf.append("The plan of");
+		tf.append(TagType.CLOSING, "a", "</a>");
+		
+		tf.append(TagType.OPENING, "b", "<b>");
+		tf.append(TagType.PLACEHOLDER, "x4", "<x/>");
+		tf.append(TagType.CLOSING, "b", "</b>");
+		
+		tf.append(TagType.OPENING, "c", "<c>");
+		tf.append("happiness");
+		tf.append(TagType.CLOSING, "c", "</c>");
+		
+		tf.append(TagType.OPENING, "d", "<d>");
+		tf.append(TagType.PLACEHOLDER, "x5", "<x/>");
+		tf.append(TagType.CLOSING, "d", "</d>");
+		tf.append(TagType.PLACEHOLDER, "x6", "<x/>");
+		
+		TextContainer tc = new TextContainer();
+		tc.append(new Segment("s1", tf));
+		
+		String[] res = TextUnitUtil.simplifyCodes(tc, true);		
+		assertEquals("<x/><x/><a><x/>The plan of</a><b><x/></b><c>happiness</c><d><x/></d><x/>", tc.toString());
+		assertNotNull(res);
+		assertEquals("<x11/><x12/>   ", res[0]);
+		assertEquals("<x23/><x24/>", res[1]);
+		
+		assertEquals(5, tc.count());
+		assertTrue(tc.get(0).isSegment());
+		assertFalse(tc.get(1).isSegment());
+		assertFalse(tc.get(2).isSegment());
+		assertFalse(tc.get(3).isSegment());
+		assertTrue(tc.get(4).isSegment());
+		
+		assertEquals("[seg 1]", tc.get(0).toString());
+		assertEquals("<x13/><x14/>", tc.get(1).toString());
+		assertEquals("<x21/><x22/>", tc.get(2).toString());
+		assertEquals("<x21/><x22/>", tc.get(2).toString());
+		assertEquals("   ", tc.get(3).toString());
+		assertEquals("[seg 2]", tc.get(4).toString());
+		
+		ISegments segs = tc.getSegments();
+		assertEquals(2, segs.count());
+	}
+	
+	@Test
 	public void testSegmentId() {
 		TextFragment tf = new TextFragment();
 		tf.append(new Code(TagType.OPENING, "x", "code1"));
