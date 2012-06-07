@@ -99,7 +99,7 @@ public class SentenceAligner {
 		// record the result in a list of AlignedPairs
 		List<AlignedPair> alignedPairs = new LinkedList<AlignedPair>();
 
-		String srcTuid = sourceParagraph.getName();				
+		String srcTuid = sourceParagraph.getName() == null ? "unknown" : sourceParagraph.getName();				
 		Iterator<DpMatrixCell> it = result.iterator();
 		while (it.hasNext()) {
 			DpMatrixCell cell = it.next();
@@ -169,6 +169,7 @@ public class SentenceAligner {
 		// record the result in a list of AlignedPairs
 		List<AlignedPair> alignedPairs = new LinkedList<AlignedPair>();
 
+		String srcTuid = bilingualParagraph.getName() == null ? "unknown" : bilingualParagraph.getName(); 
 		Iterator<DpMatrixCell> it = result.iterator();
 		while (it.hasNext()) {
 			DpMatrixCell cell = it.next();
@@ -185,9 +186,13 @@ public class SentenceAligner {
 			if (cell.getState() == DpMatrixCell.DELETED) {
 				Segment sourceSegment = matrix.getAlignmentElementX(cell.getXindex());
 				alignedPairs.add(new AlignedPair(sourceSegment, null, trgLocale));
+				LOGGER.warning(sourceSegment.toString() + 
+						"\nTarget segment deleted (TU ID: " + srcTuid + "): Non 1-1 match. Please confirm alignment.");
 			} else if (cell.getState() == DpMatrixCell.INSERTED) {
 				Segment targetSegment = matrix.getAlignmentElementY(cell.getYindex());
 				alignedPairs.add(new AlignedPair(null, targetSegment, trgLocale));
+				LOGGER.warning(targetSegment.toString() + 
+						"\nSource segment deleted (TU ID: " + srcTuid + "): Non 1-1 match. Please confirm alignment.");
 			} else if (cell.getState() == DpMatrixCell.MATCH) {
 				Segment sourceSegment = matrix.getAlignmentElementX(cell.getXindex());
 				Segment targetSegment = matrix.getAlignmentElementY(cell.getYindex());
@@ -199,6 +204,14 @@ public class SentenceAligner {
 						cell.getMultiMatchYIndexBegin(), cell.getMultiMatchYIndexEnd());
 				alignedPairs.add(new AlignedPair(new LinkedList<TextPart>(sourceSegments),
 						new LinkedList<TextPart>(targetSegments), trgLocale));
+				Segment s = null;
+				try {
+					s = sourceSegments.get(0);
+				} catch (IndexOutOfBoundsException e) {
+					s = targetSegments.get(0);
+				}
+				LOGGER.warning(s.toString() 
+						+ "\nMulti-Segment Match (TU ID: " + srcTuid + "): Non 1-1 match. Please confirm alignment.");
 			}
 		}
 

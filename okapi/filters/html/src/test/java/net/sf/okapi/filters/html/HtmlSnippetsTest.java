@@ -449,6 +449,13 @@ public class HtmlSnippetsTest {
 		assertNull(tu);
 	}
 	
+	@Test
+	public void testFreeMarker() {
+		String snippet = "<strong> this is a bolded text between html strong tags </strong> <#if contactInfo??> or ${contactInfo}</#if>.";
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		assertEquals(" this is a bolded text between html strong tags  <#if contactInfo??> or ${contactInfo}</#if>.", tu.getSource().getFirstContent().toString());
+	}
+	
 	//@Test
 	public void testDivBlockExcludeIncludeTranslateAttribute() {
 		String snippet = "<div translate='no'>no <div translate='yes'>trans</div></div>";

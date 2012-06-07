@@ -11,29 +11,30 @@ import net.sf.okapi.common.pipelinedriver.PipelineDriver;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.steps.common.RawDocumentToFilterEventsStep;
 
-public class DocxMemoryLeakTest {
+public class PlainTextMemoryLeakTest {
 
 	private static FilterConfigurationMapper fcMapper;	
 	private static LocaleId locEN = LocaleId.fromString("EN");
-
+	
 	public static void setUp() throws Exception {
 		// Create the mapper
 		fcMapper = new FilterConfigurationMapper();
 		// Fill it with the default configurations of several filters
 		fcMapper.addConfigurations("net.sf.okapi.filters.openxml.OpenXMLFilter");
 		fcMapper.addConfigurations("net.sf.okapi.filters.xml.XMLFilter");
+		fcMapper.addConfigurations("net.sf.okapi.filters.plaintext.PlainTextFilter");
 	}
 
 	private static PipelineDriver simplePipeline() throws Exception {
 		// Create the driver
 		PipelineDriver driver = new PipelineDriver();
 		driver.setFilterConfigurationMapper(fcMapper);
-		driver.addStep(new RawDocumentToFilterEventsStep());	
+		driver.addStep(new RawDocumentToFilterEventsStep());
 		return driver;
 	}
 	
 	private static URI getUri(String fileName) throws URISyntaxException {
-		URL url = DocxMemoryLeakTest.class.getResource(fileName);
+		URL url = PlainTextMemoryLeakTest.class.getResource(fileName);
 		return url.toURI();
 	}
 		
@@ -42,11 +43,11 @@ public class DocxMemoryLeakTest {
 		
 		PipelineDriver pd = simplePipeline();
 		for (int i = 0; i <= 10000000L; i++) {
-			RawDocument rd = new RawDocument(getUri("/docx/OpenXML_text_reference_v1_2.docx"), "UTF-8", locEN);
-			rd.setFilterConfigId("okf_openxml");
+			RawDocument rd = new RawDocument(getUri("/plaintext/lgpl.txt"), "UTF-8", locEN);
+			rd.setFilterConfigId("okf_plaintext");
 			pd.addBatchItem(rd, (new File("genericOutput.txt")).toURI(), "UTF-8");
 			pd.processBatch();
-			pd.clearItems();			
+			pd.clearItems();
 			System.out.println(i);
 		}				
 	}

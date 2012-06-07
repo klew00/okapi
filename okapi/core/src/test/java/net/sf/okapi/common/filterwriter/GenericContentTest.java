@@ -171,6 +171,20 @@ public class GenericContentTest {
 		assertEquals("t1<g1><g2><x3/>t2</g2></g1>t3", tf3.toText());
 	}
 	
+	@Test
+	public void testUpdate () {
+		TextFragment tf = new TextFragment();
+		tf.append(TagType.PLACEHOLDER, "x1", "[x/]");
+		tf.append("A");
+		tf.append(TagType.OPENING, "b1", "[b1]");
+		tf.append("B");
+		tf.append(TagType.CLOSING, "b1", "[/b1]");
+		
+		TextFragment tf2 = new TextFragment("", tf.getClonedCodes());
+		fmt.updateFragment("<1/>ZZ<2>QQ</2>", tf2, false);
+		assertEquals("[x/]ZZ[b1]QQ[/b1]", tf2.toText());
+	}
+	
 	private TextFragment createTextFragment () {
 		TextFragment tf = new TextFragment();
 		tf.append("t1");

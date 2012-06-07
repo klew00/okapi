@@ -326,6 +326,7 @@ public class RainbowKitFilter implements IFilter {
 			pp.setTargetLocale(rd.getTargetLocale());
 			pp.setOutputEncoding(rd.getEncoding()); // Use same as the output document
 			pp.setInputRawDocument(rd);
+			pp.setBatchInputCount(1);
 			// Add the events to the list
 			list.add(new Event(EventType.PIPELINE_PARAMETERS, pp));
 			list.add(new Event(EventType.RAW_DOCUMENT, rd));

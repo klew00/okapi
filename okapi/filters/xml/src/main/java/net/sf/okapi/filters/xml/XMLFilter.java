@@ -41,6 +41,7 @@ import net.sf.okapi.common.UsingParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.annotation.TermsAnnotation;
 import net.sf.okapi.common.encoder.EncoderManager;
+import net.sf.okapi.common.encoder.IEncoder;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.IFilter;
@@ -92,6 +93,7 @@ public class XMLFilter implements IFilter {
 	private Parameters params;
 	private boolean hasUTF8BOM;
 	private EncoderManager encoderManager;
+	private IEncoder cfEncoder;
 	private TermsAnnotation terms;
 	private RawDocument input;
 
@@ -623,8 +625,13 @@ public class XMLFilter implements IFilter {
 			List<Code> codes = tf.getCodes();
 			for ( Code code : codes ) {
 				// Escape the data of the new inline code (and only them)
-				if ( code.getType().equals(InlineCodeFinder.TAGTYPE) ) { 
-					code.setData(Util.escapeToXML(code.getData(), 0, params.escapeGT, null));
+				if ( code.getType().equals(InlineCodeFinder.TAGTYPE) ) {
+					if ( cfEncoder == null ) {
+						cfEncoder = getEncoderManager().getEncoder();
+						//TODO: We should use the proper output encoding here, not force UTF-8, but we do not know it
+						cfEncoder.setOptions(params, "utf-8", lineBreak);
+					}
+					code.setData(cfEncoder.encode(code.getData(), 0));
 				}
 			}
 		}
@@ -763,8 +770,13 @@ public class XMLFilter implements IFilter {
 				List<Code> codes = frag.getCodes();
 				for ( Code code : codes ) {
 					// Escape the data of the new inline code (and only them)
-					if ( code.getType().equals(InlineCodeFinder.TAGTYPE) ) { 
-						code.setData(Util.escapeToXML(code.getData(), 0, params.escapeGT, null));
+					if ( code.getType().equals(InlineCodeFinder.TAGTYPE) ) {
+						if ( cfEncoder == null ) {
+							cfEncoder = getEncoderManager().getEncoder();
+							//TODO: We should use the proper output encoding here, not force UTF-8, but we do not know it
+							cfEncoder.setOptions(params, "utf-8", lineBreak);
+						}
+						code.setData(cfEncoder.encode(code.getData(), 0));
 					}
 				}
 			}

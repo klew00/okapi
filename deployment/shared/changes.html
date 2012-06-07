@@ -23,6 +23,11 @@ distribution.</p>
 </ul>
 <h2>Changes from M16 to M17-SNAPSHOT</h2>
 <ul>
+	<li>Rainbow:<ul>
+	<li>Resolved issue #236: Added custom parameters folder default in User 
+	Preferences.</li>
+</ul>
+	</li>
 	<li>Filters:<ul>
 	<li>XLIFF Filter:<ul>
 	<li>Fixed issue #218 where file name was missing from XML parsing error 
@@ -40,6 +45,16 @@ distribution.</p>
 	<li>Fixed the link for the help button.</li>
 </ul>
 	</li>
+	<li>JSON Filter:<ul>
+	<li>Fixed issue 214 where the rewriting created duplicated characters in 
+	some cases.</li>
+</ul>
+	</li>
+	<li>XML Filter:<ul>
+	<li>Fixed issue #240 where code finder matches were not escaped properly in 
+	some cases.</li>
+</ul>
+	</li>
 	<li>Removed the Drupal filter. This filter will be addressed in a different 
 	way later.</li>
 </ul>
@@ -51,6 +66,8 @@ distribution.</p>
 	step.</li>
 	<li>Added support of the <code>${inputRootDir}</code> variable for all paths 
 	and the command line.</li>
+	<li>Fixed issue #230 where the length of the segment was limited to 65000 
+	characters.</li>
 </ul>
 	</li>
 	<li>Rainbow Translation Kit Creation Step:<ul>
@@ -76,11 +93,21 @@ distribution.</p>
 </ul>
 	</li>
 	<li>Moved the XLIFF 2.0 library (okapi-lib-xliff package) to a separate 
-	project (<a href="http://code.google.com/p/okapi-xliff-toolkit/">http://code.google.com/p/okapi-xliff-toolkit/</a>).<br>Dependent modules are now using the maven2 repository to get the jar.</li>
+	project (<a href="http://code.google.com/p/okapi-xliff-toolkit/">http://code.google.com/p/okapi-xliff-toolkit/</a>).</li>
+	<li>Moved the Olifant and TMdb modules to a separate project (<a href="http://code.google.com/p/okapi-olifant/">http://code.google.com/p/okapi-olifant/</a>)</li>
+	<li>Dependent modules are now using the maven2 repository to get the jar.</li>
 	<li>Fixed missing language-only values for LCID mapping.</li>
 	<li>Added support for wildcard characters in DefaultFilenameFilter. Old 
 	constructor with extension only should be backward compatible.</li>
 	<li>Added getWikiPage() method to the AbstractParametersEditor.</li>
+	<li>Added batch input count support for the Pipeline Parameters event.</li>
+	<li>Fixed issue #233. (Patch from Shane Perry): Changed default placeHolderMode to true in 
+	XLIFFWriter. This affects the direct users of the class, indirect users 
+	(like kit creations have this setting defined by the parameters). Tikal has 
+	also been updated to force its own mode rather than rely on the default.</li>
+	<li>Fixed issue #237: Removed the old and now defunc special case for TTX in 
+	the InputdocumentPanel dialog when guessing the file format. The TTX format 
+	should now be guessed properly.</li>
 </ul>
 	</li>
 </ul>

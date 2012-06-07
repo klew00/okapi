@@ -43,7 +43,7 @@ public class HtmlMemoryLeakTest {
 		
 		PipelineDriver pd = simplePipeline();
 		for (int i = 0; i <= 10000000L; i++) {
-			RawDocument rd = new RawDocument(getUri("/html/ugly_big.htm"), "UTF-8", locEN);
+			RawDocument rd = new RawDocument(getUri("/html/testBOM.html"), "UTF-8", locEN);
 			rd.setFilterConfigId("okf_html");
 			pd.addBatchItem(rd, (new File("genericOutput.txt")).toURI(), "UTF-8");
 			pd.processBatch();
