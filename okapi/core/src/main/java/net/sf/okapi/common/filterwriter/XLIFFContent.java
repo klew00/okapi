@@ -250,8 +250,7 @@ public class XLIFFContent {
 					}
 				}
 				else { // ASCII chars
-					tmp.append(Util.escapeToXML(Character.toString(codedText.charAt(i)), 
-							quoteMode, escapeGT, chsEnc));
+					tmp.append(codedText.charAt(i));
 				}
 				break;
 			}
