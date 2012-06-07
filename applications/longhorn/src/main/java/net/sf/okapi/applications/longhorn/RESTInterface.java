@@ -329,7 +329,7 @@ public class RESTInterface {
 	 * @return The specified file from the project inside a ZIP.
 	 */
 	@GET
-	@Path("/{projId}/outputFilesZipped/{filename:.+}.zip")
+	@Path("/{projId}/outputFile.zip/{filename:.+}.zip")
 	@Produces("application/zip")
 	public File getProjectOutputFileAsZip(
 			@PathParam("projId") int projId, @PathParam("filename") String filename) throws IOException {
