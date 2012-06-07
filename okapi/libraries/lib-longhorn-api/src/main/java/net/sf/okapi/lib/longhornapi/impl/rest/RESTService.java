@@ -35,10 +35,22 @@ public class RESTService implements LonghornService {
 	protected RESTService() {
 	}
 	
-	public RESTService(URI baseUri) {
+	/**
+	 * Default constructor
+	 * 
+	 * @param baseUri i.e. http://myserver:9095/okapi-longhorn
+	 * @throws IllegalArgumentException if the URL is unreachable or does not correspond to a Longhorn web-service
+	 */
+	public RESTService(URI baseUri) throws IllegalArgumentException {
 		this.baseUri = baseUri;
-		// Check if service is reachable
-		getProjects();
+		
+		try {
+			// Check if service is reachable
+			getProjects();
+		}
+		catch (RuntimeException e) {
+			throw new IllegalArgumentException(e);
+		}
 	}
 	
 	public URI getBaseUri() {
