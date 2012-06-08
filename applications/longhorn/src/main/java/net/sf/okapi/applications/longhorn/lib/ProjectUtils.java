@@ -24,7 +24,9 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -70,7 +72,7 @@ public class ProjectUtils {
 		File targetFile = WorkspaceUtils.getBatchConfigurationFile(projId);
 		Util.copyFile(tmpFile, targetFile);
 		
-			PipelineWrapper pipelineWrapper = preparePipelineWrapper(projId, plManager);
+			PipelineWrapper pipelineWrapper = preparePipelineWrapper(projId, plManager, null);
 		
 		// install batch configuration to config directory
 		BatchConfiguration bconf = new BatchConfiguration();
@@ -90,7 +92,7 @@ public class ProjectUtils {
 	 * @param plug-in manager for this wrapper
 	 * @return A PipelineWrapper using all available filter configurations and plug-ins
 	 */
-	private static PipelineWrapper preparePipelineWrapper(int projId, PluginsManager plManager) {				
+	private static PipelineWrapper preparePipelineWrapper(int projId, PluginsManager plManager, List<String> targetLanguages) {				
 		// Load local plug-ins
 		plManager.discover(new File(WorkspaceUtils.getConfigDirPath(projId)), true);
 
@@ -102,8 +104,20 @@ public class ProjectUtils {
 		fcMapper.updateCustomConfigurations();
 
 		// Load pipeline
-		PipelineWrapper pipelineWrapper = new PipelineWrapper(fcMapper, WorkspaceUtils.getConfigDirPath(projId),
-				plManager, WorkspaceUtils.getInputDirPath(projId), WorkspaceUtils.getInputDirPath(projId), null);
+		PipelineWrapper pipelineWrapper;
+		if (targetLanguages == null) {
+			pipelineWrapper = new PipelineWrapper(fcMapper, WorkspaceUtils.getConfigDirPath(projId),
+					plManager, WorkspaceUtils.getInputDirPath(projId), WorkspaceUtils.getInputDirPath(projId), null);
+		}
+		else {
+			List<LocaleId> targetLocales = new ArrayList<LocaleId>();
+			for (String targetLang : targetLanguages) {
+				targetLocales.add(LocaleId.fromBCP47(targetLang));
+			}
+			
+			pipelineWrapper = new PipelineWrapper(fcMapper, WorkspaceUtils.getConfigDirPath(projId),
+					plManager, WorkspaceUtils.getInputDirPath(projId), WorkspaceUtils.getInputDirPath(projId), null, targetLocales);
+		}
 		pipelineWrapper.addFromPlugins(plManager);
 		return pipelineWrapper;
 	}
@@ -118,7 +132,11 @@ public class ProjectUtils {
 		executeProject(projId, null, null);
 	}
 	
-	public static void executeProject(int projId, String sourceLanguage, String targetLanguage) throws IOException {
+	public static void executeProject(int projId, String sourceLanguage, List<String> targetLanguages) throws IOException {
+		String targetLanguage = null;
+		if (targetLanguages != null && !targetLanguages.isEmpty())
+			targetLanguage = targetLanguages.get(0);
+		
 		PluginsManager plManager = new PluginsManager();
 		try {
 		// Create a new, empty rainbow project
@@ -134,7 +152,7 @@ public class ProjectUtils {
 		}
 			
 		// Create a pipeline wrapper
-			PipelineWrapper pipelineWrapper = preparePipelineWrapper(projId, plManager);
+		PipelineWrapper pipelineWrapper = preparePipelineWrapper(projId, plManager, targetLanguages);
 		
 		// Load pipeline into the rainbow project
 		File pipelineFile = WorkspaceUtils.getPipelineFile(projId);
