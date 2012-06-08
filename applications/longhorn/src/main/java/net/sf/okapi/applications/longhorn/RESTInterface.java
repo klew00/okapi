@@ -26,8 +26,8 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 
 import javax.ws.rs.Consumes;
@@ -46,7 +46,6 @@ import javax.ws.rs.core.UriInfo;
 
 import net.sf.okapi.applications.longhorn.lib.ProjectUtils;
 import net.sf.okapi.applications.longhorn.lib.WorkspaceUtils;
-import net.sf.okapi.common.TargetLanguageStore;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.lib.longhornapi.impl.rest.transport.XMLStringList;
 
@@ -250,7 +249,7 @@ public class RESTInterface {
 	public Response executeProject(@PathParam("projId") int projId, @PathParam("source") String sourceLanguage, @PathParam("target") String targetLanguage) {
 
 		try {
-			ProjectUtils.executeProject(projId, sourceLanguage, targetLanguage);
+			ProjectUtils.executeProject(projId, sourceLanguage, Arrays.asList(targetLanguage));
 		}
 		catch (Exception e) {
 			e.printStackTrace();
@@ -360,8 +359,7 @@ public class RESTInterface {
 			@QueryParam("targets") final List<String> targetLanguages) {
 
 		try {
-			storeTargetLanguages(projId, targetLanguages);
-			ProjectUtils.executeProject(projId, sourceLanguage, targetLanguages.get(0));
+			ProjectUtils.executeProject(projId, sourceLanguage, targetLanguages);
 		}
 		catch (Exception e) {
 			e.printStackTrace();
@@ -369,9 +367,6 @@ public class RESTInterface {
 			final String type = MediaType.TEXT_PLAIN;
 			final String body = createStacktraceString(e);
 			return Response.status(status).type(type).entity(body).build();
-		}
-		finally {
-			clearTargetLanguages(projId);
 		}
 
 		return Response.status(HttpStatus.SC_OK).build();
@@ -381,15 +376,5 @@ public class RESTInterface {
 		final StringWriter writer = new StringWriter();
 		e.printStackTrace(new PrintWriter(writer));
 		return writer.toString();
-	}
-
-	private void storeTargetLanguages(final int projId, final List<String> targetLanguages) {
-		final TargetLanguageStore store = TargetLanguageStore.getInstance();
-		store.setTargetLocalesForProject(projId, new HashSet<String>(targetLanguages));
-	}
-
-	private void clearTargetLanguages(final int projId) {
-		final TargetLanguageStore store = TargetLanguageStore.getInstance();
-		store.clearTargetLocalesForProject(projId);
 	}
 }

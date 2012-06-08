@@ -33,6 +33,7 @@ import net.sf.okapi.applications.rainbow.Input;
 import net.sf.okapi.applications.rainbow.Project;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IParametersEditorMapper;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.ParametersEditorMapper;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.FilterConfigurationMapper;
@@ -77,6 +78,19 @@ public class PipelineWrapper {
 		driver.setUIParent(uiParent);
 		
 		refreshAvailableStepsList();
+	}
+
+	public PipelineWrapper (IFilterConfigurationMapper fcMapper,
+		String appFolder,
+		PluginsManager pm,
+		String rootDir,
+		String inputRootDir,
+		Object uiParent,
+		List<LocaleId> targetLocales)
+	{
+		this(fcMapper, appFolder, pm, rootDir, inputRootDir, uiParent);
+		
+		driver.setTargetLocales(targetLocales);
 	}
 	
 	public void refreshAvailableStepsList () {
