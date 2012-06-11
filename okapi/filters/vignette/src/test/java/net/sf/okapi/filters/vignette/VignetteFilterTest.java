@@ -153,7 +153,7 @@ public class VignetteFilterTest {
 		assertEquals(expected, result);		
 	}
 
-	@Test
+	//@Test
 	public void testDoubleExtraction () throws URISyntaxException {
 		ArrayList<InputDocument> list = new ArrayList<InputDocument>();
 		list.add(new InputDocument(root+"Test01.xml", null));

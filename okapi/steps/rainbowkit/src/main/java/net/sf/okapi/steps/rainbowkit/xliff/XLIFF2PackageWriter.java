@@ -32,6 +32,7 @@ import org.oasisopen.xliff.v2.IFragment;
 import org.oasisopen.xliff.v2.INote;
 import org.oasisopen.xliff.v2.IPart;
 import org.oasisopen.xliff.v2.IWithCandidates;
+import org.oasisopen.xliff.v2.OriginalDataStyle;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.FileUtil;
@@ -157,7 +158,7 @@ public class XLIFF2PackageWriter extends BasePackageWriter {
 		MergingInfo item = manifest.getItem(docId);
 		rawDocPath = manifest.getTempSourceDirectory() + item.getRelativeInputPath() + ".xlf";
 		// Set the writer's options
-		writer.setInlineStyle(options.getInlineStyle());
+		writer.setInlineStyle(OriginalDataStyle.fromInteger(options.getInlineStyle()));
 		
 //		StartDocument sd = event.getStartDocument();
 //		writer.create(path, null, manifest.getSourceLocale(), manifest.getTargetLocale(),
