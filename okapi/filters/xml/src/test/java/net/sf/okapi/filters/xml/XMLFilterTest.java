@@ -37,6 +37,7 @@ import static org.junit.Assert.*;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.w3c.its.ITSException;
 
 import java.io.File;
 import java.net.URISyntaxException;
@@ -111,6 +112,42 @@ public class XMLFilterTest {
 		tu = FilterTestDriver.getTextUnit(list, 2);
 		assertNotNull(tu);
 		assertEquals("xid2", tu.getName()); // xml:id overrides global rule
+	}
+	
+	@Test (expected = ITSException.class)
+	public void testITSVersionAttribute () {
+		String snippet = "<?xml version=\"1.0\"?>\n"
+			+ "<doc><its:rules badversionattribute=\"1.0\" xmlns:its=\"http://www.w3.org/2005/11/its\">"
+			+ "<its:translateRule selector=\"//doc\" translate=\"yes\"/>"
+			+ "</its:rules>"
+			+ "<p>data</p>"
+			+ "</doc>";
+		ArrayList<Event> list = getEvents(snippet);
+		FilterTestDriver.getTextUnit(list, 1);
+	}
+	
+	@Test
+	public void testITSVersion1 () {
+		String snippet = "<?xml version=\"1.0\"?>\n"
+			+ "<doc><its:rules version=\"1.0\" xmlns:its=\"http://www.w3.org/2005/11/its\">"
+			+ "<its:translateRule selector=\"//doc\" translate=\"yes\"/>"
+			+ "</its:rules>"
+			+ "<p>data</p>"
+			+ "</doc>";
+		ArrayList<Event> list = getEvents(snippet);
+		assertNotNull(FilterTestDriver.getTextUnit(list, 1));
+	}
+	
+	@Test
+	public void testITSVersion2 () {
+		String snippet = "<?xml version=\"1.0\"?>\n"
+			+ "<doc><its:rules version=\"2.0\" xmlns:its=\"http://www.w3.org/2005/11/its\">"
+			+ "<its:translateRule selector=\"//doc\" translate=\"yes\"/>"
+			+ "</its:rules>"
+			+ "<p>data</p>"
+			+ "</doc>";
+		ArrayList<Event> list = getEvents(snippet);
+		assertNotNull(FilterTestDriver.getTextUnit(list, 1));
 	}
 	
 	@Test

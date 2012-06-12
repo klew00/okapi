@@ -43,6 +43,9 @@ import org.xml.sax.SAXException;
 
 public class ITSEngine implements IProcessor, ITraversal  
 {
+	public static final String    ITS_VERSION1 = "1.0";
+	public static final String    ITS_VERSION2 = "2.0";
+	
 	public static final String    XML_NS_URI = "http://www.w3.org/XML/1998/namespace";
 	public static final String    XML_NS_PREFIX  = "xml";
 	public static final String    ITS_NS_URI = "http://www.w3.org/2005/11/its";
@@ -94,6 +97,7 @@ public class ITSEngine implements IProcessor, ITraversal
 	private Stack<ITSTrace> trace;
 	private boolean backTracking;
 	private boolean translatableAttributeRuleTriggered;
+	private String version;
 	
 	public ITSEngine (Document doc,
 		URI docURI)
@@ -178,9 +182,12 @@ public class ITSEngine implements IProcessor, ITraversal
 			Element rulesElem;
 			for ( int i=0; i<nl.getLength(); i++ ) {
 				rulesElem = (Element)nl.item(i);
-				//TODO: Check version
+				// Check version
+				version = rulesElem.getAttributeNS(null, "version");
+				if ( !version.equals(ITS_VERSION1) && !version.equals(ITS_VERSION2) ) {
+					throw new ITSException(String.format("Invalid or missing ITS version (\"%s\")", version));
+				}
 
-				//TODO: load linked rules
 				// Check for link
 				String href = rulesElem.getAttributeNS(XLINK_NS_URI, "href");
 				if ( href.length() > 0 ) {
