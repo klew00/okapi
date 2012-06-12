@@ -57,5 +57,13 @@ public class PCdataSubfilterTest {
 		list.add(new InputDocument(root + "success.xml", null));
 		assertTrue(rtc.executeCompare(xmlStreamFilter, list, "UTF-8", locEN, locEN));
 	}
-
+	
+	//@Test
+	public void testPcdataHrefReference() throws URISyntaxException, MalformedURLException {
+		xmlStreamFilter.setParametersFromURL(XmlStreamFilter.class.getResource("/okf_xmlstream@pcdata_subfilter.fprm"));
+		RoundTripComparison rtc = new RoundTripComparison();
+		ArrayList<InputDocument> list = new ArrayList<InputDocument>();
+		list.add(new InputDocument(root + "test_href_reference.xml", null));
+		assertTrue(rtc.executeCompare(xmlStreamFilter, list, "UTF-8", locEN, locEN));
+	}
 }
