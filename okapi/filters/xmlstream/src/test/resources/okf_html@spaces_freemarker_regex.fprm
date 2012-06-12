@@ -222,7 +222,7 @@ elements:
   strike:
     ruleTypes: [INLINE]
   strong:
-    ruleTypes: [INLINE]
+    ruleTypes: [TEXTUNIT]
   sub:
     ruleTypes: [INLINE]
   sup:
