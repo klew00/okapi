@@ -408,7 +408,7 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 			//cdataSubfilter = new SubFilter(cdataFilter, null, null, null);
 		}
 		
-		// intialize pcdata sub-filter
+		// initialize pcdata sub-filter
 		if (config != null && config.getGlobalPCDATASubfilter() != null) {
 			String subfilterName = getConfig().getGlobalPCDATASubfilter();
 			pcdataFilter = getFilterConfigurationMapper().createFilter(subfilterName, pcdataFilter); 

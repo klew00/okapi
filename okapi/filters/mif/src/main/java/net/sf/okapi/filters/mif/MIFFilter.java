@@ -2221,13 +2221,13 @@ public class MIFFilter implements IFilter {
 			params.getCodeFinder().process(tf);
 		}
 		// Escape inline code content
-		List<Code> codes = tf.getCodes();
-		for ( Code code : codes ) {
-			// Escape the data of the new inline code (and only them)
-			if ( code.getType().equals(InlineCodeFinder.TAGTYPE) ) { 
-				code.setData(encoder.encode(code.getData(), EncoderContext.SKELETON));
-			}
-		}
+//		List<Code> codes = tf.getCodes();
+//		for ( Code code : codes ) {
+//			// Escape the data of the new inline code (and only them)
+//			if ( code.getType().equals(InlineCodeFinder.TAGTYPE) ) { 
+//				code.setData(encoder.encode(code.getData(), EncoderContext.SKELETON));
+//			}
+//		}
 	}
 	
 	private String processString (boolean store,

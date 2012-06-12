@@ -102,16 +102,17 @@ public class AbstractMarkupEventBuilder extends EventBuilder {
 		if ( useCodeFinder ) {
 			encoderManager.setDefaultOptions(null, encoding, lineBreak);
 			encoderManager.updateEncoder(textUnit.getMimeType());
-			IEncoder encoder = encoderManager.getEncoder();
+//			IEncoder encoder = encoderManager.getEncoder();
 			codeFinder.process(text);
 			// Escape inline code content
-			List<Code> codes = text.getCodes();
-			for ( Code code : codes ) {
-				// Escape the data of the new inline code (and only them)
-				if ( code.getType().equals(InlineCodeFinder.TAGTYPE) ) {										
-					code.setData(encoder.encode(code.getData(), EncoderContext.SKELETON));
-				}
-			}
+//			List<Code> codes = text.getCodes();
+//			for ( Code code : codes ) {
+//				// Escape the data of the new inline code (and only them)
+//				if ( code.getType().equals(InlineCodeFinder.TAGTYPE) ) {										
+//					//code.setData(encoder.encode(code.getData(), EncoderContext.SKELETON));
+//					code.setData(encoder.encode(code.getData(), EncoderContext.INLINE));
+//				}
+//			}
 			
 		}
 		return textUnit;
