@@ -120,7 +120,8 @@ public class XMLFilterTest {
 			+ "<doc><its:rules version=\"2.0\" xmlns:its=\"http://www.w3.org/2005/11/its\""
 			+ " >"
 			+ "<its:translateRule selector=\"//doc\" translate=\"no\"/>"
-			+ "<its:translateRule selector=\"//src\" translate=\"yes\" idValue=\"../../name/@id\"/>"
+			+ "<its:translateRule selector=\"//src\" translate=\"yes\"/>"
+			+ "<its:idValueRule selector=\"//src\" idValue=\"../../name/@id\"/>"
 			+ "</its:rules>"
 			+ "<grp><name id=\"id1\" /><u><src>text 1</src></u></grp>"
 			+ "<grp><name id=\"id1\" /><u><src xml:id=\"xid2\">text 2</src></u></grp>"
@@ -133,7 +134,7 @@ public class XMLFilterTest {
 		assertNotNull(tu);
 		assertEquals("xid2", tu.getName()); // xml:id overrides global rule
 	}
-	
+
 	@Test (expected = ITSException.class)
 	public void testITSVersionAttribute () {
 		String snippet = "<?xml version=\"1.0\"?>\n"
