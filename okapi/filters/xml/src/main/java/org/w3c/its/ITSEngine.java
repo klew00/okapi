@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2010 by the Okapi Framework contributors
+  Copyright (C) 2008-2012 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -246,7 +246,7 @@ public class ITSEngine implements IProcessor, ITraversal
 					else if ( "withinTextRule".equals(ruleElem.getLocalName()) ) {
 						compileWithinTextRule(ruleElem, isInternal);
 					}
-					if ( "langRule".equals(ruleElem.getLocalName()) ) {
+					else if ( "langRule".equals(ruleElem.getLocalName()) ) {
 						compileLangRule(ruleElem, isInternal);
 					}
 					else if ( "dirRule".equals(ruleElem.getLocalName()) ) {
@@ -317,8 +317,20 @@ public class ITSEngine implements IProcessor, ITraversal
 			rule.infoType = TRANSLATE_TRGPOINTER; 
 		}
 
-		value = elem.getAttributeNS(ITSX_NS_URI, "idValue");
-		if ( value.length() > 0 ) {
+		value = ""; // No idValue by default
+		if ( version.equals(ITS_VERSION2) ) {
+			// Try version2 attribute
+			value = elem.getAttribute("idValue");
+		}
+		if ( value.isEmpty() ) {
+			// If not version 2 or if not there, try extension
+			value = elem.getAttributeNS(ITSX_NS_URI, "idValue");
+			if ( !value.isEmpty() ) {
+				// Warn if the extension is used in ITS 2.0
+				//TODO: Log warning
+			}
+		}
+		if ( !value.isEmpty() ) {
 			rule.idValue = value;
 		}
 		
@@ -436,7 +448,7 @@ public class ITSEngine implements IProcessor, ITraversal
 			rule.infoType = LOCNOTETYPE_TEXT;
 			rule.info = value1;
 			if (( value2.length() > 0 ) || ( value3.length() > 0 ) || ( value4.length() > 0 )) {
-				throw new ITSException("Too many locNoteXXX attributes specified");
+				throw new ITSException("Too many locNote attributes specified");
 			}
 		}
 		else {
@@ -444,7 +456,7 @@ public class ITSEngine implements IProcessor, ITraversal
 				rule.infoType = LOCNOTETYPE_POINTER;
 				rule.info = value2;
 				if (( value3.length() > 0 ) || ( value4.length() > 0 )) {
-					throw new ITSException("Too many locNoteXXX attributes specified");
+					throw new ITSException("Too many locNote attributes specified");
 				}
 			}
 			else {
@@ -452,7 +464,7 @@ public class ITSEngine implements IProcessor, ITraversal
 					rule.infoType = LOCNOTETYPE_REF;
 					rule.info = value3;
 					if ( value4.length() > 0 ) {
-						throw new ITSException("Too many locNoteXXX attributes specified");
+						throw new ITSException("Too many locNote attributes specified");
 					}
 				}
 				else {
@@ -475,7 +487,7 @@ public class ITSEngine implements IProcessor, ITraversal
 		rule.isInternal = isInternal;
 		
 		rule.info = elem.getAttribute("langPointer");
-		if ( rule.info.length() == 0 ) {
+		if ( rule.info.isEmpty() ) {
 			throw new ITSException("langPointer attribute missing.");
 		}
 		rules.add(rule);
@@ -483,6 +495,7 @@ public class ITSEngine implements IProcessor, ITraversal
 
 	public void applyRules (int dataCategories) {
 		translatableAttributeRuleTriggered = false;
+		version = "0"; // Needs to be not null (in case there is no ITS at all in file)
 		processGlobalRules(dataCategories);
 		processLocalRules(dataCategories);
 	}
@@ -828,10 +841,31 @@ public class ITSEngine implements IProcessor, ITraversal
 				Attr attr;
 				for ( int i=0; i<NL.getLength(); i++ ) {
 					attr = (Attr)NL.item(i);
-					// Skip irrelevant nodes
+					// Set the flag
 					setFlag(attr.getOwnerElement(), FP_LANGINFO, 'y', attr.getSpecified());
 					setFlag(attr.getOwnerElement(), FP_LANGINFO_DATA,
 						attr.getValue(), attr.getSpecified());
+				}
+			}
+			
+			// Local withinText attribute (ITS 2.0 only)
+			if ( version.equals(ITS_VERSION2) && (dataCategories & IProcessor.DC_WITHINTEXT) > 0 ) {
+				XPathExpression expr = xpath.compile("//*/@"+ITS_NS_PREFIX+":withinText");
+				NodeList NL = (NodeList)expr.evaluate(doc, XPathConstants.NODESET);
+				Attr attr;
+				for ( int i=0; i<NL.getLength(); i++ ) {
+					attr = (Attr)NL.item(i);
+					// Skip irrelevant nodes
+					if ( ITS_NS_URI.equals(attr.getOwnerElement().getNamespaceURI())
+						&& "withinTextRule".equals(attr.getOwnerElement().getLocalName()) ) continue;
+					// Set the flag
+					String value = attr.getValue();
+					char ch;
+					if ( "no".equals(value) ) ch='0'; // WITHINTEXT_NO;
+					else if ( "yes".equals(value) ) ch='1'; // WITHINTEXT_YES;
+					else if ( "nested".equals(value) ) ch='2'; // WITHINTEXT_NESTED;
+					else throw new ITSException("Invalid value for 'withinText'.");
+					setFlag(attr.getOwnerElement(), FP_WITHINTEXT, ch, attr.getSpecified());
 				}
 			}
 			

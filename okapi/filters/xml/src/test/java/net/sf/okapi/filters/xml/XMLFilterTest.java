@@ -114,6 +114,26 @@ public class XMLFilterTest {
 		assertEquals("xid2", tu.getName()); // xml:id overrides global rule
 	}
 	
+	@Test
+	public void testIdValueV2 () {
+		String snippet = "<?xml version=\"1.0\"?>\n"
+			+ "<doc><its:rules version=\"2.0\" xmlns:its=\"http://www.w3.org/2005/11/its\""
+			+ " >"
+			+ "<its:translateRule selector=\"//doc\" translate=\"no\"/>"
+			+ "<its:translateRule selector=\"//src\" translate=\"yes\" idValue=\"../../name/@id\"/>"
+			+ "</its:rules>"
+			+ "<grp><name id=\"id1\" /><u><src>text 1</src></u></grp>"
+			+ "<grp><name id=\"id1\" /><u><src xml:id=\"xid2\">text 2</src></u></grp>"
+			+ "</doc>";
+		ArrayList<Event> list = getEvents(snippet);
+		ITextUnit tu = FilterTestDriver.getTextUnit(list, 1);
+		assertNotNull(tu);
+		assertEquals("id1", tu.getName());
+		tu = FilterTestDriver.getTextUnit(list, 2);
+		assertNotNull(tu);
+		assertEquals("xid2", tu.getName()); // xml:id overrides global rule
+	}
+	
 	@Test (expected = ITSException.class)
 	public void testITSVersionAttribute () {
 		String snippet = "<?xml version=\"1.0\"?>\n"
@@ -191,6 +211,29 @@ public class XMLFilterTest {
 		tu = FilterTestDriver.getTextUnit(list, 2);
 		assertNotNull(tu);
 		assertEquals("id1_d", tu.getName());
+	}
+
+	@Test
+	public void testLocalWithinText () { // ITS 2.0
+		String snippet = "<?xml version=\"1.0\"?>\n"
+			+ "<doc xmlns:its=\"http://www.w3.org/2005/11/its\"><its:rules version=\"2.0\" >"
+			+ "<its:withinTextRule selector=\"//c\" withinText=\"yes\"/>"
+			+ "</its:rules>"
+			+ "<p>t1<c its:withinText='no'/>t2</p>"
+			+ "<p>t3<c />t4</p>"
+			+ "<p>t5<c></c>t6</p>"
+			+ "</doc>";
+		ArrayList<Event> list = getEvents(snippet);
+		ITextUnit tu = FilterTestDriver.getTextUnit(list, 1);
+		assertEquals("t1", fmt.setContent(tu.getSource().getFirstContent()).toString());
+		tu = FilterTestDriver.getTextUnit(list, 2);
+		assertEquals("t2", fmt.setContent(tu.getSource().getFirstContent()).toString());
+		tu = FilterTestDriver.getTextUnit(list, 3);
+		Code code = tu.getSource().getFirstContent().getCodes().get(0);
+		assertEquals(TagType.PLACEHOLDER, code.getTagType());
+		assertEquals("t3<1/>t4", fmt.setContent(tu.getSource().getFirstContent()).toString());
+		tu = FilterTestDriver.getTextUnit(list, 4);
+		assertEquals("t5<1/>t6", fmt.setContent(tu.getSource().getFirstContent()).toString());
 	}
 
 	@Test
