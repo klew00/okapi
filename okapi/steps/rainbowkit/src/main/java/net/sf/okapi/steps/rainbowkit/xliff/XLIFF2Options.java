@@ -20,12 +20,13 @@
 
 package net.sf.okapi.steps.rainbowkit.xliff;
 
+import org.oasisopen.xliff.v2.OriginalDataStyle;
+
 import net.sf.okapi.common.BaseParameters;
 import net.sf.okapi.common.ParametersDescription;
 import net.sf.okapi.common.uidescription.EditorDescription;
 import net.sf.okapi.common.uidescription.IEditorDescriptionProvider;
 import net.sf.okapi.common.uidescription.ListSelectionPart;
-import net.sf.okapi.lib.xliff.Fragment;
 
 public class XLIFF2Options extends BaseParameters implements IEditorDescriptionProvider {
 
@@ -41,7 +42,7 @@ public class XLIFF2Options extends BaseParameters implements IEditorDescriptionP
 	
 	@Override
 	public void reset() {
-		inlineStyle = Fragment.STYLE_NODATA;
+		inlineStyle = OriginalDataStyle.NODATA.ordinal();
 		createTipPackage = false;
 	}
 
@@ -90,9 +91,9 @@ public class XLIFF2Options extends BaseParameters implements IEditorDescriptionP
 		EditorDescription desc = new EditorDescription("Experimental XLIFF 2.0", true, false);
 
 		String[] values = {
-			String.valueOf(Fragment.STYLE_NODATA),
-			String.valueOf(Fragment.STYLE_DATAINSIDE),
-			String.valueOf(Fragment.STYLE_DATAOUTSIDE)
+			String.valueOf(OriginalDataStyle.NODATA.ordinal()),
+			String.valueOf(OriginalDataStyle.INSIDE.ordinal()),
+			String.valueOf(OriginalDataStyle.OUTSIDE.ordinal())
 		};
 		String[] labels = {
 			"Without original data stored",

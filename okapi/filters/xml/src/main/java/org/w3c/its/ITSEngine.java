@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2010 by the Okapi Framework contributors
+  Copyright (C) 2008-2012 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -26,6 +26,7 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Stack;
 
+import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPath;
@@ -43,6 +44,9 @@ import org.xml.sax.SAXException;
 
 public class ITSEngine implements IProcessor, ITraversal  
 {
+	public static final String    ITS_VERSION1 = "1.0";
+	public static final String    ITS_VERSION2 = "2.0";
+	
 	public static final String    XML_NS_URI = "http://www.w3.org/XML/1998/namespace";
 	public static final String    XML_NS_PREFIX  = "xml";
 	public static final String    ITS_NS_URI = "http://www.w3.org/2005/11/its";
@@ -86,6 +90,7 @@ public class ITSEngine implements IProcessor, ITraversal
 	private Document doc;
 	private URI docURI;
 	private NSContextManager nsContext;
+	private VariableResolver varResolver;
 	private XPathFactory xpFact;
 	private XPath xpath;
 	private ArrayList<ITSRule> rules;
@@ -94,6 +99,7 @@ public class ITSEngine implements IProcessor, ITraversal
 	private Stack<ITSTrace> trace;
 	private boolean backTracking;
 	private boolean translatableAttributeRuleTriggered;
+	private String version;
 	
 	public ITSEngine (Document doc,
 		URI docURI)
@@ -104,6 +110,7 @@ public class ITSEngine implements IProcessor, ITraversal
 		rules = new ArrayList<ITSRule>();
 		nsContext = new NSContextManager();
 		nsContext.addNamespace(ITS_NS_PREFIX, ITS_NS_URI);
+		varResolver = new VariableResolver();
 
 		// Macintosh work-around
 		// When you use -XstartOnFirstThread as a java -Xarg on Leopard, your ContextClassloader gets set to null.
@@ -115,6 +122,7 @@ public class ITSEngine implements IProcessor, ITraversal
 
 		xpath = xpFact.newXPath();
 		xpath.setNamespaceContext(nsContext);
+		xpath.setXPathVariableResolver(varResolver);
 	}
 
 	/**
@@ -178,9 +186,12 @@ public class ITSEngine implements IProcessor, ITraversal
 			Element rulesElem;
 			for ( int i=0; i<nl.getLength(); i++ ) {
 				rulesElem = (Element)nl.item(i);
-				//TODO: Check version
+				// Check version
+				version = rulesElem.getAttributeNS(null, "version");
+				if ( !version.equals(ITS_VERSION1) && !version.equals(ITS_VERSION2) ) {
+					throw new ITSException(String.format("Invalid or missing ITS version (\"%s\")", version));
+				}
 
-				//TODO: load linked rules
 				// Check for link
 				String href = rulesElem.getAttributeNS(XLINK_NS_URI, "href");
 				if ( href.length() > 0 ) {
@@ -239,7 +250,7 @@ public class ITSEngine implements IProcessor, ITraversal
 					else if ( "withinTextRule".equals(ruleElem.getLocalName()) ) {
 						compileWithinTextRule(ruleElem, isInternal);
 					}
-					if ( "langRule".equals(ruleElem.getLocalName()) ) {
+					else if ( "langRule".equals(ruleElem.getLocalName()) ) {
 						compileLangRule(ruleElem, isInternal);
 					}
 					else if ( "dirRule".equals(ruleElem.getLocalName()) ) {
@@ -251,6 +262,12 @@ public class ITSEngine implements IProcessor, ITraversal
 					else if ( "termRule".equals(ruleElem.getLocalName()) ) {
 						compileTermRule(ruleElem, isInternal);
 					}
+					else if ( "idValueRule".equals(ruleElem.getLocalName()) ) {
+						compileIdValueRule(ruleElem, isInternal);
+					}
+					else if ( "param".equals(ruleElem.getLocalName()) ) {
+						processParam(ruleElem);
+					}
 				}
 			}
 		}
@@ -260,6 +277,15 @@ public class ITSEngine implements IProcessor, ITraversal
 		catch ( URISyntaxException e ) {
 			throw new RuntimeException(e);
 		}
+	}
+	
+	private void processParam (Element elem) {
+		String value = elem.getTextContent();
+		String name = elem.getAttribute("name");
+		if ( name.isEmpty() ) {
+			throw new ITSException("Invalid value for 'name' in param.");
+ 		}
+		varResolver.add(new QName(name), value);
 	}
 	
 	private String getPartBeforeFile (URI uri) {
@@ -310,8 +336,13 @@ public class ITSEngine implements IProcessor, ITraversal
 			rule.infoType = TRANSLATE_TRGPOINTER; 
 		}
 
+		// If not version 2 or if not there, try extension
 		value = elem.getAttributeNS(ITSX_NS_URI, "idValue");
-		if ( value.length() > 0 ) {
+		if ( version.equals(ITS_VERSION2) && !value.isEmpty() ) {
+			// Warn if the extension is used in ITS 2.0
+			//TODO: Log warning
+		}
+		if ( !value.isEmpty() ) {
 			rule.idValue = value;
 		}
 		
@@ -343,20 +374,35 @@ public class ITSEngine implements IProcessor, ITraversal
 	}
 
 	private void compileWithinTextRule (Element elem,
-			boolean isInternal)
-		{
-			ITSRule rule = new ITSRule(IProcessor.DC_WITHINTEXT);
-			rule.selector = elem.getAttribute("selector");
-			rule.isInternal = isInternal;
+		boolean isInternal)
+	{
+		ITSRule rule = new ITSRule(IProcessor.DC_WITHINTEXT);
+		rule.selector = elem.getAttribute("selector");
+		rule.isInternal = isInternal;
 			
-			String value = elem.getAttribute("withinText");
-			if ( "yes".equals(value) ) rule.value = WITHINTEXT_YES;
-			else if ( "no".equals(value) ) rule.value = WITHINTEXT_NO;
-			else if ( "nested".equals(value) ) rule.value = WITHINTEXT_NESTED;
-			else throw new ITSException("Invalid value for 'withinText'.");
+		String value = elem.getAttribute("withinText");
+		if ( "yes".equals(value) ) rule.value = WITHINTEXT_YES;
+		else if ( "no".equals(value) ) rule.value = WITHINTEXT_NO;
+		else if ( "nested".equals(value) ) rule.value = WITHINTEXT_NESTED;
+		else throw new ITSException("Invalid value for 'withinText'.");
 			
-			rules.add(rule);
+		rules.add(rule);
+	}
+
+	private void compileIdValueRule (Element elem,
+		boolean isInternal)
+	{
+		ITSRule rule = new ITSRule(IProcessor.DC_IDVALUE);
+		rule.selector = elem.getAttribute("selector");
+		rule.isInternal = isInternal;
+			
+		String value = elem.getAttribute("idValue");
+		if ( value.isEmpty() ){
+			throw new ITSException("Invalid value for 'idValue'.");
 		}
+		rule.idValue = value;
+		rules.add(rule);
+	}
 
 	private void compileTermRule (Element elem,
 		boolean isInternal)
@@ -379,7 +425,7 @@ public class ITSEngine implements IProcessor, ITraversal
 			rule.infoType = TERMINFOTYPE_POINTER;
 			rule.info = value;
 			if (( value2.length() > 0 ) || ( value3.length() > 0 )) {
-				throw new ITSException("Too many termInfoXXX attributes specified");
+				throw new ITSException("Too many termInfo attributes specified");
 			}
 		}
 		else {
@@ -387,7 +433,7 @@ public class ITSEngine implements IProcessor, ITraversal
 				rule.infoType = TERMINFOTYPE_REF;
 				rule.info = value2;
 				if ( value3.length() > 0 ) {
-					throw new ITSException("Too many termInfoXXX attributes specified");
+					throw new ITSException("Too many termInfo attributes specified");
 				}
 			}
 			else {
@@ -429,7 +475,7 @@ public class ITSEngine implements IProcessor, ITraversal
 			rule.infoType = LOCNOTETYPE_TEXT;
 			rule.info = value1;
 			if (( value2.length() > 0 ) || ( value3.length() > 0 ) || ( value4.length() > 0 )) {
-				throw new ITSException("Too many locNoteXXX attributes specified");
+				throw new ITSException("Too many locNote attributes specified");
 			}
 		}
 		else {
@@ -437,7 +483,7 @@ public class ITSEngine implements IProcessor, ITraversal
 				rule.infoType = LOCNOTETYPE_POINTER;
 				rule.info = value2;
 				if (( value3.length() > 0 ) || ( value4.length() > 0 )) {
-					throw new ITSException("Too many locNoteXXX attributes specified");
+					throw new ITSException("Too many locNote attributes specified");
 				}
 			}
 			else {
@@ -445,7 +491,7 @@ public class ITSEngine implements IProcessor, ITraversal
 					rule.infoType = LOCNOTETYPE_REF;
 					rule.info = value3;
 					if ( value4.length() > 0 ) {
-						throw new ITSException("Too many locNoteXXX attributes specified");
+						throw new ITSException("Too many locNote attributes specified");
 					}
 				}
 				else {
@@ -468,7 +514,7 @@ public class ITSEngine implements IProcessor, ITraversal
 		rule.isInternal = isInternal;
 		
 		rule.info = elem.getAttribute("langPointer");
-		if ( rule.info.length() == 0 ) {
+		if ( rule.info.isEmpty() ) {
 			throw new ITSException("langPointer attribute missing.");
 		}
 		rules.add(rule);
@@ -476,6 +522,7 @@ public class ITSEngine implements IProcessor, ITraversal
 
 	public void applyRules (int dataCategories) {
 		translatableAttributeRuleTriggered = false;
+		version = "0"; // Needs to be not null (in case there is no ITS at all in file)
 		processGlobalRules(dataCategories);
 		processLocalRules(dataCategories);
 	}
@@ -667,14 +714,17 @@ public class ITSEngine implements IProcessor, ITraversal
 						}
 						setFlag(NL.item(i), FP_PRESERVEWS, (rule.preserveWS ? 'y' : '?'), true);
 						break;
+						
 					case IProcessor.DC_DIRECTIONALITY:
 						setFlag(NL.item(i), FP_DIRECTIONALITY,
 							String.valueOf(rule.value).charAt(0), true);
 						break;
+						
 					case IProcessor.DC_WITHINTEXT:
 						setFlag(NL.item(i), FP_WITHINTEXT,
 							String.valueOf(rule.value).charAt(0), true);
 						break;
+						
 					case IProcessor.DC_TERMINOLOGY:
 						setFlag(NL.item(i), FP_TERMINOLOGY, (rule.flag ? 'y' : 'n'), true);
 						switch ( rule.infoType ) {
@@ -689,6 +739,7 @@ public class ITSEngine implements IProcessor, ITraversal
 							break;
 						}
 						break;
+						
 					case IProcessor.DC_LOCNOTE:
 						setFlag(NL.item(i), FP_LOCNOTE, 'y', true);
 						switch ( rule.infoType ) {
@@ -706,9 +757,16 @@ public class ITSEngine implements IProcessor, ITraversal
 							break;
 						}
 						break;
+						
 					case IProcessor.DC_LANGINFO:
 						setFlag(NL.item(i), FP_LANGINFO, 'y', true);
 						setFlag(NL.item(i), FP_LANGINFO_DATA, resolvePointer(NL.item(i), rule.info), true);
+						break;
+						
+					case IProcessor.DC_IDVALUE:
+						if ( rule.idValue != null ) {
+							setFlag(NL.item(i), FP_IDVALUE_DATA, resolveExpression(NL.item(i), rule.idValue), true);							
+						}
 						break;
 					}
 				}
@@ -821,10 +879,31 @@ public class ITSEngine implements IProcessor, ITraversal
 				Attr attr;
 				for ( int i=0; i<NL.getLength(); i++ ) {
 					attr = (Attr)NL.item(i);
-					// Skip irrelevant nodes
+					// Set the flag
 					setFlag(attr.getOwnerElement(), FP_LANGINFO, 'y', attr.getSpecified());
 					setFlag(attr.getOwnerElement(), FP_LANGINFO_DATA,
 						attr.getValue(), attr.getSpecified());
+				}
+			}
+			
+			// Local withinText attribute (ITS 2.0 only)
+			if ( version.equals(ITS_VERSION2) && (dataCategories & IProcessor.DC_WITHINTEXT) > 0 ) {
+				XPathExpression expr = xpath.compile("//*/@"+ITS_NS_PREFIX+":withinText");
+				NodeList NL = (NodeList)expr.evaluate(doc, XPathConstants.NODESET);
+				Attr attr;
+				for ( int i=0; i<NL.getLength(); i++ ) {
+					attr = (Attr)NL.item(i);
+					// Skip irrelevant nodes
+					if ( ITS_NS_URI.equals(attr.getOwnerElement().getNamespaceURI())
+						&& "withinTextRule".equals(attr.getOwnerElement().getLocalName()) ) continue;
+					// Set the flag
+					String value = attr.getValue();
+					char ch;
+					if ( "no".equals(value) ) ch='0'; // WITHINTEXT_NO;
+					else if ( "yes".equals(value) ) ch='1'; // WITHINTEXT_YES;
+					else if ( "nested".equals(value) ) ch='2'; // WITHINTEXT_NESTED;
+					else throw new ITSException("Invalid value for 'withinText'.");
+					setFlag(attr.getOwnerElement(), FP_WITHINTEXT, ch, attr.getSpecified());
 				}
 			}
 			

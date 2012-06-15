@@ -22,6 +22,8 @@ package net.sf.okapi.lib.verification;
 
 import java.net.URI;
 
+import net.sf.okapi.common.Util;
+
 public class Issue {
 
 	public static final int SEVERITY_LOW = 0;
@@ -77,4 +79,23 @@ public class Issue {
 		return String.format("%s-%s-%s-%d-%s", docURI, tuId, (segId==null) ? "" : segId, srcStart, issueType);
 	}
 
+	/**
+	 * Gets the string representation of the issue.
+	 * <p><b>TEST ONLY</b>: The representation in raw XML (ITS 2.0 QA error element).
+	 */
+	@Override
+	public String toString () {
+		StringBuilder tmp = new StringBuilder();
+		tmp.append("<its:qaItem");
+		tmp.append(" docUri=\""+Util.escapeToXML(docURI.getPath(), 3, false, null)+"\"");
+		tmp.append(" tuId=\""+Util.escapeToXML(tuId, 3, false, null)+"\"");
+		tmp.append(" segId=\""+Util.escapeToXML(segId, 3, false, null)+"\"");
+		tmp.append(" tuName=\""+(tuName!=null ? Util.escapeToXML(tuName, 3, false, null) : "")+"\"");
+		tmp.append(String.format(" srcStart=\"%d\" srcEnd=\"%d\"", srcStart, srcEnd));
+		tmp.append(String.format(" trgStart=\"%d\" trgEnd=\"%d\"", trgStart, trgEnd));
+		tmp.append(String.format(" severity=\"%d\"", severity));
+		tmp.append("><its:qaNote>"+Util.escapeToXML(message, 0, false, null)+"<its:qaNote>");
+		tmp.append("</its:qaItem>");
+		return tmp.toString();
+	}
 }

@@ -33,6 +33,7 @@ public interface IProcessor {
 	public static final int DC_TERMINOLOGY       = 0x0010;
 	public static final int DC_DIRECTIONALITY    = 0x0020;
 	public static final int DC_RUBY              = 0x0040;
+	public static final int DC_IDVALUE           = 0x0080; // ITS 2.0
 	public static final int DC_ALL               = 0xFFFF;
 	
 	/**
