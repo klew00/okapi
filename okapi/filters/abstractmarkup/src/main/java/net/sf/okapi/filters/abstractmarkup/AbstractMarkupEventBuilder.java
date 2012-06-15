@@ -83,6 +83,7 @@ public class AbstractMarkupEventBuilder extends EventBuilder {
 	{
 		this.useCodeFinder = useCodeFinder;
 		if ( useCodeFinder ) {
+			codeFinder.reset();
 			for (String r : rules) {
 				codeFinder.addRule(r);
 			}
