@@ -26,6 +26,7 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Stack;
 
+import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPath;
@@ -89,6 +90,7 @@ public class ITSEngine implements IProcessor, ITraversal
 	private Document doc;
 	private URI docURI;
 	private NSContextManager nsContext;
+	private VariableResolver varResolver;
 	private XPathFactory xpFact;
 	private XPath xpath;
 	private ArrayList<ITSRule> rules;
@@ -108,6 +110,7 @@ public class ITSEngine implements IProcessor, ITraversal
 		rules = new ArrayList<ITSRule>();
 		nsContext = new NSContextManager();
 		nsContext.addNamespace(ITS_NS_PREFIX, ITS_NS_URI);
+		varResolver = new VariableResolver();
 
 		// Macintosh work-around
 		// When you use -XstartOnFirstThread as a java -Xarg on Leopard, your ContextClassloader gets set to null.
@@ -119,6 +122,7 @@ public class ITSEngine implements IProcessor, ITraversal
 
 		xpath = xpFact.newXPath();
 		xpath.setNamespaceContext(nsContext);
+		xpath.setXPathVariableResolver(varResolver);
 	}
 
 	/**
@@ -261,6 +265,9 @@ public class ITSEngine implements IProcessor, ITraversal
 					else if ( "idValueRule".equals(ruleElem.getLocalName()) ) {
 						compileIdValueRule(ruleElem, isInternal);
 					}
+					else if ( "param".equals(ruleElem.getLocalName()) ) {
+						processParam(ruleElem);
+					}
 				}
 			}
 		}
@@ -270,6 +277,15 @@ public class ITSEngine implements IProcessor, ITraversal
 		catch ( URISyntaxException e ) {
 			throw new RuntimeException(e);
 		}
+	}
+	
+	private void processParam (Element elem) {
+		String value = elem.getTextContent();
+		String name = elem.getAttribute("name");
+		if ( name.isEmpty() ) {
+			throw new ITSException("Invalid value for 'name' in param.");
+ 		}
+		varResolver.add(new QName(name), value);
 	}
 	
 	private String getPartBeforeFile (URI uri) {
