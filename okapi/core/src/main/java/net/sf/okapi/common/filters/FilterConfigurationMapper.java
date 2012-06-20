@@ -391,6 +391,8 @@ public class FilterConfigurationMapper extends ParametersEditorMapper implements
 			newConfig.configId = String.format("%s%ccopy-of-%s",
 				res[0], CONFIGFILE_SEPARATOR, res[1]);
 		}
+		
+		newConfig.classLoader = baseConfig.classLoader;
 		newConfig.name = String.format(newConfig.configId);
 		newConfig.description = "";
 		newConfig.filterClass = baseConfig.filterClass;
