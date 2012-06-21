@@ -467,6 +467,7 @@ public class FilterConfigurationMapper extends ParametersEditorMapper implements
 		if ( tmpFilter == null ) return;
 		
 		// Set the data
+		fc.classLoader = (URLClassLoader) tmpFilter.getClass().getClassLoader();
 		fc.parametersLocation = fc.configId + CONFIGFILE_EXT;
 		fc.filterClass = tmpFilter.getClass().getName();
 		fc.mimeType = tmpFilter.getMimeType();
