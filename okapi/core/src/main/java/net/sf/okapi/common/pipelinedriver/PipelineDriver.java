@@ -58,7 +58,6 @@ public class PipelineDriver implements IPipelineDriver {
 	private String rootDir;
 	private String inputRootDir;
 	private Object uiParent;
-	private List<LocaleId> targetLocales;
 	
 	/**
 	 * Creates an new PipelineDriver object with an empty pipeline.
@@ -81,11 +80,6 @@ public class PipelineDriver implements IPipelineDriver {
 	{
 		this.rootDir = rootDir;
 		this.inputRootDir = inputRootDir;
-	}
-	
-	@Override
-	public void setTargetLocales(List<LocaleId> targetLocales) {
-		this.targetLocales = targetLocales;
 	}
 	
 	@Override
@@ -264,9 +258,6 @@ public class PipelineDriver implements IPipelineDriver {
 						break;
 					case TARGET_LOCALE:
 						method.invoke(p.getStep(), input.getTargetLocale());
-						break;
-					case TARGET_LOCALES:
-						method.invoke(p.getStep(), targetLocales);
 						break;
 					case SOURCE_LOCALE:
 						method.invoke(p.getStep(), input.getSourceLocale());

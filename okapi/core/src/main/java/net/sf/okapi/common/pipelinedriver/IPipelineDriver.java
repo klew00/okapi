@@ -157,11 +157,4 @@ public interface IPipelineDriver {
 	 */
 	public int getRequestedInputCount ();
 
-	/**
-	 * The target locale list that will be passed to annotated methods.
-	 * 
-	 * @param targetLocales
-	 */
-	void setTargetLocales(List<LocaleId> targetLocales);
-
 }
