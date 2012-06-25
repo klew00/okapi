@@ -31,6 +31,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -61,6 +62,7 @@ public class RawDocument implements IResource {
 	private String encoding = UNKOWN_ENCODING;
 	private LocaleId srcLoc;
 	private LocaleId trgLoc;
+	private List<LocaleId> trgLocs;
 	private InputStream inputStream;
 	private InputStream createdStream;
 	private URI inputURI;
@@ -446,6 +448,23 @@ public class RawDocument implements IResource {
 	 */
 	public void setTargetLocale (LocaleId locId) {
 		trgLoc = locId;
+	}
+
+	/**
+	 * Gets the list of target locales associated to this resource.
+	 * 
+	 * @return the target locales associated to this resource.
+	 */
+	public List<LocaleId> getTargetLocales() {
+		return trgLocs;
+	}
+	
+	/**
+	 * Sets the list of target locales associated to this document.
+	 * @param locIds the locales to set.
+	 */
+	public void setTargetLocales (List<LocaleId> locId) {
+		trgLocs = locId;
 	}
 
 	/**
