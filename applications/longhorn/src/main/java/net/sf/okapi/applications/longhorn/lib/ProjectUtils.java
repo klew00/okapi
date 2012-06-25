@@ -25,6 +25,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -67,18 +68,19 @@ public class ProjectUtils {
 	public static void addBatchConfig(int projId, File tmpFile) {
 		PluginsManager plManager = new PluginsManager();
 		try {
-		File targetFile = WorkspaceUtils.getBatchConfigurationFile(projId);
-		Util.copyFile(tmpFile, targetFile);
-		
-			PipelineWrapper pipelineWrapper = preparePipelineWrapper(projId, plManager);
-		
-		// install batch configuration to config directory
-		BatchConfiguration bconf = new BatchConfiguration();
-		bconf.installConfiguration(targetFile.getAbsolutePath(),
-				WorkspaceUtils.getConfigDirPath(projId), pipelineWrapper);
-		} finally {
+			File targetFile = WorkspaceUtils.getBatchConfigurationFile(projId);
+			Util.copyFile(tmpFile, targetFile);
+			
+				PipelineWrapper pipelineWrapper = preparePipelineWrapper(projId, plManager);
+			
+			// install batch configuration to config directory
+			BatchConfiguration bconf = new BatchConfiguration();
+			bconf.installConfiguration(targetFile.getAbsolutePath(),
+					WorkspaceUtils.getConfigDirPath(projId), pipelineWrapper);
+		}
+		finally {
 			plManager.releaseClassLoader();
-	}
+		}
 	}
 
 	/**
@@ -118,9 +120,61 @@ public class ProjectUtils {
 		executeProject(projId, null, null);
 	}
 	
+	/**
+	 * @param projId The ID of the temporary Longhorn project
+	 * @param sourceLanguage The source language
+	 * @param targetLanguage The main target language (for components that don't support multiple target locales)
+	 * @throws IOException
+	 */
 	public static void executeProject(int projId, String sourceLanguage, String targetLanguage) throws IOException {
+		executeProject(projId, sourceLanguage, targetLanguage, null);
+	}
+		
+	/**
+	 * @param projId The ID of the temporary Longhorn project
+	 * @param sourceLanguage The source language
+	 * @param targetLanguage The main target language (for components that don't support multiple target locales)
+	 * @param targetLocales The full list of target locales (may be null)
+	 * @throws IOException
+	 */
+	public static void executeProject(int projId, String sourceLanguage, String targetLanguage, List<LocaleId> targetLocales) throws IOException {
 		PluginsManager plManager = new PluginsManager();
 		try {
+			
+			// Create a pipeline wrapper
+			PipelineWrapper pipelineWrapper = preparePipelineWrapper(projId, plManager);
+			// Load pipeline from file
+			File pipelineFile = WorkspaceUtils.getPipelineFile(projId);
+			pipelineWrapper.load(pipelineFile.getAbsolutePath());
+			
+			Project rainbowProject = prepareRainbowProject(projId, sourceLanguage, targetLanguage, pipelineWrapper);
+			
+			// Adjust paths from specific steps
+			adjustStepsPaths(projId, pipelineWrapper);
+			
+			// Load mapping of filter configs to file extensions
+			HashMap<String, String> filterConfigByExtension = loadFilterConfigurationMapping(projId);
+	
+			// Add files to project input list
+			if (!isTKitMergePipeline(pipelineWrapper)) {
+				addDocumentsToProject(projId, rainbowProject, filterConfigByExtension);
+			}
+			else {
+				addManifestToProject(projId, rainbowProject, filterConfigByExtension);
+			}
+			
+			rainbowProject.getPathBuilder().setUseExtension(false);
+	
+			// Execute pipeline
+			pipelineWrapper.execute(rainbowProject, targetLocales);
+		}
+		finally {
+			plManager.releaseClassLoader();
+		}
+	}
+
+	private static Project prepareRainbowProject(int projId, String sourceLanguage, String targetLanguage,
+			PipelineWrapper pipelineWrapper) {
 		// Create a new, empty rainbow project
 		Project rainbowProject = new Project(new LanguageManager());
 		rainbowProject.setCustomParametersFolder(WorkspaceUtils.getConfigDirPath(projId));
@@ -132,41 +186,14 @@ public class ProjectUtils {
 		if (targetLanguage != null){
 			rainbowProject.setTargetLanguage(new LocaleId(targetLanguage, true));
 		}
-			
-		// Create a pipeline wrapper
-			PipelineWrapper pipelineWrapper = preparePipelineWrapper(projId, plManager);
 		
-		// Load pipeline into the rainbow project
-		File pipelineFile = WorkspaceUtils.getPipelineFile(projId);
-		pipelineWrapper.load(pipelineFile.getAbsolutePath());
 		rainbowProject.setUtilityParameters(CURRENT_PROJECT_PIPELINE, pipelineWrapper.getStringStorage());
 
 		// Set new input and output root
 		rainbowProject.setInputRoot(0, WorkspaceUtils.getInputDirPath(projId), true);
 		rainbowProject.setOutputRoot(WorkspaceUtils.getOutputDirPath(projId));
 		rainbowProject.setUseOutputRoot(true);
-		
-		// Adjust paths from specific steps
-		adjustStepsPaths(projId, pipelineWrapper);
-		
-		// Load mapping of filter configs to file extensions
-		HashMap<String, String> filterConfigByExtension = loadFilterConfigurationMapping(projId);
-
-		// Add files to project input list
-		if (!isTKitMergePipeline(pipelineWrapper)) {
-			addDocumentsToProject(projId, rainbowProject, filterConfigByExtension);
-		}
-		else {
-			addManifestToProject(projId, rainbowProject, filterConfigByExtension);
-		}
-		
-		rainbowProject.getPathBuilder().setUseExtension(false);
-
-		// Execute pipeline
-		pipelineWrapper.execute(rainbowProject);
-		} finally {
-			plManager.releaseClassLoader();
-	}
+		return rainbowProject;
 	}
 
 	/**

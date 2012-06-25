@@ -33,6 +33,7 @@ import net.sf.okapi.applications.rainbow.Input;
 import net.sf.okapi.applications.rainbow.Project;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IParametersEditorMapper;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.ParametersEditorMapper;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.FilterConfigurationMapper;
@@ -908,6 +909,10 @@ public class PipelineWrapper {
 	}
 
 	public void execute (Project prj) {
+		execute(prj, null);
+	}
+	
+	public void execute (Project prj, List<LocaleId> targetLocales) {
 		copyInfoStepsToPipeline();
 		// Set the batch items
 		driver.clearItems();
@@ -948,6 +953,8 @@ public class PipelineWrapper {
 							prj.getSourceLanguage(), prj.getTargetLanguage());
 						rawDoc.setFilterConfigId(item2.filterConfigId);
 						rawDoc.setId(Util.makeId(item2.relativePath)); // Set the document ID based on its relative path
+						if(targetLocales != null)
+							rawDoc.setTargetLocales(targetLocales);
 						bic.add(rawDoc, outURI, prj.buildTargetEncoding(item2));
 					}
 					// If no entry for that list: it'll be null
