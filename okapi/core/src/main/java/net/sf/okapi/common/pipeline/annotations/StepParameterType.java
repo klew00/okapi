@@ -61,11 +61,6 @@ public enum StepParameterType {
 	TARGET_LOCALE,
 
 	/**
-	 * List of target locales.
-	 */
-	TARGET_LOCALES,
-
-	/**
 	 * Filter configuration identifier for the main input document.
 	 */
 	FILTER_CONFIGURATION_ID,
