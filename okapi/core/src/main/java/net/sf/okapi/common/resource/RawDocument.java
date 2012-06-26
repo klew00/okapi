@@ -31,6 +31,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -202,6 +203,9 @@ public class RawDocument implements IResource {
 		this.encoding = "UTF-16";
 		this.srcLoc = srcLoc;
 		this.trgLoc = trgLoc;
+		this.trgLocs = new ArrayList<LocaleId>();
+		if (trgLoc != null)
+			trgLocs.add(trgLoc);
 	}
 
 	private void create(URI inputURI, String defaultEncoding, LocaleId srcLoc, LocaleId trgLoc) {
@@ -212,6 +216,9 @@ public class RawDocument implements IResource {
 		this.encoding = defaultEncoding;
 		this.srcLoc = srcLoc;
 		this.trgLoc = trgLoc;
+		this.trgLocs = new ArrayList<LocaleId>();
+		if (trgLoc != null)
+			trgLocs.add(trgLoc);
 	}
 
 	private void create(InputStream inputStream, String defaultEncoding, LocaleId srcLoc,
@@ -223,6 +230,9 @@ public class RawDocument implements IResource {
 		this.encoding = defaultEncoding;
 		this.srcLoc = srcLoc;
 		this.trgLoc = trgLoc;
+		this.trgLocs = new ArrayList<LocaleId>();
+		if (trgLoc != null)
+			trgLocs.add(trgLoc);
 	}
 
 	/**
@@ -453,7 +463,9 @@ public class RawDocument implements IResource {
 	/**
 	 * Gets the list of target locales associated to this resource.
 	 * 
-	 * @return the target locales associated to this resource.
+	 * This list was initialized with one element, the target locale, if you passed one to the constructor.
+	 * 
+	 * @return the target locales associated to this resource. Never null.
 	 */
 	public List<LocaleId> getTargetLocales() {
 		return trgLocs;
@@ -461,10 +473,16 @@ public class RawDocument implements IResource {
 	
 	/**
 	 * Sets the list of target locales associated to this document.
-	 * @param locIds the locales to set.
+	 * 
+	 * This list was initialized with one element, the target locale, if you passed one to the constructor.
+	 * 
+	 * @param locIds the locales to set. If the value is null, an empty list will be associated.
 	 */
-	public void setTargetLocales (List<LocaleId> locId) {
-		trgLocs = locId;
+	public void setTargetLocales (List<LocaleId> locIds) {
+		if(locIds != null)
+			trgLocs = locIds;
+		else
+			trgLocs = new ArrayList<LocaleId>();
 	}
 
 	/**
