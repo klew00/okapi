@@ -20,6 +20,8 @@
 
 package net.sf.okapi.common;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -745,6 +747,20 @@ public final class LocaleId implements Comparable<Object> {
 	 */
 	public static boolean isBidirectional (LocaleId locId) {
 		return BIDILOCALES.matcher(locId.toBCP47()).matches();
+	}
+
+	/**
+	 * Converts a list of language codes into {@link LocaleId}s
+	 * 
+	 * @param languageCodes
+	 * @return
+	 */
+	public static List<LocaleId> convertToLocaleIds(List<String> languageCodes) {
+		List<LocaleId> locales = new ArrayList<LocaleId>();
+		for (String languageCode : languageCodes) {
+			locales.add(new LocaleId(languageCode, true));
+		}
+		return locales;
 	}
 
 }

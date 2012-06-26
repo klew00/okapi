@@ -359,7 +359,7 @@ public class RESTInterface {
 			@QueryParam("targets") final List<String> targetLanguages) {
 
 		try {
-			List<LocaleId> targetLocales = convertToLocales(targetLanguages);
+			List<LocaleId> targetLocales = LocaleId.convertToLocaleIds(targetLanguages);
 			ProjectUtils.executeProject(projId, sourceLanguage, targetLanguages.get(0), targetLocales);
 		}
 		catch (Exception e) {
@@ -371,14 +371,6 @@ public class RESTInterface {
 		}
 
 		return Response.status(HttpStatus.SC_OK).build();
-	}
-
-	private List<LocaleId> convertToLocales(List<String> targetLanguages) {
-		List<LocaleId> targetLocales = new ArrayList<LocaleId>();
-		for (String targetLang : targetLanguages) {
-			targetLocales.add(new LocaleId(targetLang, true));
-		}
-		return targetLocales;
 	}
 
 	private String createStacktraceString(final Exception e) {
