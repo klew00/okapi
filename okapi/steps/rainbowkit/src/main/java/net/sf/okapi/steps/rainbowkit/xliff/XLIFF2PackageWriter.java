@@ -26,7 +26,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.logging.Logger;
 
-import org.oasisopen.xliff.v2.ICode;
+import org.oasisopen.xliff.v2.ICMarker;
 import org.oasisopen.xliff.v2.IDataStore;
 import org.oasisopen.xliff.v2.IFragment;
 import org.oasisopen.xliff.v2.INote;
@@ -422,24 +422,24 @@ public class XLIFF2PackageWriter extends BasePackageWriter {
 
 		int index;
 		Code code;
+		boolean mayOverlapDefault = false; // Most spanning codes may not overlap
 		for ( int i=0; i<ctext.length(); i++ ) {
 			if ( TextFragment.isMarker(ctext.charAt(i)) ) {
 				index = TextFragment.toIndex(ctext.charAt(++i));
 				code = codes.get(index);
-				ICode xCode;
+				ICMarker xCode;
 				switch ( code.getTagType() ) {
 				case OPENING:
-					xCode = xFrag.append(org.oasisopen.xliff.v2.InlineType.OPENING,
-						String.valueOf(code.getId()), code.getData());
+					xCode = xFrag.append(org.oasisopen.xliff.v2.MarkerType.OPENING,
+						String.valueOf(code.getId()), code.getData(), mayOverlapDefault);
 					break;
 				case CLOSING:
-					xCode = xFrag.append(org.oasisopen.xliff.v2.InlineType.CLOSING,
-						String.valueOf(code.getId()), code.getData());
+					xCode = xFrag.append(org.oasisopen.xliff.v2.MarkerType.CLOSING,
+						String.valueOf(code.getId()), code.getData(), mayOverlapDefault);
 					break;
 				case PLACEHOLDER:
 				default:
-					xCode = xFrag.append(org.oasisopen.xliff.v2.InlineType.PLACEHOLDER,
-						String.valueOf(code.getId()), code.getData());
+					xCode = xFrag.appendPlaceholder(String.valueOf(code.getId()), code.getData());
 					break;
 				}
 				if ( code.hasReference() ) {
