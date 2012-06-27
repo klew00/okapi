@@ -933,6 +933,8 @@ public class PipelineWrapper {
 				prj.getSourceLanguage(), prj.getTargetLanguage());
 			rawDoc.setFilterConfigId(item.filterConfigId);
 			rawDoc.setId(Util.makeId(item.relativePath)); // Set the document ID based on its relative path
+			if(targetLocales != null)
+				rawDoc.setTargetLocales(targetLocales);
 			bic = new BatchItemContext(rawDoc, outURI, prj.buildTargetEncoding(item));
 			
 			// Add input/output data from other input lists if requested
