@@ -48,7 +48,7 @@ public class ProjectUtils {
 	private static final Logger LOGGER = Logger.getLogger(ProjectUtils.class.getName());
 	private static final String CURRENT_PROJECT_PIPELINE = "currentProjectPipeline";
 
-	public static int createNewProject() {
+	public static synchronized int createNewProject() {
 		
 		int projId = WorkspaceUtils.determineNewProjectId();
 		
