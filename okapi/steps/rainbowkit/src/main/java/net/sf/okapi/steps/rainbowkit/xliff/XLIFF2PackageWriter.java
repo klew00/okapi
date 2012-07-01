@@ -154,18 +154,14 @@ public class XLIFF2PackageWriter extends BasePackageWriter {
 		writer = new XLIFFWriter();
 		referents = new LinkedHashMap<String, String>();
 
-//		writer.setOptions(manifest.getTargetLocale(), "UTF-8");
 		MergingInfo item = manifest.getItem(docId);
 		rawDocPath = manifest.getTempSourceDirectory() + item.getRelativeInputPath() + ".xlf";
 		// Set the writer's options
 		writer.setInlineStyle(OriginalDataStyle.fromInteger(options.getInlineStyle()));
-		
-//		StartDocument sd = event.getStartDocument();
-//		writer.create(path, null, manifest.getSourceLocale(), manifest.getTargetLocale(),
-//			sd.getMimeType(), item.getRelativeInputPath(), null);
+		writer.setUseIndentation(true);
+		// Create the writer
 		writer.create(new File(rawDocPath), manifest.getSourceLocale().toBCP47(),
 			manifest.getTargetLocale().toBCP47());
-		writer.setIsIndented(true);
 		writer.writeStartDocument(null, "EXPERIMENTAL OUTPUT ONLY!");
 	}
 	
