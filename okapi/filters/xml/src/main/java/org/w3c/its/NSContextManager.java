@@ -40,6 +40,7 @@ public class NSContextManager implements NamespaceContext {
 		table = new Hashtable<String, String>();
 	}
 	
+	@Override
 	public String getNamespaceURI (String prefix) {
 		if ( table.containsKey(prefix) )
 			return table.get(prefix);
@@ -51,6 +52,7 @@ public class NSContextManager implements NamespaceContext {
 			return XMLConstants.NULL_NS_URI;
 	}
 
+	@Override
 	public String getPrefix (String uri) {
 		Enumeration<String> E = table.keys();
 		String key;
@@ -67,6 +69,7 @@ public class NSContextManager implements NamespaceContext {
 			return null;
 	}
 
+	@Override
 	public Iterator<String> getPrefixes (String uri) {
 		// Not implemented
 		return null;
