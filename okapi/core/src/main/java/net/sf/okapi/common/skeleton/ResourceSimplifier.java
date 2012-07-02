@@ -36,6 +36,7 @@ import net.sf.okapi.common.resource.IReferenceable;
 import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.MultiEvent;
 import net.sf.okapi.common.resource.StartDocument;
+import net.sf.okapi.common.resource.StartSubfilter;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextPart;
@@ -160,7 +161,11 @@ public class ResourceSimplifier {
 //		if (res.getId().equals("tu4"))
 //			System.out.println(res.getClass().getName());
 		
-		if (res instanceof IReferenceable) {			
+		if (res instanceof StartSubfilter) {
+			writer.processStartSubfilter((StartSubfilter) res);
+			return event;
+		}
+		else if (res instanceof IReferenceable) {			
 			if  (((IReferenceable) res).isReferent()) {
 				writer.addToReferents(event);
 				// The referent is not processed at this point (only later from a resource referencing it)
