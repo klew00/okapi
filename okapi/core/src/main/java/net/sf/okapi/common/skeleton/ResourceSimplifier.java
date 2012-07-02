@@ -161,11 +161,10 @@ public class ResourceSimplifier {
 //		if (res.getId().equals("tu4"))
 //			System.out.println(res.getClass().getName());
 		
-		if (res instanceof StartSubfilter) {
-			writer.processStartSubfilter((StartSubfilter) res);
-			return event;
-		}
-		else if (res instanceof IReferenceable) {			
+		if (res instanceof IReferenceable) {
+			if (res instanceof StartSubfilter) 
+				writer.processStartSubfilter((StartSubfilter) res);
+			
 			if  (((IReferenceable) res).isReferent()) {
 				writer.addToReferents(event);
 				// The referent is not processed at this point (only later from a resource referencing it)
