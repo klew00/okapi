@@ -277,6 +277,7 @@ public class InlineCodeTransformer {
 			String innerCodedText, boolean codeIsIsolated) {
 
 		Serializable phelement;
+		final String codeOuterData = code.getOuterData();
 
 		if (!codeIsIsolated || codeIsIsolated
 				&& code.getTagType() == TagType.PLACEHOLDER) {
@@ -284,6 +285,17 @@ public class InlineCodeTransformer {
 			PlaceHolder ph = new PlaceHolder();
 			ph.setID(code.getId());
 			ph.setType(PlaceHolderType.PH);
+			 
+			// set additional info
+			ph.setOpening(codeOuterData);
+			
+			// Closing
+			if (code.getTagType() == TagType.OPENING) {
+				final Code correspondingCode = lookupForCorrespondingCode(code, codes);
+				if (correspondingCode != null) {
+					ph.setClosing(correspondingCode.getOuterData());
+				}
+			}
 
 			if (innerCodedText != null && !innerCodedText.isEmpty()) {
 				ph.getContent().addAll(
@@ -296,16 +308,36 @@ public class InlineCodeTransformer {
 			StartPlaceHolder sph = new StartPlaceHolder();
 			sph.setID(code.getId());
 			sph.setType(PlaceHolderType.PH);
+			// set additional info
+			sph.setOpening(codeOuterData);
 			phelement = objectFactory.createTextContentSph(sph);
 		} else {
 			// use ept-style placeholder
 			EndPlaceHolder eph = new EndPlaceHolder();
 			eph.setID(code.getId());
 			eph.setType(PlaceHolderType.PH);
+			// set additional info
+			eph.setClosing(codeOuterData);
 			phelement = objectFactory.createTextContentEph(eph);
 		}
 
 		return phelement;
+	}
+	 
+	private static Code lookupForCorrespondingCode(Code code, List<Code> codes) {
+		final int wantedCodeId = code.getId();
+		final String wantedCodeType = code.getType();
+		final int startPosition = codes.indexOf(code) + 1;
+		if (startPosition > codes.size()) {
+			return null;
+		}
+		for (int i = startPosition; i < codes.size(); i++) {
+			Code currentCode = codes.get(i);
+			if (currentCode.getId() == wantedCodeId && currentCode.getType() == wantedCodeType) {
+				return currentCode;
+			}
+		}
+		return null;
 	}
 
 	public TextFragment serializeTextPartsForFilter(List<Serializable> parts) {
