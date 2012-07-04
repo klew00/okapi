@@ -41,6 +41,7 @@ import net.sf.okapi.lib.extra.steps.DocumentPartLogger;
 import net.sf.okapi.lib.extra.steps.EventListBuilderStep;
 import net.sf.okapi.lib.extra.steps.EventLogger;
 import net.sf.okapi.lib.extra.steps.TextUnitLogger;
+import net.sf.okapi.lib.extra.steps.TuDpSsfLogger;
 
 import org.junit.Test;
 
@@ -52,16 +53,15 @@ public class ResourceSimplifierStepTest {
 		ArrayList<InputDocument> list = new ArrayList<InputDocument>();				
 		String pathBase = Util.getDirectoryName(this.getClass().getResource("aa324.html").toURI().getPath()) + "/";
 		
-//		list.add(new InputDocument(pathBase + "aa324.html", null));
+		list.add(new InputDocument(pathBase + "aa324.html", null));
 		list.add(new InputDocument(pathBase + "form.html", null));
-//		list.add(new InputDocument(pathBase + "W3CHTMHLTest1.html", null));
-//		list.add(new InputDocument(pathBase + "msg00058.html", null));
+		list.add(new InputDocument(pathBase + "W3CHTMHLTest1.html", null));
+		list.add(new InputDocument(pathBase + "msg00058.html", null));
 		
 		RoundTripComparison rtc = new RoundTripComparison();
-		ResourceSimplifierStep rss = new ResourceSimplifierStep(false);
+		ResourceSimplifierStep rss = new ResourceSimplifierStep();
 		
 		assertTrue(rtc.executeCompare(new HtmlFilter(), list, "UTF-8", ENUS, ENUS, "skeleton", rss));
-		//assertTrue(rtc.executeCompare(new HtmlFilter(), list, "UTF-8", ENUS, ENUS, "skeleton"));
 	}
 	
 	@Test
@@ -164,5 +164,128 @@ public class ResourceSimplifierStepTest {
 			}
 		}		
 	}
+
+	@Test
+	public void testEvents3() throws MalformedURLException {
+		String pathBase = Util.getDirectoryName(this.getClass().getResource("aa324.html").getPath()) + "/";
+		EventListBuilderStep elbs1 = new EventListBuilderStep();
+		EventListBuilderStep elbs2 = new EventListBuilderStep();
+		
+		new XPipeline(
+				"Test pipeline for ResourceSimplifierStepTest",
+				new XBatch(
+						new XBatchItem(
+								new URL("file", null, pathBase + "form.html"),
+								"UTF-8",
+								ENUS)
+
+						),
+						
+				new RawDocumentToFilterEventsStep(new HtmlFilter()),
+				elbs1,
+				new ResourceSimplifierStep(),
+				//new EventLogger(),
+				new DocumentPartLogger(),
+				elbs2
+		).execute();
+	}
 	
+	@Test
+	public void testTuDpSsfEvents() throws URISyntaxException {
+		new XPipeline(
+				null,
+				new XBatch(
+						new XBatchItem(
+								this.getClass().getResource("form.html").toURI(),
+								"UTF-8",
+								ENUS)
+						),
+						
+				new RawDocumentToFilterEventsStep(new HtmlFilter()),
+				new TuDpSsfLogger()
+		).execute();
+	}
+	
+	@Test
+	public void testTuDpSsfEvents_simplified() throws URISyntaxException {
+		new XPipeline(
+				null,
+				new XBatch(
+						new XBatchItem(
+								this.getClass().getResource("form.html").toURI(),
+								"UTF-8",
+								ENUS)
+						),
+						
+				new RawDocumentToFilterEventsStep(new HtmlFilter()),
+				new ResourceSimplifierStep(),
+				new TuDpSsfLogger()
+		).execute();
+	}
+	
+	@Test
+	public void testTuDpSsfEvents2() throws URISyntaxException {
+		new XPipeline(
+				null,
+				new XBatch(
+						new XBatchItem(
+								this.getClass().getResource("aa324.html").toURI(),
+								"UTF-8",
+								ENUS)
+						),
+						
+				new RawDocumentToFilterEventsStep(new HtmlFilter()),
+				new TuDpSsfLogger()
+		).execute();
+	}
+	
+	@Test
+	public void testTuDpSsfEvents2_simplified() throws URISyntaxException {
+		new XPipeline(
+				null,
+				new XBatch(
+						new XBatchItem(
+								this.getClass().getResource("aa324.html").toURI(),
+								"UTF-8",
+								ENUS)
+						),
+						
+				new RawDocumentToFilterEventsStep(new HtmlFilter()),
+				new ResourceSimplifierStep(),
+				new TuDpSsfLogger()
+		).execute();
+	}
+	
+	@Test
+	public void testTuDpSsfEvents3() throws URISyntaxException {
+		new XPipeline(
+				null,
+				new XBatch(
+						new XBatchItem(
+								this.getClass().getResource("aa324_out.html").toURI(),
+								"UTF-8",
+								ENUS)
+						),
+						
+				new RawDocumentToFilterEventsStep(new HtmlFilter()),
+				new TuDpSsfLogger()
+		).execute();
+	}
+	
+	@Test
+	public void testTuDpSsfEvents3_simplified() throws URISyntaxException {
+		new XPipeline(
+				null,
+				new XBatch(
+						new XBatchItem(
+								this.getClass().getResource("aa324_out.html").toURI(),
+								"UTF-8",
+								ENUS)
+						),
+						
+				new RawDocumentToFilterEventsStep(new HtmlFilter()),
+				new ResourceSimplifierStep(),
+				new TuDpSsfLogger()
+		).execute();
+	}
 }
