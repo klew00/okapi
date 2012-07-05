@@ -28,93 +28,93 @@ distribution.</p>
 	Preferences.</li>
 </ul>
 	</li>
+	<li>Longhorn:<ul>
+	<li>fixed concurrancy issues.</li>
+	<li>fixed problem of reading existing projects.</li>
+</ul>
+	</li>
+	<li>Tikal:<ul>
+	<li>Fixed issue #249 where the HTML filter was not always loaded for 
+	sub-filter cases (Patch from Mihai)</li>
+</ul>
+	</li>
 	<li>Filters:<ul>
-	<li>XLIFF Filter:<ul>
-	<li>Fixed issue #218 where file name was missing from XML parsing error 
+		<li>XLIFF Filter:<ul>
+			<li>Fixed issue #218 where file name was missing from XML parsing error 
 	(Patch from Mihai).</li>
-	<li>Fixed issue #219 where empty &lt;target&gt; where not created instead of being 
+			<li>Fixed issue #219 where empty &lt;target&gt; where not created instead of being 
 	created empty (Patch from Mihai)</li>
-	<li>Fixed the reading of the <i>coord</i> target property.</li>
-	<li>Implemented local withinText in the ITS engine for ITS 2.0</li>
-	<li>Implemented initial support for XPath variables for ITS 2.0</li>
-	<li>Implemented idValue data category for ITS 2.0</li>
-</ul>
-	</li>
-	<li>Plain Text Filter:<ul>
-	<li>Fixed the link for the help button.</li>
-</ul>
-	</li>
-	<li>Table Filter:<ul>
-	<li>Fixed the link for the help button.</li>
-	<li>Fixed bug when reseting the reader that caused &quot;Marker invalid&quot; error in 
+			<li>Fixed the reading of the <i>coord</i> target property.</li>
+			<li>Implemented local withinText in the ITS engine for ITS 2.0</li>
+			<li>Implemented initial support for XPath variables for ITS 2.0</li>
+			<li>Implemented idValue data category for ITS 2.0</li>
+		</ul></li>
+		<li>Plain Text Filter:<ul>
+			<li>Fixed the link for the help button.</li>
+		</ul></li>
+		<li>Table Filter:<ul>
+			<li>Fixed the link for the help button.</li>
+			<li>Fixed bug when reseting the reader that caused &quot;Marker invalid&quot; error in 
 	some cases.</li>
-</ul>
-	</li>
-	<li>JSON Filter:<ul>
-	<li>Fixed issue 214 where the rewriting created duplicated characters in 
+		</ul></li>
+		<li>JSON Filter:<ul>
+			<li>Fixed issue 214 where the rewriting created duplicated characters in 
 	some cases.</li>
-</ul>
-	</li>
-	<li>XML Filter:<ul>
-	<li>Fixed issue #240 where code finder matches were not escaped properly in 
+		</ul></li>
+		<li>XML Filter:<ul>
+			<li>Fixed issue #240 where code finder matches were not escaped properly in 
 	some cases.</li>
-</ul>
-	</li>
-	<li>Removed the Drupal filter. This filter will be addressed in a different 
+		</ul></li>
+		<li>Removed the Drupal filter. This filter will be addressed in a different 
 	way later.</li>
-</ul>
-	</li>
+	</ul></li>
 	<li>Steps:<ul>
-	<li>Batch Translation Step:<ul>
-	<li>Added support to allow TMX output to be also the input file.</li>
-	<li>Added option to send the generated TMX as the only input for the next 
+		<li>Batch Translation Step:<ul>
+			<li>Added support to allow TMX output to be also the input file.</li>
+			<li>Added option to send the generated TMX as the only input for the next 
 	step.</li>
-	<li>Added support of the <code>${inputRootDir}</code> variable for all paths 
+			<li>Added support of the <code>${inputRootDir}</code> variable for all paths 
 	and the command line.</li>
-	<li>Fixed issue #230 where the length of the segment was limited to 65000 
+			<li>Fixed issue #230 where the length of the segment was limited to 65000 
 	characters.</li>
-</ul>
-	</li>
-	<li>Rainbow Translation Kit Creation Step:<ul>
-	<li>Added the option to send the prepared files to the next step (instead of 
+		</ul></li>
+		<li>Rainbow Translation Kit Creation Step:<ul>
+			<li>Added the option to send the prepared files to the next step (instead of 
 	the filter events).</li>
-	<li>Implemented capability to add support material to the package.</li>
-	<li>Fixed issue with manifest file when zipping the package.</li>
-</ul>
-	</li>
-	<li>Rainbow Translation Kit Merging Step:<ul>
-	<li>Added auto-stripping of white spaces before initial text when 
+			<li>Implemented capability to add support material to the package.</li>
+			<li>Fixed issue with manifest file when zipping the package.</li>
+			<li>Fixed concurrency problems.</li>
+		</ul></li>
+		<li>Rainbow Translation Kit Merging Step:<ul>
+			<li>Added auto-stripping of white spaces before initial text when 
 	convertingg XLIFF+RTF to XLIFF.</li>
-</ul>
-	</li>
-</ul>
-	</li>
+		</ul></li>
+	</ul></li>
 	<li>Libraries:<ul>
-	<li>Verification library:<ul>
-	<li>Added motherTongue parameter to call for bilingual mode, for 
+		<li>Verification library:<ul>
+			<li>Added motherTongue parameter to call for bilingual mode, for 
 	LanguageTool (Issue #229).</li>
-	<li>Added option &quot;Verify for same language family&quot; (Issue #220, Patch from 
+			<li>Added option &quot;Verify for same language family&quot; (Issue #220, Patch from 
 	Mihai).</li>
-</ul>
-	</li>
-	<li>Moved the XLIFF 2.0 library (okapi-lib-xliff package) to a separate 
+		</ul></li>
+		<li>Moved the XLIFF 2.0 library (okapi-lib-xliff package) to a separate 
 	project (<a href="http://code.google.com/p/okapi-xliff-toolkit/">http://code.google.com/p/okapi-xliff-toolkit/</a>).</li>
-	<li>Moved the Olifant and TMdb modules to a separate project (<a href="http://code.google.com/p/okapi-olifant/">http://code.google.com/p/okapi-olifant/</a>)</li>
-	<li>Dependent modules are now using the maven2 repository to get the jar.</li>
-	<li>Fixed missing language-only values for LCID mapping.</li>
-	<li>Added support for wildcard characters in DefaultFilenameFilter. Old 
+		<li>Moved the Olifant and TMdb modules to a separate project (<a href="http://code.google.com/p/okapi-olifant/">http://code.google.com/p/okapi-olifant/</a>)</li>
+		<li>Dependent modules are now using the maven2 repository to get the jar.</li>
+		<li>Fixed missing language-only values for LCID mapping.</li>
+		<li>Added support for wildcard characters in DefaultFilenameFilter. Old 
 	constructor with extension only should be backward compatible.</li>
-	<li>Added getWikiPage() method to the AbstractParametersEditor.</li>
-	<li>Added batch input count support for the Pipeline Parameters event.</li>
-	<li>Fixed issue #233. (Patch from Shane Perry): Changed default placeHolderMode to true in 
+		<li>Added getWikiPage() method to the AbstractParametersEditor.</li>
+		<li>Added batch input count support for the Pipeline Parameters event.</li>
+		<li>Fixed issue #233. (Patch from Shane Perry): Changed default placeHolderMode to true in 
 	XLIFFWriter. This affects the direct users of the class, indirect users 
 	(like kit creations have this setting defined by the parameters). Tikal has 
 	also been updated to force its own mode rather than rely on the default.</li>
-	<li>Fixed issue #237: Removed the old and now defunc special case for TTX in 
+		<li>Fixed issue #237: Removed the old and now defunc special case for TTX in 
 	the InputdocumentPanel dialog when guessing the file format. The TTX format 
 	should now be guessed properly.</li>
-</ul>
-	</li>
+		<li>Fixed issue #243: ID duplication in sub-filter cases.</li>
+	</ul></li>
 </ul>
 <h2>Changes from M15 to M16</h2>
 <ul>

@@ -52,6 +52,7 @@ public class RESTProject implements LonghornProject {
 		String newProjUri = serviceUri.toString();
 		if (!newProjUri.endsWith("/"))
 			newProjUri += "/";
+		newProjUri += "projects/";
 		newProjUri += projId;
 		
 		try {

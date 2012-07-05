@@ -752,15 +752,15 @@ public class Main {
 	
 	private boolean prepareFilter (String configId) {
 		boolean pluginsDone = false;
+		// Always add okf_html because it's used as sub-filter by several filters
+		//TODO: Find a better way to handle sub-filter cases
+		fcMapper.addConfigurations(filtersMap.get("okf_html"));
 		while ( true ) {
 			// Is it a default configuration?
 			if ( filtersMap.containsKey(configId) ) {
 				// Configuration ID is a default one:
 				// Add its filter to the configuration mapper
 				fcMapper.addConfigurations(filtersMap.get(configId));
-				// Always add okf_html because it's used as sub-filter by several filters
-				//TODO: Find a better way to handle sub-filter cases
-				fcMapper.addConfigurations(filtersMap.get("okf_html"));
 				return true;
 			}
 			// Else: Try to find the filter for that configuration
