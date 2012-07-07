@@ -162,7 +162,7 @@ public class SubfilterLogger extends BasePipelineStep {
 	}
 
 	public static String getSsfInfo(StartSubfilter ssf, LocaleId srcLoc) {
-		StringBuilder sb = new StringBuilder();
+		StringBuilder sb = new StringBuilder("--------------------\n");
 		fillSB(sb, ssf, srcLoc);
 		return sb.toString();
 	}
@@ -170,6 +170,7 @@ public class SubfilterLogger extends BasePipelineStep {
 	public static String getEsfInfo(EndSubfilter esf, LocaleId srcLoc) {
 		StringBuilder sb = new StringBuilder();
 		fillSB2(sb, esf, srcLoc);
+		sb.append("--------------------\n\n");
 		return sb.toString();
 	}
 }

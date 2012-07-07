@@ -70,8 +70,9 @@ public class FilterUtil {
 	 * default filter configurations or one of the custom configurations defined in
 	 * the fprm files.
 	 * @param customConfigs a list of the URLs of fprm files defining custom configurations.
-	 * Every file name denote by the URLs should be the configuration identifier and have 
-	 * the .fprm extension.
+	 * Every file name should follow the pattern of custom filter configurations, 
+	 * i.e. contain a filter name like "okf_xmlstream@custom_config.fprm". The file extension 
+	 * should be .fprm.
 	 * @return a new {@link IFilter} object (with its parameters loaded) for the given
 	 * configuration identifier, or null if the object could not be created.
 	 */
@@ -90,10 +91,12 @@ public class FilterUtil {
 	
 	/**
 	 * Adds to a given {@link FilterConfigurationMapper} object the custom configuration 
-	 * defined in the fprm file denoted by a given URL. 
+	 * defined in the fprm file denoted by a given URL.
 	 * @param fcMapper the given {@link FilterConfigurationMapper}.
 	 * @param customConfig the URL of a fprm file defining the custom configuration
-	 * the filter should be loaded from.
+	 * the filter should be loaded from. The file extension should be .fprm.
+	 * The file name should follow the pattern of custom filter configurations, 
+	 * i.e. contain a filter name like "okf_xmlstream@custom_config.fprm".
 	 * @return the configuration identifier or null if the configuration was not added.
 	 */
 	public static String addCustomConfig(FilterConfigurationMapper fcMapper, 
@@ -114,10 +117,11 @@ public class FilterUtil {
 	
 	/**
 	 * Creates an instance of the filter for a given URL of a fprm file defining a
-	 * custom configuration. The file name should be the configuration identifier 
-	 * and have the .fprm extension.
+	 * custom configuration.
 	 * @param customConfig the URL of a fprm file defining the custom configuration
-	 * the filter should be loaded from.
+	 * the filter should be loaded from. The file extension should be .fprm.
+	 * The file name should follow the pattern of custom filter configurations, 
+	 * i.e. contain a filter name like "okf_xmlstream@custom_config.fprm".
 	 * @return a new {@link IFilter} object (with its parameters loaded) for the given
 	 * configuration identifier, or null if the object could not be created.
 	 */
