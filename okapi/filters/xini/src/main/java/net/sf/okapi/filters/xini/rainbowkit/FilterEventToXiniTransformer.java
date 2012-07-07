@@ -47,6 +47,8 @@ import net.sf.okapi.filters.xini.jaxb.Seg;
 import net.sf.okapi.filters.xini.jaxb.Trans;
 import net.sf.okapi.filters.xini.jaxb.Xini;
 import net.sf.okapi.filters.xini.jaxb.Page.Elements;
+import net.sf.okapi.steps.wordcount.common.BaseCounter;
+import net.sf.okapi.steps.wordcount.common.GMX;
 
 public class FilterEventToXiniTransformer {
 
@@ -66,6 +68,7 @@ public class FilterEventToXiniTransformer {
 	private int currentPageId;
 	private int currentElementId;
 	private int currentFieldId;
+	private Long additionalWordsCount = 0L;
 
 	public void init() {
 		transformer = new InlineCodeTransformer();
@@ -88,6 +91,7 @@ public class FilterEventToXiniTransformer {
 		xini.setSchemaVersion("1.0");
 		main = objectFactory.createMain();
 		xini.setMain(main);
+		xini.setStatisticInfo(objectFactory.createStatisticInfo());
 	}
 
 	public void startPage(String name) {
@@ -110,6 +114,9 @@ public class FilterEventToXiniTransformer {
 
 		// Skip non-translatable TextUnits
 		if (!tu.isTranslatable()) {
+			if (!tu.getTargetLocales().isEmpty()) {
+				additionalWordsCount += BaseCounter.getCount(tu, GMX.TotalWordCount);
+			}
 			return;
 		}
 
@@ -263,11 +270,16 @@ public class FilterEventToXiniTransformer {
 	}
 
 	public void marshall(OutputStream os) {
+		xini.getStatisticInfo().setAditionalWords(additionalWordsCount.floatValue());
 		try {
 			m.marshal(xini, os);
 		} catch (JAXBException e) {
 			throw new RuntimeException(e);
 		}
+	}
+	 
+	public long getAdditionalWordsCount() {
+		return additionalWordsCount;
 	}
 
 }

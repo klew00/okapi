@@ -22,6 +22,8 @@ package net.sf.okapi.filters.versifiedtxt;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -30,6 +32,7 @@ import java.util.regex.Pattern;
 import net.sf.okapi.common.BOMNewlineEncodingDetector;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.UsingParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.encoder.EncoderManager;
@@ -41,10 +44,14 @@ import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filterwriter.GenericFilterWriter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
+import net.sf.okapi.common.resource.AlignedPair;
+import net.sf.okapi.common.resource.AlignmentStatus;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.RawDocument;
+import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.StartSubDocument;
+import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 
@@ -60,12 +67,19 @@ public class VersifiedTextFilter extends AbstractFilter {
 	private static final Logger LOGGER = Logger.getLogger(VersifiedTextFilter.class.getName());
 	private static final int BUFFER_SIZE = 2800;
 
-	public static final String VERSIFIED_TXT_MIME_TYPE = "text/x-versified-txt";
-	private static final String VERSE = "^[ \t]*\\|v(.+)[ \t]*$";
-	private static final Pattern VERSE_COMPILED = Pattern.compile(VERSE);
-	
 	private static final String VERSIFIED_ID = "^([0-9]+)$";
 	private static final Pattern VERSIFIED_ID_COMPILED = Pattern.compile(VERSIFIED_ID);
+	
+	public static final String VERSIFIED_TXT_MIME_TYPE = "text/x-versified-txt";
+	private static final String VERSE = "^[ \\t]*\\|v([^ ]+)[ \\t]*(\\(([^()]+)\\))?(\\+\\|)?[ \\t]*$";
+	private static final Pattern VERSE_COMPILED = Pattern.compile(VERSE);
+	
+	private static final String TRADOS_SEGMENTS = "\\{0>(.*?)<\\}[0-9]+\\{>(.*?)<0\\}";
+	private static final Pattern TRADOS_SEGMENTS_COMPILED = Pattern.compile(TRADOS_SEGMENTS, 
+			Pattern.DOTALL|Pattern.MULTILINE|Pattern.UNICODE_CASE);
+	private static final String TRADOS_LEAVINGS = "(\\{0>)|(<0\\})|(<\\}[0-9]+\\{>)|(<\\})|(\\{>)";
+	private static final Pattern TRADOS_LEAVINGS_COMPILED = Pattern.compile(TRADOS_LEAVINGS, 
+			Pattern.DOTALL|Pattern.MULTILINE|Pattern.UNICODE_CASE);		
 	
 	private static final String CHAPTER = "^[ \t]*\\|c.+[ \t]*$";
 	private static final String BOOK = "^[ \t]*\\|b.+[ \t]*$";
@@ -89,6 +103,7 @@ public class VersifiedTextFilter extends AbstractFilter {
 	private StringBuilder filterBuffer;
 	private boolean foundVerse;
 	private boolean foundBook;
+	private boolean trados;
 
 	/** Creates a new instance of VersifiedCodeNgramIndexer */
 	public VersifiedTextFilter() {
@@ -99,6 +114,7 @@ public class VersifiedTextFilter extends AbstractFilter {
 		
 		this.foundVerse = false;
 		this.foundBook = false;
+		this.trados = false;
 
 		setMimeType(VERSIFIED_TXT_MIME_TYPE);
 		setMultilingual(false); // default value, could be multilingual we check below
@@ -183,6 +199,12 @@ public class VersifiedTextFilter extends AbstractFilter {
 				}
 				if (line.matches(TARGET)) {
 					setMultilingual(true);
+					trados = false;
+					break;
+				}
+				if (line.matches(TRADOS_SEGMENTS)) {
+					setMultilingual(true);
+					trados = true;
 					break;
 				}
 			}
@@ -276,10 +298,12 @@ public class VersifiedTextFilter extends AbstractFilter {
 						handleDocumentPart(currentLine + newline);		
 						Matcher m = VERSE_COMPILED.matcher(currentLine);
 						String verseId = "";
+						String sid = null;
 						if (m.matches()) {
 							verseId = m.group(1);
+							sid = m.group(3);
 						}
-						handleVerse(versifiedFileReader, currentLine, verseId);
+						handleVerse(versifiedFileReader, currentLine, verseId, sid);
 						this.foundVerse = true;
 					} else if (currentLine.matches(BOOK)) {
 						currentBook = currentLine.substring(2);
@@ -363,12 +387,12 @@ public class VersifiedTextFilter extends AbstractFilter {
 		startSubDocument.setName(chapter);
 	}
 
-	private void handleVerse(BufferedReader verse, String currentVerse, String verseId)
+	private void handleVerse(BufferedReader verse, String currentVerse, String verseId, String sid)
 			throws IOException {
 		String currentLine = null;
 		StringBuilder source = new StringBuilder(BUFFER_SIZE);
 		StringBuilder target = new StringBuilder(BUFFER_SIZE);
-		boolean trg = false;
+		boolean targetTag = false;
 		
 		verse.mark(BUFFER_SIZE);
 		while (currentChar != -1) {			
@@ -390,11 +414,11 @@ public class VersifiedTextFilter extends AbstractFilter {
 					}
 
 					if (currentLine.matches(TARGET)) {
-						trg = true;			
+						targetTag = true;			
 						continue;
 					}
 					
-					if (trg) {
+					if (targetTag) {
 						target.append(currentLine + "\n");
 					} else {
 						source.append(currentLine + "\n");
@@ -407,52 +431,42 @@ public class VersifiedTextFilter extends AbstractFilter {
 			}
 		}
 
-		// if this is a bilingual file and we didn't see a <TARGET> tag
-		// throw an exception
-		if (isMultilingual() && !trg) {
-			throw new OkapiBadFilterInputException("Missing <TARGET> tag for verse " + verseId);
-		}
-		
-		eventBuilder.startTextUnit();
-
 		// assume any newlines after the final content goes with the string
 		// but we have to at least remove the extra newline added above
-		String s = chopNewline(source.toString());
-		String t = chopNewline(target.toString());		
+		String modifiedSource = chopNewline(source.toString());
+		String modifiedTarget = chopNewline(target.toString());		
 		if (currentChar != -1) {
-			if (trg) {
-				s = chopNewline(s);
-				t = chopNewline(t);
+			if (targetTag) {
+				modifiedSource = chopNewline(modifiedSource);
+				modifiedTarget = chopNewline(modifiedTarget);
 			} else {
-				s = chopNewline(chopNewline(s));
+				modifiedSource = chopNewline(chopNewline(modifiedSource));
 			}
 		} else {
 			// last entry trim *all* training newlines
-			if (trg) {
-				t = Util.trimEnd(t, "\n");
+			if (targetTag) {
+				modifiedTarget = Util.trimEnd(modifiedTarget, "\n");
 			} else {
-				s = Util.trimEnd(s, "\n");
+				modifiedSource = Util.trimEnd(modifiedSource, "\n");
 			}
 		}
 		
-		processPlaceHolders(s, true);
-		if (trg) {
+		if (targetTag) {
 			// if this is the last target and there is no text then we don't want any newlines			
-			if (currentChar == -1 && chopNewline(t).isEmpty()) {
-				t = "";
+			if (currentChar == -1 && chopNewline(modifiedTarget).isEmpty()) {
+				modifiedTarget = "";
 			}
-			processPlaceHolders(t, false);
 		}
-				
-		// reset for source processing
-		eventBuilder.setTargetLocale(null);
-		ITextUnit tu = eventBuilder.peekMostRecentTextUnit();
+
+		// build the TextUnit based on format
+		eventBuilder.startTextUnit();
+		ITextUnit tu = buildTextUnit(modifiedSource, modifiedTarget, targetTag, trados);
 		
 		// if this was a bilingual verse then setup the <TARGET> tag
 		// as skeleton
 		GenericSkeleton skel = new GenericSkeleton();
 		skel.addContentPlaceholder(tu);			
-		if (trg) { // bilingual case			 						 
+		if (targetTag) { // bilingual case			 						 
 			skel.add(newline + "<TARGET>" + newline);
 			skel.addContentPlaceholder(tu, getTrgLoc());			 						
 		} 		
@@ -462,28 +476,109 @@ public class VersifiedTextFilter extends AbstractFilter {
 			skel.add(newline + newline); 
 		}
 		tu.setSkeleton(skel);
-				
+		
 		// see if the verse id is a number only - if so it it not unique so we
 		// add book and chapter ids 
 		Matcher m = VERSIFIED_ID_COMPILED.matcher(verseId);
-		if (m.matches()) {
-			tu.setName(currentBook + ":" + currentChapter + ":" + m.group(1));
-			tu.setId(currentChapter + (currentChapter != null && currentChapter.isEmpty() ? "" : ":") + m.group(1));
-		} else {
-			// else id from some other source just copy the id
-			tu.setName(verseId);
+		if (sid != null) {
+			tu.setName(sid);
 			tu.setId(verseId);
+		} else {
+			if (m.matches()) {
+				tu.setName(currentBook + ":" + currentChapter + ":" + m.group(1));
+				tu.setId(currentChapter + (currentChapter != null && currentChapter.isEmpty() ? "" : ":") + m.group(1));
+			} else {
+				// else id from some other source just copy the id
+				tu.setName(verseId);
+				tu.setId(verseId);
+			}
 		}
+				
+		tu.setMimeType(getMimeType());
 		eventBuilder.endTextUnit();
 	}
 
-	private void processPlaceHolders(String text, boolean source) {
+	private ITextUnit buildTextUnit(String source, String target, boolean targetTag, boolean trados) {
+		ITextUnit tu = eventBuilder.peekTempEvent().getTextUnit();
+		
+		if (trados) {
+			tu = buildTextUnitForTrados(source);
+		} else {
+			buildTextUnitForNonTrados(source, true);
+			if (targetTag) {
+				buildTextUnitForNonTrados(target, false);
+			}
+		}
+		
+		return tu;
+	}
+	
+	private ITextUnit buildTextUnitForTrados(String text) {
+		ITextUnit tu = eventBuilder.peekTempEvent().getTextUnit();
+		
+		Matcher m = TRADOS_SEGMENTS_COMPILED.matcher(text);
+		int i = 0;
+		if (m.find()) {
+			tu.createTarget(getTrgLoc(), true, IResource.CREATE_EMPTY);
+			m.reset();
+			while (m.find()) {
+				i++;
+				Segment srcSeg = new Segment(Integer.toString(i), buildTextFragment(m.group(1)));
+				Segment trgSeg = new Segment(Integer.toString(i), buildTextFragment(m.group(2)));
+				tu.getSource().append(srcSeg);
+				tu.getTarget(getTrgLoc()).append(trgSeg);
+			}
+			tu.getTarget(getTrgLoc()).getSegments().setAlignmentStatus(AlignmentStatus.ALIGNED);
+		} else {
+			if (TRADOS_LEAVINGS_COMPILED.matcher(text).find()) {
+				throw new OkapiBadFilterInputException("Trados segment markers found in source or target text: " +
+						text);
+			}
+			
+			// treat as monolingual paragraph and log
+			// a warning
+			buildTextUnitForNonTrados(text, true);
+			LOGGER.warning("In a Trados bilingual document but found no segment markers. " +
+					"Treating as monlingual text: " + text);
+		}
+		
+		return tu;
+	}
+	
+	private TextFragment buildTextFragment(String text) {
+		// TODO: duplicated code alert! simplify later
+		TextFragment tf = new TextFragment();
+		
+		Matcher m = PLACEHOLDER_PATTERN.matcher(text);
+		if (m.find()) {
+			m.reset();
+			String[] chunks = PLACEHOLDER_PATTERN.split(text);
+			for (int i = 0; i < chunks.length; i++) {
+				tf.append(chunks[i]); // eventBuilder.addToTextUnit(chunks[i]);
+				if (m.find()) {
+					String ph = text.substring(m.start(), m.end());
+					tf.append(new Code(TagType.PLACEHOLDER, ph, ph)); // eventBuilder.addToTextUnit(new Code(TagType.PLACEHOLDER, ph, ph));
+				}
+			}
+		} else {
+			// no placeholders found - treat is text only
+			tf.append(text); // eventBuilder.addToTextUnit(text);
+		}			
+		return tf;
+	}
+	
+	private void buildTextUnitForNonTrados(String text, boolean source) {
+		if (TRADOS_LEAVINGS_COMPILED.matcher(text).find()) {
+			throw new OkapiBadFilterInputException("Trados segment markers found in source or target text: " +
+					text);
+		}
+		
 		if (source) {
 			eventBuilder.setTargetLocale(null);
 		} else {
 			eventBuilder.setTargetLocale(getTrgLoc());
 		}
-
+		
 		Matcher m = PLACEHOLDER_PATTERN.matcher(text);
 		if (m.find()) {
 			m.reset();
@@ -498,7 +593,7 @@ public class VersifiedTextFilter extends AbstractFilter {
 		} else {
 			// no placeholders found - treat is text only
 			eventBuilder.addToTextUnit(text);
-		}
+		}			
 	}
 
 	private void handleDocumentPart(String part) {

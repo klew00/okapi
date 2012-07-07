@@ -237,6 +237,21 @@ public class XMLFilterTest {
 		assertEquals("t5<1/>t6", fmt.setContent(tu.getSource().getFirstContent()).toString());
 	}
 
+	//TODO: implement it properly @Test
+	public void testLocalWithinTextNested () { // ITS 2.0
+		String snippet = "<?xml version=\"1.0\"?>\n"
+			+ "<doc xmlns:its=\"http://www.w3.org/2005/11/its\"><its:rules version=\"2.0\" >"
+			+ "<its:withinTextRule selector=\"//n\" withinText=\"nested\"/>"
+			+ "</its:rules>"
+			+ "<p>t1 <n>t2</n> t3</p>"
+			+ "</doc>";
+		ArrayList<Event> list = getEvents(snippet);
+		ITextUnit tu = FilterTestDriver.getTextUnit(list, 1);
+		assertEquals("t1 <1/> t3", fmt.setContent(tu.getSource().getFirstContent()).toString());
+		tu = FilterTestDriver.getTextUnit(list, 2);
+		assertEquals("t2", fmt.setContent(tu.getSource().getFirstContent()).toString());
+	}
+
 	@Test
 	public void testEmptyElements () {
 		String snippet = "<?xml version=\"1.0\"?>\n"
