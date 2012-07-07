@@ -82,6 +82,7 @@ public class RegexFilter implements IFilter {
 	private String lineBreak;
 	private boolean hasUTF8BOM;
 	private EncoderManager encoderManager;
+	private RawDocument input;
 	
 	public RegexFilter () {
 		params = new Parameters();
@@ -92,6 +93,9 @@ public class RegexFilter implements IFilter {
 	}
 
 	public void close () {
+		if (input != null) {
+			input.close();
+		}
 		inputText = null;
 		parseState = 0;
 	}
@@ -268,6 +272,7 @@ public class RegexFilter implements IFilter {
 	{
 		close(); // Just in case resources need to be freed
 	
+		this.input = input;
 		BOMNewlineEncodingDetector detector = new BOMNewlineEncodingDetector(input.getStream(), input.getEncoding());
 		detector.detectAndRemoveBom();
 		input.setEncoding(detector.getEncoding());

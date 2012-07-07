@@ -4,7 +4,7 @@
     <parent>
         <artifactId>build-okapi</artifactId>
         <groupId>net.sf.okapi</groupId>
-        <version>0.16</version>
+        <version>0.17-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>build-libraries</artifactId>
@@ -24,8 +24,6 @@
         <module>lib-omegat</module>
         <module>lib-transifex</module>
         <module>lib-longhorn-api</module>
-        <module>lib-xliff</module>
         <module>lib-gtt</module>
-        <module>lib-tmdb</module>
     </modules>
 </project>

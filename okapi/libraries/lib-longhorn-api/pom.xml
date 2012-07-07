@@ -3,7 +3,7 @@
 	<parent>
 		<artifactId>build-libraries</artifactId>
 		<groupId>net.sf.okapi.lib</groupId>
-		<version>0.16</version>
+		<version>0.17-SNAPSHOT</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
     <!--<groupId>net.sf.okapi.lib</groupId>-->
@@ -23,7 +23,7 @@
         <dependency>
             <groupId>org.jboss.resteasy</groupId>
             <artifactId>resteasy-jaxrs</artifactId>
-            <version>2.0.1.GA</version>
+            <version>2.3.4.Final</version>
         </dependency>
     </dependencies>
 </project>

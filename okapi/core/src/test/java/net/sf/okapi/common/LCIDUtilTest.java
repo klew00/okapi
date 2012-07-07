@@ -21,9 +21,8 @@
 package net.sf.okapi.common;
 
 import static org.junit.Assert.assertEquals;
-
-import net.sf.okapi.common.LocaleId;
-import net.sf.okapi.common.LCIDUtil;
+import static org.junit.Assert.fail;
+import net.sf.okapi.common.LCIDUtil.LCIDDescr;
 
 import org.junit.Test;
 
@@ -35,7 +34,42 @@ public class LCIDUtilTest {
 		assertEquals(0x0419, LCIDUtil.getLCID("ru-RU"));
 		assertEquals(0x0419, LCIDUtil.getLCID("ru_RU"));
 		assertEquals(0x0409, LCIDUtil.getLCID("en-us"));
+		assertEquals(0x044c, LCIDUtil.getLCID("ml-IN"));
+		assertEquals("ml-in", LCIDUtil.getTag(0x044c));
+		assertEquals(0x0007, LCIDUtil.getLCID("de"));
+		assertEquals(0x0009, LCIDUtil.getLCID("en"));		
+		assertEquals(0x000a, LCIDUtil.getLCID("es"));
+		assertEquals(0x000c, LCIDUtil.getLCID("fr"));
 		assertEquals(0x0448, LCIDUtil.getLCID(new LocaleId("or", "in")));
-		assertEquals("or-IN", LCIDUtil.getTag(new LocaleId("or", "in")));
+		assertEquals("or-in", LCIDUtil.getTag(new LocaleId("or", "in")));
+	}
+	
+	@Test
+	public void testLookups() {
+//		for (LCIDDescr descr : LCIDUtil.getTagLookup().values()) {
+//			if (!LCIDUtil.getLcidLookup().containsKey(descr.tag)) {
+//				fail("LcidLookup has no entry for " + descr.tag);
+//			}
+//		}
+		for (LCIDDescr descr : LCIDUtil.getTagLookup().values()) {
+			int lcid = descr.lcid;
+			String tag = descr.tag;
+			if (!LCIDUtil.getLcidLookup().containsKey(tag)) {
+				fail(String.format("LcidLookup has no entry for 0x%04x (%s)", lcid, descr.tag));
+			}
+		}
+	}
+	
+//  DEBUG @Test
+	public void listLcidLookup() {
+		for (String tag : LCIDUtil.getLcidLookup().keySet()) {
+			LCIDDescr descr = LCIDUtil.getLcidLookup().get(tag);
+			System.out.println(tag + ":   " + getDescrStr(descr));
+		}
+	}
+	
+	private String getDescrStr(LCIDDescr descr) {
+		return String.format("Lang: %20s Reg: %20s lcid: 0x%04x tag: %s",
+				descr.language, descr.region, descr.lcid, descr.tag);		
 	}
 }

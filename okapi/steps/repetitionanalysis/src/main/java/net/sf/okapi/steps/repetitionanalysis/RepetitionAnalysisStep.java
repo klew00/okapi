@@ -74,11 +74,6 @@ public class RepetitionAnalysisStep extends BasePipelineStep {
 		super();
 		params = new Parameters();
 		//tmDir = Util.ensureSeparator(Util.getTempDirectory(), true) + "tm/";
-		
-		// For concurrent pipelines 
-		tmDir = String.format("%s~okapi-step-repetitionanalysis-%s/", 
-				Util.ensureSeparator(Util.getTempDirectory(), true), 
-				UUID.randomUUID().toString());		
 	}
 	
 	@Override
@@ -127,12 +122,17 @@ public class RepetitionAnalysisStep extends BasePipelineStep {
 			currentTm.close();
 			currentTm = null;
 		}
-		Util.deleteDirectory(tmDir, false);
+		if (tmDir != null) Util.deleteDirectory(tmDir, false);
 	}
 	
 	@Override
 	protected Event handleStartDocument(Event event) {
 		close();
+		// For concurrent pipelines 
+		tmDir = String.format("%s~okapi-step-repetitionanalysis-%s/", 
+				Util.ensureSeparator(Util.getTempDirectory(), true), 
+				UUID.randomUUID().toString());
+		System.out.println("@@@ " + tmDir);
 		Util.createDirectories(tmDir);
 		searchExact = params.getFuzzyThreshold() >= 100;
 		

@@ -326,6 +326,7 @@ public class RainbowKitFilter implements IFilter {
 			pp.setTargetLocale(rd.getTargetLocale());
 			pp.setOutputEncoding(rd.getEncoding()); // Use same as the output document
 			pp.setInputRawDocument(rd);
+			pp.setBatchInputCount(1);
 			// Add the events to the list
 			list.add(new Event(EventType.PIPELINE_PARAMETERS, pp));
 			list.add(new Event(EventType.RAW_DOCUMENT, rd));
@@ -424,6 +425,10 @@ public class RainbowKitFilter implements IFilter {
 			if ( rtfFilter == null ) {
 				rtfFilter = new RTFFilter();
 			}
+			// For the XLIFF+RTF, set the option to strip ws before '</xml"
+			if ( tkitType == Manifest.EXTRACTIONTYPE_XLIFFRTF ) {
+				rtfFilter.setStripWSBeforeTextStart(true);
+			}
 			//TODO: encoding output warnings
 			
 			//TODO: get LB info from original
@@ -455,7 +460,7 @@ public class RainbowKitFilter implements IFilter {
 				new FileOutputStream(outputPath)), info.getTargetEncoding());
 			//TODO: check BOM option from original
 			Util.writeBOMIfNeeded(writer, false, info.getTargetEncoding());
-				
+			
 			// Process
 			StringBuilder buf = new StringBuilder();
 			while ( rtfFilter.getTextUntil(buf, -1, 0) == 0 ) {

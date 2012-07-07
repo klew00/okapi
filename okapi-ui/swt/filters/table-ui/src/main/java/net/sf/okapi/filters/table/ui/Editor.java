@@ -165,4 +165,9 @@ public class Editor extends FilterParametersEditor {
 			pageInterop(ColumnsTab.class, speaker); // to update the enabled 
 		// state of numColuimns and panel
 	}
+
+	@Override
+	protected String getWikiPage () {
+		return "Table Filter";
+	}
 }

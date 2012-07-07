@@ -471,7 +471,7 @@ public class XINIWriter implements IFilterWriter {
 		Serializable lastElementInSeg = null;
 		
 		if (xiniSegment.getContent().size() > 0)
-			lastElementInSeg = (String) xiniSegment.getContent().get(xiniSegment.getContent().size() - 1);
+			lastElementInSeg = xiniSegment.getContent().get(xiniSegment.getContent().size() - 1);
 		
 		for (Serializable newPart : newSerializedContent) {
 			if (newPart instanceof String && lastElementInSeg != null && lastElementInSeg instanceof String) {

@@ -49,15 +49,15 @@ public class GenericContentTest {
 		assertEquals("t1<1><2><3/>t2</2></1>t3", fmt.setContent(tf2).toString());
 	}
 	
-	@Test
-	public void testFromNumericCodedToFragment1 () {
-		TextFragment tf = createTextFragment();
-		String gtext = fmt.setContent(tf).toString();
-		assertEquals("t1<1><2><3/>t2</2></1>t3", gtext);
-		// Reconstruct it
-		TextFragment tf2 = fmt.fromNumericCodedToFragment(gtext, tf.getCodes(), false);
-		assertEquals("t1<1><2><3/>t2</2></1>t3", fmt.setContent(tf2).toString());
-	}
+//	@Test
+//	public void testFromNumericCodedToFragment1 () {
+//		TextFragment tf = createTextFragment();
+//		String gtext = fmt.setContent(tf).toString();
+//		assertEquals("t1<1><2><3/>t2</2></1>t3", gtext);
+//		// Reconstruct it
+//		TextFragment tf2 = fmt.fromNumericCodedToFragment(gtext, tf.getCodes(), false);
+//		assertEquals("t1<1><2><3/>t2</2></1>t3", fmt.setContent(tf2).toString());
+//	}
 	
 //	@Test
 //	public void testFromNumericCodedToFragment2 () {
@@ -169,6 +169,20 @@ public class GenericContentTest {
 
 		TextFragment tf3 = fmt.fromLetterCodedToFragment(res, tf, false);
 		assertEquals("t1<g1><g2><x3/>t2</g2></g1>t3", tf3.toText());
+	}
+	
+	@Test
+	public void testUpdate () {
+		TextFragment tf = new TextFragment();
+		tf.append(TagType.PLACEHOLDER, "x1", "[x/]");
+		tf.append("A");
+		tf.append(TagType.OPENING, "b1", "[b1]");
+		tf.append("B");
+		tf.append(TagType.CLOSING, "b1", "[/b1]");
+		
+		TextFragment tf2 = new TextFragment("", tf.getClonedCodes());
+		fmt.updateFragment("<1/>ZZ<2>QQ</2>", tf2, false);
+		assertEquals("[x/]ZZ[b1]QQ[/b1]", tf2.toText());
 	}
 	
 	private TextFragment createTextFragment () {

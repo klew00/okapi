@@ -20,6 +20,7 @@
 
 package net.sf.okapi.filters.xliff;
 
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -239,11 +240,25 @@ public class XLIFFFilter implements IFilter {
 			input.setEncoding("UTF-8"); // Default for XML, other should be auto-detected
 			BOMNewlineEncodingDetector detector = new BOMNewlineEncodingDetector(input.getStream(), input.getEncoding());
 			detector.detectBom();
+
+			String inStreamCharset = "UTF-8";
 			if ( detector.isAutodetected() ) {
-				reader = fact.createXMLStreamReader(input.getStream(), detector.getEncoding());
+				inStreamCharset = detector.getEncoding();
+			}
+			InputStreamReader inStreamReader;
+			try {
+				inStreamReader = new InputStreamReader(input.getStream(), inStreamCharset);
+			}
+			catch ( java.io.UnsupportedEncodingException e ) {
+				logger.warning(String.format("Invalid encoding '%s', using default.", inStreamCharset));
+				inStreamReader = new InputStreamReader(input.getStream());
+			}
+			// When possible, make sure we have a filename associated with the stream
+			if ( null != input.getInputURI() ) {
+				reader = fact.createXMLStreamReader(input.getInputURI().toString(), inStreamReader);
 			}
 			else {
-				reader = fact.createXMLStreamReader(input.getStream());
+				reader = fact.createXMLStreamReader(inStreamReader);
 			}
 
 			String realEnc = reader.getCharacterEncodingScheme();
@@ -866,26 +881,25 @@ public class XLIFFFilter implements IFilter {
 			//TODO: Need to standardize target-state properties
 			String stateValue = reader.getAttributeValue(null, "state");
 			// Get the coord attribute if available
-			String coordValue = reader.getAttributeValue(null, Property.COORDINATES);
+			String coordValue = reader.getAttributeValue(null, "coord");
 
 			// Get the target itself
 			skel.addContentPlaceholder(tu, trgLang);
 			tc = processContent("target", false);
-			if ( !tc.isEmpty() ) {
-				if ( !preserveSpaces.peek() ) {
-					tc.unwrap(true, false);
-				}
-				tu.setPreserveWhitespaces(preserveSpaces.peek());
-				tu.setTarget(trgLang, tc);
+			// Set the target, even if it's an empty one.
+			if ( !preserveSpaces.peek() ) {
+				tc.unwrap(true, false);
 			}
+			tu.setPreserveWhitespaces(preserveSpaces.peek());
+			tu.setTarget(trgLang, tc);
 			
-			// Set the target properties (after the target container has been set
+			// Set the target properties (after the target container has been set)
 			if ( stateValue != null ) {
-				tu.setTargetProperty(trgLang, new Property("state", stateValue, true));
+				tu.setTargetProperty(trgLang, new Property("state", stateValue, true)); // Read-only for now
 			}
 		
 			if ( coordValue != null ) {
-				tu.setTargetProperty(trgLang, new Property(Property.COORDINATES, coordValue, false));
+				tu.setTargetProperty(trgLang, new Property(Property.COORDINATES, coordValue, true)); // Read-only for now
 			}
 
 			if ( approved > -1 ) {

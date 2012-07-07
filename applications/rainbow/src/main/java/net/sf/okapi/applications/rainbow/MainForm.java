@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2011 by the Okapi Framework contributors
+  Copyright (C) 2008-2012 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -70,6 +70,7 @@ import net.sf.okapi.applications.rainbow.pipeline.XMLCharactersFixingPipeline;
 import net.sf.okapi.applications.rainbow.pipeline.XMLValidationPipeline;
 import net.sf.okapi.applications.rainbow.pipeline.XSLTransformPipeline;
 import net.sf.okapi.applications.rainbow.pipeline.SnRWithoutFilterPipeline;
+import net.sf.okapi.common.UserConfiguration;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.DefaultFilters;
 import net.sf.okapi.common.filters.FilterConfigurationMapper;
@@ -82,7 +83,6 @@ import net.sf.okapi.common.ui.InputDialog;
 import net.sf.okapi.common.ui.MRUList;
 import net.sf.okapi.common.ui.ResourceManager;
 import net.sf.okapi.common.ui.UIUtil;
-import net.sf.okapi.common.ui.UserConfiguration;
 import net.sf.okapi.common.ui.filters.FilterConfigurationsDialog;
 import net.sf.okapi.common.ui.plugins.PluginsManagerDialog;
 import net.sf.okapi.common.plugins.PluginsManager;
@@ -146,6 +146,7 @@ public class MainForm { //implements IParametersProvider {
 	public static final String OPT_LOGLEVEL = "logLevel"; //$NON-NLS-1$
 	public static final String OPT_ALWAYSOPENLOG = "alwaysOpenLog"; //$NON-NLS-1$
 	public static final String OPT_DROPINSDIR = "dropinsDir"; //$NON-NLS-1$
+	public static final String OPT_PARAMSDIR = "paramsDir"; //$NON-NLS-1$
 	public static final String OPT_USEUSERDEFAULTS = "useUserDefaults"; //$NON-NLS-1$
 	public static final String OPT_SOURCELOCALE = "sourceLocale"; //$NON-NLS-1$
 	public static final String OPT_SOURCEENCODING = "sourceEncoding"; //$NON-NLS-1$
@@ -2133,6 +2134,14 @@ public class MainForm { //implements IParametersProvider {
 			prj.isModified = false; // User defaults are not modifications
 		}
 		
+		// Set custom parameters folder
+		String tmp = config.getProperty(OPT_PARAMSDIR);
+		if ( !Util.isEmpty(tmp) ){
+			prj.setCustomParametersFolder(tmp);
+			prj.setUseCustomParametersFolder(true);
+			prj.isModified = false; // User defaults are not modifications
+		}
+		
 		customFilterConfigsNeedUpdate = true;
 		wrapper = null;
 		currentInput = 0;
@@ -2411,16 +2420,6 @@ public class MainForm { //implements IParametersProvider {
 				txprj.setPath(file.getCanonicalPath());
 				net.sf.okapi.filters.transifex.ui.ProjectDialog dlg = new net.sf.okapi.filters.transifex.ui.ProjectDialog();
 				dlg.edit(shell, txprj, false);
-			}
-			else if ( ext.equalsIgnoreCase(net.sf.okapi.filters.drupal.Project.PROJECT_EXTENSION) ) {
-				// Use the Drupal project editor if it's a Drupal project file
-				saveSurfaceData(); // Make sure we have the correct source/target locales
-				net.sf.okapi.filters.drupal.Project drprj = new net.sf.okapi.filters.drupal.Project();
-				BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(file), "UTF-8"));
-				drprj.read(br, prj.getSourceLanguage(), prj.getTargetLanguage());
-				drprj.setPath(file.getCanonicalPath());
-				net.sf.okapi.filters.drupal.ui.ProjectDialog dlg = new net.sf.okapi.filters.drupal.ui.ProjectDialog();
-				dlg.edit(shell, drprj, false);
 			}
 			else { // Other types of file
 				Program.launch(file.getCanonicalPath());

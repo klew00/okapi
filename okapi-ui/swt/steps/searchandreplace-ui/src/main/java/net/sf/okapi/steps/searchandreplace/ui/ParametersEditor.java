@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2010 by the Okapi Framework contributors
+  Copyright (C) 2008-2012 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -174,7 +174,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		table.setLinesVisible (true);
 		GridData gdTmp = new GridData(GridData.FILL_BOTH);
 		gdTmp.horizontalSpan = 2;
-		gdTmp.heightHint = 250;
+		gdTmp.heightHint = 150;
 		table.setLayoutData(gdTmp);
 
 		// Click updates button states

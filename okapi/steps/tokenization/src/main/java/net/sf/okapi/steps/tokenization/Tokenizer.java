@@ -53,7 +53,7 @@ public class Tokenizer {
 	 * @param tokenNames Optional list of token names. If omitted, all tokens will be extracted.
 	 * @return A list of Token objects.
 	 */
-	protected Tokens tokenizeString(String text, LocaleId language, String... tokenNames) {
+	protected static synchronized Tokens tokenizeString(String text, LocaleId language, String... tokenNames) {
 			
 		Tokens res = new Tokens();
 		
@@ -119,8 +119,7 @@ public class Tokenizer {
 			return doTokenize(TextUnitUtil.getText(tf), language, tokenNames);
 		}
 		else if (text instanceof String) {
-			Tokenizer tokenizer = new Tokenizer();
-			return tokenizer.tokenizeString((String) text, language, tokenNames);
+			return tokenizeString((String) text, language, tokenNames);
 		}
 		
 		return null;		

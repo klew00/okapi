@@ -70,8 +70,6 @@
 
 	<property name="ratelStamp" value="${ratelVersion}${releaseInfo}" />
 
-	<property name="olifantStamp" value="${olifantVersion}${releaseInfo}" />
-
 	<property name="checkmateStamp" value="${checkmateVersion}${releaseInfo}" />
 
  	<property name="okapiappsName" value="okapi-apps"/>
@@ -145,8 +143,6 @@
 			<fileset dir="../../okapi-ui/swt/filters/transifex-ui/target/classes"
 			 excludes="**/META-INF/**"/>
 			<fileset dir="../../okapi-ui/swt/filters/mif-ui/target/classes"
-			 excludes="**/META-INF/**"/>
-			<fileset dir="../../okapi-ui/swt/filters/drupal-ui/target/classes"
 			 excludes="**/META-INF/**"/>
 
 			<!-- Libraries -->
@@ -252,34 +248,6 @@
 		</delete>
 	</target>
 
-	<!-- Olifant 
-	<target name="olifant">
-		<delete includeEmptyDirs="true" failonerror="false">
-			<fileset dir="${tmp}"/>
-		</delete>
-		<mkdir dir="${tmp}"/>
-
-		<copy todir="${tmp}">
-			<fileset dir="../../applications/olifant/target/classes"/>
-		</copy>
-		
-		<manifest file="${tmp}/MANIFEST.MF">
-			<attribute name="Implementation-Title" value="olifant"/>
-			<attribute name="Implementation-Version" value="${olifantStamp}"/>
-			<attribute name="Main-Class" value="net.sf.okapi.applications.olifant.Main"/>
-			<attribute name="Class-Path" value="${okapilibJar} ${okapilibuiJar}"/>
-  		</manifest>
-		
-		<jar jarfile="${distLib}/olifant.jar" basedir="${tmp}"
-		 manifest="${tmp}/MANIFEST.MF"
-		 excludes="MANIFEST.MF" />
-
-		<delete includeEmptyDirs="true" failonerror="false">
-			<fileset dir="${tmp}"/>
-		</delete>
-	</target>
-	-->
-
 	<!-- CheckMate -->
 	<target name="checkmate">
 		<!-- Prepare tmp dir for creating the jar -->
@@ -342,7 +310,7 @@
 		 excludes="MANIFEST.MF" />
 
 		<copy todir="${dist}" overwrite="true">
-			<fileset dir="data/okapi-apps/${platform}" includes="**/**" excludes="**/olifant.*,**/Olifant.app/**"/>
+			<fileset dir="data/okapi-apps/${platform}" includes="**/**"/>
 		</copy>
 
 		<!-- Copy shared resources -->

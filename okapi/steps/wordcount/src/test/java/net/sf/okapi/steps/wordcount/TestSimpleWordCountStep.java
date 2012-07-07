@@ -26,12 +26,10 @@ import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.ISegments;
 import net.sf.okapi.common.resource.ITextUnit;
+import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
-import net.sf.okapi.common.resource.TextUnitUtil;
-import net.sf.okapi.steps.wordcount.common.GMX;
-import net.sf.okapi.steps.wordcount.common.MetricsAnnotation;
 
 import org.junit.Test;
 
@@ -46,22 +44,13 @@ public class TestSimpleWordCountStep {
 		segments.append(new TextFragment("The number of words in this second segment is 10."));
 		segments.append(new TextFragment("And the number of words in this third segment is 11."));
 		
-		SimpleWordCountStep step = new SimpleWordCountStep();
+		SimpleWordCountStep step = new SimpleWordCountStep();	
 		step.setSourceLocale(LocaleId.ENGLISH);
-		step.setTargetLocale(LocaleId.SPANISH);
+		StartDocument sd = new StartDocument("sd");
+		sd.setLocale(LocaleId.ENGLISH);
+		step.handleEvent(new Event(EventType.START_DOCUMENT, sd));
 		step.handleEvent(new Event(EventType.TEXT_UNIT, tu));
 		
-		//assertEquals(30, getCount(tu, null));		
-	}
-	
-	private long getCount(ITextUnit tu, LocaleId trgLoc) {
-		MetricsAnnotation ma;
-		
-		if (trgLoc == null) {
-			ma = TextUnitUtil.getSourceAnnotation(tu, MetricsAnnotation.class);
-		} else {
-			ma = TextUnitUtil.getTargetAnnotation(tu, trgLoc, MetricsAnnotation.class);
-		}
-		return ma.getMetrics().getMetric(GMX.TotalWordCount);
+		assertEquals(30, WordCounter.getCount(tu.getSource()));		
 	}
 }

@@ -533,6 +533,121 @@ public class TextUnitUtilTest {
 	}
 	
 	@Test
+	public void testSimplifyCodes_segmentedTU6() {
+		TextFragment tf = new TextFragment();
+		tf.append(TagType.PLACEHOLDER, "x1", "<x/>");
+		tf.append(TagType.PLACEHOLDER, "x2", "<x/>");
+		tf.append(TagType.OPENING, "a", "<a>");
+		tf.append(TagType.PLACEHOLDER, "x3", "<x/>");
+		tf.append("The plan of");
+		tf.append(TagType.CLOSING, "a", "</a>");
+		
+		tf.append(TagType.OPENING, "b", "<b>");
+		tf.append(TagType.PLACEHOLDER, "x4", "<x/>");
+		tf.append(TagType.CLOSING, "b", "</b>");
+		
+		tf.append(TagType.OPENING, "c", "<c>");
+		tf.append("happiness");
+		tf.append(TagType.CLOSING, "c", "</c>");
+		
+		tf.append(TagType.OPENING, "d", "<d>");
+		tf.append(TagType.PLACEHOLDER, "x5", "<x/>");
+		tf.append(TagType.CLOSING, "d", "</d>");
+		tf.append(TagType.PLACEHOLDER, "x6", "<x/>");
+		
+		TextContainer tc = new TextContainer();
+		tc.append(new Segment("s1", tf));
+		
+		String[] res = TextUnitUtil.simplifyCodes(tc, true);		
+		assertEquals("<x/><x/><a><x/>The plan of</a><b><x/></b><c>happiness</c><d><x/></d><x/>", tc.toString());
+		assertNotNull(res);
+		assertEquals(null, res[0]);
+		assertEquals(null, res[1]);
+		
+		assertEquals(3, tc.count());
+		assertFalse(tc.get(0).isSegment());
+		assertTrue(tc.get(1).isSegment());
+		assertFalse(tc.get(2).isSegment());
+		
+		assertEquals("<x/><x/><a><x/>", tc.get(0).toString());
+		assertEquals("The plan of</a><b><x/></b><c>happiness", tc.get(1).toString());
+		assertEquals("</c><d><x/></d><x/>", tc.get(2).toString());
+		
+		ISegments segs = tc.getSegments();
+		assertEquals(1, segs.count());
+	}
+	
+	@Test
+	public void testSegmentId() {
+		TextFragment tf = new TextFragment();
+		tf.append(new Code(TagType.OPENING, "x", "code1"));
+		tf.append("seg");
+		tf.append(new Code(TagType.CLOSING, "x", "code2"));
+		
+		Segment seg = new Segment("0", tf);
+		TextContainer tc = new TextContainer(seg);
+		assertEquals(1, tc.count());
+		assertEquals("0", tc.getSegments().get(0).getId());
+		
+		TextUnitUtil.simplifyCodes(tc, false);
+		
+		assertEquals(3, tc.count());
+		assertEquals("0", tc.getSegments().get(0).getId());
+	}
+	
+	@Test
+	public void testSegmentId2() {
+		TextFragment tf1 = new TextFragment();
+		tf1.append(new Code(TagType.OPENING, "x1", "code1"));
+		tf1.append("seg1");
+		tf1.append(new Code(TagType.CLOSING, "x1", "code2"));
+		
+		TextFragment tf2 = new TextFragment();
+		tf2.append(new Code(TagType.OPENING, "x2", "code3"));
+		tf2.append("seg2");
+		tf2.append(new Code(TagType.CLOSING, "x2", "code4"));
+		
+		Segment seg1 = new Segment("1", tf1);
+		Segment seg2 = new Segment("5", tf2);
+		TextContainer tc = new TextContainer(seg1);
+		tc.append(seg2);
+		assertEquals(2, tc.count());
+		
+		TextUnitUtil.simplifyCodes(tc, false);
+		
+		assertEquals(6, tc.count());
+		assertEquals("1", tc.getSegments().get(0).getId());		
+		assertEquals("seg1", tc.getSegments().get(0).getContent().toString());
+		assertEquals("5", tc.getSegments().get(1).getId());
+		assertEquals("seg2", tc.getSegments().get(1).getContent().toString());
+	}
+	
+	@Test
+	public void testSegmentId3() {
+		TextFragment tf1 = new TextFragment();
+		tf1.append(new Code(TagType.OPENING, "x1", "code1"));
+		tf1.append("seg1");
+		tf1.append(new Code(TagType.CLOSING, "x1", "code2"));
+		
+		TextFragment tf2 = new TextFragment();
+		tf2.append(new Code(TagType.OPENING, "x2", "code3"));
+		tf2.append("seg2");
+		tf2.append(new Code(TagType.CLOSING, "x2", "code4"));
+		
+		Segment seg1 = new Segment("1", tf1);
+		Segment seg2 = new Segment("5", tf2);
+		TextContainer tc = new TextContainer(seg1);
+		tc.append(seg2);
+		assertEquals(2, tc.count());
+		
+		TextFragment tf = TextUnitUtil.storeSegmentation(tc);
+		assertEquals("[#$1@%$seg_start$]code1seg1code2[#$1@%$seg_end$][#$5@%$seg_start$]code3seg2code4[#$5@%$seg_end$]", tf.toText());		
+		tc.clear();
+		assertEquals("(2: seg_start 1) (10: seg_end 1) (14: seg_start 5) (22: seg_end 5)", 
+				TextUnitUtil.restoreSegmentation(tc, tf));
+	}
+	
+	@Test
 	public void testStoreSegmentation () {		
 		TextContainer tc = new TextContainer();
 		tc.append(new Segment("s1", new TextFragment("[seg 1]")));
@@ -764,7 +879,9 @@ public class TextUnitUtilTest {
 		tf3.append(TagType.PLACEHOLDER, "x33", "<x33/>");
 		tf3.append(TagType.PLACEHOLDER, "x34", "<x34/>");
 				
-		assertEquals("<1/><2/><3/><4/>", fmt.setContent(tf1).toString());		
+		assertEquals("<1/><2/><3/><4/>", fmt.setContent(tf1).toString());
+		assertEquals("<1/><2/><3/><4/>", fmt.setContent(tf2).toString());
+		assertEquals("<1/><2/><3/><4/>", fmt.setContent(tf3).toString());
 		
 		TextContainer tc = new TextContainer();
 		tc.append(new Segment("s1", tf1));

@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2011 by the Okapi Framework contributors
+  Copyright (C) 2011-2012 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -26,12 +26,13 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.logging.Logger;
 
-import org.oasisopen.xliff.v2.ICode;
+import org.oasisopen.xliff.v2.ICMarker;
 import org.oasisopen.xliff.v2.IDataStore;
 import org.oasisopen.xliff.v2.IFragment;
 import org.oasisopen.xliff.v2.INote;
 import org.oasisopen.xliff.v2.IPart;
 import org.oasisopen.xliff.v2.IWithCandidates;
+import org.oasisopen.xliff.v2.OriginalDataStyle;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.FileUtil;
@@ -68,6 +69,7 @@ public class XLIFF2PackageWriter extends BasePackageWriter {
 	private XLIFFWriter writer;
 	private LinkedHashMap<String, String> referents;
 	private XLIFF2Options options;
+	private String rawDocPath;
 
 	public XLIFF2PackageWriter () {
 		super(Manifest.EXTRACTIONTYPE_XLIFF2);
@@ -152,30 +154,32 @@ public class XLIFF2PackageWriter extends BasePackageWriter {
 		writer = new XLIFFWriter();
 		referents = new LinkedHashMap<String, String>();
 
-//		writer.setOptions(manifest.getTargetLocale(), "UTF-8");
 		MergingInfo item = manifest.getItem(docId);
-		String path = manifest.getTempSourceDirectory() + item.getRelativeInputPath() + ".xlf";
-		
+		rawDocPath = manifest.getTempSourceDirectory() + item.getRelativeInputPath() + ".xlf";
 		// Set the writer's options
-		writer.setInlineStyle(options.getInlineStyle());
-		
-//		StartDocument sd = event.getStartDocument();
-//		writer.create(path, null, manifest.getSourceLocale(), manifest.getTargetLocale(),
-//			sd.getMimeType(), item.getRelativeInputPath(), null);
-		writer.create(new File(path), manifest.getSourceLocale().toBCP47(),
+		writer.setInlineStyle(OriginalDataStyle.fromInteger(options.getInlineStyle()));
+		writer.setUseIndentation(true);
+		// Create the writer
+		writer.create(new File(rawDocPath), manifest.getSourceLocale().toBCP47(),
 			manifest.getTargetLocale().toBCP47());
-		writer.setIsIndented(true);
 		writer.writeStartDocument(null, "EXPERIMENTAL OUTPUT ONLY!");
 	}
 	
 	@Override
-	protected void processEndDocument (Event event) {
+	protected Event processEndDocument (Event event) {
 		writer.writeEndDocument();
 		writer.close();
 		writer = null;
 		referents.clear();
 		referents = null;
-		super.processEndDocument(event);
+		
+		if ( params.getSendOutput() ) {
+			return super.creatRawDocumentEventSet(rawDocPath, "UTF-8",
+				manifest.getSourceLocale(), manifest.getTargetLocale());
+		}
+		else {
+			return event;
+		}
 	}
 
 	@Override
@@ -330,7 +334,7 @@ public class XLIFF2PackageWriter extends BasePackageWriter {
 				xSeg.setId(srcSeg.getId());
 				
 				// Applies TU-level translatable property to each segment
-				xSeg.setTranslatable(tu.isTranslatable());
+				xSeg.setTranslate(tu.isTranslatable());
 				
 				// Target
 				if ( trgSegs != null ) {
@@ -414,24 +418,24 @@ public class XLIFF2PackageWriter extends BasePackageWriter {
 
 		int index;
 		Code code;
+		boolean mayOverlapDefault = false; // Most spanning codes may not overlap
 		for ( int i=0; i<ctext.length(); i++ ) {
 			if ( TextFragment.isMarker(ctext.charAt(i)) ) {
 				index = TextFragment.toIndex(ctext.charAt(++i));
 				code = codes.get(index);
-				ICode xCode;
+				ICMarker xCode;
 				switch ( code.getTagType() ) {
 				case OPENING:
-					xCode = xFrag.append(org.oasisopen.xliff.v2.InlineType.OPENING,
-						String.valueOf(code.getId()), code.getData());
+					xCode = xFrag.append(org.oasisopen.xliff.v2.MarkerType.OPENING,
+						String.valueOf(code.getId()), code.getData(), mayOverlapDefault);
 					break;
 				case CLOSING:
-					xCode = xFrag.append(org.oasisopen.xliff.v2.InlineType.CLOSING,
-						String.valueOf(code.getId()), code.getData());
+					xCode = xFrag.append(org.oasisopen.xliff.v2.MarkerType.CLOSING,
+						String.valueOf(code.getId()), code.getData(), mayOverlapDefault);
 					break;
 				case PLACEHOLDER:
 				default:
-					xCode = xFrag.append(org.oasisopen.xliff.v2.InlineType.PLACEHOLDER,
-						String.valueOf(code.getId()), code.getData());
+					xCode = xFrag.appendPlaceholder(String.valueOf(code.getId()), code.getData());
 					break;
 				}
 				if ( code.hasReference() ) {
