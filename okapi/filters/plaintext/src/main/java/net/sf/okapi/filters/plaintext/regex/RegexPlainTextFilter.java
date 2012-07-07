@@ -30,10 +30,12 @@ import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.MimeTypeMapper;
 import net.sf.okapi.common.exceptions.OkapiBadFilterInputException;
 import net.sf.okapi.common.exceptions.OkapiIllegalFilterOperationException;
+import net.sf.okapi.common.filters.InlineCodeFinder;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.ITextUnit;
+import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.skeleton.ISkeletonWriter;
 import net.sf.okapi.filters.regex.RegexFilter;
 import net.sf.okapi.filters.regex.Rule;
@@ -59,14 +61,16 @@ public class RegexPlainTextFilter extends AbstractBaseFilter {
 	public static final String FILTER_CONFIG_LINES		= "okf_plaintext_regex_lines";
 	public static final String FILTER_CONFIG_PARAGRAPHS	= "okf_plaintext_regex_paragraphs";
 		
+	private InlineCodeFinder codeFinder;
 	private RegexFilter regex;			// Regex aggregate
 	private Parameters params;			// Regex Plain Text Filter's parameters
 	private int lineNumber = 0;
 
 		
 //	public void component_create() {
-	public RegexPlainTextFilter() {
-				
+	public RegexPlainTextFilter() {			
+		codeFinder = new InlineCodeFinder();
+		
 		// Create the regex aggregate and its parameters 
 		regex = new RegexFilter(); 
 		setParameters(new Parameters());	// Regex Plain Text Filter parameters
@@ -111,8 +115,7 @@ public class RegexPlainTextFilter extends AbstractBaseFilter {
 	 * @param sourceGroup - regex capturing group denoting text to be extracted. Default: 1.  
 	 * @param regexOptions - Java regex options. Default: Pattern.MULTILINE.
 	 */
-	public void setRule(String rule, int sourceGroup, int regexOptions) {
-		
+	public void setRule(String rule, int sourceGroup, int regexOptions) {		
 		if (rule == null) return;
 		if (rule == "") return;
 		
@@ -139,25 +142,21 @@ public class RegexPlainTextFilter extends AbstractBaseFilter {
 	 * Provides access to the internal line extractor's {@link Parameters} object. 
 	 * @return {@link Parameters} object; with this object you can access the line extraction rule, source group, regex options, etc.
 	 */
-	public net.sf.okapi.filters.regex.Parameters getRegexParameters() {
-		
+	public net.sf.okapi.filters.regex.Parameters getRegexParameters() {		
 		return _getRegexParams();
 	}
 
 // IFilter	
 
-	public void cancel() {
-		
+	public void cancel() {		
 		if (regex != null) regex.cancel();
 	}
 
-	public void close() {
-		
+	public void close() {		
 		if (regex != null) regex.close();
 	}
 
-	public IFilterWriter createFilterWriter() {
-		
+	public IFilterWriter createFilterWriter() {		
 		return (regex != null) ? regex.createFilterWriter() : null;
 	}
 
@@ -166,23 +165,19 @@ public class RegexPlainTextFilter extends AbstractBaseFilter {
 		return (regex != null) ? regex.createSkeletonWriter() : null;
 	}
 
-	public String getMimeType() {
-		
+	public String getMimeType() {		
 		return FILTER_MIME;
 	}
 	
-	public String getName() {
-		
+	public String getName() {		
 		return FILTER_NAME;
 	}
 
-	public IParameters getParameters() {
-		
+	public IParameters getParameters() {		
 		return params;
 	}
 
-	public boolean hasNext() {
-		
+	public boolean hasNext() {		
 		return (regex != null) ? regex.hasNext() : null;
 	}
 
@@ -195,64 +190,69 @@ public class RegexPlainTextFilter extends AbstractBaseFilter {
 		IResource res = event.getResource();
 		if (res == null) return event; // Do not change event
 		
-		if (event.getEventType() == EventType.TEXT_UNIT) {		
+		if (event.getEventType() == EventType.TEXT_UNIT) {
+			ITextUnit textUnit = event.getTextUnit();
+			
 			// Change mime type
-			if (res instanceof ITextUnit) ((ITextUnit)res).setMimeType(this.getMimeType());
+			textUnit.setMimeType(this.getMimeType());
 			
 			// Lines are what the regex considers the lines, so line numbering is actually TU numbering 
 			((ITextUnit)res).setSourceProperty(new Property(AbstractLineFilter.LINE_NUMBER, String.valueOf(++lineNumber), true));
+			
+			// Automatically replace text fragments with in-line codes (based on regex rules of codeFinder)
+			if (params.useCodeFinder && codeFinder != null) {
+				// We can use getFirstPartContent() because nothing is segmented yet
+				TextContainer source = textUnit.getSource();
+				if (source == null) return event;		
+				codeFinder.process(source.getFirstContent());
+			}
 		}
 				
 		return event;
 	}
 
-	public void open(RawDocument input) {
-		
-		lineNumber = 0;
-		
-		if (input == null) 
-			throw new OkapiBadFilterInputException("Input RawDocument is not defined.");
-		else 
-			if (regex != null) regex.open(input);
+	public void open(RawDocument input) {		
+		open(input, true);
 	}
 
-	public void open(RawDocument input, boolean generateSkeleton) {
-		
+	public void open(RawDocument input, boolean generateSkeleton) {		
 		lineNumber = 0;
 		
 		if (input == null) 
 			throw new OkapiBadFilterInputException("Input RawDocument is not defined.");
 		else
-			if (regex != null) regex.open(input, generateSkeleton);		
+			if (regex != null) regex.open(input, generateSkeleton);
+		
+		// Initialization
+		if ( this.params.useCodeFinder && ( codeFinder != null )) {
+			codeFinder.fromString(this.params.codeFinderRules);
+			codeFinder.compile();
+		}
 	}
 
 	public void setParameters(IParameters params) {
-		
 		super.setParameters(params);
 		
-		if (params instanceof Parameters) {			// Also checks for null
+		if (params instanceof Parameters) {	// Also checks for null
 			this.params = (Parameters)params;
 			
 			if (this.params != null)
 				setRule(this.params.rule, this.params.sourceGroup, this.params.regexOptions); // To compile rules
-		}
+		}		
 	}
 
 	@Override
 	protected void component_done() {
-		
 	}
 
 	@Override
-	protected void component_init() {
-		
+	protected void component_init() {		
 	}
 	
 
 // Helpers 
 	
-	private net.sf.okapi.filters.regex.Parameters _getRegexParams() {
-		
+	private net.sf.okapi.filters.regex.Parameters _getRegexParams() {		
 		IParameters punk;
 		
 		if (regex == null) return null;
@@ -261,8 +261,7 @@ public class RegexPlainTextFilter extends AbstractBaseFilter {
 		return (punk instanceof net.sf.okapi.filters.regex.Parameters) ? (net.sf.okapi.filters.regex.Parameters)punk : null; 
 	}
 	
-	private Rule _getFirstRegexRule() {			
-		
+	private Rule _getFirstRegexRule() {					
 		net.sf.okapi.filters.regex.Parameters regexParams = _getRegexParams();
 		
 		if (regexParams == null) return null;
