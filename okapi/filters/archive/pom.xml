@@ -3,7 +3,7 @@
   <parent>
     <artifactId>build-filters</artifactId>
     <groupId>net.sf.okapi.filters</groupId>
-    <version>0.17-SNAPSHOT</version>
+    <version>0.17</version>
   </parent>
 <!--  <groupId>net.sf.okapi.filters</groupId>-->
   <artifactId>okapi-filter-archive</artifactId>
