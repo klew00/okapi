@@ -86,5 +86,10 @@ public class RESTService implements LonghornService {
 			throw new RuntimeException(e);
 		}
 	}
+	
+	@Override
+	public String toString() {
+		return baseUri.toString();
+	}
 
 }

@@ -204,5 +204,10 @@ public class RESTProject implements LonghornProject {
 			throw new RuntimeException(e);
 		}
 	}
+	
+	@Override
+	public String toString() {
+		return projUri.toString();
+	}
 
 }
