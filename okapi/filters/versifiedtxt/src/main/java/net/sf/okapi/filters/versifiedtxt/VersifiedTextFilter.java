@@ -22,8 +22,8 @@ package net.sf.okapi.filters.versifiedtxt;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -44,7 +44,6 @@ import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filterwriter.GenericFilterWriter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
-import net.sf.okapi.common.resource.AlignedPair;
 import net.sf.okapi.common.resource.AlignmentStatus;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.ITextUnit;
@@ -64,6 +63,17 @@ import net.sf.okapi.common.skeleton.GenericSkeleton;
 @UsingParameters()
 // No parameters
 public class VersifiedTextFilter extends AbstractFilter {
+	// custom placeholders
+	private static final Map<String, String> REPLACABLES = new HashMap<String, String>();
+    static {
+    	REPLACABLES.put("{tab}", "\t");
+    	REPLACABLES.put("{nb}", "\u00a0");
+    	REPLACABLES.put("{em}", "\u2014");
+    	REPLACABLES.put("{en}", "\u2013");
+    	REPLACABLES.put("{emsp}", "\u2003");
+    	REPLACABLES.put("{ensp}", "\u2002");
+    }
+               
 	private static final Logger LOGGER = Logger.getLogger(VersifiedTextFilter.class.getName());
 	private static final int BUFFER_SIZE = 2800;
 
@@ -497,9 +507,23 @@ public class VersifiedTextFilter extends AbstractFilter {
 		tu.setMimeType(getMimeType());
 		eventBuilder.endTextUnit();
 	}
+	
+	private String replacePlacebles(String text) {
+		if (text == null || text.isEmpty()) {
+			return text;
+		}
+		
+		// search and replace "REPLACABLES" with raw character
+		for (String r : REPLACABLES.keySet()) {
+			text = text.replace(r, REPLACABLES.get(r));
+		}		
+		return text;
+	}
 
 	private ITextUnit buildTextUnit(String source, String target, boolean targetTag, boolean trados) {
 		ITextUnit tu = eventBuilder.peekTempEvent().getTextUnit();
+		source = replacePlacebles(source);
+		target = replacePlacebles(target);
 		
 		if (trados) {
 			tu = buildTextUnitForTrados(source);
@@ -535,8 +559,7 @@ public class VersifiedTextFilter extends AbstractFilter {
 						text);
 			}
 			
-			// treat as monolingual paragraph and log
-			// a warning
+			// treat as monolingual paragraph and log a warning
 			buildTextUnitForNonTrados(text, true);
 			LOGGER.warning("In a Trados bilingual document but found no segment markers. " +
 					"Treating as monlingual text: " + text);
