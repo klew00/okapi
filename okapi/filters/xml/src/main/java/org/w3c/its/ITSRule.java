@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2010 by the Okapi Framework contributors
+  Copyright (C) 2008-2012 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -20,6 +20,8 @@
 
 package org.w3c.its;
 
+import java.util.Map;
+
 class ITSRule {
 	
 	int ruleType;
@@ -31,8 +33,10 @@ class ITSRule {
 	int infoType;
 	String idValue;
 	boolean preserveWS;
+	Map<String, String> map;
 
 	public ITSRule (int type) {
 		ruleType = type;
 	}
+
 }

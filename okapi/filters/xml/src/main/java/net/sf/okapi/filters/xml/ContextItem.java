@@ -28,9 +28,10 @@ class ContextItem {
 	Node node;
 	boolean translate;
 	String trgPointer;
-	String idPointer;
+	String idValue;
 	String locNote;
 	boolean preserveWS;
+	String domain;
 
 	public ContextItem (Node node,
 		ITraversal trav)
@@ -39,9 +40,10 @@ class ContextItem {
 		// Context is always an element node
 		this.translate = trav.translate();
 		this.trgPointer = trav.getTargetPointer();
-		this.idPointer = trav.getIdValue();
+		this.idValue = trav.getIdValue();
 		this.locNote = trav.getNote();
 		this.preserveWS = trav.preserveWS();
+		this.domain = trav.getDomain();
 	}
 
 }

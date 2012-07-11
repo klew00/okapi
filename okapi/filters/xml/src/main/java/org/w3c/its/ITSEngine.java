@@ -24,6 +24,8 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Stack;
 
 import javax.xml.namespace.QName;
@@ -42,8 +44,8 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-public class ITSEngine implements IProcessor, ITraversal  
-{
+public class ITSEngine implements IProcessor, ITraversal {
+
 	public static final String    ITS_VERSION1 = "1.0";
 	public static final String    ITS_VERSION2 = "2.0";
 	
@@ -58,9 +60,12 @@ public class ITSEngine implements IProcessor, ITraversal
 	
 	private static final String   FLAGNAME            = "\u00ff";
 	private static final String   FLAGSEP             = "\u001c";
-	// Must have +FLAGSEP as many time as there are FP_XXX_DATA entries +1
-	private static final String   FLAGDEFAULTDATA     = "???????"+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP;
+	
+	// Must have '?' as many times as there are FP_XXX entries +1
+	// Must have +FLAGSEP as many times as there are FP_XXX_DATA entries +1
+	private static final String   FLAGDEFAULTDATA     = "????????"+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP;
 
+	// Indicator position
 	private static final int      FP_TRANSLATE        = 0;
 	private static final int      FP_DIRECTIONALITY   = 1;
 	private static final int      FP_WITHINTEXT       = 2;
@@ -68,12 +73,15 @@ public class ITSEngine implements IProcessor, ITraversal
 	private static final int      FP_LOCNOTE          = 4;
 	private static final int      FP_PRESERVEWS       = 5;
 	private static final int      FP_LANGINFO         = 6;
+	private static final int      FP_DOMAIN           = 7;
 	
+	// Data position 
 	private static final int      FP_TERMINOLOGY_DATA      = 0;
 	private static final int      FP_LOCNOTE_DATA          = 1;
 	private static final int      FP_LANGINFO_DATA         = 2;
 	private static final int      FP_TRGPOINTER_DATA       = 3;
 	private static final int      FP_IDVALUE_DATA          = 4;
+	private static final int      FP_DOMAIN_DATA           = 5;
 	
 	private static final int      TERMINFOTYPE_POINTER     = 1;
 	private static final int      TERMINFOTYPE_REF         = 2;
@@ -265,6 +273,9 @@ public class ITSEngine implements IProcessor, ITraversal
 					else if ( "idValueRule".equals(ruleElem.getLocalName()) ) {
 						compileIdValueRule(ruleElem, isInternal);
 					}
+					else if ( "domainRule".equals(ruleElem.getLocalName()) ) {
+						compileDomainRule(ruleElem, isInternal);
+					}
 					else if ( "param".equals(ruleElem.getLocalName()) ) {
 						processParam(ruleElem);
 					}
@@ -397,13 +408,103 @@ public class ITSEngine implements IProcessor, ITraversal
 		rule.isInternal = isInternal;
 			
 		String value = elem.getAttribute("idValue");
-		if ( value.isEmpty() ){
+		if ( value.isEmpty() ) {
 			throw new ITSException("Invalid value for 'idValue'.");
 		}
 		rule.idValue = value;
 		rules.add(rule);
 	}
 
+	private void compileDomainRule (Element elem,
+		boolean isInternal)
+	{
+		ITSRule rule = new ITSRule(IProcessor.DC_DOMAIN);
+		rule.selector = elem.getAttribute("selector");
+		rule.isInternal = isInternal;
+				
+		String pointer = elem.getAttribute("domainPointer");
+		if ( pointer.isEmpty() ) {
+			throw new ITSException("Invalid value for 'domainPointer'.");
+		}
+		rule.info = pointer;
+
+		// Process domainMapping attribute if it's there
+		rule.map = fromStringToMap(elem.getAttribute("domainMapping"));
+
+		// Add the rule
+		rules.add(rule);
+	}
+
+	/**
+	 * Converts a string like domainMapping to a map.
+	 * @param mapping the string to process.
+	 * @return the map for the given string, or null if there is no values. 
+	 */
+	private Map<String, String> fromStringToMap (String mapping) {
+		if ( mapping.isEmpty() ) return null;
+		
+		Map<String, String> map = null;
+
+		if ( !mapping.isEmpty() ) {
+			// Parse the list of paired values
+			// Split list on commas
+			String[] pairs = mapping.split(",", 0);
+			// Split the pairs
+			char endQuote = 0x00; int state = 0;
+			for ( String pair : pairs ) {
+				pair = pair.trim();
+				StringBuilder left = new StringBuilder();
+				StringBuilder right = new StringBuilder();
+				StringBuilder str = left;
+				for ( int i=0; i<pair.length(); i++ ) {
+					char ch = pair.charAt(i);
+					switch ( ch ) {
+					case '\"':
+						if ( state == 0 )  {
+							endQuote = ch;
+							state = 1;
+						}
+						else {
+							if ( ch == endQuote ) state = 0; // End of string
+							else str.append(ch); // Else: we store
+						}
+						continue;
+					case '\'':
+						if ( state == 0 )  {
+							endQuote = ch;
+							state = 1;
+						}
+						else {
+							if ( ch == endQuote ) state = 0; // End of string
+							else str.append(ch); // Else: we store
+						}
+						continue;
+					case ' ':
+						// If it's a space inside a quoted string: we add to the string
+						// Otherwise it we change to the right side value
+						if ( state == 1 ) str.append(' ');
+						else str = right;
+						continue;
+					default:
+						str.append(pair.charAt(i));
+						break;
+					}
+				}
+				
+				if (( left.length() == 0 ) || ( right.length() == 0 )) {
+					throw new ITSException("Invalid pair in mapping value.");
+				}
+				
+				if ( map == null ) {
+					map = new LinkedHashMap<String, String>();
+				}
+				map.put(left.toString(), right.toString());
+			}
+		}
+		
+		return map;
+	}
+	
 	private void compileTermRule (Element elem,
 		boolean isInternal)
 	{
@@ -609,7 +710,12 @@ public class ITSEngine implements IProcessor, ITraversal
 			trace.peek().translate = (data.charAt(FP_TRANSLATE) == 'y');
 			trace.peek().targetPointer = getFlagData(data, FP_TRGPOINTER_DATA);
 		}
+		
 		trace.peek().idValue = getFlagData(data, FP_IDVALUE_DATA);
+		
+		if ( data.charAt(FP_DOMAIN) != '?' ) {
+			trace.peek().domain = getFlagData(data, FP_DOMAIN_DATA);
+		}
 		
 		if ( data.charAt(FP_DIRECTIONALITY) != '?' ) {
 			switch ( data.charAt(FP_DIRECTIONALITY) ) {
@@ -709,7 +815,7 @@ public class ITSEngine implements IProcessor, ITraversal
 						if ( rule.infoType == TRANSLATE_TRGPOINTER ) {
 							setFlag(NL.item(i), FP_TRGPOINTER_DATA, rule.info, true);							
 						}
-						if ( rule.idValue != null ) {
+						if ( rule.idValue != null ) { // For deprecated extension
 							setFlag(NL.item(i), FP_IDVALUE_DATA, resolveExpression(NL.item(i), rule.idValue), true);							
 						}
 						setFlag(NL.item(i), FP_PRESERVEWS, (rule.preserveWS ? 'y' : '?'), true);
@@ -764,9 +870,22 @@ public class ITSEngine implements IProcessor, ITraversal
 						break;
 						
 					case IProcessor.DC_IDVALUE:
+						// For new ITS 2.0 rule, but deprecated extension still supported in DC_TRANSLATE case
 						if ( rule.idValue != null ) {
 							setFlag(NL.item(i), FP_IDVALUE_DATA, resolveExpression(NL.item(i), rule.idValue), true);							
 						}
+						break;
+						
+					case IProcessor.DC_DOMAIN:
+						setFlag(NL.item(i), FP_DOMAIN, 'y', true);
+						String value = resolveExpression(NL.item(i), rule.info);
+						// Check if we have a mapping for this rule
+						if ( rule.map != null ) {
+							if ( rule.map.containsKey(value) ) {
+								value = rule.map.get(value);
+							}
+						}
+						setFlag(NL.item(i), FP_DOMAIN_DATA, value, true);
 						break;
 					}
 				}
@@ -1124,6 +1243,18 @@ public class ITSEngine implements IProcessor, ITraversal
 		if ( (tmp = (String)attribute.getUserData(FLAGNAME)) == null ) return null;
 		if ( tmp.charAt(FP_LOCNOTE) != 'y' ) return null;
 		return getFlagData(tmp, FP_LOCNOTE_DATA);
+	}
+
+	public String getDomain () {
+		return trace.peek().domain;
+	}
+	
+	public String getDomain (Attr attribute) {
+		if ( attribute == null ) return null;
+		String tmp;
+		if ( (tmp = (String)attribute.getUserData(FLAGNAME)) == null ) return null;
+		if ( tmp.charAt(FP_DOMAIN) != 'y' ) return null;
+		return getFlagData(tmp, FP_DOMAIN_DATA);
 	}
 
 	public boolean preserveWS () {

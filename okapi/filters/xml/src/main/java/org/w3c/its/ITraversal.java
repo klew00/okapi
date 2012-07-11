@@ -77,8 +77,8 @@ public interface ITraversal {
 	public String getTargetPointer ();
 	
 	/**
-	 * Gets the id value for the current element of the traversal. This method
-	 * is used for an extension to ITS 1.0.
+	 * Gets the id value for the current element of the traversal.
+	 * This method is used for both the ITS 2.0 feature and the deprecated extension to ITS 1.0.
 	 * @return The value of the identifier for this node.
 	 */
 	public String getIdValue ();
@@ -129,19 +129,36 @@ public interface ITraversal {
 	/**
 	 * Gets the localization notes of the current element of the traversal, or null
 	 * if the node has no localization notes.
-	 * @return The localization note of the current element, or null if the
+	 * @return the localization note of the current element, or null if the
 	 * node has no localization note.
 	 */
 	public String getNote ();
 	
 	/**
-	 * Get the localization note of the given attribute of the current element.
-	 * @param attribute The attribute to query. The attribute must be in the current
+	 * Gets the localization note of the given attribute of the current element.
+	 * @param attribute the attribute to query. The attribute must be in the current
 	 * node of the traversal.
 	 * @return The localization note of the attribute, or null if the
 	 * attribute has no localization note.
 	 */
 	public String getNote (Attr attribute);
+	
+	/**
+	 * Gets the domain of the current element of the traversal, or null
+	 * if the node has no domain.
+	 * @return the domain of the current element of the traversal, or null
+	 * if the node has no domain.
+	 */
+	public String getDomain ();
+	
+	/**
+	 * Gets the domain of the given attribute of the current element.
+	 * @param attribute the attribute to query. the attribute must be in the current
+	 * node of the traversal.
+	 * @return the domain of the given attribute of the current element, or null if the
+	 * attribute has no domain.
+	 */
+	public String getDomain (Attr attribute);
 
 	/**
 	 * Indicates if the white spaces of the current element of the traversal

@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2010 by the Okapi Framework contributors
+  Copyright (C) 2008-2012 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -33,8 +33,10 @@ class ITSTrace {
 	String language;
 	String targetPointer;
 	String idValue;
+	String domain;
 
 	ITSTrace () {
+		// Default constructor
 	}
 	
 	ITSTrace (ITSTrace initialTrace,
@@ -48,11 +50,11 @@ class ITSTrace {
 		
 		// withinText: No inheritance
 		
-		// term : No inheritance
+		// term: No inheritance
 		
 		// target: No inheritance
 		
-		// locnote: Inheritance for child elements but not attributes
+		// locNote: Inheritance for child elements including attributes
 		locNote = initialTrace.locNote;
 		
 		// preserveWS: Inheritance for child elements but not attributes
@@ -60,6 +62,11 @@ class ITSTrace {
 	
 		// language: Inheritance for child element including attributes 
 		language = initialTrace.language;
+		
+		// idValue: No inheritance
+		
+		// domain: Inheritance for child elements including attributes
+		domain = initialTrace.domain;
 		
 		this.isChildDone = isChildDone;
 	}
