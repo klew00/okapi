@@ -57,7 +57,11 @@ public enum StepParameterType {
 
 	/**
 	 * Target locale.
+	 * 
+	 * @deprecated The single target locale annotation will be removed in the near future (M18, M19 or M20).
+	 * Use <code>TARGET_LOCALES</code> instead, to retrieve the target locale list.
 	 */
+	@Deprecated
 	TARGET_LOCALE,
 
 	/**
