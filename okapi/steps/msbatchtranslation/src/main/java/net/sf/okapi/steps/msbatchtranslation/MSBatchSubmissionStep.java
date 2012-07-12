@@ -110,7 +110,8 @@ public class MSBatchSubmissionStep extends BasePipelineStep {
 		// Initialize the engine
 		conn = new MicrosoftMTConnector();
 		net.sf.okapi.connectors.microsoft.Parameters prm = (net.sf.okapi.connectors.microsoft.Parameters)conn.getParameters();
-		prm.setAppId(params.getAppId());
+		prm.setClientId(params.getClientId());
+		prm.setSecret(params.getSecret());
 		conn.setLanguages(sourceLocale, targetLocale);
 
 		return event;

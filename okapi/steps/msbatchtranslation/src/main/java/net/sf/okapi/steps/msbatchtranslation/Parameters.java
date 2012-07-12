@@ -35,7 +35,9 @@ import net.sf.okapi.common.uidescription.TextLabelPart;
 @EditorFor(Parameters.class)
 public class Parameters extends BaseParameters implements IEditorDescriptionProvider {
 
-	private static final String APPID = "appId";
+	private static final String CLIENTID = "clientId";
+	private static final String SECRET = "secret";
+	private static final String CATEGORY = "category";
 	private static final String ANNOTATE = "annotate";
 	private static final String MAKETMX = "makeTmx";
 	private static final String TMXPATH = "tmxPath";
@@ -47,7 +49,9 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	private static final String FILLTARGETTHRESHOLD = "fillTargetThreshold";
 	private static final String ONLYWHENWITHOUTCANDIDATE = "onlyWhenWithoutCandidate";
 	
-	private String appId;
+	private String clientId;
+	private String secret;
+	private String category;
 	private String tmxPath;
 	private boolean markAsMT;
 	private int maxEvents;
@@ -72,7 +76,9 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	public void fromString (String data) {
 		reset();
 		buffer.fromString(data);
-		appId = buffer.getEncodedString(APPID, appId);
+		clientId = buffer.getEncodedString(CLIENTID, clientId);
+		secret = buffer.getEncodedString(SECRET, secret);
+		category = buffer.getEncodedString(CATEGORY, category);
 		tmxPath = buffer.getString(TMXPATH, tmxPath);
 		markAsMT = buffer.getBoolean(MARKASMT, markAsMT);
 		maxEvents = buffer.getInteger(MAXEVENTS, maxEvents);
@@ -88,7 +94,9 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	@Override
 	public void reset () {
 		// Default
-		appId = "";
+		clientId = "";
+		secret = "";
+		category = "";
 		tmxPath = "${rootDir}/tmFromMS.tmx";
 		markAsMT = true;
 		maxEvents = 20;
@@ -104,7 +112,9 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	@Override
 	public String toString () {
 		buffer.reset();
-		buffer.setEncodedString(APPID, appId);
+		buffer.setString(CLIENTID,clientId);
+		buffer.setEncodedString(SECRET, secret);
+		buffer.setEncodedString(CATEGORY, category);
 		buffer.setString(TMXPATH, tmxPath);
 		buffer.setBoolean(MARKASMT, markAsMT);
 		buffer.setInteger(MAXEVENTS, maxEvents);
@@ -174,12 +184,28 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		this.tmxPath = tmxPath;
 	}
 
-	public String getAppId () {
-		return appId;
+	public String getClientId () {
+		return clientId;
 	}
 
-	public void setAppId (String appId) {
-		this.appId = appId;
+	public void setClientId (String clientId) {
+		this.clientId = clientId;
+	}
+	
+	public String getSecret () {
+		return secret;
+	}
+
+	public String getCategory () {
+		return category;
+	}
+
+	public void setSecret (String secret) {
+		this.secret = secret;
+	}
+	
+	public void setCategory (String category) {
+		this.category = category;
 	}
 	
 	public boolean getMakeTmx () {
@@ -209,7 +235,9 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	@Override
 	public ParametersDescription getParametersDescription () {
 		ParametersDescription desc = new ParametersDescription(this);
-		desc.add(APPID, "Application ID", "Application ID for the account to use");
+		desc.add(CLIENTID, "Client ID", "Client ID in Microsoft Azure Marketplace");
+		desc.add(SECRET, "Client Secret", "Client Secret from Microsoft Azure Marketplace");
+		desc.add(CATEGORY, "Category", "Category code if accessing a trained system");
 		desc.add(MAXEVENTS, "Events buffer", "Number of events to store before sending a query");
 		desc.add(MAXMATCHES, "Maximum matches", "Maximum number of matches allowed");
 		desc.add(THRESHOLD, "Threshold", "Score below which matches are not retained");
@@ -232,9 +260,16 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		SeparatorPart sp = desc.addSeparatorPart();
 		sp.setVertical(true);
 		
-		TextInputPart tip = desc.addTextInputPart(paramsDesc.get(APPID));
-		tip.setPassword(true);
+		TextInputPart tip = desc.addTextInputPart(paramsDesc.get(CLIENTID));
+		tip.setPassword(false);
 		
+		tip = desc.addTextInputPart(paramsDesc.get(SECRET));
+		tip.setPassword(true);
+
+		tip = desc.addTextInputPart(paramsDesc.get(CATEGORY));
+		tip.setAllowEmpty(true);
+		tip.setPassword(false);
+
 		sp = desc.addSeparatorPart();
 		sp.setVertical(true);
 		

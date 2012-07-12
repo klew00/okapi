@@ -28,56 +28,90 @@ import net.sf.okapi.common.uidescription.TextInputPart;
 
 public class Parameters extends BaseParameters implements IEditorDescriptionProvider {
 
-	private static final String APPID = "appId";
+	private static final String CLIENTID = "clientId";
+	private static final String SECRET = "secret";
+	private static final String CATEGORY = "category";
 	
-	private String appId;
+	private String clientId="";
+	private String secret="";
+	private String category="";
 	
 	public Parameters () {
 		reset();
 		toString();
 	}
 	
-	public String getAppId () {
-		return appId;
+	public String getClientId () {
+		return clientId;
 	}
 
-	public void setAppId (String appId) {
-		this.appId = appId;
+	public void setClientId (String clientId) {
+		this.clientId = clientId;
+	}
+
+	public String getSecret () {
+		return secret;
+	}
+
+	public void setSecret (String secret) {
+		this.secret = secret;
+	}
+
+	public String getCategory () {
+		return category;
+	}
+
+	public void setCategory (String category) {
+		this.category = category;
 	}
 
 	@Override
 	public void fromString (String data) {
 		reset();
 		buffer.fromString(data);
-		appId = buffer.getEncodedString(APPID, appId);
+		clientId = buffer.getEncodedString(CLIENTID, clientId);
+		secret = buffer.getEncodedString(CLIENTID, secret);
+		category = buffer.getEncodedString(CLIENTID, category);
 	}
 
 	@Override
 	public void reset () {
 		// Default for tests
-		appId = "";
+		clientId = "";
+		secret = "";
+		category = "";
 	}
 
 	@Override
 	public String toString () {
 		buffer.reset();
-		buffer.setEncodedString(APPID, appId);
+		buffer.setEncodedString(CLIENTID, clientId);
+		buffer.setEncodedString(SECRET, secret);
+		buffer.setEncodedString(CATEGORY, clientId);
 		return buffer.toString();
 	}
 
 	@Override
 	public ParametersDescription getParametersDescription () {
 		ParametersDescription desc = new ParametersDescription(this);
-		desc.add(APPID,
-			"Application ID (See http://www.bing.com/developers/appids.aspx)", "The AppID to identify the application/user");
+		desc.add(CLIENTID,
+			"Client ID (See http://msdn.microsoft.com/en-us/library/hh454950.aspx)", "The ClientID to identify the user");
+		desc.add(SECRET,
+				"Secret (See http://msdn.microsoft.com/en-us/library/hh454950.aspx)", "A code obtained from Microsoft Azure after payment");
+		desc.add(CATEGORY,
+				"Category (See http://hub.microsofttranslator.com", "A category code for an MT system trained by user data, if any");
 		return desc;
 	}
 
 	@Override
 	public EditorDescription createEditorDescription (ParametersDescription paramsDesc) {
 		EditorDescription desc = new EditorDescription("Microsoft MT Connector Settings", true, false);
-		TextInputPart tip = desc.addTextInputPart(paramsDesc.get(APPID));
+		TextInputPart tip = desc.addTextInputPart(paramsDesc.get(CLIENTID));
 		tip.setPassword(true);
+		TextInputPart tip2 = desc.addTextInputPart(paramsDesc.get(SECRET));
+		tip2.setPassword(true);
+		TextInputPart tip3 = desc.addTextInputPart(paramsDesc.get(CATEGORY));
+		tip3.setPassword(true);
 		return desc;
 	}
 

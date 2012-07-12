@@ -33,11 +33,15 @@ import net.sf.okapi.common.uidescription.TextLabelPart;
 @EditorFor(SubmissionParameters.class)
 public class SubmissionParameters extends BaseParameters implements IEditorDescriptionProvider {
 
-	private static final String APPID = "appId";
+	private static final String CLIENTID = "clientId";
+	private static final String SECRET = "secret";
+	private static final String CATEGORY = "category";
 	private static final String BATCHSIZE = "batchSize";
 	private static final String RATING = "rating";
 	
-	private String appId;
+	private String clientId;
+	private String secret;
+	private String category;
 	private int batchSize;
 	private int rating;
 	
@@ -54,7 +58,9 @@ public class SubmissionParameters extends BaseParameters implements IEditorDescr
 	public void fromString (String data) {
 		reset();
 		buffer.fromString(data);
-		appId = buffer.getEncodedString(APPID, appId);
+		clientId = buffer.getEncodedString(CLIENTID, clientId);
+		secret = buffer.getEncodedString(SECRET, secret);
+		category = buffer.getEncodedString(CATEGORY, category);
 		batchSize = buffer.getInteger(BATCHSIZE, batchSize);
 		rating = buffer.getInteger(RATING, rating);
 	}
@@ -62,7 +68,9 @@ public class SubmissionParameters extends BaseParameters implements IEditorDescr
 	@Override
 	public void reset () {
 		// Default
-		appId = "";
+		clientId = "";
+		secret = "";
+		category = "";
 		batchSize = 80;
 		rating = 4;
 	}
@@ -70,7 +78,9 @@ public class SubmissionParameters extends BaseParameters implements IEditorDescr
 	@Override
 	public String toString () {
 		buffer.reset();
-		buffer.setEncodedString(APPID, appId);
+		buffer.setEncodedString(CLIENTID, clientId);
+		buffer.setEncodedString(SECRET, secret);
+		buffer.setEncodedString(CATEGORY, category);
 		buffer.setInteger(BATCHSIZE, batchSize);
 		buffer.setInteger(RATING, rating);
 		return buffer.toString();
@@ -91,18 +101,37 @@ public class SubmissionParameters extends BaseParameters implements IEditorDescr
 	public void setRating (int rating) {
 		this.rating = rating;
 	}
-	public String getAppId () {
-		return appId;
+
+	public String getClientId () {
+		return clientId;
 	}
 
-	public void setAppId (String appId) {
-		this.appId = appId;
+	public String getSecret () {
+		return secret;
+	}
+
+	public String getCategory () {
+		return category;
+	}
+
+	public void setClientId (String clientId) {
+		this.clientId = clientId;
+	}
+
+	public void setSecret (String secret) {
+		this.secret = secret;
+	}
+
+	public void setCategory (String category) {
+		this.category = category;
 	}
 
 	@Override
 	public ParametersDescription getParametersDescription () {
 		ParametersDescription desc = new ParametersDescription(this);
-		desc.add(APPID, "Application ID", "Application ID for the account to use");
+		desc.add(CLIENTID, "Client ID", "Client ID in Microsoft Azure Marketplace");
+		desc.add(SECRET, "Client Secret", "Client Secret from Microsoft Azure Marketplace");
+		desc.add(CATEGORY, "Category", "Category code if accessing a trained system");
 		desc.add(BATCHSIZE, "Batch size", "Number of segments to send in each batch");
 		desc.add(RATING, "Default rating", "Default rating to use for if one is not provided with the translated segment");
 		return desc;
@@ -117,8 +146,15 @@ public class SubmissionParameters extends BaseParameters implements IEditorDescr
 		SeparatorPart sp = desc.addSeparatorPart();
 		sp.setVertical(true);
 
-		TextInputPart tip = desc.addTextInputPart(paramsDesc.get(APPID));
+		TextInputPart tip = desc.addTextInputPart(paramsDesc.get(CLIENTID));
+		tip.setPassword(false);
+
+		tip = desc.addTextInputPart(paramsDesc.get(SECRET));
 		tip.setPassword(true);
+
+		tip = desc.addTextInputPart(paramsDesc.get(CATEGORY));
+		tip.setAllowEmpty(true);
+		tip.setPassword(false);
 
 		sp = desc.addSeparatorPart();
 		sp.setVertical(true);
