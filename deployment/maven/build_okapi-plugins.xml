@@ -57,6 +57,27 @@
 
 	<!-- Make the zip files -->
 	<target name="makeZips"> 
+		<!-- ============== okapi-steps-tradosutils -->
+		<delete includeEmptyDirs="true" failonerror="false">
+			<fileset dir="${tmp}"/>
+		</delete>
+		<mkdir dir="${tmp}"/>
+
+		<property name="plg001" value="okapiTradosUtilities-${okapilibStamp}"/>
+		<property name="jacobVersion" value="1.14.3"/>
+		<property name="jacobJar" value="jacob-${jacobVersion}.jar"/>
+	
+		<jar destfile="${tmp}/${plg001}.jar">
+			<manifest>
+				<attribute name="Class-Path" value="${jacobJar}" />
+			</manifest>
+			<fileset dir="../../okapi/steps/tradosutils/target/classes" includes="net/**" />
+		</jar>
+
+		<copy todir="${tmp}" file="${mavenStore}/net/sf/jacob-project/jacob/${jacobVersion}/${jacobJar}"/>
+		<copy todir="${tmp}" file="data/okapi-plugins/jacob-${jacobVersion}-x86.dll" overwrite="true"/>
+		<copy todir="${tmp}" file="data/okapi-plugins/jacob-${jacobVersion}-x64.dll" overwrite="true"/>
+		<zip destfile="${dist_plugins}/${plg001}.zip" basedir="${tmp}"/>
 
 		<!-- ============== okapi-step-xmlvalidation -->
 <!--		<property name="plg001" value="okapi-step-xmlvalidation-${okapilibStamp}"/>

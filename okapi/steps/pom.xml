@@ -47,5 +47,6 @@
 		<module>repetitionanalysis</module>
 		<module>gttbatchtranslation</module>
 		<module>msbatchtranslation</module>
+		<module>tradosutils</module>
     </modules>
 </project>

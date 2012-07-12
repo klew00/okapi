@@ -1,11 +1,11 @@
 <?xml version="1.0"?>
 <pluginsDeployment>
 
-<!-- <plugin name="okapi-step-simplekit-@version@"
-  helpURL="http://www.opentag.com/okapi/wiki/index.php?title=Translation Package Creation Step"
+<plugin name="okapiTradosUtilities-@version@"
+  helpURL="http://www.opentag.com/okapi/wiki/index.php?title=Trados_Utilities_Plugin"
   provider="Okapi Framework">
-  <description>ALPHA - Test only - Creates translation packages.</description>
+  <description>ALPHA - Test only - Trados utilities.
+Those steps are for Windows 32/64-bit and require Trados 7.x or 2007.</description>
  </plugin>
--->
 
 </pluginsDeployment>
