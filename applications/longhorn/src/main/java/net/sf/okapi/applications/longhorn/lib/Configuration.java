@@ -49,7 +49,7 @@ public class Configuration {
 	public Configuration(String workingDir) {
 		workingDir = workingDir.replace("\\", File.separator);
 		workingDir = workingDir.replace("/", File.separator);
-		this.workingDirectory = workingDir;
+		workingDirectory = workingDir;
 	}
 	
 	public Configuration(InputStream confXml) {

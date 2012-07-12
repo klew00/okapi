@@ -20,6 +20,9 @@
 
 package net.sf.okapi.steps.segmentation;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import net.sf.okapi.common.Event;
@@ -32,9 +35,9 @@ import net.sf.okapi.common.Util;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
 import net.sf.okapi.common.pipeline.annotations.StepParameterMapping;
 import net.sf.okapi.common.pipeline.annotations.StepParameterType;
+import net.sf.okapi.common.resource.ISegments;
 import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.Segment;
-import net.sf.okapi.common.resource.ISegments;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextPart;
 import net.sf.okapi.lib.segmentation.SRXDocument;
@@ -47,9 +50,9 @@ public class SegmentationStep extends BasePipelineStep {
 
 	private Parameters params;
 	private ISegmenter srcSeg;
-	private ISegmenter trgSeg;
+	private Map<LocaleId, ISegmenter> trgSegs;
 	private LocaleId sourceLocale;
-	private LocaleId targetLocale;
+	private List<LocaleId> targetLocales;
 	private boolean initDone;
 	private String rootDir;
 	private String inputRootDir;
@@ -57,6 +60,7 @@ public class SegmentationStep extends BasePipelineStep {
 	public SegmentationStep () {
 		params = new Parameters();
 		srcSeg = null;
+		trgSegs = new HashMap<LocaleId, ISegmenter>();
 	}
 	
 	@StepParameterMapping(parameterType = StepParameterType.SOURCE_LOCALE)
@@ -64,9 +68,9 @@ public class SegmentationStep extends BasePipelineStep {
 		this.sourceLocale = sourceLocale;
 	}
 	
-	@StepParameterMapping(parameterType = StepParameterType.TARGET_LOCALE)
-	public void setTargetLocale (LocaleId targetLocale) {
-		this.targetLocale = targetLocale;
+	@StepParameterMapping(parameterType = StepParameterType.TARGET_LOCALES)
+	public void setTargetLocales (List<LocaleId> targetLocales) {
+		this.targetLocales = targetLocales;
 	}
 	
 	@StepParameterMapping(parameterType = StepParameterType.ROOT_DIRECTORY)
@@ -145,7 +149,10 @@ public class SegmentationStep extends BasePipelineStep {
 				srxDoc.setTrimTrailingWhitespaces(params.trimTrgTrailingWS==Parameters.TRIM_YES);
 			}
 			// Instantiate the segmenter
-			trgSeg = srxDoc.compileLanguageRules(targetLocale, null);
+			for(LocaleId targetLocale : targetLocales) {
+				ISegmenter trgSeg = srxDoc.compileLanguageRules(targetLocale, null);
+				trgSegs.put(targetLocale, trgSeg);
+			}
 		}		
 		
 		return event;
@@ -186,43 +193,46 @@ public class SegmentationStep extends BasePipelineStep {
 			}
 		}
 		
-		if (targetLocale != null) {
-			TextContainer trgCont = tu.getTarget(targetLocale);
-	
-			// Segment target if requested
-			if ( params.segmentTarget && ( trgCont != null )) {
-				if ( params.getSegmentationStrategy() == SegmStrategy.OVERWRITE_EXISTING ||
-						!trgCont.hasBeenSegmented() ) {
-					trgSeg.computeSegments(trgCont);
-					trgCont.getSegments().create(trgSeg.getRanges());
+		if (targetLocales != null) {
+			for(LocaleId targetLocale : targetLocales) {
+				TextContainer trgCont = tu.getTarget(targetLocale);
+				ISegmenter trgSeg = trgSegs.get(targetLocale);
+		
+				// Segment target if requested
+				if ( params.segmentTarget && ( trgCont != null )) {
+					if ( params.getSegmentationStrategy() == SegmStrategy.OVERWRITE_EXISTING ||
+							!trgCont.hasBeenSegmented() ) {
+						trgSeg.computeSegments(trgCont);
+						trgCont.getSegments().create(trgSeg.getRanges());
+					}
+					else if (params.getSegmentationStrategy() == SegmStrategy.DEEPEN_EXISTING) {
+						// Has been segmented or not (if unsegmented, it's still 1 segment)
+						deepenSegmentation(trgCont, trgSeg);
+					}
 				}
-				else if (params.getSegmentationStrategy() == SegmStrategy.DEEPEN_EXISTING) {
-					// Has been segmented or not (if unsegmented, it's still 1 segment)
-					deepenSegmentation(trgCont, trgSeg);
+				
+				// Make sure we have target content if needed, segmentation is incurred by the variant source 
+				if ( params.copySource ) {
+					trgCont = tu.createTarget(targetLocale, false, IResource.COPY_ALL);
 				}
-			}
-			
-			// Make sure we have target content if needed, segmentation is incurred by the variant source 
-			if ( params.copySource ) {
-				trgCont = tu.createTarget(targetLocale, false, IResource.COPY_ALL);
-			}
-	
-			// If requested, verify that we have one-to-one match
-			// This is needed only if we do have a target
-			if ( params.checkSegments && ( trgCont != null)) {
-				if ( trgCont.getSegments().count() != tu.getSource().getSegments().count() ) {
-					// Not the same number of segments
-					logger.warning(String.format("Text unit id='%s': Source and target do not have the same number of segments.",
-						tu.getId()));
-				}
-				// Otherwise make sure we have matches
-				else {
-					ISegments trgSegs = trgCont.getSegments();
-					for ( Segment seg : tu.getSource().getSegments() ) {
-						if ( trgSegs.get(seg.id) == null ) {
-							// No target segment matching source segment seg.id
-							logger.warning(String.format("Text unit id='%s': No target match found for source segment id='%s'",
-								tu.getId(), seg.id));
+		
+				// If requested, verify that we have one-to-one match
+				// This is needed only if we do have a target
+				if ( params.checkSegments && ( trgCont != null)) {
+					if ( trgCont.getSegments().count() != tu.getSource().getSegments().count() ) {
+						// Not the same number of segments
+						logger.warning(String.format("Text unit id='%s': Source (%s) and target (%s) do not have the same number of segments.",
+							tu.getId(), sourceLocale, targetLocale));
+					}
+					// Otherwise make sure we have matches
+					else {
+						ISegments trgSegs = trgCont.getSegments();
+						for ( Segment seg : tu.getSource().getSegments() ) {
+							if ( trgSegs.get(seg.id) == null ) {
+								// No target segment matching source segment seg.id
+								logger.warning(String.format("Text unit id='%s': No match found for source segment id='%s' in target language '%s'",
+									tu.getId(), seg.id, targetLocale));
+							}
 						}
 					}
 				}

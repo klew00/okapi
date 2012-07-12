@@ -6,11 +6,13 @@ import static org.junit.Assert.assertTrue;
 
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
+import java.util.Arrays;
 
 import net.sf.okapi.common.ClassUtil;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.filterwriter.GenericContent;
 import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextContainer;
@@ -34,14 +36,19 @@ public class SegmentationStepTest {
 
 	private SegmentationStep segStep;
 	private Parameters params;
+	private GenericContent fmt;
 	
 	@Before
 	public void startUp() throws URISyntaxException {
+		fmt = new GenericContent();
 		segStep = new SegmentationStep();
 		segStep.setSourceLocale(LocaleId.ENGLISH);
-		segStep.setTargetLocale(LocaleId.FRENCH);
+		segStep.setTargetLocales(Arrays.asList(LocaleId.FRENCH, LocaleId.GERMAN));
 		params = (Parameters) segStep.getParameters();
-		params.setSourceSrxPath(this.getClass().getResource("/Test01.srx").toURI().getPath());
+		String srxFile = this.getClass().getResource("/Test01.srx").toURI().getPath();
+		params.setSourceSrxPath(srxFile);
+		params.setTargetSrxPath(srxFile);
+		params.segmentTarget = true;
 		segStep.handleStartBatchItem(new Event(EventType.START_BATCH_ITEM));
 	}
 	
@@ -160,6 +167,22 @@ public class SegmentationStepTest {
 		
 		assertEquals(" ", source.get(2).toString());
 		assertFalse(source.get(2).isSegment());
+	}
+	
+	@Test
+	public void testAllTargetsBecomeSegmented() {
+		ITextUnit tu1 = new TextUnit("tu1");
+		TextContainer source = tu1.getSource();
+		source.append(new Segment("seg1", new TextFragment("Part 1. Part 2.")));
+		TextContainer targetFr = tu1.createTarget(LocaleId.FRENCH, true, TextUnit.COPY_ALL);
+		TextContainer targetDe = tu1.createTarget(LocaleId.GERMAN, true, TextUnit.COPY_ALL);
+
+		params.setSegmentationStrategy(SegmStrategy.OVERWRITE_EXISTING);
+		segStep.handleTextUnit(new Event(EventType.TEXT_UNIT, tu1));
+
+		assertEquals("[Part 1.] [Part 2.]", fmt.printSegmentedContent(source, true));
+		assertEquals("[Part 1.] [Part 2.]", fmt.printSegmentedContent(targetFr, true));
+		assertEquals("[Part 1.] [Part 2.]", fmt.printSegmentedContent(targetDe, true));
 	}
 	
 	@Test

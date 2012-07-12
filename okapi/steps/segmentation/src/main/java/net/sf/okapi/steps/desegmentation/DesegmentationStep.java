@@ -20,6 +20,8 @@
 
 package net.sf.okapi.steps.desegmentation;
 
+import java.util.List;
+
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.LocaleId;
@@ -34,15 +36,15 @@ import net.sf.okapi.common.resource.TextContainer;
 public class DesegmentationStep extends BasePipelineStep {
 
 	private Parameters params;
-	private LocaleId targetLocale;
+	private List<LocaleId>  targetLocales;
 
 	public DesegmentationStep () {
 		params = new Parameters();
 	}
 	
-	@StepParameterMapping(parameterType = StepParameterType.TARGET_LOCALE)
-	public void setTargetLocale (LocaleId targetLocale) {
-		this.targetLocale = targetLocale;
+	@StepParameterMapping(parameterType = StepParameterType.TARGET_LOCALES)
+	public void setTargetLocales (List<LocaleId> targetLocales) {
+		this.targetLocales = targetLocales;
 	}
 	
 	@Override
@@ -79,11 +81,13 @@ public class DesegmentationStep extends BasePipelineStep {
 		}
 		
 		// Desegment target if needed
-		if ( params.getDesegmentTarget() ) {
-			TextContainer cont = tu.getTarget(targetLocale);
-			if ( cont != null ) {
-				if ( cont.hasBeenSegmented() ) {
-					cont.getSegments().joinAll();
+		if ( params.getDesegmentTarget() && targetLocales != null ) {
+			for(LocaleId targetLocale : targetLocales) {
+				TextContainer cont = tu.getTarget(targetLocale);
+				if ( cont != null ) {
+					if ( cont.hasBeenSegmented() ) {
+						cont.getSegments().joinAll();
+					}
 				}
 			}
 		}

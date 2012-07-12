@@ -51,15 +51,29 @@ public class RESTFile implements LonghornFile {
 	@Override
 	public InputStream openStream() {
 		try {
-			URI remoteFile = null;
-			switch (type) {
-				case input:
-					remoteFile = new URI(project.getProjectURI() + "/inputFiles/" + relativePath);
-					break;
-				case output:
-					remoteFile = new URI(project.getProjectURI() + "/outputFiles/" + relativePath);
-					break;
-			}
+			URI remoteFile = new URI(project.getProjectURI() + getPathRelativeToProject());
+			return remoteFile.toURL().openStream();
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+	
+	private String getPathRelativeToProject() {
+		switch (type) {
+		case input:
+			return "/inputFiles/" + relativePath;
+		case output:
+			return "/outputFiles/" + relativePath;
+		default: throw new RuntimeException("Illegal type: " + type);
+		}
+	}
+
+	@Override
+	public InputStream openStreamToZip() {
+		
+		try {
+			final URI remoteFile = new URI(project.getProjectURI() + "/outputFile.zip/" + relativePath + ".zip");
 			return remoteFile.toURL().openStream();
 		}
 		catch (Exception e) {
@@ -70,6 +84,11 @@ public class RESTFile implements LonghornFile {
 	@Override
 	public String getRelativePath() {
 		return relativePath;
+	}
+	
+	@Override
+	public String toString() {
+		return getPathRelativeToProject();
 	}
 
 }
