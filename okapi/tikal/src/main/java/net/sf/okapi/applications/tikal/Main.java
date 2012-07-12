@@ -160,6 +160,7 @@ public class Main {
 	protected String mosesToPath;
 	protected String skeletonDir;
 	protected String outputDir;
+	protected String rootDir = System.getProperty("user.dir");
 	
 	private FilterConfigurationMapper fcMapper;
 	private Hashtable<String, String> extensionsMap;
@@ -252,6 +253,9 @@ public class Main {
 				}
 				else if ( arg.equals("-sd") ) {
 					prog.skeletonDir = prog.getArgument(args, ++i);
+				}
+				else if ( arg.equals("-rd") ) {
+					prog.rootDir = prog.getArgument(args, ++i);
 				}
 				else if ( arg.equals("-x") ) {
 					prog.command = CMD_EXTRACT;
@@ -1102,8 +1106,8 @@ public class Main {
 		ps.println("      [-tl trgLang] [-seg [srxFile]] [-tt [hostname[:port]]|-mm [key]");
 		ps.println("      |-pen tmDirectory|-gs configFile|-apertium [configFile]");
 		ps.println("      |-ms configFile|-tda configFile|-gg configFile]");
-		ps.println("      [-maketmx [tmxFile]] [-opt threshold]");
-		ps.println("      [-od outputDirectory] [-nocopy] [-noalttrans]");
+		ps.println("      [-maketmx [tmxFile]] [-opt threshold] [-od outputDirectory]");
+		ps.println("      [-rd rootDirectory] [-nocopy] [-noalttrans]");
 		ps.println("Merges an XLIFF document back to its original format:");
 		ps.println("   -m xliffFile [xliffFile2...] [-fc configId] [-ie encoding] [-oe encoding]");
 		ps.println("      [-sd sourceDirectory] [-od outputDirectory]");
@@ -1112,17 +1116,17 @@ public class Main {
 		ps.println("   -t inputFile [inputFile2...] [-fc configId] [-ie encoding] [-oe encoding]");
 		ps.println("      [-sl srcLang] [-tl trgLang] [-seg [srxFile]] [-tt [hostname[:port]]");
 		ps.println("      |-mm [key]|-pen tmDirectory|-gs configFile|-apertium [configFile]");
-		ps.println("      |-ms configFile|-tda configFile|-gg configFile]");
+		ps.println("      |-ms configFile|-tda configFile|-gg configFile] [-rd rootDirectory]");
 		ps.println("      [-maketmx [tmxFile]] [-opt threshold]");
 		ps.println("Extracts a file to Moses InlineText:");
-		ps.println("   -xm inputFile [-fc configId] [-ie encoding] [-seg [srxFile]]");
-		ps.println("      [-sl srcLang] [-tl trgLang] [-2] [-to srcOutputFile]");
+		ps.println("   -xm inputFile [-fc configId] [-ie encoding] [-seg [srxFile]] [-2]");
+		ps.println("      [-sl srcLang] [-tl trgLang] [-to srcOutputFile] [-rd rootDirectory]");
 		ps.println("Leverages a file with Moses InlineText:");
 		ps.println("   -lm inputFile [-fc configId] [-ie encoding] [-oe encoding] [-sl srcLang]");
 		ps.println("      [-tl trgLang] [-seg [srxFile]] [-totrg|-overtrg] [-bpt]");
-		ps.println("      [-from mosesFile] [-to outputFile]");
+		ps.println("      [-from mosesFile] [-to outputFile] [-rd rootDirectory]");
 		ps.println("Segments a file:");
-		ps.println("   -s inputFile [-fc configId] [-ie encoding]");
+		ps.println("   -s inputFile [-fc configId] [-ie encoding] [-rd rootDirectory]");
 		ps.println("      [-sl srcLang] [-tl trgLang] [-seg [srxFile]]");
 		ps.println("Queries translation resources:");
 		ps.println("   -q \"source text\" [-sl srcLang] [-tl trgLang] [-opentran]");
@@ -1133,18 +1137,19 @@ public class Main {
 		ps.println("   -a \"source text\" \"target text\" [rating] [-sl srcLang] [-tl trgLang]");
 		ps.println("      -ms configFile");
 		ps.println("Converts to PO format:");
-		ps.println("   -2po inputFile [inputFile2...] [-fc configId] [-ie encoding] [-all]");
-		ps.println("      [-sl srcLang] [-tl trgLang] [-generic] [-trgsource|-trgempty]");
+		ps.println("   -2po inputFile [inputFile2...] [-fc configId] [-ie encoding] [-all] [-generic]");
+		ps.println("      [-sl srcLang] [-tl trgLang] [-trgsource|-trgempty] [-rd rootDirectory]");
 		ps.println("Converts to TMX format:");
-		ps.println("   -2tmx inputFile [inputFile2...] [-fc configId] [-ie encoding]");
-		ps.println("      [-sl srcLang] [-tl trgLang] [-trgsource|-trgempty] [-all]");
+		ps.println("   -2tmx inputFile [inputFile2...] [-fc configId] [-ie encoding] [-all]");
+		ps.println("      [-sl srcLang] [-tl trgLang] [-trgsource|-trgempty] [-rd rootDirectory]");
 		ps.println("Converts to table format:");
 		ps.println("   -2tbl inputFile [inputFile2...] [-fc configId] [-ie encoding]");
-		ps.println("      [-sl srcLang] [-tl trgLang] [-trgsource|-trgempty]");
-		ps.println("      [-csv|-tab] [-xliff|-xliffgx|-tmx|-generic] [-all]");
+		ps.println("      [-sl srcLang] [-tl trgLang] [-trgsource|-trgempty] [-csv|-tab]");
+		ps.println("      [-xliff|-xliffgx|-tmx|-generic] [-all] [-rd rootDirectory]");
 		ps.println("Imports to Pensieve TM:");
 		ps.println("   -imp tmDirectory inputFile [inputFile2...] [-fc configId] [-ie encoding]");
 		ps.println("      [-sl srcLang] [-tl trgLang] [-trgsource|-trgempty] [-all] [-over]");
+		ps.println("      [-rd rootDirectory]");
 		ps.println("Exports Pensieve TM as TMX:");
 		ps.println("   -exp tmDirectory1 [tmDirectory2...] [-sl srcLang] [-tl trgLang]");
 		ps.println("      [-trgsource|-trgempty] [-all]");
@@ -1362,8 +1367,7 @@ public class Main {
 		// Create the driver
 		PipelineDriver driver = new PipelineDriver();
 		driver.setFilterConfigurationMapper(fcMapper);
-		driver.setRootDirectories(System.getProperty("user.dir"),
-			Util.getDirectoryName(rd.getInputURI().getPath()));
+		driver.setRootDirectories(rootDir, Util.getDirectoryName(rd.getInputURI().getPath()));
 
 		RawDocumentToFilterEventsStep rd2feStep = new RawDocumentToFilterEventsStep();
 		driver.addStep(rd2feStep);
@@ -1473,8 +1477,7 @@ public class Main {
 		// Create the driver
 		PipelineDriver driver = new PipelineDriver();
 		driver.setFilterConfigurationMapper(fcMapper);
-		driver.setRootDirectories(System.getProperty("user.dir"),
-			Util.getDirectoryName(rd.getInputURI().getPath()));
+		driver.setRootDirectories(rootDir, Util.getDirectoryName(rd.getInputURI().getPath()));
 
 		// Raw document to filter events step 
 		RawDocumentToFilterEventsStep rd2feStep = new RawDocumentToFilterEventsStep();
@@ -1498,7 +1501,7 @@ public class Main {
 		writer.setCopySource(extOptCopy);
 		writer.setIncludeAltTrans(extOptAltTrans);
 		fewStep.setFilterWriter(writer);
-		fewStep.setDocumentRoots(System.getProperty("user.dir"));
+		fewStep.setDocumentRoots(rootDir);
 		driver.addStep(fewStep);
 
 		// Create the raw document and set the output
@@ -1526,8 +1529,7 @@ public class Main {
 		// Create the driver
 		PipelineDriver driver = new PipelineDriver();
 		driver.setFilterConfigurationMapper(fcMapper);
-		driver.setRootDirectories(System.getProperty("user.dir"),
-			Util.getDirectoryName(rd.getInputURI().getPath()));
+		driver.setRootDirectories(rootDir, Util.getDirectoryName(rd.getInputURI().getPath()));
 
 		// Raw document to filter events step 
 		RawDocumentToFilterEventsStep rd2feStep = new RawDocumentToFilterEventsStep();
@@ -1561,8 +1563,7 @@ public class Main {
 		// Create the driver
 		PipelineDriver driver = new PipelineDriver();
 		driver.setFilterConfigurationMapper(fcMapper);
-		driver.setRootDirectories(System.getProperty("user.dir"),
-			Util.getDirectoryName(rd.getInputURI().getPath()));
+		driver.setRootDirectories(rootDir, Util.getDirectoryName(rd.getInputURI().getPath()));
 		driver.addStep(new RawDocumentToFilterEventsStep());
 
 		// Add segmentation step if requested
@@ -1591,8 +1592,7 @@ public class Main {
 		// Create the driver
 		PipelineDriver driver = new PipelineDriver();
 		driver.setFilterConfigurationMapper(fcMapper);
-		driver.setRootDirectories(System.getProperty("user.dir"),
-			Util.getDirectoryName(rd.getInputURI().getPath()));
+		driver.setRootDirectories(rootDir, Util.getDirectoryName(rd.getInputURI().getPath()));
 
 		// Raw document to filter events step 
 		RawDocumentToFilterEventsStep rd2feStep = new RawDocumentToFilterEventsStep();
@@ -1635,8 +1635,7 @@ public class Main {
 		// Create the driver
 		PipelineDriver driver = new PipelineDriver();
 		driver.setFilterConfigurationMapper(fcMapper);
-		driver.setRootDirectories(System.getProperty("user.dir"),
-			Util.getDirectoryName(rd.getInputURI().getPath()));
+		driver.setRootDirectories(rootDir, Util.getDirectoryName(rd.getInputURI().getPath()));
 
 		// Raw document to filter events step 
 		RawDocumentToFilterEventsStep rd2feStep = new RawDocumentToFilterEventsStep();
