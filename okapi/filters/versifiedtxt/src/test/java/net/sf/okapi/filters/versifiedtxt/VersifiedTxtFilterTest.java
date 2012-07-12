@@ -244,36 +244,36 @@ public class VersifiedTxtFilterTest {
 		assertEquals("gh", tu.getName());
 		assertEquals(AlignmentStatus.ALIGNED, tu.getAlignedSegments().getAlignmentStatus(LocaleId.SPANISH));
 		assertEquals(2, tu.getSource().getSegments().count());
-		assertEquals("a record. ", tu.getSource().getFirstSegment().toString());
-		assertEquals("A RECORD. ", tu.getTarget(LocaleId.SPANISH).getFirstSegment().toString());
+		assertEquals("\ta record. ", tu.getSource().getFirstSegment().toString());
+		assertEquals("\tA RECORD. ", tu.getTarget(LocaleId.SPANISH).getFirstSegment().toString());
 		
 		tu = FilterTestDriver.getTextUnit(events, 2);
 		assertEquals("source", tu.getName());
 		assertEquals(AlignmentStatus.ALIGNED, tu.getAlignedSegments().getAlignmentStatus(LocaleId.SPANISH));
 		assertEquals(1, tu.getSource().getSegments().count());
-		assertEquals("Add a Source", tu.getSource().getFirstSegment().toString());
-		assertEquals("ADD A SOURCE", tu.getTarget(LocaleId.SPANISH).getFirstSegment().toString());
+		assertEquals("\u00a0Add a Source", tu.getSource().getFirstSegment().toString());
+		assertEquals("\u00a0ADD A SOURCE", tu.getTarget(LocaleId.SPANISH).getFirstSegment().toString());
 
 		tu = FilterTestDriver.getTextUnit(events, 3);
 		assertEquals("newsource", tu.getName());
 		assertEquals(AlignmentStatus.ALIGNED, tu.getAlignedSegments().getAlignmentStatus(LocaleId.SPANISH));
 		assertEquals(1, tu.getSource().getSegments().count());
-		assertEquals("Add a New Source", tu.getSource().getFirstSegment().toString());
-		assertEquals("ADD A NEW SOURCE", tu.getTarget(LocaleId.SPANISH).getFirstSegment().toString());
+		assertEquals("\u2014Add a New Source", tu.getSource().getFirstSegment().toString());
+		assertEquals("\u2014ADD A NEW SOURCE", tu.getTarget(LocaleId.SPANISH).getFirstSegment().toString());
 
 		tu = FilterTestDriver.getTextUnit(events, 4);
 		assertEquals("sourcelink", tu.getName());
 		assertEquals(AlignmentStatus.ALIGNED, tu.getAlignedSegments().getAlignmentStatus(LocaleId.SPANISH));
 		assertEquals(1, tu.getSource().getSegments().count());
-		assertEquals("Create a New Source", tu.getSource().getFirstSegment().toString());
-		assertEquals("CREATE A NEW SOURCE", tu.getTarget(LocaleId.SPANISH).getFirstSegment().toString());
+		assertEquals("\u2013Create a New Source", tu.getSource().getFirstSegment().toString());
+		assertEquals("\u2013CREATE A NEW SOURCE", tu.getTarget(LocaleId.SPANISH).getFirstSegment().toString());
 
 		tu = FilterTestDriver.getTextUnit(events, 5);
 		assertEquals("suredetach", tu.getName());
 		assertEquals(AlignmentStatus.ALIGNED, tu.getAlignedSegments().getAlignmentStatus(LocaleId.SPANISH));
 		assertEquals(1, tu.getSource().getSegments().count());
-		assertEquals("detach this source?", tu.getSource().getFirstSegment().toString());
-		assertEquals("DETACH THIS SOURCE FROM THIS INDIVIDUAL?", tu.getTarget(LocaleId.SPANISH).getFirstSegment().toString());
+		assertEquals("\u2003detach this source?\u2002", tu.getSource().getFirstSegment().toString());
+		assertEquals("\u2003DETACH THIS SOURCE FROM THIS INDIVIDUAL?\u2002", tu.getTarget(LocaleId.SPANISH).getFirstSegment().toString());
 	}
 	
 	//@Test
