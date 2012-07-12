@@ -24,6 +24,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Provides abstract methods for interacting with one of the temporary projects
@@ -82,6 +83,17 @@ public interface LonghornProject {
 	 * @throws NullPointerException if one of the parameters is <code>null</code>
 	 */
 	void executePipeline(String sourceLanguage, String targetLanguage) throws NullPointerException;
+
+	/**
+	 * Executes the pipeline from the previously added batch configuration
+	 * on all input files in this project and sets the source and target languages
+	 * of the project to the parameter values.
+	 *
+	 * @param sourceLanguage source language for pipeline
+	 * @param targetLanguages target languages for pipeline
+	 * @throws NullPointerException if one of the parameters is <code>null</code>
+	 */
+	void executePipeline(String sourceLanguage, List<String> targetLanguages) throws NullPointerException;
 	
 	/**
 	 * Returns all output files that were generated when the project's pipeline was executed.
@@ -96,8 +108,9 @@ public interface LonghornProject {
 	 * the same relative file paths as the output files in the project.
 	 * 
 	 * @return The content of the zip file
+	 * @throws IllegalStateException If there are no output files
 	 */
-	InputStream getOutputFilesAsZip();
+	InputStream getOutputFilesAsZip() throws IllegalStateException;
 	
 	/**
 	 * Deletes this project from the web-service.

@@ -259,6 +259,9 @@ public class PipelineDriver implements IPipelineDriver {
 					case TARGET_LOCALE:
 						method.invoke(p.getStep(), input.getTargetLocale());
 						break;
+					case TARGET_LOCALES:
+						method.invoke(p.getStep(), input.getTargetLocales());
+						break;
 					case SOURCE_LOCALE:
 						method.invoke(p.getStep(), input.getSourceLocale());
 						break;
