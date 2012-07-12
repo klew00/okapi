@@ -3,6 +3,7 @@ package net.sf.okapi.filters.xini;
 import static org.junit.Assert.assertEquals;
 
 import java.net.URL;
+import java.util.Arrays;
 import java.util.List;
 
 import net.sf.okapi.common.Event;
@@ -68,7 +69,7 @@ public class SegmentationAndDesegmentationTest {
 		SegmentationStep segmentationStep = new SegmentationStep();
 		segmentationStep.setParameters(params);
 		segmentationStep.setSourceLocale(locDE);
-		segmentationStep.setTargetLocale(locEN);
+		segmentationStep.setTargetLocales(Arrays.asList(locEN));
 		segmentizer = new StepHelper(segmentationStep);
 	}
 

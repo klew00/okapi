@@ -90,6 +90,8 @@ http://www.opentag.com/okapi/wiki/index.php?title=Main_Page
 --- 9) Commit all changed files
 This revision is the one for this release.
 
+- create a tag for the release (e.g. m17)
+
 
 --- 10) Update the versions numbers in the files for the next version
 - All the POM.XML files

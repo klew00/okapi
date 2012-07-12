@@ -26,6 +26,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import net.sf.okapi.common.Event;
@@ -38,6 +39,7 @@ import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.FilterTestDriver;
 import net.sf.okapi.common.filters.InputDocument;
 import net.sf.okapi.common.filters.RoundTripComparison;
+import net.sf.okapi.common.resource.AlignmentStatus;
 import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
@@ -230,6 +232,59 @@ public class VersifiedTxtFilterTest {
 	}
 	
 	@Test
+	public void testTrados() throws URISyntaxException {
+		RawDocument rawDoc = new RawDocument(Util.toURI(root+"trados.vrsz"), "windows-1252", LocaleId.ENGLISH, LocaleId.SPANISH);
+		filter.open(rawDoc);
+		List<Event> events = new LinkedList<Event>();
+		while(filter.hasNext()) {
+			events.add(filter.next());
+		}
+		filter.close();
+		ITextUnit tu = FilterTestDriver.getTextUnit(events, 1);
+		assertEquals("gh", tu.getName());
+		assertEquals(AlignmentStatus.ALIGNED, tu.getAlignedSegments().getAlignmentStatus(LocaleId.SPANISH));
+		assertEquals(2, tu.getSource().getSegments().count());
+		assertEquals("\ta record. ", tu.getSource().getFirstSegment().toString());
+		assertEquals("\tA RECORD. ", tu.getTarget(LocaleId.SPANISH).getFirstSegment().toString());
+		
+		tu = FilterTestDriver.getTextUnit(events, 2);
+		assertEquals("source", tu.getName());
+		assertEquals(AlignmentStatus.ALIGNED, tu.getAlignedSegments().getAlignmentStatus(LocaleId.SPANISH));
+		assertEquals(1, tu.getSource().getSegments().count());
+		assertEquals("\u00a0Add a Source", tu.getSource().getFirstSegment().toString());
+		assertEquals("\u00a0ADD A SOURCE", tu.getTarget(LocaleId.SPANISH).getFirstSegment().toString());
+
+		tu = FilterTestDriver.getTextUnit(events, 3);
+		assertEquals("newsource", tu.getName());
+		assertEquals(AlignmentStatus.ALIGNED, tu.getAlignedSegments().getAlignmentStatus(LocaleId.SPANISH));
+		assertEquals(1, tu.getSource().getSegments().count());
+		assertEquals("\u2014Add a New Source", tu.getSource().getFirstSegment().toString());
+		assertEquals("\u2014ADD A NEW SOURCE", tu.getTarget(LocaleId.SPANISH).getFirstSegment().toString());
+
+		tu = FilterTestDriver.getTextUnit(events, 4);
+		assertEquals("sourcelink", tu.getName());
+		assertEquals(AlignmentStatus.ALIGNED, tu.getAlignedSegments().getAlignmentStatus(LocaleId.SPANISH));
+		assertEquals(1, tu.getSource().getSegments().count());
+		assertEquals("\u2013Create a New Source", tu.getSource().getFirstSegment().toString());
+		assertEquals("\u2013CREATE A NEW SOURCE", tu.getTarget(LocaleId.SPANISH).getFirstSegment().toString());
+
+		tu = FilterTestDriver.getTextUnit(events, 5);
+		assertEquals("suredetach", tu.getName());
+		assertEquals(AlignmentStatus.ALIGNED, tu.getAlignedSegments().getAlignmentStatus(LocaleId.SPANISH));
+		assertEquals(1, tu.getSource().getSegments().count());
+		assertEquals("\u2003detach this source?\u2002", tu.getSource().getFirstSegment().toString());
+		assertEquals("\u2003DETACH THIS SOURCE FROM THIS INDIVIDUAL?\u2002", tu.getTarget(LocaleId.SPANISH).getFirstSegment().toString());
+	}
+	
+	//@Test
+	public void testTradosRoundtrip() throws URISyntaxException {
+		ArrayList<InputDocument> list = new ArrayList<InputDocument>();
+		list.add(new InputDocument(root+"trados.vrsz", null));		
+		RoundTripComparison rtc = new RoundTripComparison(false);
+		assertTrue(rtc.executeCompare(filter, list, "windows-1252", LocaleId.ENGLISH, LocaleId.SPANISH));
+	}
+	
+	@Test
 	public void testOpenTwiceWithString() {
 		RawDocument rawDoc = new RawDocument("|vtest", LocaleId.ENGLISH);
 		filter.open(rawDoc);
@@ -250,17 +305,26 @@ public class VersifiedTxtFilterTest {
 		assertEquals("This is a test.", tu.getSource().toString());
 	}
 	
+	@Test
+	public void testSidWithSpecialTerminator() {
+		String snippet = "|v1 (sid)+| \nThis is a test.";
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		assertEquals("This is a test.", tu.getSource().toString());
+	}
+	
+	@Test
+	public void testSidAndTradosSegmentMarkers() {
+		String snippet = "|v1 (SOURCE)+| \n{0>SOURCE<}100{>TARGET<0}";
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		assertEquals(AlignmentStatus.ALIGNED, tu.getAlignedSegments().getAlignmentStatus(LocaleId.SPANISH));
+		assertEquals("SOURCE", tu.getSource().getFirstSegment().toString());
+		assertEquals("TARGET", tu.getTarget(LocaleId.SPANISH).getFirstSegment().toString());
+	}
+	
 	@Test(expected=OkapiBadFilterInputException.class)
-	public void testMissingTarget() {
-		RawDocument rawDoc = new RawDocument(Util.toURI(root+"xml.vrsz"), "UTF-8", LocaleId.ENGLISH);
-		filter.open(rawDoc);
-		try {
-			while(filter.hasNext()) {
-				filter.next();
-			}
-		} finally {
-			filter.close();
-		}
+	public void testSidAndBrokenTradosSegmentMarkers() {
+		String snippet = "|v1\n{0>SOURCE<}100{>TARGET<0";
+		FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 	}
 	
 	private ArrayList<Event> getEvents (String snippet) {

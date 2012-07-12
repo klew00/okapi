@@ -36,4 +36,9 @@ public interface LonghornFile {
 	 * @return The content of the file
 	 */
 	InputStream openStream();
+	
+	/**
+	 * @return The content of a newly created zip file, containing this file
+	 */
+	InputStream openStreamToZip();
 }

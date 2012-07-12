@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2012 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -18,32 +18,41 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.filters.xml;
+package org.w3c.its;
 
-import org.w3c.dom.Node;
-import org.w3c.its.ITraversal;
+import java.util.Hashtable;
 
-class ContextItem {
+import javax.xml.namespace.QName;
+import javax.xml.xpath.XPathVariableResolver;
+
+/**
+ * Resolver for XPath string variables.
+ */
+public class VariableResolver implements XPathVariableResolver {
+
+	private Hashtable<QName, String> table;
 	
-	Node node;
-	boolean translate;
-	String trgPointer;
-	String idValue;
-	String locNote;
-	boolean preserveWS;
-	String domain;
+	/**
+	 * Resolves the variable for a given name.
+	 * @aram qName the name of the variable.
+	 * @return the value for the given name, or null if no value for that name exists.
+	 */
+	@Override
+	public Object resolveVariable (QName qName) {
+		if ( table == null ) return null;
+		return table.get(qName);
+	}
 
-	public ContextItem (Node node,
-		ITraversal trav)
+	/**
+	 * Adds a variable and its value to this object. If the variable already exists, it is overwritten.
+	 * @param qName the name of the variable.
+	 * @param value the value.
+	 */
+	public void add (QName qName,
+		String value)
 	{
-		this.node = node;
-		// Context is always an element node
-		this.translate = trav.translate();
-		this.trgPointer = trav.getTargetPointer();
-		this.idValue = trav.getIdValue();
-		this.locNote = trav.getNote();
-		this.preserveWS = trav.preserveWS();
-		this.domain = trav.getDomain();
+		if ( table == null ) table = new Hashtable<QName, String>();
+		table.put(qName, value);
 	}
 
 }

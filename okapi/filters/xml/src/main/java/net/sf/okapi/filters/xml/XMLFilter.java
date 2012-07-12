@@ -313,8 +313,9 @@ public class XMLFilter implements IFilter {
 		}
 		
 		// Apply the all rules (external and internal) to the document
-		itsEng.applyRules(IProcessor.DC_TRANSLATE | IProcessor.DC_LANGINFO 
-			| IProcessor.DC_LOCNOTE | IProcessor.DC_WITHINTEXT | IProcessor.DC_TERMINOLOGY);
+		itsEng.applyRules(IProcessor.DC_TRANSLATE | IProcessor.DC_LANGINFO | IProcessor.DC_IDVALUE
+			| IProcessor.DC_LOCNOTE | IProcessor.DC_WITHINTEXT | IProcessor.DC_TERMINOLOGY
+			| IProcessor.DC_DOMAIN);
 		
 		trav = itsEng;
 		trav.startTraversal();
@@ -812,15 +813,20 @@ public class XMLFilter implements IFilter {
 			tu.setProperty(new Property(Property.NOTE, locNote));
 		}
 		
+		String domain = context.peek().domain;
+		if ( domain != null ) {
+			//TODO: Use specific annotation, not a note
+			//TODO: Handle multiple entries
+			tu.setProperty(new Property(Property.NOTE, "its:domain="+domain));
+		}
+		
 		if ( terms != null ) {
 			tu.getSource().setAnnotation(terms);
 			terms = null; // Reset for next time
 		}
-		
-		String id = context.peek().idPointer;
-		if ( id != null ) {
-			tu.setName(id);
-		}
+
+		// Null is fine
+		tu.setName(context.peek().idValue);
 		
 		if ( context.peek().preserveWS ) {
 			tu.setPreserveWhitespaces(true);
