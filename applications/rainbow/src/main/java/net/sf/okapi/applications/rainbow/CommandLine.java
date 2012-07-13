@@ -21,6 +21,8 @@
 package net.sf.okapi.applications.rainbow;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.PrintStream;
 import java.net.URLDecoder;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -60,11 +62,17 @@ public class CommandLine {
 	private boolean promptForOptions = true;
 	private BaseHelp help;
 	private PluginsManager pm;
+	private PrintStream ps = null;
 	
 	public int execute (Shell shell,
 		String[] args)
 	{
 		try {
+			File file  = new File(System.getProperty("user.home")+"/rainbowBatchLog.txt");  
+			ps = new PrintStream(new FileOutputStream(file));
+			System.setOut(ps);
+			System.setErr(ps);
+			
 			this.shell = shell;
 			printBanner();
 			initialize();
@@ -99,6 +107,9 @@ public class CommandLine {
 		catch ( Throwable e ) {
 			e.printStackTrace();
 			return 1;
+		}
+		finally {
+			if ( ps != null ) ps.close();
 		}
 		if (( log != null ) && ( log.getErrorCount() > 0 )) {
 			return 1;
