@@ -49,6 +49,7 @@ public class MicrosoftBatchTokenConnectorTest {
 		String sTranslation="";
 		MicrosoftMTConnector mmtc = new MicrosoftMTConnector();
 		Parameters params = (Parameters) mmtc.getParameters();
+		// Add ClientId and Secret to test
 		params.setClientId("");
 		params.setSecret("");
 		params.setCategory("");
