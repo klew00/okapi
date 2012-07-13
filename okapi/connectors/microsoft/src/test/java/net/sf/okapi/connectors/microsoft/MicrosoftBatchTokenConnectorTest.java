@@ -49,8 +49,8 @@ public class MicrosoftBatchTokenConnectorTest {
 		String sTranslation="";
 		MicrosoftMTConnector mmtc = new MicrosoftMTConnector();
 		Parameters params = (Parameters) mmtc.getParameters();
-		params.setClientId("LDSChurchTranslationWorldServer");
-		params.setSecret("FnpHwigBKrZNvQsGiZSvKIVkBdRF5l5B6soliezGLa0=");
+		params.setClientId("");
+		params.setSecret("");
 		params.setCategory("");
 		
 		// test query
