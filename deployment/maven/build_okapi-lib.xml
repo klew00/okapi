@@ -427,6 +427,16 @@
 		<echo file="tmpJars" append="yes"> ${jar025}</echo>
 		<copy todir="${distLib}" file="${dep025}/${jar025}"/>
 
+		<property name="dep026" value="${mavenStore}/org/apache/httpcomponents/httpclient/4.2.1"/>
+		<fileset id="list.contents" dir="${dep026}"
+		 includes="**/httpclient-4.2.1.jar"/>
+		<property name="jar026" refid="list.contents"/>
+		<echo file="tmpJars" append="yes"> ${jar026}</echo>
+		<copy todir="${distLib}" file="${dep026}/${jar026}"/>
+		<!-- TODO<copy todir="${distLicenses}">
+		   <fileset dir="../shared/licenses" includes="**/commons-*"/>
+		</copy>-->
+
 		<!-- Create the manifest file -->
 		<property file="tmpJars"/>
 		<copy todir="${tmp}/META-INF">

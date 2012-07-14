@@ -34,11 +34,24 @@ import net.sf.okapi.connectors.microsoft.MicrosoftMTConnector;
 import net.sf.okapi.connectors.microsoft.Parameters;
 
 import org.junit.Test;
+import static org.junit.Assert.*;
 
 public class MicrosoftBatchTokenConnectorTest {
 
 	@Test
-	public void runTest () {
+	public void paramTest () {
+		MicrosoftMTConnector mmtc = new MicrosoftMTConnector();
+		Parameters params = (Parameters) mmtc.getParameters();
+		params.setClientId("testID");
+		params.setSecret("testSecret");
+		assertEquals("testID", params.getClientId());
+		assertEquals("testSecret", params.getSecret());
+	}
+	
+	// To test manually: uncomment and add clientId and secret
+	// Make sure to comment before pushing to public repository
+	// @Test
+	public void manualTest () {
 		int lenny;
 		int lynn;
 		QueryResult result;
