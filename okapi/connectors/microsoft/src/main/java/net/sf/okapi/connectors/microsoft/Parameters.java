@@ -70,8 +70,8 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		reset();
 		buffer.fromString(data);
 		clientId = buffer.getEncodedString(CLIENTID, clientId);
-		secret = buffer.getEncodedString(CLIENTID, secret);
-		category = buffer.getEncodedString(CLIENTID, category);
+		secret = buffer.getEncodedString(SECRET, secret);
+		category = buffer.getString(CATEGORY, category);
 	}
 
 	@Override
@@ -87,7 +87,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		buffer.reset();
 		buffer.setEncodedString(CLIENTID, clientId);
 		buffer.setEncodedString(SECRET, secret);
-		buffer.setEncodedString(CATEGORY, clientId);
+		buffer.setString(CATEGORY, category);
 		return buffer.toString();
 	}
 
@@ -97,9 +97,9 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		desc.add(CLIENTID,
 			"Client ID (See http://msdn.microsoft.com/en-us/library/hh454950.aspx)", "The ClientID to identify the user");
 		desc.add(SECRET,
-				"Secret (See http://msdn.microsoft.com/en-us/library/hh454950.aspx)", "A code obtained from Microsoft Azure after payment");
+			"Secret (See http://msdn.microsoft.com/en-us/library/hh454950.aspx)", "A code obtained from Microsoft Azure");
 		desc.add(CATEGORY,
-				"Category (See http://hub.microsofttranslator.com", "A category code for an MT system trained by user data, if any");
+			"Category (See http://hub.microsofttranslator.com", "A category code for an MT system trained by user data, if any");
 		return desc;
 	}
 
@@ -107,11 +107,10 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	public EditorDescription createEditorDescription (ParametersDescription paramsDesc) {
 		EditorDescription desc = new EditorDescription("Microsoft MT Connector Settings", true, false);
 		TextInputPart tip = desc.addTextInputPart(paramsDesc.get(CLIENTID));
-		tip.setPassword(true);
 		TextInputPart tip2 = desc.addTextInputPart(paramsDesc.get(SECRET));
 		tip2.setPassword(true);
 		TextInputPart tip3 = desc.addTextInputPart(paramsDesc.get(CATEGORY));
-		tip3.setPassword(true);
+		tip3.setAllowEmpty(true);
 		return desc;
 	}
 

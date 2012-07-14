@@ -555,7 +555,7 @@ public class MicrosoftMTConnector extends BaseConnector implements ITMQuery {
 			}
 		}
 		catch ( Throwable e ) {
-			throw new RuntimeException("Error when batch translating.", e);
+			throw new RuntimeException("Error when batch translating.\n"+e.getMessage(), e);
 		}
 		
 		return list;
@@ -565,15 +565,14 @@ public class MicrosoftMTConnector extends BaseConnector implements ITMQuery {
 		// returns false if Token could not be obtained
 		boolean bResult = true;
 		long lNow = getCurrentTime();
-		if (lNow > lExpirationTime - 500) { // get a new token if current one
+		if ( lNow > lExpirationTime - 500 ) { // get a new token if current one
 			// will expire in half a second
-
-
 			Long lDiff = lNow - lExpirationTime;
-			if (lDiff > 0 && lDiff < 500) {
+			if ( lDiff > 0 && lDiff < 500 ) {
 				try {
 					Thread.sleep(lNow - lExpirationTime);
-				} catch (InterruptedException e) {
+				}
+				catch ( InterruptedException e ) {
 					throw new RuntimeException("Sleep interrupted while attempting to get Azure Marketplace Token" + e.getMessage(), e);
 				}
 			}
@@ -582,7 +581,8 @@ public class MicrosoftMTConnector extends BaseConnector implements ITMQuery {
 				if (gitAccessToken()) {
 					bResult = true;
 					break;
-				} else {
+				}
+				else {
 					if (zzyxx == TOKENRETRIES - 1) { // no use sleeping to
 						// just fall out of
 						// for loop
@@ -590,7 +590,8 @@ public class MicrosoftMTConnector extends BaseConnector implements ITMQuery {
 					}
 					try {
 						Thread.sleep(SLEEPPAUSE);
-					} catch (InterruptedException e) { // this should never happen unless the app is closed
+					}
+					catch (InterruptedException e) { // this should never happen unless the app is closed
 						throw new RuntimeException("Interrupted while waiting for Microsoft Translator access token");
 					}  // wait then try again
 				}
@@ -599,18 +600,20 @@ public class MicrosoftMTConnector extends BaseConnector implements ITMQuery {
 		return bResult;
 	}
 
-	private boolean gitAccessToken() {
+	private boolean gitAccessToken () {
 		boolean bResult = false;
 		try {
 			String sally = ApacheHttpClientForMT.getAzureAccessToken(
-					"https://datamarket.accesscontrol.windows.net/v2/OAuth2-13",
-					params.getClientId(), params.getSecret());
-			if (sally != null) {
+				"https://datamarket.accesscontrol.windows.net/v2/OAuth2-13",
+				params.getClientId(), params.getSecret());
+			if ( sally != null ) {
 				sToken = parseTokenForm(sally); // parseTokenForm should set nExpirationSecond
-				if (!sToken.equals(""))
+				if ( !sToken.equals("") ) {
 					bResult = true;
+				}
 			}
-		} catch (Throwable e) {
+		}
+		catch (Throwable e) {
 			int i = 1;
 			i = i + 1;
 		}
@@ -649,7 +652,7 @@ public class MicrosoftMTConnector extends BaseConnector implements ITMQuery {
 		return sAccessToken;
 	}
 
-	private long getCurrentTime() {
+	private long getCurrentTime () {
 		java.util.Date date = new java.util.Date();
 		return date.getTime();
 	}

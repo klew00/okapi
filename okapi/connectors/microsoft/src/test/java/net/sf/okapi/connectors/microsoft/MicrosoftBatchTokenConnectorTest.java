@@ -50,7 +50,7 @@ public class MicrosoftBatchTokenConnectorTest {
 	
 	// To test manually: uncomment and add clientId and secret
 	// Make sure to comment before pushing to public repository
-	// @Test
+	//@Test
 	public void manualTest () {
 		int lenny;
 		int lynn;
