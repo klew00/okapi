@@ -58,8 +58,8 @@ public class ITSEngine implements IProcessor, ITraversal {
 	public static final String    XLINK_NS_URI = "http://www.w3.org/1999/xlink";
 	public static final String    XLINK_NS_PREFIX = "xlink";
 	
-	private static final String   FLAGNAME            = "\u00ff";
-	private static final String   FLAGSEP             = "\u001c";
+	private static final String   FLAGNAME            = "\u00ff"; // Name of the user-data property that holds the flags
+	private static final String   FLAGSEP             = "\u001c"; // Separator between data categories
 	
 	// Must have '?' as many times as there are FP_XXX entries +1
 	// Must have +FLAGSEP as many times as there are FP_XXX_DATA entries +1
