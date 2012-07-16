@@ -427,9 +427,9 @@
 		<echo file="tmpJars" append="yes"> ${jar025}</echo>
 		<copy todir="${distLib}" file="${dep025}/${jar025}"/>
 
-		<property name="dep026" value="${mavenStore}/org/apache/httpcomponents/httpclient/4.2.1"/>
+		<property name="dep026" value="${mavenStore}/org/apache/httpcomponents/httpclient/4.1.2"/>
 		<fileset id="list.contents" dir="${dep026}"
-		 includes="**/httpclient-4.2.1.jar"/>
+		 includes="**/httpclient-4.1.2.jar"/>
 		<property name="jar026" refid="list.contents"/>
 		<echo file="tmpJars" append="yes"> ${jar026}</echo>
 		<copy todir="${distLib}" file="${dep026}/${jar026}"/>
@@ -437,23 +437,23 @@
 		   <fileset dir="../shared/licenses" includes="**/commons-*"/>
 		</copy>-->
 		<!--+-->
-		<property name="dep027" value="${mavenStore}/org/apache/httpcomponents/httpcore/4.2.1"/>
+		<property name="dep027" value="${mavenStore}/org/apache/httpcomponents/httpcore/4.1.2"/>
 		<fileset id="list.contents" dir="${dep027}"
-		 includes="**/httpcore-4.2.1.jar"/>
+		 includes="**/httpcore-4.1.2.jar"/>
 		<property name="jar027" refid="list.contents"/>
 		<echo file="tmpJars" append="yes"> ${jar027}</echo>
 		<copy todir="${distLib}" file="${dep027}/${jar027}"/>
 		<!--+-->
-		<property name="dep028" value="${mavenStore}/org/apache/httpcomponents/httpmime/4.2.1"/>
+		<property name="dep028" value="${mavenStore}/org/apache/httpcomponents/httpmime/4.1.2"/>
 		<fileset id="list.contents" dir="${dep028}"
-		 includes="**/httpmime-4.2.1.jar"/>
+		 includes="**/httpmime-4.1.2.jar"/>
 		<property name="jar028" refid="list.contents"/>
 		<echo file="tmpJars" append="yes"> ${jar028}</echo>
 		<copy todir="${distLib}" file="${dep028}/${jar028}"/>
 		<!--+-->
-		<property name="dep029" value="${mavenStore}/org/apache/httpcomponents/httpclient-cache/4.2.1"/>
+		<property name="dep029" value="${mavenStore}/org/apache/httpcomponents/httpclient-cache/4.1.2"/>
 		<fileset id="list.contents" dir="${dep029}"
-		 includes="**/httpclient-cache-4.2.1.jar"/>
+		 includes="**/httpclient-cache-4.1.2.jar"/>
 		<property name="jar029" refid="list.contents"/>
 		<echo file="tmpJars" append="yes"> ${jar029}</echo>
 		<copy todir="${distLib}" file="${dep029}/${jar029}"/>
