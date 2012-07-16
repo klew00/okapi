@@ -174,6 +174,10 @@ public class CommandLine {
 				prj.setCustomParametersFolder(nextArg(args, ++i));
 				prj.setUseCustomParametersFolder(true);
 			}
+			else if ( "-rd".equals(arg) ) { //$NON-NLS-1$
+				// Use the project file name to set the root directory
+				prj.setPath(Util.ensureSeparator(nextArg(args, ++i), false)+"project.rnb");
+			}
 			else if ( "-opt".equals(arg) ) { //$NON-NLS-1$
 				optionsFile = nextArg(args, ++i);
 			}
