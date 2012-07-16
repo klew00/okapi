@@ -50,3 +50,5 @@ local.properties
 /okapi/integration-tests/output1.html
 /okapi/integration-tests/output2.html
 /okapi/steps/termextraction/terms.txt
+/deployment/website/dist
+

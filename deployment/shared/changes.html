@@ -24,13 +24,27 @@ distribution.</p>
 <h2>Changes from M18 to M19-SNAPSHOT</h2>
 <ul>
 	<li>Rainbow:<ul>
-	<liUpdated Microsoft Translator Connection to use Azure Marketplace Access Token.</li>
+	<li>Updated Microsoft Translator Connection to use Azure Marketplace Access Token.</li>
+</ul></li>
+	<li>Longhorn:<ul>
+	<li>Made API available to execute pipelines with multiple target languages</li>
+</ul>
+	</li>
+	<li>Steps:<ul>
+	<li>Segmentation and Desegmentation Step:<ul>
+	<li>Will now affect all target locales, that you are processing</li>
+</ul>
+	</li>
+</ul>
+	</li>
 </ul>
 <h2>Changes from M17 to M18-SNAPSHOT</h2>
 <ul>
 	<li>Rainbow:<ul>
 	<li>Changed the batch mode so the log and error output go to the 
 	rainbowBatchLog.txt file in the user home directory.</li>
+	<li>Added the <code>-rd</code> option (root directory) to the command-line 
+	mode.</li>
 </ul>
 	</li>
 	<li>Tikal:<ul>
@@ -41,6 +55,14 @@ distribution.</p>
 	<li>Filters:<ul>
 	<li>XML Filter:<ul>
 	<li>Added initial implementation for the ITS 2.0 Domain data category.</li>
+</ul>
+	</li>
+</ul>
+	</li>
+	<li>Steps:<ul>
+	<li>Translation Comparison Step:<ul>
+	<li>Added support for <code>${rootDir}</code>, <code>${inputRootDir}</code> 
+	and locale variables.</li>
 </ul>
 	</li>
 </ul>

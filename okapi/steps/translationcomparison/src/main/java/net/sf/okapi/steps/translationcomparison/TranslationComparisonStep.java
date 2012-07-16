@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009-2011 by the Okapi Framework contributors
+  Copyright (C) 2009-2012 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -73,6 +73,8 @@ public class TranslationComparisonStep extends BasePipelineStep {
 	private RawDocument rawDoc2;
 	private RawDocument rawDoc3;
 	private GenericContent fmt;
+	private String rootDir;
+	private String inputRootDir;
 
 	public TranslationComparisonStep () {
 		params = new Parameters();
@@ -109,6 +111,16 @@ public class TranslationComparisonStep extends BasePipelineStep {
 		this.rawDoc3 = thirdInput;
 	}
 	
+	@StepParameterMapping(parameterType = StepParameterType.ROOT_DIRECTORY)
+	public void setRootDirectory (String rootDir) {
+		this.rootDir = rootDir;
+	}
+
+	@StepParameterMapping(parameterType = StepParameterType.INPUT_ROOT_DIRECTORY)
+	public void setInputRootDirectory (String inputRootDir) {
+		this.inputRootDir = inputRootDir;
+	}
+
 	@Override
 	public String getName () {
 		return "Translation Comparison";
@@ -140,7 +152,10 @@ public class TranslationComparisonStep extends BasePipelineStep {
 		}
 		// Start TMX writer (one for all input documents)
 		if ( params.isGenerateTMX() ) {
-			tmx = new TMXWriter(params.getTmxPath());
+			String resolvedPath = Util.fillRootDirectoryVariable(params.getTmxPath(), rootDir);
+			resolvedPath = Util.fillInputRootDirectoryVariable(resolvedPath, inputRootDir);
+			resolvedPath = LocaleId.replaceVariables(resolvedPath, sourceLocale, targetLocale);
+			tmx = new TMXWriter(resolvedPath);
 			tmx.writeStartDocument(sourceLocale, targetLocale,
 				getClass().getName(), null, null, null, null);
 		}
