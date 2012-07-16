@@ -103,7 +103,7 @@ public class ApacheHttpClientForMT {
 		URL url;
 		try {
 			sContent = String.format("grant_type=client_credentials&client_id=%s&client_secret=%s&scope=%s",
-				sClientID,URLEncoder.encode(sEcret),"http://api.microsofttranslator.com");
+				sClientID,URLEncoder.encode(sEcret,"UTF-8"),"http://api.microsofttranslator.com");
 			url = new URL(sUral);
 			conn = (HttpURLConnection)url.openConnection();
 			conn.addRequestProperty("Content-Type", "text/xml");
