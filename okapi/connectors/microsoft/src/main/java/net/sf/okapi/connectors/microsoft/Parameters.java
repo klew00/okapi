@@ -76,7 +76,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 
 	@Override
 	public void reset () {
-		// Default for tests
+		// Default values
 		clientId = "";
 		secret = "";
 		category = "";
@@ -106,11 +106,11 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	@Override
 	public EditorDescription createEditorDescription (ParametersDescription paramsDesc) {
 		EditorDescription desc = new EditorDescription("Microsoft MT Connector Settings", true, false);
-		TextInputPart tip = desc.addTextInputPart(paramsDesc.get(CLIENTID));
-		TextInputPart tip2 = desc.addTextInputPart(paramsDesc.get(SECRET));
-		tip2.setPassword(true);
-		TextInputPart tip3 = desc.addTextInputPart(paramsDesc.get(CATEGORY));
-		tip3.setAllowEmpty(true);
+		desc.addTextInputPart(paramsDesc.get(CLIENTID));
+		TextInputPart tip = desc.addTextInputPart(paramsDesc.get(SECRET));
+		tip.setPassword(true);
+		tip = desc.addTextInputPart(paramsDesc.get(CATEGORY));
+		tip.setAllowEmpty(true);
 		return desc;
 	}
 

@@ -34,19 +34,20 @@ public class DefaultFilenameFilter implements FilenameFilter {
 	/**
 	 * Creates a new DefaultFilenameFilter object for a given pattern.
 	 * @param pattern to filter on.
+	 * @param caseSensitive true to use case-sensitive pattern, false otherwise.
 	 * You can use ? to match any single character and * to match any multiple characters.
 	 * The pattern is not case-sensitive ("test.*" and "TeSt.*" give the same results)
 	 */
-	public DefaultFilenameFilter (String mask,
+	public DefaultFilenameFilter (String pattern,
 		boolean caseSensitive)
 	{
-		if ( mask == null ) throw new NullPointerException("Mask of the filename cannot be null.");
-		mask = mask.replace('.', '\b');
-		mask = mask.replace("*", ".*");
-		mask = mask.replace('?', '.');
-		mask = mask.replace("\b", "\\.");
-		if ( caseSensitive ) pattern = Pattern.compile(mask);
-		else pattern = Pattern.compile(mask, Pattern.CASE_INSENSITIVE);
+		if ( pattern == null ) throw new NullPointerException("Mask of the filename cannot be null.");
+		pattern = pattern.replace('.', '\b');
+		pattern = pattern.replace("*", ".*");
+		pattern = pattern.replace('?', '.');
+		pattern = pattern.replace("\b", "\\.");
+		if ( caseSensitive ) this.pattern = Pattern.compile(pattern);
+		else this.pattern = Pattern.compile(pattern, Pattern.CASE_INSENSITIVE);
 	}
 
 	/**

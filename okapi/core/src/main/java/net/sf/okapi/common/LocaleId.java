@@ -751,11 +751,10 @@ public final class LocaleId implements Comparable<Object> {
 
 	/**
 	 * Converts a list of language codes into {@link LocaleId}s
-	 * 
-	 * @param languageCodes
-	 * @return
+	 * @param languageCodes the list of codes.
+	 * @return the list of {@link LocaleId} objects created.
 	 */
-	public static List<LocaleId> convertToLocaleIds(List<String> languageCodes) {
+	public static List<LocaleId> convertToLocaleIds (List<String> languageCodes) {
 		List<LocaleId> locales = new ArrayList<LocaleId>();
 		for (String languageCode : languageCodes) {
 			locales.add(new LocaleId(languageCode, true));
