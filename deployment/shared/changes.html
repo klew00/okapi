@@ -21,23 +21,6 @@ distribution.</p>
 	<li>Google Code Project site: <a href="http://code.google.com/p/okapi/">
 	http://code.google.com/p/okapi/</a></li>
 </ul>
-<h2>Changes from M18 to M19-SNAPSHOT</h2>
-<ul>
-	<li>Rainbow:<ul>
-	<li>Updated Microsoft Translator Connection to use Azure Marketplace Access Token.</li>
-</ul></li>
-	<li>Longhorn:<ul>
-	<li>Made API available to execute pipelines with multiple target languages</li>
-</ul>
-	</li>
-	<li>Steps:<ul>
-	<li>Segmentation and Desegmentation Step:<ul>
-	<li>Will now affect all target locales, that you are processing</li>
-</ul>
-	</li>
-</ul>
-	</li>
-</ul>
 <h2>Changes from M17 to M18-SNAPSHOT</h2>
 <ul>
 	<li>Rainbow:<ul>
@@ -50,6 +33,13 @@ distribution.</p>
 	<li>Tikal:<ul>
 	<li>Resoved issue #252: Added <code>-rd</code> option to set the root 
 	directory (Patch from Mihai)</li>
+	<li>Fixed issue #254: Added support to change the display encoding using the
+	<code>.Tikal</code> configuration file and the <code>displayEncoding</code> 
+	setting.</li>
+</ul>
+	</li>
+	<li>Longhorn:<ul>
+	<li>Made API available to execute pipelines with multiple target languages</li>
 </ul>
 	</li>
 	<li>Filters:<ul>
@@ -65,18 +55,29 @@ distribution.</p>
 	and locale variables.</li>
 </ul>
 	</li>
+	<li>Segmentation and Desegmentation Step:<ul>
+		<li>Will now affect all target locales, that you are processing.</li>
+	</ul></li>
+</ul>
+	</li>
+	<li>Connectors:<ul>
+	<li>Microsoft Translator Connector:<ul>
+	<li>Updated code and interface to use Azure Marketplace Access Tokens 
+	instead of AppIDs.</li>
+</ul>
+	</li>
 </ul>
 	</li>
 	<li>Libraries:<ul>
 	<li>Removed extra files leftover from xliff-lib and olifant migration.</li>
+	<li>Added the TARGET_LOCALES step parameter and depracted the TARGET_LOCALE 
+	one.</li>
 </ul>
 	</li>
 	<li>Trados Utilities Plugin:<ul>
-	<li>Added the
-	<a href="http://www.opentag.com/okapi/wiki/index.php?title=Trados_Utilities_Plugin">
-	Trados/Word steps</a> to the main build.</li>
-</ul>
-	</li>
+		<li>Added the
+		<a href="http://www.opentag.com/okapi/wiki/index.php?title=Trados_Utilities_Plugin">Trados/Word steps</a> to the main build.</li>
+	</ul></li>
 </ul>
 <h2>Changes from M16 to M17</h2>
 <ul>

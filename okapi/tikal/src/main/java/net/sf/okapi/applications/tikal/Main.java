@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009-2011 by the Okapi Framework contributors
+  Copyright (C) 2009-2012 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -43,6 +43,7 @@ import java.util.regex.Pattern;
 
 import net.sf.okapi.common.FileUtil;
 import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.UserConfiguration;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.filters.DefaultFilters;
@@ -172,15 +173,21 @@ public class Main {
 	 */
 	private static String getConsoleEncodingName () {
 		String osName = System.getProperty("os.name");
+		String enc = null;
 		if ( osName.startsWith("Mac OS")) {
-			return "UTF-8"; // Apparently the default for bash on Mac
+			enc = "UTF-8"; // Apparently the default for bash on Mac
 		}
-		if ( osName.startsWith("Windows") ) {
-			//TODO: Get DOS code-pages per locale
-			return "cp850"; // Not perfect, but covers many languages
+		else if ( osName.startsWith("Windows") ) {
+			enc = "cp850"; // Not perfect, but covers many languages
 		}
-		// Default: Assumes unique encoding overall 
-		return Charset.defaultCharset().name();
+		else {
+			// Default: Assumes unique encoding overall
+			enc = Charset.defaultCharset().name();
+		}
+		// Now check if we have a user setting
+		UserConfiguration uc = new UserConfiguration();
+		uc.load("Tikal");
+		return uc.getProperty("displayEncoding", enc);
 	}
 	
 	public static void main (String[] originalArgs) {
@@ -192,6 +199,7 @@ public class Main {
 			// System.out uses the default system encoding that
 			// may not be the right one (e.g. windows-1252 vs cp850)
 			ps = new PrintStream(System.out, true, getConsoleEncodingName());
+			
 			// Disable root console handler
 			Handler[] handlers = Logger.getLogger("").getHandlers();
 			for ( Handler handler : handlers ) {
@@ -1073,6 +1081,7 @@ public class Main {
 		ps.println(String.format("Java VM memory: free=%s KB, total=%s KB", //$NON-NLS-1$
 			nf.format(rt.freeMemory()/1024),
 			nf.format(rt.totalMemory()/1024)));
+		ps.println(String.format("Tikal display encoding: %s", getConsoleEncodingName()));
 		ps.println("-------------------------------------------------------------------------------"); //$NON-NLS-1$
 	}
 	
