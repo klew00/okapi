@@ -374,6 +374,7 @@ public class VersifiedTextFilter extends AbstractFilter {
 		return hasUtf8Encoding;
 	}
 	
+	@SuppressWarnings("incomplete-switch")
 	private String handleNewline() throws IOException {
 		String newline = "\n";
 		switch (detector.getNewlineType()) {
