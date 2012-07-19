@@ -43,6 +43,7 @@ import java.util.regex.Pattern;
 
 import net.sf.okapi.common.FileUtil;
 import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.UserConfiguration;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.exceptions.OkapiIOException;
@@ -52,17 +53,26 @@ import net.sf.okapi.common.filters.FilterConfigurationMapper;
 import net.sf.okapi.common.filters.IFilterConfigurationEditor;
 import net.sf.okapi.common.filters.IFilterConfigurationListEditor;
 import net.sf.okapi.common.filterwriter.XLIFFWriter;
-import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.pipeline.IPipelineStep;
 import net.sf.okapi.common.pipelinedriver.BatchItemContext;
 import net.sf.okapi.common.pipelinedriver.PipelineDriver;
 import net.sf.okapi.common.plugins.PluginsManager;
+import net.sf.okapi.common.query.IQuery;
+import net.sf.okapi.common.query.QueryResult;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextFragment.TagType;
-import net.sf.okapi.common.query.IQuery;
+import net.sf.okapi.connectors.apertium.ApertiumMTConnector;
+import net.sf.okapi.connectors.globalsight.GlobalSightTMConnector;
+import net.sf.okapi.connectors.google.GoogleMTv2Connector;
+import net.sf.okapi.connectors.microsoft.MicrosoftMTConnector;
+import net.sf.okapi.connectors.mymemory.MyMemoryTMConnector;
+import net.sf.okapi.connectors.opentran.OpenTranTMConnector;
+import net.sf.okapi.connectors.pensieve.PensieveTMConnector;
+import net.sf.okapi.connectors.tda.TDASearchConnector;
+import net.sf.okapi.connectors.translatetoolkit.TranslateToolkitTMConnector;
+import net.sf.okapi.filters.mosestext.FilterWriterParameters;
 import net.sf.okapi.lib.translation.ITMQuery;
-import net.sf.okapi.common.query.QueryResult;
 import net.sf.okapi.steps.common.FilterEventsToRawDocumentStep;
 import net.sf.okapi.steps.common.FilterEventsWriterStep;
 import net.sf.okapi.steps.common.RawDocumentToFilterEventsStep;
@@ -74,16 +84,6 @@ import net.sf.okapi.steps.moses.ExtractionStep;
 import net.sf.okapi.steps.moses.MergingParameters;
 import net.sf.okapi.steps.moses.MergingStep;
 import net.sf.okapi.steps.segmentation.SegmentationStep;
-import net.sf.okapi.connectors.apertium.ApertiumMTConnector;
-import net.sf.okapi.connectors.globalsight.GlobalSightTMConnector;
-import net.sf.okapi.connectors.google.GoogleMTv2Connector;
-import net.sf.okapi.connectors.microsoft.MicrosoftMTConnector;
-import net.sf.okapi.connectors.mymemory.MyMemoryTMConnector;
-import net.sf.okapi.connectors.opentran.OpenTranTMConnector;
-import net.sf.okapi.connectors.pensieve.PensieveTMConnector;
-import net.sf.okapi.connectors.tda.TDASearchConnector;
-import net.sf.okapi.connectors.translatetoolkit.TranslateToolkitTMConnector;
-import net.sf.okapi.filters.mosestext.FilterWriterParameters;
 
 public class Main {
 	
@@ -1133,7 +1133,7 @@ public class Main {
 		ps.println("Leverages a file with Moses InlineText:");
 		ps.println("   -lm inputFile [-fc configId] [-ie encoding] [-oe encoding] [-sl srcLang]");
 		ps.println("      [-tl trgLang] [-seg [srxFile]] [-totrg|-overtrg] [-bpt]");
-		ps.println("      [-from mosesFile] [-to outputFile] [-rd rootDirectory]");
+		ps.println("      [-from mosesFile] [-to outputFile] [-rd rootDirectory] [-noalttrans]");
 		ps.println("Segments a file:");
 		ps.println("   -s inputFile [-fc configId] [-ie encoding] [-rd rootDirectory]");
 		ps.println("      [-sl srcLang] [-tl trgLang] [-seg [srxFile]]");
@@ -1584,7 +1584,7 @@ public class Main {
 		MergingParameters params = (MergingParameters)mrgStep.getParameters();
 		params.setCopyToTarget(mosesCopyToTarget);
 		params.setOverwriteExistingTarget(mosesOverwriteTarget);
-		params.setForceAltTransOutput(true);
+		params.setForceAltTransOutput(extOptAltTrans);
 		params.setUseGModeInAltTrans(mosesUseGModeInAltTrans);
 		driver.addStep(mrgStep);
 		
