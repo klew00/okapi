@@ -31,6 +31,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import net.sf.okapi.common.IParameters;
@@ -59,6 +60,7 @@ public class MicrosoftMTConnector extends BaseConnector implements ITMQuery {
 		"<User>defaultUser</User>" +
 		"</TranslateOptions>";
 
+	private static final int QUERYLENGTHLIMIT = 10000;
 	private static final int RETRIES = 5; // number of times to try to get a response from Microsoft before failing
 	private final String PLACEHOLDER = "[$#@list@#$]";
 	private final int TOKENRETRIES = 5;
@@ -476,7 +478,13 @@ public class MicrosoftMTConnector extends BaseConnector implements ITMQuery {
 	public List<List<QueryResult>> batchQuery (List<TextFragment> fragments) {
 		String sBlock;
 		List<List<QueryResult>> list = new ArrayList<List<QueryResult>>();
-
+		List<List<QueryResult>> subList;
+		List<TextFragment> subFragments;
+		int nCharCount;
+		int nEwLen = 0;
+		String sEscapee;
+		boolean bGotSome = false;
+		StringBuilder sb;
 		// Create the query template if needed
 		StringWriter strWriter = null;
 		try {
@@ -510,16 +518,38 @@ public class MicrosoftMTConnector extends BaseConnector implements ITMQuery {
 			}
 			
 			// Fill the template
-			StringBuilder sb = new StringBuilder();
+			nCharCount = queryListTemplate.length() + 200; // add 200 just to be sure
+			sb = new StringBuilder();
+			subFragments = new ArrayList<TextFragment>();
+			subList = new ArrayList<List<QueryResult>>();
 			for ( TextFragment tf : fragments ) {
+				
 				if ( !tf.hasText(false) ) continue; // Skip no-text entries
-				sb.append("<s:string>");
 				String stext = util.toCodedHTML(tf);
-				sb.append(Util.escapeToXML(stext, 0, false, null));
+				sEscapee = Util.escapeToXML(stext, 0, false, null);
+				nEwLen = 21 + sEscapee.length();
+				if (nEwLen+queryListTemplate.length() + 200 > QUERYLENGTHLIMIT)
+					continue; // this segment by itself is too long for a query, so skip it
+				if (nCharCount+nEwLen > QUERYLENGTHLIMIT) { // do query now so don't exceed length limit
+					subList = subBatchQuery(queryListTemplate,sb,subFragments);
+					Iterator<List<QueryResult>> it = subList.iterator();
+					while(it.hasNext()) {
+						list.add(it.next());
+						bGotSome = true;
+					}
+					nCharCount = queryListTemplate.length() + 200; // add 200 just to be sure
+					sb = new StringBuilder();
+					subFragments = new ArrayList<TextFragment>();
+					subList = new ArrayList<List<QueryResult>>();				
+				}
+				sb.append("<s:string>");
+				sb.append(sEscapee);
 				sb.append("</s:string>");
+				nCharCount += nEwLen;
+				subFragments.add(tf);
 			}
 
-			if ( sb.length() == 0 ) {
+			if ( !bGotSome && (sb.length() == 0 )) {
 				// Case where all segments are non-text: We build a list of empty results
 				for ( int i=0; i<fragments.size(); i++ ) {
 					List<QueryResult> res = new ArrayList<QueryResult>();
@@ -528,9 +558,26 @@ public class MicrosoftMTConnector extends BaseConnector implements ITMQuery {
 				return list;
 			}
 
+			subList = subBatchQuery(queryListTemplate,sb,subFragments);
+			Iterator<List<QueryResult>> it = subList.iterator();
+			while(it.hasNext()) {
+				list.add(it.next());
+			}
+		}
+		catch ( Throwable e ) {
+			throw new RuntimeException("Error when translating batch.\n"+e.getMessage(), e);
+		}
+		
+		return list;
+	}
+	
+	private List<List<QueryResult>> subBatchQuery(String subQueryListTemplate, StringBuilder sb, List<TextFragment> fragments) {
+		String sBlock;
+		List<List<QueryResult>> list = new ArrayList<List<QueryResult>>();
+		try {
+			String query = subQueryListTemplate.replace(PLACEHOLDER, sb.toString());
 //			URL url = new URL(String.format("http://api.microsofttranslator.com/v2/Http.svc/GetTranslationsArray"
-//				+ "?appId=%s", params.getAppId()));
-			String query = queryListTemplate.replace(PLACEHOLDER, sb.toString());
+//			+ "?appId=%s", params.getAppId()));
 			String sAddress = String.format("http://api.microsofttranslator.com/v2/Http.svc/GetTranslationsArray");
 			for (int zzyxx = 0; zzyxx < RETRIES; zzyxx++) {
 				if (!getNewTokenIfNeeded())
@@ -557,7 +604,7 @@ public class MicrosoftMTConnector extends BaseConnector implements ITMQuery {
 		catch ( Throwable e ) {
 			throw new RuntimeException("Error when batch translating.\n"+e.getMessage(), e);
 		}
-		
+
 		return list;
 	}
 	

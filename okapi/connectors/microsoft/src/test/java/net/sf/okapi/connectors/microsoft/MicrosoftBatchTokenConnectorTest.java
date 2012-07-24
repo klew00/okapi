@@ -41,9 +41,9 @@ public class MicrosoftBatchTokenConnectorTest {
 	public void paramTest () {
 		MicrosoftMTConnector mmtc = new MicrosoftMTConnector();
 		Parameters params = (Parameters) mmtc.getParameters();
-		params.setClientId("testID");
+		params.setClientId("testClient");
 		params.setSecret("testSecret");
-		assertEquals("testID", params.getClientId());
+		assertEquals("testClient", params.getClientId());
 		assertEquals("testSecret", params.getSecret());
 	}
 	
@@ -57,7 +57,7 @@ public class MicrosoftBatchTokenConnectorTest {
 		TextFragment frag;
 		List<QueryResult> franz;
 		List<List<QueryResult>> liszt;
-		ArrayList<TextFragment> froggies = new ArrayList<TextFragment>();
+		ArrayList<TextFragment> froggies;
 		String sTranslation="";
 		MicrosoftMTConnector mmtc = new MicrosoftMTConnector();
 		Parameters params = (Parameters) mmtc.getParameters();
@@ -79,6 +79,7 @@ public class MicrosoftBatchTokenConnectorTest {
 		}
 		assertTrue(sTranslation.equals("Lo que un pájaro maravilloso son la rana!"));
 		
+		froggies = new ArrayList<TextFragment>();
 		froggies.add(new TextFragment("When he stand he sit almost."));
 		froggies.add(new TextFragment("When he hop he fly almost."));
 		froggies.add(new TextFragment("He ain't got no sense hardly."));
@@ -94,5 +95,25 @@ public class MicrosoftBatchTokenConnectorTest {
 		}
 		assertTrue(sTranslation.equals("$Cuando él siente casi.$Cuando él hop volar casi.$No consiguió ningún sentido apenas."));
 //		assertTrue(sTranslation.equals("$Cuando él presentarse él sentarse casi.$Cuando él salto él volar casi.$No consiguió ningún sentido difícilmente."));
+		
+		froggies = new ArrayList<TextFragment>();
+		for(int i=0; i<1000; i++) {
+			froggies.add(new TextFragment(Integer.toString(i)+". When he stand he sit almost."));
+		}
+		liszt = mmtc.batchQuery(froggies);
+		lynn = liszt.size();
+		sTranslation = "";
+		for(int i=0; i<lynn; i++) {
+			franz = liszt.get(i);
+			lenny = franz.size();
+			for(int j=0; j<lenny; j++) {
+				sTranslation = franz.get(j).target.getText();
+				if (!(sTranslation.equals(Integer.toString(i)+". Cuando siente casi.") ||
+					  (sTranslation.equals(Integer.toString(i)+". Cuando él siente casi."))))
+					i = 0;
+				assertTrue(sTranslation.equals(Integer.toString(i)+". Cuando siente casi.") ||
+						  (sTranslation.equals(Integer.toString(i)+". Cuando él siente casi.")));		
+			}
+		}
 	}
 }
