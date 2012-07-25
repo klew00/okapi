@@ -408,11 +408,15 @@ public class QualityCheckSession {
 
 	public void generateReport (String rootDir) {
 		String finalPath = Util.fillRootDirectoryVariable(params.getOutputPath(), rootDir);
-		if ( params.getOutputType() == 1 ) {
-			generateTabDelimitedReport(finalPath);
-		}
-		else {
-			generateHTMLReport(finalPath);
+		switch ( params.getOutputType() ) {
+			case 1: // text
+				generateTabDelimitedReport(finalPath);
+				break;
+			case 2: // xml
+				generateXMLReport(finalPath);
+				break;
+			default:
+				generateHTMLReport(finalPath);
 		}
 	}
 	
@@ -523,6 +527,64 @@ public class QualityCheckSession {
 		finally {
 			if ( writer != null ) writer.close();
 		}
+	}
+
+	private void generateXMLReport (String finalPath) {
+		XMLWriter writer = null;
+		try {
+			// Create the output file
+			writer = new XMLWriter(finalPath);
+			writer.writeStartDocument();
+			writer.writeStartElement("qualityCheckReport");	writer.writeLineBreak();
+			writer.writeStartElement("issues");				writer.writeLineBreak();
+
+			// Process the issues
+			URI docId = null;
+			for ( Issue issue : issues ) {
+				// Skip disabled issues
+				if ( !issue.enabled ) continue;
+
+				writer.writeStartElement("issue");		writer.writeLineBreak();
+				writeIndentedElementString( writer, "input", issue.docURI.toString());
+				writeIndentedElementString( writer, "tuName", issue.tuName);
+				writeIndentedElementString( writer, "tuId", issue.tuId);
+				writeIndentedElementString( writer, "segId", issue.segId);
+				writeIndentedElementString( writer, "severity", Integer.toString(issue.severity));
+				writeIndentedElementString( writer, "issueType", issue.issueType.toString());
+				writeIndentedElementString( writer, "message", issue.message);
+				writeIndentedElementStringHilite(writer,"source", issue.oriSource, issue.srcStart, issue.srcEnd );
+				writeIndentedElementStringHilite(writer,"target", issue.oriTarget, issue.trgStart, issue.trgEnd );
+
+				writer.writeEndElementLineBreak(); // issue
+			} // End of for issues
+
+			// Write end of document
+			writer.writeEndElementLineBreak(); // issues
+			writer.writeEndElementLineBreak(); // qualityCheckReport
+			writer.writeEndDocument();
+		}
+		finally {
+			if ( writer != null ) writer.close();
+		}
+	}
+
+	private static void writeIndentedElementString(XMLWriter writer, String element, String text) {
+		writer.writeString("\t");
+		writer.writeElementString(element, text);
+		writer.writeLineBreak();
+	}
+
+	private static void writeIndentedElementStringHilite(XMLWriter writer, String element, String text, int start, int end) {
+		if (end > 0) {
+			writer.writeString("\t");
+			writer.writeStartElement(element);
+			writer.writeString(text.substring(0,start));
+			writer.writeElementString("hi",text.substring(start,end));
+			writer.writeString(text.substring(end));
+			writer.writeEndElementLineBreak(); // element
+		}
+		else
+			writeIndentedElementString( writer, element, text);
 	}
 
 	private String escape (String text) {

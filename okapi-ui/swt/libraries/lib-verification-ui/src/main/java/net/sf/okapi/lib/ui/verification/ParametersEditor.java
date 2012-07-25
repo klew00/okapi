@@ -859,6 +859,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		cbOutputType = new Combo(grpTmp, SWT.READ_ONLY | SWT.DROP_DOWN);
 		cbOutputType.add("HTML file");
 		cbOutputType.add("Tab-delimited file");
+		cbOutputType.add("XML file");
 		cbOutputType.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				updateOutputPathExtension();
@@ -939,6 +940,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		String tmp = pnlOutputPath.getText();
 		String ext = ".html";
 		if ( cbOutputType.getSelectionIndex() == 1 ) ext = ".txt";
+		if ( cbOutputType.getSelectionIndex() == 2 ) ext = ".xml";
 		if ( tmp.endsWith(ext) ) return;
 		
 		// Change the extension
