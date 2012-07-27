@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2010 by the Okapi Framework contributors
+  Copyright (C) 2008-2012 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -21,38 +21,36 @@
 package org.w3c.its;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.TransformerFactoryConfigurationError;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
+
+import net.sf.okapi.common.Util;
+import net.sf.okapi.common.XMLWriter;
 
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 public class Main {
 
 	public static void main (String[] args) {
+		XMLWriter writer = null;
 		try {
 			System.out.println("ITSTest");
 			
 			File inputFile;
 			if ( args.length > 0 ) inputFile = new File(args[0]);
-			else inputFile = new File("input.xml"); 
+			else inputFile = new File("inputFile.xml"); 
 			System.out.println("   input: " + inputFile.getAbsolutePath());
 			
 			File outputFile;
 			if ( args.length > 1 ) outputFile = new File(args[1]);
-			else outputFile = new File("output.xml");
+			else {
+				outputFile = new File(Util.getDirectoryName(inputFile.getAbsolutePath())
+					+ File.separator + "nodelist-with-its-information.xml");
+			}
 			System.out.println("  output: " + outputFile.getAbsolutePath());
 
 			File rulesFile = null;
@@ -64,8 +62,20 @@ public class Main {
 			DocumentBuilderFactory fact = DocumentBuilderFactory.newInstance();
 			fact.setNamespaceAware(true);
 			fact.setValidating(false);
+			
+			writer = new XMLWriter(outputFile.getAbsolutePath());
+			writer.setLineBreak("\n");
+			writer.writeStartDocument();
+			writer.writeStartElement("nodeList");
+			writer.writeAttributeString("xmlns:its", ITSEngine.ITS_NS_URI);
+			writer.writeAttributeString("xmlns:datc", "http://example.com/datacats");
+			writer.writeStartElement("nodeList");
+			writer.writeAttributeString("datacat", "TODO");
+			
 			Document doc = fact.newDocumentBuilder().parse(inputFile);
 			ITraversal trav = applyITSRules(doc, inputFile, rulesFile);
+
+			String path = "";
 			
 			// Process the document
 			trav.startTraversal();
@@ -75,41 +85,49 @@ public class Main {
 				case Node.ELEMENT_NODE:
 					// Use !backTracking() to get to the elements only once
 					// and to include the empty elements (for attributes).
-					if ( !trav.backTracking() ) {
+					if ( trav.backTracking() ) {
+						int n = path.lastIndexOf('/');
+						if ( n > -1 ) path = path.substring(0, n);
+					}
+					else {
 						Element element = (Element)node;
-						if ( trav.translate() && hasTextChild(node) ) { // Add only if there is text already
-							element.appendChild(doc.createTextNode(" + TRANSLATION"));
-						}
-						if ( trav.isTerm() && hasTextChild(node) ) {
-							element.appendChild(doc.createTextNode(" + TERM!"));
-						}
+						path += "/"+element.getLocalName();
+						
+						writer.writeStartElement("node");
+						writer.writeAttributeString("path", path);
+						writer.writeAttributeString("outputType", "TODO");
+						writer.writeStartElement("output");
+						
+						writer.writeEndElement(); // output
+						writer.writeEndElement(); // node
+
 						if ( element.hasAttributes() ) {
 							NamedNodeMap map = element.getAttributes();
-							Attr attr;
 							for ( int i=0; i<map.getLength(); i++ ) {
-								attr = (Attr)map.item(i);
-								if ( trav.translate(attr) ) {
-									attr.setValue(attr.getValue()+ " + TRANSLATION");
-								}
-								if ( trav.isTerm(attr) ) {
-									attr.setValue(attr.getValue()+ " + TERM!");
-								}
+								Attr attr = (Attr)map.item(i);
+								writer.writeStartElement("node");
+								writer.writeAttributeString("path", path+"/@"+attr.getName());
+								writer.writeAttributeString("outputType", "TODO");
+								writer.writeStartElement("output");
+								
+								writer.writeEndElement(); // output
+								writer.writeEndElement(); // node
 							}
 						}
-						// Show the language
-						element.appendChild(doc.createTextNode(" + lang="+ trav.getLanguage()));
-						// Show idPointer
-						element.appendChild(doc.createTextNode(" + idValue="+ trav.getIdValue()));
-						// Show white spaces
-						element.appendChild(doc.createTextNode(" + ws="+ (trav.preserveWS() ? "preserve" : "default")));
 					}
-					break;
+					break; // End switch
 				}
 			}
-			saveDocument(doc, outputFile);
 		}
 		catch ( Throwable e ) {
 			e.printStackTrace();
+		}
+		finally {
+			if ( writer != null ) {
+				writer.writeEndElement(); // nodeList for datacat
+				writer.writeEndElement(); // root nodeList
+				writer.close();
+			}
 		}
 	}
 
@@ -131,21 +149,21 @@ public class Main {
 		return itsEng;
 	}
 	
-	private static boolean hasTextChild (Node element) {
-		NodeList nl = element.getChildNodes();
-		for ( int i=0; i<nl.getLength(); i++ ) {
-			if ( nl.item(i).getNodeType() == Node.TEXT_NODE ) return true;
-		}
-		return false;
-	}
-	
-	private static void saveDocument (Document doc,
-		File outputFile)
-		throws TransformerFactoryConfigurationError, TransformerException, FileNotFoundException
-	{
-		Transformer trans = TransformerFactory.newInstance().newTransformer();
-		FileOutputStream output = new FileOutputStream(outputFile);
-		trans.transform(new DOMSource(doc), new StreamResult(output));
-	}
+//	private static boolean hasTextChild (Node element) {
+//		NodeList nl = element.getChildNodes();
+//		for ( int i=0; i<nl.getLength(); i++ ) {
+//			if ( nl.item(i).getNodeType() == Node.TEXT_NODE ) return true;
+//		}
+//		return false;
+//	}
+//	
+//	private static void saveDocument (Document doc,
+//		File outputFile)
+//		throws TransformerFactoryConfigurationError, TransformerException, FileNotFoundException
+//	{
+//		Transformer trans = TransformerFactory.newInstance().newTransformer();
+//		FileOutputStream output = new FileOutputStream(outputFile);
+//		trans.transform(new DOMSource(doc), new StreamResult(output));
+//	}
 
 }

@@ -37,6 +37,8 @@ import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
+import net.sf.okapi.common.Util;
+
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -63,7 +65,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 	
 	// Must have '?' as many times as there are FP_XXX entries +1
 	// Must have +FLAGSEP as many times as there are FP_XXX_DATA entries +1
-	private static final String   FLAGDEFAULTDATA     = "????????"+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP;
+	private static final String   FLAGDEFAULTDATA     = "????????"+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP;
 
 	// Indicator position
 	private static final int      FP_TRANSLATE        = 0;
@@ -79,7 +81,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 	private static final int      FP_TERMINOLOGY_DATA      = 0;
 	private static final int      FP_LOCNOTE_DATA          = 1;
 	private static final int      FP_LANGINFO_DATA         = 2;
-	private static final int      FP_TRGPOINTER_DATA       = 3;
+	private static final int      FP_TARGETPOINTER_DATA    = 3;
 	private static final int      FP_IDVALUE_DATA          = 4;
 	private static final int      FP_DOMAIN_DATA           = 5;
 	
@@ -91,8 +93,6 @@ public class ITSEngine implements IProcessor, ITraversal {
 	private static final int      LOCNOTETYPE_POINTER      = 2;
 	private static final int      LOCNOTETYPE_REF          = 3;
 	private static final int      LOCNOTETYPE_REFPOINTER   = 4;
-
-	private static final int      TRANSLATE_TRGPOINTER     = 1;
 
 	private DocumentBuilderFactory fact; 
 	private Document doc;
@@ -276,6 +276,9 @@ public class ITSEngine implements IProcessor, ITraversal {
 					else if ( "domainRule".equals(ruleElem.getLocalName()) ) {
 						compileDomainRule(ruleElem, isInternal);
 					}
+					else if ( "targetPointerRule".equals(ruleElem.getLocalName()) ) {
+						compileTargetPointerRule(ruleElem, isInternal);
+					}
 					else if ( "param".equals(ruleElem.getLocalName()) ) {
 						processParam(ruleElem);
 					}
@@ -341,12 +344,6 @@ public class ITSEngine implements IProcessor, ITraversal {
 		else if ( "no".equals(value) ) rule.flag = false;
 		else throw new ITSException("Invalid value for 'translate'.");
 		
-		value = elem.getAttributeNS(ITSX_NS_URI, "targetPointer");
-		if ( value.length() > 0 ) {
-			rule.info = value;
-			rule.infoType = TRANSLATE_TRGPOINTER; 
-		}
-
 		// If not version 2 or if not there, try extension
 		value = elem.getAttributeNS(ITSX_NS_URI, "idValue");
 		if ( version.equals(ITS_VERSION2) && !value.isEmpty() ) {
@@ -430,6 +427,23 @@ public class ITSEngine implements IProcessor, ITraversal {
 
 		// Process domainMapping attribute if it's there
 		rule.map = fromStringToMap(elem.getAttribute("domainMapping"));
+
+		// Add the rule
+		rules.add(rule);
+	}
+
+	private void compileTargetPointerRule (Element elem,
+		boolean isInternal)
+	{
+		ITSRule rule = new ITSRule(IProcessor.DC_TARGETPOINTER);
+		rule.selector = elem.getAttribute("selector");
+		rule.isInternal = isInternal;
+				
+		String pointer = elem.getAttribute("targetPointer");
+		if ( pointer.isEmpty() ) {
+			throw new ITSException("Invalid value for 'targetPointer'.");
+		}
+		rule.info = pointer;
 
 		// Add the rule
 		rules.add(rule);
@@ -708,7 +722,6 @@ public class ITSEngine implements IProcessor, ITraversal {
 		// Otherwise: see if there are any flags to change
 		if ( data.charAt(FP_TRANSLATE) != '?' ) {
 			trace.peek().translate = (data.charAt(FP_TRANSLATE) == 'y');
-			trace.peek().targetPointer = getFlagData(data, FP_TRGPOINTER_DATA);
 		}
 		
 		trace.peek().idValue = getFlagData(data, FP_IDVALUE_DATA);
@@ -716,7 +729,9 @@ public class ITSEngine implements IProcessor, ITraversal {
 		if ( data.charAt(FP_DOMAIN) != '?' ) {
 			trace.peek().domain = getFlagData(data, FP_DOMAIN_DATA);
 		}
-		
+
+		trace.peek().targetPointer = getFlagData(data, FP_TARGETPOINTER_DATA);
+
 		if ( data.charAt(FP_DIRECTIONALITY) != '?' ) {
 			switch ( data.charAt(FP_DIRECTIONALITY) ) {
 			case '0':
@@ -811,10 +826,6 @@ public class ITSEngine implements IProcessor, ITraversal {
 						if ( NL.item(i).getNodeType() == Node.ATTRIBUTE_NODE ) {
 							if ( rule.flag ) translatableAttributeRuleTriggered = true; 
 						}
-						// Set other info for the node
-						if ( rule.infoType == TRANSLATE_TRGPOINTER ) {
-							setFlag(NL.item(i), FP_TRGPOINTER_DATA, rule.info, true);							
-						}
 						if ( rule.idValue != null ) { // For deprecated extension
 							setFlag(NL.item(i), FP_IDVALUE_DATA, resolveExpression(NL.item(i), rule.idValue), true);							
 						}
@@ -887,6 +898,11 @@ public class ITSEngine implements IProcessor, ITraversal {
 						}
 						setFlag(NL.item(i), FP_DOMAIN_DATA, value, true);
 						break;
+						
+					case IProcessor.DC_TARGETPOINTER:
+						setFlag(NL.item(i), FP_TARGETPOINTER_DATA, rule.info, true);							
+						break;
+						
 					}
 				}
 		    }
@@ -897,11 +913,13 @@ public class ITSEngine implements IProcessor, ITraversal {
 	}
 	
 	private void processLocalRules (int dataCategories) {
+		XPathExpression expr;
+		NodeList NL;
+		Attr attr;
 		try {
 			if ( (dataCategories & IProcessor.DC_TRANSLATE) > 0 ) {
-				XPathExpression expr = xpath.compile("//*/@"+ITS_NS_PREFIX+":translate|//"+ITS_NS_PREFIX+":span/@translate");
-				NodeList NL = (NodeList)expr.evaluate(doc, XPathConstants.NODESET);
-				Attr attr;
+				expr = xpath.compile("//*/@"+ITS_NS_PREFIX+":translate|//"+ITS_NS_PREFIX+":span/@translate");
+				NL = (NodeList)expr.evaluate(doc, XPathConstants.NODESET);
 				for ( int i=0; i<NL.getLength(); i++ ) {
 					attr = (Attr)NL.item(i);
 					// Skip irrelevant nodes
@@ -919,9 +937,8 @@ public class ITSEngine implements IProcessor, ITraversal {
 			}
 			
 			if ( (dataCategories & IProcessor.DC_DIRECTIONALITY) > 0 ) {
-				XPathExpression expr = xpath.compile("//*/@"+ITS_NS_PREFIX+":dir|//"+ITS_NS_PREFIX+":span/@dir");
-				NodeList NL = (NodeList)expr.evaluate(doc, XPathConstants.NODESET);
-				Attr attr;
+				expr = xpath.compile("//*/@"+ITS_NS_PREFIX+":dir|//"+ITS_NS_PREFIX+":span/@dir");
+				NL = (NodeList)expr.evaluate(doc, XPathConstants.NODESET);
 				for ( int i=0; i<NL.getLength(); i++ ) {
 					attr = (Attr)NL.item(i);
 					// Skip irrelevant nodes
@@ -940,10 +957,9 @@ public class ITSEngine implements IProcessor, ITraversal {
 			}
 			
 			if ( (dataCategories & IProcessor.DC_TERMINOLOGY) > 0 ) {
-				XPathExpression expr = xpath.compile("//*/@"+ITS_NS_PREFIX+":term|//"+ITS_NS_PREFIX+":span/@term"
+				expr = xpath.compile("//*/@"+ITS_NS_PREFIX+":term|//"+ITS_NS_PREFIX+":span/@term"
 					+"//*/@"+ITS_NS_PREFIX+":termInfoRef|//"+ITS_NS_PREFIX+":span/@termInfoRef");
-				NodeList NL = (NodeList)expr.evaluate(doc, XPathConstants.NODESET);
-				Attr attr;
+				NL = (NodeList)expr.evaluate(doc, XPathConstants.NODESET);
 				String localName;
 				for ( int i=0; i<NL.getLength(); i++ ) {
 					attr = (Attr)NL.item(i);
@@ -969,10 +985,9 @@ public class ITSEngine implements IProcessor, ITraversal {
 			}
 
 			if ( (dataCategories & IProcessor.DC_LOCNOTE) > 0 ) {
-				XPathExpression expr = xpath.compile("//*/@"+ITS_NS_PREFIX+":locNote|//"+ITS_NS_PREFIX+":span/@locNote"
+				expr = xpath.compile("//*/@"+ITS_NS_PREFIX+":locNote|//"+ITS_NS_PREFIX+":span/@locNote"
 					+"//*/@"+ITS_NS_PREFIX+":locNoteRef|//"+ITS_NS_PREFIX+":span/@locNoteRef");
-				NodeList NL = (NodeList)expr.evaluate(doc, XPathConstants.NODESET);
-				Attr attr;
+				NL = (NodeList)expr.evaluate(doc, XPathConstants.NODESET);
 				String localName;
 				for ( int i=0; i<NL.getLength(); i++ ) {
 					attr = (Attr)NL.item(i);
@@ -993,9 +1008,8 @@ public class ITSEngine implements IProcessor, ITraversal {
 			}
 
 			if ( (dataCategories & IProcessor.DC_LANGINFO) > 0 ) {
-				XPathExpression expr = xpath.compile("//*/@"+XML_NS_PREFIX+":lang");
-				NodeList NL = (NodeList)expr.evaluate(doc, XPathConstants.NODESET);
-				Attr attr;
+				expr = xpath.compile("//*/@"+XML_NS_PREFIX+":lang");
+				NL = (NodeList)expr.evaluate(doc, XPathConstants.NODESET);
 				for ( int i=0; i<NL.getLength(); i++ ) {
 					attr = (Attr)NL.item(i);
 					// Set the flag
@@ -1006,10 +1020,9 @@ public class ITSEngine implements IProcessor, ITraversal {
 			}
 			
 			// Local withinText attribute (ITS 2.0 only)
-			if ( version.equals(ITS_VERSION2) && (dataCategories & IProcessor.DC_WITHINTEXT) > 0 ) {
-				XPathExpression expr = xpath.compile("//*/@"+ITS_NS_PREFIX+":withinText");
-				NodeList NL = (NodeList)expr.evaluate(doc, XPathConstants.NODESET);
-				Attr attr;
+			if (( (dataCategories & IProcessor.DC_WITHINTEXT) > 0 ) && isVersion2() ) {
+				expr = xpath.compile("//*/@"+ITS_NS_PREFIX+":withinText");
+				NL = (NodeList)expr.evaluate(doc, XPathConstants.NODESET);
 				for ( int i=0; i<NL.getLength(); i++ ) {
 					attr = (Attr)NL.item(i);
 					// Skip irrelevant nodes
@@ -1027,9 +1040,8 @@ public class ITSEngine implements IProcessor, ITraversal {
 			}
 			
 			// xml:space always applied
-			XPathExpression expr = xpath.compile("//*/@"+XML_NS_PREFIX+":space");
-			NodeList NL = (NodeList)expr.evaluate(doc, XPathConstants.NODESET);
-			Attr attr;
+			expr = xpath.compile("//*/@"+XML_NS_PREFIX+":space");
+			NL = (NodeList)expr.evaluate(doc, XPathConstants.NODESET);
 			for ( int i=0; i<NL.getLength(); i++ ) {
 				attr = (Attr)NL.item(i);
 				// Validate the value
@@ -1053,12 +1065,56 @@ public class ITSEngine implements IProcessor, ITraversal {
 						value, attr.getSpecified());
 				}
 			}
+			
+			// Local targetPointer attribute (ITS 2.0 only)
+			if (( (dataCategories & IProcessor.DC_TARGETPOINTER) > 0 ) && isVersion2() ) {
+				expr = xpath.compile("//*/@"+ITS_NS_PREFIX+":targetPointer");
+				NL = (NodeList)expr.evaluate(doc, XPathConstants.NODESET);
+				for ( int i=0; i<NL.getLength(); i++ ) {
+					attr = (Attr)NL.item(i);
+					// Skip irrelevant nodes
+					if ( ITS_NS_URI.equals(attr.getOwnerElement().getNamespaceURI())
+						&& "targetPointerRule".equals(attr.getOwnerElement().getLocalName()) ) continue;
+					// Set the flag
+					String value = attr.getValue();
+					if ( value != null ) {
+						setFlag(attr.getOwnerElement(), FP_TARGETPOINTER_DATA,
+							value, attr.getSpecified());
+					}
+				}
+			}
+			
+			
 		}
 		catch ( XPathExpressionException e ) {
 			throw new RuntimeException(e);
 		}
 	}
 
+	private boolean isVersion2 () throws XPathExpressionException {
+		// If the version is not detected yet: detect it.
+		if ( version.equals("0") ) {
+			XPathExpression expr = xpath.compile("//*/@"+ITS_NS_PREFIX+":version|//"+ITS_NS_PREFIX+":span/@version");
+			NodeList NL = (NodeList)expr.evaluate(doc, XPathConstants.NODESET);
+			if (( NL == null ) || ( NL.getLength() == 0 )) {
+				// No version detected: we assume it's a 2.0 behavior
+				version = "2.0";
+			}
+			else {
+				if ( NL.getLength() > 0 ) {
+					version = ((Attr)NL.item(0)).getValue();
+					if ( !version.equals(ITS_VERSION1) && !version.equals(ITS_VERSION2) ) {
+						throw new ITSException(String.format("Invalid or missing ITS version (\"%s\")", version));
+					}
+				}
+				if ( NL.getLength() > 1 ) {
+					throw new ITSException("More than one ITS version is defined in this document.");
+				}
+			}
+		}
+		return version.equals(ITS_VERSION2);		
+	}
+	
 	/**
 	 * Gets the text content of the first TEXT child of an element node.
 	 * This is to use instead of node.getTextContent() which does not work with some

@@ -27,10 +27,13 @@ import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.StringReader;
+import java.net.URI;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -50,7 +53,7 @@ public class TraversalTest {
 	@Test
 	public void testSimple () throws SAXException, IOException, ParserConfigurationException {
 		Document doc = fact.newDocumentBuilder().parse(root + "/input.xml");
-		ITraversal trav = applyITSRules(doc, new File(root + "/input.xml"), null);
+		ITraversal trav = applyITSRules(doc, new File(root + "/input.xml").toURI(), null);
 		Element elem = getElement(trav, "p", 1);
 		assertNotNull(elem);
 		assertTrue(trav.translate());
@@ -62,7 +65,7 @@ public class TraversalTest {
 	@Test
 	public void testTerm () throws SAXException, IOException, ParserConfigurationException {
 		Document doc = fact.newDocumentBuilder().parse(root + "/input.xml");
-		ITraversal trav = applyITSRules(doc, new File(root + "/input.xml"), null);
+		ITraversal trav = applyITSRules(doc, new File(root + "/input.xml").toURI(), null);
 		Element elem = getElement(trav, "p", 1);
 		assertNotNull(elem);
 		assertFalse(trav.isTerm());
@@ -77,7 +80,7 @@ public class TraversalTest {
 	@Test
 	public void testXmlId () throws SAXException, IOException, ParserConfigurationException {
 		Document doc = fact.newDocumentBuilder().parse(root + "/input.xml");
-		ITraversal trav = applyITSRules(doc, new File(root + "/input.xml"), null);
+		ITraversal trav = applyITSRules(doc, new File(root + "/input.xml").toURI(), null);
 		Element elem = getElement(trav, "gloss", 1);
 		assertNotNull(elem);
 		assertEquals("TDPV", trav.getIdValue());
@@ -86,13 +89,49 @@ public class TraversalTest {
 	@Test
 	public void testWithinText () throws SAXException, IOException, ParserConfigurationException {
 		Document doc = fact.newDocumentBuilder().parse(root + "/Translate1.xml");
-		ITraversal trav = applyITSRules(doc, new File(root + "/Translate1.xml"), null);
+		ITraversal trav = applyITSRules(doc, new File(root + "/Translate1.xml").toURI(), null);
 		Element elem = getElement(trav, "verbatim", 1);
 		assertNotNull(elem);
 		assertFalse(trav.translate());
 		assertTrue(trav.getWithinText()==ITraversal.WITHINTEXT_YES);
 	}
 
+	@Test
+	public void testTargetPointerGlobal () throws SAXException, IOException, ParserConfigurationException {
+		InputSource is = new InputSource(new StringReader("<doc>"
+			+ "<i:rules xmlns:i='"+ITSEngine.ITS_NS_URI+"' version='2.0'>"
+			+ "<i:targetPointerRule selector='//entry/src' targetPointer='../trg'/>"
+			+ "</i:rules>"
+			+ "<entry><src>source</src><trg></trg></entry></doc>"));
+		Document doc = fact.newDocumentBuilder().parse(is);
+		ITraversal trav = applyITSRules(doc, null, null);
+		Element elem = getElement(trav, "entry", 1);
+		assertNotNull(elem);
+		assertTrue(trav.translate());
+		assertEquals(null, trav.getTargetPointer());
+		elem = getElement(trav, "src", 1);
+		assertNotNull(elem);
+		assertTrue(trav.translate());
+		assertEquals("../trg", trav.getTargetPointer());
+	}
+
+	@Test
+	public void testTargetPointerLocal () throws SAXException, IOException, ParserConfigurationException {
+		InputSource is = new InputSource(new StringReader("<doc xmlns:i='"+ITSEngine.ITS_NS_URI+"' i:version='2.0'>"
+			+ "<entry><src i:targetPointer='../trg'>source</src><trg></trg></entry></doc>"));
+		Document doc = fact.newDocumentBuilder().parse(is);
+		ITraversal trav = applyITSRules(doc, null, null);
+		Element elem = getElement(trav, "entry", 1);
+		assertNotNull(elem);
+		assertTrue(trav.translate());
+		assertEquals(null, trav.getTargetPointer());
+		elem = getElement(trav, "src", 1);
+		assertNotNull(elem);
+		assertTrue(trav.translate());
+		assertEquals("../trg", trav.getTargetPointer());
+	}
+
+	
 	private static Element getElement (ITraversal trav,
 		String name,
 		int number)
@@ -115,11 +154,11 @@ public class TraversalTest {
 	}
 	
 	private static ITraversal applyITSRules (Document doc,
-		File inputFile,
+		URI docURI,
 		File rulesFile)
 	{
 		// Create the ITS engine
-		ITSEngine itsEng = new ITSEngine(doc, inputFile.toURI());
+		ITSEngine itsEng = new ITSEngine(doc, docURI);
 		// Add any external rules file(s)
 		if ( rulesFile != null ) {
 			itsEng.addExternalRules(rulesFile.toURI());

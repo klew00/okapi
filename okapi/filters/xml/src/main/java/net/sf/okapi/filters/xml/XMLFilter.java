@@ -315,7 +315,7 @@ public class XMLFilter implements IFilter {
 		// Apply the all rules (external and internal) to the document
 		itsEng.applyRules(IProcessor.DC_TRANSLATE | IProcessor.DC_LANGINFO | IProcessor.DC_IDVALUE
 			| IProcessor.DC_LOCNOTE | IProcessor.DC_WITHINTEXT | IProcessor.DC_TERMINOLOGY
-			| IProcessor.DC_DOMAIN);
+			| IProcessor.DC_DOMAIN | IProcessor.DC_TARGETPOINTER);
 		
 		trav = itsEng;
 		trav.startTraversal();
