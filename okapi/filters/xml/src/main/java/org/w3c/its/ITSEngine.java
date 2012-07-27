@@ -25,6 +25,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
@@ -36,8 +37,6 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
-
-import net.sf.okapi.common.Util;
 
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
@@ -827,7 +826,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 							if ( rule.flag ) translatableAttributeRuleTriggered = true; 
 						}
 						if ( rule.idValue != null ) { // For deprecated extension
-							setFlag(NL.item(i), FP_IDVALUE_DATA, resolveExpression(NL.item(i), rule.idValue), true);							
+							setFlag(NL.item(i), FP_IDVALUE_DATA, resolveExpressionAsString(NL.item(i), rule.idValue), true);							
 						}
 						setFlag(NL.item(i), FP_PRESERVEWS, (rule.preserveWS ? 'y' : '?'), true);
 						break;
@@ -883,20 +882,25 @@ public class ITSEngine implements IProcessor, ITraversal {
 					case IProcessor.DC_IDVALUE:
 						// For new ITS 2.0 rule, but deprecated extension still supported in DC_TRANSLATE case
 						if ( rule.idValue != null ) {
-							setFlag(NL.item(i), FP_IDVALUE_DATA, resolveExpression(NL.item(i), rule.idValue), true);							
+							setFlag(NL.item(i), FP_IDVALUE_DATA, resolveExpressionAsString(NL.item(i), rule.idValue), true);							
 						}
 						break;
 						
 					case IProcessor.DC_DOMAIN:
 						setFlag(NL.item(i), FP_DOMAIN, 'y', true);
-						String value = resolveExpression(NL.item(i), rule.info);
-						// Check if we have a mapping for this rule
-						if ( rule.map != null ) {
-							if ( rule.map.containsKey(value) ) {
-								value = rule.map.get(value);
+						List<String> list = resolveExpressionAsList(NL.item(i), rule.info);
+						// Map the values and build the final string
+						StringBuilder tmp = new StringBuilder();
+						for ( String value : list ) {
+							if ( rule.map != null ) {
+								if ( rule.map.containsKey(value) ) {
+									value = rule.map.get(value);
+								}
 							}
+							if ( tmp.length() > 0 ) tmp.append(", ");
+							tmp.append(value);
 						}
-						setFlag(NL.item(i), FP_DOMAIN_DATA, value, true);
+						setFlag(NL.item(i), FP_DOMAIN_DATA, tmp.toString(), true);
 						break;
 						
 					case IProcessor.DC_TARGETPOINTER:
@@ -1155,20 +1159,41 @@ public class ITSEngine implements IProcessor, ITraversal {
 		return "pointer("+pointer+")";
 	}
 	
-	private String resolveExpression (Node node,
+	private String resolveExpressionAsString (Node node,
 		String expression)
 	{
-		String res = "";
 		try {
 			XPathExpression expr = xpath.compile(expression);
-			res = (String)expr.evaluate(node, XPathConstants.STRING);
+			return (String)expr.evaluate(node, XPathConstants.STRING);
 		}
 		catch (XPathExpressionException e) {
 			return "Bab XPath expression \""+expression+"\".";
 		}
-		return res;
 	}
 		
+	private List<String> resolveExpressionAsList (Node node,
+		String expression)
+	{
+		ArrayList<String> list = new ArrayList<String>();
+		try {
+			XPathExpression expr = xpath.compile(expression);
+			NodeList nl = (NodeList)expr.evaluate(node, XPathConstants.NODESET);
+			for ( int i=0; i<nl.getLength(); i++ ) {
+				Node tmpNode = nl.item(i);
+				if ( tmpNode.getNodeType() == Node.ELEMENT_NODE ) {
+					list.add(tmpNode.getTextContent());
+				}
+				else { // Attribute
+					list.add(tmpNode.getNodeValue());
+				}
+			}
+		}
+		catch (XPathExpressionException e) {
+			list.add("Bab XPath expression \""+expression+"\".");
+		}
+		return list;
+	}
+			
 	/**
 	 * Sets the flag for a given node.
 	 * @param node The node to flag.

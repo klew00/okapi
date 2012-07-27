@@ -97,6 +97,24 @@ public class TraversalTest {
 	}
 
 	@Test
+	public void testDomainGlobal () throws SAXException, IOException, ParserConfigurationException {
+		InputSource is = new InputSource(new StringReader("<doc>"
+			+ "<i:rules xmlns:i='"+ITSEngine.ITS_NS_URI+"' version='2.0'>"
+			+ "<i:domainRule selector='//doc' domainPointer='head/subject' "
+			+ " domainMapping=\"dom1 finalDom1, 'dom2 val' 'final dom2'\"/>"
+			+ "</i:rules>"
+			+ "<head><subject>dom1</subject><subject>dom2 val</subject></head><p>text</p></doc>"));
+		Document doc = fact.newDocumentBuilder().parse(is);
+		ITraversal trav = applyITSRules(doc, null, null);
+		Element elem = getElement(trav, "doc", 1);
+		assertEquals("finalDom1, final dom2", trav.getDomain());
+		elem = getElement(trav, "head", 1);
+		assertEquals("finalDom1, final dom2", trav.getDomain());
+		elem = getElement(trav, "p", 1);
+		assertEquals("finalDom1, final dom2", trav.getDomain());
+	}
+
+	@Test
 	public void testTargetPointerGlobal () throws SAXException, IOException, ParserConfigurationException {
 		InputSource is = new InputSource(new StringReader("<doc>"
 			+ "<i:rules xmlns:i='"+ITSEngine.ITS_NS_URI+"' version='2.0'>"
