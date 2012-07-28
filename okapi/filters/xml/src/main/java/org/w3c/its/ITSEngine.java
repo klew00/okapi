@@ -64,17 +64,18 @@ public class ITSEngine implements IProcessor, ITraversal {
 	
 	// Must have '?' as many times as there are FP_XXX entries +1
 	// Must have +FLAGSEP as many times as there are FP_XXX_DATA entries +1
-	private static final String   FLAGDEFAULTDATA     = "????????"+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP;
+	private static final String   FLAGDEFAULTDATA     = "?????????"+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP;
 
 	// Indicator position
-	private static final int      FP_TRANSLATE        = 0;
-	private static final int      FP_DIRECTIONALITY   = 1;
-	private static final int      FP_WITHINTEXT       = 2;
-	private static final int      FP_TERMINOLOGY      = 3;
-	private static final int      FP_LOCNOTE          = 4;
-	private static final int      FP_PRESERVEWS       = 5;
-	private static final int      FP_LANGINFO         = 6;
-	private static final int      FP_DOMAIN           = 7;
+	private static final int      FP_TRANSLATE             = 0;
+	private static final int      FP_DIRECTIONALITY        = 1;
+	private static final int      FP_WITHINTEXT            = 2;
+	private static final int      FP_TERMINOLOGY           = 3;
+	private static final int      FP_LOCNOTE               = 4;
+	private static final int      FP_PRESERVEWS            = 5;
+	private static final int      FP_LANGINFO              = 6;
+	private static final int      FP_DOMAIN                = 7;
+	private static final int      FP_EXTERNALRES           = 8;
 	
 	// Data position 
 	private static final int      FP_TERMINOLOGY_DATA      = 0;
@@ -83,6 +84,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 	private static final int      FP_TARGETPOINTER_DATA    = 3;
 	private static final int      FP_IDVALUE_DATA          = 4;
 	private static final int      FP_DOMAIN_DATA           = 5;
+	private static final int      FP_EXTERNALRES_DATA      = 6;
 	
 	private static final int      TERMINFOTYPE_POINTER     = 1;
 	private static final int      TERMINFOTYPE_REF         = 2;
@@ -278,6 +280,9 @@ public class ITSEngine implements IProcessor, ITraversal {
 					else if ( "targetPointerRule".equals(ruleElem.getLocalName()) ) {
 						compileTargetPointerRule(ruleElem, isInternal);
 					}
+					else if ( "externalResourcesRefRule".equals(ruleElem.getLocalName()) ) {
+						compileExternalResourceRule(ruleElem, isInternal);
+					}
 					else if ( "param".equals(ruleElem.getLocalName()) ) {
 						processParam(ruleElem);
 					}
@@ -426,6 +431,23 @@ public class ITSEngine implements IProcessor, ITraversal {
 
 		// Process domainMapping attribute if it's there
 		rule.map = fromStringToMap(elem.getAttribute("domainMapping"));
+
+		// Add the rule
+		rules.add(rule);
+	}
+
+	private void compileExternalResourceRule (Element elem,
+		boolean isInternal)
+	{
+		ITSRule rule = new ITSRule(IProcessor.DC_EXTERNALRES);
+		rule.selector = elem.getAttribute("selector");
+		rule.isInternal = isInternal;
+				
+		String pointer = elem.getAttribute("externalResourcesRefPointer");
+		if ( pointer.isEmpty() ) {
+			throw new ITSException("Invalid value for 'externalResourcesRefPointer'.");
+		}
+		rule.info = pointer;
 
 		// Add the rule
 		rules.add(rule);
@@ -729,6 +751,10 @@ public class ITSEngine implements IProcessor, ITraversal {
 			trace.peek().domain = getFlagData(data, FP_DOMAIN_DATA);
 		}
 
+		if ( data.charAt(FP_EXTERNALRES) != '?' ) {
+			trace.peek().externalRes = getFlagData(data, FP_EXTERNALRES_DATA);
+		}
+
 		trace.peek().targetPointer = getFlagData(data, FP_TARGETPOINTER_DATA);
 
 		if ( data.charAt(FP_DIRECTIONALITY) != '?' ) {
@@ -877,6 +903,11 @@ public class ITSEngine implements IProcessor, ITraversal {
 					case IProcessor.DC_LANGINFO:
 						setFlag(NL.item(i), FP_LANGINFO, 'y', true);
 						setFlag(NL.item(i), FP_LANGINFO_DATA, resolvePointer(NL.item(i), rule.info), true);
+						break;
+						
+					case IProcessor.DC_EXTERNALRES:
+						setFlag(NL.item(i), FP_EXTERNALRES, 'y', true);
+						setFlag(NL.item(i), FP_EXTERNALRES_DATA, resolvePointer(NL.item(i), rule.info), true);
 						break;
 						
 					case IProcessor.DC_IDVALUE:
@@ -1345,4 +1376,19 @@ public class ITSEngine implements IProcessor, ITraversal {
 	public String getLanguage () {
 		return trace.peek().language;
 	}
+
+	@Override
+	public String getExternalResourcesRef () {
+		return trace.peek().externalRes;
+	}
+
+	@Override
+	public String getExternalResourcesRef (Attr attribute) {
+		if ( attribute == null ) return null;
+		String tmp;
+		if ( (tmp = (String)attribute.getUserData(FLAGNAME)) == null ) return null;
+		if ( tmp.charAt(FP_EXTERNALRES) != 'y' ) return null;
+		return getFlagData(tmp, FP_EXTERNALRES_DATA);
+	}
+
 }

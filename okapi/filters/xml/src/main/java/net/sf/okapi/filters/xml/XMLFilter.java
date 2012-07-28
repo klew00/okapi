@@ -808,18 +808,25 @@ public class XMLFilter implements IFilter {
 		
 		tu.setSourceContent(frag);
 		
-		String locNote = context.peek().locNote;
-		if ( locNote != null ) {
-			tu.setProperty(new Property(Property.NOTE, locNote));
+		// Build the note
+		//TODO: Provide separate annotations
+		StringBuilder note = new StringBuilder();
+		if ( !Util.isEmpty(context.peek().locNote) ) {
+			note.append(context.peek().locNote);
+		}
+		if ( !Util.isEmpty(context.peek().domain) ) {
+			if ( note.length() > 0 ) note.append("\n");
+			note.append("its:domain="+context.peek().domain);
+		}
+		if ( !Util.isEmpty(context.peek().externalRes) ) {
+			if ( note.length() > 0 ) note.append("\n");
+			note.append("its:externalResourcesRef="+context.peek().externalRes);
+		}
+		if ( note.length() > 0 ) {
+			tu.setProperty(new Property(Property.NOTE, note.toString()));
 		}
 		
-		String domain = context.peek().domain;
-		if ( domain != null ) {
-			//TODO: Use specific annotation, not a note
-			//TODO: Handle multiple entries
-			tu.setProperty(new Property(Property.NOTE, "its:domain="+domain));
-		}
-		
+		// Set term info
 		if ( terms != null ) {
 			tu.getSource().setAnnotation(terms);
 			terms = null; // Reset for next time

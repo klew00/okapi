@@ -32,6 +32,7 @@ class ITSTrace {
 	boolean preserveWS;
 	String language;
 	String targetPointer;
+	String externalRes;
 	String idValue;
 	String domain;
 
@@ -64,6 +65,9 @@ class ITSTrace {
 		language = initialTrace.language;
 		
 		// idValue: No inheritance
+		
+		// external resource reference: Inheritance for child element including attributes
+		externalRes = initialTrace.externalRes;
 		
 		// domain: Inheritance for child elements including attributes
 		domain = initialTrace.domain;

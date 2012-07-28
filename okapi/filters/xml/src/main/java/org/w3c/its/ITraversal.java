@@ -99,6 +99,10 @@ public interface ITraversal {
 	 */
 	public int getDirectionality (Attr attribute);
 	
+	public String getExternalResourcesRef ();
+	
+	public String getExternalResourcesRef (Attr attribute);
+	
 	/**
 	 * Gets the element-withinText-related information for the current element.
 	 * @return One of the WINTINTEXT_* values.

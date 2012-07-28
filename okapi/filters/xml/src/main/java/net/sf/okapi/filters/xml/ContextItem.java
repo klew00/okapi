@@ -32,6 +32,7 @@ class ContextItem {
 	String locNote;
 	boolean preserveWS;
 	String domain;
+	String externalRes;
 
 	public ContextItem (Node node,
 		ITraversal trav)
@@ -44,6 +45,7 @@ class ContextItem {
 		this.locNote = trav.getNote();
 		this.preserveWS = trav.preserveWS();
 		this.domain = trav.getDomain();
+		this.externalRes = trav.getExternalResourcesRef();
 	}
 
 }

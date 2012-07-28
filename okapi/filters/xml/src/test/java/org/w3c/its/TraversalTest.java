@@ -24,6 +24,7 @@ import net.sf.okapi.common.TestUtil;
 import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
+import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -149,7 +150,37 @@ public class TraversalTest {
 		assertEquals("../trg", trav.getTargetPointer());
 	}
 
-	
+	@Test
+	public void testExternalResourceRefGlobal () throws SAXException, IOException, ParserConfigurationException {
+		InputSource is = new InputSource(new StringReader("<doc>"
+			+ "<i:rules xmlns:i='"+ITSEngine.ITS_NS_URI+"' version='2.0'>"
+			+ "<i:externalResourcesRefRule selector='//video/@src' externalResourcesRefPointer='.' />"
+			+ "<i:externalResourcesRefRule selector='//video/@poster' externalResourcesRefPointer='.' />"
+			+ "</i:rules>"
+			+ "<p>Text with <video src=\"http://www.example.com/v2.mp\" poster=\"video-image.png\" /></p></doc>"));
+		Document doc = fact.newDocumentBuilder().parse(is);
+		ITraversal trav = applyITSRules(doc, null, null);
+		Element elem = getElement(trav, "video", 1);
+		assertEquals("http://www.example.com/v2.mp", trav.getExternalResourcesRef(elem.getAttributeNode("src")));
+		assertEquals("video-image.png", trav.getExternalResourcesRef(elem.getAttributeNode("poster")));
+	}
+
+	@Test
+	public void testTranslateGlobal () throws SAXException, IOException, ParserConfigurationException {
+		InputSource is = new InputSource(new StringReader("<doc>"
+			+ "<i:rules xmlns:i='"+ITSEngine.ITS_NS_URI+"' version='2.0'>"
+			+ "<i:translateRule selector='//par/@title' translate='yes' />"
+			+ "<i:translateRule selector='//par/@alt' translate='yes' />"
+			+ "</i:rules>"
+			+ "<par title='title text' test='test' alt='alt text'>Text</par></doc>"));
+		Document doc = fact.newDocumentBuilder().parse(is);
+		ITraversal trav = applyITSRules(doc, null, null);
+		Element elem = getElement(trav, "par", 1);
+		assertTrue(trav.translate(elem.getAttributeNode("title")));
+		assertTrue(trav.translate(elem.getAttributeNode("alt")));
+		assertFalse(trav.translate(elem.getAttributeNode("test")));
+	}
+
 	private static Element getElement (ITraversal trav,
 		String name,
 		int number)
