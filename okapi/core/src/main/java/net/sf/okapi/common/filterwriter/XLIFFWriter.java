@@ -62,6 +62,8 @@ public class XLIFFWriter implements IFilterWriter {
 	 */
 	public static final String OKP_MATCHTYPE = "matchType";
 	
+	public static final String NS_ITS20 = "http://www.w3.org/2005/11/its";
+	
 	private static final String RESTYPEVALUES = 
 		";auto3state;autocheckbox;autoradiobutton;bedit;bitmap;button;caption;cell;"
 		+ "checkbox;checkboxmenuitem;checkedlistbox;colorchooser;combobox;comboboxexitem;"
@@ -443,6 +445,25 @@ public class XLIFFWriter implements IFilterWriter {
 		if ( tu.preserveWhitespaces() ) {
 			writer.writeAttributeString("xml:space", "preserve");
 		}
+		
+		// ITS properties
+		boolean hasITSnamespace = false;
+		String name = "its:domain";
+		if ( tu.hasProperty(name) ) {
+			writer.writeAttributeString("xmlns:its", NS_ITS20);
+			writer.writeAttributeString("its:version", "2.0");
+			hasITSnamespace = true;
+			writer.writeAttributeString(name, tu.getProperty(name).getValue());
+		}
+		name = "its:externalResourcesRef";
+		if ( tu.hasProperty(name) ) {
+			if ( !hasITSnamespace ) {
+				writer.writeAttributeString("xmlns:its", NS_ITS20);
+				writer.writeAttributeString("its:version", "2.0");
+			}
+			writer.writeAttributeString(name, tu.getProperty(name).getValue());
+		}
+		
 		writer.writeLineBreak();
 
 		// Get the source container

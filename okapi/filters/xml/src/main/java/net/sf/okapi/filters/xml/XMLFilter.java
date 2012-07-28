@@ -315,7 +315,7 @@ public class XMLFilter implements IFilter {
 		// Apply the all rules (external and internal) to the document
 		itsEng.applyRules(IProcessor.DC_TRANSLATE | IProcessor.DC_LANGINFO | IProcessor.DC_IDVALUE
 			| IProcessor.DC_LOCNOTE | IProcessor.DC_WITHINTEXT | IProcessor.DC_TERMINOLOGY
-			| IProcessor.DC_DOMAIN | IProcessor.DC_TARGETPOINTER);
+			| IProcessor.DC_DOMAIN | IProcessor.DC_TARGETPOINTER | IProcessor.DC_EXTERNALRES);
 		
 		trav = itsEng;
 		trav.startTraversal();
@@ -808,22 +808,17 @@ public class XMLFilter implements IFilter {
 		
 		tu.setSourceContent(frag);
 		
-		// Build the note
-		//TODO: Provide separate annotations
-		StringBuilder note = new StringBuilder();
+		// ITS Localization Note
 		if ( !Util.isEmpty(context.peek().locNote) ) {
-			note.append(context.peek().locNote);
+			tu.setProperty(new Property(Property.NOTE, context.peek().locNote));
 		}
+		// ITS Domain
 		if ( !Util.isEmpty(context.peek().domain) ) {
-			if ( note.length() > 0 ) note.append("\n");
-			note.append("its:domain="+context.peek().domain);
+			tu.setProperty(new Property("its:domain", context.peek().domain));
 		}
+		// ITS External resources Reference
 		if ( !Util.isEmpty(context.peek().externalRes) ) {
-			if ( note.length() > 0 ) note.append("\n");
-			note.append("its:externalResourcesRef="+context.peek().externalRes);
-		}
-		if ( note.length() > 0 ) {
-			tu.setProperty(new Property(Property.NOTE, note.toString()));
+			tu.setProperty(new Property("its:externalResourcesRef", context.peek().externalRes));
 		}
 		
 		// Set term info
