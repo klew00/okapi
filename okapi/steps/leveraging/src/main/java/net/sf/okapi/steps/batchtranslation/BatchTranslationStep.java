@@ -105,7 +105,8 @@ public class BatchTranslationStep extends BasePipelineStep {
 			if ( sendTMX ) {
 				return trans.endBatch();
 			}
-			else { // Don't use the multi-events, just send the input event
+			else { // Don't use the multi-events
+				// This returns null
 				trans.endBatch();
 			}
 		}
