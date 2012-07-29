@@ -748,7 +748,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 		trace.peek().idValue = getFlagData(data, FP_IDVALUE_DATA);
 		
 		if ( data.charAt(FP_DOMAIN) != '?' ) {
-			trace.peek().domain = getFlagData(data, FP_DOMAIN_DATA);
+			trace.peek().domains = getFlagData(data, FP_DOMAIN_DATA);
 		}
 
 		if ( data.charAt(FP_EXTERNALRES) != '?' ) {
@@ -928,7 +928,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 									value = rule.map.get(value);
 								}
 							}
-							if ( tmp.length() > 0 ) tmp.append(", ");
+							if ( tmp.length() > 0 ) tmp.append("\t");
 							tmp.append(value);
 						}
 						setFlag(NL.item(i), FP_DOMAIN_DATA, tmp.toString(), true);
@@ -1357,11 +1357,11 @@ public class ITSEngine implements IProcessor, ITraversal {
 		return getFlagData(tmp, FP_LOCNOTE_DATA);
 	}
 
-	public String getDomain () {
-		return trace.peek().domain;
+	public String getDomains () {
+		return trace.peek().domains;
 	}
 	
-	public String getDomain (Attr attribute) {
+	public String getDomains (Attr attribute) {
 		if ( attribute == null ) return null;
 		String tmp;
 		if ( (tmp = (String)attribute.getUserData(FLAGNAME)) == null ) return null;

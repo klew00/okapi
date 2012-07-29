@@ -813,12 +813,12 @@ public class XMLFilter implements IFilter {
 			tu.setProperty(new Property(Property.NOTE, context.peek().locNote));
 		}
 		// ITS Domain
-		if ( !Util.isEmpty(context.peek().domain) ) {
-			tu.setProperty(new Property("its:domain", context.peek().domain));
+		if ( !Util.isEmpty(context.peek().domains) ) {
+			tu.setProperty(new Property(Property.ITS_DOMAINS, context.peek().domains));
 		}
 		// ITS External resources Reference
 		if ( !Util.isEmpty(context.peek().externalRes) ) {
-			tu.setProperty(new Property("its:externalResourcesRef", context.peek().externalRes));
+			tu.setProperty(new Property(Property.ITS_EXTERNALRESREF, context.peek().externalRes));
 		}
 		
 		// Set term info

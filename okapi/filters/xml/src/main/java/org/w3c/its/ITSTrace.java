@@ -34,7 +34,7 @@ class ITSTrace {
 	String targetPointer;
 	String externalRes;
 	String idValue;
-	String domain;
+	String domains;
 
 	ITSTrace () {
 		// Default constructor
@@ -70,7 +70,7 @@ class ITSTrace {
 		externalRes = initialTrace.externalRes;
 		
 		// domain: Inheritance for child elements including attributes
-		domain = initialTrace.domain;
+		domains = initialTrace.domains;
 		
 		this.isChildDone = isChildDone;
 	}

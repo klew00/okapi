@@ -112,11 +112,14 @@ public class TraversalTest {
 		Document doc = fact.newDocumentBuilder().parse(is);
 		ITraversal trav = applyITSRules(doc, null, null);
 		Element elem = getElement(trav, "doc", 1);
-		assertEquals("finalDom1, final dom2", trav.getDomain());
+		assertNotNull(elem);
+		assertEquals("finalDom1\tfinal dom2", trav.getDomains());
 		elem = getElement(trav, "head", 1);
-		assertEquals("finalDom1, final dom2", trav.getDomain());
+		assertNotNull(elem);
+		assertEquals("finalDom1\tfinal dom2", trav.getDomains());
 		elem = getElement(trav, "p", 1);
-		assertEquals("finalDom1, final dom2", trav.getDomain());
+		assertNotNull(elem);
+		assertEquals("finalDom1\tfinal dom2", trav.getDomains());
 	}
 
 	@Test

@@ -239,8 +239,8 @@ public class XLIFFWriterTest {
 	{
 		writer.create(root+"out.xlf", null, locEN, null, null, "original.ext", null);
 		ITextUnit tu = new TextUnit("tu1", "text");
-		tu.setProperty(new Property("its:domain", "dom1, dom2"));
-		tu.setProperty(new Property("its:externalResourcesRef", "http://example.com/res"));
+		tu.setProperty(new Property(Property.ITS_DOMAINS, "dom1\tdom2"));
+		tu.setProperty(new Property(Property.ITS_EXTERNALRESREF, "http://example.com/res"));
 		writer.writeTextUnit(tu);
 		writer.close();
 
@@ -249,7 +249,7 @@ public class XLIFFWriterTest {
 			+ "<xliff version=\"1.2\" xmlns=\"urn:oasis:names:tc:xliff:document:1.2\" xmlns:okp=\"okapi-framework:xliff-extensions\">\n"
 			+ "<file original=\"original.ext\" source-language=\"en\" datatype=\"x-undefined\">\n"
 			+ "<body>\n"
-			+ "<trans-unit id=\"tu1\" xmlns:its=\"http://www.w3.org/2005/11/its\" its:version=\"2.0\" its:domain=\"dom1, dom2\" its:externalResourcesRef=\"http://example.com/res\">\n"
+			+ "<trans-unit id=\"tu1\" xmlns:its=\"http://www.w3.org/2005/11/its\" its:version=\"2.0\" its:domain=\"dom1\" its:externalResourcesRef=\"http://example.com/res\">\n"
 			+ "<source xml:lang=\"en\">text</source>\n"
 			+ "</trans-unit>\n"
 			+ "</body>\n</file>\n</xliff>\n", result);

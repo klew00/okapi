@@ -448,20 +448,23 @@ public class XLIFFWriter implements IFilterWriter {
 		
 		// ITS properties
 		boolean hasITSnamespace = false;
-		String name = "its:domain";
-		if ( tu.hasProperty(name) ) {
+		if ( tu.hasProperty(Property.ITS_DOMAINS) ) {
 			writer.writeAttributeString("xmlns:its", NS_ITS20);
 			writer.writeAttributeString("its:version", "2.0");
 			hasITSnamespace = true;
-			writer.writeAttributeString(name, tu.getProperty(name).getValue());
+			// In XLIFF output we provide only the first value
+			// Otherwise we would have to use something else than 'its:domain'
+			tmp = tu.getProperty(Property.ITS_DOMAINS).getValue();
+			int n = tmp.indexOf('\t');
+			if ( n > 0 ) writer.writeAttributeString("its:domain", tmp.substring(0, n));
+			else writer.writeAttributeString("its:domain", tmp);
 		}
-		name = "its:externalResourcesRef";
-		if ( tu.hasProperty(name) ) {
+		if ( tu.hasProperty(Property.ITS_EXTERNALRESREF) ) {
 			if ( !hasITSnamespace ) {
 				writer.writeAttributeString("xmlns:its", NS_ITS20);
 				writer.writeAttributeString("its:version", "2.0");
 			}
-			writer.writeAttributeString(name, tu.getProperty(name).getValue());
+			writer.writeAttributeString("its:externalResourcesRef", tu.getProperty(Property.ITS_EXTERNALRESREF).getValue());
 		}
 		
 		writer.writeLineBreak();
