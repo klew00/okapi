@@ -37,6 +37,7 @@ public interface IProcessor {
 	public static final int DC_DOMAIN            = 0x0100; // ITS 2.0
 	public static final int DC_TARGETPOINTER     = 0x0200; // ITS 2.0
 	public static final int DC_EXTERNALRES       = 0x0400; // ITS 2.0
+	public static final int DC_LOCFILTER         = 0x0800; // ITS 2.0
 	public static final int DC_ALL               = 0xFFFF;
 	
 	/**

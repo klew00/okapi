@@ -142,6 +142,28 @@ public class TraversalTest {
 	}
 
 	@Test
+	public void testLocaleFilter () throws SAXException, IOException, ParserConfigurationException {
+		InputSource is = new InputSource(new StringReader("<book xmlns:its=\"http://www.w3.org/2005/11/its\">"
+			+ "<info>"
+			+ "<its:rules version=\"2.0\">"
+			+ "<its:localeFilterRule selector=\"//legalnotice[@role='Canada']\" localeFilterType=\"include\" localeFilterList=\"en-CA, fr-CA\"/>"
+			+ "</its:rules>"
+			+ "<legalnotice role=\"Canada\">"
+			+ "<para>This legal notice is only for Canadian locales.</para>"
+			+ "<para its:localeFilterType='all'>This text is for all locales.</para>"
+			+ "</legalnotice>"
+			+ "</info></book>"));
+		Document doc = fact.newDocumentBuilder().parse(is);
+		ITraversal trav = applyITSRules(doc, null, null);
+		Element elem = getElement(trav, "para", 1);
+		assertNotNull(elem);
+		assertEquals("+en-CA, fr-CA", trav.getLocaleFilter());
+		elem = getElement(trav, "para", 2);
+		assertNotNull(elem);
+		assertEquals("+*", trav.getLocaleFilter());
+	}
+
+	@Test
 	public void testTargetPointerLocal () throws SAXException, IOException, ParserConfigurationException {
 		InputSource is = new InputSource(new StringReader("<doc xmlns:i='"+ITSEngine.ITS_NS_URI+"' i:version='2.0'>"
 			+ "<entry><src i:targetPointer='../trg'>source</src><trg></trg></entry></doc>"));

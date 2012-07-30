@@ -95,6 +95,85 @@ public class XMLFilterTest {
 	}
 	
 	@Test
+	public void testLocaleFilter1 () {
+		String snippet = "<?xml version=\"1.0\"?>\n"
+			+ "<doc><its:rules version=\"2.0\" xmlns:its=\"http://www.w3.org/2005/11/its\">"
+			+ "<its:localeFilterRule selector=\"//para1\" localeFilterType='none'/>"
+			+ "</its:rules>"
+			+ "<para1>text1</para1>"
+			+ "<para2>text2</para2>"
+			+ "</doc>";
+		ArrayList<Event> list = getEvents(snippet);
+		ITextUnit tu = FilterTestDriver.getTextUnit(list, 1);
+		assertNotNull(tu);
+		assertEquals("text2", tu.getSource().toString());
+	}
+	
+	@Test
+	public void testLocaleFilter2 () {
+		String snippet = "<?xml version=\"1.0\"?>\n"
+			+ "<doc><its:rules version=\"2.0\" xmlns:its=\"http://www.w3.org/2005/11/its\">"
+			+ "<its:localeFilterRule selector=\"//para1\" localeFilterType='include' localeFilterList=''/>"
+			+ "<its:localeFilterRule selector=\"//para2\" localeFilterType='exclude' localeFilterList='*'/>"
+			+ "</its:rules>"
+			+ "<para1>text1</para1>"
+			+ "<para2>text2</para2>"
+			+ "<para3>text3</para3>"
+			+ "</doc>";
+		ArrayList<Event> list = getEvents(snippet);
+		ITextUnit tu = FilterTestDriver.getTextUnit(list, 1);
+		assertNotNull(tu);
+		assertEquals("text3", tu.getSource().toString());
+	}
+
+	@Test
+	public void testLocaleFilter3 () {
+		String snippet = "<?xml version=\"1.0\"?>\n"
+			+ "<doc><its:rules version=\"2.0\" xmlns:its=\"http://www.w3.org/2005/11/its\">"
+			+ "<its:localeFilterRule selector=\"//para1\" localeFilterType='include' localeFilterList='de-CH, de-AT'/>"
+			+ "<its:localeFilterRule selector=\"//para2\" localeFilterType='include' localeFilterList='en-CA, fr-CA'/>"
+			+ "</its:rules>"
+			+ "<para1>text1</para1>"
+			+ "<para2>text2</para2>"
+			+ "</doc>";
+		ArrayList<Event> list = getEvents(snippet);
+		ITextUnit tu = FilterTestDriver.getTextUnit(list, 1);
+		assertNotNull(tu);
+		assertEquals("text2", tu.getSource().toString());
+	}
+	
+	@Test
+	public void testLocaleFilter4 () {
+		String snippet = "<?xml version=\"1.0\"?>\n"
+			+ "<doc><its:rules version=\"2.0\" xmlns:its=\"http://www.w3.org/2005/11/its\">"
+			+ "<its:localeFilterRule selector=\"//para1\" localeFilterType='exclude' localeFilterList='fr-CH, de-CH'/>"
+			+ "<its:localeFilterRule selector=\"//para2\" localeFilterType='exclude' localeFilterList='en-CA, de'/>"
+			+ "</its:rules>"
+			+ "<para1>text1</para1>"
+			+ "<para2>text2</para2>"
+			+ "</doc>";
+		ArrayList<Event> list = getEvents(snippet);
+		ITextUnit tu = FilterTestDriver.getTextUnit(list, 1);
+		assertNotNull(tu);
+		assertEquals("text2", tu.getSource().toString());
+	}
+	
+	@Test
+	public void testLocaleFilter5 () {
+		String snippet = "<?xml version=\"1.0\"?>\n"
+			+ "<doc xmlns:its=\"http://www.w3.org/2005/11/its\"><its:rules version=\"2.0\">"
+			+ "<its:localeFilterRule selector=\"/doc\" localeFilterType='exclude' localeFilterList='fr-CH, de-CH'/>"
+			+ "</its:rules>"
+			+ "<para1 its:localeFilterType='include' its:localeFilterList='fr-CH'>text1</para1>"
+			+ "<para2>text2</para2>"
+			+ "</doc>";
+		ArrayList<Event> list = getEvents(snippet);
+		ITextUnit tu = FilterTestDriver.getTextUnit(list, 1);
+		assertNotNull(tu);
+		assertEquals("text1", tu.getSource().toString());
+	}
+	
+	@Test
 	public void testComplexIdValue () {
 		String snippet = "<?xml version=\"1.0\"?>\n"
 			+ "<doc><its:rules version=\"1.0\" xmlns:its=\"http://www.w3.org/2005/11/its\""
@@ -746,7 +825,7 @@ public class XMLFilterTest {
 
 	private ArrayList<Event> getEvents(String snippet) {
 		ArrayList<Event> list = new ArrayList<Event>();
-		filter.open(new RawDocument(snippet, locEN));
+		filter.open(new RawDocument(snippet, locEN, LocaleId.FRENCH));
 		while ( filter.hasNext() ) {
 			Event event = filter.next();
 			list.add(event);

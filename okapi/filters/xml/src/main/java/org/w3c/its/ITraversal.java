@@ -165,6 +165,13 @@ public interface ITraversal {
 	public String getDomains (Attr attribute);
 
 	/**
+	 * Gets the locale filter information.
+	 * @return A '+' or '-' (include or exclude) followed by a comma-separated list
+	 * of basic language ranges as defined in BCP-47 (and possibly empty).
+	 */
+	public String getLocaleFilter ();
+	
+	/**
 	 * Indicates if the white spaces of the current element of the traversal
 	 * must be preserved. 
 	 * @return True if the white spaces of the current element must be preserve,

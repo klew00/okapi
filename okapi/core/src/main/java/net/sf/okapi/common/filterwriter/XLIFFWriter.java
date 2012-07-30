@@ -446,24 +446,10 @@ public class XLIFFWriter implements IFilterWriter {
 			writer.writeAttributeString("xml:space", "preserve");
 		}
 		
-		// ITS properties
-		boolean hasITSnamespace = false;
-		if ( tu.hasProperty(Property.ITS_DOMAINS) ) {
+		// TU-level ITS properties (as attribute)
+		if ( tu.hasProperty(Property.ITS_EXTERNALRESREF) ) {
 			writer.writeAttributeString("xmlns:its", NS_ITS20);
 			writer.writeAttributeString("its:version", "2.0");
-			hasITSnamespace = true;
-			// In XLIFF output we provide only the first value
-			// Otherwise we would have to use something else than 'its:domain'
-			tmp = tu.getProperty(Property.ITS_DOMAINS).getValue();
-			int n = tmp.indexOf('\t');
-			if ( n > 0 ) writer.writeAttributeString("its:domain", tmp.substring(0, n));
-			else writer.writeAttributeString("its:domain", tmp);
-		}
-		if ( tu.hasProperty(Property.ITS_EXTERNALRESREF) ) {
-			if ( !hasITSnamespace ) {
-				writer.writeAttributeString("xmlns:its", NS_ITS20);
-				writer.writeAttributeString("its:version", "2.0");
-			}
 			writer.writeAttributeString("its:externalResourcesRef", tu.getProperty(Property.ITS_EXTERNALRESREF).getValue());
 		}
 		
@@ -546,7 +532,19 @@ public class XLIFFWriter implements IFilterWriter {
 			writer.writeString("Terms:\n"+ann.toString());
 			writer.writeEndElementLineBreak(); // note
 		}
-		
+
+		// ITS properties (as element)
+		if ( tu.hasProperty(Property.ITS_DOMAINS) ) {
+			writer.writeStartElement("okp:itsDomains");
+			writer.writeAttributeString("xmlns:dc", "http://purl.org/dc/elements/1.1/");
+			for ( String value : tu.getProperty(Property.ITS_DOMAINS).getValue().split("\t", 0) ) {
+				writer.writeStartElement("okp:item");
+				writer.writeAttributeString("dc:subject", value);
+				writer.writeEndElement();
+			}
+			writer.writeEndElement();
+		}
+
 		writer.writeEndElementLineBreak(); // trans-unit
 	}
 

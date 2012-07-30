@@ -28,6 +28,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
+import java.util.logging.Logger;
 
 import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -64,7 +65,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 	
 	// Must have '?' as many times as there are FP_XXX entries +1
 	// Must have +FLAGSEP as many times as there are FP_XXX_DATA entries +1
-	private static final String   FLAGDEFAULTDATA     = "?????????"+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP;
+	private static final String   FLAGDEFAULTDATA     = "??????????"+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP;
 
 	// Indicator position
 	private static final int      FP_TRANSLATE             = 0;
@@ -76,6 +77,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 	private static final int      FP_LANGINFO              = 6;
 	private static final int      FP_DOMAIN                = 7;
 	private static final int      FP_EXTERNALRES           = 8;
+	private static final int      FP_LOCFILTER             = 9;
 	
 	// Data position 
 	private static final int      FP_TERMINOLOGY_DATA      = 0;
@@ -85,6 +87,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 	private static final int      FP_IDVALUE_DATA          = 4;
 	private static final int      FP_DOMAIN_DATA           = 5;
 	private static final int      FP_EXTERNALRES_DATA      = 6;
+	private static final int      FP_LOCFILTER_DATA        = 7;
 	
 	private static final int      TERMINFOTYPE_POINTER     = 1;
 	private static final int      TERMINFOTYPE_REF         = 2;
@@ -109,6 +112,8 @@ public class ITSEngine implements IProcessor, ITraversal {
 	private boolean backTracking;
 	private boolean translatableAttributeRuleTriggered;
 	private String version;
+
+	private final Logger logger = Logger.getLogger(getClass().getName());
 	
 	public ITSEngine (Document doc,
 		URI docURI)
@@ -280,6 +285,9 @@ public class ITSEngine implements IProcessor, ITraversal {
 					else if ( "targetPointerRule".equals(ruleElem.getLocalName()) ) {
 						compileTargetPointerRule(ruleElem, isInternal);
 					}
+					else if ( "localeFilterRule".equals(ruleElem.getLocalName()) ) {
+						compileLocaleFilterRule(ruleElem, isInternal);
+					}
 					else if ( "externalResourcesRefRule".equals(ruleElem.getLocalName()) ) {
 						compileExternalResourceRule(ruleElem, isInternal);
 					}
@@ -352,7 +360,8 @@ public class ITSEngine implements IProcessor, ITraversal {
 		value = elem.getAttributeNS(ITSX_NS_URI, "idValue");
 		if ( version.equals(ITS_VERSION2) && !value.isEmpty() ) {
 			// Warn if the extension is used in ITS 2.0
-			//TODO: Log warning
+			logger.warning(String.format("This document uses the %s:idValue extension instead of the ITS 2.0 idValue attribute.",
+				ITSX_NS_URI));
 		}
 		if ( !value.isEmpty() ) {
 			rule.idValue = value;
@@ -449,6 +458,18 @@ public class ITSEngine implements IProcessor, ITraversal {
 		}
 		rule.info = pointer;
 
+		// Add the rule
+		rules.add(rule);
+	}
+
+	private void compileLocaleFilterRule (Element elem,
+		boolean isInternal)
+	{
+		ITSRule rule = new ITSRule(IProcessor.DC_LOCFILTER);
+		rule.selector = elem.getAttribute("selector");
+		rule.isInternal = isInternal;
+		// Process the attributes
+		rule.info = retrieveLocaleFilterList(elem, false);
 		// Add the rule
 		rules.add(rule);
 	}
@@ -755,6 +776,10 @@ public class ITSEngine implements IProcessor, ITraversal {
 			trace.peek().externalRes = getFlagData(data, FP_EXTERNALRES_DATA);
 		}
 
+		if ( data.charAt(FP_LOCFILTER) != '?' ) {
+			trace.peek().localeFilter = getFlagData(data, FP_LOCFILTER_DATA);
+		}
+
 		trace.peek().targetPointer = getFlagData(data, FP_TARGETPOINTER_DATA);
 
 		if ( data.charAt(FP_DIRECTIONALITY) != '?' ) {
@@ -908,6 +933,11 @@ public class ITSEngine implements IProcessor, ITraversal {
 					case IProcessor.DC_EXTERNALRES:
 						setFlag(NL.item(i), FP_EXTERNALRES, 'y', true);
 						setFlag(NL.item(i), FP_EXTERNALRES_DATA, resolvePointer(NL.item(i), rule.info), true);
+						break;
+						
+					case IProcessor.DC_LOCFILTER:
+						setFlag(NL.item(i), FP_LOCFILTER, 'y', true);
+						setFlag(NL.item(i), FP_LOCFILTER_DATA, rule.info, true);
 						break;
 						
 					case IProcessor.DC_IDVALUE:
@@ -1089,6 +1119,24 @@ public class ITSEngine implements IProcessor, ITraversal {
 					("preserve".equals(value) ? 'y' : '?'), attr.getSpecified());
 			}
 			
+			// locale filter type/list
+			// Only localeFilterType is needed, localeFilterList cannot be used alone
+			if (( (dataCategories & IProcessor.DC_LOCFILTER) > 0 ) && isVersion2() ) {
+				expr = xpath.compile("//*/@"+ITS_NS_PREFIX+":localeFilterType");
+				NL = (NodeList)expr.evaluate(doc, XPathConstants.NODESET);
+				for ( int i=0; i<NL.getLength(); i++ ) {
+					attr = (Attr)NL.item(i);
+					// Skip irrelevant nodes
+					if ( ITS_NS_URI.equals(attr.getOwnerElement().getNamespaceURI())
+						&& "localeFilterRule".equals(attr.getOwnerElement().getLocalName()) ) continue;
+					// Set the flag
+					String value = retrieveLocaleFilterList(attr.getOwnerElement(), true);
+					setFlag(attr.getOwnerElement(), FP_LOCFILTER, 'y', attr.getSpecified());
+					setFlag(attr.getOwnerElement(), FP_LOCFILTER_DATA,
+						value, attr.getSpecified()); 
+				}
+			}
+			
 			// xml:id always applied
 			expr = xpath.compile("//*/@"+XML_NS_PREFIX+":id");
 			NL = (NodeList)expr.evaluate(doc, XPathConstants.NODESET);
@@ -1118,14 +1166,46 @@ public class ITSEngine implements IProcessor, ITraversal {
 					}
 				}
 			}
-			
-			
 		}
 		catch ( XPathExpressionException e ) {
 			throw new RuntimeException(e);
 		}
 	}
 
+	/**
+	 * Retrieve the final list to use for a locale filter data category
+	 * @param elem the element where the attributes are defined.
+	 * @param qualified true if the attributes are expected to be qualified (local markup)
+	 * @return the final list.
+	 */
+	private String retrieveLocaleFilterList (Element elem,
+		boolean qualified)
+	{
+		String type;
+		if ( qualified ) type = elem.getAttributeNS(ITS_NS_URI, "localeFilterType");
+		else type = elem.getAttribute("localeFilterType");
+		
+		if ( type.isEmpty() || ";all;noneinclude;exclude;".indexOf(type) == -1 ) {
+			throw new ITSException(String.format("Invalid value '%s' for 'localeFilterType'.", type));
+		}
+	
+		String list = "-*";
+		if ( type.equals("include") ) {
+			if ( qualified ) list = "+"+elem.getAttributeNS(ITS_NS_URI, "localeFilterList");
+			else list = "+"+elem.getAttribute("localeFilterList");
+		}
+		else if ( type.equals("exclude") ) {
+			if ( qualified ) list = "-"+elem.getAttributeNS(ITS_NS_URI, "localeFilterList");
+			else list = "-"+elem.getAttribute("localeFilterList");
+		}
+		else { // To simplify we set the list to '+*' for all and "-*" for 'none'
+			if ( type.equals("all") ) list = "+*";
+			// Else: we just use the empty string set as the default
+		}
+
+		return list;
+	}
+	
 	private boolean isVersion2 () throws XPathExpressionException {
 		// If the version is not detected yet: detect it.
 		if ( version.equals("0") ) {
@@ -1389,6 +1469,11 @@ public class ITSEngine implements IProcessor, ITraversal {
 		if ( (tmp = (String)attribute.getUserData(FLAGNAME)) == null ) return null;
 		if ( tmp.charAt(FP_EXTERNALRES) != 'y' ) return null;
 		return getFlagData(tmp, FP_EXTERNALRES_DATA);
+	}
+
+	@Override
+	public String getLocaleFilter () {
+		return trace.peek().localeFilter;
 	}
 
 }

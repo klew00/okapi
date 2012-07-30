@@ -33,6 +33,7 @@ class ITSTrace {
 	String language;
 	String targetPointer;
 	String externalRes;
+	String localeFilter;
 	String idValue;
 	String domains;
 
@@ -68,6 +69,9 @@ class ITSTrace {
 		
 		// external resource reference: Inheritance for child element including attributes
 		externalRes = initialTrace.externalRes;
+		
+		// locale filter:  Inheritance for child element including attributes
+		localeFilter = initialTrace.localeFilter;
 		
 		// domain: Inheritance for child elements including attributes
 		domains = initialTrace.domains;
