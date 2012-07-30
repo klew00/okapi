@@ -588,6 +588,10 @@ class QualityChecker {
 				0, -1, m.start(), m.end(), Issue.SEVERITY_HIGH, srcOri, trgOri, null);
 		}
 	}
+
+	private boolean isSpaceWeCareAbout(char c) {
+		return Character.isWhitespace(c) || Character.isSpaceChar(c);
+	}
 	
 	private void checkWhiteSpaces (String srcOri,
 		String trgOri,
@@ -598,7 +602,7 @@ class QualityChecker {
 			
 			// Missing ones
 			for ( int i=0; i<srcOri.length(); i++ ) {
-				if ( Character.isWhitespace(srcOri.charAt(i)) ) {
+				if ( isSpaceWeCareAbout(srcOri.charAt(i)) ) {
 					if ( srcOri.length() > i ) {
 						if ( trgOri.charAt(i) != srcOri.charAt(i) ) {
 							reportIssue(IssueType.MISSINGORDIFF_LEADINGWS, tu, null,
@@ -618,7 +622,7 @@ class QualityChecker {
 
 			// Extra ones
 			for ( int i=0; i<trgOri.length(); i++ ) {
-				if ( Character.isWhitespace(trgOri.charAt(i)) ) {
+				if ( isSpaceWeCareAbout(trgOri.charAt(i)) ) {
 					if ( srcOri.length() > i ) {
 						if ( srcOri.charAt(i) != trgOri.charAt(i) ) {
 							reportIssue(IssueType.EXTRAORDIFF_LEADINGWS, tu, null,
@@ -643,7 +647,7 @@ class QualityChecker {
 			// Missing ones
 			int j = trgOri.length()-1;
 			for ( int i=srcOri.length()-1; i>=0; i-- ) {
-				if ( Character.isWhitespace(srcOri.charAt(i)) ) {
+				if ( isSpaceWeCareAbout(srcOri.charAt(i)) ) {
 					if ( j >= 0 ) {
 						if ( trgOri.charAt(j) != srcOri.charAt(i) ) {
 							reportIssue(IssueType.MISSINGORDIFF_TRAILINGWS, tu, null,
@@ -665,7 +669,7 @@ class QualityChecker {
 			// Extra ones
 			j = srcOri.length()-1;
 			for ( int i=trgOri.length()-1; i>=0; i-- ) {
-				if ( Character.isWhitespace(trgOri.charAt(i)) ) {
+				if ( isSpaceWeCareAbout(trgOri.charAt(i)) ) {
 					if ( j >= 0 ) {
 						if ( srcOri.charAt(j) != trgOri.charAt(i) ) {
 							reportIssue(IssueType.EXTRAORDIFF_TRAILINGWS, tu, null,
