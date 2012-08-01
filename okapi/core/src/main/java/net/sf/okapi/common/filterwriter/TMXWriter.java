@@ -69,6 +69,20 @@ public class TMXWriter {
      * If another document exists already it will be overwritten.
      */
     public TMXWriter (String path) {
+    	setPath(path);
+    }
+
+    /**
+     * Creates a new TMXWriter object.
+     * Creates a new TMX document.
+     * @param writer an instance of an XMLWriter to use.
+     * If another document exists already it will be overwritten.
+     */
+    public TMXWriter (XMLWriter writer) {
+    	setXmlWriter(writer);
+    }
+    
+    protected void setPath(String path) {
     	if ( path == null ) {
     		throw new IllegalArgumentException("path must be set");
     	}
@@ -79,14 +93,8 @@ public class TMXWriter {
     	altAttribute = new Hashtable<String, String>();
     	altAttribute.put(CREATIONID, FROMALTERNATE);
     }
-
-    /**
-     * Creates a new TMXWriter object.
-     * Creates a new TMX document.
-     * @param writer an instance of an XMLWriter to use.
-     * If another document exists already it will be overwritten.
-     */
-    public TMXWriter (XMLWriter writer) {
+    
+    protected void setXmlWriter(XMLWriter writer) {
     	this.setWriteAllPropertiesAsAttributes(false);
     	this.writer = writer;
     }
@@ -710,7 +718,7 @@ public class TMXWriter {
     	
     }
 
-    private void writeAllPropertiesAsAttibutes (XMLWriter writer, 
+    protected void writeAllPropertiesAsAttibutes (XMLWriter writer, 
     	Set<String> names, 
     	ITextUnit item)
     {
@@ -730,7 +738,7 @@ public class TMXWriter {
      * @param contForProp the TextContainer that has the properties to write for
      * this TUV, or null for no properties.
      */
-    private void writeTUV (TextFragment frag,
+    protected void writeTUV (TextFragment frag,
    		LocaleId locale,
    		TextContainer contForProp)
     {
