@@ -150,7 +150,7 @@ public class TraversalTest {
 			+ "</its:rules>"
 			+ "<legalnotice role=\"Canada\">"
 			+ "<para>This legal notice is only for Canadian locales.</para>"
-			+ "<para its:localeFilterType='all'>This text is for all locales.</para>"
+			+ "<para its:localeFilterType='include' its:localeFilterList='*'>This text is for all locales.</para>"
 			+ "</legalnotice>"
 			+ "</info></book>"));
 		Document doc = fact.newDocumentBuilder().parse(is);

@@ -98,7 +98,8 @@ public class XMLFilterTest {
 	public void testLocaleFilter1 () {
 		String snippet = "<?xml version=\"1.0\"?>\n"
 			+ "<doc><its:rules version=\"2.0\" xmlns:its=\"http://www.w3.org/2005/11/its\">"
-			+ "<its:localeFilterRule selector=\"//para1\" localeFilterType='none'/>"
+			+ "<its:localeFilterRule selector=\"//para1\" localeFilterType='exclude' localeFilterList='*'/>"
+			+ "<its:localeFilterRule selector=\"//para2\" localeFilterType='include' localeFilterList='*'/>"
 			+ "</its:rules>"
 			+ "<para1>text1</para1>"
 			+ "<para2>text2</para2>"
@@ -113,8 +114,8 @@ public class XMLFilterTest {
 	public void testLocaleFilter2 () {
 		String snippet = "<?xml version=\"1.0\"?>\n"
 			+ "<doc><its:rules version=\"2.0\" xmlns:its=\"http://www.w3.org/2005/11/its\">"
-			+ "<its:localeFilterRule selector=\"//para1\" localeFilterType='include' localeFilterList=''/>"
-			+ "<its:localeFilterRule selector=\"//para2\" localeFilterType='exclude' localeFilterList='*'/>"
+			+ "<its:localeFilterRule selector=\"//para1\" localeFilterType='exclude' localeFilterList='*'/>"
+			+ "<its:localeFilterRule selector=\"//para2\" localeFilterType='exclude' localeFilterList='fr'/>"
 			+ "</its:rules>"
 			+ "<para1>text1</para1>"
 			+ "<para2>text2</para2>"
