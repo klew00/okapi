@@ -1181,29 +1181,32 @@ public class ITSEngine implements IProcessor, ITraversal {
 	private String retrieveLocaleFilterList (Element elem,
 		boolean qualified)
 	{
+		final String LFTYPE = "localeFilterType";
+		final String LFLIST = "localeFilterList";
 		String type;
-		if ( qualified ) type = elem.getAttributeNS(ITS_NS_URI, "localeFilterType");
-		else type = elem.getAttribute("localeFilterType");
+		String list;
+
+		// Get the values
+		if ( qualified ) { // Locally
+			type = elem.getAttributeNS(ITS_NS_URI, LFTYPE);
+			list = elem.getAttributeNS(ITS_NS_URI, "localeFilterList").trim();
+		}
+		else { // Inside a global rule
+			type = elem.getAttribute(LFTYPE);
+			list = elem.getAttribute(LFLIST).trim();
+		}
 		
-		if ( type.isEmpty() || ";all;noneinclude;exclude;".indexOf(type) == -1 ) {
-			throw new ITSException(String.format("Invalid value '%s' for 'localeFilterType'.", type));
+		// Check the type
+		if ( type.isEmpty() && !type.equals("include") && !type.equals("exclude") ) {
+			throw new ITSException(String.format("Missing or invalid value '%s' for '%s'.", type, LFTYPE));
+		}
+		// Check the list
+		if ( list.isEmpty() ) {
+			throw new ITSException(String.format("Missing or invalid value '%s' for '%s'.", type, LFLIST));
 		}
 	
-		String list = "-*";
-		if ( type.equals("include") ) {
-			if ( qualified ) list = "+"+elem.getAttributeNS(ITS_NS_URI, "localeFilterList");
-			else list = "+"+elem.getAttribute("localeFilterList");
-		}
-		else if ( type.equals("exclude") ) {
-			if ( qualified ) list = "-"+elem.getAttributeNS(ITS_NS_URI, "localeFilterList");
-			else list = "-"+elem.getAttribute("localeFilterList");
-		}
-		else { // To simplify we set the list to '+*' for all and "-*" for 'none'
-			if ( type.equals("all") ) list = "+*";
-			// Else: we just use the empty string set as the default
-		}
-
-		return list;
+		if ( type.equals("include") ) return "+"+list;
+		else return "-"+list; // 'exclude'
 	}
 	
 	private boolean isVersion2 () throws XPathExpressionException {
