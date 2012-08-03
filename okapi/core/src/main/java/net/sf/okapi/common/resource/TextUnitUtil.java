@@ -2002,7 +2002,8 @@ public class TextUnitUtil {
 		
 		List<GenericSkeletonPart> parts = ((GenericSkeleton) skel).getParts();
 		for (GenericSkeletonPart part : parts) {
-			if (SkeletonUtil.isText(part)) { 
+			// if it is a self reference then its still standalone (return true)
+			if (SkeletonUtil.isReference(part)) { 
 				return false;
 			}
 		}
