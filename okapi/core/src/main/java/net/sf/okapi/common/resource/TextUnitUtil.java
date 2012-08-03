@@ -28,6 +28,7 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import net.sf.okapi.common.ISkeleton;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Range;
 import net.sf.okapi.common.StringUtil;
@@ -1970,5 +1971,42 @@ public class TextUnitUtil {
 			tf.changeToCode(0, tf.getCodedText().length(), 
 					TagType.PLACEHOLDER, null);
 		}
+	}
+
+	public static boolean isStandalone(ITextUnit tu) {
+		if (tu == null) {
+			return true;
+		}
+		
+		if (tu.isReferent()) {
+			return false;
+		}
+		
+		TextFragment tf = tu.getSource().getUnSegmentedContentCopy();
+		for (Code code : tf.getCodes()) {
+			if (code.hasReference()) { 
+				return false;
+			}
+		}
+		
+		ISkeleton skel = tu.getSkeleton();
+		if (skel == null) {
+			return true;
+		}		
+		
+		// FIXME: other skeleton types may have TU references
+		// We need a better ISkeleton interface!
+		if (!(skel instanceof GenericSkeleton)) {
+			return true;
+		}
+		
+		List<GenericSkeletonPart> parts = ((GenericSkeleton) skel).getParts();
+		for (GenericSkeletonPart part : parts) {
+			if (SkeletonUtil.isText(part)) { 
+				return false;
+			}
+		}
+		
+		return true;
 	}
 }
