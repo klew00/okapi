@@ -790,6 +790,32 @@ public class XMLFilterTest {
 		filter.open(rawDoc);
 		filter.close();
 	}
+	
+	@Test
+	public void extendedMatchTest () {
+		assertTrue(filter.extendedMatch("*-CH", "de-CH"));
+		assertTrue(filter.extendedMatch("*-CH", "fr-ch"));
+		assertTrue(filter.extendedMatch("de-*-DE, fr", "de-de"));
+		assertTrue(filter.extendedMatch("fr, de-*-DE", "de-Latn-de"));
+		assertTrue(filter.extendedMatch("za ,  de-*-DE , po-pl  ", "de-DE-x-goethe"));
+		assertTrue(filter.extendedMatch("za, de-*-DE,   po-pl", "de-DE"));
+		
+		assertTrue(filter.extendedMatch("za, de-*, po-pl", "de"));
+		assertTrue(filter.extendedMatch("de-*, de", "de"));
+		
+		assertTrue(filter.extendedMatch("de-*-DE", "de-DE"));
+		assertTrue(filter.extendedMatch("de-*-DE", "de-de"));
+		assertTrue(filter.extendedMatch("de-*-DE", "de-Latn-DE"));
+		assertTrue(filter.extendedMatch("de-*-DE", "de-Latf-DE"));
+		assertTrue(filter.extendedMatch("de-*-DE", "de-DE-x-goethe"));
+		assertTrue(filter.extendedMatch("de-*-DE", "de-Latn-DE-1996"));
+		assertTrue(filter.extendedMatch("de-*-DE", "de-Deva-DE"));
+		
+		assertFalse(filter.extendedMatch("de-*-DE", "de"));
+		assertFalse(filter.extendedMatch("de-*-DE", "de-x-DE"));
+		assertFalse(filter.extendedMatch("de-*-DE", "de-Deva"));
+	}
+	
 
 	@Test
 	public void testDoubleExtraction () throws URISyntaxException {

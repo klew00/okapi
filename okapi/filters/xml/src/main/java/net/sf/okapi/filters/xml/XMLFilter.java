@@ -37,6 +37,7 @@ import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IdGenerator;
+import net.sf.okapi.common.ListUtil;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.MimeTypeMapper;
 import net.sf.okapi.common.UsingParameters;
@@ -767,6 +768,7 @@ public class XMLFilter implements IFilter {
 		if ( lf.equals("+*") || lf.equals("-") ) return true; // For any locales
 		if ( lf.equals("-*") || lf.equals("+") ) return false; // For any locales
 		
+//TODO: extended filtering		
 		// More info for language range here:
 		// http://www.rfc-editor.org/rfc/bcp/bcp47.txt
 		if ( trgLangCode == null ) {
@@ -785,6 +787,69 @@ public class XMLFilter implements IFilter {
 		// Else: type==exclude
 		// Return true if no-match, false otherwise 
 		return (tmp.indexOf(trgLangCode) == -1);
+	}
+	
+	// Based on the algorithm described at:
+	// http://tools.ietf.org/html/rfc4647#section-3.3.2
+	
+	/**
+	 * Indicates if a given language tag matches at least one item of a list of extended language ranges.
+	 * <p>Based on the algorithm described at: http://tools.ietf.org/html/rfc4647#section-3.3.2
+	 * @param langRanges the list of extended language ranges
+	 * @param langTag the language tag.
+	 * @return true if the language tag matches at least one item of a list of extended language ranges.
+	 */
+	boolean extendedMatch (String langRanges,
+		String langTag)
+	{
+		for ( String langRange : ListUtil.stringAsArray(langRanges.toLowerCase()) ) {
+			if ( doesLangTagMacthesLangRange(langRange, langTag) ) return true;
+		}
+		return false;
+	}
+
+	/**
+	 * Compares an extended language range with a language tag.
+	 * @param langRange the extended language range.
+	 * @param langTag the language tag.
+	 * @return true if the language tag matches the language range.
+	 */
+	private boolean doesLangTagMacthesLangRange (String langRange,
+		String langTag)
+	{
+		String[] lrParts = langRange.toLowerCase().split("-", 0);
+		String[] ltParts = langTag.toLowerCase().split("-", 0);
+		
+		int i = 0;
+		int j = 0;
+		String lrst = lrParts[i];
+		String ltst = ltParts[j]; j++;
+		if ( !lrst.equals(ltst) && !lrst.equals("*") ) return false;
+
+		i = 1;
+		j = 1;
+		while ( i<lrParts.length) {
+			lrst = lrParts[i];
+			if ( lrst.equals("*") ) {
+				i++;
+				continue;
+			}
+			else if ( j >= ltParts.length ) {
+				return false;
+			}
+			else if ( ltParts[j].equals(lrst) ) {
+				i++; j++;
+				continue;
+			}
+			else if ( ltParts[j].length() == 1 ) {
+				return false;
+			}
+			else {
+				j++;
+			}
+		}
+	
+		return true;
 	}
 	
 	private boolean isContextTranslatable () {
