@@ -133,6 +133,10 @@ public class BatchTranslator {
 		initDone = false;
 	}
 
+	/**
+	 * Finishes the batch.
+	 * @return a mutli-events event if the option is to send the TMX as raw document, or null otherwise.
+	 */
 	public Event endBatch () {
 		LOGGER.info("");
 		if ( currentTm != null ) {
@@ -144,25 +148,28 @@ public class BatchTranslator {
 		// Then close all files/TMs
 		closeAll();
 		
-		// Create a multi-event for sending the TMX document
-		List<Event> list = new ArrayList<Event>();
-		// Change the pipeline parameters for the raw-document-related data
-		PipelineParameters pp = new PipelineParameters();
-		pp.setOutputURI(tmxRawDoc.getInputURI()); // Use same name as this output for now
-		pp.setSourceLocale(tmxRawDoc.getSourceLocale());
-		pp.setTargetLocale(tmxRawDoc.getTargetLocale());
-		pp.setOutputEncoding(tmxRawDoc.getEncoding()); // Use same as the output document
-		pp.setInputRawDocument(tmxRawDoc);
-		pp.setFilterConfigurationId(tmxRawDoc.getFilterConfigId());
-		pp.setBatchInputCount(1); // Only one input file now
-		// Add the event to the list
-		list.add(new Event(EventType.PIPELINE_PARAMETERS, pp));
-		// Add raw-document related events
-		list.add(new Event(EventType.START_BATCH_ITEM));
-		list.add(new Event(EventType.RAW_DOCUMENT, tmxRawDoc));
-		list.add(new Event(EventType.END_BATCH_ITEM));
-		// Return the list as a multiple-event event
-		return new Event(EventType.MULTI_EVENT, new MultiEvent(list));
+		if ( params.getSendTMX() ) {
+			// Create a multi-event for sending the TMX document
+			List<Event> list = new ArrayList<Event>();
+			// Change the pipeline parameters for the raw-document-related data
+			PipelineParameters pp = new PipelineParameters();
+			pp.setOutputURI(tmxRawDoc.getInputURI()); // Use same name as this output for now
+			pp.setSourceLocale(tmxRawDoc.getSourceLocale());
+			pp.setTargetLocale(tmxRawDoc.getTargetLocale());
+			pp.setOutputEncoding(tmxRawDoc.getEncoding()); // Use same as the output document
+			pp.setInputRawDocument(tmxRawDoc);
+			pp.setFilterConfigurationId(tmxRawDoc.getFilterConfigId());
+			pp.setBatchInputCount(1); // Only one input file now
+			// Add the event to the list
+			list.add(new Event(EventType.PIPELINE_PARAMETERS, pp));
+			// Add raw-document related events
+			list.add(new Event(EventType.START_BATCH_ITEM));
+			list.add(new Event(EventType.RAW_DOCUMENT, tmxRawDoc));
+			list.add(new Event(EventType.END_BATCH_ITEM));
+			// Return the list as a multiple-event event
+			return new Event(EventType.MULTI_EVENT, new MultiEvent(list));
+		}
+		return null;
 	}
 
 	// Call this method at the first document

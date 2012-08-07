@@ -37,6 +37,15 @@ public class Property {
 	public static final String NOTE = "note"; 
 	public static final String TRANSNOTE = "transNote"; 
 	public static final String COORDINATES = "coordinates"; 
+
+	/**
+	 * Tab-delimited list of ITS Domain values
+	 */
+	public static final String ITS_DOMAINS = "its-domains";
+	/**
+	 * ITS External Resources Reference value
+	 */
+	public static final String ITS_EXTERNALRESREF = "ist-externalResourcesRef"; 
 	
 	private final String name;
 	private String value;

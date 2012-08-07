@@ -92,12 +92,10 @@ public class XLIFF2Options extends BaseParameters implements IEditorDescriptionP
 
 		String[] values = {
 			String.valueOf(OriginalDataStyle.NODATA.ordinal()),
-			String.valueOf(OriginalDataStyle.INSIDE.ordinal()),
 			String.valueOf(OriginalDataStyle.OUTSIDE.ordinal())
 		};
 		String[] labels = {
 			"Without original data stored",
-			"Original data stored inline",
 			"Original data stored outside the content"
 		};
 		ListSelectionPart lsp = desc.addListSelectionPart(paramsDesc.get(INLINESTYLE), values);

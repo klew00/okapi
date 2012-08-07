@@ -31,7 +31,8 @@ class ContextItem {
 	String idValue;
 	String locNote;
 	boolean preserveWS;
-	String domain;
+	String domains;
+	String externalRes;
 
 	public ContextItem (Node node,
 		ITraversal trav)
@@ -43,7 +44,8 @@ class ContextItem {
 		this.idValue = trav.getIdValue();
 		this.locNote = trav.getNote();
 		this.preserveWS = trav.preserveWS();
-		this.domain = trav.getDomain();
+		this.domains = trav.getDomains();
+		this.externalRes = trav.getExternalResourcesRef();
 	}
 
 }

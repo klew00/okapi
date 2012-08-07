@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
+import java.util.logging.Logger;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -36,6 +37,8 @@ import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IdGenerator;
+import net.sf.okapi.common.ListUtil;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.MimeTypeMapper;
 import net.sf.okapi.common.UsingParameters;
 import net.sf.okapi.common.Util;
@@ -49,16 +52,15 @@ import net.sf.okapi.common.filters.IFilterConfigurationMapper;
 import net.sf.okapi.common.filters.InlineCodeFinder;
 import net.sf.okapi.common.filterwriter.GenericFilterWriter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
-import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.ITextUnit;
-import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.Property;
+import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextFragment;
-import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.resource.TextFragment.TagType;
+import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
 import net.sf.okapi.common.skeleton.ISkeletonWriter;
@@ -77,9 +79,12 @@ import org.xml.sax.SAXException;
 @UsingParameters(Parameters.class)
 public class XMLFilter implements IFilter {
 
+	private final Logger logger = Logger.getLogger(getClass().getName());
+
 	private String docName;
 	private String encoding;
 	private LocaleId srcLang;
+	private String trgLangCode; // can be null
 	private String lineBreak;
 	private Document doc;
 	private ITraversal trav;
@@ -298,6 +303,12 @@ public class XMLFilter implements IFilter {
 			docName = input.getInputURI().getPath();
 		}
 		
+		// Allow no target locale too
+		trgLangCode = null;
+		if ( !Util.isNullOrEmpty(input.getTargetLocale()) ) {
+			trgLangCode = input.getTargetLocale().toString().toLowerCase();
+		}
+		
 		if ( params.useCodeFinder ) {
 			params.codeFinder.compile();
 		}
@@ -312,10 +323,12 @@ public class XMLFilter implements IFilter {
 			}
 		}
 		
-		// Apply the all rules (external and internal) to the document
-		itsEng.applyRules(IProcessor.DC_TRANSLATE | IProcessor.DC_LANGINFO | IProcessor.DC_IDVALUE
+		// Apply the rules (external and internal) to the document
+		// (Applies only the ones used by the filter
+		itsEng.applyRules(IProcessor.DC_TRANSLATE | IProcessor.DC_IDVALUE
 			| IProcessor.DC_LOCNOTE | IProcessor.DC_WITHINTEXT | IProcessor.DC_TERMINOLOGY
-			| IProcessor.DC_DOMAIN);
+			| IProcessor.DC_DOMAIN | IProcessor.DC_TARGETPOINTER | IProcessor.DC_EXTERNALRES
+			| IProcessor.DC_LOCFILTER);
 		
 		trav = itsEng;
 		trav.startTraversal();
@@ -435,7 +448,7 @@ public class XMLFilter implements IFilter {
 					skel.append(buildCDATA(node));
 				}
 				else {
-					if ( trav.translate() ) {
+					if ( extract() ) {
 						frag.append(node.getNodeValue());
 					}
 					else {
@@ -450,7 +463,7 @@ public class XMLFilter implements IFilter {
 						node.getNodeValue().replace("\n", lineBreak), 0, false, null));
 				}
 				else {
-					if ( trav.translate() ) {
+					if ( extract() ) {
 						if ( params.lineBreakAsCode ) escapeAndAppend(frag, node.getNodeValue());
 						else frag.append(node.getNodeValue());
 					}
@@ -720,7 +733,7 @@ public class XMLFilter implements IFilter {
 			default: // Not within text
 				if ( frag == null ) { // Not yet in extraction
 					addStartTagToSkeleton(node);
-					if ( trav.translate() ) {
+					if ( extract() ) {
 						frag = new TextFragment();
 					}
 					if ( node.hasChildNodes() ) {
@@ -732,7 +745,7 @@ public class XMLFilter implements IFilter {
 					addTextUnit(node, false);
 					addStartTagToSkeleton(node);
 					// And create a new one
-					if ( trav.translate() ) {
+					if ( extract() ) {
 						frag = new TextFragment();
 					}
 					if ( node.hasChildNodes() ) {
@@ -745,6 +758,88 @@ public class XMLFilter implements IFilter {
 		return false;
 	}
 
+	private boolean extract () {
+		// Check ITS translate
+		if ( !trav.translate() ) return false;
+		
+		// Check ITS locale filter
+		String list = trav.getLocaleFilter();
+		if ( Util.isEmpty(list) || list.equals("*") ) return true;
+		
+		// More info for extended language range/filtering here:
+		// http://www.rfc-editor.org/rfc/bcp/bcp47.txt
+		if ( trgLangCode == null ) {
+			// Log a warning that the data category cannot be used
+			logger.warning("No target locale specified: Cannot use the provided ITS Locale Filter data category.");
+			return true;
+		}
+		// Now check with one or more codes
+		return extendedMatch(list, trgLangCode);
+	}
+	
+	// Based on the algorithm described at:
+	// http://tools.ietf.org/html/rfc4647#section-3.3.2
+	
+	/**
+	 * Indicates if a given language tag matches at least one item of a list of extended language ranges.
+	 * <p>Based on the algorithm described at: http://tools.ietf.org/html/rfc4647#section-3.3.2
+	 * @param langRanges the list of extended language ranges
+	 * @param langTag the language tag.
+	 * @return true if the language tag matches at least one item of a list of extended language ranges.
+	 */
+	boolean extendedMatch (String langRanges,
+		String langTag)
+	{
+		for ( String langRange : ListUtil.stringAsArray(langRanges.toLowerCase()) ) {
+			if ( doesLangTagMacthesLangRange(langRange, langTag) ) return true;
+		}
+		return false;
+	}
+
+	/**
+	 * Compares an extended language range with a language tag.
+	 * @param langRange the extended language range.
+	 * @param langTag the language tag.
+	 * @return true if the language tag matches the language range.
+	 */
+	private boolean doesLangTagMacthesLangRange (String langRange,
+		String langTag)
+	{
+		String[] lrParts = langRange.toLowerCase().split("-", 0);
+		String[] ltParts = langTag.toLowerCase().split("-", 0);
+		
+		int i = 0;
+		int j = 0;
+		String lrst = lrParts[i];
+		String ltst = ltParts[j]; j++;
+		if ( !lrst.equals(ltst) && !lrst.equals("*") ) return false;
+
+		i = 1;
+		j = 1;
+		while ( i<lrParts.length) {
+			lrst = lrParts[i];
+			if ( lrst.equals("*") ) {
+				i++;
+				continue;
+			}
+			else if ( j >= ltParts.length ) {
+				return false;
+			}
+			else if ( ltParts[j].equals(lrst) ) {
+				i++; j++;
+				continue;
+			}
+			else if ( ltParts[j].length() == 1 ) {
+				return false;
+			}
+			else {
+				j++;
+			}
+		}
+	
+		return true;
+	}
+	
 	private boolean isContextTranslatable () {
 		if ( context.size() == 0 ) return false;
 		return context.peek().translate;
@@ -808,18 +903,20 @@ public class XMLFilter implements IFilter {
 		
 		tu.setSourceContent(frag);
 		
-		String locNote = context.peek().locNote;
-		if ( locNote != null ) {
-			tu.setProperty(new Property(Property.NOTE, locNote));
+		// ITS Localization Note
+		if ( !Util.isEmpty(context.peek().locNote) ) {
+			tu.setProperty(new Property(Property.NOTE, context.peek().locNote));
+		}
+		// ITS Domain
+		if ( !Util.isEmpty(context.peek().domains) ) {
+			tu.setProperty(new Property(Property.ITS_DOMAINS, context.peek().domains));
+		}
+		// ITS External resources Reference
+		if ( !Util.isEmpty(context.peek().externalRes) ) {
+			tu.setProperty(new Property(Property.ITS_EXTERNALRESREF, context.peek().externalRes));
 		}
 		
-		String domain = context.peek().domain;
-		if ( domain != null ) {
-			//TODO: Use specific annotation, not a note
-			//TODO: Handle multiple entries
-			tu.setProperty(new Property(Property.NOTE, "its:domain="+domain));
-		}
-		
+		// Set term info
 		if ( terms != null ) {
 			tu.getSource().setAnnotation(terms);
 			terms = null; // Reset for next time

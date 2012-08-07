@@ -69,6 +69,20 @@ public class TMXWriter {
      * If another document exists already it will be overwritten.
      */
     public TMXWriter (String path) {
+    	setPath(path);
+    }
+
+    /**
+     * Creates a new TMXWriter object.
+     * Creates a new TMX document.
+     * @param writer an instance of an XMLWriter to use.
+     * If another document exists already it will be overwritten.
+     */
+    public TMXWriter (XMLWriter writer) {
+    	setXmlWriter(writer);
+    }
+    
+    protected void setPath(String path) {
     	if ( path == null ) {
     		throw new IllegalArgumentException("path must be set");
     	}
@@ -79,14 +93,8 @@ public class TMXWriter {
     	altAttribute = new Hashtable<String, String>();
     	altAttribute.put(CREATIONID, FROMALTERNATE);
     }
-
-    /**
-     * Creates a new TMXWriter object.
-     * Creates a new TMX document.
-     * @param writer an instance of an XMLWriter to use.
-     * If another document exists already it will be overwritten.
-     */
-    public TMXWriter (XMLWriter writer) {
+    
+    protected void setXmlWriter(XMLWriter writer) {
     	this.setWriteAllPropertiesAsAttributes(false);
     	this.writer = writer;
     }
@@ -676,19 +684,8 @@ public class TMXWriter {
     		
     		writer.writeLineBreak();
 
-    		// Write any resource-level properties
-    		for ( String name : names ) {    			
-    			
-    			// Filter out attributes (temporary solution)
-    			if ( ATTR_NAMES.contains(";"+name+";") ) continue;
-    			
-    			// Write out the property
-    			writer.writeStartElement("prop");
-    			writer.writeAttributeString("type", name);
-    			writer.writeString(item.getProperty(name).getValue());
-    			writer.writeEndElementLineBreak(); // prop
-    		}
-
+    		writeResourceLevelProperties(names, item, srcSeg.text);
+    		
     		// Write the source TUV
     		writeTUV(srcSeg.text, srcLoc, srcCont);
 		
@@ -709,8 +706,26 @@ public class TMXWriter {
     	} // End of the segments loop
     	
     }
+    
+    protected void writeResourceLevelProperties(Set<String> names, ITextUnit item, TextFragment srcSegment) {
+    	// Write any resource-level properties
+		for ( String name : names ) {    						
+			// Filter out attributes (temporary solution)
+			if ( ATTR_NAMES.contains(";"+name+";") ) continue;
+			
+			writeProp(name, item.getProperty(name).getValue());
+		}
+    }
+    
+    protected void writeProp(String name, String value) {
+		// Write out the property
+		writer.writeStartElement("prop");
+		writer.writeAttributeString("type", name);
+		writer.writeString(value);
+		writer.writeEndElementLineBreak(); // prop
+    }
 
-    private void writeAllPropertiesAsAttibutes (XMLWriter writer, 
+    protected void writeAllPropertiesAsAttibutes (XMLWriter writer, 
     	Set<String> names, 
     	ITextUnit item)
     {
@@ -730,7 +745,7 @@ public class TMXWriter {
      * @param contForProp the TextContainer that has the properties to write for
      * this TUV, or null for no properties.
      */
-    private void writeTUV (TextFragment frag,
+    protected void writeTUV (TextFragment frag,
    		LocaleId locale,
    		TextContainer contForProp)
     {

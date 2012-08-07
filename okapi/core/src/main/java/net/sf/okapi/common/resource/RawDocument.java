@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009-2011 by the Okapi Framework contributors
+  Copyright (C) 2009-2012 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -62,7 +62,6 @@ public class RawDocument implements IResource {
 	private String id;
 	private String encoding = UNKOWN_ENCODING;
 	private LocaleId srcLoc;
-	private LocaleId trgLoc;
 	private List<LocaleId> trgLocs;
 	private InputStream inputStream;
 	private InputStream createdStream;
@@ -83,7 +82,9 @@ public class RawDocument implements IResource {
 	 * @param sourceLocale
 	 *            the source locale for this RawDocument.
 	 */
-	public RawDocument(CharSequence inputCharSequence, LocaleId sourceLocale) {
+	public RawDocument (CharSequence inputCharSequence,
+		LocaleId sourceLocale)
+	{
 		this.hasReaderBeenCalled = false;
 		create(inputCharSequence, sourceLocale, null);
 	}
@@ -98,7 +99,10 @@ public class RawDocument implements IResource {
 	 * @param targetLocale
 	 *            the target locale for this RawDocument.
 	 */
-	public RawDocument(CharSequence inputCharSequence, LocaleId sourceLocale, LocaleId targetLocale) {
+	public RawDocument (CharSequence inputCharSequence,
+		LocaleId sourceLocale,
+		LocaleId targetLocale)
+	{
 		this.hasReaderBeenCalled = false;
 		create(inputCharSequence, sourceLocale, targetLocale);
 	}
@@ -113,7 +117,10 @@ public class RawDocument implements IResource {
 	 * @param sourceLocale
 	 *            the source locale for this RawDocument.
 	 */
-	public RawDocument(URI inputURI, String defaultEncoding, LocaleId sourceLocale) {
+	public RawDocument (URI inputURI,
+		String defaultEncoding,
+		LocaleId sourceLocale)
+	{
 		this.hasReaderBeenCalled = false;
 		create(inputURI, defaultEncoding, sourceLocale, null);
 	}
@@ -130,8 +137,11 @@ public class RawDocument implements IResource {
 	 * @param targetLocale
 	 *            the target locale for this RawDocument.
 	 */
-	public RawDocument(URI inputURI, String defaultEncoding, LocaleId sourceLocale,
-			LocaleId targetLocale) {
+	public RawDocument (URI inputURI,
+		String defaultEncoding,
+		LocaleId sourceLocale,
+		LocaleId targetLocale)
+	{
 		this.hasReaderBeenCalled = false;
 		create(inputURI, defaultEncoding, sourceLocale, targetLocale);
 	}
@@ -146,7 +156,10 @@ public class RawDocument implements IResource {
 	 * @param sourceLocale
 	 *            the source locale for this RawDocument.
 	 */
-	public RawDocument(InputStream inputStream, String defaultEncoding, LocaleId sourceLocale) {
+	public RawDocument (InputStream inputStream,
+		String defaultEncoding,
+		LocaleId sourceLocale)
+	{
 		this.hasReaderBeenCalled = false;
 		create(inputStream, defaultEncoding, sourceLocale, null);
 	}
@@ -166,7 +179,7 @@ public class RawDocument implements IResource {
 	 * @param filterConfigId
 	 *            the filter configuration id.
 	 */
-	public RawDocument(URI inputURI,
+	public RawDocument (URI inputURI,
 		String defaultEncoding,
 		LocaleId sourceLocale,
 		LocaleId targetLocale,
@@ -189,50 +202,63 @@ public class RawDocument implements IResource {
 	 * @param targetLocale
 	 *            the target locale for this RawDocument.
 	 */
-	public RawDocument(InputStream inputStream, String defaultEncoding, LocaleId sourceLocale,
-			LocaleId targetLocale) {
+	public RawDocument (InputStream inputStream,
+		String defaultEncoding,
+		LocaleId sourceLocale,
+		LocaleId targetLocale)
+	{
 		this.hasReaderBeenCalled = false;
 		create(inputStream, defaultEncoding, sourceLocale, targetLocale);
 	}
 
-	private void create(CharSequence inputCharSequence, LocaleId srcLoc, LocaleId trgLoc) {
+	private void create (CharSequence inputCharSequence,
+		LocaleId srcLoc,
+		LocaleId trgLoc)
+	{
 		if (inputCharSequence == null) {
 			throw new IllegalArgumentException("inputCharSequence cannot be null");
 		}
 		this.inputCharSequence = inputCharSequence;
 		this.encoding = "UTF-16";
 		this.srcLoc = srcLoc;
-		this.trgLoc = trgLoc;
-		this.trgLocs = new ArrayList<LocaleId>();
-		if (trgLoc != null)
+		this.trgLocs = new ArrayList<LocaleId>(1);
+		if ( trgLoc != null ) {
 			trgLocs.add(trgLoc);
+		}
 	}
 
-	private void create(URI inputURI, String defaultEncoding, LocaleId srcLoc, LocaleId trgLoc) {
+	private void create (URI inputURI,
+		String defaultEncoding,
+		LocaleId srcLoc,
+		LocaleId trgLoc)
+	{
 		if (inputURI == null) {
 			throw new IllegalArgumentException("inputURI cannot be null");
 		}
 		this.inputURI = inputURI;
 		this.encoding = defaultEncoding;
 		this.srcLoc = srcLoc;
-		this.trgLoc = trgLoc;
-		this.trgLocs = new ArrayList<LocaleId>();
-		if (trgLoc != null)
+		this.trgLocs = new ArrayList<LocaleId>(1);
+		if ( trgLoc != null ) {
 			trgLocs.add(trgLoc);
+		}
 	}
 
-	private void create(InputStream inputStream, String defaultEncoding, LocaleId srcLoc,
-			LocaleId trgLoc) {
+	private void create (InputStream inputStream,
+		String defaultEncoding,
+		LocaleId srcLoc,
+		LocaleId trgLoc)
+	{
 		if (inputStream == null) {
 			throw new IllegalArgumentException("inputStream cannot be null");
 		}
 		this.inputStream = inputStream;
 		this.encoding = defaultEncoding;
 		this.srcLoc = srcLoc;
-		this.trgLoc = trgLoc;
-		this.trgLocs = new ArrayList<LocaleId>();
-		if (trgLoc != null)
+		this.trgLocs = new ArrayList<LocaleId>(1);
+		if ( trgLoc != null ) {
 			trgLocs.add(trgLoc);
+		}
 	}
 
 	/**
@@ -422,7 +448,7 @@ public class RawDocument implements IResource {
 	 * 
 	 * @return The default encoding associated to this resource.
 	 */
-	public String getEncoding() {
+	public String getEncoding () {
 		return encoding;
 	}
 
@@ -431,7 +457,7 @@ public class RawDocument implements IResource {
 	 * 
 	 * @return the source locale associated to this resource.
 	 */
-	public LocaleId getSourceLocale() {
+	public LocaleId getSourceLocale () {
 		return srcLoc;
 	}
 
@@ -445,44 +471,51 @@ public class RawDocument implements IResource {
 
 	/**
 	 * Gets the target locale associated to this resource.
+	 * <p>If several targets are set, this method returns the first one.
 	 * 
-	 * @return the target locale associated to this resource.
+	 * @return the sole or first target locale associated to this resource,
+	 * or null if no target locale is set.
 	 */
-	public LocaleId getTargetLocale() {
-		return trgLoc;
+	public LocaleId getTargetLocale () {
+		if ( trgLocs.isEmpty() ) return null;
+		return trgLocs.get(0);
 	}
 	
 	/**
 	 * Sets the target locale associated to this document.
+	 * <p>This call overrides any existing target locale or list of target locales.
 	 * @param locId the locale to set.
 	 */
 	public void setTargetLocale (LocaleId locId) {
-		trgLoc = locId;
+		trgLocs.clear();
+		trgLocs.add(locId);
 	}
 
 	/**
 	 * Gets the list of target locales associated to this resource.
-	 * 
-	 * This list was initialized with one element, the target locale, if you passed one to the constructor.
+	 * <p>If the target locale was set using a constructor or {@link #setTargetLocale(LocaleId)},
+	 * this list return that locale.
 	 * 
 	 * @return the target locales associated to this resource. Never null.
 	 */
-	public List<LocaleId> getTargetLocales() {
+	public List<LocaleId> getTargetLocales () {
 		return trgLocs;
 	}
 	
 	/**
 	 * Sets the list of target locales associated to this document.
-	 * 
-	 * This list was initialized with one element, the target locale, if you passed one to the constructor.
+	 * <p>If the target locale was set with a constructor or {@link #setTargetLocale(LocaleId)},
+	 * this method overrides that locale.
 	 * 
 	 * @param locIds the locales to set. If the value is null, an empty list will be associated.
 	 */
 	public void setTargetLocales (List<LocaleId> locIds) {
-		if(locIds != null)
+		if ( locIds != null ) {
 			trgLocs = locIds;
-		else
-			trgLocs = new ArrayList<LocaleId>();
+		}
+		else {
+			trgLocs = new ArrayList<LocaleId>(1);
+		}
 	}
 
 	/**
@@ -493,7 +526,7 @@ public class RawDocument implements IResource {
 	 * 
 	 * @param encoding
 	 */
-	public void setEncoding(String encoding) {
+	public void setEncoding (String encoding) {
 		// Cannot reset an encoding on a CharSequence document
 		if (inputCharSequence != null) {
 			LOGGER.log(Level.FINE,

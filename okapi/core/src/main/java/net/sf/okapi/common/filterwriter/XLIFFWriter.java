@@ -62,6 +62,8 @@ public class XLIFFWriter implements IFilterWriter {
 	 */
 	public static final String OKP_MATCHTYPE = "matchType";
 	
+	public static final String NS_ITS20 = "http://www.w3.org/2005/11/its";
+	
 	private static final String RESTYPEVALUES = 
 		";auto3state;autocheckbox;autoradiobutton;bedit;bitmap;button;caption;cell;"
 		+ "checkbox;checkboxmenuitem;checkedlistbox;colorchooser;combobox;comboboxexitem;"
@@ -443,6 +445,14 @@ public class XLIFFWriter implements IFilterWriter {
 		if ( tu.preserveWhitespaces() ) {
 			writer.writeAttributeString("xml:space", "preserve");
 		}
+		
+		// TU-level ITS properties (as attribute)
+		if ( tu.hasProperty(Property.ITS_EXTERNALRESREF) ) {
+			writer.writeAttributeString("xmlns:its", NS_ITS20);
+			writer.writeAttributeString("its:version", "2.0");
+			writer.writeAttributeString("its:externalResourcesRef", tu.getProperty(Property.ITS_EXTERNALRESREF).getValue());
+		}
+		
 		writer.writeLineBreak();
 
 		// Get the source container
@@ -522,7 +532,19 @@ public class XLIFFWriter implements IFilterWriter {
 			writer.writeString("Terms:\n"+ann.toString());
 			writer.writeEndElementLineBreak(); // note
 		}
-		
+
+		// ITS properties (as element)
+		if ( tu.hasProperty(Property.ITS_DOMAINS) ) {
+			writer.writeStartElement("okp:itsDomains");
+			writer.writeAttributeString("xmlns:dc", "http://purl.org/dc/elements/1.1/");
+			for ( String value : tu.getProperty(Property.ITS_DOMAINS).getValue().split("\t", 0) ) {
+				writer.writeStartElement("okp:item");
+				writer.writeAttributeString("dc:subject", value);
+				writer.writeEndElement();
+			}
+			writer.writeEndElement();
+		}
+
 		writer.writeEndElementLineBreak(); // trans-unit
 	}
 

@@ -32,8 +32,10 @@ class ITSTrace {
 	boolean preserveWS;
 	String language;
 	String targetPointer;
+	String externalRes;
+	String localeFilter;
 	String idValue;
-	String domain;
+	String domains;
 
 	ITSTrace () {
 		// Default constructor
@@ -65,8 +67,14 @@ class ITSTrace {
 		
 		// idValue: No inheritance
 		
+		// external resource reference: Inheritance for child element including attributes
+		externalRes = initialTrace.externalRes;
+		
+		// locale filter:  Inheritance for child element including attributes
+		localeFilter = initialTrace.localeFilter;
+		
 		// domain: Inheritance for child elements including attributes
-		domain = initialTrace.domain;
+		domains = initialTrace.domains;
 		
 		this.isChildDone = isChildDone;
 	}
