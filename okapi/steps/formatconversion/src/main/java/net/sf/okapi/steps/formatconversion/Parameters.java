@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009-2011 by the Okapi Framework contributors
+  Copyright (C) 2009-2012 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -237,6 +237,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		desc.addCheckboxPart(paramDesc.get(APPROVEDENTRIESONLY));
 		desc.addCheckboxPart(paramDesc.get(USEGENERICCODES));
 		desc.addCheckboxPart(paramDesc.get(OVERWRITESAMESOURCE));
+		desc.addCheckboxPart(paramDesc.get(SKIPENTRIESWITHOUTTEXT));
 
 		CheckboxPart cbp1 = desc.addCheckboxPart(paramDesc.get(SINGLEOUTPUT));
 		PathInputPart pip = desc.addPathInputPart(paramDesc.get(OUTPUTPATH), "Output File", true);
