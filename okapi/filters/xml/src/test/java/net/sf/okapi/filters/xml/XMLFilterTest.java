@@ -131,7 +131,7 @@ public class XMLFilterTest {
 	public void testLocaleFilter3 () {
 		String snippet = "<?xml version=\"1.0\"?>\n"
 			+ "<doc><its:rules version=\"2.0\" xmlns:its=\"http://www.w3.org/2005/11/its\">"
-			+ "<its:localeFilterRule selector=\"//para1\" localeFilterList='de-CH, de-AT'/>"
+			+ "<its:localeFilterRule selector=\"//para1\" localeFilterList=''/>"
 			+ "<its:localeFilterRule selector=\"//para2\" localeFilterList='en-CA, fr-*'/>"
 			+ "</its:rules>"
 			+ "<para1>text1</para1>"

@@ -1180,23 +1180,12 @@ public class ITSEngine implements IProcessor, ITraversal {
 	private String retrieveLocaleFilterList (Element elem,
 		boolean qualified)
 	{
-		final String LFLIST = "localeFilterList";
-		String list;
-
-		// Get the values
 		if ( qualified ) { // Locally
-			list = elem.getAttributeNS(ITS_NS_URI, "localeFilterList").trim();
+			return elem.getAttributeNS(ITS_NS_URI, "localeFilterList").trim();
 		}
 		else { // Inside a global rule
-			list = elem.getAttribute(LFLIST).trim();
+			return elem.getAttribute("localeFilterList").trim();
 		}
-		
-		// Check the list
-		if ( list.isEmpty() ) {
-			throw new ITSException(String.format("Missing or invalid value '%s' for '%s'.", list, LFLIST));
-		}
-	
-		return list;
 	}
 	
 	private boolean isVersion2 () throws XPathExpressionException {

@@ -764,7 +764,9 @@ public class XMLFilter implements IFilter {
 		
 		// Check ITS locale filter
 		String list = trav.getLocaleFilter();
-		if ( Util.isEmpty(list) || list.equals("*") ) return true;
+		// null is none-defined, so default is '*'
+		if (( list == null ) || list.equals("*") ) return true;
+		if ( list.length() == 0 ) return false; // Empty list is 'none'
 		
 		// More info for extended language range/filtering here:
 		// http://www.rfc-editor.org/rfc/bcp/bcp47.txt
@@ -776,9 +778,6 @@ public class XMLFilter implements IFilter {
 		// Now check with one or more codes
 		return extendedMatch(list, trgLangCode);
 	}
-	
-	// Based on the algorithm described at:
-	// http://tools.ietf.org/html/rfc4647#section-3.3.2
 	
 	/**
 	 * Indicates if a given language tag matches at least one item of a list of extended language ranges.
