@@ -763,30 +763,18 @@ public class XMLFilter implements IFilter {
 		if ( !trav.translate() ) return false;
 		
 		// Check ITS locale filter
-		String lf = trav.getLocaleFilter();
-		if ( Util.isEmpty(lf) ) return true;
-		if ( lf.equals("+*") || lf.equals("-") ) return true; // For any locales
-		if ( lf.equals("-*") || lf.equals("+") ) return false; // For any locales
+		String list = trav.getLocaleFilter();
+		if ( Util.isEmpty(list) || list.equals("*") ) return true;
 		
-//TODO: extended filtering		
-		// More info for language range here:
+		// More info for extended language range/filtering here:
 		// http://www.rfc-editor.org/rfc/bcp/bcp47.txt
 		if ( trgLangCode == null ) {
 			// Log a warning that the data category cannot be used
 			logger.warning("No target locale specified: Cannot use the provided ITS Locale Filter data category.");
 			return true;
 		}
-
 		// Now check with one or more codes
-		String tmp = lf.substring(1).toLowerCase();
-		if ( (lf.charAt(0)=='+') ) {
-			// type==include
-			// Return true if match found, false otherwise
-			return (tmp.indexOf(trgLangCode) > -1);
-		}
-		// Else: type==exclude
-		// Return true if no-match, false otherwise 
-		return (tmp.indexOf(trgLangCode) == -1);
+		return extendedMatch(list, trgLangCode);
 	}
 	
 	// Based on the algorithm described at:

@@ -157,10 +157,10 @@ public class TraversalTest {
 		ITraversal trav = applyITSRules(doc, null, null);
 		Element elem = getElement(trav, "para", 1);
 		assertNotNull(elem);
-		assertEquals("+en-CA, fr-CA", trav.getLocaleFilter());
+		assertEquals("en-CA, fr-CA", trav.getLocaleFilter());
 		elem = getElement(trav, "para", 2);
 		assertNotNull(elem);
-		assertEquals("+*", trav.getLocaleFilter());
+		assertEquals("*", trav.getLocaleFilter());
 	}
 
 	@Test
