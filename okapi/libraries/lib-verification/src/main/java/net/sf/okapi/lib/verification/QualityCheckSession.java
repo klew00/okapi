@@ -48,7 +48,6 @@ import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.ITextUnit;
 
 public class QualityCheckSession {
-
 	private static final String serialSignature = "OQCS";
 	private static final long serialVersionUID = 1L;
 
@@ -195,6 +194,11 @@ public class QualityCheckSession {
 			if ( filter == null ) {
 				throw new RuntimeException("Unsupported filter type.");
 			}
+
+			if ( params.getCheckXliffSchema() )
+				if("okf_xliff".equals(filter.getName()))
+					ValidateXliffSchema.validateXliffSchema(rd.getInputURI());
+
 			filter.open(rd);
 			while ( filter.hasNext() ) {
 				Event event = filter.next();

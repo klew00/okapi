@@ -99,6 +99,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 	private Composite mainComposite;
 	private TextAndBrowsePanel pnlOutputPath;
 	private Combo cbOutputType;
+	private Button chkXliffSchema;
 	private Button chkPatterns;
 	private Button chkDoubledWord;
 	private Label stDoubledWordExceptions;
@@ -366,6 +367,14 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		gdTmp.horizontalIndent = horizIndent;
 		edDoubledWordExceptions.setLayoutData(gdTmp);
+
+		Group grpFile = new Group(cmpTmp, SWT.NONE);
+		grpFile.setText("File verifications");
+		grpFile.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		grpFile.setLayout(new GridLayout());
+
+		chkXliffSchema = new Button(grpFile, SWT.CHECK);
+		chkXliffSchema.setText("Validate XLIFF files against schema");
 		
 		TabItem tiTmp = new TabItem(tabs, SWT.NONE);
 		tiTmp.setText("General");
@@ -1337,6 +1346,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		edLTTranslationSource.setText(params.getLtTranslationSource());
 		edLTTranslationTarget.setText(params.getLtTranslationTarget());
 		edLTTranslationServiceKey.setText(params.getLtTranslationServiceKey());
+		chkXliffSchema.setSelection(params.getCheckXliffSchema());
 		chkPatterns.setSelection(params.getCheckPatterns());
 		chkDoubledWord.setSelection(params.getDoubledWord());
 		edDoubledWordExceptions.setText(params.getDoubledWordExceptions());
@@ -1577,6 +1587,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 				params.setSessionPath(pnlSessionPath.getText());
 			}
 		}
+		params.setCheckXliffSchema(chkXliffSchema.getSelection());
 		params.setCheckPatterns(chkPatterns.getSelection());
 		params.setPatterns(savePatternsData());
 		result = true;
