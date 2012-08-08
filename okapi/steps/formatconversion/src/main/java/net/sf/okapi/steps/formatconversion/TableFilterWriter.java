@@ -287,7 +287,7 @@ public class TableFilterWriter implements IFilterWriter {
 		if ( trgCont == null ) {
 			trgCont = new TextContainer(); // Empty
 		}
-
+		
 		// If not segmented: index the whole entry
 		if ( !srcCont.contentIsOneSegment() ) {
 			writeRow(srcCont.getFirstContent(), trgCont.getFirstContent());

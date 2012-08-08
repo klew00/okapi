@@ -22,6 +22,7 @@ package net.sf.okapi.steps.formatconversion;
 
 import java.io.File;
 import java.net.URI;
+import java.nio.charset.Charset;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
@@ -38,6 +39,7 @@ import net.sf.okapi.common.pipeline.annotations.StepParameterType;
 import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.ITextUnit;
+import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.filters.pensieve.PensieveFilterWriter;
 import net.sf.okapi.filters.po.POWriter;
 
@@ -139,6 +141,8 @@ public class FormatConversionStep extends BasePipelineStep {
 			break;
 			
 		case START_DOCUMENT:
+			if (!firstOutputCreated)
+				writer.setOptions(targetLocale, "UTF-8"); // in case target locale changed in this document
 			if ( !firstOutputCreated || !params.getSingleOutput() ) {
 				switch ( outputType ) {
 				case PO_OUTPUT:
@@ -157,6 +161,7 @@ public class FormatConversionStep extends BasePipelineStep {
 					startCorpusOutput();
 					break;
 				}
+				StartDocument sd = (StartDocument) event.getResource(); 
 				writer.handleEvent(event);
 			}
 			break;
@@ -193,7 +198,6 @@ public class FormatConversionStep extends BasePipelineStep {
 
 	protected void processTextUnit (Event event) {
 		ITextUnit tu = event.getTextUnit();
-		
 		// Skip empty or code-only entries
 		if ( params.getSkipEntriesWithoutText() ) {
 			if ( !tu.getSource().hasText(true, false) ) return;
@@ -217,6 +221,7 @@ public class FormatConversionStep extends BasePipelineStep {
 			tu.createTarget(targetLocale, true, IResource.COPY_ALL);
 			break;
 		}
+		writer.setOptions(targetLocale, "UTF-8"); // we were getting a new raw document but no start document
 		writer.handleEvent(event);
 	}
 
@@ -307,6 +312,7 @@ public class FormatConversionStep extends BasePipelineStep {
 		} else {
 			writer = params.getWriter();
 		}
+		writer.setOptions(targetLocale, "UTF-8");
 		TableFilterWriterParameters options = (TableFilterWriterParameters)writer.getParameters();
 		options.fromString(params.getFormatOptions());
 	}

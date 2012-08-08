@@ -98,8 +98,8 @@ public class XMLFilterTest {
 	public void testLocaleFilter1 () {
 		String snippet = "<?xml version=\"1.0\"?>\n"
 			+ "<doc><its:rules version=\"2.0\" xmlns:its=\"http://www.w3.org/2005/11/its\">"
-			+ "<its:localeFilterRule selector=\"//para1\" localeFilterType='exclude' localeFilterList='*'/>"
-			+ "<its:localeFilterRule selector=\"//para2\" localeFilterType='include' localeFilterList='*'/>"
+			+ "<its:localeFilterRule selector=\"//para1\" localeFilterList='de'/>"
+			+ "<its:localeFilterRule selector=\"//para2\" localeFilterList='*'/>"
 			+ "</its:rules>"
 			+ "<para1>text1</para1>"
 			+ "<para2>text2</para2>"
@@ -114,8 +114,8 @@ public class XMLFilterTest {
 	public void testLocaleFilter2 () {
 		String snippet = "<?xml version=\"1.0\"?>\n"
 			+ "<doc><its:rules version=\"2.0\" xmlns:its=\"http://www.w3.org/2005/11/its\">"
-			+ "<its:localeFilterRule selector=\"//para1\" localeFilterType='exclude' localeFilterList='*'/>"
-			+ "<its:localeFilterRule selector=\"//para2\" localeFilterType='exclude' localeFilterList='fr'/>"
+			+ "<its:localeFilterRule selector=\"//para1\" localeFilterList='de'/>"
+			+ "<its:localeFilterRule selector=\"//para2\" localeFilterList='fr-CH'/>"
 			+ "</its:rules>"
 			+ "<para1>text1</para1>"
 			+ "<para2>text2</para2>"
@@ -131,8 +131,8 @@ public class XMLFilterTest {
 	public void testLocaleFilter3 () {
 		String snippet = "<?xml version=\"1.0\"?>\n"
 			+ "<doc><its:rules version=\"2.0\" xmlns:its=\"http://www.w3.org/2005/11/its\">"
-			+ "<its:localeFilterRule selector=\"//para1\" localeFilterType='include' localeFilterList='de-CH, de-AT'/>"
-			+ "<its:localeFilterRule selector=\"//para2\" localeFilterType='include' localeFilterList='en-CA, fr-CA'/>"
+			+ "<its:localeFilterRule selector=\"//para1\" localeFilterList=''/>"
+			+ "<its:localeFilterRule selector=\"//para2\" localeFilterList='en-CA, fr-*'/>"
 			+ "</its:rules>"
 			+ "<para1>text1</para1>"
 			+ "<para2>text2</para2>"
@@ -147,8 +147,8 @@ public class XMLFilterTest {
 	public void testLocaleFilter4 () {
 		String snippet = "<?xml version=\"1.0\"?>\n"
 			+ "<doc><its:rules version=\"2.0\" xmlns:its=\"http://www.w3.org/2005/11/its\">"
-			+ "<its:localeFilterRule selector=\"//para1\" localeFilterType='exclude' localeFilterList='fr-CH, de-CH'/>"
-			+ "<its:localeFilterRule selector=\"//para2\" localeFilterType='exclude' localeFilterList='en-CA, de'/>"
+			+ "<its:localeFilterRule selector=\"//para1\" localeFilterList='fr-CH, fr-*-CH'/>"
+			+ "<its:localeFilterRule selector=\"//para2\" localeFilterList='fr-CA, fr'/>"
 			+ "</its:rules>"
 			+ "<para1>text1</para1>"
 			+ "<para2>text2</para2>"
@@ -163,15 +163,15 @@ public class XMLFilterTest {
 	public void testLocaleFilter5 () {
 		String snippet = "<?xml version=\"1.0\"?>\n"
 			+ "<doc xmlns:its=\"http://www.w3.org/2005/11/its\"><its:rules version=\"2.0\">"
-			+ "<its:localeFilterRule selector=\"/doc\" localeFilterType='exclude' localeFilterList='fr-CH, de-CH'/>"
+			+ "<its:localeFilterRule selector=\"/doc\" localeFilterList='fr'/>"
 			+ "</its:rules>"
-			+ "<para1 its:localeFilterType='include' its:localeFilterList='fr-CH'>text1</para1>"
+			+ "<para1 its:localeFilterList='fr-CH'>text1</para1>"
 			+ "<para2>text2</para2>"
 			+ "</doc>";
 		ArrayList<Event> list = getEvents(snippet);
 		ITextUnit tu = FilterTestDriver.getTextUnit(list, 1);
 		assertNotNull(tu);
-		assertEquals("text1", tu.getSource().toString());
+		assertEquals("text2", tu.getSource().toString());
 	}
 	
 	@Test
@@ -790,6 +790,32 @@ public class XMLFilterTest {
 		filter.open(rawDoc);
 		filter.close();
 	}
+	
+	@Test
+	public void extendedMatchTest () {
+		assertTrue(filter.extendedMatch("*-CH", "de-CH"));
+		assertTrue(filter.extendedMatch("*-CH", "fr-ch"));
+		assertTrue(filter.extendedMatch("de-*-DE, fr", "de-de"));
+		assertTrue(filter.extendedMatch("fr, de-*-DE", "de-Latn-de"));
+		assertTrue(filter.extendedMatch("za ,  de-*-DE , po-pl  ", "de-DE-x-goethe"));
+		assertTrue(filter.extendedMatch("za, de-*-DE,   po-pl", "de-DE"));
+		
+		assertTrue(filter.extendedMatch("za, de-*, po-pl", "de"));
+		assertTrue(filter.extendedMatch("de-*, de", "de"));
+		
+		assertTrue(filter.extendedMatch("de-*-DE", "de-DE"));
+		assertTrue(filter.extendedMatch("de-*-DE", "de-de"));
+		assertTrue(filter.extendedMatch("de-*-DE", "de-Latn-DE"));
+		assertTrue(filter.extendedMatch("de-*-DE", "de-Latf-DE"));
+		assertTrue(filter.extendedMatch("de-*-DE", "de-DE-x-goethe"));
+		assertTrue(filter.extendedMatch("de-*-DE", "de-Latn-DE-1996"));
+		assertTrue(filter.extendedMatch("de-*-DE", "de-Deva-DE"));
+		
+		assertFalse(filter.extendedMatch("de-*-DE", "de"));
+		assertFalse(filter.extendedMatch("de-*-DE", "de-x-DE"));
+		assertFalse(filter.extendedMatch("de-*-DE", "de-Deva"));
+	}
+	
 
 	@Test
 	public void testDoubleExtraction () throws URISyntaxException {

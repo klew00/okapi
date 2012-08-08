@@ -468,7 +468,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 		ITSRule rule = new ITSRule(IProcessor.DC_LOCFILTER);
 		rule.selector = elem.getAttribute("selector");
 		rule.isInternal = isInternal;
-		// Process the attributes
+		// Retrieve the list
 		rule.info = retrieveLocaleFilterList(elem, false);
 		// Add the rule
 		rules.add(rule);
@@ -1119,10 +1119,9 @@ public class ITSEngine implements IProcessor, ITraversal {
 					("preserve".equals(value) ? 'y' : '?'), attr.getSpecified());
 			}
 			
-			// locale filter type/list
-			// Only localeFilterType is needed, localeFilterList cannot be used alone
+			// locale filter
 			if (( (dataCategories & IProcessor.DC_LOCFILTER) > 0 ) && isVersion2() ) {
-				expr = xpath.compile("//*/@"+ITS_NS_PREFIX+":localeFilterType");
+				expr = xpath.compile("//*/@"+ITS_NS_PREFIX+":localeFilterList");
 				NL = (NodeList)expr.evaluate(doc, XPathConstants.NODESET);
 				for ( int i=0; i<NL.getLength(); i++ ) {
 					attr = (Attr)NL.item(i);
@@ -1181,32 +1180,12 @@ public class ITSEngine implements IProcessor, ITraversal {
 	private String retrieveLocaleFilterList (Element elem,
 		boolean qualified)
 	{
-		final String LFTYPE = "localeFilterType";
-		final String LFLIST = "localeFilterList";
-		String type;
-		String list;
-
-		// Get the values
 		if ( qualified ) { // Locally
-			type = elem.getAttributeNS(ITS_NS_URI, LFTYPE);
-			list = elem.getAttributeNS(ITS_NS_URI, "localeFilterList").trim();
+			return elem.getAttributeNS(ITS_NS_URI, "localeFilterList").trim();
 		}
 		else { // Inside a global rule
-			type = elem.getAttribute(LFTYPE);
-			list = elem.getAttribute(LFLIST).trim();
+			return elem.getAttribute("localeFilterList").trim();
 		}
-		
-		// Check the type
-		if ( type.isEmpty() && !type.equals("include") && !type.equals("exclude") ) {
-			throw new ITSException(String.format("Missing or invalid value '%s' for '%s'.", type, LFTYPE));
-		}
-		// Check the list
-		if ( list.isEmpty() ) {
-			throw new ITSException(String.format("Missing or invalid value '%s' for '%s'.", type, LFLIST));
-		}
-	
-		if ( type.equals("include") ) return "+"+list;
-		else return "-"+list; // 'exclude'
 	}
 	
 	private boolean isVersion2 () throws XPathExpressionException {

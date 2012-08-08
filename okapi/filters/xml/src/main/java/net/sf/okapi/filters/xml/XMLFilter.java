@@ -37,6 +37,7 @@ import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IdGenerator;
+import net.sf.okapi.common.ListUtil;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.MimeTypeMapper;
 import net.sf.okapi.common.UsingParameters;
@@ -762,29 +763,80 @@ public class XMLFilter implements IFilter {
 		if ( !trav.translate() ) return false;
 		
 		// Check ITS locale filter
-		String lf = trav.getLocaleFilter();
-		if ( Util.isEmpty(lf) ) return true;
-		if ( lf.equals("+*") || lf.equals("-") ) return true; // For any locales
-		if ( lf.equals("-*") || lf.equals("+") ) return false; // For any locales
+		String list = trav.getLocaleFilter();
+		// null is none-defined, so default is '*'
+		if (( list == null ) || list.equals("*") ) return true;
+		if ( list.length() == 0 ) return false; // Empty list is 'none'
 		
-		// More info for language range here:
+		// More info for extended language range/filtering here:
 		// http://www.rfc-editor.org/rfc/bcp/bcp47.txt
 		if ( trgLangCode == null ) {
 			// Log a warning that the data category cannot be used
 			logger.warning("No target locale specified: Cannot use the provided ITS Locale Filter data category.");
 			return true;
 		}
-
 		// Now check with one or more codes
-		String tmp = lf.substring(1).toLowerCase();
-		if ( (lf.charAt(0)=='+') ) {
-			// type==include
-			// Return true if match found, false otherwise
-			return (tmp.indexOf(trgLangCode) > -1);
+		return extendedMatch(list, trgLangCode);
+	}
+	
+	/**
+	 * Indicates if a given language tag matches at least one item of a list of extended language ranges.
+	 * <p>Based on the algorithm described at: http://tools.ietf.org/html/rfc4647#section-3.3.2
+	 * @param langRanges the list of extended language ranges
+	 * @param langTag the language tag.
+	 * @return true if the language tag matches at least one item of a list of extended language ranges.
+	 */
+	boolean extendedMatch (String langRanges,
+		String langTag)
+	{
+		for ( String langRange : ListUtil.stringAsArray(langRanges.toLowerCase()) ) {
+			if ( doesLangTagMacthesLangRange(langRange, langTag) ) return true;
 		}
-		// Else: type==exclude
-		// Return true if no-match, false otherwise 
-		return (tmp.indexOf(trgLangCode) == -1);
+		return false;
+	}
+
+	/**
+	 * Compares an extended language range with a language tag.
+	 * @param langRange the extended language range.
+	 * @param langTag the language tag.
+	 * @return true if the language tag matches the language range.
+	 */
+	private boolean doesLangTagMacthesLangRange (String langRange,
+		String langTag)
+	{
+		String[] lrParts = langRange.toLowerCase().split("-", 0);
+		String[] ltParts = langTag.toLowerCase().split("-", 0);
+		
+		int i = 0;
+		int j = 0;
+		String lrst = lrParts[i];
+		String ltst = ltParts[j]; j++;
+		if ( !lrst.equals(ltst) && !lrst.equals("*") ) return false;
+
+		i = 1;
+		j = 1;
+		while ( i<lrParts.length) {
+			lrst = lrParts[i];
+			if ( lrst.equals("*") ) {
+				i++;
+				continue;
+			}
+			else if ( j >= ltParts.length ) {
+				return false;
+			}
+			else if ( ltParts[j].equals(lrst) ) {
+				i++; j++;
+				continue;
+			}
+			else if ( ltParts[j].length() == 1 ) {
+				return false;
+			}
+			else {
+				j++;
+			}
+		}
+	
+		return true;
 	}
 	
 	private boolean isContextTranslatable () {
