@@ -94,7 +94,7 @@ public class VersifiedTextFilter extends AbstractFilter {
 	private static final String CHAPTER = "^[ \t]*\\|c.+[ \t]*$";
 	private static final String BOOK = "^[ \t]*\\|b.+[ \t]*$";
 	private static final String TARGET = "^[ \t]*<TARGET>[ \t]*$";
-	private static final String PLACEHOLDER = "(\\{|</?)[0-9]+(\\}|>)";
+	private static final String PLACEHOLDER = "(\\{|</?)([0-9]+)(\\}|>)";
 	private static final Pattern PLACEHOLDER_PATTERN = Pattern.compile(PLACEHOLDER);
 
 	private String newline = "\n";
@@ -581,7 +581,9 @@ public class VersifiedTextFilter extends AbstractFilter {
 				tf.append(chunks[i]); // eventBuilder.addToTextUnit(chunks[i]);
 				if (m.find()) {
 					String ph = text.substring(m.start(), m.end());
-					tf.append(new Code(TagType.PLACEHOLDER, ph, ph)); // eventBuilder.addToTextUnit(new Code(TagType.PLACEHOLDER, ph, ph));
+					Code c = new Code(TagType.PLACEHOLDER, ph, ph);
+					c.setId(Integer.parseInt(m.group(2)));
+					tf.append(c); // eventBuilder.addToTextUnit(new Code(TagType.PLACEHOLDER, ph, ph));
 				}
 			}
 		} else {
@@ -611,7 +613,9 @@ public class VersifiedTextFilter extends AbstractFilter {
 				eventBuilder.addToTextUnit(chunks[i]);
 				if (m.find()) {
 					String ph = text.substring(m.start(), m.end());
-					eventBuilder.addToTextUnit(new Code(TagType.PLACEHOLDER, ph, ph));
+					Code c = new Code(TagType.PLACEHOLDER, ph, ph);
+					c.setId(Integer.parseInt(m.group(2)));
+					eventBuilder.addToTextUnit(c);
 				}
 			}
 		} else {
