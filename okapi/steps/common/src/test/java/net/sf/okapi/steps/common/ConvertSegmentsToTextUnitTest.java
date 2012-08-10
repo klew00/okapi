@@ -1,14 +1,14 @@
 package net.sf.okapi.steps.common;
 
-import static org.junit.Assert.*;
-
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.AlignmentStatus;
 import net.sf.okapi.common.resource.ITextUnit;
-import net.sf.okapi.common.resource.MultiEvent;
 import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
