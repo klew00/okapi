@@ -328,7 +328,7 @@ public class XMLFilter implements IFilter {
 		itsEng.applyRules(IProcessor.DC_TRANSLATE | IProcessor.DC_IDVALUE
 			| IProcessor.DC_LOCNOTE | IProcessor.DC_WITHINTEXT | IProcessor.DC_TERMINOLOGY
 			| IProcessor.DC_DOMAIN | IProcessor.DC_TARGETPOINTER | IProcessor.DC_EXTERNALRES
-			| IProcessor.DC_LOCFILTER);
+			| IProcessor.DC_LOCFILTER | IProcessor.DC_PRESERVESPACE);
 		
 		trav = itsEng;
 		trav.startTraversal();

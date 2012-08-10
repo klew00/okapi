@@ -180,6 +180,25 @@ public class TraversalTest {
 	}
 
 	@Test
+	public void testPreserveSpaces () throws SAXException, IOException, ParserConfigurationException {
+		InputSource is = new InputSource(new StringReader("<book xmlns:its=\"http://www.w3.org/2005/11/its\">"
+			+ "<info>"
+			+ "<its:rules version=\"2.0\">"
+			+ "<its:preserveSpaceRule selector=\"//pre\" space=\"preserve\"/>"
+			+ "</its:rules>"
+			+ "<p> a  b  c  </p>"
+			+ "<pre> a  b  c  </pre>"
+			+ "</info></book>"));
+		Document doc = fact.newDocumentBuilder().parse(is);
+		ITraversal trav = applyITSRules(doc, null, null);
+		Element elem = getElement(trav, "p", 1);
+		assertNotNull(elem);
+		assertFalse(trav.preserveWS());
+		elem = getElement(trav, "pre", 1);
+		assertTrue(trav.preserveWS());
+	}
+	
+	@Test
 	public void testExternalResourceRefGlobal () throws SAXException, IOException, ParserConfigurationException {
 		InputSource is = new InputSource(new StringReader("<doc>"
 			+ "<i:rules xmlns:i='"+ITSEngine.ITS_NS_URI+"' version='2.0'>"

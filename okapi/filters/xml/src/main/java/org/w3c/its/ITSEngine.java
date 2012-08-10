@@ -288,6 +288,9 @@ public class ITSEngine implements IProcessor, ITraversal {
 					else if ( "localeFilterRule".equals(ruleElem.getLocalName()) ) {
 						compileLocaleFilterRule(ruleElem, isInternal);
 					}
+					else if ( "preserveSpaceRule".equals(ruleElem.getLocalName()) ) {
+						compilePrserveSpaceRule(ruleElem, isInternal);
+					}
 					else if ( "externalResourcesRefRule".equals(ruleElem.getLocalName()) ) {
 						compileExternalResourceRule(ruleElem, isInternal);
 					}
@@ -355,23 +358,29 @@ public class ITSEngine implements IProcessor, ITraversal {
 		if ( "yes".equals(value) ) rule.flag = true;
 		else if ( "no".equals(value) ) rule.flag = false;
 		else throw new ITSException("Invalid value for 'translate'.");
-		
-		// If not version 2 or if not there, try extension
+
+		// idValue extension (deprecated but supported)
 		value = elem.getAttributeNS(ITSX_NS_URI, "idValue");
-		if ( version.equals(ITS_VERSION2) && !value.isEmpty() ) {
-			// Warn if the extension is used in ITS 2.0
-			logger.warning(String.format("This document uses the %s:idValue extension instead of the ITS 2.0 idValue attribute.",
-				ITSX_NS_URI));
-		}
 		if ( !value.isEmpty() ) {
+			if ( version.equals(ITS_VERSION2) ) {
+				// Warn if the extension is used in ITS 2.0
+				logger.warning(String.format("This document uses the %s:idValue extension instead of the ITS 2.0 Id Value data category.",
+					ITSX_NS_URI));
+			}
 			rule.idValue = value;
 		}
 		
+		// whiteSpaces extension (deprecated but supported)
 		value = elem.getAttributeNS(ITSX_NS_URI, "whiteSpaces");
-		if ( value.length() > 0 ) {
+		if ( !value.isEmpty() ) {
+			if ( version.equals(ITS_VERSION2) ) {
+				// Warn if the extension is used in ITS 2.0
+				logger.warning(String.format("This document uses the %s:whiteSpaces extension instead of the ITS 2.0 Preserve Space data category.",
+					ITSX_NS_URI));
+			}
 			if ( "preserve".equals(value) ) rule.preserveWS = true;
 			else if ( "default".equals(value) ) rule.preserveWS = false;
-			else throw new ITSException("Invalid value for 'witheSpaces'.");
+			else throw new ITSException("Invalid value for 'whiteSpaces'.");
 		}
 		
 		rules.add(rule);
@@ -473,6 +482,24 @@ public class ITSEngine implements IProcessor, ITraversal {
 		// Add the rule
 		rules.add(rule);
 	}
+	
+	
+	private void compilePrserveSpaceRule (Element elem,
+		boolean isInternal)
+	{
+		ITSRule rule = new ITSRule(IProcessor.DC_PRESERVESPACE);
+		rule.selector = elem.getAttribute("selector");
+		rule.isInternal = isInternal;
+		// Get the value
+		String value = elem.getAttribute("space");
+		if (( !"preserve".equals(value) ) && ( !"default".equals(value) )) {
+			throw new ITSException("Invalid value for 'space'.");
+		}
+		rule.preserveWS = "preserve".equals(value);
+		// Add the rule
+		rules.add(rule);
+	}
+		
 
 	private void compileTargetPointerRule (Element elem,
 		boolean isInternal)
@@ -879,6 +906,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 						if ( rule.idValue != null ) { // For deprecated extension
 							setFlag(NL.item(i), FP_IDVALUE_DATA, resolveExpressionAsString(NL.item(i), rule.idValue), true);							
 						}
+						// For deprecated extension
 						setFlag(NL.item(i), FP_PRESERVEWS, (rule.preserveWS ? 'y' : '?'), true);
 						break;
 						
@@ -938,6 +966,11 @@ public class ITSEngine implements IProcessor, ITraversal {
 					case IProcessor.DC_LOCFILTER:
 						setFlag(NL.item(i), FP_LOCFILTER, 'y', true);
 						setFlag(NL.item(i), FP_LOCFILTER_DATA, rule.info, true);
+						break;
+						
+					case IProcessor.DC_PRESERVESPACE:
+						// For new ITS 2.0 rule, but deprecated extension still supported in DC_PRESERVESPACE case
+						setFlag(NL.item(i), FP_PRESERVEWS, (rule.preserveWS ? 'y' : '?'), true);
 						break;
 						
 					case IProcessor.DC_IDVALUE:

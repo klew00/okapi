@@ -193,7 +193,7 @@ public class XMLFilterTest {
 		assertNotNull(tu);
 		assertEquals("xid2", tu.getName()); // xml:id overrides global rule
 	}
-	
+
 	@Test
 	public void testIdValueV2 () {
 		String snippet = "<?xml version=\"1.0\"?>\n"
@@ -226,6 +226,30 @@ public class XMLFilterTest {
 		ArrayList<Event> list = getEvents(snippet);
 		FilterTestDriver.getTextUnit(list, 1);
 	}
+
+	@Test
+	public void testPreserveSpace1 () {
+		String snippet = "<?xml version=\"1.0\"?>\n"
+			+ "<doc><its:rules version=\"2.0\" xmlns:its=\"http://www.w3.org/2005/11/its\">"
+			+ "<its:preserveSpaceRule selector=\"//grp\" space='preserve'/>"
+			+ "<its:preserveSpaceRule selector=\"//grp/p\" space='default'/>"
+			+ "</its:rules>"
+			+ "<p>  a  b  c  </p>"
+			+ "<grp>"
+			+ "<p>  a  b  c  </p>"
+			+ "</grp>"
+			+ "</doc>";
+		ArrayList<Event> list = getEvents(snippet);
+		ITextUnit tu = FilterTestDriver.getTextUnit(list, 1);
+		assertNotNull(tu);
+		assertEquals(" a b c ", tu.getSource().toString());
+		assertFalse(tu.preserveWhitespaces());
+		tu = FilterTestDriver.getTextUnit(list, 2);
+		assertNotNull(tu);
+		assertEquals("  a  b  c  ", tu.getSource().toString());
+		assertTrue(tu.preserveWhitespaces());
+	}
+	
 	
 	@Test
 	public void testITSVersion1 () {
