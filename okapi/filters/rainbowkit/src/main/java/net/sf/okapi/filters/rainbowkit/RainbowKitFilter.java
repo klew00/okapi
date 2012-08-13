@@ -131,6 +131,14 @@ public class RainbowKitFilter implements IFilter {
 			"Configuration for Rainbow translation kit package.",
 			null,
 			RAINBOWKIT_PACKAGE_EXTENSION+";"));
+		list.add(new FilterConfiguration(getName() + "-noprompt",
+			RAINBOWKIT_MIME_TYPE,
+			getClass().getName(),
+			"Rainbow Translation Kit (No prompt)",
+			"Configuration for Rainbow translation kit (without prompt).",
+			"noprompt.fprm",
+			Manifest.MANIFEST_EXTENSION+";"));
+		
 		return list;
 	}
 	

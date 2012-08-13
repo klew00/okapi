@@ -45,16 +45,34 @@ distribution.</p>
 </ul>
 	</li>
 	<li>Filters:<ul>
+	<li>RainbowKit Filter:<ul>
+	<li>Added pre-defined configuration &quot;noprompt&quot; for processing without 
+	prompting.</li>
+</ul>
+	</li>
 	<li>XML Filter:<ul>
-	<li>Added initial implementation for the ITS 2.0 Domain data category.</li>
+	<li>Added implementation for the ITS 2.0 Domain data category.</li>
+	<li>Added implementation for the ITS 2.0 External Resources 
+	Reference data category.</li>
+	<li>Added implementation for the ITS 2.0 Locale Filter data category.</li>
+	<li>Added implementation for the ITS 2.0 Preserve Space data category.</li>
 </ul>
 	</li>
 </ul>
 	</li>
 	<li>Steps:<ul>
+	<li>Batch Translation Step:<ul>
+	<li>Fixed issue #260 where an error occured at the end of the batch process 
+	when the option &#39;send TMX to the next step&#39; was not set.</li>
+</ul>
+	</li>
 	<li>Translation Comparison Step:<ul>
 	<li>Added support for <code>${rootDir}</code>, <code>${inputRootDir}</code> 
 	and locale variables.</li>
+</ul>
+	</li>
+	<li>Format Conversion Step:<ul>
+	<li>Added the UI for the option &quot;Do not output entries without text&quot;.</li>
 </ul>
 	</li>
 	<li>Segmentation and Desegmentation Step:<ul>
@@ -71,9 +89,23 @@ distribution.</p>
 </ul>
 	</li>
 	<li>Libraries:<ul>
+	<li>Upgraded the SWT library from 3.7 to 4.2.</li>
+	<li>XLIFFWriter:<ul>
+	<li>Added support for <i>its:domain</i> and <i>its:externalResourcesRef</i> 
+	properties</li>
+</ul>
+	</li>
 	<li>Removed extra files leftover from xliff-lib and olifant migration.</li>
 	<li>Added the TARGET_LOCALES step parameter and depracted the TARGET_LOCALE 
 	one.</li>
+	<li>ITSEngine class for ITS 2.0:<ul>
+	<li>Added support for the Target Pointer data category.</li>
+	<li>Added support for the Domain data category.</li>
+	<li>Added support for the External Resources Reference data category.</li>
+	<li>Added support for the Locale Filter data category.</li>
+	<li>Added support for the Preserve Space data category.</li>
+</ul>
+	</li>
 </ul>
 	</li>
 	<li>Trados Utilities Plugin:<ul>

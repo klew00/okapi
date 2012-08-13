@@ -5,107 +5,86 @@
 <trans-unit id="1" resname="toolStripMenuItem1.Text" xml:space="preserve">
 <source xml:lang="en">&amp;File</source>
 <target xml:lang="fr">&amp;File</target>
-<note></note>
 </trans-unit>
 <trans-unit id="2" resname="toolStripComboBox1.Items" xml:space="preserve">
 <source xml:lang="en">Last session log</source>
 <target xml:lang="fr">Last session log</target>
-<note></note>
 </trans-unit>
 <trans-unit id="3" resname="toolStripComboBox1.Items1" xml:space="preserve">
 <source xml:lang="en">Last month log</source>
 <target xml:lang="fr">Last month log</target>
-<note></note>
 </trans-unit>
 <trans-unit id="4" resname="toolStripComboBox1.ToolTipText" xml:space="preserve">
 <source xml:lang="en">List of the previous log documents</source>
 <target xml:lang="fr">List of the previous log documents</target>
-<note></note>
 </trans-unit>
 <trans-unit id="5" resname="toolStripTextBox2.Text" xml:space="preserve">
 <source xml:lang="en">Recording Mode</source>
 <target xml:lang="fr">Recording Mode</target>
-<note></note>
 </trans-unit>
 <trans-unit id="6" resname="toolStripTextBox2.ToolTipText" xml:space="preserve">
 <source xml:lang="en">This shows the type of recording behing done at the moment.</source>
 <target xml:lang="fr">This shows the type of recording behing done at the moment.</target>
-<note></note>
 </trans-unit>
 <trans-unit id="7" resname="menuStrip1.Text" xml:space="preserve">
 <source xml:lang="en">Main Menu</source>
 <target xml:lang="fr">Main Menu</target>
-<note></note>
 </trans-unit>
 <trans-unit id="8" resname="openArchiveToolStripMenuItem.Text" xml:space="preserve">
 <source xml:lang="en">&amp;Open Archive...</source>
 <target xml:lang="fr">&amp;Open Archive...</target>
-<note></note>
 </trans-unit>
 <trans-unit id="9" resname="saveCurrentLogToolStripMenuItem.Text" xml:space="preserve">
 <source xml:lang="en">&amp;Save Current Log</source>
 <target xml:lang="fr">&amp;Save Current Log</target>
-<note></note>
 </trans-unit>
 <trans-unit id="10" resname="exitToolStripMenuItem.Text" xml:space="preserve">
 <source xml:lang="en">E&amp;xit</source>
 <target xml:lang="fr">E&amp;xit</target>
-<note></note>
 </trans-unit>
 <trans-unit id="11" resname="toolStrip1.Text" xml:space="preserve">
 <source xml:lang="en">Main Toolbar</source>
 <target xml:lang="fr">Main Toolbar</target>
-<note></note>
 </trans-unit>
 <trans-unit id="12" resname="toolStripButton1.Text" xml:space="preserve">
 <source xml:lang="en">Enable Watcher</source>
 <target xml:lang="fr">Enable Watcher</target>
-<note></note>
 </trans-unit>
 <trans-unit id="13" resname="toolStripButton1.ToolTipText" xml:space="preserve">
 <source xml:lang="en">Click here to enable the Watcher</source>
 <target xml:lang="fr">Click here to enable the Watcher</target>
-<note></note>
 </trans-unit>
 <trans-unit id="14" resname="toolStripComboBox2.Items" xml:space="preserve">
 <source xml:lang="en">Direct monitoring</source>
 <target xml:lang="fr">Direct monitoring</target>
-<note></note>
 </trans-unit>
 <trans-unit id="15" resname="toolStripComboBox2.Items1" xml:space="preserve">
 <source xml:lang="en">Random monitoring</source>
 <target xml:lang="fr">Random monitoring</target>
-<note></note>
 </trans-unit>
 <trans-unit id="16" resname="toolStripComboBox2.ToolTipText" xml:space="preserve">
 <source xml:lang="en">List of the monitoring command available.</source>
 <target xml:lang="fr">List of the monitoring command available.</target>
-<note></note>
 </trans-unit>
 <trans-unit id="17" resname="btExport.Text" xml:space="preserve">
 <source xml:lang="en">&amp;Export...</source>
 <target xml:lang="fr">&amp;Export...</target>
-<note></note>
 </trans-unit>
 <trans-unit id="18" resname="groupBox1.Text" xml:space="preserve">
 <source xml:lang="en">Options</source>
 <target xml:lang="fr">Options</target>
-<note></note>
 </trans-unit>
 <trans-unit id="19" resname="frame64.Text" xml:space="preserve">
 <source xml:lang="en">64 frames recording mode.</source>
 <target xml:lang="fr">64 frames recording mode.</target>
-<note></note>
 </trans-unit>
 <trans-unit id="20" resname="frames32.Text" xml:space="preserve">
 <source xml:lang="en">32 franes recording mode,</source>
 <target xml:lang="fr">32 franes recording mode,</target>
-<note></note>
 </trans-unit>
 <trans-unit id="21" resname="startLogger.Text" xml:space="preserve">
 <source xml:lang="en">Start logger when starting session</source>
 <target xml:lang="fr">Start logger when starting session</target>
-<note></note>
 </trans-unit>
 <trans-unit id="22" resname="$this.Text" xml:space="preserve">
 <source xml:lang="en">Gandalf Monitoring System</source>

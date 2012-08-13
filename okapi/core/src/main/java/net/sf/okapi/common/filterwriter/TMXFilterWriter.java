@@ -53,6 +53,11 @@ public class TMXFilterWriter implements IFilterWriter {
 		this.params = new Parameters();
 	}
 
+	public TMXFilterWriter(TMXWriter writer) {
+		this.params = new Parameters();
+		this.writer = writer;
+	}
+	
 	public void setSegType (String segType) {
 		this.segType = segType;
 	}
@@ -132,12 +137,21 @@ public class TMXFilterWriter implements IFilterWriter {
 		try {
 			StartDocument sd = (StartDocument)event.getResource();
 			// Create the output
-			if ( outputStream == null ) {
-				writer = new TMXWriter(outputPath);
+			if ( outputStream == null ) {	
+				if (writer == null) {
+					writer = new TMXWriter(outputPath);
+				} else {
+					writer.setPath(outputPath);
+				}
 			}
 			else if ( outputStream != null ) {
-				writer = new TMXWriter(new XMLWriter(
-					new OutputStreamWriter(outputStream, "UTF-8")));
+				if (writer == null) {
+					writer = new TMXWriter(new XMLWriter(
+							new OutputStreamWriter(outputStream, "UTF-8")));
+				} else {
+					writer.setXmlWriter(new XMLWriter(
+							new OutputStreamWriter(outputStream, "UTF-8")));
+				}
 			}
 			
 			writer.setWriteAllPropertiesAsAttributes(params.isWriteAllPropertiesAsAttributes());		

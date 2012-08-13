@@ -99,6 +99,10 @@ public interface ITraversal {
 	 */
 	public int getDirectionality (Attr attribute);
 	
+	public String getExternalResourcesRef ();
+	
+	public String getExternalResourcesRef (Attr attribute);
+	
 	/**
 	 * Gets the element-withinText-related information for the current element.
 	 * @return One of the WINTINTEXT_* values.
@@ -144,22 +148,29 @@ public interface ITraversal {
 	public String getNote (Attr attribute);
 	
 	/**
-	 * Gets the domain of the current element of the traversal, or null
+	 * Gets the domain or domains of the current element of the traversal, or null
 	 * if the node has no domain.
-	 * @return the domain of the current element of the traversal, or null
-	 * if the node has no domain.
+	 * @return a tab-delimited list of the domains of the current element of the traversal,
+	 * or null if the node has no domain.
 	 */
-	public String getDomain ();
+	public String getDomains ();
 	
 	/**
-	 * Gets the domain of the given attribute of the current element.
+	 * Gets the domain or domains of the given attribute of the current element.
 	 * @param attribute the attribute to query. the attribute must be in the current
 	 * node of the traversal.
-	 * @return the domain of the given attribute of the current element, or null if the
-	 * attribute has no domain.
+	 * @return a tab-delimited list of the domains of the given attribute of the current element,
+	 * or null if the attribute has no domain.
 	 */
-	public String getDomain (Attr attribute);
+	public String getDomains (Attr attribute);
 
+	/**
+	 * Gets the locale filter information.
+	 * @return A '+' or '-' (include or exclude) followed by a comma-separated list
+	 * of basic language ranges as defined in BCP-47 (and possibly empty).
+	 */
+	public String getLocaleFilter ();
+	
 	/**
 	 * Indicates if the white spaces of the current element of the traversal
 	 * must be preserved. 

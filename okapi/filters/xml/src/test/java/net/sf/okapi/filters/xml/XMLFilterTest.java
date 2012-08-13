@@ -95,6 +95,86 @@ public class XMLFilterTest {
 	}
 	
 	@Test
+	public void testLocaleFilter1 () {
+		String snippet = "<?xml version=\"1.0\"?>\n"
+			+ "<doc><its:rules version=\"2.0\" xmlns:its=\"http://www.w3.org/2005/11/its\">"
+			+ "<its:localeFilterRule selector=\"//para1\" localeFilterList='de'/>"
+			+ "<its:localeFilterRule selector=\"//para2\" localeFilterList='*'/>"
+			+ "</its:rules>"
+			+ "<para1>text1</para1>"
+			+ "<para2>text2</para2>"
+			+ "</doc>";
+		ArrayList<Event> list = getEvents(snippet);
+		ITextUnit tu = FilterTestDriver.getTextUnit(list, 1);
+		assertNotNull(tu);
+		assertEquals("text2", tu.getSource().toString());
+	}
+	
+	@Test
+	public void testLocaleFilter2 () {
+		String snippet = "<?xml version=\"1.0\"?>\n"
+			+ "<doc><its:rules version=\"2.0\" xmlns:its=\"http://www.w3.org/2005/11/its\">"
+			+ "<its:localeFilterRule selector=\"//para1\" localeFilterList='de'/>"
+			+ "<its:localeFilterRule selector=\"//para2\" localeFilterList='fr-CH'/>"
+			+ "</its:rules>"
+			+ "<para1>text1</para1>"
+			+ "<para2>text2</para2>"
+			+ "<para3>text3</para3>"
+			+ "</doc>";
+		ArrayList<Event> list = getEvents(snippet);
+		ITextUnit tu = FilterTestDriver.getTextUnit(list, 1);
+		assertNotNull(tu);
+		assertEquals("text3", tu.getSource().toString());
+	}
+
+	@Test
+	public void testLocaleFilter3 () {
+		String snippet = "<?xml version=\"1.0\"?>\n"
+			+ "<doc><its:rules version=\"2.0\" xmlns:its=\"http://www.w3.org/2005/11/its\">"
+			+ "<its:localeFilterRule selector=\"//para1\" localeFilterList=''/>"
+			+ "<its:localeFilterRule selector=\"//para2\" localeFilterList='en-CA, fr-*'/>"
+			+ "</its:rules>"
+			+ "<para1>text1</para1>"
+			+ "<para2>text2</para2>"
+			+ "</doc>";
+		ArrayList<Event> list = getEvents(snippet);
+		ITextUnit tu = FilterTestDriver.getTextUnit(list, 1);
+		assertNotNull(tu);
+		assertEquals("text2", tu.getSource().toString());
+	}
+	
+	@Test
+	public void testLocaleFilter4 () {
+		String snippet = "<?xml version=\"1.0\"?>\n"
+			+ "<doc><its:rules version=\"2.0\" xmlns:its=\"http://www.w3.org/2005/11/its\">"
+			+ "<its:localeFilterRule selector=\"//para1\" localeFilterList='fr-CH, fr-*-CH'/>"
+			+ "<its:localeFilterRule selector=\"//para2\" localeFilterList='fr-CA, fr'/>"
+			+ "</its:rules>"
+			+ "<para1>text1</para1>"
+			+ "<para2>text2</para2>"
+			+ "</doc>";
+		ArrayList<Event> list = getEvents(snippet);
+		ITextUnit tu = FilterTestDriver.getTextUnit(list, 1);
+		assertNotNull(tu);
+		assertEquals("text2", tu.getSource().toString());
+	}
+	
+	@Test
+	public void testLocaleFilter5 () {
+		String snippet = "<?xml version=\"1.0\"?>\n"
+			+ "<doc xmlns:its=\"http://www.w3.org/2005/11/its\"><its:rules version=\"2.0\">"
+			+ "<its:localeFilterRule selector=\"/doc\" localeFilterList='fr'/>"
+			+ "</its:rules>"
+			+ "<para1 its:localeFilterList='fr-CH'>text1</para1>"
+			+ "<para2>text2</para2>"
+			+ "</doc>";
+		ArrayList<Event> list = getEvents(snippet);
+		ITextUnit tu = FilterTestDriver.getTextUnit(list, 1);
+		assertNotNull(tu);
+		assertEquals("text2", tu.getSource().toString());
+	}
+	
+	@Test
 	public void testComplexIdValue () {
 		String snippet = "<?xml version=\"1.0\"?>\n"
 			+ "<doc><its:rules version=\"1.0\" xmlns:its=\"http://www.w3.org/2005/11/its\""
@@ -113,7 +193,7 @@ public class XMLFilterTest {
 		assertNotNull(tu);
 		assertEquals("xid2", tu.getName()); // xml:id overrides global rule
 	}
-	
+
 	@Test
 	public void testIdValueV2 () {
 		String snippet = "<?xml version=\"1.0\"?>\n"
@@ -146,6 +226,30 @@ public class XMLFilterTest {
 		ArrayList<Event> list = getEvents(snippet);
 		FilterTestDriver.getTextUnit(list, 1);
 	}
+
+	@Test
+	public void testPreserveSpace1 () {
+		String snippet = "<?xml version=\"1.0\"?>\n"
+			+ "<doc><its:rules version=\"2.0\" xmlns:its=\"http://www.w3.org/2005/11/its\">"
+			+ "<its:preserveSpaceRule selector=\"//grp\" space='preserve'/>"
+			+ "<its:preserveSpaceRule selector=\"//grp/p\" space='default'/>"
+			+ "</its:rules>"
+			+ "<p>  a  b  c  </p>"
+			+ "<grp>"
+			+ "<p>  a  b  c  </p>"
+			+ "</grp>"
+			+ "</doc>";
+		ArrayList<Event> list = getEvents(snippet);
+		ITextUnit tu = FilterTestDriver.getTextUnit(list, 1);
+		assertNotNull(tu);
+		assertEquals(" a b c ", tu.getSource().toString());
+		assertFalse(tu.preserveWhitespaces());
+		tu = FilterTestDriver.getTextUnit(list, 2);
+		assertNotNull(tu);
+		assertEquals("  a  b  c  ", tu.getSource().toString());
+		assertTrue(tu.preserveWhitespaces());
+	}
+	
 	
 	@Test
 	public void testITSVersion1 () {
@@ -710,6 +814,32 @@ public class XMLFilterTest {
 		filter.open(rawDoc);
 		filter.close();
 	}
+	
+	@Test
+	public void extendedMatchTest () {
+		assertTrue(filter.extendedMatch("*-CH", "de-CH"));
+		assertTrue(filter.extendedMatch("*-CH", "fr-ch"));
+		assertTrue(filter.extendedMatch("de-*-DE, fr", "de-de"));
+		assertTrue(filter.extendedMatch("fr, de-*-DE", "de-Latn-de"));
+		assertTrue(filter.extendedMatch("za ,  de-*-DE , po-pl  ", "de-DE-x-goethe"));
+		assertTrue(filter.extendedMatch("za, de-*-DE,   po-pl", "de-DE"));
+		
+		assertTrue(filter.extendedMatch("za, de-*, po-pl", "de"));
+		assertTrue(filter.extendedMatch("de-*, de", "de"));
+		
+		assertTrue(filter.extendedMatch("de-*-DE", "de-DE"));
+		assertTrue(filter.extendedMatch("de-*-DE", "de-de"));
+		assertTrue(filter.extendedMatch("de-*-DE", "de-Latn-DE"));
+		assertTrue(filter.extendedMatch("de-*-DE", "de-Latf-DE"));
+		assertTrue(filter.extendedMatch("de-*-DE", "de-DE-x-goethe"));
+		assertTrue(filter.extendedMatch("de-*-DE", "de-Latn-DE-1996"));
+		assertTrue(filter.extendedMatch("de-*-DE", "de-Deva-DE"));
+		
+		assertFalse(filter.extendedMatch("de-*-DE", "de"));
+		assertFalse(filter.extendedMatch("de-*-DE", "de-x-DE"));
+		assertFalse(filter.extendedMatch("de-*-DE", "de-Deva"));
+	}
+	
 
 	@Test
 	public void testDoubleExtraction () throws URISyntaxException {
@@ -746,7 +876,7 @@ public class XMLFilterTest {
 
 	private ArrayList<Event> getEvents(String snippet) {
 		ArrayList<Event> list = new ArrayList<Event>();
-		filter.open(new RawDocument(snippet, locEN));
+		filter.open(new RawDocument(snippet, locEN, LocaleId.FRENCH));
 		while ( filter.hasNext() ) {
 			Event event = filter.next();
 			list.add(event);

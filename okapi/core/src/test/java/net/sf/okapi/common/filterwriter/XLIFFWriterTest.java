@@ -28,6 +28,7 @@ import java.io.IOException;
 
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.TestUtil;
+import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.TextFragment.TagType;
@@ -232,6 +233,29 @@ public class XLIFFWriterTest {
 			+ "</body>\n</file>\n</xliff>\n", result);
 	}
 
+	@Test
+	public void testBasicWithITSProperties ()
+		throws IOException
+	{
+		writer.create(root+"out.xlf", null, locEN, null, null, "original.ext", null);
+		ITextUnit tu = new TextUnit("tu1", "text");
+		tu.setProperty(new Property(Property.ITS_DOMAINS, "dom1\tdom2"));
+		tu.setProperty(new Property(Property.ITS_EXTERNALRESREF, "http://example.com/res"));
+		writer.writeTextUnit(tu);
+		writer.close();
+
+		String result = readFile(root+"out.xlf");
+		assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+			+ "<xliff version=\"1.2\" xmlns=\"urn:oasis:names:tc:xliff:document:1.2\" xmlns:okp=\"okapi-framework:xliff-extensions\">\n"
+			+ "<file original=\"original.ext\" source-language=\"en\" datatype=\"x-undefined\">\n"
+			+ "<body>\n"
+			+ "<trans-unit id=\"tu1\" xmlns:its=\"http://www.w3.org/2005/11/its\" its:version=\"2.0\" its:externalResourcesRef=\"http://example.com/res\">\n"
+			+ "<source xml:lang=\"en\">text</source>\n"
+			+ "<okp:itsDomains xmlns:dc=\"http://purl.org/dc/elements/1.1/\"><okp:item dc:subject=\"dom1\"></okp:item><okp:item dc:subject=\"dom2\"></okp:item></okp:itsDomains>"
+			+ "</trans-unit>\n"
+			+ "</body>\n</file>\n</xliff>\n", result);
+	}
+	
 	private String readFile (String path)
 		throws IOException
 	{
