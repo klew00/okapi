@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2010-2011 by the Okapi Framework contributors
+  Copyright (C) 2010-2012 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -41,6 +41,7 @@ public class IDMLSkeleton implements ISkeleton {
 	private Node scopeNode; // Used for TextUnit
 	private HashMap<String, NodeReference> refs; // Used for TextUnit
 	private String[] movedParts; // Temporary moved outside the content
+	private boolean forced = false; // Indicates the TU was forced (for example by a Br tag) and need special care on merge
 	
 	public IDMLSkeleton (ZipFile original) {
 		this.original = original;
@@ -104,12 +105,20 @@ public class IDMLSkeleton implements ISkeleton {
 	public Node getScopeNode () {
 		return scopeNode;
 	}
+	
+	public void setForced (boolean forced) {
+		this.forced = forced;
+	}
+	
+	public boolean getForced () {
+		return forced;
+	}
 
 	/**
 	 * Returns a shallow copy of this skeleton.
 	 */
 	@Override
-	public IDMLSkeleton clone() {
+	public IDMLSkeleton clone () {
 		IDMLSkeleton newSkel = new IDMLSkeleton(original);
 		newSkel.entry = entry;
 		newSkel.doc = doc;
