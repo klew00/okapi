@@ -21,6 +21,7 @@
 package net.sf.okapi.common.filters;
 
 import java.io.File;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -176,7 +177,7 @@ public class FilterConfigurationMapper extends ParametersEditorMapper implements
 				// configuration identifiers
 				URL url = filter.getClass().getResource(fc.parametersLocation);
 				try {
-					params.load(url.toURI(), false);
+					params.load(new URI(url.toString().replace('\\', '/')), false);
 				}
 				catch ( URISyntaxException e ) {
 					throw new RuntimeException(String.format(
@@ -467,7 +468,7 @@ public class FilterConfigurationMapper extends ParametersEditorMapper implements
 		if ( tmpFilter == null ) return;
 		
 		// Set the data
-		fc.classLoader = (URLClassLoader) tmpFilter.getClass().getClassLoader();
+		//fc.classLoader = (URLClassLoader) tmpFilter.getClass().getClassLoader();
 		fc.parametersLocation = fc.configId + CONFIGFILE_EXT;
 		fc.filterClass = tmpFilter.getClass().getName();
 		fc.mimeType = tmpFilter.getMimeType();
@@ -509,6 +510,13 @@ public class FilterConfigurationMapper extends ParametersEditorMapper implements
 		}
 		if ( filter == null ) {
 			try {
+				
+				// If config has no classLoader, attempt to query from known configs.
+				if ( config.classLoader == null ) {
+					String[] res = splitFilterFromConfiguration(config.configId);
+					config.classLoader = configMap.containsKey(res[0]) ? configMap.get(res[0]).classLoader : null;
+				}
+				
 				if ( config.classLoader == null ) {
 					filter = (IFilter)Class.forName(config.filterClass).newInstance();
 				}
