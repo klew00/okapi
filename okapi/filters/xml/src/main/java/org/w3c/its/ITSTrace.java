@@ -67,8 +67,7 @@ class ITSTrace {
 		
 		// idValue: No inheritance
 		
-		// external resource reference: Inheritance for child element including attributes
-		externalRes = initialTrace.externalRes;
+		// external resource reference: No inheritance
 		
 		// locale filter:  Inheritance for child element including attributes
 		localeFilter = initialTrace.localeFilter;

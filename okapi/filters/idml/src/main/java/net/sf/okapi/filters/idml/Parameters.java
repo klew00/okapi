@@ -34,11 +34,13 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	private static final String SIMPLIFYCODES = "simplifyCodes";
 	private static final String EXTRACTMASTERSPREADS = "extractMasterSpreads";
 	private static final String SKIPTHRESHOLD = "skipThreshold";
+	private static final String NEWTUONBR = "newTuOnBr";
 
 	private boolean extractNotes;
 	private boolean simplifyCodes;
 	private boolean extractMasterSpreads;
 	private int skipThreshold;
+	private boolean newTuOnBr;
 
 	public Parameters () {
 		reset();
@@ -50,6 +52,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		simplifyCodes = true;
 		extractMasterSpreads = true;
 		skipThreshold = 1000;
+		newTuOnBr = false; //true;
 	}
 
 	public void fromString (String data) {
@@ -59,6 +62,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		simplifyCodes = buffer.getBoolean(SIMPLIFYCODES, simplifyCodes);
 		extractMasterSpreads = buffer.getBoolean(EXTRACTMASTERSPREADS, extractMasterSpreads);
 		skipThreshold = buffer.getInteger(SKIPTHRESHOLD, skipThreshold);
+		newTuOnBr = buffer.getBoolean(NEWTUONBR, newTuOnBr);
 	}
 	
 	@Override
@@ -68,6 +72,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		buffer.setBoolean(SIMPLIFYCODES, simplifyCodes);
 		buffer.setBoolean(EXTRACTMASTERSPREADS, extractMasterSpreads);
 		buffer.setInteger(SKIPTHRESHOLD, skipThreshold);
+		buffer.setBoolean(NEWTUONBR, newTuOnBr);
 		return buffer.toString();
 	}
 
@@ -103,12 +108,21 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		this.skipThreshold = skipThreshold;
 	}
 
+	public boolean getNewTuOnBr () {
+		return newTuOnBr;
+	}
+	
+	public void setNewTuOnBr (boolean newTuOnBr) {
+		this.newTuOnBr = newTuOnBr;
+	}
+
 	@Override
 	public ParametersDescription getParametersDescription() {
 		ParametersDescription desc = new ParametersDescription(this);
 		desc.add(EXTRACTNOTES, "Extract notes", null);
 		desc.add(EXTRACTMASTERSPREADS, "Extract master spreads", null);
 		desc.add(SIMPLIFYCODES, "Simplify inline codes when possible", null);
+		desc.add(NEWTUONBR, "Create new paragraphs on hard returns (<Br/> elements) [BETA]", null);
 		desc.add(SKIPTHRESHOLD, "Maximum spread size", "Skip any spread larger than the given value (in Kbytes)");
 		return desc;
 	}
@@ -119,10 +133,14 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		
 		desc.addCheckboxPart(paramsDesc.get(EXTRACTNOTES));
 		desc.addCheckboxPart(paramsDesc.get(EXTRACTMASTERSPREADS));
+		desc.addSeparatorPart();
+		
+		desc.addCheckboxPart(paramsDesc.get(SIMPLIFYCODES));
+		desc.addCheckboxPart(paramsDesc.get(NEWTUONBR));
+		desc.addSeparatorPart();
+		
 		SpinInputPart sip = desc.addSpinInputPart(paramsDesc.get(SKIPTHRESHOLD));
 		sip.setRange(1, 32000);
-		desc.addSeparatorPart();
-		desc.addCheckboxPart(paramsDesc.get(SIMPLIFYCODES));
 		
 		return desc;
 	}

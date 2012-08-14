@@ -250,7 +250,6 @@ public class XMLFilterTest {
 		assertTrue(tu.preserveWhitespaces());
 	}
 	
-	
 	@Test
 	public void testITSVersion1 () {
 		String snippet = "<?xml version=\"1.0\"?>\n"
@@ -580,6 +579,38 @@ public class XMLFilterTest {
 		//TODO: Implement replacement of the lang value
 		//assertEquals(expect, FilterTestDriver.generateOutput(getEvents(snippet), snippet, "FR"));
 	}*/
+
+	@Test
+	public void testOutputTargetPointer () {
+		String snippet = "<?xml version=\"1.0\"?>\n"
+			+ "<doc xmlns:its=\"http://www.w3.org/2005/11/its\"><its:rules version=\"2.0\">"
+			+ "<its:translateRule selector=\"/doc\" translate=\"no\"/>"
+			+ "<its:translateRule selector=\"//item/src\" translate=\"yes\"/>"
+			+ "<its:targetPointerRule selector=\"//item/src\" targetPointer=\"../trg\"/>"
+			+ "</its:rules>"
+			+ "<item><src>Text</src><trg/></item>"
+			+ "</doc>";
+		String expect = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+			+ "<doc xmlns:its=\"http://www.w3.org/2005/11/its\"><its:rules version=\"2.0\">"
+			+ "<its:translateRule selector=\"/doc\" translate=\"no\"/>"
+			+ "<its:translateRule selector=\"//item/src\" translate=\"yes\"/>"
+			+ "<its:targetPointerRule selector=\"//item/src\" targetPointer=\"../trg\"/>"
+			+ "</its:rules>"
+//TODO:	to implement		+ "<item><src>Text</src><trg>Text</trg></item>"
+			+ "<item><src>Text</src><trg/></item>"
+			+ "</doc>";
+		
+		// Check extraction
+		ArrayList<Event> list = getEvents(snippet);
+		ITextUnit tu = FilterTestDriver.getTextUnit(list, 1);
+		assertNotNull(tu);
+		assertEquals("Text", tu.getSource().getCodedText());
+		
+		// Check output
+		assertEquals(expect, FilterTestDriver.generateOutput(list,
+			filter.getEncoderManager(), LocaleId.FRENCH));
+	}
+	
 	
 	@Test
 	public void testOutputSupplementalChars () {
