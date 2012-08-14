@@ -758,6 +758,10 @@ public class XMLFilter implements IFilter {
 		return false;
 	}
 
+	/**
+	 * Indicates if the current node is to be extracted according its ITS state.
+	 * @return true if it is to be extracted, false otherwise.
+	 */
 	private boolean extract () {
 		// Check ITS translate
 		if ( !trav.translate() ) return false;
@@ -921,13 +925,14 @@ public class XMLFilter implements IFilter {
 			terms = null; // Reset for next time
 		}
 
-		// Null is fine
+		// Set the resname value (or null, which is fine)
 		tu.setName(context.peek().idValue);
 		
+		// Set the information about preserving or not white-spaces
 		if ( context.peek().preserveWS ) {
 			tu.setPreserveWhitespaces(true);
 		}
-		else {
+		else { // We laso unwrap if we don't have to preserve
 			tu.setPreserveWhitespaces(false);
 			tu.getSource().unwrap(false, true);
 		}
