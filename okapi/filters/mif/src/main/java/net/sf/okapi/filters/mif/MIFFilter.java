@@ -2421,7 +2421,7 @@ public class MIFFilter implements IFilter {
 			unread = n-2;
 		}
 
-		// <MIFFile N.00>
+		// <MIFFile NN.00>
 		if ( tmp.length() < 13 ) {
 			throw new OkapiIOException("Invalid MIF header.");
 		}
@@ -2429,8 +2429,9 @@ public class MIFFilter implements IFilter {
 			throw new OkapiIOException("Invalid MIF header.");
 		}
 		
-		version = tmp.substring(9);
-		if ( version.compareTo("8.00") < 0 ) {
+		version = tmp.substring(9,13);
+		double dblVer = Double.valueOf(version);
+		if ( dblVer < 8.00 ) {
 			baseEncoding = FRAMEROMAN;
 		}
 		

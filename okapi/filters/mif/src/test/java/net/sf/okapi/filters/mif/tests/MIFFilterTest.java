@@ -395,6 +395,29 @@ public class MIFFilterTest {
 		rewriteThenCompareFile("Test01-v7.mif");
 //		rewriteThenCompareFile("Test03_mif7.mif");
 	}
+ 	
+	@Test
+	public void testV10IsUsingV9Encoding () {
+		ArrayList<Event> eventsV9 = getEventsFromFile("TestEncoding-v9.mif", null);
+		ArrayList<Event> eventsV10 = getEventsFromFile("TestEncoding-v10.mif", null);
+
+		assertTrue("Content of both files should be the same.", eventsV9.size() == eventsV10.size());
+		
+		for (int i = 0; i < eventsV9.size(); i++) {
+			Event eventV9 = eventsV9.get(i);
+			Event eventV10 = eventsV10.get(i);
+			if ( eventV9.getEventType() != eventV10.getEventType() ) {
+				// Trigger assert and allow easy debug
+				assertTrue("Content of both files should be the same.", false);
+			}
+			if ( eventV9.getEventType() == EventType.TEXT_UNIT ) {
+				ITextUnit tu1 = eventV9.getTextUnit();
+				ITextUnit tu2 = eventV10.getTextUnit();
+				assertEquals(tu1.getSource().getFirstContent().getText(),
+					tu2.getSource().getFirstContent().getText());
+			}
+		}
+	}
 	
 //	@Test
 //	public void testDoubleExtraction () {
