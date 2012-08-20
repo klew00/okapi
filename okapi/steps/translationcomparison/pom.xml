@@ -21,6 +21,11 @@
             <artifactId>okapi-lib-translation</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>net.sf.okapi.lib</groupId>
+            <artifactId>okapi-lib-search</artifactId>
+            <version>${project.version}</version>
+        </dependency> 
 	</dependencies>
 </project>		
 		
