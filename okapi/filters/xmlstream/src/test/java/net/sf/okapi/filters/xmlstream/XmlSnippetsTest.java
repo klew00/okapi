@@ -369,6 +369,18 @@ public class XmlSnippetsTest {
 				xmlStreamFilter));
 		parameters = originalParameters;
 	}
+	
+	// XXX This doesn't actually test anything
+	@Test
+	public void testExcludeByDefault() {
+		String snippet = "<xml><test>Exclude this</test><test translate='y'>Include this</test></xml>";
+		URL originalParameters = parameters;
+		parameters = XmlSnippetsTest.class.getResource("/excludeByDefault.yml");
+		assertEquals(snippet, XmlStreamTestUtils.generateOutput(
+				XmlStreamTestUtils.getEvents(snippet, xmlStreamFilter, parameters), snippet, locEN,
+				xmlStreamFilter));
+		parameters = originalParameters;
+	}
 
 	@Test
 	public void testCodeFinder() {
