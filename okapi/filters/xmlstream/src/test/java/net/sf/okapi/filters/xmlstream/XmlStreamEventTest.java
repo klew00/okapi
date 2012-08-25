@@ -481,6 +481,39 @@ public class XmlStreamEventTest {
 		assertTrue(FilterTestDriver.laxCompareEvents(events, getEvents(snippet)));
 	}
 
+	@Test
+	public void testExcludeByDefault() {
+		String snippet = "<xml><test>Exclude this</test><test translate='y'>Include this</test></xml>";
+		URL originalParameters = parameters;
+		parameters = XmlStreamEventTest.class.getResource("/excludeByDefault.yml");
+		ArrayList<Event> events = new ArrayList<Event>();
+		addStartEvents(events);
+		
+		GenericSkeleton skel = new GenericSkeleton();		
+		DocumentPart dp = new DocumentPart("dp1", false);
+		skel.add("<xml><test>Exclude this</test><test translate='y'>");
+		dp.setSkeleton(skel);
+		events.add(new Event(EventType.DOCUMENT_PART, dp));
+		
+		ITextUnit tu = new TextUnit("tu1", "Include this");
+		events.add(new Event(EventType.TEXT_UNIT, tu));
+		
+		skel = new GenericSkeleton();
+		dp = new DocumentPart("dp2", false);
+		skel.add("</test></xml>");
+		dp.setSkeleton(skel);
+		events.add(new Event(EventType.DOCUMENT_PART, dp));
+		
+		addEndEvents(events);
+
+		try {
+			assertTrue(FilterTestDriver.laxCompareEvents(events, getEvents(snippet)));
+		}
+		finally {
+			parameters = originalParameters;
+		}
+	}
+	
 	private ArrayList<Event> getEvents(String snippet) {
 		ArrayList<Event> list = new ArrayList<Event>();
 		filter.setParametersFromURL(parameters);
