@@ -28,7 +28,8 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import net.htmlparser.jericho.Element;
 import net.htmlparser.jericho.HTMLElementName;
@@ -60,7 +61,7 @@ import net.sf.okapi.tm.pensieve.writer.TmWriterFactory;
 
 public class BatchTranslator {
 
-	private static final Logger LOGGER = Logger.getLogger(BatchTranslator.class.getName());
+	private static final Logger LOGGER = LoggerFactory.getLogger(BatchTranslator.class.getName());
 
 	private IFilterConfigurationMapper fcMapper;
 	private IFilter filter;
@@ -218,7 +219,7 @@ public class BatchTranslator {
 			srxPath = Util.fillInputRootDirectoryVariable(srxPath, inputRootDir);
 			srxPath = LocaleId.replaceVariables(srxPath, srcLoc, trgLoc);
 			srxDoc.loadRules(srxPath);
-			//if ( srxDoc.hasWarning() ) logger.warning(srxDoc.getWarning());
+			//if ( srxDoc.hasWarning() ) logger.warn(srxDoc.getWarning());
 			segmenter = srxDoc.compileLanguageRules(srcLoc, null);
 		}
 	}
@@ -527,7 +528,7 @@ public class BatchTranslator {
 				}
 				catch ( Throwable e ) {
 					// Catch issues with inline codes
-					LOGGER.warning(String.format("Skipping entry '%d:%s:%s'.\n", htmlSubDocId, htmlTuId, htmlSegId)
+					LOGGER.warn(String.format("Skipping entry '%d:%s:%s'.\n", htmlSubDocId, htmlTuId, htmlSegId)
 						+ e.getMessage());
 					continue; // Skip this entry
 				}

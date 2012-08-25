@@ -26,8 +26,8 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import net.sf.okapi.applications.rainbow.Project;
 import net.sf.okapi.applications.rainbow.batchconfig.BatchConfiguration;
@@ -46,7 +46,7 @@ import net.sf.okapi.steps.rainbowkit.creation.Parameters;
 import net.sf.okapi.steps.rainbowkit.postprocess.MergingStep;
 
 public class ProjectUtils {
-	private static final Logger LOGGER = Logger.getLogger(ProjectUtils.class.getName());
+	private static final Logger LOGGER = LoggerFactory.getLogger(ProjectUtils.class.getName());
 	private static final String CURRENT_PROJECT_PIPELINE = "currentProjectPipeline";
 
 	public static synchronized int createNewProject() {
@@ -55,7 +55,7 @@ public class ProjectUtils {
 		
 		File workingDir = new File(WorkspaceUtils.getWorkingDirectory());
 		if (!workingDir.exists())
-			LOGGER.log(Level.INFO, "The working directory " + workingDir.getAbsolutePath() + " doesn't exist. " +
+			LOGGER.info("The working directory " + workingDir.getAbsolutePath() + " doesn't exist. " +
 					"It will be created.");
 		
 		Util.createDirectories(WorkspaceUtils.getInputDirPath(projId) + File.separator);

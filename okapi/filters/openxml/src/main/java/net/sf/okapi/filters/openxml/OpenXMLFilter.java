@@ -32,8 +32,8 @@ import java.util.Enumeration;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.TreeSet;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
@@ -78,7 +78,7 @@ import net.sf.okapi.common.skeleton.ZipSkeleton;
 @UsingParameters(ConditionalParameters.class)
 public class OpenXMLFilter implements IFilter {
 	
-	private Logger LOGGER = Logger.getLogger(OpenXMLFilter.class.getName());
+	private Logger LOGGER = LoggerFactory.getLogger(OpenXMLFilter.class.getName());
 
 	private enum NextAction {
 		OPENZIP, NEXTINZIP, NEXTINSUBDOC, DONE
@@ -105,7 +105,7 @@ public class OpenXMLFilter implements IFilter {
 	private ConditionalParameters cparams=null; // DWH 6-16-09
 	private int nZipType=MSWORD;
 	private int nFileType=MSWORD; // DWH 4-16-09
-	private Level nLogLevel=Level.FINE;
+// TZU	private Level nLogLevel=Level.FINE;
 	private boolean bSquishable=true;
 	private AbstractTranslator translator=null;
 	private LocaleId sOutputLanguage = LocaleId.fromString("en-us");
@@ -205,11 +205,12 @@ public class OpenXMLFilter implements IFilter {
 	 * Level.FINER Debug information. For developers. 
 	 * Level.FINEST Debug information. For developers. 
 	 */
+/* TZU
 	public void setNLogLevel(Level nLogLevel) // set debug level
 	{
 		this.nLogLevel = nLogLevel;
 	}
-	
+*/
 	/**
 	 * Creates the skeleton writer for use with this filter.
 	 * Null return means implies GenericSkeletonWriter. 
@@ -327,7 +328,7 @@ public class OpenXMLFilter implements IFilter {
 		}
 		else if ( input.getInputURI() != null ) {
 			open(input.getInputURI());
-			LOGGER.log(Level.FINER,"\nOpening "+input.getInputURI().toString());
+			LOGGER.debug("\nOpening "+input.getInputURI().toString());
 		}
 		else if ( input.getStream() != null ) {
 			open(input.getStream());
@@ -356,7 +357,7 @@ public class OpenXMLFilter implements IFilter {
 		}
 		else if ( input.getInputURI() != null ) {
 			open(input.getInputURI(),bSquishable);
-			LOGGER.log(Level.FINER,"\nOpening "+input.getInputURI().toString());
+			LOGGER.debug("\nOpening "+input.getInputURI().toString());
 		}
 		else if ( input.getStream() != null ) {
 			open(input.getStream());
@@ -380,6 +381,7 @@ public class OpenXMLFilter implements IFilter {
 	 * Level.FINER Debug information. For developers. 
 	 * Level.FINEST Debug information. For developers. 
 	 */
+/* TZU
 	public void open (RawDocument input,
 			boolean generateSkeleton, boolean bSquishable, Level nLogLevel)
 	{
@@ -390,17 +392,17 @@ public class OpenXMLFilter implements IFilter {
 		}
 		else if ( input.getInputURI() != null ) {
 			open(input.getInputURI(),bSquishable,nLogLevel);
-			LOGGER.log(Level.FINER,"\nOpening "+input.getInputURI().toString());
+			LOGGER.debug("\nOpening "+input.getInputURI().toString());
 		}
 		else if ( input.getStream() != null ) {
 			open(input.getStream());
-			LOGGER.log(Level.FINER,"\nOpening ");
+			LOGGER.debug("\nOpening ");
 		}
 		else {
 			throw new RuntimeException("InputResource has no input defined.");
 		}
 	}
-
+*/
 	/**
 	 * Opens an input stream for filtering
 	 * @param input an input stream to open and filter
@@ -426,7 +428,8 @@ public class OpenXMLFilter implements IFilter {
 	 * @param a cURI to open and filter
 	 */
 	private void open (URI inputURI) {
-		open(inputURI,true,Level.FINE); // DWH 2-26-09 just a default
+// TZU		open(inputURI,true,Level.FINE); // DWH 2-26-09 just a default
+		open(inputURI,true); // DWH 2-26-09 just a default
 	}
 	
 	/**
@@ -435,10 +438,11 @@ public class OpenXMLFilter implements IFilter {
 	 * @param bSquishable true if file should be optimized by combining compatible
 	 *        text runs
 	 */
+/* TZU
 	public void open (URI inputURI, boolean bSquishable) {
 		open(inputURI, bSquishable, Level.FINE);
 	}
-	
+*/
 	/**
 	 * Opens a URI for filtering
 	 * @param a cURI to open and filter
@@ -452,18 +456,18 @@ public class OpenXMLFilter implements IFilter {
 	 * Level.FINER Debug information. For developers. 
 	 * Level.FINEST Debug information. For developers. 
 	 */
-	public void open (URI inputURI, boolean bSquishable, Level nLogLevel) {
+	public void open (URI inputURI, boolean bSquishable) { // TZU , Level nLogLevel) {
 		close();
 		docURI = inputURI;
 		nextAction = NextAction.OPENZIP;
 		queue = new LinkedList<Event>();
 		openXMLContentFilter = new OpenXMLContentFilter();
-		this.nLogLevel = nLogLevel;
+		// TZU this.nLogLevel = nLogLevel;
 		openXMLContentFilter.setLogger(LOGGER);
 		this.bSquishable = bSquishable;
 		if (cparams!=null)
 			readParams(); // rainbow loads into cparams before this but after it is open
-		LOGGER.log(Level.FINE,"\nOpening "+inputURI.toString());
+		LOGGER.debug("\nOpening "+inputURI.toString());
 	}
 
 	/**
@@ -674,7 +678,7 @@ public class OpenXMLFilter implements IFilter {
 			openXMLContentFilter.setBInSettingsFile(bInSettingsFile); // DWH 4-12-10 for <v:textbox in settings file
 			if (bInMainFile && bSquishable)
 			{
-				LOGGER.log(Level.FINER,"\n\n<<<<<<< "+sEntryName+" : "+sDocType+" >>>>>>>");
+				LOGGER.debug("\n\n<<<<<<< "+sEntryName+" : "+sDocType+" >>>>>>>");
 				nFileType = nZipType;
 				openXMLContentFilter.setUpConfig(nFileType);
 				yparams = (YamlParameters)openXMLContentFilter.getParameters();
@@ -724,7 +728,7 @@ public class OpenXMLFilter implements IFilter {
 				openXMLContentFilter.setUpConfig(nFileType);
 				yparams = (YamlParameters)openXMLContentFilter.getParameters();
 				  // DWH 6-15-09 fully specified Parameters
-				LOGGER.log(Level.FINER,"<<<<<<< "+sEntryName+" : "+sDocType+" >>>>>>>");
+				LOGGER.debug("<<<<<<< "+sEntryName+" : "+sDocType+" >>>>>>>");
 				Event ually = openSubDocument(false); // DWH 6-25-09 save the event
 				resetExcel(); // DWH 6-25-09 if Excel and excluding colors or columns, start through zips again if done with worksheets
 				return ually; // DWH 6-25-09 now return the event
@@ -799,7 +803,7 @@ public class OpenXMLFilter implements IFilter {
 				openXMLContentFilter.setTsExcludeWordStyles(tsExcludeWordStyles);
 			//			openXMLContentFilter.next(); // START
 			event = openXMLContentFilter.next(); // START_DOCUMENT
-			LOGGER.log(Level.FINEST,openXMLContentFilter.getParameters().toString());
+			LOGGER.trace(openXMLContentFilter.getParameters().toString());
 			  // DWH 4-22-09 This lists what YAML actually read out of the configuration file
 		}
 		catch (IOException e) {
@@ -917,19 +921,23 @@ public class OpenXMLFilter implements IFilter {
 	 * Returns the java.util.logging.Logger.
 	 * @return the java.util.logging.Logger
 	 */
-	public Logger getLogger()
+/* TZU
+	public LoggerFactory.getLogger()
 	{
 		return LOGGER;
 	}
+*/
 	/**
 	 * Returns the current Log Level.
 	 * @return he current Log Level
 	 */
+/* TZU
 	public void setLogLevel(Level lvl)
 	{
 		nLogLevel = lvl;
 		LOGGER.setLevel(lvl);
 	}
+*/
 	public void setBPreferenceTranslateDocProperties(boolean bPreferenceTranslateDocProperties)
 	{
 		this.bPreferenceTranslateDocProperties = bPreferenceTranslateDocProperties;

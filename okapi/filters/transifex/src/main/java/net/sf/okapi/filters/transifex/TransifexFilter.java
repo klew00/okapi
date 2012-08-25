@@ -27,7 +27,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
@@ -56,7 +57,7 @@ public class TransifexFilter implements IFilter {
 
 	private static final String MIMETYPE = "application/x-transifex";
 	
-	private final Logger logger = Logger.getLogger(getClass().getName());
+	private final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
 	private Parameters params;
 	private Project proj;
@@ -225,7 +226,7 @@ public class TransifexFilter implements IFilter {
 			}
 		}
 		catch ( Throwable e ) {
-			logger.severe(String.format("Cannot create the editor (%s)\n"+e.getMessage(), className));
+			logger.error(String.format("Cannot create the editor (%s)\n"+e.getMessage(), className));
 			// And move on
 			return false;
 		}
@@ -277,7 +278,7 @@ public class TransifexFilter implements IFilter {
 //		// Check the information on this file
 //		Object[] res = cli.getInformation(resId, trgLoc);
 //		if ( res[0] == null ) {
-//			logger.warning(String.format("Cannot get information for resource '%s' (%s).", resId, trgLoc.toPOSIXLocaleId()));
+//			logger.warn(String.format("Cannot get information for resource '%s' (%s).", resId, trgLoc.toPOSIXLocaleId()));
 //			return false;
 //		}
 //		//TODO: avoid re-downloading if we re-write here and the existing file is newer
@@ -287,7 +288,7 @@ public class TransifexFilter implements IFilter {
 		String outputPath = tempDir + File.separator + info.getName();
 		String[] res = cli.getResource(info.getId(), proj.getTargetLocale(), outputPath);
 		if ( res[0] == null ) {
-			logger.severe(String.format("Could not download the resource '%s'.\n%s", info.getId(), res[1]));
+			logger.error(String.format("Could not download the resource '%s'.\n%s", info.getId(), res[1]));
 			return false;
 		}
 

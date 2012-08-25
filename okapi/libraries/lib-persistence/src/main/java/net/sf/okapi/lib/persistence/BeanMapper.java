@@ -24,7 +24,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import net.sf.okapi.common.ClassUtil;
 import net.sf.okapi.common.Util;
@@ -49,7 +50,7 @@ public class BeanMapper {
 	private ArrayList<String> loggedClassNames;
 	private ConcurrentHashMap<String, IPersistenceBean<?>> proxies; // used in ref resolution
 	private IPersistenceSession session;
-	private final Logger LOGGER = Logger.getLogger(this.getClass().getName());
+	private final Logger LOGGER = LoggerFactory.getLogger(this.getClass().getName());
 	
 	public BeanMapper(IPersistenceSession session) {
 		this.session = session;
@@ -127,7 +128,7 @@ public class BeanMapper {
 					beanClass = (Class<IPersistenceBean<T>>) beanClassMapping.get(cls);
 					if (session.getState() == SessionState.WRITING && !loggedClasses.contains(classRef)) {
 						loggedClasses.add(classRef);
-						LOGGER.warning(String.format(MAPPER_NOT_REG, 
+						LOGGER.warn(String.format(MAPPER_NOT_REG,
 								ClassUtil.getQualifiedClassName(classRef),
 								ClassUtil.getQualifiedClassName(beanClass),
 								ClassUtil.getQualifiedClassName(cls)));
@@ -136,7 +137,7 @@ public class BeanMapper {
 				}	
 			if (beanClass == null && !loggedClasses.contains(classRef)) {
 				loggedClasses.add(classRef);
-				LOGGER.warning(String.format("No bean class registered for %s", ClassUtil.getQualifiedClassName(classRef)));
+				LOGGER.warn(String.format("No bean class registered for %s", ClassUtil.getQualifiedClassName(classRef)));
 			}				
 		}
 		return beanClass;		
@@ -162,7 +163,7 @@ public class BeanMapper {
 		IPersistenceBean<?> proxy = proxies.get(NamespaceMapper.getMapping(objClassName)); 
 		if (proxy == null && !loggedClassNames.contains(objClassName)) {
 			loggedClassNames.add(objClassName);
-			LOGGER.warning(String.format("No proxy found for %s", objClassName));
+			LOGGER.warn(String.format("No proxy found for %s", objClassName));
 		}
 		
 		return proxy;

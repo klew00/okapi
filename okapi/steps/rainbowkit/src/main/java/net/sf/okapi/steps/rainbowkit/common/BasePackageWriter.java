@@ -24,7 +24,8 @@ import java.io.File;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import net.sf.okapi.common.DefaultFilenameFilter;
 import net.sf.okapi.common.Event;
@@ -53,7 +54,7 @@ import net.sf.okapi.steps.rainbowkit.creation.Parameters;
 
 public abstract class BasePackageWriter implements IPackageWriter {
 
-	protected final Logger logger = Logger.getLogger(getClass().getName());
+	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
 	protected Parameters params;
 	protected Manifest manifest;
@@ -564,7 +565,7 @@ public abstract class BasePackageWriter implements IPackageWriter {
 			File dir = new File(Util.getDirectoryName(origin));
 			File[] files = dir.listFiles(new DefaultFilenameFilter(pattern, false));
 			if ( files == null ) {
-				logger.warning(String.format("Invalid list of files for '%s'", origin));
+				logger.warn(String.format("Invalid list of files for '%s'", origin));
 				continue;
 			}
 			

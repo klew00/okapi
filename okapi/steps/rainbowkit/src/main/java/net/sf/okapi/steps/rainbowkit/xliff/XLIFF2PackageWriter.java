@@ -24,7 +24,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.oasisopen.xliff.v2.ICMarker;
 import org.oasisopen.xliff.v2.IDataStore;
@@ -64,7 +65,7 @@ public class XLIFF2PackageWriter extends BasePackageWriter {
 	public static final String POBJECTS_DIR = "pobjects";
 
 	private static final String TU_PREFIX = "$tu$";
-	private static final Logger LOGGER = Logger.getLogger(XLIFF2PackageWriter.class.getName());
+	private static final Logger LOGGER = LoggerFactory.getLogger(XLIFF2PackageWriter.class.getName());
 	
 	private XLIFFWriter writer;
 	private LinkedHashMap<String, String> referents;
@@ -296,7 +297,7 @@ public class XLIFF2PackageWriter extends BasePackageWriter {
 			trgTc = tu.getTarget(manifest.getTargetLocale());
 			if ( trgTc.getSegments().count() != srcTc.getSegments().count() ) {
 				// Use un-segmented entry if we have different number of segments
-				LOGGER.warning(String.format("Text unit id='%s' has different number of segments in source and target.\n"
+				LOGGER.warn(String.format("Text unit id='%s' has different number of segments in source and target.\n"
 					+"This entry will be output un-segmented.", tu.getId()));
 				srcTc = tu.getSource().clone(); srcTc.joinAll();
 				trgTc = tu.getTarget(manifest.getTargetLocale()).clone(); trgTc.joinAll();

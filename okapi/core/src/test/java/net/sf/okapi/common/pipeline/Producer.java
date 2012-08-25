@@ -19,8 +19,8 @@
 /*===========================================================================*/
 package net.sf.okapi.common.pipeline;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
@@ -28,7 +28,7 @@ import net.sf.okapi.common.pipeline.BasePipelineStep;
 
 public class Producer extends BasePipelineStep {	
 	
-	private static final Logger LOGGER = Logger.getLogger(Producer.class.getName());
+	private static final Logger LOGGER = LoggerFactory.getLogger(Producer.class.getName());
 	private int eventCount = -1;
 
 	public String getName() {
@@ -41,13 +41,13 @@ public class Producer extends BasePipelineStep {
 
 	@Override
 	protected Event handleEndBatchItem (Event event) {		
-		LOGGER.log(Level.FINEST, getName() + " end-batch-item");
+		LOGGER.trace(getName() + " end-batch-item");
 		return event;
 	}
 
 	@Override
 	protected Event handleStartBatchItem (Event event) {		
-		LOGGER.log(Level.FINEST, getName() + " start-batch-item");
+		LOGGER.trace(getName() + " start-batch-item");
 		return event;
 	}
 	

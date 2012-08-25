@@ -23,7 +23,8 @@ package net.sf.okapi.steps.rainbowkit.postprocess;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
@@ -50,7 +51,7 @@ import net.sf.okapi.filters.rainbowkit.MergingInfo;
 
 public class Merger {
 
-	private static final Logger LOGGER = Logger.getLogger(Merger.class.getName());
+	private static final Logger LOGGER = LoggerFactory.getLogger(Merger.class.getName());
 
 	private IFilter filter;
 	private IFilterWriter writer;
@@ -211,7 +212,7 @@ public class Merger {
 			internalEvent = filter.next();
 		}
 		if (( internalEvent == null ) || ( internalEvent.getEventType() != EventType.START_DOCUMENT )) {
-			LOGGER.severe("The start document event is missing when parsing the original file.");
+			LOGGER.error("The start document event is missing when parsing the original file.");
 		}
 		else {
 			processStartDocument(internalEvent.getStartDocument());
@@ -265,7 +266,7 @@ public class Merger {
 		// search for the corresponding event in the original
 		Event oriEvent = processUntilTextUnit();
 		if ( oriEvent == null ) {
-			LOGGER.severe(String.format("No corresponding text unit for id='%s' in the original file.",
+			LOGGER.error(String.format("No corresponding text unit for id='%s' in the original file.",
 				traTu.getId()));
 			return;
 		}
@@ -274,7 +275,7 @@ public class Merger {
 
 		// Check the IDs
 		if ( !traTu.getId().equals(oriTu.getId()) ) {
-			LOGGER.severe(String.format("De-synchronized files: translated TU id='%s', Original TU id='%s'.",
+			LOGGER.error(String.format("De-synchronized files: translated TU id='%s', Original TU id='%s'.",
 				traTu.getId(), oriTu.getId()));
 			return;
 		}
@@ -287,7 +288,7 @@ public class Merger {
 		if ( trgTraCont == null ) {
 			if ( oriTu.getSource().hasText() ) {
 				// Warn only if there source is not empty
-				LOGGER.warning(String.format("No translation found for TU id='%s'. Using source instead.", traTu.getId()));
+				LOGGER.warn(String.format("No translation found for TU id='%s'. Using source instead.", traTu.getId()));
 			}
 			writer.handleEvent(oriEvent); // Use the source
 			return;
@@ -304,7 +305,7 @@ public class Merger {
 		}
 		if ( !isTransApproved && manifest.getUseApprovedOnly() ) {
 			// Not approved: use the source
-			LOGGER.warning(String.format("Item id='%s': Target is not approved. Using source instead.", traTu.getId()));
+			LOGGER.warn(String.format("Item id='%s': Target is not approved. Using source instead.", traTu.getId()));
 			writer.handleEvent(oriEvent); // Use the source
 			return;
 		}
@@ -326,7 +327,7 @@ public class Merger {
 			// Use the source of the target to get the proper segmentations
 			if ( !srcOriCont.getUnSegmentedContentCopy().getCodedText().equals(
 				srcTraCont.getUnSegmentedContentCopy().getCodedText()) ) {
-				LOGGER.warning(String.format("Item id='%s': Original source and source in the translated file are different.\n"
+				LOGGER.warn(String.format("Item id='%s': Original source and source in the translated file are different.\n"
 					+ "Cannot use the source of the translation as the new segmented source.",
 					traTu.getId()));
 			}
@@ -378,7 +379,7 @@ public class Merger {
 
 		// Check if the target has more segments
 		if ( srcOriCont.getSegments().count() < trgTraCont.getSegments().count() ) {
-			LOGGER.warning(String.format("Item id='%s': There is at least one extra segment in the translation file.\n"
+			LOGGER.warn(String.format("Item id='%s': There is at least one extra segment in the translation file.\n"
 				+ "Extra segments are not merged into the translated output.",
 				traTu.getId()));
 		}

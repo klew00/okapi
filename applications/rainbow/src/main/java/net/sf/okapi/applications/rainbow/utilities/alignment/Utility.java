@@ -81,11 +81,11 @@ public class Utility extends BaseFilterDrivenUtility {
 			String srcSrxPath = params.sourceSrxPath.replace(VAR_PROJDIR, projectDir);
 			SRXDocument doc = new SRXDocument();
 			doc.loadRules(srcSrxPath);
-			if ( doc.hasWarning() ) logger.warning(doc.getWarning());
+			if ( doc.hasWarning() ) logger.warn(doc.getWarning());
 			srcSeg = doc.compileLanguageRules(srcLang, null);
 			if ( !srcSrxPath.equals(trgSrxPath) ) {
 				doc.loadRules(trgSrxPath);
-				if ( doc.hasWarning() ) logger.warning(doc.getWarning());
+				if ( doc.hasWarning() ) logger.warn(doc.getWarning());
 			}
 			trgSeg = doc.compileLanguageRules(trgLang, null);
 		}

@@ -21,7 +21,8 @@
 package net.sf.okapi.steps.termextraction;
 
 import java.io.File;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
@@ -35,7 +36,7 @@ import net.sf.okapi.common.pipeline.annotations.StepParameterType;
 @UsingParameters(Parameters.class)
 public class TermExtractionStep extends BasePipelineStep {
 
-	private static final Logger LOGGER = Logger.getLogger(TermExtractionStep.class.getName());
+	private static final Logger LOGGER = LoggerFactory.getLogger(TermExtractionStep.class.getName());
 
 	private Parameters params;
 	private SimpleTermExtractor extractor;

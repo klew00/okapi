@@ -28,7 +28,8 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;
@@ -85,7 +86,7 @@ public class TTXFilter implements IFilter {
 	private final static String TTXNOTEXTCHARS = "\u00a0~`!@#$%^&*()_+=-{[}]|\\:;\"'<,>.?/\u2022\u2013";
 	
 	private final static String TARGETLANGUAGE_ATTR = "TargetLanguage";
-	private final Logger logger = Logger.getLogger(getClass().getName());
+	private final Logger logger = LoggerFactory.getLogger(getClass().getName());
 	
 	private boolean hasNext;
 	private XMLStreamReader reader;
@@ -517,7 +518,7 @@ public class TTXFilter implements IFilter {
 									value = Integer.valueOf(tmp);
 								}
 								catch ( Throwable e ) {
-									logger.warning(String.format("Unexpected value in %s attribute (%s)", MATCHPERCENT, tmp));
+									logger.warn(String.format("Unexpected value in %s attribute (%s)", MATCHPERCENT, tmp));
 								}
 							}
 							if ( value > 0 ) {
@@ -542,7 +543,7 @@ public class TTXFilter implements IFilter {
 							inTarget = trgLoc.equals(tmp);
 						}
 						else { // Just in case we don't have Lang
-							logger.warning(String.format("Attribute Lang is missing in Tuv (after text unit '%d'", tuId));
+							logger.warn(String.format("Attribute Lang is missing in Tuv (after text unit '%d'", tuId));
 							inTarget = !inTarget;
 						}
 						if ( inTarget ) {
@@ -982,7 +983,7 @@ public class TTXFilter implements IFilter {
 		String tmp = reader.getAttributeValue(null, "SourceLanguage");
 		if ( !Util.isEmpty(tmp) ) {
 			 if ( !srcLoc.equals(tmp) ) {
-				 logger.warning(String.format("Specified source was '%s' but source language in the file is '%s'.\nUsing '%s'.",
+				 logger.warn(String.format("Specified source was '%s' but source language in the file is '%s'.\nUsing '%s'.",
 					srcLoc.toString(), tmp, tmp));
 				 srcLoc = LocaleId.fromString(tmp);
 				 srcLangCode = tmp;
@@ -994,7 +995,7 @@ public class TTXFilter implements IFilter {
 		tmp = reader.getAttributeValue(null, TARGETLANGUAGE_ATTR);
 		if ( !Util.isEmpty(tmp) ) {
 			 if ( !trgLoc.equals(tmp) ) {
-				 logger.warning(String.format("Specified target was '%s' but target language in the file is '%s'.\nUsing '%s'.",
+				 logger.warn(String.format("Specified target was '%s' but target language in the file is '%s'.\nUsing '%s'.",
 					trgLoc.toString(), tmp, tmp));
 				 trgLoc = LocaleId.fromString(tmp);
 				 trgLangCode = tmp;

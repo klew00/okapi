@@ -101,7 +101,7 @@ public class TransifexPackageWriter extends BasePackageWriter {
 			String[] res1 = cli.createProject(options.getProjectId(), options.getProjectName(), null, null);
 			if ( res1[0] == null ) {
 				// Could not create the project
-				logger.severe(res1[1]);
+				logger.error(res1[1]);
 				return;
 			}
 			for ( int id : manifest.getItems().keySet() ) {
@@ -121,7 +121,7 @@ public class TransifexPackageWriter extends BasePackageWriter {
 				
 				res1 = cli.putSourceResource(poPath, manifest.getSourceLocale(), resourceFile);
 	 			if ( res1[0] == null ) {
-					logger.severe(res1[1]);
+					logger.error(res1[1]);
 					return;
 				}
 				// Else: set the resource id
@@ -140,7 +140,7 @@ public class TransifexPackageWriter extends BasePackageWriter {
 				poPath = makeTargetPath(info);
 				String[] res2 = cli.putTargetResource(poPath, manifest.getTargetLocale(), res1[1], resourceFile);
 				if ( res2[0] == null ) {
-					logger.severe(res2[1]);
+					logger.error(res2[1]);
 				}
 			
 			}

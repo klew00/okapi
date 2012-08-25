@@ -23,8 +23,8 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import net.sf.okapi.common.IContext;
 import net.sf.okapi.common.IHelp;
@@ -68,7 +68,7 @@ public abstract class AbstractParametersEditor implements IParametersEditor, Lis
 	private List<IDialogPage> pages = null;
 	boolean readOnly = false;
 	
-	private final Logger logger = Logger.getLogger(this.getClass().getName());
+	private final Logger logger = LoggerFactory.getLogger(this.getClass().getName());
 
 	public boolean edit(IParameters paramsObject, boolean readOnly, IContext context) {
 
@@ -559,42 +559,42 @@ public abstract class AbstractParametersEditor implements IParametersEditor, Lis
 
 			result = false;
 			//e.printStackTrace();
-			logMessage(Level.FINE, "Page instantiation failed: " + e.getMessage());
+			logger.debug("Page instantiation failed: " + e.getMessage());
 			return null;
 
 		} catch (IllegalAccessException e) {
 
 			result = false;
 			//e.printStackTrace();
-			logMessage(Level.FINE, "Page instantiation failed: " + e.getMessage());
+			logger.debug("Page instantiation failed: " + e.getMessage());
 			return null;
 
 		} catch (SecurityException e) {
 
 			result = false;
 			//e.printStackTrace();
-			logMessage(Level.FINE, "Page instantiation failed: " + e.getMessage());
+			logger.debug("Page instantiation failed: " + e.getMessage());
 			return null;
 
 		} catch (NoSuchMethodException e) {
 
 			result = false;
 			//e.printStackTrace();
-			logMessage(Level.FINE, "Page instantiation failed: " + e.getMessage());
+			logger.debug("Page instantiation failed: " + e.getMessage());
 			return null;
 
 		} catch (IllegalArgumentException e) {
 
 			result = false;
 			//e.printStackTrace();
-			logMessage(Level.FINE, "Page instantiation failed: " + e.getMessage());
+			logger.debug("Page instantiation failed: " + e.getMessage());
 			return null;
 
 		} catch (InvocationTargetException e) {
 
 			result = false;
 			//e.printStackTrace();
-			logMessage(Level.FINE, "Page instantiation failed: " + e.getMessage());
+			logger.debug("Page instantiation failed: " + e.getMessage());
 			return null;
 		}
 	}
@@ -772,12 +772,6 @@ public abstract class AbstractParametersEditor implements IParametersEditor, Lis
 	 */
 	protected boolean isReadOnly() {
 		return readOnly;
-	}
-
-	protected void logMessage (Level level, String text) {
-		
-		if (logger != null)
-			logger.log(level, text);
 	}
 
 	/**

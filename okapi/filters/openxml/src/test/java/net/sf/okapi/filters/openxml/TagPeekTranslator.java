@@ -20,8 +20,8 @@
 package net.sf.okapi.filters.openxml;
 
 import java.util.List;
-import java.util.logging.Logger;
-import java.util.logging.Level;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.TextFragment;
@@ -211,7 +211,7 @@ public class TagPeekTranslator extends AbstractTranslator {
 		}
 		catch(Throwable e)
 		{
-			LOGGER.log(Level.WARNING,"Tag Translator failed on "+s);
+			LOGGER.warn("Tag Translator failed on "+s);
 		}
 		return rslt;
 	}

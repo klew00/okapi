@@ -22,7 +22,8 @@ package net.sf.okapi.steps.idbasedcopy;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
@@ -48,7 +49,7 @@ import net.sf.okapi.common.resource.ITextUnit;
 @UsingParameters(Parameters.class)
 public class IdBasedCopyStep extends BasePipelineStep {
 
-	private final Logger logger = Logger.getLogger(getClass().getName());
+	private final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
 	private Parameters params;
 	private IFilter filter = null;
@@ -104,7 +105,7 @@ public class IdBasedCopyStep extends BasePipelineStep {
 		useTargetText = event.getStartDocument().isMultilingual();
 		// Create the table if possible
 		if ( toCopyInput == null ) {
-			logger.warning("Second input file is not specified.");
+			logger.warn("Second input file is not specified.");
 			toCopy = null;
 		}
 		else {
@@ -120,7 +121,7 @@ public class IdBasedCopyStep extends BasePipelineStep {
 		if ( toCopy != null ) {
 			if ( toCopy.size() > 0 ) {
 				for ( String id : toCopy.keySet() ) {
-					logger.warning(String.format("Id '%s' is in the second file, but not in the main input.", id));
+					logger.warn(String.format("Id '%s' is in the second file, but not in the main input.", id));
 				}
 			}
 		}
@@ -175,12 +176,12 @@ public class IdBasedCopyStep extends BasePipelineStep {
 					ITextUnit tu = event.getTextUnit();
 					String id = tu.getName();
 					if ( Util.isEmpty(id) ) {
-						logger.warning("Entry without id detected in second file.");
+						logger.warn("Entry without id detected in second file.");
 						continue;
 					}
 					// Else: put in the hash table
 					if ( toCopy.get(id) != null ) {
-						logger.warning("Duplicate id detected: "+id);
+						logger.warn("Duplicate id detected: "+id);
 						continue;
 					}
 					toCopy.put(id, tu);

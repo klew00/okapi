@@ -22,7 +22,8 @@ package net.sf.okapi.common.skeleton;
 
 import java.security.InvalidParameterException;
 import java.util.List;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
@@ -46,7 +47,7 @@ import net.sf.okapi.common.resource.TextPart;
  * The sequence of DOCUMENT_PART and TEXT_UNIT events is packed into a single MULTI_EVENT event.
  */
 public class ResourceSimplifier {
-	private final Logger logger = Logger.getLogger(getClass().getName());
+	private final Logger logger = LoggerFactory.getLogger(getClass().getName());
 	private boolean isMultilingual;
 	private LocaleId trgLoc;
 	private String outEncoding = "UTF-16BE";
@@ -340,7 +341,7 @@ public class ResourceSimplifier {
 		if (tuIndex == 1)
 			id = resId;
 		else {
-			logger.warning("Duplicate TU: " + resId);
+			logger.warn("Duplicate TU: " + resId);
 			id = String.format("%s_%d", resId, tuIndex);
 		}
 		
@@ -458,7 +459,7 @@ public class ResourceSimplifier {
 			if (part.parent instanceof ITextUnit)
 				newSkel.add(writer.getContent((ITextUnit)part.parent, null, 0)); // Source goes to skeleton
 			else {
-				logger.warning("The self-reference must be a text-unit: " + resId);
+				logger.warn("The self-reference must be a text-unit: " + resId);
 				newSkel.add(part.parent.toString());
 			}
 		}
@@ -485,13 +486,13 @@ public class ResourceSimplifier {
 		if (parent instanceof IReferenceable) {
 			IReferenceable r = (IReferenceable) parent;
 			if (!r.isReferent()) {
-				logger.warning("Referent flag is not set in parent: " + resId);
+				logger.warn("Referent flag is not set in parent: " + resId);
 				return false;
 			}
 			return true;
 		}
 		else {
-			logger.warning("Invalid parent type: " + resId);
+			logger.warn("Invalid parent type: " + resId);
 			return false;
 		}
 	}

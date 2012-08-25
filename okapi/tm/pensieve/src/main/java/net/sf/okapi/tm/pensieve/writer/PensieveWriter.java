@@ -22,8 +22,8 @@ package net.sf.okapi.tm.pensieve.writer;
 
 import java.io.IOException;
 import java.util.Locale;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.exceptions.OkapiIOException;
@@ -53,7 +53,7 @@ import org.apache.lucene.store.Directory;
  */
 public class PensieveWriter implements ITmWriter {
 	
-	private static final Logger LOGGER = Logger.getLogger(PensieveWriter.class.getName());
+	private static final Logger LOGGER = LoggerFactory.getLogger(PensieveWriter.class.getName());
 
 	private IndexWriter indexWriter;
 
@@ -89,7 +89,7 @@ public class PensieveWriter implements ITmWriter {
 			try {
 				indexWriter.close();
 			} catch (IOException ignored) {
-				LOGGER.log(Level.WARNING, "Exception closing Pensieve IndexWriter.", ignored); //$NON-NLS-1$
+				LOGGER.warn("Exception closing Pensieve IndexWriter.", ignored); //$NON-NLS-1$
 			}
 		}
 	}

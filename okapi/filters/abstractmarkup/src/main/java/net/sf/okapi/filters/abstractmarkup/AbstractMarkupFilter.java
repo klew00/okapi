@@ -29,8 +29,8 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.util.regex.Pattern;
 
 import net.htmlparser.jericho.Attribute;
@@ -86,7 +86,7 @@ import net.sf.okapi.filters.yaml.TaggedFilterConfiguration.RULE_TYPE;
  * 
  */
 public abstract class AbstractMarkupFilter extends AbstractFilter {
-	private static final Logger LOGGER = Logger.getLogger(AbstractMarkupFilter.class.getName());
+	private static final Logger LOGGER = LoggerFactory.getLogger(AbstractMarkupFilter.class.getName());
 	private static final String CDATA_START_REGEX = "<\\!\\[CDATA\\[";
 	private static final String CDATA_END_REGEX = "\\]\\]>";
 	private static final Pattern CDATA_START_PATTERN = Pattern.compile(CDATA_START_REGEX);
@@ -177,7 +177,7 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 		}
 		this.document = null; // help Java GC
 		
-		LOGGER.log(Level.FINE, getDocumentName() + " has been closed");
+		LOGGER.debug(getDocumentName() + " has been closed");
 	}
 
 	/*
@@ -230,12 +230,11 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 
 		if (detectedEncoding == null && getEncoding() != null) {
 			detectedEncoding = getEncoding();
-			LOGGER.log(Level.FINE, String.format(
+			LOGGER.debug(String.format(
 					"Cannot auto-detect encoding. Using the default encoding (%s)", getEncoding()));
 		} else if (getEncoding() == null) {
 			detectedEncoding = parsedHeader.getEncoding(); // get best guess
-			LOGGER.log(
-					Level.FINE,
+			LOGGER.debug(
 					String.format(
 							"Default encoding and detected encoding not found. Using best guess encoding (%s)",
 							detectedEncoding));
@@ -252,7 +251,7 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 	 */
 	public void open(RawDocument input) {
 		open(input, true);
-		LOGGER.log(Level.FINE, getName() + " has opened an input document");
+		LOGGER.debug(getName() + " has opened an input document");
 	}
 
 	/**

@@ -23,7 +23,8 @@ package net.sf.okapi.common;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
@@ -73,7 +74,7 @@ public class LCIDUtil {
 			String reg0 = descr0.region;
 			String st = Util.isEmpty(reg0) ? lang0 : String.format("%s (%s)", lang0, reg0);
 			if (language.equals(lang0) && region.equals(reg0))
-				Logger.getLogger(LCIDUtil.class.getName()).warning(String.format("Already registered LCID: (0x%04x) %s",					
+				LoggerFactory.getLogger(LCIDUtil.class.getName()).warn(String.format("Already registered LCID: (0x%04x) %s",					
 						lcid, st));
 		}
 		
@@ -84,7 +85,7 @@ public class LCIDUtil {
 //		String tag = getTag(lcid);
 //		//if (tagLookup.get(lcid) != null)
 //		if (!Util.isEmpty(tag))
-//			Logger.getLogger(LCIDUtil.class.getName()).warning(String.format("Already registered LCID: 0x%04x",					
+//			LoggerFactory.getLogger(LCIDUtil.class.getName()).warn(String.format("Already registered LCID: 0x%04x",					
 //					lcid));
 //		
 		tagLookup.put(lcid, descr);
@@ -100,10 +101,10 @@ public class LCIDUtil {
 		descr = tagLookup.get(lcid);
 		
 		if (descr == null) {
-//			Logger.getLogger(LCIDUtil.class.getName()).warning(String.format("Unregistered LCID: 0x%04x %s -- %s\n" +
+//			LoggerFactory.getLogger(LCIDUtil.class.getName()).warn(String.format("Unregistered LCID: 0x%04x %s -- %s\n" +
 //					"registerLCID(\"%s\", \"\", 0x%04x);\n", lcid, tag,
 //					LanguageList.getDisplayName(tag), LanguageList.getDisplayName(tag), lcid));
-			Logger.getLogger(LCIDUtil.class.getName()).warning(String.format("Unregistered LCID: 0x%04x %s\n", lcid, tag));
+			LoggerFactory.getLogger(LCIDUtil.class.getName()).warn(String.format("Unregistered LCID: 0x%04x %s\n", lcid, tag));
 			return;
 		}
 		tag = new LocaleId(tag).toString();

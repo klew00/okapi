@@ -23,7 +23,8 @@ package net.sf.okapi.steps.tokenization;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.logging.Level;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.ListUtil;
@@ -50,6 +51,7 @@ import net.sf.okapi.steps.tokenization.tokens.Tokens;
 
 @UsingParameters(Parameters.class)
 public class TokenizationStep extends AbstractPipelineStep {
+	private final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
 	public static final int RAWTEXT = -1;
 	
@@ -105,7 +107,7 @@ public class TokenizationStep extends AbstractPipelineStep {
 		String structureLocation = config.getEngineConfig();
 		
 		if (Util.isEmpty(structureLocation) || !structureParams.loadFromResource(classRef, structureLocation))
-			logMessage(Level.FINE, "Lexers' config file not found.");
+			logger.debug("Lexers' config file not found.");
 		
 		instantiateLexers();		
 		
@@ -148,17 +150,17 @@ public class TokenizationStep extends AbstractPipelineStep {
 				
 			} catch (ClassNotFoundException e) {
 				
-				logMessage(Level.FINE, "Lexer instantiation falied: " + e.getMessage());
+				logger.debug("Lexer instantiation falied: " + e.getMessage());
 				continue;
 				
 			} catch (InstantiationException e) {
 				
-				logMessage(Level.FINE, "Lexer instantiation falied: " + e.getMessage());
+				logger.debug("Lexer instantiation falied: " + e.getMessage());
 				continue;
 				
 			} catch (IllegalAccessException e) {
 				
-				logMessage(Level.FINE, "Lexer instantiation falied: " + e.getMessage());
+				logger.debug("Lexer instantiation falied: " + e.getMessage());
 				continue;
 			}				
 		}
@@ -342,9 +344,9 @@ public class TokenizationStep extends AbstractPipelineStep {
 				// Deadlock and chain-reaction protection
 				if (saveNumRawtextLexems > 0 && rawtextLexems.size() >= saveNumRawtextLexems) {					
 					if (rawtextLexems.size() == saveNumRawtextLexems)
-						logMessage(Level.FINE, "RAWTEXT lexems are not processed in tokenize()");
+						logger.debug("RAWTEXT lexems are not processed in tokenize()");
 					else
-						logMessage(Level.FINE, "RAWTEXT lexems are creating a chain reaction in tokenize()");
+						logger.debug("RAWTEXT lexems are creating a chain reaction in tokenize()");
 					
 					break;
 				}

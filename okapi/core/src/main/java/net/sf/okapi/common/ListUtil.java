@@ -29,15 +29,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Helper methods to manipulate lists.
  */
 public class ListUtil {
 
-	protected static final Logger logger = Logger.getLogger(ClassUtil.getClassName(ListUtil.class));
+	protected static final Logger logger = LoggerFactory.getLogger(ClassUtil.getClassName(ListUtil.class));
 	
 	/**
 	 * Splits up a string of comma-separated substrings into a string list of those substrings.
@@ -476,12 +476,12 @@ public class ListUtil {
 				
 			} catch (InstantiationException e) {
 				
-				logMessage(Level.FINE, "List instantiation failed in ListUtil.copyItems(): " + e.getMessage());
+				logger.debug("List instantiation failed in ListUtil.copyItems(): " + e.getMessage());
 				return null;
 				
 			} catch (IllegalAccessException e) {
 				
-				logMessage(Level.FINE, "List instantiation failed in ListUtil.copyItems(): " + e.getMessage());
+				logger.debug("List instantiation failed in ListUtil.copyItems(): " + e.getMessage());
 				return null;
 			}
 			
@@ -527,12 +527,12 @@ public class ListUtil {
 				
 			} catch (InstantiationException e) {
 				
-				logMessage(Level.FINE, "List instantiation failed in ListUtil.copyItems(): " + e.getMessage());
+				logger.debug("List instantiation failed in ListUtil.copyItems(): " + e.getMessage());
 				return null;
 				
 			} catch (IllegalAccessException e) {
 				
-				logMessage(Level.FINE, "List instantiation failed in ListUtil.copyItems(): " + e.getMessage());
+				logger.debug("List instantiation failed in ListUtil.copyItems(): " + e.getMessage());
 				return null;
 			}
 			
@@ -590,12 +590,6 @@ public class ListUtil {
 
 		return null;		
 	}
-	
-	protected static void logMessage (Level level, String text) {
-		
-		if (logger != null)
-			logger.log(level, text);
-	}
 
 	/**
 	 * Creates a new list of strings and fills it with the data read from a given resource.
@@ -630,7 +624,7 @@ public class ListUtil {
 			
 		} catch (UnsupportedEncodingException e) {
 			
-			logMessage(Level.FINE, String.format("ListUtil.loadList() encoding problem of \"%s\": %s", resourceLocation, e.getMessage()));
+			logger.debug(String.format("ListUtil.loadList() encoding problem of \"%s\": %s", resourceLocation, e.getMessage()));
 			return;
 		}
 		
@@ -648,7 +642,7 @@ public class ListUtil {
 			}
 		} catch (IOException e) {
 			
-			logMessage(Level.FINE, String.format("ListUtil.loadList() IO problem of \"%s\": %s", resourceLocation, e.getMessage()));
+			logger.debug(String.format("ListUtil.loadList() IO problem of \"%s\": %s", resourceLocation, e.getMessage()));
 			return;
 		}	
 	}

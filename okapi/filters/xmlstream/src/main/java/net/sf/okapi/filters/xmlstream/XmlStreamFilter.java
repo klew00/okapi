@@ -38,7 +38,7 @@ import net.sf.okapi.filters.yaml.TaggedFilterConfiguration;
 @UsingParameters(Parameters.class)
 public class XmlStreamFilter extends AbstractMarkupFilter {
 
-	//not used for now: private static final Logger LOGGER = Logger.getLogger(XmlStreamFilter.class.getName());
+	//not used for now: private static final Logger LOGGER = LoggerFactory.getLogger(XmlStreamFilter.class.getName());
 
 	private Parameters parameters;
 	

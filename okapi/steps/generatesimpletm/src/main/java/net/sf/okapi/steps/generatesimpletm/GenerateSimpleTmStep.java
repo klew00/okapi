@@ -20,7 +20,8 @@
 
 package net.sf.okapi.steps.generatesimpletm;
 
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
@@ -39,7 +40,7 @@ import net.sf.okapi.tm.simpletm.Database;
 @UsingParameters(Parameters.class)
 public class GenerateSimpleTmStep extends BasePipelineStep {
 
-	protected final Logger logger = Logger.getLogger(getClass().getName());
+	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
 	private Database simpleTm = null;
 	private Parameters params;
@@ -130,7 +131,7 @@ public class GenerateSimpleTmStep extends BasePipelineStep {
 		fileName = Util.getFilename(sd.getName(), true);
 		isMultilingual = sd.isMultilingual();
 		if(!isMultilingual){
-			logger.warning("File "+fileName+ " is not processed as a multiLingual file and cannot be used to populate the SimpleTm.");
+			logger.warn("File "+fileName+ " is not processed as a multiLingual file and cannot be used to populate the SimpleTm.");
 		} 
 		
 		return event;
@@ -153,13 +154,13 @@ public class GenerateSimpleTmStep extends BasePipelineStep {
 		} 
 		
 		if ( tu.getSource() == null ) {
-			logger.warning("TextUnit is missing source content.");
+			logger.warn("TextUnit is missing source content.");
 			countTuNotAdded++;
 			return event;
 		}
 		
 		if( !tu.hasTarget(targetLocale) || ( tu.getTarget(targetLocale)==null )){
-			logger.warning(String.format("TextUnit is missing '%s' target.", targetLocale));
+			logger.warn(String.format("TextUnit is missing '%s' target.", targetLocale));
 			countTuNotAdded++;
 			return event;
 		}

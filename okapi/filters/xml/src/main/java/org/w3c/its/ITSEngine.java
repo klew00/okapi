@@ -28,7 +28,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -113,7 +114,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 	private boolean translatableAttributeRuleTriggered;
 	private String version;
 
-	private final Logger logger = Logger.getLogger(getClass().getName());
+	private final Logger logger = LoggerFactory.getLogger(getClass().getName());
 	
 	public ITSEngine (Document doc,
 		URI docURI)
@@ -364,7 +365,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 		if ( !value.isEmpty() ) {
 			if ( version.equals(ITS_VERSION2) ) {
 				// Warn if the extension is used in ITS 2.0
-				logger.warning(String.format("This document uses the %s:idValue extension instead of the ITS 2.0 Id Value data category.",
+				logger.warn(String.format("This document uses the %s:idValue extension instead of the ITS 2.0 Id Value data category.",
 					ITSX_NS_URI));
 			}
 			rule.idValue = value;
@@ -375,7 +376,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 		if ( !value.isEmpty() ) {
 			if ( version.equals(ITS_VERSION2) ) {
 				// Warn if the extension is used in ITS 2.0
-				logger.warning(String.format("This document uses the %s:whiteSpaces extension instead of the ITS 2.0 Preserve Space data category.",
+				logger.warn(String.format("This document uses the %s:whiteSpaces extension instead of the ITS 2.0 Preserve Space data category.",
 					ITSX_NS_URI));
 			}
 			if ( "preserve".equals(value) ) rule.preserveWS = true;

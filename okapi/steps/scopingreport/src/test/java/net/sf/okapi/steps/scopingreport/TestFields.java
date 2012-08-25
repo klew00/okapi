@@ -4,7 +4,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.net.URISyntaxException;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.LocaleId;
@@ -35,7 +36,7 @@ public class TestFields {
 		Event sbEvent, ebEvent;
 		ITextUnit tu1, tu2, tu3, tu4;
 		Event tuEvent1, tuEvent2, tuEvent3, tuEvent4;
-		Logger logger = Logger.getLogger(getClass().getName());
+		Logger logger = LoggerFactory.getLogger(getClass().getName());
 		
 		String pathBase = Util.getDirectoryName(this.getClass().getResource("").toURI().getPath()) + "/";
 		net.sf.okapi.connectors.pensieve.Parameters rparams = 
@@ -126,10 +127,10 @@ public class TestFields {
 		srs.handleEvent(eiEvent);
 		srs.handleEvent(ebEvent);
 				
-		logger.fine(TextUnitLogger.getTuInfo(tu1, LocaleId.ENGLISH));
-		logger.fine(TextUnitLogger.getTuInfo(tu2, LocaleId.ENGLISH));
-		logger.fine(TextUnitLogger.getTuInfo(tu3, LocaleId.ENGLISH));
-		logger.fine(TextUnitLogger.getTuInfo(tu4, LocaleId.ENGLISH));
+		logger.debug(TextUnitLogger.getTuInfo(tu1, LocaleId.ENGLISH));
+		logger.debug(TextUnitLogger.getTuInfo(tu2, LocaleId.ENGLISH));
+		logger.debug(TextUnitLogger.getTuInfo(tu3, LocaleId.ENGLISH));
+		logger.debug(TextUnitLogger.getTuInfo(tu4, LocaleId.ENGLISH));
 		
 		gen = srs.getReportGenerator();
 	}

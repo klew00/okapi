@@ -28,7 +28,8 @@ import java.io.OutputStreamWriter;
 import java.net.URI;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -46,7 +47,7 @@ import net.sf.okapi.filters.rtf.RTFFilter;
 @UsingParameters(Parameters.class)
 public class RTFConversionStep extends BasePipelineStep {
 
-	private final Logger logger = Logger.getLogger(getClass().getName());
+	private final Logger logger = LoggerFactory.getLogger(getClass().getName());
 	private final Pattern reXML;
 	private final String strXMLReplace;
 	private final Pattern reXMLVersion;
@@ -188,7 +189,7 @@ public class RTFConversionStep extends BasePipelineStep {
 				}
 
 				if ( !encoder.canEncode(buf.toString()) ) {
-					logger.warning(String.format("At least one character cannot be encoded in '%s' in '%s'.", outputEncoding, buf.toString()));
+					logger.warn(String.format("At least one character cannot be encoded in '%s' in '%s'.", outputEncoding, buf.toString()));
 				}
 				
 				writer.write(buf.toString());

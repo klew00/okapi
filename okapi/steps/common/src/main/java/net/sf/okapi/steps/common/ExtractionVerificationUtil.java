@@ -23,7 +23,8 @@ package net.sf.okapi.steps.common;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.LocaleId;
@@ -45,7 +46,7 @@ import net.sf.okapi.common.resource.TextPart;
  */
 public class ExtractionVerificationUtil {
 	
-	private static final Logger LOGGER = Logger.getLogger(ExtractionVerificationUtil.class.getName());
+	private static final Logger LOGGER = LoggerFactory.getLogger(ExtractionVerificationUtil.class.getName());
 	
 	boolean compareSkeleton;
 	boolean isMultilingual;
@@ -115,7 +116,7 @@ public class ExtractionVerificationUtil {
 		//--Parent Id--
 		if( !bothAreNull(ssd1.getParentId(),ssd2.getParentId()) ){
 			if ( !ssd1.getParentId().equals(ssd2.getParentId()) ) {
-				LOGGER.warning("compareStartSubDocument warning: StartSubDocument Parent Id difference.");
+				LOGGER.warn("compareStartSubDocument warning: StartSubDocument Parent Id difference.");
 				return false;
 			}
 		}
@@ -123,7 +124,7 @@ public class ExtractionVerificationUtil {
 		//--FilterParameters--
 		if( !bothAreNull(ssd1.getFilterParameters(),ssd2.getFilterParameters()) ){
 			if ( !ssd1.getFilterParameters().equals(ssd2.getFilterParameters()) ) {
-				LOGGER.warning("compareStartSubDocument warning: StartSubDocument FilterParameters difference.");
+				LOGGER.warn("compareStartSubDocument warning: StartSubDocument FilterParameters difference.");
 				return false;
 			}
 		}
@@ -158,7 +159,7 @@ public class ExtractionVerificationUtil {
 		//--Id--
 		if( !bothAreNull(br1.getParentId(),br2.getParentId()) ){
 			if ( !br1.getParentId().equals(br2.getParentId()) ) {
-				LOGGER.warning("compareBaseReferenceable warning: BaseReferenceable Parent Id difference.");
+				LOGGER.warn("compareBaseReferenceable warning: BaseReferenceable Parent Id difference.");
 				return false;
 			}
 		}
@@ -206,13 +207,13 @@ public class ExtractionVerificationUtil {
 
 		//--HasVariantSources--
 		if (tu1.isEmpty() != tu2.isEmpty()) {
-			LOGGER.warning("compareTextUnits warning: ITextUnit isEmtpy difference.");
+			LOGGER.warn("compareTextUnits warning: ITextUnit isEmtpy difference.");
 			return false;
 		}
 		
 		//--IsEmpty--
 		if (tu1.hasVariantSources() != tu2.hasVariantSources()) {
-			LOGGER.warning("compareTextUnits warning: ITextUnit hasVariantSources difference.");
+			LOGGER.warn("compareTextUnits warning: ITextUnit hasVariantSources difference.");
 			return false;
 		}
 		
@@ -228,7 +229,7 @@ public class ExtractionVerificationUtil {
 				Set<LocaleId> targetLocales = tu2.getTargetLocales();
 				if(targetLocales.size()==1 && !targetLocales.contains(targetLocale)){
 					LocaleId overridenLocaleId = targetLocales.iterator().next();
-					LOGGER.warning("compareTextUnits warning: Specified targetLocale not found. Assuming it was overriden by the filter. [Overriden from: "+targetLocale+"\tto:"+overridenLocaleId+"]");
+					LOGGER.warn("compareTextUnits warning: Specified targetLocale not found. Assuming it was overriden by the filter. [Overriden from: "+targetLocale+"\tto:"+overridenLocaleId+"]");
 					targetLocale = targetLocales.iterator().next();
 					targetLocaleOverriden = true;
 				}
@@ -242,20 +243,20 @@ public class ExtractionVerificationUtil {
 				}	
 				
 				if (tu1.getTargetLocales().size() > tu2.getTargetLocales().size()-1){
-					LOGGER.warning("compareTextUnits warning: ITextUnit targetCount difference. Tu1 has more targets than Tu2");
+					LOGGER.warn("compareTextUnits warning: ITextUnit targetCount difference. Tu1 has more targets than Tu2");
 					return false;
 				}else if (tu2.getTargetLocales().size()-1 > tu1.getTargetLocales().size()){
-					LOGGER.warning("compareTextUnits warning: ITextUnit targetCount difference. Tu2 has more targets than Tu1");
+					LOGGER.warn("compareTextUnits warning: ITextUnit targetCount difference. Tu2 has more targets than Tu1");
 					return false;
 				}
 	
 			}else{
 				
 				if (tu1.getTargetLocales().size() > tu2.getTargetLocales().size()){
-					LOGGER.warning("compareTextUnits warning: ITextUnit targetCount difference. Tu1 has more targets than Tu2");
+					LOGGER.warn("compareTextUnits warning: ITextUnit targetCount difference. Tu1 has more targets than Tu2");
 					return false;
 				}else if (tu2.getTargetLocales().size() > tu1.getTargetLocales().size()){
-					LOGGER.warning("compareTextUnits warning: ITextUnit targetCount difference. Tu2 has more targets than Tu1");
+					LOGGER.warn("compareTextUnits warning: ITextUnit targetCount difference. Tu2 has more targets than Tu1");
 					return false;
 				}
 			}
@@ -302,13 +303,13 @@ public class ExtractionVerificationUtil {
 		
 		//--HasBeenSegmented--
 		if (tc1.hasBeenSegmented() != tc2.hasBeenSegmented()) {
-			LOGGER.warning("compareTextContainer warning: hasBeenSegmented difference.");
+			LOGGER.warn("compareTextContainer warning: hasBeenSegmented difference.");
 			return false;
 		}
 
 		//--PROPERTY CHECK--
 		if( !tc1.getPropertyNames().equals(tc2.getPropertyNames()) ){
-			LOGGER.warning("compareTextContainer warning: TextContainer properties difference. [tc1:"+tc1.getPropertyNames()+"\ttc2:"+tc2.getPropertyNames()+" ]");
+			LOGGER.warn("compareTextContainer warning: TextContainer properties difference. [tc1:"+tc1.getPropertyNames()+"\ttc2:"+tc2.getPropertyNames()+" ]");
 			if(!allowPropValChanges){
 				return false;				
 			}
@@ -324,7 +325,7 @@ public class ExtractionVerificationUtil {
 		
 		//--TextPart count--
 		if (tc1.count() != tc2.count()) {
-			LOGGER.warning("compareTextContainer warning: TextPart count difference.\n" +
+			LOGGER.warn("compareTextContainer warning: TextPart count difference.\n" +
 					"tc1=" + tc1.count() + "\ntc2="+ tc2.count() );
 			return false;
 		}
@@ -340,7 +341,7 @@ public class ExtractionVerificationUtil {
 				TextPart tp2 = it2.next();
 				
 				if( !(tp1.isSegment()) == (tp2.isSegment())){
-					LOGGER.warning("compareTextContainer warning: TextContainer TextPart <--> Segment difference.");
+					LOGGER.warn("compareTextContainer warning: TextContainer TextPart <--> Segment difference.");
 					return false;
 				}
 				
@@ -381,7 +382,7 @@ public class ExtractionVerificationUtil {
 		//--Id--
 		if( !bothAreNull(seg1.getId(),seg2.getId()) ){
 			if ( !seg1.getId().equals(seg2.getId()) ) {
-				LOGGER.warning("compareSegment warning: Segment Id difference.");
+				LOGGER.warn("compareSegment warning: Segment Id difference.");
 				return false;
 			}
 		}
@@ -444,7 +445,7 @@ public class ExtractionVerificationUtil {
 		
 		//--code count--
 		if (codes1.size() != codes2.size()) {
-			LOGGER.warning("compareTextFragment warning: TextFragment code count difference.\n" +
+			LOGGER.warn("compareTextFragment warning: TextFragment code count difference.\n" +
 					"tf1=" + codes1.size() + "\ntf2="+ codes2.size());
 			return false;
 		}
@@ -452,7 +453,7 @@ public class ExtractionVerificationUtil {
 		//--coded text--
 		if (!tf1.getCodedText().equals(tf2.getCodedText())) {
 			//if(tf1.compareTo(tf2) != 0){
-			LOGGER.warning("compareTextFragment warning: TextFragment coded text difference.\n" +
+			LOGGER.warn("compareTextFragment warning: TextFragment coded text difference.\n" +
 					"text1=\"" + tf1.getCodedText() + "\"\ntext2=\""+ tf2.getCodedText() + "\"");
 			return false;
 		}
@@ -464,53 +465,53 @@ public class ExtractionVerificationUtil {
 			
 			// Id
 			if (code1.getId() != code2.getId()) {
-				LOGGER.warning("compareTextFragment warning: TextFragment Code id difference.\n" +
+				LOGGER.warn("compareTextFragment warning: TextFragment Code id difference.\n" +
 						"code1 id=\"" + code1.getId() + "\"\ncode2 id=\""+ code2.getId() + "\"");
 				return false;
 			}
 
 			// Data
 			if ( !code1.getData().equals(code2.getData()) ) {
-				LOGGER.warning("compareTextFragment warning: TextFragment Code data difference.\n" +
+				LOGGER.warn("compareTextFragment warning: TextFragment Code data difference.\n" +
 						"code1 data=\"" + code1.getData() + "\"\ncode2 data=\""+ code2.getData() + "\"");
 				return false;
 			}
 
 			// Outer data
 			if ( !code1.getOuterData().equals(code2.getOuterData()) ) {
-				LOGGER.warning("compareTextFragment warning: TextFragment Code outer data difference.\n" +
+				LOGGER.warn("compareTextFragment warning: TextFragment Code outer data difference.\n" +
 						"code1 outerdata=\"" + code1.getOuterData() + "\"\ncode2 outerdata=\""+ code2.getOuterData() + "\"");
 				return false;
 			}
 			
 			if ( !code1.getType().equals(code2.getType()) ) {
-				LOGGER.warning("compareTextFragment warning: TextFragment Code type difference.\n" +
+				LOGGER.warn("compareTextFragment warning: TextFragment Code type difference.\n" +
 						"code1 type=\"" + code1.getType() + "\"\ncode2 type=\""+ code2.getType() + "\"");
 				return false;
 			}
 			if (code1.getTagType() != code2.getTagType()) {
-				LOGGER.warning("compareTextFragment warning: TextFragment Code TagType difference.");
+				LOGGER.warn("compareTextFragment warning: TextFragment Code TagType difference.");
 				return false;
 			}
 			if (code1.hasReference() != code2.hasReference()) {
-				LOGGER.warning("compareTextFragment warning: TextFragment Code hasReference difference.");
+				LOGGER.warn("compareTextFragment warning: TextFragment Code hasReference difference.");
 				return false;
 			}
 			if (code1.isCloneable() != code2.isCloneable()) {
-				LOGGER.warning("compareTextFragment warning: TextFragment Code isCloenable difference.");
+				LOGGER.warn("compareTextFragment warning: TextFragment Code isCloenable difference.");
 				return false;
 			}
 			if (code1.isDeleteable() != code2.isDeleteable()) {
-				LOGGER.warning("compareTextFragment warning: TextFragment Code isDeleteable difference.");
+				LOGGER.warn("compareTextFragment warning: TextFragment Code isDeleteable difference.");
 				return false;
 			}
 			if (code1.hasAnnotation() != code2.hasAnnotation()) {
-				LOGGER.warning("compareTextFragment warning: TextFragment Code hasAnnotation difference.");
+				LOGGER.warn("compareTextFragment warning: TextFragment Code hasAnnotation difference.");
 				return false;
 			}
 			
 			if (code1.hasAnnotation() != code2.hasAnnotation()) {
-				LOGGER.warning("compareTextFragment warning: TextFragment Code hasAnnotation difference.");
+				LOGGER.warn("compareTextFragment warning: TextFragment Code hasAnnotation difference.");
 				return false;
 			}
 		}
@@ -519,7 +520,7 @@ public class ExtractionVerificationUtil {
 		String codeStr1 = Code.codesToString(codes1);
 		String codeStr2 = Code.codesToString(codes2);
 		if ( !codeStr1.equals(codeStr2) ) {
-			LOGGER.warning("compareTextFragment warning: TextFragment Code string difference.\n" +
+			LOGGER.warn("compareTextFragment warning: TextFragment Code string difference.\n" +
 					"code1=\"" + codeStr1 + "\"\ncode2=\""+ codeStr2 + "\"");
 			return false;
 		}
@@ -552,7 +553,7 @@ public class ExtractionVerificationUtil {
 		//--Name--
 		if( !bothAreNull(n1.getName(),n2.getName()) ){
 			if (!n1.getName().equals(n2.getName())) {
-				LOGGER.warning("compareINameables warning: INameable Name difference.");
+				LOGGER.warn("compareINameables warning: INameable Name difference.");
 				return false;
 			}
 		}
@@ -560,7 +561,7 @@ public class ExtractionVerificationUtil {
 		//--Type--
 		if( !bothAreNull(n1.getType(),n2.getType()) ){
 			if (!n1.getType().equals(n2.getType())) {
-				LOGGER.warning("compareINameables warning: INameable Type difference.");
+				LOGGER.warn("compareINameables warning: INameable Type difference.");
 				return false;
 			}
 		}
@@ -568,26 +569,26 @@ public class ExtractionVerificationUtil {
 		//--MimeType--
 		if( !bothAreNull(n1.getMimeType(),n2.getMimeType()) ){
 			if (!n1.getMimeType().equals(n2.getMimeType())) {
-				LOGGER.warning("compareINameables warning: INameable MimeType difference.");
+				LOGGER.warn("compareINameables warning: INameable MimeType difference.");
 				return false;
 			}
 		}
 		
 		//--IsTranslatable--
 		if (n1.isTranslatable() != n2.isTranslatable()) {
-			LOGGER.warning("compareINameables warning: INameable isTranslatable difference.");
+			LOGGER.warn("compareINameables warning: INameable isTranslatable difference.");
 			return false;
 		}
 
 		//--PreserveWhitespaces--
 		if (n1.preserveWhitespaces() != n2.preserveWhitespaces()) {
-			LOGGER.warning("compareINameables warning: INameable isTranslatable difference.");
+			LOGGER.warn("compareINameables warning: INameable isTranslatable difference.");
 			return false;
 		}
 		
 		//--PROPERTY CHECK--
 		if( !n1.getPropertyNames().equals(n2.getPropertyNames()) ){
-			LOGGER.warning("compareINameables warning: INameable properties difference.");
+			LOGGER.warn("compareINameables warning: INameable properties difference.");
 			return false;
 		}
 		
@@ -599,7 +600,7 @@ public class ExtractionVerificationUtil {
 		
 		//--SOURCE PROPERTY CHECK--
 		if( !n1.getSourcePropertyNames().equals(n2.getSourcePropertyNames()) ){
-			LOGGER.warning("compareINameables warning: INameable source properties difference.");
+			LOGGER.warn("compareINameables warning: INameable source properties difference.");
 			return false;
 		}
 		
@@ -612,7 +613,7 @@ public class ExtractionVerificationUtil {
 		//--TARGET LOCALE CHECK--
 		if(!n1.getTargetLocales().equals(n2.getTargetLocales()) ){
 			if(!isMultilingual()){
-				LOGGER.warning("compareINameables warning: INameable target locales difference.");
+				LOGGER.warn("compareINameables warning: INameable target locales difference.");
 				return false;
 			}
 		}
@@ -622,7 +623,7 @@ public class ExtractionVerificationUtil {
 
 			//--TARGET PROPERTY CHECK--
 			if( !n1.getTargetPropertyNames(locId).equals(n2.getTargetPropertyNames(locId)) ){
-				LOGGER.warning("compareINameables warning: INameable target properties difference.");
+				LOGGER.warn("compareINameables warning: INameable target properties difference.");
 				return false;
 			}
 			
@@ -662,7 +663,7 @@ public class ExtractionVerificationUtil {
 		
 		if( !bothAreNull(r1.getId(),r2.getId()) ){
 			if (!r1.getId().equals(r2.getId())) {
-				LOGGER.warning("compareIResource warning: IResource Id difference.");
+				LOGGER.warn("compareIResource warning: IResource Id difference.");
 				return false;
 			}
 		}
@@ -683,7 +684,7 @@ public class ExtractionVerificationUtil {
 		}
 
 		if (!r1.getSkeleton().toString().equals(r2.getSkeleton().toString())) {
-			LOGGER.warning("compareIResource warning: Skeleton content difference (If skeleton difference is acceptable turn it off in the settings).\n" +
+			LOGGER.warn("compareIResource warning: Skeleton content difference (If skeleton difference is acceptable turn it off in the settings).\n" +
 					"skel1=\"" + r1.getSkeleton().toString() + "\"\nskel2=\""+ r2.getSkeleton().toString() + "\"");
 			return false;
 		}
@@ -712,13 +713,13 @@ public class ExtractionVerificationUtil {
 		
 		//--IsReferent--
 		if (r1.isReferent() != r2.isReferent()) {
-			LOGGER.warning("compareIReferenceable warning: IReferenceable isReferent difference.");
+			LOGGER.warn("compareIReferenceable warning: IReferenceable isReferent difference.");
 			return false;
 		}
 
 		//--ReferenceCount--
 		if (r1.getReferenceCount() != r2.getReferenceCount()) {
-			LOGGER.warning("compareIReferenceable warning: IReferenceable getReferenceCount difference.");
+			LOGGER.warn("compareIReferenceable warning: IReferenceable getReferenceCount difference.");
 			return false;
 		}
 		
@@ -747,18 +748,18 @@ public class ExtractionVerificationUtil {
 
 		if( !bothAreNull(p1.getName(),p2.getName()) ){
 			if (!p1.getName().equals(p2.getName())) {
-				LOGGER.warning("compareProperty warning: Property name difference.");
+				LOGGER.warn("compareProperty warning: Property name difference.");
 				return false;
 			}
 		}
 		if( !bothAreNull(p1.getValue(),p2.getValue()) ){
 			if (!p1.getValue().equals(p2.getValue())) {
-				LOGGER.warning("compareProperty warning: Property value difference. [prop name:"+p1.getName()+"\tval p1:"+p1.getValue()+"\tval p2:"+p2.getValue()+"]");
+				LOGGER.warn("compareProperty warning: Property value difference. [prop name:"+p1.getName()+"\tval p1:"+p1.getValue()+"\tval p2:"+p2.getValue()+"]");
 				return false;
 			}
 		}
 		if (p1.isReadOnly() != p2.isReadOnly()) {
-			LOGGER.warning("compareProperty warning: isReadOnly difference.");
+			LOGGER.warn("compareProperty warning: isReadOnly difference.");
 			return false;
 		}
 		
@@ -790,11 +791,11 @@ public class ExtractionVerificationUtil {
 	public boolean oneIsNulll(Object o1, Object o2, String function, String type){
 		
 		if (o1 == null && o2 != null){
-			LOGGER.warning(function+ " warning: "+type+" 1 is null and "+type+" 2 is not null.");
+			LOGGER.warn(function+ " warning: "+type+" 1 is null and "+type+" 2 is not null.");
 			return true;
 		} 
 		if (o1 != null && o2 == null){				
-			LOGGER.warning(function+ " warning: "+type+" 1 is not null and "+type+" 2 is null.");
+			LOGGER.warn(function+ " warning: "+type+" 1 is not null and "+type+" 2 is null.");
 			return true;
 		}
 		return false;

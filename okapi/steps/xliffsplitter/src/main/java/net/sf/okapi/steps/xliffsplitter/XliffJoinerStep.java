@@ -31,7 +31,8 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import javax.xml.stream.XMLEventFactory;
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLEventWriter;
@@ -106,7 +107,7 @@ public class XliffJoinerStep extends BasePipelineStep {
 		}
 	}
 	
-	private final Logger logger = Logger.getLogger(getClass().getName());
+	private final Logger logger = LoggerFactory.getLogger(getClass().getName());
 	
 	private HashMap<String, BaseXliffFile> baseXliffFiles = new HashMap<String, BaseXliffFile>();
 	
@@ -153,7 +154,7 @@ public class XliffJoinerStep extends BasePipelineStep {
 		if(params.getInputFileMarker().trim().length() == 0){
 			throw new OkapiBadFilterParametersException("The input file marker cannot be empty");
 		}else if(params.getOutputFileMarker().trim().length() == 0){
-			logger.warning("Leaving output file marker empty your original file(s) could be overwritten");
+			logger.warn("Leaving output file marker empty your original file(s) could be overwritten");
 		}
 		
 		return event;
@@ -194,7 +195,7 @@ public class XliffJoinerStep extends BasePipelineStep {
 		String baseFilename = getBaseFilename(inputFileName, params.getInputFileMarker());
 		
 		if ( baseFilename == null){
-			logger.warning("This file is skipped: Input marker not found in its name.");
+			logger.warn("This file is skipped: Input marker not found in its name.");
 			return event;
 		}
 

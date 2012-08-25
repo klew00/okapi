@@ -30,7 +30,8 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -83,7 +84,7 @@ import net.sf.okapi.filters.abstractmarkup.AbstractMarkupFilter;
 @UsingParameters(Parameters.class)
 public class VignetteFilter implements IFilter {
 
-	private final Logger logger = Logger.getLogger(getClass().getName());
+	private final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
 	private final String STARTBLOCK = "<importContentInstance>";
 	private final String ENDBLOCK = "</importContentInstance>";
@@ -309,7 +310,7 @@ public class VignetteFilter implements IFilter {
 				// No source
 				if ( !Util.isEmpty(data[1]) ) {
 					// No source but target exists
-					logger.warning(String.format(
+					logger.warn(String.format(
 						"Entry '%s': No corresponding source entry exists for the target '%s'",
 						data[1], trgLoc.toPOSIXLocaleId()));
 				}
@@ -317,7 +318,7 @@ public class VignetteFilter implements IFilter {
 			else { // Source exists
 				if ( Util.isEmpty(data[1]) ) {
 					// Source exists but not the target
-					logger.warning(String.format(
+					logger.warn(String.format(
 						"Entry '%s': No entry exists for the target '%s'",
 						data[0], trgLoc.toPOSIXLocaleId()));
 				}
@@ -328,7 +329,7 @@ public class VignetteFilter implements IFilter {
 			}
 		}
 		if ( toExtract <= 0 ) {
-			logger.warning("There are no entries to extract");
+			logger.warn("There are no entries to extract");
 		}
 
 		// Second pass: extraction
@@ -601,13 +602,13 @@ public class VignetteFilter implements IFilter {
 		if ( Util.isEmpty(localeId) || Util.isEmpty(sourceId) ) {
 			// Warn during pre-processing, then treat as document part
 			if ( preprocessing ) {
-				logger.warning(String.format(
+				logger.warn(String.format(
 					"Entry with incomplete data at %s number %d\nlocale='%s' sourceId='%s'",
 					STARTBLOCK, counter, localeId, sourceId));
 				return false;
 			}
 			else {
-				logger.warning("Missing data, this section is skipped.");
+				logger.warn("Missing data, this section is skipped.");
 				DocumentPart dp = new DocumentPart(String.valueOf(++otherId), false);
 				dp.setSkeleton(new GenericSkeleton(content.replace("\n", lineBreak)));
 				queue.add(new Event(EventType.DOCUMENT_PART, dp));

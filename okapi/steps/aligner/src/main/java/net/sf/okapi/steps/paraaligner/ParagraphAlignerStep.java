@@ -22,7 +22,8 @@ package net.sf.okapi.steps.paraaligner;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
@@ -52,7 +53,7 @@ import net.sf.okapi.steps.sentencealigner.SentenceAlignerStep;
  */
 @UsingParameters(Parameters.class)
 public class ParagraphAlignerStep extends BasePipelineStep {
-	private static final Logger LOGGER = Logger.getLogger(ParagraphAlignerStep.class.getName());
+	private static final Logger LOGGER = LoggerFactory.getLogger(ParagraphAlignerStep.class.getName());
 
 	private Parameters params;
 	private IFilter filter = null;

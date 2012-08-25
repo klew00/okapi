@@ -24,7 +24,8 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.xml.XMLConstants;
 import javax.xml.parsers.ParserConfigurationException;
@@ -56,7 +57,7 @@ import org.xml.sax.XMLReader;
 @UsingParameters(Parameters.class)
 public class XMLValidationStep extends BasePipelineStep {
 
-	private final Logger logger = Logger.getLogger(getClass().getName());
+	private final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
 	private XMLInputFactory xmlInputFact;
 	private String currentFileDir;
@@ -138,7 +139,7 @@ public class XMLValidationStep extends BasePipelineStep {
 
 		}
 		catch ( XMLStreamException e ) {
-			logger.severe("Well-Formedness Error " +
+			logger.error("Well-Formedness Error " +
 				"Line: "+ e.getLocation().getLineNumber() +
 				", Column: "+ e.getLocation().getColumnNumber() +
 				", Offset: "+ e.getLocation().getCharacterOffset() +
@@ -201,13 +202,13 @@ public class XMLValidationStep extends BasePipelineStep {
 				    validator.validate(xmlInput);
 				}
 			} catch (SAXException e) {
-				logger.severe(e.getMessage());
+				logger.error(e.getMessage());
 				return event;
 			} catch (IOException e) {
-				logger.severe(e.getMessage());
+				logger.error(e.getMessage());
 				  return event;
 			} catch (ParserConfigurationException e) {
-				logger.severe(e.getMessage());
+				logger.error(e.getMessage());
 				return event;
 			} 			
 		}
@@ -225,7 +226,7 @@ class ValidatingErrorHandler implements ErrorHandler {
 	
 	 @Override
 	public void error(SAXParseException e) throws SAXException {
-		logger.severe("Validation Error " +
+		logger.error("Validation Error " +
 				"Line: "+ e.getLineNumber() +
 				", Column: "+ e.getColumnNumber() +
 				"\n"+ e.getMessage()+"\n");
@@ -234,7 +235,7 @@ class ValidatingErrorHandler implements ErrorHandler {
 
 	@Override
 	public void fatalError(SAXParseException e) throws SAXException {
-		logger.severe("Validation Fatal Error " +
+		logger.error("Validation Fatal Error " +
 				"Line: "+ e.getLineNumber() +
 				", Column: "+ e.getColumnNumber() +
 				"\n"+ e.getMessage()+"\n");
@@ -243,7 +244,7 @@ class ValidatingErrorHandler implements ErrorHandler {
 
 	@Override
 	public void warning(SAXParseException e) throws SAXException {
-		logger.severe("Validation Warning " +
+		logger.error("Validation Warning " +
 				"Line: "+ e.getLineNumber() +
 				", Column: "+ e.getColumnNumber() +
 				"\n"+ e.getMessage()+"\n");

@@ -25,7 +25,8 @@ import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
@@ -52,7 +53,7 @@ import net.sf.okapi.connectors.microsoft.MicrosoftMTConnector;
 @UsingParameters(Parameters.class)
 public class MSBatchTranslationStep extends BasePipelineStep {
 
-	private final Logger logger = Logger.getLogger(getClass().getName());
+	private final Logger logger = LoggerFactory.getLogger(getClass().getName());
 	
 	private final static int MAXEVENTS = 20;
 	
@@ -282,7 +283,7 @@ public class MSBatchTranslationStep extends BasePipelineStep {
 		// Call the translation engine
 		List<List<QueryResult>> list = conn.batchQuery(fragments);
 		if ( Util.isEmpty(list) ) {
-			logger.warning("No translation generated.");
+			logger.warn("No translation generated.");
 			return;
 		}
 		
@@ -415,7 +416,7 @@ public class MSBatchTranslationStep extends BasePipelineStep {
 //			for ( Segment srcSeg : tu.getSourceSegments() ) {
 //				if ( !srcSeg.text.hasText() ) continue;
 //				if ( list.size() < entryIndex-1 ) {
-//					logger.warning(String.format("Discrepancy between the number of source and translations for text unit id='%s'", tu.getId()));
+//					logger.warn(String.format("Discrepancy between the number of source and translations for text unit id='%s'", tu.getId()));
 //					continue;
 //				}
 //				Segment trgSeg = null;

@@ -24,8 +24,8 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.EmptyStackException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import net.htmlparser.jericho.Attribute;
 import net.htmlparser.jericho.EndTag;
@@ -54,8 +54,7 @@ import net.sf.okapi.filters.yaml.TaggedFilterConfiguration.RULE_TYPE;
 @UsingParameters(Parameters.class)
 public class HtmlFilter extends AbstractMarkupFilter {
 
-	private static final Logger LOGGER = Logger.getLogger(HtmlFilter.class
-			.getName());
+	private static final Logger LOGGER = LoggerFactory.getLogger(HtmlFilter.class.getName());
 
 	private Parameters parameters;
 	private RawDocument tempSourceInput;
@@ -101,8 +100,7 @@ public class HtmlFilter extends AbstractMarkupFilter {
 	protected void startFilter() {
 		super.startFilter();
 		if (!getConfig().isGlobalPreserveWhitespace()) {
-			LOGGER.log(
-					Level.FINE,
+			LOGGER.debug(
 					"By default the HTML filter will collapse whitespace unless overridden in the configuration"); //$NON-NLS-1$
 		}
 		getEventBuilder().initializeCodeFinder(getConfig().isUseCodeFinder(),
@@ -234,7 +232,7 @@ public class HtmlFilter extends AbstractMarkupFilter {
 			// assume the default (non-conditional) rule
 			if (!currentState.ruleName.equalsIgnoreCase(endTag.getName())) {
 				String character = Integer.toString(endTag.getBegin());
-				LOGGER.log(Level.FINE, "End tag " + endTag.getName()
+				LOGGER.debug("End tag " + endTag.getName()
 						+ " and start tag " + currentState.ruleName
 						+ " do not match at character number " + character);
 			}

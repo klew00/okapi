@@ -31,8 +31,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.SortedMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import net.sf.okapi.applications.rainbow.batchconfig.BatchConfiguration;
 import net.sf.okapi.applications.rainbow.lib.CodeFinderEditor;
@@ -163,7 +163,7 @@ public class MainForm { //implements IParametersProvider {
 	private ArrayList<InputTableModel> inputTableMods;
 	private Shell shell;
 	private ILog log;
-	private LogHandler logHandler;
+	// TZU private LogHandler logHandler;
 	private UserConfiguration config;
 	private MRUList mruList;
 	private String appRootFolder;
@@ -318,9 +318,9 @@ public class MainForm { //implements IParametersProvider {
 
 		log = new LogForm(shell);
 		log.setTitle(Res.getString("LOG_CAPTION")); //$NON-NLS-1$
-		logHandler = new LogHandler(log);
-		setLogLevel();
-		Logger.getLogger("").addHandler(logHandler); //$NON-NLS-1$
+		// TZU logHandler = new LogHandler(log);
+		// TZU setLogLevel();
+		// TZU LoggerFactory.getLogger("").addHandler(logHandler); //$NON-NLS-1$
 
 		fcMapper = new FilterConfigurationMapper();
 		// Get pre-defined configurations
@@ -1184,7 +1184,7 @@ public class MainForm { //implements IParametersProvider {
 			wrapper.refreshAvailableStepsList();
 		}
 	}
-	
+/* TZU
 	private void setLogLevel () {
 		int n = config.getInteger(MainForm.OPT_LOGLEVEL);
 		switch ( n ) {
@@ -1202,7 +1202,7 @@ public class MainForm { //implements IParametersProvider {
 			break;
 		}
 	}
-	
+*/
 	private void createToolbar () {
 		ToolBar toolbar = new ToolBar(shell, SWT.FLAT | SWT.WRAP);
 		GridData gdTmp = new GridData(GridData.FILL_HORIZONTAL);
@@ -1929,7 +1929,7 @@ public class MainForm { //implements IParametersProvider {
 			dlg.showDialog();
 			
 			// Update dependent data
-			setLogLevel();
+			// TZU setLogLevel();
 			updatePluginsAndDependencies();
 		}
 		catch ( Exception e ) {

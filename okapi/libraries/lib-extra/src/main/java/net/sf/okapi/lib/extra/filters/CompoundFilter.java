@@ -25,7 +25,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.LinkedList;
-import java.util.logging.Level;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
@@ -46,6 +47,7 @@ import net.sf.okapi.lib.extra.Notification;
  * @version 0.1, 10.06.2009
  */
 public class CompoundFilter extends AbstractBaseFilter {
+	private final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
 	private LinkedList<IFilter> subFilters = new LinkedList<IFilter>();
 	
@@ -83,37 +85,37 @@ public class CompoundFilter extends AbstractBaseFilter {
 		} catch (InstantiationException e) {
 			
 			//e.printStackTrace();
-			logMessage(Level.FINE, "Subfilter instantiation failed: " + e.getMessage());
+			logger.debug("Subfilter instantiation failed: " + e.getMessage());
 			return false;
 			
 		} catch (IllegalAccessException e) {
 			
 			//e.printStackTrace();
-			logMessage(Level.FINE, "Subfilter instantiation failed: " + e.getMessage());
+			logger.debug("Subfilter instantiation failed: " + e.getMessage());
 			return false;
 			
 		} catch (SecurityException e) {
 			
 			//e.printStackTrace();
-			logMessage(Level.FINE, "Subfilter instantiation failed: " + e.getMessage());
+			logger.debug("Subfilter instantiation failed: " + e.getMessage());
 			return false;
 			
 		} catch (NoSuchMethodException e) {
 			
 			//e.printStackTrace();
-			logMessage(Level.FINE, "Subfilter instantiation failed: " + e.getMessage());
+			logger.debug("Subfilter instantiation failed: " + e.getMessage());
 			return false;
 			
 		} catch (IllegalArgumentException e) {
 			
 			//e.printStackTrace();
-			logMessage(Level.FINE, "Subfilter instantiation failed: " + e.getMessage());
+			logger.debug("Subfilter instantiation failed: " + e.getMessage());
 			return false;
 			
 		} catch (InvocationTargetException e) {
 			
 			//e.printStackTrace();
-			logMessage(Level.FINE, "Subfilter instantiation failed: " + e.getMessage());
+			logger.debug("Subfilter instantiation failed: " + e.getMessage());
 			return false;
 		}
 		

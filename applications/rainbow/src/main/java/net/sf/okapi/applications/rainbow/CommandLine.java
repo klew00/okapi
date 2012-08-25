@@ -24,8 +24,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.net.URLDecoder;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.eclipse.swt.widgets.Shell;
 
@@ -55,7 +55,7 @@ public class CommandLine {
 	private FilterConfigurationMapper fcMapper;
 	private UtilitiesAccess utilitiesAccess;
 	private BatchLog log;
-	private LogHandler logHandler;
+// TZU	private LogHandler logHandler;
 	private String utilityId;
 	private String pipelineFile;
 	private String optionsFile;
@@ -259,9 +259,8 @@ public class CommandLine {
 		help = new BaseHelp(appRootFolder+File.separator+"help"); //$NON-NLS-1$
 
 		log = new BatchLog();
-		logHandler = new LogHandler(log);
-		logHandler.setLevel(Level.INFO);
-		Logger.getLogger("").addHandler(logHandler); //$NON-NLS-1$
+		// TZU logHandler = new LogHandler(log);
+		// TZU LoggerFactory.getLogger("").addHandler(logHandler); //$NON-NLS-1$
 		
 		lm = new LanguageManager();
 		lm.loadList(sharedFolder + File.separator + "languages.xml"); //$NON-NLS-1$

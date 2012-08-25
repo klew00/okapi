@@ -47,6 +47,7 @@
 	<property name="done" value="done"/>
 	<property name="distLib" value="${dist}/lib"/>
 	<property name="distLicenses" value="${distLib}/licenses"/>
+	<property name="distLogger" value="${distLib}/logger"/>
 	<property name="distName" value="${okapilibName}_all-platforms_${okapilibStamp}" />
 	<property name="mavenStore" value="${user.home}/.m2/repository"/>
 
@@ -60,6 +61,7 @@
 		</delete>
 		<mkdir dir="${distLib}"/>
 		<mkdir dir="${distLicenses}"/>
+		<mkdir dir="${distLogger}"/>
 		<mkdir dir="${done}"/>
  	</target>
 
@@ -451,6 +453,20 @@
 		<echo file="tmpJars" append="yes"> ${jar028}</echo>
 		<copy todir="${distLib}" file="${dep028}/${jar028}"/>		
 
+		<property name="dep029" value="${mavenStore}/org/slf4j/slf4j-api/1.6.6"/>
+		<fileset id="list.contents" dir="${dep029}"
+		 includes="**/slf4j-api-1.6.6.jar"/>
+		<property name="jar029" refid="list.contents"/>
+		<echo file="tmpJars" append="yes"> ${jar029}</echo>
+		<copy todir="${distLib}" file="${dep029}/${jar029}"/>
+
+		<property name="dep030" value="${mavenStore}/org/slf4j/slf4j-jdk14/1.6.6"/>
+		<fileset id="list.contents" dir="${dep030}"
+		 includes="**/slf4j-jdk14-1.6.6.jar"/>
+		<property name="jar030" refid="list.contents"/>
+		<!-- Missing <echo file="tmpJars" append="yes" ... is intentional -->
+		<copy todir="${distLogger}" file="${dep030}/${jar030}"/>
+
 		<!-- Create the manifest file -->
 		<property file="tmpJars"/>
 		<copy todir="${tmp}/META-INF">
@@ -459,7 +475,7 @@
 		<manifest file="${tmp}/MANIFEST.MF">
 			<attribute name="Implementation-Title" value="${okapilibName}"/>
 			<attribute name="Implementation-Version" value="${okapilibStamp}"/>
-			<attribute name="Class-Path" value="${okapilibCP}"/>
+			<attribute name="Class-Path" value="${okapilibCP} logger/logger.jar"/>
   		</manifest>
 		
 		<!-- Create the jar file -->
@@ -495,6 +511,9 @@
 			<fileset dir="../shared/config">
 			</fileset>
 		</copy>
+
+		<!-- Copy logger files -->
+		<copy todir="${distLogger}" file="../shared/logger/logger.jar"/>
 
 		<!-- Copy help
 		<copy todir="${dist}/help">

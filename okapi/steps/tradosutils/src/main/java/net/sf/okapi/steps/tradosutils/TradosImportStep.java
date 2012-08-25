@@ -23,7 +23,8 @@ package net.sf.okapi.steps.tradosutils;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.jacob.activeX.ActiveXComponent;
 import com.jacob.com.Variant;
@@ -42,7 +43,7 @@ import net.sf.okapi.common.resource.RawDocument;
 @UsingParameters(ParametersImport.class)
 public class TradosImportStep extends BasePipelineStep{
 
-	private final Logger logger = Logger.getLogger(getClass().getName());
+	private final Logger logger = LoggerFactory.getLogger(getClass().getName());
 	
 	private ParametersImport params;
 	private ArrayList<String> inputFiles = new ArrayList<String>();

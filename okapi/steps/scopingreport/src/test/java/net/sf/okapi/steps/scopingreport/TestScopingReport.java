@@ -28,8 +28,8 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
@@ -71,9 +71,8 @@ public class TestScopingReport {
 	
 	
 	public static void testPath(String path) {
-		Logger logger = Logger.getLogger(TestScopingReport.class.getName()); // loggers are cached
-		logger.setLevel(Level.FINE);
-		logger.fine(new File(path).getAbsolutePath());
+		Logger logger = LoggerFactory.getLogger(TestScopingReport.class.getName()); // loggers are cached
+		logger.debug(new File(path).getAbsolutePath());
 	}
 	
 	@Test
@@ -362,7 +361,7 @@ public class TestScopingReport {
 		Event sbEvent, ebEvent;
 		ITextUnit tu1, tu2, tu3, tu4;
 		Event tuEvent1, tuEvent2, tuEvent3, tuEvent4;
-		Logger logger = Logger.getLogger(getClass().getName());
+		Logger logger = LoggerFactory.getLogger(getClass().getName());
 		
 		String pathBase = Util.getDirectoryName(this.getClass().getResource("").toURI().getPath()) + "/";
 		net.sf.okapi.connectors.pensieve.Parameters rparams = 
@@ -451,10 +450,10 @@ public class TestScopingReport {
 		srs.handleEvent(eiEvent);
 		srs.handleEvent(ebEvent);
 				
-		logger.fine(TextUnitLogger.getTuInfo(tu1, LocaleId.ENGLISH));
-		logger.fine(TextUnitLogger.getTuInfo(tu2, LocaleId.ENGLISH));
-		logger.fine(TextUnitLogger.getTuInfo(tu3, LocaleId.ENGLISH));
-		logger.fine(TextUnitLogger.getTuInfo(tu4, LocaleId.ENGLISH));
+		logger.debug(TextUnitLogger.getTuInfo(tu1, LocaleId.ENGLISH));
+		logger.debug(TextUnitLogger.getTuInfo(tu2, LocaleId.ENGLISH));
+		logger.debug(TextUnitLogger.getTuInfo(tu3, LocaleId.ENGLISH));
+		logger.debug(TextUnitLogger.getTuInfo(tu4, LocaleId.ENGLISH));
 		
 		testPath(outputFilePath);
 		
@@ -473,7 +472,7 @@ public class TestScopingReport {
 		Event sbEvent, ebEvent;
 		ITextUnit tu1, tu2, tu3, tu4;
 		Event tuEvent1, tuEvent2, tuEvent3, tuEvent4;
-		Logger logger = Logger.getLogger(getClass().getName());
+		Logger logger = LoggerFactory.getLogger(getClass().getName());
 		
 		String pathBase = Util.getDirectoryName(this.getClass().getResource("").toURI().getPath()) + "/";
 		net.sf.okapi.connectors.pensieve.Parameters rparams = 
@@ -564,10 +563,10 @@ public class TestScopingReport {
 		srs.handleEvent(eiEvent);
 		srs.handleEvent(ebEvent);
 				
-		logger.fine(TextUnitLogger.getTuInfo(tu1, LocaleId.ENGLISH));
-		logger.fine(TextUnitLogger.getTuInfo(tu2, LocaleId.ENGLISH));
-		logger.fine(TextUnitLogger.getTuInfo(tu3, LocaleId.ENGLISH));
-		logger.fine(TextUnitLogger.getTuInfo(tu4, LocaleId.ENGLISH));
+		logger.debug(TextUnitLogger.getTuInfo(tu1, LocaleId.ENGLISH));
+		logger.debug(TextUnitLogger.getTuInfo(tu2, LocaleId.ENGLISH));
+		logger.debug(TextUnitLogger.getTuInfo(tu3, LocaleId.ENGLISH));
+		logger.debug(TextUnitLogger.getTuInfo(tu4, LocaleId.ENGLISH));
 		
 		testPath(outputFilePath);
 		
@@ -586,7 +585,7 @@ public class TestScopingReport {
 		Event sbEvent, ebEvent;
 		ITextUnit tu1, tu2, tu3, tu4;
 		Event tuEvent1, tuEvent2, tuEvent3, tuEvent4;
-		Logger logger = Logger.getLogger(getClass().getName());
+		Logger logger = LoggerFactory.getLogger(getClass().getName());
 		
 		String pathBase = Util.getDirectoryName(this.getClass().getResource("").toURI().getPath()) + "/";
 //		net.sf.okapi.connectors.pensieve.Parameters rparams = 
@@ -694,10 +693,10 @@ public class TestScopingReport {
 		srs.handleEvent(eiEvent);
 		srs.handleEvent(ebEvent);
 				
-		logger.fine(TextUnitLogger.getTuInfo(tu1, LocaleId.ENGLISH));
-		logger.fine(TextUnitLogger.getTuInfo(tu2, LocaleId.ENGLISH));
-		logger.fine(TextUnitLogger.getTuInfo(tu3, LocaleId.ENGLISH));
-		logger.fine(TextUnitLogger.getTuInfo(tu4, LocaleId.ENGLISH));
+		logger.debug(TextUnitLogger.getTuInfo(tu1, LocaleId.ENGLISH));
+		logger.debug(TextUnitLogger.getTuInfo(tu2, LocaleId.ENGLISH));
+		logger.debug(TextUnitLogger.getTuInfo(tu3, LocaleId.ENGLISH));
+		logger.debug(TextUnitLogger.getTuInfo(tu4, LocaleId.ENGLISH));
 		
 		testPath(outputFilePath);
 		

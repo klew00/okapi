@@ -23,8 +23,8 @@ package net.sf.okapi.filters.openxml;
 import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.LocaleId;
@@ -62,12 +62,9 @@ public class OpenXMLSnippetsTest {
 	
 	@Before
 	public void setUp()  {
-		LOGGER = Logger.getLogger(OpenXMLSnippetsTest.class.getName());
+		LOGGER = LoggerFactory.getLogger(OpenXMLSnippetsTest.class.getName());
 		openXMLContentFilter = new OpenXMLContentFilter();	
 		openXMLContentFilter.setLogger(LOGGER);
-		LOGGER.setLevel(Level.FINER);
-		if (LOGGER.getHandlers().length<1)
-			LOGGER.addHandler(new LogHandlerSystemOut());		
 	}
 
 	@After
@@ -230,9 +227,9 @@ public class OpenXMLSnippetsTest {
 			}
 		}		
 
-		LOGGER.setUseParentHandlers(false);
-		LOGGER.log(Level.FINER,"nOriginal: "+original);
-		LOGGER.log(Level.FINER,"Output:    "+tmp.toString());
+		// TZU LOGGER.setUseParentHandlers(false);
+		LOGGER.debug("nOriginal: "+original);
+		LOGGER.debug("Output:    "+tmp.toString());
 		writer.close();
 		return tmp.toString();
 	}

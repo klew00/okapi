@@ -25,7 +25,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
@@ -39,7 +40,7 @@ import net.sf.okapi.common.resource.RawDocument;
 @UsingParameters(Parameters.class)
 public class BOMConversionStep extends BasePipelineStep {
 
-	private final Logger logger = Logger.getLogger(getClass().getName());
+	private final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
 	private final byte[] BOM_UTF8 = {(byte)0xEF,(byte)0xBB,(byte)0xBF};
 	private final byte[] BOM_UTF16BE = {(byte)0xFE,(byte)0xFF};
@@ -164,7 +165,7 @@ public class BOMConversionStep extends BasePipelineStep {
 							logger.info("Added UTF-8 BOM");
 						}
 						else { // Cannot add to un-supported encodings
-							logger.warning(String.format("Cannot add a BOM to a document in %s.", enc));
+							logger.warn(String.format("Cannot add a BOM to a document in %s.", enc));
 						}
 					}
 					// Then write the buffer we checked

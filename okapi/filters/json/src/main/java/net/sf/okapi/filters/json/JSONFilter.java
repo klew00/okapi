@@ -27,7 +27,8 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.util.regex.Pattern;
 
 import net.sf.okapi.common.BOMNewlineEncodingDetector;
@@ -75,7 +76,7 @@ public class JSONFilter implements IFilter {
 	
 	private static final String MIMETYPE = "application/json";
 	
-	private final Logger logger = Logger.getLogger(getClass().getName());
+	private final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
 	private Parameters params;
 	private String encoding;
@@ -397,7 +398,7 @@ public class JSONFilter implements IFilter {
 					buffer.append(inputText.charAt(current));
 					break;
 				default: // Unexpected escape sequence
-					logger.warning(String.format("Unexpected escape sequence '\\%c'.",
+					logger.warn(String.format("Unexpected escape sequence '\\%c'.",
 						inputText.charAt(current)));
 					buffer.append('\\');
 					buffer.append(inputText.charAt(current));

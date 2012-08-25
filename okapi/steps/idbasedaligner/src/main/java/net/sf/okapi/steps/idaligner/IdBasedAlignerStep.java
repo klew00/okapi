@@ -22,7 +22,8 @@ package net.sf.okapi.steps.idaligner;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
@@ -60,7 +61,7 @@ import net.sf.okapi.common.resource.TextUnitUtil;
 @UsingParameters(Parameters.class)
 public class IdBasedAlignerStep extends BasePipelineStep {
 
-	private static final Logger LOGGER = Logger.getLogger(IdBasedAlignerStep.class.getName());
+	private static final Logger LOGGER = LoggerFactory.getLogger(IdBasedAlignerStep.class.getName());
 	private Parameters params;
 	private IFilter filter = null;
 	private IFilterConfigurationMapper fcMapper;
@@ -235,10 +236,10 @@ public class IdBasedAlignerStep extends BasePipelineStep {
 		}
 		else { // No match in the reference file
 			if ( missingReferenceMatch ) {
-				LOGGER.warning("No match found for: " + sourceTu.getName());
+				LOGGER.warn("No match found for: " + sourceTu.getName());
 			}
 			else {
-				LOGGER.warning("Source texts differ for: " + sourceTu.getName());
+				LOGGER.warn("Source texts differ for: " + sourceTu.getName());
 			}
 			if ( params.getReplaceWithSource()) {
 				// Use the source text if there is no target
@@ -271,7 +272,7 @@ public class IdBasedAlignerStep extends BasePipelineStep {
 					
 					// check if we have a name value
 					if (tu.getName() == null) {
-						LOGGER.warning("Missing id (name value) and empty target Skipping...");
+						LOGGER.warn("Missing id (name value) and empty target Skipping...");
 						continue;
 					}
 
@@ -282,7 +283,7 @@ public class IdBasedAlignerStep extends BasePipelineStep {
 
 					// check if we have a duplicate name
 					if (targetTextUnitMap.get(tu.getName()) != null) {
-						LOGGER.warning("Duplicate entry for: " + tu.getName() + " Skipping...");
+						LOGGER.warn("Duplicate entry for: " + tu.getName() + " Skipping...");
 						continue;
 					}
 					

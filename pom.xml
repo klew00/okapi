@@ -11,6 +11,6 @@
 	<modules>
 		<module>okapi</module>
 		<module>okapi-ui/swt</module>
-		<module>applications</module>		
+		<module>applications</module>
 	</modules>
 </project>

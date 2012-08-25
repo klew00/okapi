@@ -2,7 +2,9 @@ package net.sf.okapi.steps.wordcount.categorized.okapi;
 
 import static org.junit.Assert.assertEquals;
 
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import net.sf.okapi.common.ClassUtil;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
@@ -27,7 +29,7 @@ public class TestOkapiCounts {
 	private Event sdEvent;
 	private ITextUnit tu;
 	private Event tuEvent;
-	private final Logger logger = Logger.getLogger(getClass().getName());
+	private final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
 	@Before
 	public void startup() {
@@ -73,7 +75,7 @@ public class TestOkapiCounts {
 		bcs.setTargetLocale(LocaleId.FRENCH);
 		bcs.handleEvent(sdEvent);
 		bcs.handleEvent(tuEvent);
-		logger.fine(TextUnitLogger.getTuInfo(tu, LocaleId.ENGLISH));
+		logger.debug(TextUnitLogger.getTuInfo(tu, LocaleId.ENGLISH));
 
 		assertEquals(3, BaseCounter.getCount(tu, matchType.name())); //
 	}

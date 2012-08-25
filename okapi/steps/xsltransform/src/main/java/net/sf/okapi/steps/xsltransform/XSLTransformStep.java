@@ -24,7 +24,8 @@ import java.io.File;
 import java.net.URI;
 import java.util.Map;
 import java.util.Properties;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
@@ -60,7 +61,7 @@ public class XSLTransformStep extends BasePipelineStep {
 	private static final String VAR_INPUTPATH3 = "${inputPath3}"; 
 	private static final String VAR_INPUTURI3 = "${inputURI3}"; 
 
-	private final Logger logger = Logger.getLogger(getClass().getName());
+	private final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
 	private Parameters params;
 	private Source xsltInput;
@@ -311,7 +312,7 @@ public class XSLTransformStep extends BasePipelineStep {
 			}
 		}
 		catch ( Throwable e ) {
-			logger.severe(String.format("Error when trying to substitute variables in the parameter value '%s'", value));
+			logger.error(String.format("Error when trying to substitute variables in the parameter value '%s'", value));
 		}
 	}
 

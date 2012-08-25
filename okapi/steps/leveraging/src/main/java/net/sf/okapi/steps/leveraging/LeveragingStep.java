@@ -20,7 +20,8 @@
 
 package net.sf.okapi.steps.leveraging;
 
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
@@ -39,7 +40,7 @@ import net.sf.okapi.lib.translation.ResourceItem;
 @UsingParameters(Parameters.class)
 public class LeveragingStep extends BasePipelineStep {
 
-	private final Logger logger = Logger.getLogger(getClass().getName());
+	private final Logger logger = LoggerFactory.getLogger(getClass().getName());
 	
 	private Parameters params;
 	private LocaleId sourceLocale;

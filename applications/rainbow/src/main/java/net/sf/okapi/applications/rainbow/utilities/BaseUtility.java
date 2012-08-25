@@ -22,7 +22,8 @@ package net.sf.okapi.applications.rainbow.utilities;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.event.EventListenerList;
 
@@ -37,7 +38,7 @@ public abstract class BaseUtility implements IUtility {
 
 	public static final String VAR_PROJDIR = "${ProjDir}";
 	
-	protected final Logger logger = Logger.getLogger(getClass().getName());
+	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 	protected EventListenerList listenerList = new EventListenerList();
 	protected FilterConfigurationMapper mapper;
 	protected Shell shell;

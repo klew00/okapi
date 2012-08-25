@@ -23,8 +23,8 @@ import java.io.File;
 //import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.logging.Level; // DWH 4-22-09
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.JFileChooser;
 
@@ -52,17 +52,14 @@ public class ShowTagsForAllFilesInADirectory {
 		}
 		catch(Exception e)
 		{
-			LOGGER.log(Level.WARNING, e.getMessage());
+			LOGGER.warn(e.getMessage());
 		}
 	}
 	
 	public void setUp() throws Exception {
-		LOGGER = Logger.getLogger(OpenXMLSnippetsTest.class.getName());
+		LOGGER = LoggerFactory.getLogger(OpenXMLSnippetsTest.class.getName());
 		openXMLFilter = new OpenXMLFilter(new TagPeekTranslator(),locENUS);	
 		openXMLFilter.setLogger(LOGGER);
-		LOGGER.setLevel(Level.FINE);
-		if (LOGGER.getHandlers().length<1)
-			LOGGER.addHandler(new LogHandlerSystemOut());		
 		openXMLFilter.setOptions(locENUS, "UTF-8", true);
     	    testFileList = new String[1]; // timporary
 
@@ -116,7 +113,7 @@ public class ShowTagsForAllFilesInADirectory {
 			writer.setOutput(sOutputPath);
 			try {
 				URI uriFf = new URI(fff);
-				openXMLFilter.open(new RawDocument(uriFf,"UTF-8",locENUS),true,true,Level.FINEST); // DWH 4-22-09
+				openXMLFilter.open(new RawDocument(uriFf,"UTF-8",locENUS),true,true); // TZU ,Level.FINEST); // DWH 4-22-09
 				while (openXMLFilter.hasNext()) {
 					event = openXMLFilter.next();
 					if (event!=null)

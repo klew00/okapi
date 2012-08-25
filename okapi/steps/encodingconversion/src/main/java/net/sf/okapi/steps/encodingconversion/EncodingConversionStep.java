@@ -33,7 +33,8 @@ import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -52,7 +53,7 @@ import net.sf.okapi.common.resource.RawDocument;
 @UsingParameters(Parameters.class)
 public class EncodingConversionStep extends BasePipelineStep {
 
-	private final Logger logger = Logger.getLogger(getClass().getName());
+	private final Logger logger = LoggerFactory.getLogger(getClass().getName());
 	private static final int MAXBUF = 1024;
 
 	private Parameters params;
@@ -278,7 +279,7 @@ public class EncodingConversionStep extends BasePipelineStep {
 				for ( int i=0; i<n; i++ ) {
 					if ( !(canEncode = outputEncoder.canEncode(buffer.get(i))) ) {
 						if ( params.reportUnsupported ) {
-							logger.warning(String.format("Un-supported character: U+%04X ('%c')",
+							logger.warn(String.format("Un-supported character: U+%04X ('%c')",
 								(int)buffer.get(i), buffer.get(i)));
 						}
 					}

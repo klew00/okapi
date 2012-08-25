@@ -23,7 +23,8 @@ package net.sf.okapi.steps.sentencealigner;
 import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
@@ -59,7 +60,7 @@ import net.sf.okapi.steps.gcaligner.AlignmentScorer;
  */
 @UsingParameters(Parameters.class)
 public class SentenceAlignerStep extends BasePipelineStep implements IObserver {
-	private static final Logger LOGGER = Logger.getLogger(SentenceAlignerStep.class.getName());
+	private static final Logger LOGGER = LoggerFactory.getLogger(SentenceAlignerStep.class.getName());
 	
 	private Parameters params;
 	private IFilter filter = null;
@@ -133,7 +134,7 @@ public class SentenceAlignerStep extends BasePipelineStep implements IObserver {
 					srxDocument.loadRules(params.getCustomSourceRulesPath());
 					loadDefault = false;
 				} catch (Exception e) {
-					LOGGER.warning(String
+					LOGGER.warn(String
 							.format("Custom source segmentation rules file '%s' cannot be read.\nUsing the default rules instead.",
 									params.getCustomSourceRulesPath()));
 				}
@@ -156,7 +157,7 @@ public class SentenceAlignerStep extends BasePipelineStep implements IObserver {
 					srxDocument.loadRules(params.getCustomTargetRulesPath());
 					loadDefault = false;
 				} catch (Exception e) {
-					LOGGER.warning(String
+					LOGGER.warn(String
 							.format("Custom target segmentation rules file '%s' cannot be read.\nUsing the default rules instead.",
 									params.getCustomTargetRulesPath()));
 				}

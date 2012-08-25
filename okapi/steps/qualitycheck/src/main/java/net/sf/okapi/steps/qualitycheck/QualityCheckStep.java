@@ -21,7 +21,8 @@
 package net.sf.okapi.steps.qualitycheck;
 
 import java.io.File;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
@@ -41,7 +42,7 @@ import net.sf.okapi.lib.verification.QualityCheckSession;
 @UsingParameters(Parameters.class)
 public class QualityCheckStep extends BasePipelineStep {
 
-	private static final Logger LOGGER = Logger.getLogger(QualityCheckStep.class.getName());
+	private static final Logger LOGGER = LoggerFactory.getLogger(QualityCheckStep.class.getName());
 
 	private QualityCheckSession session;
 	private IQualityCheckEditor editor;
@@ -186,7 +187,7 @@ public class QualityCheckStep extends BasePipelineStep {
 				LOGGER.info("No issue found.");
 			}
 			else {
-				LOGGER.warning(String.format("Number of issues found = %d", count));
+				LOGGER.warn(String.format("Number of issues found = %d", count));
 			}
 			
 			// Open the report if requested

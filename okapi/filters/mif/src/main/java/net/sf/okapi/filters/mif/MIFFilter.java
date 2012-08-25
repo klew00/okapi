@@ -38,7 +38,8 @@ import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
@@ -77,7 +78,7 @@ public class MIFFilter implements IFilter {
 	
 	public static final String FRAMEROMAN = "x-FrameRoman";
 
-	private final Logger logger = Logger.getLogger(getClass().getName());
+	private final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
 	private static final int BLOCKTYPE_TEXTFLOW = 1;
 	private static final int BLOCKTYPE_TABLE = 2;
@@ -673,7 +674,7 @@ public class MIFFilter implements IFilter {
 							else {
 								// Else: unexpected type of page: extract it just in case
 								trToExtract.add(textRectId);
-								logger.warning(String.format("Unknown page type '%s' (It will be extracted)", pageType));
+								logger.warn(String.format("Unknown page type '%s' (It will be extracted)", pageType));
 							}
 						}
 
@@ -1297,7 +1298,7 @@ public class MIFFilter implements IFilter {
 		if ( token.getType() == MIFToken.TYPE_STRING ) {
 			String str = charTable.get(token.getString());
 			if ( str == null ) {
-				logger.warning(String.format("Unknow character name '%s'. This character will be ignored.", token));
+				logger.warn(String.format("Unknow character name '%s'. This character will be ignored.", token));
 			}
 			else {
 				chToken.setString(str); 
@@ -1305,7 +1306,7 @@ public class MIFFilter implements IFilter {
 		}
 		else {
 			// Invalid statement
-			logger.warning("Unexpected token is Char statement. This character will be ignored.");
+			logger.warn("Unexpected token is Char statement. This character will be ignored.");
 		}
 		return chToken;
 	}
@@ -1327,7 +1328,7 @@ public class MIFFilter implements IFilter {
 		
 		String tag = readUntil("MTypeName;", true, sb, -1, true);
 		if ( tag == null ) {
-			logger.warning("Marker without type or text found. It will be skipped.");
+			logger.warn("Marker without type or text found. It will be skipped.");
 			skipOverContent(true, sb);
 			return res;
 		}
@@ -1713,7 +1714,7 @@ public class MIFFilter implements IFilter {
 		String mappedEncoding = encodingTable.get(encoding);
 		if ( mappedEncoding == null ) {
 			// Warn if the name is not found (and just move on)
-			logger.warning(String.format("Unknown encoding name: '%s'.", encoding));
+			logger.warn(String.format("Unknown encoding name: '%s'.", encoding));
 			return res;
 		}
 		else {
@@ -2271,7 +2272,7 @@ public class MIFFilter implements IFilter {
 						catch ( CharacterCodingException e ) {
 							if ( ++decodingErrors < 25 ) {
 								// Warning message, but only up to a point
-								logger.warning(String.format("Error with decoding character with encoding '%s'.",
+								logger.warn(String.format("Error with decoding character with encoding '%s'.",
 									currentDecoder.charset().name()));
 							}
 						}
@@ -2292,7 +2293,7 @@ public class MIFFilter implements IFilter {
 					if ( byteMode ) {
 						if ( c > 127 ) {
 							// Extended characters are normally all escaped in a byte string
-							logger.warning(String.format("A raw extended character (0x%04X) was found in a byte string.\n"
+							logger.warn(String.format("A raw extended character (0x%04X) was found in a byte string.\n"
 								+ "This may be a problem.", c));
 						}
 						byteStream.write(c);
@@ -2328,7 +2329,7 @@ public class MIFFilter implements IFilter {
 					}
 					if ( byteMode ) {
 						// We should not see this in byte mode
-						logger.warning("A Uniocde escape sequence was found in a byte string.\n"
+						logger.warn("A Uniocde escape sequence was found in a byte string.\n"
 							+ "Mixed notations are not supported, this character will be skipped.");
 					}
 					else {
@@ -2389,7 +2390,7 @@ public class MIFFilter implements IFilter {
 		}
 		catch ( NumberFormatException e ) {
 			// Log warning
-			logger.warning(String.format("Invalid escape sequence found: '%s'", tagBuffer.toString()));
+			logger.warn(String.format("Invalid escape sequence found: '%s'", tagBuffer.toString()));
 		}
 		
 		// Error

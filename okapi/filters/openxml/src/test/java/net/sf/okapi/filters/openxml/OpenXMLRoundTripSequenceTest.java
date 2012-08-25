@@ -26,8 +26,8 @@ import static org.junit.Assert.fail;
 import java.io.File;
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.TestUtil;
@@ -59,7 +59,7 @@ import org.junit.Test;
 public class OpenXMLRoundTripSequenceTest {
 	private ZipCompare zc=null;
 
-	private static Logger LOGGER = Logger.getLogger(OpenXMLRoundTripTest.class.getName());
+	private static Logger LOGGER = LoggerFactory.getLogger(OpenXMLRoundTripTest.class.getName());
 	private boolean allGood=true;
 	private ConditionalParameters cparams; // DWH 6-18-09
 	private boolean bSquishy=true; // DWH 7-16-09
@@ -69,10 +69,7 @@ public class OpenXMLRoundTripSequenceTest {
 
 	@Test
 	public void runTest () {
-		LOGGER.setLevel(Level.FINE);
-//		LOGGER.setLevel(Level.FINER);
-//		LOGGER.setLevel(Level.FINEST);
-		LOGGER.addHandler(new LogHandlerSystemOut());
+		// TZU LOGGER.addHandler(new LogHandlerSystemOut());
 		cparams = getParametersFromUserInterface();
 
 		ArrayList<String> themfiles = new ArrayList<String>();
@@ -119,7 +116,7 @@ public class OpenXMLRoundTripSequenceTest {
 //				bis = new BufferedInputStream(new FileInputStream(filly));
 //				filter.open(new RawDocument(bis,"UTF-8","en-US"),true,false,Level.FINEST); // DWH 6-09-09			
 
-				filter.open(new RawDocument(uri,"UTF-8",locENUS),true,bSquishy,Level.FINEST); // DWH 7-16-09 squishiness
+				filter.open(new RawDocument(uri,"UTF-8",locENUS),true,bSquishy); // TZU ,Level.FINEST); // DWH 7-16-09 squishiness
 			}
 			catch(Exception e)
 			{
@@ -146,12 +143,12 @@ public class OpenXMLRoundTripSequenceTest {
 			}
 			writer.close();
 			rtrued2 = zc.zipsExactlyTheSame(sOutputPath+"Tran"+filename, sGoldPath+"Tran"+filename);
-			LOGGER.log(Level.INFO,"Tran"+filename+(rtrued2 ? " SUCCEEDED" : " FAILED"));
+			LOGGER.info("Tran"+filename+(rtrued2 ? " SUCCEEDED" : " FAILED"));
 			if (!rtrued2)
 				allGood = false;
 		}
 		catch ( Throwable e ) {
-			LOGGER.log(Level.WARNING,e.getMessage());
+			LOGGER.warn(e.getMessage());
 			fail("An unexpected exception was thrown " + e);
 		}
 		finally {

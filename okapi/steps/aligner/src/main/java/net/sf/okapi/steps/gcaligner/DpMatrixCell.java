@@ -30,7 +30,7 @@ package net.sf.okapi.steps.gcaligner;
 
 public class DpMatrixCell
 {
-//	private static final Logger LOGGER = Logger.getLogger(DpMatrixCell.class.getName());
+//	private static final Logger LOGGER = LoggerFactory.getLogger(DpMatrixCell.class.getName());
 	
     private DpMatrixCell m_backLink;
     private int m_xPos;

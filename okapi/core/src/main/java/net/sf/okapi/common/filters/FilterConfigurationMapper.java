@@ -31,7 +31,8 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map.Entry;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import net.sf.okapi.common.DefaultFilenameFilter;
 import net.sf.okapi.common.IParameters;
@@ -61,7 +62,7 @@ public class FilterConfigurationMapper extends ParametersEditorMapper implements
 	 */
 	public static final char CONFIGFILE_SEPARATOR = '@';
 
-	private static final Logger LOGGER = Logger.getLogger(FilterConfigurationMapper.class.getName());
+	private static final Logger LOGGER = LoggerFactory.getLogger(FilterConfigurationMapper.class.getName());
 
 	private LinkedHashMap<String, FilterConfiguration> configMap;
 	private ArrayList<FilterInfo> filters;
@@ -560,15 +561,15 @@ public class FilterConfigurationMapper extends ParametersEditorMapper implements
 			filter.setFilterConfigurationMapper(this);
 		}
 		catch ( InstantiationException e ) {
-			LOGGER.warning(String.format("Cannot instantiate the filter '%s'. (InstantiationException)", filterClass));
+			LOGGER.warn(String.format("Cannot instantiate the filter '%s'. (InstantiationException)", filterClass));
 			return null;
 		}
 		catch ( IllegalAccessException e ) {
-			LOGGER.warning(String.format("Cannot instantiate the filter '%s'. (IllegalAccessException)", filterClass));
+			LOGGER.warn(String.format("Cannot instantiate the filter '%s'. (IllegalAccessException)", filterClass));
 			return null;
 		}
 		catch ( ClassNotFoundException e ) {
-			LOGGER.warning(String.format("Cannot instantiate the filter '%s'. (ClassNotFoundException)", filterClass));
+			LOGGER.warn(String.format("Cannot instantiate the filter '%s'. (ClassNotFoundException)", filterClass));
 			return null;
 		}
 		
@@ -582,22 +583,22 @@ public class FilterConfigurationMapper extends ParametersEditorMapper implements
 		// Get the available configurations for this filter
 		List<FilterConfiguration> list = filter.getConfigurations();
 		if (( list == null ) || ( list.size() == 0 )) {
-			LOGGER.warning(String.format("No configuration provided for '%s'", filterClass));
+			LOGGER.warn(String.format("No configuration provided for '%s'", filterClass));
 			return null;
 		}
 		// Add the configurations to the mapper
 		for ( FilterConfiguration config : list ) {
 			if ( config.filterClass == null ) {
-				LOGGER.warning(String.format("Configuration without filter class name in '%s'", config.toString()));
+				LOGGER.warn(String.format("Configuration without filter class name in '%s'", config.toString()));
 				config.filterClass = filterClass;
 			}
 			if ( config.name == null ) {
-				LOGGER.warning(String.format("Configuration without name in '%s'", config.toString()));
+				LOGGER.warn(String.format("Configuration without name in '%s'", config.toString()));
 				config.name = config.toString();
 			}
 			if ( config.description == null ) {
 				if ( config.description == null ) {
-					LOGGER.warning(String.format("Configuration without description in '%s'", config.toString()));
+					LOGGER.warn(String.format("Configuration without description in '%s'", config.toString()));
 					config.description = config.toString();
 				}
 			}

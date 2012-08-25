@@ -23,7 +23,8 @@ package net.sf.okapi.applications.longhorn.lib;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -34,7 +35,7 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 public class Configuration {
-	private static final Logger LOGGER = Logger.getLogger(Configuration.class.getName());
+	private static final Logger LOGGER = LoggerFactory.getLogger(Configuration.class.getName());
 	private static final String DEF_WORKING_DIR = System.getProperty("user.home") + File.separator + "Okapi-Longhorn-Files";
 	
 	private String workingDirectory;

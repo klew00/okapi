@@ -23,8 +23,8 @@ package net.sf.okapi.applications.rainbow;
 import java.io.File;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import net.sf.okapi.applications.rainbow.lib.ILog;
 import net.sf.okapi.applications.rainbow.utilities.CancelEvent;
@@ -45,7 +45,7 @@ import org.eclipse.swt.widgets.Shell;
 
 public class UtilityDriver implements CancelListener {
 
-	private final Logger logger = Logger.getLogger(getClass().getName());
+	private final Logger logger = LoggerFactory.getLogger(getClass().getName());
 	
 	private ILog log;
 	private Project prj;
@@ -169,15 +169,16 @@ public class UtilityDriver implements CancelListener {
 			utility.preprocess();
 			
 			// Last check to warning for empty list
-			if ( prj.getList(0).size() == 0 ) {
-				log.warning(Res.getString("UtilityDriver.noInput")); //$NON-NLS-1$
+			if ( prj.getList(0).size() == 0 ) { // TZU
+				logger.warn(Res.getString("UtilityDriver.noInput")); //$NON-NLS-1$
 			}
 
 			// Process each input file
 			int f = -1;
 			for ( Input item : prj.getList(0) ) {
 				f++;
-				log.message(Res.getString("UtilityDriver.input")+item.relativePath); //$NON-NLS-1$
+// TZU
+				logger.warn(Res.getString("UtilityDriver.input")+item.relativePath); //$NON-NLS-1$
 
 				// Initialize the main input
 				utility.resetLists();
@@ -227,14 +228,14 @@ public class UtilityDriver implements CancelListener {
 		catch ( Throwable e ) {
 			if ( filter != null ) filter.close();
 			if ( utility != null ) utility.postprocess();
-			logger.log(Level.SEVERE, Res.getString("UtilityDriver.utilityError"), e); //$NON-NLS-1$
+			logger.error(Res.getString("UtilityDriver.utilityError"), e); //$NON-NLS-1$
 			StringWriter sw = new StringWriter();
 			e.printStackTrace(new PrintWriter(sw));
 			logger.info(sw.toString());
 		}
 		finally {
 			if ( stopProcess ) {
-				logger.warning(Res.getString("UtilityDriver.userCancel")); //$NON-NLS-1$
+				logger.warn(Res.getString("UtilityDriver.userCancel")); //$NON-NLS-1$
 			}
 			if ( utility != null ) {
 				outputFolder = utility.getFolderAfterProcess();

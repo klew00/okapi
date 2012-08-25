@@ -23,8 +23,8 @@ package net.sf.okapi.applications.tikal;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
@@ -45,7 +45,7 @@ import net.sf.okapi.filters.xliff.XLIFFFilter;
 // Temporary merging step. This should eventually be a normal step
 public class XLIFFMergingStep {
 	
-	private final Logger logger = Logger.getLogger(getClass().getName());
+	private final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
 	private IFilter filter;
 	private IFilterWriter writer;
@@ -152,7 +152,7 @@ public class XLIFFMergingStep {
 			tuFromTrans = getTextUnitFromXLIFF();
 			if ( tuFromTrans == null ) {
 				// Problem: 
-				logger.log(Level.WARNING,
+				logger.warn(
 					String.format("There is no more items in the package to merge with id=\"%s\".", tu.getId()));
 				// Keep the source
 				return;
@@ -175,7 +175,7 @@ public class XLIFFMergingStep {
 //			tuFromTrans = getTextUnitFromXLIFF();
 //			if ( tuFromTrans == null ) {
 //				// Problem: 
-//				logger.log(Level.WARNING,
+//				logger.warn(
 //					String.format("There is no more items in the package to merge with id=\"%s\".", tu.getId()));
 //				// Keep the source
 //				return;
@@ -186,7 +186,7 @@ public class XLIFFMergingStep {
 //		
 //		if ( !tu.getId().equals(tuFromTrans.getId()) ) {
 //			// Problem: different IDs
-//			logger.warning(String.format("ID mismatch: Original item id=\"%s\" package item id=\"%s\".",
+//			logger.warn(String.format("ID mismatch: Original item id=\"%s\" package item id=\"%s\".",
 //				tu.getId(), tuFromTrans.getId()));
 //			return; // Use the source
 //		}
@@ -194,7 +194,7 @@ public class XLIFFMergingStep {
 		if ( !tuFromTrans.hasTarget(trgLoc) ) {
 			// No translation in package
 			if ( !tu.getSource().isEmpty() ) {
-				logger.log(Level.WARNING,
+				logger.warn(
 					String.format("Item id=\"%s\": No translation provided; using source instead.", tu.getId()));
 				return; // Use the source
 			}
@@ -207,7 +207,7 @@ public class XLIFFMergingStep {
 //		}
 //		if ( manifest.useApprovedOnly() && !isTransApproved ) {
 //			// Not approved: use the source
-//			logger.log(Level.WARNING,
+//			logger.warn(
 //				String.format("Item id='%s': Target is not approved; using source instead.", tu.getId()));
 //			return; // Use the source
 //		}
@@ -217,7 +217,7 @@ public class XLIFFMergingStep {
 		if ( fromTrans == null ) {
 			if ( tuFromTrans.getSource().isEmpty() ) return;
 			// Else: Missing target in the XLIFF
-			logger.log(Level.WARNING,
+			logger.warn(
 				String.format("Item id='%s': No target in XLIFF; using source instead.", tu.getId()));
 			return; // Use the source
 		}
@@ -285,7 +285,7 @@ public class XLIFFMergingStep {
 			}
 		}
 		catch ( RuntimeException e ) {
-			logger.log(Level.SEVERE,
+			logger.error(
 				String.format("Inline code error with item id=\"%s\".\n" + e.getLocalizedMessage(), tu.getId()));
 			// Use the source instead, continue the merge
 			tu.setTarget(trgLoc, tu.getSource());
@@ -335,7 +335,7 @@ public class XLIFFMergingStep {
 			if ( oriCode == null ) { // Not found in original (extra in target)
 				if ( !transCode.hasData() ) {
 					// Leave it like that
-					logger.warning(String.format("The extra target code id='%d' does not have corresponding data (item id='%s', name='%s')",
+					logger.warn(String.format("The extra target code id='%d' does not have corresponding data (item id='%s', name='%s')",
 						transCode.getId(), tu.getId(), (tu.getName()==null ? "" : tu.getName())));
 				}
 			}
@@ -357,7 +357,7 @@ public class XLIFFMergingStep {
 				if ( oriIndices[i] != -1 ) {
 					Code code = oriCodes.get(oriIndices[i]);
 					if ( !code.isDeleteable() ) {
-						logger.warning(String.format("The code id='%d' (%s) is missing in target (item id='%s', name='%s')",
+						logger.warn(String.format("The code id='%d' (%s) is missing in target (item id='%s', name='%s')",
 							code.getId(), code.getData(), tu.getId(), (tu.getName()==null ? "" : tu.getName())));
 						logger.info("Source='"+tu.getSource().toString()+"'");
 					}
@@ -405,7 +405,7 @@ public class XLIFFMergingStep {
 //					break;
 //				}
 //				if ( orderWarning ) {
-//					logger.warning(String.format("The target code id='%d' has been moved (item id='%s', name='%s')",
+//					logger.warn(String.format("The target code id='%d' has been moved (item id='%s', name='%s')",
 //						transCode.getId(), tu.getId(), (tu.getName()==null ? "" : tu.getName())));
 //					orderWarning = false; 
 //				}
@@ -414,7 +414,7 @@ public class XLIFFMergingStep {
 //				if (( transCode.getData() == null )
 //					|| ( transCode.getData().length() == 0 )) {
 //					// Leave it like that
-//					logger.warning(String.format("The extra target code id='%d' does not have corresponding data (item id='%s', name='%s')",
+//					logger.warn(String.format("The extra target code id='%d' does not have corresponding data (item id='%s', name='%s')",
 //						transCode.getId(), tu.getId(), (tu.getName()==null ? "" : tu.getName())));
 //				}
 //			}
@@ -437,7 +437,7 @@ public class XLIFFMergingStep {
 //				if ( oriIndices[i] != -1 ) {
 //					Code code = oriCodes.get(oriIndices[i]);
 //					if ( !code.isDeleteable() ) {
-//						logger.warning(String.format("The code id='%d' (%s) is missing in target (item id='%s', name='%s')",
+//						logger.warn(String.format("The code id='%d' (%s) is missing in target (item id='%s', name='%s')",
 //							code.getId(), code.getData(), tu.getId(), (tu.getName()==null ? "" : tu.getName())));
 //						logger.info("Source='"+tu.getSource().toString()+"'");
 //					}

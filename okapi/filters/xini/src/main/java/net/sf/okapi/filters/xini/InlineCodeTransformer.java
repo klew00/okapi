@@ -26,7 +26,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.xml.bind.JAXBElement;
 
@@ -43,7 +44,7 @@ import net.sf.okapi.filters.xini.jaxb.StartPlaceHolder;
 import net.sf.okapi.filters.xini.jaxb.TextContent;
 
 public class InlineCodeTransformer {
-    private static final Logger LOGGER = Logger.getLogger(InlineCodeTransformer.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(InlineCodeTransformer.class.getName());
 	private static final boolean TARGET_IS_TKIT = true;
 	private static final boolean TARGET_IS_FILTER = false;
 	private static final Map<String, String> tagType;
@@ -531,11 +532,11 @@ public class InlineCodeTransformer {
 			fragment.append(code);
 		}
 		else if (jaxbEl.getValue() instanceof Empty) {
-			LOGGER.warning("Inline element " + jaxbEl.getName() + " will be ignored");
+			LOGGER.warn("Inline element " + jaxbEl.getName() + " will be ignored");
 
 		}
 		else if (jaxbEl.getValue() instanceof TextContent) {
-			LOGGER.warning("Inline element " + jaxbEl.getName() + " will be ignored");
+			LOGGER.warn("Inline element " + jaxbEl.getName() + " will be ignored");
 			JAXBElement<TextContent> txtC = (JAXBElement<TextContent>) part;
 			TextFragment innerText = serializeTextParts(txtC.getValue().getContent(), TARGET_IS_TKIT);
 			fragment.append(innerText);

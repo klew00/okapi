@@ -35,7 +35,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.xml.stream.XMLEventFactory;
 import javax.xml.stream.XMLEventReader;
@@ -79,7 +80,7 @@ import net.sf.okapi.common.resource.RawDocument;
 @UsingParameters(XliffSplitterParameters.class)
 public class XliffSplitterStep extends BasePipelineStep {
 
-	private final Logger logger = Logger.getLogger(getClass().getName());
+	private final Logger logger = LoggerFactory.getLogger(getClass().getName());
 	
 	private XliffSplitterParameters params;
 	private boolean done = false;

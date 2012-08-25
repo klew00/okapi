@@ -21,7 +21,8 @@
 package net.sf.okapi.filters.plaintext.base;
 
 //import java.util.List;
-import java.util.logging.Level;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import net.sf.okapi.common.EventType;
 //import net.sf.okapi.common.ListUtil;
@@ -44,6 +45,7 @@ import net.sf.okapi.lib.extra.filters.TextProcessingResult;
  * @version 0.1, 09.06.2009
  */
 public class BasePlainTextFilter extends AbstractLineFilter {	
+	private final Logger logger = LoggerFactory.getLogger(getClass().getName());
 	
 	public static final String FILTER_NAME				= "okf_plaintext";
 	public static final String FILTER_MIME				= MimeTypeMapper.PLAIN_TEXT_MIME_TYPE;	
@@ -446,14 +448,14 @@ public class BasePlainTextFilter extends AbstractLineFilter {
 							tmpText.append((char)nTmp);
 						}
 						catch ( Exception e ) {
-							logMessage(Level.WARNING,
+							logger.warn(
 								String.format(INVALID_UESCAPE, text.substring(i+2, i+6)));
 						}
 						i += 5;
 						continue;
 					}
 					else {
-						logMessage(Level.WARNING,
+						logger.warn(
 							String.format(INVALID_UESCAPE, text.substring(i+2)));
 					}
 					break;
@@ -485,4 +487,3 @@ public class BasePlainTextFilter extends AbstractLineFilter {
 	}
 
 }	
-	
