@@ -37,7 +37,7 @@ import org.slf4j.LoggerFactory;
  */
 public class ListUtil {
 
-	protected static final Logger logger = LoggerFactory.getLogger(ClassUtil.getClassName(ListUtil.class));
+	private static final Logger logger = LoggerFactory.getLogger(ClassUtil.getClassName(ListUtil.class));
 	
 	/**
 	 * Splits up a string of comma-separated substrings into a string list of those substrings.

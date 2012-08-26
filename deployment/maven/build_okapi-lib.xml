@@ -453,19 +453,17 @@
 		<echo file="tmpJars" append="yes"> ${jar028}</echo>
 		<copy todir="${distLib}" file="${dep028}/${jar028}"/>		
 
-		<property name="dep029" value="${mavenStore}/org/slf4j/slf4j-api/1.6.6"/>
-		<fileset id="list.contents" dir="${dep029}"
-		 includes="**/slf4j-api-1.6.6.jar"/>
-		<property name="jar029" refid="list.contents"/>
-		<echo file="tmpJars" append="yes"> ${jar029}</echo>
-		<copy todir="${distLib}" file="${dep029}/${jar029}"/>
+		<property name="depSlf4jApi" value="${mavenStore}/org/slf4j/slf4j-api/1.6.6"/>
+		<fileset id="list.contents" dir="${depSlf4jApi}" includes="**/slf4j-api-1.6.6.jar"/>
+		<property name="jarSlf4jApi" refid="list.contents"/>
+		<echo file="tmpJars" append="yes"> ${jarSlf4jApi}</echo>
+		<copy todir="${distLib}" file="${depSlf4jApi}/${jarSlf4jApi}"/>
 
-		<property name="dep030" value="${mavenStore}/org/slf4j/slf4j-jdk14/1.6.6"/>
-		<fileset id="list.contents" dir="${dep030}"
-		 includes="**/slf4j-jdk14-1.6.6.jar"/>
-		<property name="jar030" refid="list.contents"/>
+		<property name="depSlf4jToJdk" value="${mavenStore}/org/slf4j/slf4j-jdk14/1.6.6"/>
+		<fileset id="list.contents" dir="${depSlf4jToJdk}" includes="**/slf4j-jdk14-1.6.6.jar"/>
+		<property name="jarSlf4jToJdk" refid="list.contents"/>
 		<!-- Missing <echo file="tmpJars" append="yes" ... is intentional -->
-		<copy todir="${distLogger}" file="${dep030}/${jar030}"/>
+		<copy todir="${distLogger}" file="${depSlf4jToJdk}/${jarSlf4jToJdk}"/>
 
 		<!-- Create the manifest file -->
 		<property file="tmpJars"/>
@@ -475,7 +473,7 @@
 		<manifest file="${tmp}/MANIFEST.MF">
 			<attribute name="Implementation-Title" value="${okapilibName}"/>
 			<attribute name="Implementation-Version" value="${okapilibStamp}"/>
-			<attribute name="Class-Path" value="${okapilibCP} logger/logger.jar"/>
+			<attribute name="Class-Path" value="${okapilibCP} logger/logger.jar ."/>
   		</manifest>
 		
 		<!-- Create the jar file -->
@@ -536,10 +534,16 @@
 		</copy>
 		<copy todir="${dist}/localweb" file="../../website/okapi.css"/>
 		<!-- javadoc files -->
-		<javadoc destdir="${dist}/localweb/javadoc" Encoding="UTF-8">
+		<javadoc destdir="${dist}/localweb/javadoc" Encoding="UTF-8" packagenames="net.sf.okapi.*">
+			<classpath>
+				<pathelement path="${depSlf4jApi}/${jarSlf4jApi}"/>
+				<pathelement path="${dep020}/${jar020}"/>
+			</classpath>
 			<packageset dir="../../okapi/core/src/main/java" defaultexcludes="yes"/>
-			<packageset dir="../../okapi/libraries/lib-segmentation/src/main/java" defaultexcludes="yes"/>			
-			<packageset dir="../../okapi/libraries/lib-translation/src/main/java" defaultexcludes="yes"/>			
+			<packageset dir="../../okapi/libraries/lib-segmentation/src/main/java" defaultexcludes="yes"/>
+			<packageset dir="../../okapi/libraries/lib-translation/src/main/java" defaultexcludes="yes"/>
+<!--			<link offline="true" href="http://www.slf4j.org/apidocs/" packagelistURL="http://www.slf4j.org/apidocs/"/> -->
+<!--			<link offline="true" href="http://icu-project.org/apiref/icu4j46/" packagelistURL="http://icu-project.org/apiref/icu4j46/"/> -->
 		</javadoc>
 
 	</target>
