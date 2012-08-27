@@ -37,6 +37,8 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 	<modules>
+		<module>deployment/log4j-color-appender</module>
+		<module>deployment/log4j-logger-binder</module>
 		<module>core</module>
 		<module>filters</module>
 		<module>libraries</module>
@@ -58,8 +60,25 @@
 		</dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-jdk14</artifactId>
+			<artifactId>slf4j-log4j12</artifactId>
 			<version>1.6.6</version>
+		</dependency>
+		<dependency>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+			<version>1.2.17</version>
+		</dependency>
+		<dependency>
+		    <groupId>okapi-log4j-extras</groupId>
+		    <artifactId>log4j-color-appender</artifactId>
+		    <version>1.0.0</version>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+		    <groupId>okapi-log4j-extras</groupId>
+		    <artifactId>log4j-logger-binder</artifactId>
+		    <version>1.0.0</version>
+			<scope>runtime</scope>
 		</dependency>
 	</dependencies>
 	<build>
@@ -67,6 +86,18 @@
 			<!--<plugin> <groupId>org.apache.maven.plugins</groupId> <artifactId>maven-surefire-plugin</artifactId> 
 				<version>2.6</version> <configuration> <parallel>classes</parallel> <useUnlimitedThreads>true</useUnlimitedThreads> 
 				</configuration> </plugin> -->
+
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>2.6</version>
+<!--
+				<configuration>
+					<argLine>-Dlog4j.configuration=file:E:/xliff/okapigit/deployment/shared/logger/log4j.properties</argLine>
+				</configuration>
+-->
+			</plugin>
 
 			<plugin>
 				<groupId>org.apache.felix</groupId>
