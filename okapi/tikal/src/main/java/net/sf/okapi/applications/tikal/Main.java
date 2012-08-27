@@ -198,17 +198,7 @@ public class Main {
 			// System.out uses the default system encoding that
 			// may not be the right one (e.g. windows-1252 vs cp850)
 			ps = new PrintStream(System.out, true, getConsoleEncodingName());
-/* TZU
-			// Disable root console handler
-			Handler[] handlers = LoggerFactory.getLogger("").getHandlers();
-			for ( Handler handler : handlers ) {
-				LoggerFactory.getLogger("").removeHandler(handler);
-			}
-			// Create our own handler
-			LogHandler logHandler = new LogHandler(ps);
-			logHandler.setLevel(Level.INFO);
-			LoggerFactory.getLogger("").addHandler(logHandler); //$NON-NLS-1$
-*/
+
 			// Remove all empty arguments
 			// This is to work around the "$1" issue in bash
 			ArrayList<String> args = new ArrayList<String>();
