@@ -49,7 +49,7 @@ import org.junit.Test;
 
 public class OpenXMLSnippetsTest {
 
-	private static Logger LOGGER;
+	private static Logger LOGGER = LoggerFactory.getLogger(OpenXMLSnippetsTest.class.getName());
 	private OpenXMLContentFilter openXMLContentFilter;
 	public final static int MSWORD=1;
 	public final static int MSEXCEL=2;
@@ -62,9 +62,7 @@ public class OpenXMLSnippetsTest {
 	
 	@Before
 	public void setUp()  {
-		LOGGER = LoggerFactory.getLogger(OpenXMLSnippetsTest.class.getName());
 		openXMLContentFilter = new OpenXMLContentFilter();	
-		openXMLContentFilter.setLogger(LOGGER);
 	}
 
 	@After
@@ -185,7 +183,6 @@ public class OpenXMLSnippetsTest {
 */	
 	private ArrayList<Event> getEvents(String snippet, int filetype) {
 		ArrayList<Event> list = new ArrayList<Event>();
-		openXMLContentFilter.setLogger(LOGGER);
 		openXMLContentFilter.setUpConfig(filetype);
 		openXMLContentFilter.open(new RawDocument(snippet, locENUS));
 		while (openXMLContentFilter.hasNext()) {
@@ -227,7 +224,6 @@ public class OpenXMLSnippetsTest {
 			}
 		}		
 
-		// TZU LOGGER.setUseParentHandlers(false);
 		LOGGER.debug("nOriginal: "+original);
 		LOGGER.debug("Output:    "+tmp.toString());
 		writer.close();

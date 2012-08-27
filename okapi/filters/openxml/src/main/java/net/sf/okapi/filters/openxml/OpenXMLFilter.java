@@ -105,7 +105,6 @@ public class OpenXMLFilter implements IFilter {
 	private ConditionalParameters cparams=null; // DWH 6-16-09
 	private int nZipType=MSWORD;
 	private int nFileType=MSWORD; // DWH 4-16-09
-// TZU	private Level nLogLevel=Level.FINE;
 	private boolean bSquishable=true;
 	private AbstractTranslator translator=null;
 	private LocaleId sOutputLanguage = LocaleId.fromString("en-us");
@@ -195,22 +194,6 @@ public class OpenXMLFilter implements IFilter {
 		}
 	}
 
-	/**
-	 * Sets the java.util.logging.Logger log level.
-	 * @param nLogLevel a java.util.logging.Level constant
-	 * Level.SEVERE Errors the end user should see. 
-	 * Level.WARNING Important alert messages the end user should see. 
-	 * Level.INFO Additional log information, progress, etc. These messages are also shown to the user. 
-	 * Level.FINE Extra, less important information. The end user may choose to see them. 
-	 * Level.FINER Debug information. For developers. 
-	 * Level.FINEST Debug information. For developers. 
-	 */
-/* TZU
-	public void setNLogLevel(Level nLogLevel) // set debug level
-	{
-		this.nLogLevel = nLogLevel;
-	}
-*/
 	/**
 	 * Creates the skeleton writer for use with this filter.
 	 * Null return means implies GenericSkeletonWriter. 
@@ -368,42 +351,6 @@ public class OpenXMLFilter implements IFilter {
 	}
 
 	/**
-	 * Opens a RawDocument for filtering
-	 * @param input a Raw Document to open and filter
-	 * @param generateSkeleton true if a skeleton should be generated
-	 * @param bSquishable true if file should be optimized by combining compatible
-	 *        text runs
-	 * @param nLogLevel a java.util.logging.Level constant
-	 * Level.SEVERE Errors the end user should see. 
-	 * Level.WARNING Important alert messages the end user should see. 
-	 * Level.INFO Additional log information, progress, etc. These messages are also shown to the user. 
-	 * Level.FINE Extra, less important information. The end user may choose to see them. 
-	 * Level.FINER Debug information. For developers. 
-	 * Level.FINEST Debug information. For developers. 
-	 */
-/* TZU
-	public void open (RawDocument input,
-			boolean generateSkeleton, boolean bSquishable, Level nLogLevel)
-	{
-		setOptions(input.getSourceLocale(), input.getTargetLocale(),
-			input.getEncoding(), generateSkeleton);
-		if ( input.getInputCharSequence() != null ) {
-			open(input.getInputCharSequence());
-		}
-		else if ( input.getInputURI() != null ) {
-			open(input.getInputURI(),bSquishable,nLogLevel);
-			LOGGER.debug("\nOpening "+input.getInputURI().toString());
-		}
-		else if ( input.getStream() != null ) {
-			open(input.getStream());
-			LOGGER.debug("\nOpening ");
-		}
-		else {
-			throw new RuntimeException("InputResource has no input defined.");
-		}
-	}
-*/
-	/**
 	 * Opens an input stream for filtering
 	 * @param input an input stream to open and filter
 	 */
@@ -428,21 +375,9 @@ public class OpenXMLFilter implements IFilter {
 	 * @param a cURI to open and filter
 	 */
 	private void open (URI inputURI) {
-// TZU		open(inputURI,true,Level.FINE); // DWH 2-26-09 just a default
 		open(inputURI,true); // DWH 2-26-09 just a default
 	}
 	
-	/**
-	 * Opens a URI for filtering
-	 * @param a cURI to open and filter
-	 * @param bSquishable true if file should be optimized by combining compatible
-	 *        text runs
-	 */
-/* TZU
-	public void open (URI inputURI, boolean bSquishable) {
-		open(inputURI, bSquishable, Level.FINE);
-	}
-*/
 	/**
 	 * Opens a URI for filtering
 	 * @param a cURI to open and filter
@@ -456,13 +391,12 @@ public class OpenXMLFilter implements IFilter {
 	 * Level.FINER Debug information. For developers. 
 	 * Level.FINEST Debug information. For developers. 
 	 */
-	public void open (URI inputURI, boolean bSquishable) { // TZU , Level nLogLevel) {
+	public void open (URI inputURI, boolean bSquishable) {
 		close();
 		docURI = inputURI;
 		nextAction = NextAction.OPENZIP;
 		queue = new LinkedList<Event>();
 		openXMLContentFilter = new OpenXMLContentFilter();
-		// TZU this.nLogLevel = nLogLevel;
 		openXMLContentFilter.setLogger(LOGGER);
 		this.bSquishable = bSquishable;
 		if (cparams!=null)
@@ -908,36 +842,6 @@ public class OpenXMLFilter implements IFilter {
 	public void cancel() {
 		// TODO Auto-generated method stub		
 	}
-	/**
-	 * Sets the java.util.logging.Logger.
-	 */
-	public void setLogger(Logger lgr)
-	{
-		LOGGER = lgr;
-		if (openXMLContentFilter!=null)
-			openXMLContentFilter.setLogger(lgr);
-	}
-	/**
-	 * Returns the java.util.logging.Logger.
-	 * @return the java.util.logging.Logger
-	 */
-/* TZU
-	public LoggerFactory.getLogger()
-	{
-		return LOGGER;
-	}
-*/
-	/**
-	 * Returns the current Log Level.
-	 * @return he current Log Level
-	 */
-/* TZU
-	public void setLogLevel(Level lvl)
-	{
-		nLogLevel = lvl;
-		LOGGER.setLevel(lvl);
-	}
-*/
 	public void setBPreferenceTranslateDocProperties(boolean bPreferenceTranslateDocProperties)
 	{
 		this.bPreferenceTranslateDocProperties = bPreferenceTranslateDocProperties;

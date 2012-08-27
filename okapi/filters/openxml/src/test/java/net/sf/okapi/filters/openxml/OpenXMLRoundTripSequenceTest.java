@@ -69,7 +69,6 @@ public class OpenXMLRoundTripSequenceTest {
 
 	@Test
 	public void runTest () {
-		// TZU LOGGER.addHandler(new LogHandlerSystemOut());
 		cparams = getParametersFromUserInterface();
 
 		ArrayList<String> themfiles = new ArrayList<String>();
@@ -96,8 +95,6 @@ public class OpenXMLRoundTripSequenceTest {
 			filter.setParameters(cparams);
 
 			filter.setOptions(locENUS, "UTF-8", true);
-//			filter.setLogLevel(Level.FINEST);
-//			filter.setLogLevel(Level.FINE);
 
 			sInputPath = TestUtil.getParentDir(this.getClass(), "/BoldWorld.docx");
 			sOutputPath = sInputPath + "output/";
@@ -116,13 +113,12 @@ public class OpenXMLRoundTripSequenceTest {
 //				bis = new BufferedInputStream(new FileInputStream(filly));
 //				filter.open(new RawDocument(bis,"UTF-8","en-US"),true,false,Level.FINEST); // DWH 6-09-09			
 
-				filter.open(new RawDocument(uri,"UTF-8",locENUS),true,bSquishy); // TZU ,Level.FINEST); // DWH 7-16-09 squishiness
+				filter.open(new RawDocument(uri,"UTF-8",locENUS),true,bSquishy); // DWH 7-16-09 squishiness
 			}
 			catch(Exception e)
 			{
 				throw new RuntimeException(e);				
 			}
-			filter.setLogger(LOGGER);
 			
 			OpenXMLZipFilterWriter writer = new OpenXMLZipFilterWriter(); // DWH 4-8-09 was just ZipFilterWriter
 

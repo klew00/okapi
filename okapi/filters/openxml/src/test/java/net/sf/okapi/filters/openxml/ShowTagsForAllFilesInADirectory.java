@@ -39,7 +39,7 @@ import net.sf.okapi.filters.openxml.OpenXMLZipFilterWriter;
 
 public class ShowTagsForAllFilesInADirectory {
 
-	private static Logger LOGGER;
+	private static Logger LOGGER = LoggerFactory.getLogger(OpenXMLSnippetsTest.class.getName());
 	private OpenXMLFilter openXMLFilter;
 	private String[] testFileList;
 	private LocaleId locENUS = LocaleId.fromString("en-us");
@@ -57,9 +57,7 @@ public class ShowTagsForAllFilesInADirectory {
 	}
 	
 	public void setUp() throws Exception {
-		LOGGER = LoggerFactory.getLogger(OpenXMLSnippetsTest.class.getName());
 		openXMLFilter = new OpenXMLFilter(new TagPeekTranslator(),locENUS);	
-		openXMLFilter.setLogger(LOGGER);
 		openXMLFilter.setOptions(locENUS, "UTF-8", true);
     	    testFileList = new String[1]; // timporary
 
@@ -113,7 +111,7 @@ public class ShowTagsForAllFilesInADirectory {
 			writer.setOutput(sOutputPath);
 			try {
 				URI uriFf = new URI(fff);
-				openXMLFilter.open(new RawDocument(uriFf,"UTF-8",locENUS),true,true); // TZU ,Level.FINEST); // DWH 4-22-09
+				openXMLFilter.open(new RawDocument(uriFf,"UTF-8",locENUS),true,true); // DWH 4-22-09
 				while (openXMLFilter.hasNext()) {
 					event = openXMLFilter.next();
 					if (event!=null)
