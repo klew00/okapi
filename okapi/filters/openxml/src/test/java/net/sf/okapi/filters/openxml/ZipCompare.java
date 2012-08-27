@@ -43,7 +43,7 @@ import net.sf.okapi.common.FileCompare;
 
 public class ZipCompare {
 
-	Logger LOGGER = LoggerFactory.getLogger(OpenXMLSnippetsTest.class.getName());
+	Logger LOGGER = LoggerFactory.getLogger(ZipCompare.class.getName());
 	private FileCompare fc=null;
 	public ZipCompare()
 	{

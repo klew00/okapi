@@ -39,7 +39,7 @@ import net.sf.okapi.filters.openxml.OpenXMLZipFilterWriter;
 
 public class ShowTagsForAllFilesInADirectory {
 
-	private static Logger LOGGER = LoggerFactory.getLogger(OpenXMLSnippetsTest.class.getName());
+	private static Logger LOGGER = LoggerFactory.getLogger(ShowTagsForAllFilesInADirectory.class.getName());
 	private OpenXMLFilter openXMLFilter;
 	private String[] testFileList;
 	private LocaleId locENUS = LocaleId.fromString("en-us");

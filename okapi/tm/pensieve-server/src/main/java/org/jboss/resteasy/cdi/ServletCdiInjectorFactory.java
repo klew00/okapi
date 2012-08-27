@@ -9,8 +9,7 @@ import org.slf4j.LoggerFactory;
 
 public class ServletCdiInjectorFactory extends CdiInjectorFactory {
 
-	private static final Logger log = LoggerFactory
-			.getLogger(ServletCdiInjectorFactory.class);
+	private static final Logger log = LoggerFactory.getLogger(ServletCdiInjectorFactory.class);
 
 	@Override
 	protected BeanManager lookupBeanManager() {
