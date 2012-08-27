@@ -7,7 +7,6 @@
     <groupId>okapi-log4j-extras</groupId>
     <artifactId>log4j-logger-binder</artifactId>
     <version>1.0.0</version>
-    <name>Binds slf4j to log4j as default logging. Nothing but a classpath in a manifest.</name>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
