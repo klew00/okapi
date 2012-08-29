@@ -40,7 +40,7 @@ import net.sf.okapi.tm.simpletm.Database;
 @UsingParameters(Parameters.class)
 public class GenerateSimpleTmStep extends BasePipelineStep {
 
-	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
+	private final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
 	private Database simpleTm = null;
 	private Parameters params;

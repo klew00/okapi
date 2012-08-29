@@ -78,7 +78,7 @@ import net.sf.okapi.common.skeleton.ZipSkeleton;
 @UsingParameters(ConditionalParameters.class)
 public class OpenXMLFilter implements IFilter {
 	
-	private Logger LOGGER = LoggerFactory.getLogger(OpenXMLFilter.class.getName());
+	private final Logger LOGGER = LoggerFactory.getLogger(this.getClass().getName());
 
 	private enum NextAction {
 		OPENZIP, NEXTINZIP, NEXTINSUBDOC, DONE
@@ -397,7 +397,6 @@ public class OpenXMLFilter implements IFilter {
 		nextAction = NextAction.OPENZIP;
 		queue = new LinkedList<Event>();
 		openXMLContentFilter = new OpenXMLContentFilter();
-		openXMLContentFilter.setLogger(LOGGER);
 		this.bSquishable = bSquishable;
 		if (cparams!=null)
 			readParams(); // rainbow loads into cparams before this but after it is open

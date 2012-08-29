@@ -43,7 +43,7 @@ public abstract class AbstractParameters extends BaseParameters implements INoti
 	protected Component owner = null;
 	private String data;
 
-	protected final Logger logger = LoggerFactory.getLogger(this.getClass().getName());
+	private final Logger logger = LoggerFactory.getLogger(this.getClass().getName());
 	
 	public AbstractParameters() {
 		

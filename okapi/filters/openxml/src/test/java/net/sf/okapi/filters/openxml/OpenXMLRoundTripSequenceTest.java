@@ -59,7 +59,7 @@ import org.junit.Test;
 public class OpenXMLRoundTripSequenceTest {
 	private ZipCompare zc=null;
 
-	private static Logger LOGGER = LoggerFactory.getLogger(OpenXMLRoundTripTest.class.getName());
+	private static final Logger LOGGER = LoggerFactory.getLogger(OpenXMLRoundTripTest.class.getName());
 	private boolean allGood=true;
 	private ConditionalParameters cparams; // DWH 6-18-09
 	private boolean bSquishy=true; // DWH 7-16-09

@@ -55,7 +55,7 @@ public class OpenXMLRoundTripTest {
 	private LocaleId locLA = LocaleId.fromString("la");
 	private LocaleId locENUS = LocaleId.fromString("en-us");
 
-	private static Logger LOGGER = LoggerFactory.getLogger(OpenXMLRoundTripTest.class.getName());
+	private static final Logger LOGGER = LoggerFactory.getLogger(OpenXMLRoundTripTest.class.getName());
 	private boolean allGood=true;
 	private ConditionalParameters cparams; // DWH 6-18-09
 	private boolean bSquishy=true; // DWH 7-16-09

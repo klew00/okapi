@@ -21,6 +21,8 @@
 package net.sf.okapi.applications.rainbow.utilities.merging;
 
 import java.util.Iterator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import net.sf.okapi.applications.rainbow.packages.Manifest;
 import net.sf.okapi.applications.rainbow.utilities.BaseUtility;
@@ -28,7 +30,7 @@ import net.sf.okapi.applications.rainbow.utilities.ISimpleUtility;
 import net.sf.okapi.common.IParameters;
 
 public class Utility extends BaseUtility implements ISimpleUtility {
-
+	private final Logger logger = LoggerFactory.getLogger(getClass().getName());
 	private String manifestPath;
 	private Manifest manifest;
 	private Merger merger;

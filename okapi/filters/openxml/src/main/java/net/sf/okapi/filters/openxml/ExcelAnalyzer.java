@@ -49,7 +49,7 @@ import net.sf.okapi.filters.yaml.TaggedFilterConfiguration.RULE_TYPE;
 
 public class ExcelAnalyzer
 {
-	private Logger LOGGER = LoggerFactory.getLogger(OpenXMLFilter.class.getName());
+	private final Logger LOGGER = LoggerFactory.getLogger(this.getClass().getName());
 
 	private ZipFile zipFile;
 	private ZipEntry entry;

@@ -25,6 +25,9 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.XMLWriter;
@@ -38,6 +41,7 @@ import net.sf.okapi.lib.transifex.TransifexClient;
 import net.sf.okapi.steps.rainbowkit.common.BasePackageWriter;
 
 public class TransifexPackageWriter extends BasePackageWriter {
+	private final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
 	private POWriter potWriter;
 	private POWriter trgWriter;

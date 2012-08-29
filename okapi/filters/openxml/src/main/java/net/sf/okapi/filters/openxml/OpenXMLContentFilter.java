@@ -104,7 +104,7 @@ import net.sf.okapi.common.skeleton.GenericSkeleton;
  */
 public class OpenXMLContentFilter extends AbstractMarkupFilter {
 
-	private Logger LOGGER = LoggerFactory.getLogger(this.getClass().getName());
+	private final Logger LOGGER = LoggerFactory.getLogger(this.getClass().getName());
 	
 	public final static int MSWORD=1;
 	public final static int MSEXCEL=2;
@@ -1820,10 +1820,6 @@ public class OpenXMLContentFilter extends AbstractMarkupFilter {
 	protected boolean getBInSettingsFile() // DWH 4-12-10 for <v:textbox
 	{
 		return bInSettingsFile;
-	}
-	public void setLogger(Logger lgr)
-	{
-		LOGGER = lgr;
 	}
 	public void setTsExcludeWordStyles(TreeSet tsExcludeWordStyles)
 	{

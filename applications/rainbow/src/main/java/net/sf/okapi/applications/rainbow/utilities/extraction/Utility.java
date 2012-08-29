@@ -21,6 +21,8 @@
 package net.sf.okapi.applications.rainbow.utilities.extraction;
 
 import java.io.File;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import net.sf.okapi.applications.rainbow.packages.IWriter;
 import net.sf.okapi.applications.rainbow.utilities.BaseFilterDrivenUtility;
@@ -41,7 +43,7 @@ import net.sf.okapi.lib.segmentation.SRXDocument;
 import net.sf.okapi.lib.translation.QueryManager;
 
 public class Utility extends BaseFilterDrivenUtility {
-
+	private final Logger logger = LoggerFactory.getLogger(getClass().getName());
 	private Parameters params;
 	private IWriter writer;
 	private int id;

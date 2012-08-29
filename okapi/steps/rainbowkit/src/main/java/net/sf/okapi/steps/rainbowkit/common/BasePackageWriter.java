@@ -54,7 +54,7 @@ import net.sf.okapi.steps.rainbowkit.creation.Parameters;
 
 public abstract class BasePackageWriter implements IPackageWriter {
 
-	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
+	private final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
 	protected Parameters params;
 	protected Manifest manifest;

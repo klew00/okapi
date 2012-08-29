@@ -36,7 +36,7 @@ import net.sf.okapi.common.resource.TextUnitUtil;
 abstract public class BaseCounter {
 
 	private static BaseCounter counter = null;	
-	private static Logger logger = LoggerFactory.getLogger(BaseCounter.class.getName());
+	private static final Logger logger = LoggerFactory.getLogger(BaseCounter.class.getName());
 	
 	abstract protected long doCount(String text, LocaleId language);
 	

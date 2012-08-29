@@ -38,9 +38,11 @@ import net.sf.okapi.tm.simpletm.Database;
 import java.io.File;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Utility extends BaseFilterDrivenUtility {
-
+	private final Logger logger = LoggerFactory.getLogger(getClass().getName());
 	private Parameters params;
 	private String fileName;
 	private DbStoreBuilder dbStoreBuilder;
