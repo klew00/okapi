@@ -48,7 +48,7 @@ import net.sf.okapi.common.resource.RawDocument;
 @UsingParameters(Parameters.class)
 public class ImageModificationStep extends BasePipelineStep {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(ImageModificationStep.class.getName());
+	private final Logger LOGGER = LoggerFactory.getLogger(getClass());
 
 	private boolean isDone;
 	private Parameters params;

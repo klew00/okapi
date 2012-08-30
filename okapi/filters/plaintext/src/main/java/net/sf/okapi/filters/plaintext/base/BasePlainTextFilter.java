@@ -45,7 +45,7 @@ import net.sf.okapi.lib.extra.filters.TextProcessingResult;
  * @version 0.1, 09.06.2009
  */
 public class BasePlainTextFilter extends AbstractLineFilter {	
-	private final Logger logger = LoggerFactory.getLogger(getClass().getName());
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 	
 	public static final String FILTER_NAME				= "okf_plaintext";
 	public static final String FILTER_MIME				= MimeTypeMapper.PLAIN_TEXT_MIME_TYPE;	

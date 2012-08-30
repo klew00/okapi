@@ -40,7 +40,7 @@ import net.sf.okapi.common.resource.ITextUnit;
 @UsingParameters(Parameters.class)
 public class CharListingStep extends BasePipelineStep {
 
-	private final Logger logger = LoggerFactory.getLogger(getClass().getName());
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 
 	private Parameters params;
 	private Hashtable<Character, Integer> charList;

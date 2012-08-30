@@ -42,7 +42,7 @@ import net.sf.okapi.steps.gcaligner.Penalties;
  */
 
 public class SentenceAligner {
-	private static final Logger LOGGER = LoggerFactory.getLogger(SentenceAligner.class.getName());
+	private final Logger LOGGER = LoggerFactory.getLogger(getClass());
 	
 	private static final long MAX_CELL_SIZE = 80000L;
 	private List<AlignmentScorer<Segment>> scorerList;

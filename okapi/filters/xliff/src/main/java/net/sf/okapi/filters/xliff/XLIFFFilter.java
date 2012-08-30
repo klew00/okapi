@@ -78,7 +78,7 @@ import net.sf.okapi.common.skeleton.ISkeletonWriter;
 @UsingParameters(Parameters.class)
 public class XLIFFFilter implements IFilter {
 
-	private final Logger logger = LoggerFactory.getLogger(getClass().getName());
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 	
 	public static final String PROP_BUILDNUM = "build-num";
 	public static final String PROP_EXTRADATA = "extradata";

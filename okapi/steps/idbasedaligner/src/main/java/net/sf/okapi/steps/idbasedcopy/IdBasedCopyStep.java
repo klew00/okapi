@@ -49,7 +49,7 @@ import net.sf.okapi.common.resource.ITextUnit;
 @UsingParameters(Parameters.class)
 public class IdBasedCopyStep extends BasePipelineStep {
 
-	private final Logger logger = LoggerFactory.getLogger(getClass().getName());
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 
 	private Parameters params;
 	private IFilter filter = null;

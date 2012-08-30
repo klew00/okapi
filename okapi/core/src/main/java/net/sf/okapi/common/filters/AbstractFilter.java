@@ -44,7 +44,7 @@ import net.sf.okapi.common.skeleton.ISkeletonWriter;
  * Basic abstract implementation of {@link IFilter}.
  */
 public abstract class AbstractFilter implements IFilter {
-	private static final Logger LOGGER = LoggerFactory.getLogger(AbstractFilter.class.getName());
+	private final Logger LOGGER = LoggerFactory.getLogger(getClass());
 
 	List<FilterConfiguration> configList = new ArrayList<FilterConfiguration>();
 	private IdGenerator documentId;

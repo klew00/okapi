@@ -53,7 +53,7 @@ import net.sf.okapi.connectors.microsoft.MicrosoftMTConnector;
 @UsingParameters(Parameters.class)
 public class MSBatchTranslationStep extends BasePipelineStep {
 
-	private final Logger logger = LoggerFactory.getLogger(getClass().getName());
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 	
 	private final static int MAXEVENTS = 20;
 	

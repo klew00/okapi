@@ -76,7 +76,7 @@ public class JSONFilter implements IFilter {
 	
 	private static final String MIMETYPE = "application/json";
 	
-	private final Logger logger = LoggerFactory.getLogger(getClass().getName());
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 
 	private Parameters params;
 	private String encoding;

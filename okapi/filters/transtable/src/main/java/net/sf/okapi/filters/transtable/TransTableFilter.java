@@ -60,7 +60,7 @@ import net.sf.okapi.common.skeleton.ISkeletonWriter;
 
 public class TransTableFilter implements IFilter {
 
-	private final Logger logger = LoggerFactory.getLogger(getClass().getName());
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 
 	private static String MIMETYPE = "text/x-transtable";
 	

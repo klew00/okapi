@@ -44,7 +44,7 @@ import net.sf.okapi.common.resource.RawDocument;
 @UsingParameters(ParametersAnalysis.class)
 public class TradosAnalysisStep extends BasePipelineStep{
 
-	private final Logger logger = LoggerFactory.getLogger(getClass().getName());
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 	
 	private ParametersAnalysis params;
 	private ArrayList<String> inputFiles = new ArrayList<String>();

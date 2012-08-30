@@ -45,7 +45,7 @@ import org.eclipse.swt.widgets.Shell;
 
 public class UtilityDriver implements CancelListener {
 
-	private final Logger logger = LoggerFactory.getLogger(getClass().getName());
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 	
 	private ILog log;
 	private Project prj;

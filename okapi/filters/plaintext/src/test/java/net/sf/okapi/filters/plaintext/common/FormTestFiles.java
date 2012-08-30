@@ -80,8 +80,8 @@ public class FormTestFiles {
 		
 		formMixture();
 		
-		Logger logger = LoggerFactory.getLogger(FormTestFiles.class.getName());
-		logger.debug("Done");
+		Logger localLogger = LoggerFactory.getLogger(FormTestFiles.class);
+		localLogger.debug("Done");
 	}
 
 }

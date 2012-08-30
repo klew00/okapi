@@ -34,7 +34,7 @@ public class EventLogger extends BasePipelineStep {
 
 	private int indent = 0;
 	private boolean increasing = true;
-	private final Logger logger = LoggerFactory.getLogger(getClass().getName());
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 	private StringBuilder sb;
 	
 	@Override

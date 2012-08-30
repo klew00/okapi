@@ -47,7 +47,7 @@ import net.sf.okapi.filters.rtf.RTFFilter;
 @UsingParameters(Parameters.class)
 public class RTFConversionStep extends BasePipelineStep {
 
-	private final Logger logger = LoggerFactory.getLogger(getClass().getName());
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 	private final Pattern reXML;
 	private final String strXMLReplace;
 	private final Pattern reXMLVersion;

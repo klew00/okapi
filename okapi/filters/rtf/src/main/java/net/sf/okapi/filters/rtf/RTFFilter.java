@@ -134,7 +134,7 @@ public class RTFFilter implements IFilter {
 	public static final int CW_FLDINST           = 57;
 	public static final int CW_XMLOPEN           = 58;
 
-	private final Logger logger = LoggerFactory.getLogger(getClass().getName());
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 	
 	// Tags from S-Tagger that are open/close, all other are isolated
 	private static final String PAIREDTAGS = ":fc:cs:b:i:s:bi:c:c1:c2:cns:el:elf:ti:";

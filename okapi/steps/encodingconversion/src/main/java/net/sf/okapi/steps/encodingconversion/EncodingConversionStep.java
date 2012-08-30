@@ -53,7 +53,7 @@ import net.sf.okapi.common.resource.RawDocument;
 @UsingParameters(Parameters.class)
 public class EncodingConversionStep extends BasePipelineStep {
 
-	private final Logger logger = LoggerFactory.getLogger(getClass().getName());
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 	private static final int MAXBUF = 1024;
 
 	private Parameters params;

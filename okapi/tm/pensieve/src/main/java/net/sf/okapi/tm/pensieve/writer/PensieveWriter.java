@@ -53,7 +53,7 @@ import org.apache.lucene.store.Directory;
  */
 public class PensieveWriter implements ITmWriter {
 	
-	private static final Logger LOGGER = LoggerFactory.getLogger(PensieveWriter.class.getName());
+	private final Logger LOGGER = LoggerFactory.getLogger(getClass());
 
 	private IndexWriter indexWriter;
 

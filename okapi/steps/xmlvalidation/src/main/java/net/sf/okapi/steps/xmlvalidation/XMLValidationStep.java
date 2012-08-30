@@ -57,7 +57,7 @@ import org.xml.sax.XMLReader;
 @UsingParameters(Parameters.class)
 public class XMLValidationStep extends BasePipelineStep {
 
-	private final Logger logger = LoggerFactory.getLogger(getClass().getName());
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 
 	private XMLInputFactory xmlInputFact;
 	private String currentFileDir;

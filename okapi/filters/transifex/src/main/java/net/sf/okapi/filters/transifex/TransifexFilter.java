@@ -57,7 +57,7 @@ public class TransifexFilter implements IFilter {
 
 	private static final String MIMETYPE = "application/x-transifex";
 	
-	private final Logger logger = LoggerFactory.getLogger(getClass().getName());
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 
 	private Parameters params;
 	private Project proj;

@@ -47,7 +47,7 @@ import net.sf.okapi.common.resource.TextPart;
  * The sequence of DOCUMENT_PART and TEXT_UNIT events is packed into a single MULTI_EVENT event.
  */
 public class ResourceSimplifier {
-	private final Logger logger = LoggerFactory.getLogger(getClass().getName());
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 	private boolean isMultilingual;
 	private LocaleId trgLoc;
 	private String outEncoding = "UTF-16BE";

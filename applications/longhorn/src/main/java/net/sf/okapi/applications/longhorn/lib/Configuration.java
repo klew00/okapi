@@ -35,7 +35,7 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 public class Configuration {
-	private static final Logger LOGGER = LoggerFactory.getLogger(Configuration.class.getName());
+	private final Logger LOGGER = LoggerFactory.getLogger(getClass());
 	private static final String DEF_WORKING_DIR = System.getProperty("user.home") + File.separator + "Okapi-Longhorn-Files";
 	
 	private String workingDirectory;

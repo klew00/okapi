@@ -74,7 +74,7 @@ public class VersifiedTextFilter extends AbstractFilter {
     	REPLACABLES.put("{ensp}", "\u2002");
     }
                
-	private static final Logger LOGGER = LoggerFactory.getLogger(VersifiedTextFilter.class.getName());
+	private final Logger LOGGER = LoggerFactory.getLogger(getClass());
 	private static final int BUFFER_SIZE = 2800;
 
 	private static final String VERSIFIED_ID = "^([0-9]+)$";

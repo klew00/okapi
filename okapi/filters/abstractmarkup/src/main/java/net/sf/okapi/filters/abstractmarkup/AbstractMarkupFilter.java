@@ -86,7 +86,7 @@ import net.sf.okapi.filters.yaml.TaggedFilterConfiguration.RULE_TYPE;
  * 
  */
 public abstract class AbstractMarkupFilter extends AbstractFilter {
-	private static final Logger LOGGER = LoggerFactory.getLogger(AbstractMarkupFilter.class.getName());
+	private final Logger LOGGER = LoggerFactory.getLogger(getClass());
 	private static final String CDATA_START_REGEX = "<\\!\\[CDATA\\[";
 	private static final String CDATA_END_REGEX = "\\]\\]>";
 	private static final Pattern CDATA_START_PATTERN = Pattern.compile(CDATA_START_REGEX);

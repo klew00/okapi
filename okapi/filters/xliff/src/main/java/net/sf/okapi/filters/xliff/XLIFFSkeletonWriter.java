@@ -54,7 +54,7 @@ public class XLIFFSkeletonWriter extends GenericSkeletonWriter {
 	public static final String SEGSOURCEMARKER = "[@#$SEGSRC$#@]";
 	public static final String ALTTRANSMARKER = "[@#$ALTTRANS$#@]";
 	
-	private final Logger logger = LoggerFactory.getLogger(getClass().getName());
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 	
 	private Parameters params;
 	private XLIFFContent fmt;

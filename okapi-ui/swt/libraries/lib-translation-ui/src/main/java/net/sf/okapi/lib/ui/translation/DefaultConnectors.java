@@ -13,7 +13,6 @@ import net.sf.okapi.common.query.IQuery;
 public class DefaultConnectors implements IConnectorList {
 
 	private ArrayList<ConnectorInfo> list;
-	private static final Logger LOGGER = LoggerFactory.getLogger(DefaultConnectors.class.getName());
 	
 	@Deprecated 
 	public DefaultConnectors () {
@@ -128,7 +127,8 @@ public class DefaultConnectors implements IConnectorList {
 		try {
 			connector = (IQuery) ClassUtil.instantiateClass(connectorClass, classLoader);
 		} catch (Exception e) {
-			LOGGER.warn(String.format("Cannot instantiate the connector '%s'.", connectorClass));
+			Logger localLogger = LoggerFactory.getLogger(DefaultConnectors.class);
+			localLogger.warn(String.format("Cannot instantiate the connector '%s'.", connectorClass));
 			return "Unknown plug-in connector";
 		}
 		

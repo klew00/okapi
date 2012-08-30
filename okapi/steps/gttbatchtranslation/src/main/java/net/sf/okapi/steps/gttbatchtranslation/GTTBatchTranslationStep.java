@@ -61,7 +61,7 @@ public class GTTBatchTranslationStep extends BasePipelineStep {
 
 	private final static long MAXSIZE =(1020*1024); // Less than 1 MB 
 		
-	private final Logger logger = LoggerFactory.getLogger(getClass().getName());
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 	
 	private Parameters params;
 	private QueryUtil qutil;

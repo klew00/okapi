@@ -64,7 +64,7 @@ public class ArchiveFilterTest {
 	private static final LocaleId EN = new LocaleId("en", "us");
 	private static final LocaleId ESES = new LocaleId("es", "es");
 	private String pathBase;
-	private final Logger logger = LoggerFactory.getLogger(getClass().getName());
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 	
 	@Before
 	public void setUp() throws URISyntaxException {

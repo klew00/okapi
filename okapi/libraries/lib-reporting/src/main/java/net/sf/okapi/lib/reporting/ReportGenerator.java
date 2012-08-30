@@ -51,7 +51,7 @@ public class ReportGenerator {
 	private boolean multiItemReport;
 	private boolean htmlReport;
 	
-	private final Logger logger = LoggerFactory.getLogger(this.getClass().getName());
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 	
 	public ReportGenerator(String template) {
 		super();

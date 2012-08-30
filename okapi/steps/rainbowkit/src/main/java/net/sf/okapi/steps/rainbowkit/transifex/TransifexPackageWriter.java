@@ -41,7 +41,7 @@ import net.sf.okapi.lib.transifex.TransifexClient;
 import net.sf.okapi.steps.rainbowkit.common.BasePackageWriter;
 
 public class TransifexPackageWriter extends BasePackageWriter {
-	private final Logger logger = LoggerFactory.getLogger(getClass().getName());
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 
 	private POWriter potWriter;
 	private POWriter trgWriter;

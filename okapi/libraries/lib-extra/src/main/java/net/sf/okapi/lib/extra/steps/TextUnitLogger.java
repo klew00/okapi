@@ -34,7 +34,7 @@ import net.sf.okapi.common.resource.TextContainer;
 
 public class TextUnitLogger extends BasePipelineStep {
 
-	private final Logger logger = LoggerFactory.getLogger(getClass().getName());
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 	private StringBuilder sb;
 	private LocaleId srcLoc;
 	

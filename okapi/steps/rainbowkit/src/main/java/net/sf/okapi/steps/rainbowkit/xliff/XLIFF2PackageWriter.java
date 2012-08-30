@@ -65,7 +65,7 @@ public class XLIFF2PackageWriter extends BasePackageWriter {
 	public static final String POBJECTS_DIR = "pobjects";
 
 	private static final String TU_PREFIX = "$tu$";
-	private static final Logger LOGGER = LoggerFactory.getLogger(XLIFF2PackageWriter.class.getName());
+	private final Logger LOGGER = LoggerFactory.getLogger(getClass());
 	
 	private XLIFFWriter writer;
 	private LinkedHashMap<String, String> referents;

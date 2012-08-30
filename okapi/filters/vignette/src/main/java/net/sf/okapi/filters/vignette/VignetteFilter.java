@@ -84,7 +84,7 @@ import net.sf.okapi.filters.abstractmarkup.AbstractMarkupFilter;
 @UsingParameters(Parameters.class)
 public class VignetteFilter implements IFilter {
 
-	private final Logger logger = LoggerFactory.getLogger(getClass().getName());
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 
 	private final String STARTBLOCK = "<importContentInstance>";
 	private final String ENDBLOCK = "</importContentInstance>";

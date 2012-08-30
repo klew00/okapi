@@ -52,7 +52,7 @@ import net.sf.okapi.steps.leveraging.LeveragingStep;
 
 public class PipelineWrapper {
 	
-	private static final Logger LOGGER = LoggerFactory.getLogger(PipelineWrapper.class.getName());
+	private final Logger LOGGER = LoggerFactory.getLogger(getClass());
 
 	private Map<String, StepInfo> availableSteps;
 	private Map<String, ClassLoader> pluginConnectors;

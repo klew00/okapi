@@ -74,7 +74,7 @@ import net.sf.okapi.common.resource.TextContainer;
 @UsingParameters(Parameters.class)
 public class SearchAndReplaceStep extends BasePipelineStep {
 
-	private final Logger logger = LoggerFactory.getLogger(getClass().getName());
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 
 	private Parameters params;
 	private Matcher matcher;

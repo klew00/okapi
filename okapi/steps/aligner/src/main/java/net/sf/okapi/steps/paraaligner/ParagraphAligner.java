@@ -39,7 +39,7 @@ import net.sf.okapi.steps.gcaligner.Penalties;
  */
 
 public class ParagraphAligner {
-	private static final Logger LOGGER = LoggerFactory.getLogger(ParagraphAligner.class.getName());
+	private final Logger LOGGER = LoggerFactory.getLogger(getClass());
 	
 	private static final long MAX_CELL_SIZE = 80000L;
 	private List<AlignmentScorer<ITextUnit>> scorerList;

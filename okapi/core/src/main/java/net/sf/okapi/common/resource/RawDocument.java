@@ -53,7 +53,7 @@ import net.sf.okapi.common.LocaleId;
  * one) of three input objects: a CharSequence, a URI, or an InputStream.
  */
 public class RawDocument implements IResource {
-	private static final Logger LOGGER = LoggerFactory.getLogger(RawDocument.class.getName());
+	private final Logger LOGGER = LoggerFactory.getLogger(getClass());
 
 	public static final String UNKOWN_ENCODING = "null";
 

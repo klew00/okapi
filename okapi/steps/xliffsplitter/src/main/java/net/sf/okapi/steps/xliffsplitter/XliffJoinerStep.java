@@ -107,7 +107,7 @@ public class XliffJoinerStep extends BasePipelineStep {
 		}
 	}
 	
-	private final Logger logger = LoggerFactory.getLogger(getClass().getName());
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 	
 	private HashMap<String, BaseXliffFile> baseXliffFiles = new HashMap<String, BaseXliffFile>();
 	

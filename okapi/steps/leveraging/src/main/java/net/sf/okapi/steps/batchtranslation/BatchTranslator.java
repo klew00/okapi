@@ -61,7 +61,7 @@ import net.sf.okapi.tm.pensieve.writer.TmWriterFactory;
 
 public class BatchTranslator {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(BatchTranslator.class.getName());
+	private final Logger LOGGER = LoggerFactory.getLogger(getClass());
 
 	private IFilterConfigurationMapper fcMapper;
 	private IFilter filter;

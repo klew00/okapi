@@ -80,7 +80,7 @@ import org.xml.sax.SAXException;
 @UsingParameters(Parameters.class)
 public class XMLFilter implements IFilter {
 
-	private final Logger logger = LoggerFactory.getLogger(getClass().getName());
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 
 	private String docName;
 	private String encoding;

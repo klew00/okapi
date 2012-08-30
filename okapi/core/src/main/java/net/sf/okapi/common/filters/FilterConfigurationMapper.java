@@ -62,7 +62,7 @@ public class FilterConfigurationMapper extends ParametersEditorMapper implements
 	 */
 	public static final char CONFIGFILE_SEPARATOR = '@';
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(FilterConfigurationMapper.class.getName());
+	private final Logger LOGGER = LoggerFactory.getLogger(getClass());
 
 	private LinkedHashMap<String, FilterConfiguration> configMap;
 	private ArrayList<FilterInfo> filters;

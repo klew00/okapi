@@ -28,7 +28,7 @@ import net.sf.okapi.common.pipeline.BasePipelineStep;
 
 public class ConsumerProducer extends BasePipelineStep {
 	
-	private static final Logger LOGGER = LoggerFactory.getLogger(ConsumerProducer.class.getName());
+	private final Logger LOGGER = LoggerFactory.getLogger(getClass());
 	
 	public String getName() {
 		return "ProducerConsumer";

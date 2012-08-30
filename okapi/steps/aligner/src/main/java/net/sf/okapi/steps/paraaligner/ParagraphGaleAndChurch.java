@@ -31,7 +31,7 @@ import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.steps.gcaligner.AlignmentScorer;
 
 public class ParagraphGaleAndChurch implements AlignmentScorer<ITextUnit> {
-	private static final Logger LOGGER = LoggerFactory.getLogger(ParagraphGaleAndChurch.class.getName());
+	private final Logger LOGGER = LoggerFactory.getLogger(getClass());
 
 	private final static int BIG_DISTANCE = 2500;
 

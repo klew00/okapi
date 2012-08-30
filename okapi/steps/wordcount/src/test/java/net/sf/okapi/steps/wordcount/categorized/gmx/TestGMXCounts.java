@@ -32,7 +32,7 @@ public class TestGMXCounts {
 	private Event sdEvent;
 	private ITextUnit tu;
 	private Event tuEvent;
-	private final Logger logger = LoggerFactory.getLogger(getClass().getName());
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 	
 	@Before
 	public void startup() {

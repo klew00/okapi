@@ -104,7 +104,7 @@ import net.sf.okapi.common.skeleton.GenericSkeleton;
  */
 public class OpenXMLContentFilter extends AbstractMarkupFilter {
 
-	private final Logger LOGGER = LoggerFactory.getLogger(this.getClass().getName());
+	private final Logger LOGGER = LoggerFactory.getLogger(getClass());
 	
 	public final static int MSWORD=1;
 	public final static int MSEXCEL=2;

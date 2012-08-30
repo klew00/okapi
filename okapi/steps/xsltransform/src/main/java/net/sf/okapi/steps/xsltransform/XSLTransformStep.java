@@ -61,7 +61,7 @@ public class XSLTransformStep extends BasePipelineStep {
 	private static final String VAR_INPUTPATH3 = "${inputPath3}"; 
 	private static final String VAR_INPUTURI3 = "${inputURI3}"; 
 
-	private final Logger logger = LoggerFactory.getLogger(getClass().getName());
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 
 	private Parameters params;
 	private Source xsltInput;

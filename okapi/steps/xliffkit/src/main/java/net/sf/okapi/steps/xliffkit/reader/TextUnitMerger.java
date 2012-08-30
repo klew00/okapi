@@ -38,7 +38,7 @@ import net.sf.okapi.common.resource.TextContainer;
 
 public class TextUnitMerger {
 	
-	private final Logger logger = LoggerFactory.getLogger(getClass().getName());
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 	
 	private boolean useApprovedOnly;
 	private boolean updateApprovedFlag;

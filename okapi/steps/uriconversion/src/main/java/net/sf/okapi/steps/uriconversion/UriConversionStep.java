@@ -44,7 +44,7 @@ public class UriConversionStep extends BasePipelineStep {
 
 	private static final String FORCEESCAPE = " * -,.";
 
-	private final Logger logger = LoggerFactory.getLogger(getClass().getName());
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 
 	private Parameters params;
 	private LocaleId trgLang;

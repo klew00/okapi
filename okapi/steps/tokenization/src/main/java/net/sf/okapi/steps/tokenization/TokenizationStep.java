@@ -51,7 +51,7 @@ import net.sf.okapi.steps.tokenization.tokens.Tokens;
 
 @UsingParameters(Parameters.class)
 public class TokenizationStep extends AbstractPipelineStep {
-	private final Logger logger = LoggerFactory.getLogger(getClass().getName());
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 
 	public static final int RAWTEXT = -1;
 	

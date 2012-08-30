@@ -61,7 +61,7 @@ import net.sf.okapi.common.resource.TextUnitUtil;
 @UsingParameters(Parameters.class)
 public class IdBasedAlignerStep extends BasePipelineStep {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(IdBasedAlignerStep.class.getName());
+	private final Logger LOGGER = LoggerFactory.getLogger(getClass());
 	private Parameters params;
 	private IFilter filter = null;
 	private IFilterConfigurationMapper fcMapper;

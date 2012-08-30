@@ -40,7 +40,7 @@ import net.sf.okapi.common.resource.RawDocument;
 @UsingParameters(Parameters.class)
 public class BOMConversionStep extends BasePipelineStep {
 
-	private final Logger logger = LoggerFactory.getLogger(getClass().getName());
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 
 	private final byte[] BOM_UTF8 = {(byte)0xEF,(byte)0xBB,(byte)0xBF};
 	private final byte[] BOM_UTF16BE = {(byte)0xFE,(byte)0xFF};

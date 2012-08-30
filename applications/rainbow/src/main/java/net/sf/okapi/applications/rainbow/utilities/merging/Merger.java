@@ -54,7 +54,7 @@ import net.sf.okapi.filters.rtf.RTFFilter;
 
 public class Merger {
 
-	private final Logger logger = LoggerFactory.getLogger(getClass().getName());
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 
 	private Manifest manifest;
 	private IReader reader;

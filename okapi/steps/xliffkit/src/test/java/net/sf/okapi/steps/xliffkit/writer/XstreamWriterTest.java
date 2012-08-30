@@ -163,8 +163,8 @@ public class XstreamWriterTest {
 	}
 	
 	private void log(String str) {
-		Logger logger = LoggerFactory.getLogger(getClass().getName()); // loggers are cached
-		logger.debug(str);
+		Logger localLogger = LoggerFactory.getLogger(getClass()); // loggers are cached
+		localLogger.debug(str);
 	}
 	
 	// DEBUG @Test

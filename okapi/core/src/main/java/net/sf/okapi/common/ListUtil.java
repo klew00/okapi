@@ -36,8 +36,6 @@ import org.slf4j.LoggerFactory;
  * Helper methods to manipulate lists.
  */
 public class ListUtil {
-
-	private static final Logger logger = LoggerFactory.getLogger(ClassUtil.getClassName(ListUtil.class));
 	
 	/**
 	 * Splits up a string of comma-separated substrings into a string list of those substrings.
@@ -470,18 +468,19 @@ public class ListUtil {
 		
 		if (list == null) return null;
 		
+		Logger localLogger = LoggerFactory.getLogger(ListUtil.class);
 		List<E> res = null;
 			try {
 				res = list.getClass().newInstance();
 				
 			} catch (InstantiationException e) {
 				
-				logger.debug("List instantiation failed in ListUtil.copyItems(): " + e.getMessage());
+				localLogger.debug("List instantiation failed in ListUtil.copyItems(): " + e.getMessage());
 				return null;
 				
 			} catch (IllegalAccessException e) {
 				
-				logger.debug("List instantiation failed in ListUtil.copyItems(): " + e.getMessage());
+				localLogger.debug("List instantiation failed in ListUtil.copyItems(): " + e.getMessage());
 				return null;
 			}
 			
@@ -521,18 +520,19 @@ public class ListUtil {
 	
 		if (list == null) return null;
 		
+		Logger localLogger = LoggerFactory.getLogger(ListUtil.class);
 		List<E> res = null;
 			try {
 				res = list.getClass().newInstance();
 				
 			} catch (InstantiationException e) {
 				
-				logger.debug("List instantiation failed in ListUtil.copyItems(): " + e.getMessage());
+				localLogger.debug("List instantiation failed in ListUtil.copyItems(): " + e.getMessage());
 				return null;
 				
 			} catch (IllegalAccessException e) {
 				
-				logger.debug("List instantiation failed in ListUtil.copyItems(): " + e.getMessage());
+				localLogger.debug("List instantiation failed in ListUtil.copyItems(): " + e.getMessage());
 				return null;
 			}
 			
@@ -618,13 +618,13 @@ public class ListUtil {
 		if (Util.isEmpty(resourceLocation)) return;
 		
 		BufferedReader reader = null;
+		Logger localLogger = LoggerFactory.getLogger(ListUtil.class);
 		
 		try {
 			reader = new BufferedReader(new InputStreamReader(classRef.getResourceAsStream(resourceLocation), "UTF-8"));
 			
 		} catch (UnsupportedEncodingException e) {
-			
-			logger.debug(String.format("ListUtil.loadList() encoding problem of \"%s\": %s", resourceLocation, e.getMessage()));
+			localLogger.debug(String.format("ListUtil.loadList() encoding problem of \"%s\": %s", resourceLocation, e.getMessage()));
 			return;
 		}
 		
@@ -642,7 +642,7 @@ public class ListUtil {
 			}
 		} catch (IOException e) {
 			
-			logger.debug(String.format("ListUtil.loadList() IO problem of \"%s\": %s", resourceLocation, e.getMessage()));
+			localLogger.debug(String.format("ListUtil.loadList() IO problem of \"%s\": %s", resourceLocation, e.getMessage()));
 			return;
 		}	
 	}

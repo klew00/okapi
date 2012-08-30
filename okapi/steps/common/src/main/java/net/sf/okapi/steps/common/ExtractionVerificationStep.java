@@ -52,7 +52,7 @@ import net.sf.okapi.common.resource.StartSubDocument;
 @UsingParameters(ExtractionVerificationStepParameters.class) // No parameters
 public class ExtractionVerificationStep extends BasePipelineStep {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(ExtractionVerificationStep.class.getName());
+	private final Logger LOGGER = LoggerFactory.getLogger(getClass());
 	
 	private IFilter filter1, filter2;
 	private IFilterWriter writer;

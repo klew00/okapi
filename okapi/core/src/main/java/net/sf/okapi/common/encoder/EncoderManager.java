@@ -36,7 +36,7 @@ import net.sf.okapi.common.MimeTypeMapper;
  */
 public class EncoderManager implements IEncoder {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(EncoderManager.class.getName());
+	private final Logger LOGGER = LoggerFactory.getLogger(getClass());
 	
 	private Hashtable<String, String> mimeMap;
 	private String mimeType = "";

@@ -53,7 +53,7 @@ import net.sf.okapi.steps.sentencealigner.SentenceAlignerStep;
  */
 @UsingParameters(Parameters.class)
 public class ParagraphAlignerStep extends BasePipelineStep {
-	private static final Logger LOGGER = LoggerFactory.getLogger(ParagraphAlignerStep.class.getName());
+	private final Logger LOGGER = LoggerFactory.getLogger(getClass());
 
 	private Parameters params;
 	private IFilter filter = null;

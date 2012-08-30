@@ -64,6 +64,7 @@ import net.sf.okapi.steps.wordcount.common.MetricsAnnotation;
 import org.junit.Test;
 
 public class TestScopingReport {
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 
 	private static final LocaleId EN = new LocaleId("en-us");
 	private static final LocaleId ES = new LocaleId("es-es");
@@ -71,8 +72,8 @@ public class TestScopingReport {
 	
 	
 	public static void testPath(String path) {
-		Logger logger = LoggerFactory.getLogger(TestScopingReport.class.getName()); // loggers are cached
-		logger.debug(new File(path).getAbsolutePath());
+		Logger localLogger = LoggerFactory.getLogger(TestScopingReport.class); // loggers are cached
+		localLogger.debug(new File(path).getAbsolutePath());
 	}
 	
 	@Test
@@ -361,7 +362,6 @@ public class TestScopingReport {
 		Event sbEvent, ebEvent;
 		ITextUnit tu1, tu2, tu3, tu4;
 		Event tuEvent1, tuEvent2, tuEvent3, tuEvent4;
-		Logger logger = LoggerFactory.getLogger(getClass().getName());
 		
 		String pathBase = Util.getDirectoryName(this.getClass().getResource("").toURI().getPath()) + "/";
 		net.sf.okapi.connectors.pensieve.Parameters rparams = 
@@ -472,7 +472,6 @@ public class TestScopingReport {
 		Event sbEvent, ebEvent;
 		ITextUnit tu1, tu2, tu3, tu4;
 		Event tuEvent1, tuEvent2, tuEvent3, tuEvent4;
-		Logger logger = LoggerFactory.getLogger(getClass().getName());
 		
 		String pathBase = Util.getDirectoryName(this.getClass().getResource("").toURI().getPath()) + "/";
 		net.sf.okapi.connectors.pensieve.Parameters rparams = 
@@ -585,7 +584,6 @@ public class TestScopingReport {
 		Event sbEvent, ebEvent;
 		ITextUnit tu1, tu2, tu3, tu4;
 		Event tuEvent1, tuEvent2, tuEvent3, tuEvent4;
-		Logger logger = LoggerFactory.getLogger(getClass().getName());
 		
 		String pathBase = Util.getDirectoryName(this.getClass().getResource("").toURI().getPath()) + "/";
 //		net.sf.okapi.connectors.pensieve.Parameters rparams = 

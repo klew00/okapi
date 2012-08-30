@@ -168,8 +168,8 @@ public class TokenizationTest {
 			
 			sb.append(token.toString() + "\n");
 		}
-		Logger logger = LoggerFactory.getLogger(getClass().getName()); // loggers are cached
-		logger.debug(sb.toString());
+		Logger localLogger = LoggerFactory.getLogger(getClass()); // loggers are cached
+		localLogger.debug(sb.toString());
 	}
 	
 	

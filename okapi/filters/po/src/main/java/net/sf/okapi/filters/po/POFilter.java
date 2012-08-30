@@ -97,7 +97,7 @@ public class POFilter implements IFilter {
 		"(content-type)(\\s*):(.*?)charset(\\s*)=(\\s*)(.*?)([\\\\|;|\\n])",
 		Pattern.CASE_INSENSITIVE);
 			
-	private final Logger logger = LoggerFactory.getLogger(getClass().getName());
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 
 	private Parameters params;
 	private BufferedReader reader;

@@ -44,7 +44,7 @@ import net.sf.okapi.common.resource.RawDocument;
 @UsingParameters(ParametersCleanup.class)
 public class TradosCleanupStep extends BasePipelineStep{
 
-	private final Logger logger = LoggerFactory.getLogger(getClass().getName());
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 	
 	private ParametersCleanup params;
 	private ArrayList<String> inputFiles = new ArrayList<String>();

@@ -12,7 +12,7 @@ import net.sf.okapi.common.resource.StartDocument;
 
 public class DocumentPartLogger extends BasePipelineStep {
 
-	private final Logger logger = LoggerFactory.getLogger(getClass().getName());
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 	private StringBuilder sb;
 	private LocaleId srcLoc;
 	

@@ -27,7 +27,6 @@ import net.sf.okapi.lib.persistence.PersistenceBean;
 public class TypeInfoBean extends PersistenceBean<Object> {
 
 	private String className;
-	//private final Logger LOGGER = LoggerFactory.getLogger(this.getClass().getName());
 
 	@Override
 	protected Object createObject(IPersistenceSession session) {

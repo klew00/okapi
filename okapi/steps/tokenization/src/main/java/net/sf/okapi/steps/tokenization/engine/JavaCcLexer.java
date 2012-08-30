@@ -37,7 +37,7 @@ import net.sf.okapi.steps.tokenization.engine.javacc.WordTokenizerTokenManager;
 import net.sf.okapi.steps.tokenization.tokens.Tokens;
 
 public class JavaCcLexer extends AbstractLexer {
-	private final Logger logger = LoggerFactory.getLogger(getClass().getName());
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 
 	private SimpleCharStream stream;
 	private WordTokenizer tokenizer;

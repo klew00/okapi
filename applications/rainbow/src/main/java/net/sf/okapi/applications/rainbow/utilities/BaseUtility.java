@@ -38,7 +38,7 @@ public abstract class BaseUtility implements IUtility {
 
 	public static final String VAR_PROJDIR = "${ProjDir}";
 	
-	private final Logger logger = LoggerFactory.getLogger(getClass().getName());
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 	protected EventListenerList listenerList = new EventListenerList();
 	protected FilterConfigurationMapper mapper;
 	protected Shell shell;

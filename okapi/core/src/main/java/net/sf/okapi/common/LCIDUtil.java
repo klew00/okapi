@@ -73,9 +73,10 @@ public class LCIDUtil {
 			String lang0 = descr0.language;
 			String reg0 = descr0.region;
 			String st = Util.isEmpty(reg0) ? lang0 : String.format("%s (%s)", lang0, reg0);
-			if (language.equals(lang0) && region.equals(reg0))
-				LoggerFactory.getLogger(LCIDUtil.class.getName()).warn(String.format("Already registered LCID: (0x%04x) %s",					
-						lcid, st));
+			if (language.equals(lang0) && region.equals(reg0)) {
+				Logger localLogger = LoggerFactory.getLogger(LCIDUtil.class);
+				localLogger.warn(String.format("Already registered LCID: (0x%04x) %s", lcid, st));
+			}
 		}
 		
 		if (inst == null) inst = new LCIDUtil();
@@ -85,7 +86,7 @@ public class LCIDUtil {
 //		String tag = getTag(lcid);
 //		//if (tagLookup.get(lcid) != null)
 //		if (!Util.isEmpty(tag))
-//			LoggerFactory.getLogger(LCIDUtil.class.getName()).warn(String.format("Already registered LCID: 0x%04x",					
+//			logger.warn(String.format("Already registered LCID: 0x%04x",
 //					lcid));
 //		
 		tagLookup.put(lcid, descr);
@@ -101,10 +102,11 @@ public class LCIDUtil {
 		descr = tagLookup.get(lcid);
 		
 		if (descr == null) {
-//			LoggerFactory.getLogger(LCIDUtil.class.getName()).warn(String.format("Unregistered LCID: 0x%04x %s -- %s\n" +
+			Logger localLogger = LoggerFactory.getLogger(LCIDUtil.class);
+//			logger.warn(String.format("Unregistered LCID: 0x%04x %s -- %s\n" +
 //					"registerLCID(\"%s\", \"\", 0x%04x);\n", lcid, tag,
 //					LanguageList.getDisplayName(tag), LanguageList.getDisplayName(tag), lcid));
-			LoggerFactory.getLogger(LCIDUtil.class.getName()).warn(String.format("Unregistered LCID: 0x%04x %s\n", lcid, tag));
+			localLogger.warn(String.format("Unregistered LCID: 0x%04x %s\n", lcid, tag));
 			return;
 		}
 		tag = new LocaleId(tag).toString();

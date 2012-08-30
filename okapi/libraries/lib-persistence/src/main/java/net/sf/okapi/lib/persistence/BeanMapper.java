@@ -50,7 +50,7 @@ public class BeanMapper {
 	private ArrayList<String> loggedClassNames;
 	private ConcurrentHashMap<String, IPersistenceBean<?>> proxies; // used in ref resolution
 	private IPersistenceSession session;
-	private final Logger LOGGER = LoggerFactory.getLogger(this.getClass().getName());
+	private final Logger LOGGER = LoggerFactory.getLogger(getClass());
 	
 	public BeanMapper(IPersistenceSession session) {
 		this.session = session;

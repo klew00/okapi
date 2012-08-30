@@ -80,7 +80,7 @@ import net.sf.okapi.common.resource.RawDocument;
 @UsingParameters(XliffSplitterParameters.class)
 public class XliffSplitterStep extends BasePipelineStep {
 
-	private final Logger logger = LoggerFactory.getLogger(getClass().getName());
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 	
 	private XliffSplitterParameters params;
 	private boolean done = false;

@@ -64,7 +64,7 @@ public class RainbowKitFilter implements IFilter {
 	public static final String RAINBOWKIT_PACKAGE_MIME_TYPE = "application/x-rainbowkit-package";
 	public static final String RAINBOWKIT_PACKAGE_EXTENSION = ".rkp";
 	
-	private static final Logger LOGGER = LoggerFactory.getLogger(RainbowKitFilter.class.getName());
+	private final Logger LOGGER = LoggerFactory.getLogger(getClass());
 
 	private Parameters params;
 	private boolean canceled;

@@ -42,7 +42,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class Utility extends BaseFilterDrivenUtility {
-	private final Logger logger = LoggerFactory.getLogger(getClass().getName());
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 	private Parameters params;
 	private String fileName;
 	private DbStoreBuilder dbStoreBuilder;

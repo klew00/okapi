@@ -59,7 +59,7 @@ import net.sf.okapi.common.skeleton.GenericSkeleton;
  * HtmlFilter and OpenXmlFilter for examples of using EventBuilder.
  */
 public class EventBuilder {
-	private static final Logger LOGGER = LoggerFactory.getLogger(EventBuilder.class.getName());
+	private final Logger LOGGER = LoggerFactory.getLogger(getClass());
 
 	private String mimeType;
 	private IdGenerator groupId;

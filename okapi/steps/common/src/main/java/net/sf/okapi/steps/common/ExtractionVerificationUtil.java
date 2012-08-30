@@ -46,7 +46,7 @@ import net.sf.okapi.common.resource.TextPart;
  */
 public class ExtractionVerificationUtil {
 	
-	private static final Logger LOGGER = LoggerFactory.getLogger(ExtractionVerificationUtil.class.getName());
+	private final Logger LOGGER = LoggerFactory.getLogger(getClass());
 	
 	boolean compareSkeleton;
 	boolean isMultilingual;

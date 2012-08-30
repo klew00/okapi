@@ -45,7 +45,7 @@ import net.sf.okapi.filters.xliff.XLIFFFilter;
 // Temporary merging step. This should eventually be a normal step
 public class XLIFFMergingStep {
 	
-	private final Logger logger = LoggerFactory.getLogger(getClass().getName());
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 
 	private IFilter filter;
 	private IFilterWriter writer;

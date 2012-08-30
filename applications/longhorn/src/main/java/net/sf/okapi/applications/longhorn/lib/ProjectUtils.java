@@ -46,7 +46,6 @@ import net.sf.okapi.steps.rainbowkit.creation.Parameters;
 import net.sf.okapi.steps.rainbowkit.postprocess.MergingStep;
 
 public class ProjectUtils {
-	private static final Logger LOGGER = LoggerFactory.getLogger(ProjectUtils.class.getName());
 	private static final String CURRENT_PROJECT_PIPELINE = "currentProjectPipeline";
 
 	public static synchronized int createNewProject() {
@@ -54,9 +53,11 @@ public class ProjectUtils {
 		int projId = WorkspaceUtils.determineNewProjectId();
 		
 		File workingDir = new File(WorkspaceUtils.getWorkingDirectory());
-		if (!workingDir.exists())
-			LOGGER.info("The working directory " + workingDir.getAbsolutePath() + " doesn't exist. " +
+		if (!workingDir.exists()) {
+			Logger localLogger = LoggerFactory.getLogger(ProjectUtils.class);
+			localLogger.info("The working directory " + workingDir.getAbsolutePath() + " doesn't exist. " +
 					"It will be created.");
+		}
 		
 		Util.createDirectories(WorkspaceUtils.getInputDirPath(projId) + File.separator);
 		Util.createDirectories(WorkspaceUtils.getConfigDirPath(projId) + File.separator);

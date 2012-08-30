@@ -47,7 +47,7 @@ import net.sf.okapi.steps.segmentation.Parameters.SegmStrategy;
 @UsingParameters(Parameters.class)
 public class SegmentationStep extends BasePipelineStep {
 
-	private final Logger logger = LoggerFactory.getLogger(getClass().getName());
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 
 	private Parameters params;
 	private ISegmenter srcSeg;

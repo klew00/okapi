@@ -47,7 +47,7 @@ import net.sf.okapi.lib.extra.Notification;
  * @version 0.1, 10.06.2009
  */
 public class CompoundFilter extends AbstractBaseFilter {
-	private final Logger logger = LoggerFactory.getLogger(getClass().getName());
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 
 	private LinkedList<IFilter> subFilters = new LinkedList<IFilter>();
 	

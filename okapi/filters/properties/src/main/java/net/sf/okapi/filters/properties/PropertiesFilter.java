@@ -74,7 +74,7 @@ public class PropertiesFilter implements IFilter {
 	private static final int RESULT_ITEM = 1;
 	private static final int RESULT_DATA = 2;
 
-	private final Logger logger = LoggerFactory.getLogger(getClass().getName());
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 
 	private Parameters params;
 	private BufferedReader reader;

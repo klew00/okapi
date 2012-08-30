@@ -78,7 +78,7 @@ public class MIFFilter implements IFilter {
 	
 	public static final String FRAMEROMAN = "x-FrameRoman";
 
-	private final Logger logger = LoggerFactory.getLogger(getClass().getName());
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 
 	private static final int BLOCKTYPE_TEXTFLOW = 1;
 	private static final int BLOCKTYPE_TABLE = 2;

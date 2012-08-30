@@ -36,7 +36,7 @@ public class Component implements IComponent, INotifiable {
 	private String name;
 	private String description;	
 	
-	private final Logger logger = LoggerFactory.getLogger(this.getClass().getName());
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 	
 	public Component() {
 		super();		

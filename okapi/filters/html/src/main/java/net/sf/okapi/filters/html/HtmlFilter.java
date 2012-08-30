@@ -54,7 +54,7 @@ import net.sf.okapi.filters.yaml.TaggedFilterConfiguration.RULE_TYPE;
 @UsingParameters(Parameters.class)
 public class HtmlFilter extends AbstractMarkupFilter {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(HtmlFilter.class.getName());
+	private final Logger LOGGER = LoggerFactory.getLogger(getClass());
 
 	private Parameters parameters;
 	private RawDocument tempSourceInput;

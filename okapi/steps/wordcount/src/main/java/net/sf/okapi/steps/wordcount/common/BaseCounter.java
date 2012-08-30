@@ -36,7 +36,6 @@ import net.sf.okapi.common.resource.TextUnitUtil;
 abstract public class BaseCounter {
 
 	private static BaseCounter counter = null;	
-	private static final Logger logger = LoggerFactory.getLogger(BaseCounter.class.getName());
 	
 	abstract protected long doCount(String text, LocaleId language);
 	
@@ -86,16 +85,17 @@ abstract public class BaseCounter {
 		
 		if (counter != null) return; // Already instantiated
 		
+		Logger localLogger = LoggerFactory.getLogger(BaseCounter.class);
 		try {
 			counter = (BaseCounter) classRef.newInstance();
 			
 		} catch (InstantiationException e) {
 			
-			logger.debug("Counter instantiation failed: " + e.getMessage());
+			localLogger.debug("Counter instantiation failed: " + e.getMessage());
 			
 		} catch (IllegalAccessException e) {
 			
-			logger.debug("Counter instantiation failed: " + e.getMessage());
+			localLogger.debug("Counter instantiation failed: " + e.getMessage());
 		}
 	}
 

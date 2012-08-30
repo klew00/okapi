@@ -313,7 +313,7 @@ public class TsFilter implements IFilter {
 	private EncoderManager encoderManager;
 	private String contextName;
 	
-	private final Logger logger = LoggerFactory.getLogger(getClass().getName());
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 	
 	public TsFilter(){
 		params = new Parameters();

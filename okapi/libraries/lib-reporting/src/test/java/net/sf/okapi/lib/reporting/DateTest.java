@@ -36,7 +36,7 @@ public class DateTest {
 //		TimeZone tz;
 		
 		date = new Date();
-		Logger logger = LoggerFactory.getLogger(getClass().getName());
-		logger.debug(date.toString());
+		Logger localLogger = LoggerFactory.getLogger(getClass());
+		localLogger.debug(date.toString());
 	}
 }

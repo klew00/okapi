@@ -38,7 +38,7 @@ import net.sf.okapi.common.pipeline.IPipelineStep;
 import net.sf.okapi.common.resource.RawDocument;
 
 public class RoundTripComparison {
-	private static final Logger LOGGER = LoggerFactory.getLogger(RoundTripComparison.class.getName());
+	private final Logger LOGGER = LoggerFactory.getLogger(getClass());
 
 	private IFilter filter;
 	private ArrayList<Event> extraction1Events;

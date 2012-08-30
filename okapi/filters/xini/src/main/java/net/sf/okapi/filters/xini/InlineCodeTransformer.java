@@ -44,7 +44,7 @@ import net.sf.okapi.filters.xini.jaxb.StartPlaceHolder;
 import net.sf.okapi.filters.xini.jaxb.TextContent;
 
 public class InlineCodeTransformer {
-    private static final Logger LOGGER = LoggerFactory.getLogger(InlineCodeTransformer.class.getName());
+    private final Logger LOGGER = LoggerFactory.getLogger(getClass());
 	private static final boolean TARGET_IS_TKIT = true;
 	private static final boolean TARGET_IS_FILTER = false;
 	private static final Map<String, String> tagType;

@@ -58,7 +58,7 @@ import org.apache.commons.exec.PumpStreamHandler;
 @UsingParameters(Parameters.class)
 public class ExternalCommandStep extends BasePipelineStep {
 	
-	private static final Logger LOGGER = LoggerFactory.getLogger(ExternalCommandStep.class.getName());
+	private final Logger LOGGER = LoggerFactory.getLogger(getClass());
 
 	private static final String INPUT_FILE_VAR = "inputPath";
 	private static final String OUTPUT_FILE_VAR = "outputPath";

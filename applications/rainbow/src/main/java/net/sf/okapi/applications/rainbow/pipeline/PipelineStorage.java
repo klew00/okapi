@@ -49,7 +49,7 @@ import net.sf.okapi.common.pipeline.Pipeline;
 
 public class PipelineStorage implements IPipelineWriter, IPipelineReader {
 
-	private final Logger LOGGER = LoggerFactory.getLogger(getClass().getName());
+	private final Logger LOGGER = LoggerFactory.getLogger(getClass());
 
 	private String path;
 	private StringWriter strWriter;

@@ -28,7 +28,7 @@ import net.sf.okapi.lib.extra.Component;
 import net.sf.okapi.steps.tokenization.tokens.Tokens;
 
 public abstract class AbstractLexer extends Component implements ILexer {
-	private final Logger logger = LoggerFactory.getLogger(getClass().getName());
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 
 	private boolean cancelled = false;
 	//private int lexerId = 0;

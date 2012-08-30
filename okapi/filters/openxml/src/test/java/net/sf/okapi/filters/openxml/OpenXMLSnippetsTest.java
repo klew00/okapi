@@ -49,7 +49,7 @@ import org.junit.Test;
 
 public class OpenXMLSnippetsTest {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(OpenXMLSnippetsTest.class.getName());
+	private final Logger LOGGER = LoggerFactory.getLogger(getClass());
 	private OpenXMLContentFilter openXMLContentFilter;
 	public final static int MSWORD=1;
 	public final static int MSEXCEL=2;

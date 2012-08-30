@@ -67,7 +67,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 	// They must be multilingual
 	protected boolean allowEmptyOutputTarget = false;
 	
-	private final Logger logger = LoggerFactory.getLogger(getClass().getName());
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 
 	private LinkedHashMap<String, Referent> referents;
 	protected String outputEncoding;

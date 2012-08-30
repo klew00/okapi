@@ -77,6 +77,7 @@ import org.junit.Test;
 
 @SuppressWarnings("unused")
 public class XLIFFKitWriterTest {
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 
 //	private final String IN_NAME1 = "Gate Openerss.htm";
 	private final String IN_NAME2 = "TestDocument01.odt";
@@ -673,7 +674,6 @@ public class XLIFFKitWriterTest {
 	}
 
 	private void log(String str) {
-		Logger logger = LoggerFactory.getLogger(getClass().getName()); // loggers are cached
 		logger.debug(str);
 	}
 
@@ -1240,7 +1240,6 @@ public class XLIFFKitWriterTest {
 	
 	@Test
 	public void testStaxParser () throws XMLStreamException {		
-		Logger logger = LoggerFactory.getLogger(getClass().getName());
 		XMLInputFactory fact = null;
 		XMLStreamReader reader = null;
 		 
@@ -1254,7 +1253,6 @@ public class XLIFFKitWriterTest {
 	
 	@Test
 	public void testStaxParser2 () throws XMLStreamException {		
-		Logger logger = LoggerFactory.getLogger(getClass().getName());
 		XMLInputFactory fact = null;
 		XMLStreamReader reader = null;
 		 

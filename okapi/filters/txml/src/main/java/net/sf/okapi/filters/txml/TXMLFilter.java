@@ -72,7 +72,7 @@ public class TXMLFilter implements IFilter {
 
 	private final static String TARGETLOCALE = "targetlocale";
 	
-	private final Logger logger = LoggerFactory.getLogger(getClass().getName());
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 
 	private Parameters params;
 	private boolean hasNext;

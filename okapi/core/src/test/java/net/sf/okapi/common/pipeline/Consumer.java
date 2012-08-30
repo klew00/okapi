@@ -29,7 +29,7 @@ import net.sf.okapi.common.pipeline.BasePipelineStep;
 
 public class Consumer extends BasePipelineStep {
 	
-	private static final Logger LOGGER = LoggerFactory.getLogger(Consumer.class.getName());
+	private final Logger LOGGER = LoggerFactory.getLogger(getClass());
 	
 	public String getName() {
 		return "Consumer";

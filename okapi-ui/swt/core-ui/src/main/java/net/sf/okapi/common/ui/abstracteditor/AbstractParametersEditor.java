@@ -68,7 +68,7 @@ public abstract class AbstractParametersEditor implements IParametersEditor, Lis
 	private List<IDialogPage> pages = null;
 	boolean readOnly = false;
 	
-	private final Logger logger = LoggerFactory.getLogger(this.getClass().getName());
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 
 	public boolean edit(IParameters paramsObject, boolean readOnly, IContext context) {
 

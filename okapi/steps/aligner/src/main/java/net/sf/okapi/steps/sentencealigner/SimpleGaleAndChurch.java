@@ -31,7 +31,7 @@ import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.steps.gcaligner.AlignmentScorer;
 
 public class SimpleGaleAndChurch implements AlignmentScorer<Segment> {
-	private static final Logger LOGGER = LoggerFactory.getLogger(SimpleGaleAndChurch.class.getName());
+	private final Logger LOGGER = LoggerFactory.getLogger(getClass());
 
 	private final static int BIG_DISTANCE = 2500;
 

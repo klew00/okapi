@@ -28,7 +28,7 @@ import static org.jboss.resteasy.cdi.Bootstrap.lookupResteasyCdiConfiguration;
  */
 public class CdiInjectorFactory implements InjectorFactory
 {
-   private static final Logger log = LoggerFactory.getLogger(CdiInjectorFactory.class);
+   private final Logger logger = LoggerFactory.getLogger(getClass());
    private PropertyInjector noopPropertyInjector = new NoopPropertyInjector();
    private InjectorFactory delegate;
    private BeanManager manager;
@@ -49,18 +49,18 @@ public ConstructorInjector createConstructor(Constructor constructor)
 
       if (!manager.getBeans(constructor.getDeclaringClass()).isEmpty())
       {
-         log.debug("Using CdiConstructorInjector for class {}.", clazz);
+         logger.debug("Using CdiConstructorInjector for class {}.", clazz);
          return new CdiConstructorInjector(clazz, manager);
       }
       
       if (configuration.containsSessionBeanClass((constructor.getDeclaringClass())))
       {
          Class<?> intfc = configuration.getSessionBeanLocalInterface(clazz);
-         log.debug("Using interface {} for lookup of Session Bean {}.", intfc, clazz);
+         logger.debug("Using interface {} for lookup of Session Bean {}.", intfc, clazz);
          return new CdiConstructorInjector(intfc, manager);
       }
       
-      log.debug("No CDI beans found for {}. Using default ConstructorInjector.", clazz);
+      logger.debug("No CDI beans found for {}. Using default ConstructorInjector.", clazz);
       return delegate.createConstructor(constructor);
    }
 
@@ -89,7 +89,7 @@ public ConstructorInjector createConstructor(Constructor constructor)
       InitialContext ctx = null;
       try
       {
-         log.debug("Doing a lookup of BeanManager in java:comp/BeanManager");
+         logger.debug("Doing a lookup of BeanManager in java:comp/BeanManager");
          ctx = new InitialContext();
          return (BeanManager) ctx.lookup("java:comp/BeanManager");
       }
@@ -98,7 +98,7 @@ public ConstructorInjector createConstructor(Constructor constructor)
          // Workaround for WELDINT-19
          try
          {
-            log.debug("Lookup failed. Trying java:app/BeanManager");
+            logger.debug("Lookup failed. Trying java:app/BeanManager");
             return (BeanManager) ctx.lookup("java:app/BeanManager");
          }
          catch (NamingException ne)

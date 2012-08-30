@@ -39,7 +39,7 @@ import net.sf.okapi.common.exceptions.OkapiUnsupportedEncodingException;
  */
 public final class BOMNewlineEncodingDetector {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(BOMNewlineEncodingDetector.class.getName());
+	private final Logger LOGGER = LoggerFactory.getLogger(getClass());
 
 	private static final int MAX_LOOKAHEAD = 1024;
 

@@ -48,7 +48,7 @@ public class PipelineDriver implements IPipelineDriver {
 	/**
 	 * Logger for this driver.
 	 */
-	private final Logger logger = LoggerFactory.getLogger(getClass().getName());
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 	
 	private IPipeline pipeline;
 	private List<IBatchItemContext> batchItems;

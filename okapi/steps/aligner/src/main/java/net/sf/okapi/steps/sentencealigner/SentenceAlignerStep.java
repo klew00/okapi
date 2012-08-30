@@ -60,7 +60,7 @@ import net.sf.okapi.steps.gcaligner.AlignmentScorer;
  */
 @UsingParameters(Parameters.class)
 public class SentenceAlignerStep extends BasePipelineStep implements IObserver {
-	private static final Logger LOGGER = LoggerFactory.getLogger(SentenceAlignerStep.class.getName());
+	private final Logger LOGGER = LoggerFactory.getLogger(getClass());
 	
 	private Parameters params;
 	private IFilter filter = null;

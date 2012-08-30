@@ -51,7 +51,7 @@ import net.sf.okapi.filters.rainbowkit.MergingInfo;
 
 public class Merger {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(Merger.class.getName());
+	private final Logger LOGGER = LoggerFactory.getLogger(getClass());
 
 	private IFilter filter;
 	private IFilterWriter writer;

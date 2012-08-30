@@ -80,7 +80,7 @@ public class OpenXMLZipFilterWriter implements IFilterWriter {
 	private File tempFile;
 	private File tempZip;
 	private YamlParameters params; // DWH 7-16-09
-	private static final Logger LOGGER = LoggerFactory.getLogger(OpenXMLZipFilterWriter.class.getName());
+	private final Logger LOGGER = LoggerFactory.getLogger(getClass());
 	private EncoderManager encoderManager;
 
 	/**

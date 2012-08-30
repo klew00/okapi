@@ -43,7 +43,7 @@ import net.sf.okapi.lib.segmentation.SRXDocument;
 import net.sf.okapi.lib.translation.QueryManager;
 
 public class Utility extends BaseFilterDrivenUtility {
-	private final Logger logger = LoggerFactory.getLogger(getClass().getName());
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 	private Parameters params;
 	private IWriter writer;
 	private int id;

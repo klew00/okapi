@@ -45,7 +45,7 @@ import net.sf.okapi.common.resource.TextUnitUtil;
  */
 public abstract class BaseConnector implements IQuery {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(BaseConnector.class.getName());
+	private final Logger LOGGER = LoggerFactory.getLogger(getClass());
 
 	protected LocaleId srcLoc;
 	protected String srcCode;

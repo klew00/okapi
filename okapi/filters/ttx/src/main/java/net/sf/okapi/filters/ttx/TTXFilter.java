@@ -86,7 +86,7 @@ public class TTXFilter implements IFilter {
 	private final static String TTXNOTEXTCHARS = "\u00a0~`!@#$%^&*()_+=-{[}]|\\:;\"'<,>.?/\u2022\u2013";
 	
 	private final static String TARGETLANGUAGE_ATTR = "TargetLanguage";
-	private final Logger logger = LoggerFactory.getLogger(getClass().getName());
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 	
 	private boolean hasNext;
 	private XMLStreamReader reader;

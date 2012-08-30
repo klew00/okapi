@@ -48,7 +48,7 @@ import net.sf.okapi.common.resource.RawDocument;
 @UsingParameters(Parameters.class)
 public class XMLCharFixingStep extends BasePipelineStep {
 
-	private final Logger LOGGER = LoggerFactory.getLogger(getClass().getName());
+	private final Logger LOGGER = LoggerFactory.getLogger(getClass());
 	private final Pattern pattern = Pattern.compile("&#(x?)([0-9a-fA-F]+);");
 	
 	private Parameters params;

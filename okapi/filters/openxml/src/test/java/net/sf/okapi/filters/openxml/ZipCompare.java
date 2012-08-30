@@ -43,7 +43,7 @@ import net.sf.okapi.common.FileCompare;
 
 public class ZipCompare {
 
-	private final Logger LOGGER = LoggerFactory.getLogger(this.getClass().getName());
+	private final Logger LOGGER = LoggerFactory.getLogger(getClass());
 	private FileCompare fc=null;
 	public ZipCompare()
 	{

@@ -42,7 +42,7 @@ import net.sf.okapi.lib.verification.QualityCheckSession;
 @UsingParameters(Parameters.class)
 public class QualityCheckStep extends BasePipelineStep {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(QualityCheckStep.class.getName());
+	private final Logger LOGGER = LoggerFactory.getLogger(getClass());
 
 	private QualityCheckSession session;
 	private IQualityCheckEditor editor;

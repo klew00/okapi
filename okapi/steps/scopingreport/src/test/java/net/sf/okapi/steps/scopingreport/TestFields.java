@@ -36,7 +36,7 @@ public class TestFields {
 		Event sbEvent, ebEvent;
 		ITextUnit tu1, tu2, tu3, tu4;
 		Event tuEvent1, tuEvent2, tuEvent3, tuEvent4;
-		Logger logger = LoggerFactory.getLogger(getClass().getName());
+		Logger localLogger = LoggerFactory.getLogger(getClass());
 		
 		String pathBase = Util.getDirectoryName(this.getClass().getResource("").toURI().getPath()) + "/";
 		net.sf.okapi.connectors.pensieve.Parameters rparams = 
@@ -127,10 +127,10 @@ public class TestFields {
 		srs.handleEvent(eiEvent);
 		srs.handleEvent(ebEvent);
 				
-		logger.debug(TextUnitLogger.getTuInfo(tu1, LocaleId.ENGLISH));
-		logger.debug(TextUnitLogger.getTuInfo(tu2, LocaleId.ENGLISH));
-		logger.debug(TextUnitLogger.getTuInfo(tu3, LocaleId.ENGLISH));
-		logger.debug(TextUnitLogger.getTuInfo(tu4, LocaleId.ENGLISH));
+		localLogger.debug(TextUnitLogger.getTuInfo(tu1, LocaleId.ENGLISH));
+		localLogger.debug(TextUnitLogger.getTuInfo(tu2, LocaleId.ENGLISH));
+		localLogger.debug(TextUnitLogger.getTuInfo(tu3, LocaleId.ENGLISH));
+		localLogger.debug(TextUnitLogger.getTuInfo(tu4, LocaleId.ENGLISH));
 		
 		gen = srs.getReportGenerator();
 	}

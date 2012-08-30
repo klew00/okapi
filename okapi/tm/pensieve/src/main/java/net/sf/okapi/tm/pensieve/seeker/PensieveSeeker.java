@@ -73,7 +73,7 @@ import org.apache.lucene.store.Directory;
  * @author HARGRAVEJE
  */
 public class PensieveSeeker implements ITmSeeker, Iterable<TranslationUnit> {
-	private static final Logger LOGGER = LoggerFactory.getLogger(PensieveSeeker.class.getName());
+	private final Logger LOGGER = LoggerFactory.getLogger(getClass());
 
 	private final static NgramAnalyzer defaultFuzzyAnalyzer = new NgramAnalyzer(Locale.ENGLISH, 4);
 	private final static float MAX_HITS_RATIO = 0.01f;

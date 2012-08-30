@@ -174,7 +174,7 @@ public class ScopingReportStep extends CompoundStep {
 	public static final String ITEM_NOCATEGORY = "ITEM_NOCATEGORY";
 		
 	private static final String DEFAULT_TEMPLATE = "scoping_report.html";
-	private final Logger logger = LoggerFactory.getLogger(getClass().getName());
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 	
 	private Parameters params;
 	private ReportGenerator gen;

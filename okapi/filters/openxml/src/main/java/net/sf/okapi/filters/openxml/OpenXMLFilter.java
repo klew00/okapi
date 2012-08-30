@@ -78,7 +78,7 @@ import net.sf.okapi.common.skeleton.ZipSkeleton;
 @UsingParameters(ConditionalParameters.class)
 public class OpenXMLFilter implements IFilter {
 	
-	private final Logger LOGGER = LoggerFactory.getLogger(this.getClass().getName());
+	private final Logger LOGGER = LoggerFactory.getLogger(getClass());
 
 	private enum NextAction {
 		OPENZIP, NEXTINZIP, NEXTINSUBDOC, DONE

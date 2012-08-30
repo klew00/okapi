@@ -86,7 +86,7 @@ public class IDMLFilter implements IFilter {
 	private final static CodeSimplifier SIMPLIFIER = new CodeSimplifier();
 	private final DocumentBuilder docBuilder;
 
-	private final Logger logger = LoggerFactory.getLogger(getClass().getName());
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 	
 	private URI docURI;
 	private LinkedList<Event> queue;

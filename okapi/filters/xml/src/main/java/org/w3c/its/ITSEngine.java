@@ -114,7 +114,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 	private boolean translatableAttributeRuleTriggered;
 	private String version;
 
-	private final Logger logger = LoggerFactory.getLogger(getClass().getName());
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 	
 	public ITSEngine (Document doc,
 		URI docURI)

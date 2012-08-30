@@ -40,7 +40,7 @@ import net.sf.okapi.lib.translation.ResourceItem;
 @UsingParameters(Parameters.class)
 public class LeveragingStep extends BasePipelineStep {
 
-	private final Logger logger = LoggerFactory.getLogger(getClass().getName());
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 	
 	private Parameters params;
 	private LocaleId sourceLocale;

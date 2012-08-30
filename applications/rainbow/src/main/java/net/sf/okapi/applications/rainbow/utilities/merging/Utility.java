@@ -30,7 +30,7 @@ import net.sf.okapi.applications.rainbow.utilities.ISimpleUtility;
 import net.sf.okapi.common.IParameters;
 
 public class Utility extends BaseUtility implements ISimpleUtility {
-	private final Logger logger = LoggerFactory.getLogger(getClass().getName());
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 	private String manifestPath;
 	private Manifest manifest;
 	private Merger merger;

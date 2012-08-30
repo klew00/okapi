@@ -45,7 +45,6 @@ import net.sf.okapi.steps.tokenization.tokens.Tokens;
 public class Tokenizer {
 
 	protected static TokenizationStep ts = new TokenizationStep();
-	private static final Logger logger = LoggerFactory.getLogger(Tokenizer.class.getName());
 	
 	/**
 	 * Extracts tokens from the given text.
@@ -95,7 +94,8 @@ public class Tokenizer {
 		
 		if ( text == null ) return null;
 		if ( Util.isNullOrEmpty(language) ) {
-			logger.warn("Language is not set, cannot tokenize.");
+			Logger localLogger = LoggerFactory.getLogger(Tokenizer.class);
+			localLogger.warn("Language is not set, cannot tokenize.");
 			return null;
 		}
 		

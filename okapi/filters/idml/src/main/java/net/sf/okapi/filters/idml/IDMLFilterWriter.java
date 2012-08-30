@@ -74,7 +74,7 @@ import net.sf.okapi.common.skeleton.ISkeletonWriter;
 
 public class IDMLFilterWriter implements IFilterWriter {
 
-	private final Logger logger = LoggerFactory.getLogger(getClass().getName());
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 
 	private final DocumentBuilder docBuilder;
 	private String outputPath;
