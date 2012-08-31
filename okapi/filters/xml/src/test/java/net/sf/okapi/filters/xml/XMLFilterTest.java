@@ -175,6 +175,25 @@ public class XMLFilterTest {
 	}
 	
 	@Test
+	public void testLocaleFilter6 () {
+		String snippet = "<?xml version=\"1.0\"?>\n"
+			+ "<doc xmlns:its=\"http://www.w3.org/2005/11/its\"><its:rules version=\"2.0\">"
+			+ "<its:localeFilterRule selector=\"//para[@scope='GER']\" localeFilterList='de'/>"
+			+ "</its:rules>"
+			+ "<para scope='GER'>text1</para>"
+			+ "<para scope='ZZZ'>text2</para>"
+			+ "<para scope='ZZZ' its:localeFilterList='fr-*'>text3</para>"
+			+ "</doc>";
+		ArrayList<Event> list = getEvents(snippet);
+		ITextUnit tu = FilterTestDriver.getTextUnit(list, 1);
+		assertNotNull(tu);
+		assertEquals("text2", tu.getSource().toString());
+		tu = FilterTestDriver.getTextUnit(list, 2);
+		assertNotNull(tu);
+		assertEquals("text3", tu.getSource().toString());
+	}
+	
+	@Test
 	public void testComplexIdValue () {
 		String snippet = "<?xml version=\"1.0\"?>\n"
 			+ "<doc><its:rules version=\"1.0\" xmlns:its=\"http://www.w3.org/2005/11/its\""

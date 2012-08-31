@@ -249,7 +249,7 @@ public class XLIFFWriterTest {
 			+ "<xliff version=\"1.2\" xmlns=\"urn:oasis:names:tc:xliff:document:1.2\" xmlns:okp=\"okapi-framework:xliff-extensions\">\n"
 			+ "<file original=\"original.ext\" source-language=\"en\" datatype=\"x-undefined\">\n"
 			+ "<body>\n"
-			+ "<trans-unit id=\"tu1\" xmlns:its=\"http://www.w3.org/2005/11/its\" its:version=\"2.0\" its:externalResourcesRef=\"http://example.com/res\">\n"
+			+ "<trans-unit id=\"tu1\" xmlns:okp=\"okapi-framework:xliff-extensions\" okp:externalResourcesRef=\"http://example.com/res\">\n"
 			+ "<source xml:lang=\"en\">text</source>\n"
 			+ "<okp:itsDomains xmlns:dc=\"http://purl.org/dc/elements/1.1/\"><okp:item dc:subject=\"dom1\"></okp:item><okp:item dc:subject=\"dom2\"></okp:item></okp:itsDomains>"
 			+ "</trans-unit>\n"

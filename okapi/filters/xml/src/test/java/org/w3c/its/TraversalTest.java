@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2010 by the Okapi Framework contributors
+  Copyright (C) 2010-2012 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -146,11 +146,11 @@ public class TraversalTest {
 		InputSource is = new InputSource(new StringReader("<book xmlns:its=\"http://www.w3.org/2005/11/its\">"
 			+ "<info>"
 			+ "<its:rules version=\"2.0\">"
-			+ "<its:localeFilterRule selector=\"//legalnotice[@role='Canada']\" localeFilterType=\"include\" localeFilterList=\"en-CA, fr-CA\"/>"
+			+ "<its:localeFilterRule selector=\"//legalnotice[@role='Canada']\" localeFilterList=\"en-CA, fr-CA\"/>"
 			+ "</its:rules>"
 			+ "<legalnotice role=\"Canada\">"
 			+ "<para>This legal notice is only for Canadian locales.</para>"
-			+ "<para its:localeFilterType='include' its:localeFilterList='*'>This text is for all locales.</para>"
+			+ "<para its:localeFilterList='*'>This text is for all locales.</para>"
 			+ "</legalnotice>"
 			+ "</info></book>"));
 		Document doc = fact.newDocumentBuilder().parse(is);
@@ -196,6 +196,96 @@ public class TraversalTest {
 		assertFalse(trav.preserveWS());
 		elem = getElement(trav, "pre", 1);
 		assertTrue(trav.preserveWS());
+	}
+
+	@Test
+	public void testLQIssueGlobal1 () throws SAXException, IOException, ParserConfigurationException {
+		InputSource is = new InputSource(new StringReader("<doc>"
+			+ "<i:rules xmlns:i='"+ITSEngine.ITS_NS_URI+"' version='2.0'>"
+			+ "<i:locQualityIssueRule selector='//z' locQualityIssueTypePointer='@type' locQualityIssueCommentPointer='@comment'"
+			+ " locQualityIssueScorePointer='@score' locQualityIssueProfileRefPointer='@pref'/>"
+			+ "</i:rules>"
+			+ "<p>Text with <z type='other' comment='comment' pref='uri' score='1'>error</z></p></doc>"));
+		Document doc = fact.newDocumentBuilder().parse(is);
+		ITraversal trav = applyITSRules(doc, null, null);
+		getElement(trav, "z", 1);
+		assertEquals("other", trav.getLocQualityIssueType());
+		assertEquals("comment", trav.getLocQualityIssueComment());
+		assertEquals("1", trav.getLocQualityIssueScore());
+		assertEquals("uri", trav.getLocQualityIssueProfileRef());
+	}
+
+	@Test
+	public void testLQIssueGlobal2 () throws SAXException, IOException, ParserConfigurationException {
+		InputSource is = new InputSource(new StringReader("<doc xmlns:i='"+ITSEngine.ITS_NS_URI+"' i:version='2.0'>"
+			+ "<i:rules xmlns:i='"+ITSEngine.ITS_NS_URI+"' version='2.0'>"
+			+ "<i:locQualityIssueRule selector='//z' locQualityIssuesRefPointer='@ref' />"
+			+ "</i:rules>"
+			+ "<p>Text with <z ref='#id1'>error</z></p>"
+			+ "<info id='id1' i:locQualityIssueComment='comment'/></doc>"));
+		Document doc = fact.newDocumentBuilder().parse(is);
+		ITraversal trav = applyITSRules(doc, null, null);
+		getElement(trav, "z", 1);
+		assertEquals("#id1", trav.getLocQualityIssuesRef());
+		assertEquals(null, trav.getLocQualityIssueType());
+		assertEquals(null, trav.getLocQualityIssueComment());
+		assertEquals(null, trav.getLocQualityIssueScore());
+		assertEquals(null, trav.getLocQualityIssueProfileRef());
+		Element elem = getElement(trav, "info", 1);
+		assertNotNull(elem);
+		assertEquals(null, trav.getLocQualityIssuesRef());
+		assertEquals(null, trav.getLocQualityIssueType());
+		assertEquals("comment", trav.getLocQualityIssueComment());
+		assertEquals(null, trav.getLocQualityIssueScore());
+		assertEquals(null, trav.getLocQualityIssueProfileRef());
+		
+	}
+
+	@Test
+	public void testLQIssueGlobalAndLocal1 () throws SAXException, IOException, ParserConfigurationException {
+		InputSource is = new InputSource(new StringReader("<doc xmlns:i='"+ITSEngine.ITS_NS_URI+"' i:version='2.0'>"
+			+ "<i:rules xmlns:i='"+ITSEngine.ITS_NS_URI+"' version='2.0'>"
+			+ "<i:locQualityIssueRule selector='//z' locQualityIssueTypePointer='@type' locQualityIssueCommentPointer='@comment'"
+			+ " locQualityIssueScorePointer='@score' locQualityIssueProfileRefPointer='@pref'/>"
+			+ "</i:rules>"
+			+ "<p>Text with <z type='other' comment='comment' pref='uri' score='1'"
+			+ " i:locQualityIssueType='terminology' i:locQualityIssueProfileRef='thisUri'>error</z></p></doc>"));
+		Document doc = fact.newDocumentBuilder().parse(is);
+		ITraversal trav = applyITSRules(doc, null, null);
+		getElement(trav, "z", 1);
+		assertEquals(null, trav.getLocQualityIssuesRef());
+		assertEquals("terminology", trav.getLocQualityIssueType());
+		assertEquals("comment", trav.getLocQualityIssueComment());
+		assertEquals("1", trav.getLocQualityIssueScore());
+		assertEquals("thisUri", trav.getLocQualityIssueProfileRef());
+	}
+
+	@Test
+	public void testLQIssueLocal1 () throws SAXException, IOException, ParserConfigurationException {
+		InputSource is = new InputSource(new StringReader("<doc xmlns:i='"+ITSEngine.ITS_NS_URI+"' i:version='2.0'>"
+			+ "<p>Text with <z i:locQualityIssueType='other' i:locQualityIssueComment='comment'"
+			+ " i:locQualityIssueProfileRef='uri' i:locQualityIssueScore='1'>error</z></p></doc>"));
+		Document doc = fact.newDocumentBuilder().parse(is);
+		ITraversal trav = applyITSRules(doc, null, null);
+		getElement(trav, "z", 1);
+		assertEquals("other", trav.getLocQualityIssueType());
+		assertEquals("comment", trav.getLocQualityIssueComment());
+		assertEquals("1", trav.getLocQualityIssueScore());
+		assertEquals("uri", trav.getLocQualityIssueProfileRef());
+	}
+	
+	@Test
+	public void testLQIssueLocalWithSpan () throws SAXException, IOException, ParserConfigurationException {
+		InputSource is = new InputSource(new StringReader("<doc xmlns:i='"+ITSEngine.ITS_NS_URI+"' i:version='2.0'>"
+			+ "<p>Text with <i:span locQualityIssueType='other' locQualityIssueComment='comment'"
+			+ " locQualityIssueProfileRef='uri' locQualityIssueScore='1'>error</i:span></p></doc>"));
+		Document doc = fact.newDocumentBuilder().parse(is);
+		ITraversal trav = applyITSRules(doc, null, null);
+		getElement(trav, "i:span", 1);
+		assertEquals("other", trav.getLocQualityIssueType());
+		assertEquals("comment", trav.getLocQualityIssueComment());
+		assertEquals("1", trav.getLocQualityIssueScore());
+		assertEquals("uri", trav.getLocQualityIssueProfileRef());
 	}
 	
 	@Test

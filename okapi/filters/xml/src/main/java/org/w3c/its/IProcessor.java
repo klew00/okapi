@@ -39,6 +39,7 @@ public interface IProcessor {
 	public static final int DC_EXTERNALRES       = 0x0400; // ITS 2.0
 	public static final int DC_LOCFILTER         = 0x0800; // ITS 2.0
 	public static final int DC_PRESERVESPACE     = 0x1000; // ITS 2.0
+	public static final int DC_LOCQUALITYISSUE   = 0x2000; // ITS 2.0
 	public static final int DC_ALL               = 0xFFFF;
 	
 	/**

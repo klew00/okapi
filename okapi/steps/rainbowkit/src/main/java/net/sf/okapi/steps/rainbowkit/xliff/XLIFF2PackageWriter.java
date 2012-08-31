@@ -26,12 +26,16 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.logging.Logger;
 
+import javax.xml.namespace.QName;
+
 import org.oasisopen.xliff.v2.ICMarker;
 import org.oasisopen.xliff.v2.IDataStore;
+import org.oasisopen.xliff.v2.IExtendedChild;
 import org.oasisopen.xliff.v2.IFragment;
 import org.oasisopen.xliff.v2.INote;
 import org.oasisopen.xliff.v2.IPart;
 import org.oasisopen.xliff.v2.IWithCandidates;
+import org.oasisopen.xliff.v2.Names;
 import org.oasisopen.xliff.v2.OriginalDataStyle;
 
 import net.sf.okapi.common.Event;
@@ -53,6 +57,8 @@ import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.filters.rainbowkit.Manifest;
 import net.sf.okapi.filters.rainbowkit.MergingInfo;
 import net.sf.okapi.lib.xliff.Candidate;
+import net.sf.okapi.lib.xliff.ExtendedAttribute;
+import net.sf.okapi.lib.xliff.ExtendedElement;
 import net.sf.okapi.lib.xliff.Fragment;
 import net.sf.okapi.lib.xliff.Note;
 import net.sf.okapi.lib.xliff.Unit;
@@ -307,6 +313,10 @@ public class XLIFF2PackageWriter extends BasePackageWriter {
 		if ( tu.hasProperty(Property.NOTE) ) {
 			unit.addNote(new Note(tu.getProperty(Property.NOTE).getValue()));
 		}
+		// Add trans-unit level translator note if needed 
+		if ( tu.hasProperty(Property.TRANSNOTE) ) {
+			unit.addNote(new Note("From Translator: "+tu.getProperty(Property.TRANSNOTE).getValue()));
+		}
 		// Add source notes
 		if ( tu.hasSourceProperty(Property.NOTE) ) {
 			unit.addNote(new Note(tu.getSourceProperty(Property.NOTE).getValue(), INote.AppliesTo.SOURCE));
@@ -315,6 +325,26 @@ public class XLIFF2PackageWriter extends BasePackageWriter {
 		if ( tu.hasTargetProperty(manifest.getTargetLocale(), Property.NOTE) ) {
 			unit.addNote(new Note(tu.getTargetProperty(manifest.getTargetLocale(), Property.NOTE).getValue(), INote.AppliesTo.TARGET));
 		}
+		
+		
+		// External resource reference
+		if ( tu.hasProperty(Property.ITS_EXTERNALRESREF) ) {
+			unit.getExtendedAttributes().setAttribute(Names.NS_XLIFFOKAPI, "itsExternalResource",
+				tu.getProperty(Property.ITS_EXTERNALRESREF).getValue());
+		}
+		// Domains
+		if ( tu.hasProperty(Property.ITS_DOMAINS) ) {
+			ExtendedElement domains = new ExtendedElement(new QName(Names.NS_XLIFFOKAPI, "itsDomains", Names.PREFIX_XLIFFOKAPI), null);
+			domains.getAttributes().setNamespace("okp", Names.NS_XLIFFOKAPI);
+			//Not used for now domains.getAttributes().setNamespace("dc", "http://purl.org/dc/elements/1.1/");
+			for ( String value : tu.getProperty(Property.ITS_DOMAINS).getValue().split("\t", 0) ) {
+				ExtendedElement item = new ExtendedElement(new QName(Names.NS_XLIFFOKAPI, "item", Names.PREFIX_XLIFFOKAPI), null);
+				item.getAttributes().setAttribute("http://purl.org/dc/elements/1.1/", "subject", value);
+				domains.addChild(item);
+			}
+			unit.getExtendedElements().add(domains);
+		}
+		
 		
 		// Go through the parts: Use the source to drive the order
 		// But match on segment ids

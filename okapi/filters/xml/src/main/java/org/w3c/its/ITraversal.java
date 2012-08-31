@@ -69,8 +69,7 @@ public interface ITraversal {
 	public boolean translate (Attr attribute);
 
 	/**
-	 * Gets the target pointer for the current element of the traversal. This method
-	 * is used for an extension to ITS 1.0.
+	 * Gets the target pointer for the current element of the traversal.
 	 * @return The XPath relative to the current element to the node where the
 	 * translation should be placed.
 	 */
@@ -102,6 +101,16 @@ public interface ITraversal {
 	public String getExternalResourcesRef ();
 	
 	public String getExternalResourcesRef (Attr attribute);
+	
+	public String getLocQualityIssuesRef ();
+	
+	public String getLocQualityIssueType ();
+	
+	public String getLocQualityIssueComment ();
+	
+	public String getLocQualityIssueScore ();
+	
+	public String getLocQualityIssueProfileRef ();
 	
 	/**
 	 * Gets the element-withinText-related information for the current element.

@@ -45,7 +45,7 @@ public class Property {
 	/**
 	 * ITS External Resources Reference value
 	 */
-	public static final String ITS_EXTERNALRESREF = "ist-externalResourcesRef"; 
+	public static final String ITS_EXTERNALRESREF = "its-externalResourcesRef"; 
 	
 	private final String name;
 	private String value;

@@ -21,6 +21,7 @@
 package org.w3c.its;
 
 import java.io.File;
+import java.util.Stack;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 
@@ -35,29 +36,56 @@ import org.w3c.dom.Node;
 
 public class Main {
 
+	public static final String DC_TRANSLATE = "translate";
+	public static final String DC_IDVALUE = "idvalue";
+
 	public static void main (String[] args) {
-		XMLWriter writer = null;
+ 
+	XMLWriter writer = null;
 		try {
 			System.out.println("ITSTest");
 			
-			File inputFile;
-			if ( args.length > 0 ) inputFile = new File(args[0]);
-			else inputFile = new File("inputFile.xml"); 
-			System.out.println("   input: " + inputFile.getAbsolutePath());
-			
-			File outputFile;
-			if ( args.length > 1 ) outputFile = new File(args[1]);
-			else {
-				outputFile = new File(Util.getDirectoryName(inputFile.getAbsolutePath())
-					+ File.separator + "nodelist-with-its-information.xml");
-			}
-			System.out.println("  output: " + outputFile.getAbsolutePath());
-
+			File inputFile = null;
+			File outputFile = null;
 			File rulesFile = null;
-			if ( args.length > 2 ) rulesFile = new File(args[2]);
-			System.out.print("   rules: ");
-			if ( rulesFile == null ) System.out.print("No external rules file will be used.");
-			else System.out.println(rulesFile.getAbsolutePath());
+			String dc = "translate";
+			
+			if ( args.length == 0 ) inputFile = new File("inputFile.xml");
+			else for ( int i=0; i<args.length; i++ ) {
+				String arg = args[i];
+				if ( arg.equals("-r") ) { // External rule file
+					i++; rulesFile = new File(args[i]);
+				}
+				else if ( arg.equals("-dc") ) { // Data category
+					i++; dc = args[i];
+				}
+				else {
+					if ( inputFile == null ) {
+						inputFile = new File(args[i]);
+					}
+					else {
+						outputFile = new File(args[i]);
+					}
+				}
+			}
+			
+			// Default output
+			if ( outputFile == null ) {
+				String ext = Util.getExtension(inputFile.getAbsolutePath());
+				String name = inputFile.getAbsolutePath();
+				int n = name.lastIndexOf('.');
+				if ( n > -1 ) name = name.substring(0, n);
+				name += "output";
+				name += ext;
+				outputFile = new File(name);
+			}
+			
+			// Trace
+			System.out.println("   input: " + inputFile.getAbsolutePath());
+			System.out.println("  output: " + outputFile.getAbsolutePath());
+			if ( rulesFile != null ) {
+				System.out.print("   rules: " + rulesFile.getAbsolutePath());
+			}
 			
 			DocumentBuilderFactory fact = DocumentBuilderFactory.newInstance();
 			fact.setNamespaceAware(true);
@@ -70,12 +98,14 @@ public class Main {
 			writer.writeAttributeString("xmlns:its", ITSEngine.ITS_NS_URI);
 			writer.writeAttributeString("xmlns:datc", "http://example.com/datacats");
 			writer.writeStartElement("nodeList");
-			writer.writeAttributeString("datacat", "TODO");
+			writer.writeAttributeString("datacat", dc);
 			
 			Document doc = fact.newDocumentBuilder().parse(inputFile);
 			ITraversal trav = applyITSRules(doc, inputFile, rulesFile);
 
-			String path = "";
+			String path = null;
+			Stack<Integer> stack = new Stack<Integer>();
+			stack.push(1);
 			
 			// Process the document
 			trav.startTraversal();
@@ -88,30 +118,48 @@ public class Main {
 					if ( trav.backTracking() ) {
 						int n = path.lastIndexOf('/');
 						if ( n > -1 ) path = path.substring(0, n);
+						stack.pop();
 					}
 					else {
 						Element element = (Element)node;
-						path += "/"+element.getLocalName();
 						
-						writer.writeStartElement("node");
-						writer.writeAttributeString("path", path);
-						writer.writeAttributeString("outputType", "TODO");
-						writer.writeStartElement("output");
+						// Get the previous sibling element (if any)
+						Node prev = element;
+						do {
+							prev = prev.getPreviousSibling();
+						}
+						while (( prev != null ) && ( prev.getNodeType() != node.ELEMENT_NODE ));
+
+						// If it's the same kind of element, we increment the counter
+						if (( prev != null ) && prev.getNodeName().equals(element.getNodeName()) ) { 
+							stack.push(stack.peek()+1);
+						}
+						else {
+							stack.push(1);
+						}
 						
-						writer.writeEndElement(); // output
-						writer.writeEndElement(); // node
+						// If it's a sibling element, remove the other sibling before appending
+						if ( prev != null ) {
+							int n = path.lastIndexOf('/');
+							if ( n > -1 ) path = path.substring(0, n);
+						}
+						if ( element == doc.getDocumentElement() ) {
+							path = "/"+element.getNodeName();
+						}
+						else {
+							path += String.format("/%s[%d]", element.getNodeName(), stack.peek());
+						}
+
+						// Gather and output the values for the element
+						output(writer, dc, path, trav, null);
 
 						if ( element.hasAttributes() ) {
 							NamedNodeMap map = element.getAttributes();
 							for ( int i=0; i<map.getLength(); i++ ) {
 								Attr attr = (Attr)map.item(i);
-								writer.writeStartElement("node");
-								writer.writeAttributeString("path", path+"/@"+attr.getName());
-								writer.writeAttributeString("outputType", "TODO");
-								writer.writeStartElement("output");
-								
-								writer.writeEndElement(); // output
-								writer.writeEndElement(); // node
+								if ( attr.getNodeName().startsWith("xmlns:") ) continue; // Skip NS declarations
+								// gather and output the values for the attribute
+								output(writer, dc, path+"/@"+attr.getNodeName(), trav, attr);
 							}
 						}
 					}
@@ -131,6 +179,40 @@ public class Main {
 		}
 	}
 
+	private static void output (XMLWriter writer,
+		String dc,
+		String path,
+		ITraversal trav,
+		Attr attr)
+	{
+		// Get the values for the give data category
+		String outType = "no-value";
+		String out1 = null;
+		if ( dc.equals(DC_IDVALUE) ) {
+			out1 = trav.getIdValue();
+			if ( out1 != null ) outType = "cannot-detect";
+		}
+		else if ( dc.equals(DC_TRANSLATE) ) {
+			if ( attr != null ) out1 = (trav.translate(attr) ? "yes" : "no");
+			else out1 = (trav.translate() ? "yes" : "no");
+		}
+
+		writer.writeStartElement("node");
+		writer.writeAttributeString("path", path);
+		writer.writeAttributeString("outputType", outType);
+		writer.writeStartElement("output");
+		
+		if ( dc.equals(DC_IDVALUE) ) {
+			if ( out1 != null ) writer.writeAttributeString("idValue", out1);
+		}
+		else if ( dc.equals(DC_TRANSLATE) ) {
+			if ( out1 != null ) writer.writeAttributeString("translate", out1);
+		}
+		
+		writer.writeEndElement(); // output
+		writer.writeEndElement(); // node
+	}
+	
 	private static ITraversal applyITSRules (Document doc,
 		File inputFile,
 		File rulesFile)
