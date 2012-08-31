@@ -461,11 +461,11 @@
 		<copy todir="${distLib}" file="${depSlf4jApi}/${jarSlf4jApi}"/>
 
 		<echo file="tmpJars" append="yes"> logger/logger.jar</echo>
-		<copy file="${mavenStore}/okapi-log4j-extras/log4j-logger-binder/1.0.0/log4j-logger-binder-1.0.0.jar"
+		<copy file="${mavenStore}/net/sf/okapi/log4j/binder/${okapilibStamp}/binder-${okapilibStamp}.jar"
 		      tofile="${distLogger}/logger.jar" />
 
-		<property name="depLog4jColorAppend" value="${mavenStore}/okapi-log4j-extras/log4j-color-appender/1.0.0"/>
-		<fileset id="list.contents" dir="${depLog4jColorAppend}" includes="**/log4j-color-appender-1.0.0.jar"/>
+		<property name="depLog4jColorAppend" value="${mavenStore}/net/sf/okapi/log4j/colorappender/${okapilibStamp}"/>
+		<fileset id="list.contents" dir="${depLog4jColorAppend}" includes="**/colorappender-${okapilibStamp}.jar"/>
 		<property name="jarLog4jColorAppend" refid="list.contents"/>
 		<!-- Missing <echo file="tmpJars" append="yes" ... is intentional -->
 		<copy todir="${distLogger}" file="${depLog4jColorAppend}/${jarLog4jColorAppend}"/>
