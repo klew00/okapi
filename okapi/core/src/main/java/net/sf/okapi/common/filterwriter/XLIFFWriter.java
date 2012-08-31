@@ -449,7 +449,7 @@ public class XLIFFWriter implements IFilterWriter {
 		// TU-level ITS properties (as attribute)
 		if ( tu.hasProperty(Property.ITS_EXTERNALRESREF) ) {
 			writer.writeAttributeString("xmlns:okp", NS_XLIFFOKAPI);
-			writer.writeAttributeString("okp:itsExternalResource",
+			writer.writeAttributeString("okp:itsExternalResourceRef",
 				tu.getProperty(Property.ITS_EXTERNALRESREF).getValue());
 		}
 		

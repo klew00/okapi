@@ -30,7 +30,6 @@ import javax.xml.namespace.QName;
 
 import org.oasisopen.xliff.v2.ICMarker;
 import org.oasisopen.xliff.v2.IDataStore;
-import org.oasisopen.xliff.v2.IExtendedChild;
 import org.oasisopen.xliff.v2.IFragment;
 import org.oasisopen.xliff.v2.INote;
 import org.oasisopen.xliff.v2.IPart;
@@ -329,7 +328,7 @@ public class XLIFF2PackageWriter extends BasePackageWriter {
 		
 		// External resource reference
 		if ( tu.hasProperty(Property.ITS_EXTERNALRESREF) ) {
-			unit.getExtendedAttributes().setAttribute(Names.NS_XLIFFOKAPI, "itsExternalResource",
+			unit.getExtendedAttributes().setAttribute(Names.NS_XLIFFOKAPI, "itsExternalResourceRef",
 				tu.getProperty(Property.ITS_EXTERNALRESREF).getValue());
 		}
 		// Domains
