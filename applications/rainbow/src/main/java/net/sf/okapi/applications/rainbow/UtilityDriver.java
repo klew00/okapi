@@ -169,7 +169,7 @@ public class UtilityDriver implements CancelListener {
 			utility.preprocess();
 			
 			// Last check to warning for empty list
-			if ( prj.getList(0).size() == 0 ) { // TZU
+			if ( prj.getList(0).size() == 0 ) {
 				logger.warn(Res.getString("UtilityDriver.noInput")); //$NON-NLS-1$
 			}
 
@@ -177,7 +177,6 @@ public class UtilityDriver implements CancelListener {
 			int f = -1;
 			for ( Input item : prj.getList(0) ) {
 				f++;
-// TZU
 				logger.warn(Res.getString("UtilityDriver.input")+item.relativePath); //$NON-NLS-1$
 
 				// Initialize the main input

@@ -30,7 +30,7 @@ class LogHandlerNop implements ILogHandler {
 		if( !log.isVisible() )
 			log.show();
 		log.setTitle("ERROR");
-		log.error("        Unknown undelying logger, cannot capture it's output");
+		log.error("        Unknown underlying logger, cannot capture it's output");
 	}
 
 	public void setLogLevel(int level) {

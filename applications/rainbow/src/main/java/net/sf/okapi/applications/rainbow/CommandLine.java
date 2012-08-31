@@ -55,7 +55,6 @@ public class CommandLine {
 	private FilterConfigurationMapper fcMapper;
 	private UtilitiesAccess utilitiesAccess;
 	private BatchLog log;
-// TZU	private LogHandler logHandler;
 	private String utilityId;
 	private String pipelineFile;
 	private String optionsFile;
@@ -259,9 +258,6 @@ public class CommandLine {
 		help = new BaseHelp(appRootFolder+File.separator+"help"); //$NON-NLS-1$
 
 		log = new BatchLog();
-		// TZU logHandler = new LogHandler(log);
-		// TZU LoggerFactory.getLogger("").addHandler(logHandler); //$NON-NLS-1$
-		
 		lm = new LanguageManager();
 		lm.loadList(sharedFolder + File.separator + "languages.xml"); //$NON-NLS-1$
 		

@@ -163,7 +163,7 @@ public class MainForm { //implements IParametersProvider {
 	private ArrayList<InputTableModel> inputTableMods;
 	private Shell shell;
 	private ILog log;
-	private ILogHandler logHandler; // TZU
+	private ILogHandler logHandler;
 	private UserConfiguration config;
 	private MRUList mruList;
 	private String appRootFolder;
@@ -1185,7 +1185,7 @@ public class MainForm { //implements IParametersProvider {
 			wrapper.refreshAvailableStepsList();
 		}
 	}
-// TZU
+
 	private void setLogLevel () {
 		int n = config.getInteger(MainForm.OPT_LOGLEVEL);
 		switch ( n ) {
@@ -1930,7 +1930,6 @@ public class MainForm { //implements IParametersProvider {
 			dlg.showDialog();
 			
 			// Update dependent data
-			// TZU
 			setLogLevel();
 			updatePluginsAndDependencies();
 		}
