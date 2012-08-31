@@ -37,7 +37,6 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 	<modules>
-		<module>deployment/log4j-colorappender</module>
 		<module>deployment/log4j-binder</module>
 		<module>core</module>
 		<module>filters</module>
@@ -71,12 +70,6 @@
 		<dependency>
 			<groupId>net.sf.okapi.log4j</groupId>
 			<artifactId>binder</artifactId>
-			<version>${project.version}</version>
-			<scope>runtime</scope>
-		</dependency>
-		<dependency>
-			<groupId>net.sf.okapi.log4j</groupId>
-			<artifactId>colorappender</artifactId>
 			<version>${project.version}</version>
 			<scope>runtime</scope>
 		</dependency>

@@ -28,12 +28,6 @@
 			<artifactId>log4j</artifactId>
 			<version>1.2.17</version>
 		</dependency>
-		<dependency>
-			<groupId>net.sf.okapi.log4j</groupId>
-			<artifactId>colorappender</artifactId>
-            <version>${project.version}</version>
-			<scope>runtime</scope>
-		</dependency>
 	</dependencies>
 
 	<build>
@@ -63,6 +57,28 @@
 					<target>1.6</target>
 				</configuration>
 			</plugin>
+
+			<plugin>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<executions>
+					<execution>
+						<phase>compile</phase>
+						<configuration>
+							<tasks>
+								<copy todir="${settings.localRepository}/net/sf/okapi/log4j/${project.artifactId}/${project.version}" overwrite="true">
+									<fileset dir="src/resources">
+										<include name="*.properties"/>
+									</fileset>
+								</copy>
+							</tasks>
+						</configuration>
+						<goals>
+							<goal>run</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
 		</plugins>
 	</build>
 
