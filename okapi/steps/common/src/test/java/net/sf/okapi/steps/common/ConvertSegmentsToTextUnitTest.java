@@ -8,10 +8,12 @@ import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.AlignmentStatus;
+import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.resource.TextFragment.TagType;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -19,7 +21,9 @@ import org.junit.Test;
 public class ConvertSegmentsToTextUnitTest {
 	private ConvertSegmentsToTextUnitsStep converter;
 	private ITextUnit segmentedTu;
+	private ITextUnit segmentedTuWithCodes;
 	private ITextUnit nonSegmentedTu;
+	
 	
 	@Before
 	public void setUp() {
@@ -37,6 +41,28 @@ public class ConvertSegmentsToTextUnitTest {
 		}
 		segmentedTu.getTarget(LocaleId.SPANISH).getSegments().setAlignmentStatus(AlignmentStatus.ALIGNED);
 		
+		// set up segmentedTUWithCodes
+		segmentedTuWithCodes = new TextUnit("segmentedTUWithCodes");
+		segmentedTuWithCodes.createTarget(LocaleId.SPANISH, true, IResource.CREATE_EMPTY);
+		
+		for (int j = 0; j < 3; j++) {			
+			TextFragment stf = new TextFragment("a segment. ");
+			Code sc = new Code(TagType.PLACEHOLDER, "type", "data");
+			sc.setId(15);
+			stf.append(sc);
+			Segment srcSeg = new Segment(Integer.toString(j), stf);
+			
+			TextFragment ttf = new TextFragment("A SEGMENT. ");
+			Code tc = new Code(TagType.PLACEHOLDER, "type", "data");
+			tc.setId(15);
+			ttf.append(tc);
+			Segment trgSeg = new Segment(Integer.toString(j), ttf);
+			
+			segmentedTuWithCodes.getSource().append(srcSeg);
+			segmentedTuWithCodes.getTarget(LocaleId.SPANISH).append(trgSeg);
+		}
+		segmentedTuWithCodes.getTarget(LocaleId.SPANISH).getSegments().setAlignmentStatus(AlignmentStatus.ALIGNED);
+				
 		// set up non segmented TU
 		nonSegmentedTu = new TextUnit("NON-SEGMENTED");
 		nonSegmentedTu.setSourceContent(new TextFragment("a segment. "));
@@ -52,6 +78,25 @@ public class ConvertSegmentsToTextUnitTest {
 			ITextUnit tu = e.getTextUnit();
 			assertEquals("a segment. ", tu.getSource().toString());
 			assertEquals("A SEGMENT. ", tu.getTarget(LocaleId.SPANISH).toString());
+		}
+		
+		assertEquals(3, count);
+	}
+	
+	
+	@Test
+	public void convertSegmentedTuToMultipleWithCodes() {
+		Event event = converter.handleTextUnit(new Event(EventType.TEXT_UNIT, segmentedTuWithCodes));
+		int count = 0;
+		for (Event e : event.getMultiEvent()) {
+			count++;
+			ITextUnit tu = e.getTextUnit();
+			Code sc = tu.getSource().getFirstContent().getCode(0);
+			assertEquals(15, sc.getId());
+			assertEquals("a segment. data", tu.getSource().toString());
+			Code tc = tu.getSource().getFirstContent().getCode(0);
+			assertEquals(15, tc.getId());
+			assertEquals("A SEGMENT. data", tu.getTarget(LocaleId.SPANISH).toString());
 		}
 		
 		assertEquals(3, count);

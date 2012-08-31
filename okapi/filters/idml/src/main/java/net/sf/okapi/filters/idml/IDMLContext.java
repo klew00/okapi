@@ -78,6 +78,10 @@ public class IDMLContext {
 	public Node getScopeNode () {
 		return scopeNode;
 	}
+
+	public IDMLSkeleton getSkeleton () {
+		return skel;
+	}
 	
 	public void leaveScope () {
 		inScope = false;
@@ -91,10 +95,13 @@ public class IDMLContext {
 	/**
 	 * Adds the text unit to the given queue.
 	 * @param queue the event queue where to add the event.
+	 * @param evenIfEmpty true to create a TU event with empty content.
 	 * @return true if a text unit with possibly inline codes was added, false otherwise.
 	 */
-	public boolean addToQueue (List<Event> queue) {
-		if ( tf.isEmpty() ) return false; // Skip empty entries
+	public boolean addToQueue (List<Event> queue,
+		boolean evenIfEmpty)
+	{
+		if ( tf.isEmpty() && !evenIfEmpty ) return false; // Skip empty entries
 		
 //		if ( status == 1 ) {
 //			// Only one content: no need for inline codes

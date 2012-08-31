@@ -53,7 +53,7 @@
                 <os>
                     <family>unix</family>
                     <name>mac os x</name>
-					<arch>x64</arch>
+					<arch>x86_64</arch>
                 </os>
             </activation>
             <dependencies>

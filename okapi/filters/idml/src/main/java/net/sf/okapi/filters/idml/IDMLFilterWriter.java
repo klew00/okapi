@@ -88,6 +88,8 @@ public class IDMLFilterWriter implements IFilterWriter {
 	private int group;
 	private Stack<IReferenceable> referents;
 	private ArrayList<String> storiesLeft;
+	private StringBuilder xml;
+	private boolean reconstructing; // Re-building a full element that was forced in several TUs
 	
 	public IDMLFilterWriter () {
         try {
@@ -204,6 +206,7 @@ public class IDMLFilterWriter implements IFilterWriter {
 			group = 0;
 			referents = new Stack<IReferenceable>();
 			storiesLeft = new ArrayList<String>();
+			reconstructing = false;
 		
 			// Create the output stream from the path provided
 			tempFile = null;			
@@ -316,7 +319,14 @@ public class IDMLFilterWriter implements IFilterWriter {
 		tf.setCodedText(ctext);
 		
 		// Now the whole content is true XML, it can be parsed as a fragment
-		StringBuilder xml = new StringBuilder("<r>");
+		if ( reconstructing ) {
+			// Append to the existing XML buffer 
+		}
+		else {
+			xml = new StringBuilder("<r>");
+		}
+		reconstructing = skel.getForced();
+		
 		// If there were moved inline codes: we put them back, so we have valid XML
 		String[] res = skel.getMovedParts();
 		if (( res != null ) && ( res[0] != null )) {
@@ -326,7 +336,15 @@ public class IDMLFilterWriter implements IFilterWriter {
 		if (( res != null ) && ( res[1] != null )) {
 			xml.append(res[1]);
 		}
-		xml.append("</r>");
+
+		if ( reconstructing ) {
+			return; // Done for now
+			// Needs the next TU(s) to finish the reconstruction
+		}
+		else {
+			xml.append("</r>");
+			
+		}
 		
 		try {
 			Document tmpDoc =  docBuilder.parse(new InputSource(new StringReader(xml.toString())));
@@ -391,6 +409,8 @@ public class IDMLFilterWriter implements IFilterWriter {
 	}
 	
 	private void processStartGroup (StartGroup res) {
+		reconstructing = false;
+		xml = null;
 		group++;
 		IDMLSkeleton skel = (IDMLSkeleton)res.getSkeleton();
 		if ( skel == null ) return; // Not a story group

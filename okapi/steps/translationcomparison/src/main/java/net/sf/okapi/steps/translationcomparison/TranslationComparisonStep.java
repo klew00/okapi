@@ -44,6 +44,7 @@ import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.lib.search.lucene.analysis.AlphabeticNgramTokenizer;
 import net.sf.okapi.lib.translation.TextMatcher;
 
 @UsingParameters(Parameters.class)
@@ -62,7 +63,14 @@ public class TranslationComparisonStep extends BasePipelineStep {
 	private int options;
 	private Property score1to2Prop;
 	private Property score1to3Prop;
-	private long scoreTotal;
+	private Property fuzzyScore1to2Prop;
+	private Property fuzzyScore1to3Prop;
+	private long scoreTotal1to2;
+	private long scoreTotal1to3;
+	private long scoreTotal2to3;
+	private long fuzzyScoreTotal1to2;
+	private long fuzzyScoreTotal1to3;
+	private long fuzzyScoreTotal2to3;
 	private int itemCount;
 	private IFilterConfigurationMapper fcMapper;
 	private LocaleId targetLocale;
@@ -75,6 +83,7 @@ public class TranslationComparisonStep extends BasePipelineStep {
 	private GenericContent fmt;
 	private String rootDir;
 	private String inputRootDir;
+	private AlphabeticNgramTokenizer tokenizer;
 
 	public TranslationComparisonStep () {
 		params = new Parameters();
@@ -161,14 +170,18 @@ public class TranslationComparisonStep extends BasePipelineStep {
 		}
 		pathToOpen = null;
 		score1to2Prop = new Property("Txt::Score", "", false);
+		fuzzyScore1to2Prop = new Property("Txt::FuzzyScore", "", false);
 		targetLocale2Extra = LocaleId.fromString(targetLocale.toString()+params.getTarget2Suffix());
 		score1to3Prop = new Property("Txt::Score1to3", "", false);
+		fuzzyScore1to3Prop = new Property("Txt::FuzzyScore1to3", "", false);
 		targetLocale3Extra = LocaleId.fromString(targetLocale.toString()+params.getTarget3Suffix());
 		
 		options = 0;
 		if ( !params.isCaseSensitive() ) options |= TextMatcher.IGNORE_CASE;
 		if ( !params.isWhitespaceSensitive() ) options |= TextMatcher.IGNORE_WHITESPACES;
 		if ( !params.isPunctuationSensitive() ) options |= TextMatcher.IGNORE_PUNCTUATION;
+		
+		tokenizer = net.sf.okapi.lib.search.lucene.scorer.Util.createNgramTokenizer(3, targetLocale);
 		
 		return event;
 	}
@@ -211,7 +224,13 @@ public class TranslationComparisonStep extends BasePipelineStep {
 			isInput3Multilingual = startDoc3.isMultilingual();
 		}
 		
-		scoreTotal = 0;
+		scoreTotal1to2 = 0;
+		scoreTotal1to3 = 0;
+		scoreTotal2to3 = 0;
+		fuzzyScoreTotal1to2 = 0;
+		fuzzyScoreTotal1to3 = 0;
+		fuzzyScoreTotal2to3 = 0;
+		
 		itemCount = 0;
 		
 		return event1;
@@ -229,8 +248,35 @@ public class TranslationComparisonStep extends BasePipelineStep {
 			writer.writeEndElement(); // table
     		writer.writeElementString("p", String.format("", itemCount));
     		if ( itemCount > 0 ) {
-    			writer.writeElementString("p", String.format("Number of items = %d. Average score = %.2f",
-    				itemCount, (float)scoreTotal / itemCount));
+
+    			writer.writeElementString("p", String.format("Number of items = %d.", itemCount));
+    			
+    			writer.writeStartElement("table"); //$NON-NLS-1$
+    			writer.writeRawXML("<tr><td>"); //$NON-NLS-1$
+    			writer.writeString("Average Scores:");
+    			writer.writeRawXML("</td><td><b>"); //$NON-NLS-1$
+    			writer.writeString(String.format(" %s to %s = %.2f,  ",
+    					params.getDocument1Label(), params.getDocument2Label(), (float)scoreTotal1to2 / itemCount));
+    			if (scoreTotal1to3 > 0){
+        			writer.writeString(String.format("%s to %s = %.2f,  ",
+        					params.getDocument1Label(), params.getDocument3Label(), (float)scoreTotal1to3 / itemCount));
+        			writer.writeString(String.format("%s to %s = %.2f",
+        					params.getDocument2Label(), params.getDocument3Label(), (float)scoreTotal2to3 / itemCount));
+    			}
+    			writer.writeRawXML("</b></td></tr>\n"); //$NON-NLS-1$
+    			writer.writeRawXML("<tr><td>"); //$NON-NLS-1$
+    			writer.writeString("Average Fuzzy Scores:");
+    			writer.writeRawXML("</td><td><b>"); //$NON-NLS-1$
+    			writer.writeString(String.format(" %s to %s = %.2f,  ",
+    					params.getDocument1Label(), params.getDocument2Label(), (float)fuzzyScoreTotal1to2 / itemCount));
+    			if (scoreTotal1to3 > 0){
+        			writer.writeString(String.format("%s to %s = %.2f,  ",
+        					params.getDocument1Label(), params.getDocument3Label(), (float)fuzzyScoreTotal1to3 / itemCount));
+        			writer.writeString(String.format("%s to %s = %.2f",
+        					params.getDocument2Label(), params.getDocument3Label(), (float)fuzzyScoreTotal2to3 / itemCount));
+    			}
+    			writer.writeRawXML("</b></td></tr>\n"); //$NON-NLS-1$
+    			writer.writeEndElement(); // table
     		}
 			writer.writeEndElement(); // body
 			writer.writeEndElement(); // html
@@ -380,15 +426,29 @@ public class TranslationComparisonStep extends BasePipelineStep {
 		
 		// Compute the distance
 		int score1to2 = matcher.compare(trgFrag1, trgFrag2, options);
+		int fuzzyScore1to2 = Math.round(net.sf.okapi.lib.search.lucene.scorer.Util.calculateNgramDiceCoefficient(
+				trgFrag1.getText(), trgFrag2.getText(), tokenizer));
 		int score1to3 = -1;
+		int fuzzyScore1to3 = -1;
 		int score2to3 = -1;
+		int fuzzyScore2to3 = -1;
 		if ( event3 != null ) {
 			score1to3 = matcher.compare(trgFrag1, trgFrag3, options);
+			fuzzyScore1to3 = Math.round(net.sf.okapi.lib.search.lucene.scorer.Util.calculateNgramDiceCoefficient(
+					trgFrag1.getText(), trgFrag3.getText(), tokenizer));
 			score2to3 = matcher.compare(trgFrag2, trgFrag3, options);
+			fuzzyScore2to3 = Math.round(net.sf.okapi.lib.search.lucene.scorer.Util.calculateNgramDiceCoefficient(
+					trgFrag2.getText(), trgFrag3.getText(), tokenizer));
 		}
 		
 		// Store the scores for the average
-		scoreTotal += score1to2;
+		scoreTotal1to2 += score1to2;
+		scoreTotal1to3 += score1to3;
+		scoreTotal2to3 += score2to3;
+		fuzzyScoreTotal1to2 += fuzzyScore1to2;
+		fuzzyScoreTotal1to3 += fuzzyScore1to3;
+		fuzzyScoreTotal2to3 += fuzzyScore2to3;
+		
 		itemCount++;
 
 		// Output in HTML
@@ -440,6 +500,19 @@ public class TranslationComparisonStep extends BasePipelineStep {
 					params.getDocument2Label(), params.getDocument3Label(), score2to3));
 			}
 			writer.writeRawXML("</b></td></tr>\n"); //$NON-NLS-1$
+			
+			writer.writeRawXML("<tr><td>"); //$NON-NLS-1$
+			writer.writeString("Fuzzy Scores:");
+			writer.writeRawXML("</td><td><b>"); //$NON-NLS-1$
+			writer.writeString(String.format("%s to %s = %d",
+				params.getDocument1Label(), params.getDocument2Label(), fuzzyScore1to2));
+			if ( score1to3 > -1 ) {
+				writer.writeString(String.format(",  %s to %s = %d",
+					params.getDocument1Label(), params.getDocument3Label(), fuzzyScore1to3));
+				writer.writeString(String.format(",  %s to %s = %d",
+					params.getDocument2Label(), params.getDocument3Label(), fuzzyScore2to3));
+			}
+			writer.writeRawXML("</b></td></tr>\n"); //$NON-NLS-1$
 		}
 
 		if ( params.isGenerateTMX() ) {
@@ -453,11 +526,15 @@ public class TranslationComparisonStep extends BasePipelineStep {
 			tmxTu.setTargetContent(targetLocale, trgFrag1);
 			tmxTu.setTargetContent(targetLocale2Extra, trgFrag2);
 			score1to2Prop.setValue(String.format("%03d", score1to2));
+			fuzzyScore1to2Prop.setValue(String.format("%03d", fuzzyScore1to2));
 			tmxTu.setTargetProperty(targetLocale2Extra, score1to2Prop);
+			tmxTu.setTargetProperty(targetLocale2Extra, fuzzyScore1to2Prop);						
 			if ( filter3 != null ) {
 				tmxTu.setTargetContent(targetLocale3Extra, trgFrag3);
 				score1to3Prop.setValue(String.format("%03d", score1to3));
+				fuzzyScore1to3Prop.setValue(String.format("%03d", fuzzyScore1to3));
 				tmxTu.setTargetProperty(targetLocale3Extra, score1to3Prop);
+				tmxTu.setTargetProperty(targetLocale3Extra, fuzzyScore1to3Prop);
 			}
 			tmx.writeTUFull(tmxTu);
 		}
