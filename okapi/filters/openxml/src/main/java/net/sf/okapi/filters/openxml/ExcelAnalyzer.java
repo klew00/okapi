@@ -415,7 +415,7 @@ public class ExcelAnalyzer
 			is = zipFile.getInputStream(entry);
 			URL urlConfig = OpenXMLContentFilter.class.getResource("/net/sf/okapi/filters/openxml/excelConfiguration.yml");
 			parameters = new YamlParameters(urlConfig); // DWH 7-16-09
-			ruleState = new ExtractionRuleState(true);
+			ruleState = new ExtractionRuleState(true, false);
 			document = new StreamedSource(new InputStreamReader(is,"UTF-8"));
 			nodeIterator = document.iterator();
 		}
@@ -430,7 +430,7 @@ public class ExcelAnalyzer
 		try {			
 			URL urlConfig = OpenXMLContentFilter.class.getResource("/net/sf/okapi/filters/openxml/excelStylesConfiguration.yml"); // DWH 3-9-09
 			parameters = new YamlParameters(urlConfig); // DWH 7-16-09
-			ruleState = new ExtractionRuleState(true);
+			ruleState = new ExtractionRuleState(true, false);
 			is = zipFile.getInputStream(ntry);
 			document = new StreamedSource(new InputStreamReader(is));
 		} catch (IOException e) {
