@@ -21,6 +21,9 @@
 package org.w3c.its;
 
 import java.io.File;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Stack;
 
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -41,7 +44,8 @@ public class Main {
 
 	public static void main (String[] args) {
  
-	XMLWriter writer = null;
+		PrintWriter writer = null;
+		
 		try {
 			System.out.println("ITSTest");
 			
@@ -71,12 +75,12 @@ public class Main {
 			
 			// Default output
 			if ( outputFile == null ) {
-				String ext = Util.getExtension(inputFile.getAbsolutePath());
+				//String ext = Util.getExtension(inputFile.getAbsolutePath());
 				String name = inputFile.getAbsolutePath();
 				int n = name.lastIndexOf('.');
 				if ( n > -1 ) name = name.substring(0, n);
 				name += "output";
-				name += ext;
+				name += ".txt";
 				outputFile = new File(name);
 			}
 			
@@ -91,14 +95,8 @@ public class Main {
 			fact.setNamespaceAware(true);
 			fact.setValidating(false);
 			
-			writer = new XMLWriter(outputFile.getAbsolutePath());
-			writer.setLineBreak("\n");
-			writer.writeStartDocument();
-			writer.writeStartElement("nodeList");
-			writer.writeAttributeString("xmlns:its", ITSEngine.ITS_NS_URI);
-			writer.writeAttributeString("xmlns:datc", "http://example.com/datacats");
-			writer.writeStartElement("nodeList");
-			writer.writeAttributeString("datacat", dc);
+			Util.createDirectories(outputFile.getAbsolutePath());
+			writer = new PrintWriter(outputFile.getAbsolutePath(), "UTF-8");
 			
 			Document doc = fact.newDocumentBuilder().parse(inputFile);
 			ITraversal trav = applyITSRules(doc, inputFile, rulesFile);
@@ -155,8 +153,15 @@ public class Main {
 
 						if ( element.hasAttributes() ) {
 							NamedNodeMap map = element.getAttributes();
+							
+							ArrayList<String> list = new ArrayList<String>();
 							for ( int i=0; i<map.getLength(); i++ ) {
-								Attr attr = (Attr)map.item(i);
+								list.add(((Attr)map.item(i)).getNodeName());
+							}
+							Collections.sort(list);
+							
+							for ( String attrName : list ) {
+								Attr attr = (Attr)map.getNamedItem(attrName);
 								if ( attr.getNodeName().startsWith("xmlns:") ) continue; // Skip NS declarations
 								// gather and output the values for the attribute
 								output(writer, dc, path+"/@"+attr.getNodeName(), trav, attr);
@@ -172,14 +177,13 @@ public class Main {
 		}
 		finally {
 			if ( writer != null ) {
-				writer.writeEndElement(); // nodeList for datacat
-				writer.writeEndElement(); // root nodeList
+				writer.flush();
 				writer.close();
 			}
 		}
 	}
 
-	private static void output (XMLWriter writer,
+	private static void output (PrintWriter writer,
 		String dc,
 		String path,
 		ITraversal trav,
@@ -197,20 +201,18 @@ public class Main {
 			else out1 = (trav.translate() ? "yes" : "no");
 		}
 
-		writer.writeStartElement("node");
-		writer.writeAttributeString("path", path);
-		writer.writeAttributeString("outputType", outType);
-		writer.writeStartElement("output");
+		writer.print(path+"\t");
 		
 		if ( dc.equals(DC_IDVALUE) ) {
-			if ( out1 != null ) writer.writeAttributeString("idValue", out1);
+			if ( out1 != null ) writer.print(String.format("its:idValue=\"%s\"",
+				Util.escapeToXML(out1, 3, false, null)));
 		}
 		else if ( dc.equals(DC_TRANSLATE) ) {
-			if ( out1 != null ) writer.writeAttributeString("translate", out1);
+			if ( out1 != null ) writer.print(String.format("its:translate=\"%s\"",
+				Util.escapeToXML(out1, 3, false, null)));
 		}
 		
-		writer.writeEndElement(); // output
-		writer.writeEndElement(); // node
+		writer.print("\n");
 	}
 	
 	private static ITraversal applyITSRules (Document doc,

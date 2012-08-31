@@ -1,0 +1,6 @@
+/file	
+/file/res[1]	its:idValue="btnAgain"
+/file/res[1]/@name	its:idValue="btnAgain"
+/file/res[1]/@xml:id	its:idValue="btnAgain"
+/res[2]	
+/res[2]/@name	

@@ -24,6 +24,7 @@ import static org.junit.Assert.*;
 
 import java.io.File;
 
+import net.sf.okapi.common.FileCompare;
 import net.sf.okapi.common.TestUtil;
 import net.sf.okapi.common.Util;
 
@@ -32,10 +33,12 @@ import org.junit.Test;
 public class ITSTest {
 
 	private String root = TestUtil.getParentDir(this.getClass(), "/input.xml") + "/ITS2/input";
-
+	private FileCompare fc = new FileCompare();
+	
 	@Test
 	public void testTranslate () {
-		String base = root+"/translate/xml"; 
+		String base = root+"/translate/xml";
+		removeOutput(base);
 		process(base+"/Translate1.xml", Main.DC_TRANSLATE);
 		process(base+"/Translate3.xml", Main.DC_TRANSLATE);
 		process(base+"/Translate4.xml", Main.DC_TRANSLATE);
@@ -47,12 +50,18 @@ public class ITSTest {
 
 	@Test
 	public void testIdValue () {
-		String base = root+"/idvalue/xml"; 
+		String base = root+"/idvalue/xml";
+		removeOutput(base);
 		process(base+"/idvalue1xml.xml", Main.DC_IDVALUE);
 		process(base+"/idvalue2xml.xml", Main.DC_IDVALUE);
 		process(base+"/idvalue3xml.xml", Main.DC_IDVALUE);
 	}
 
+	private void removeOutput (String baseDir) {
+		String outDir = baseDir.replace("/input/", "/output/");
+		Util.deleteDirectory(outDir, true);
+	}
+	
 	private void process (String baseName,
 		String dataCategory)
 	{
@@ -61,10 +70,13 @@ public class ITSTest {
 		int n = output.lastIndexOf('.');
 		if ( n > -1 ) output = output.substring(0, n);
 		output += "output";
-		output += Util.getExtension(input);
+		output += ".txt"; //Util.getExtension(input);
 		
 		Main.main(new String[]{input, output, "-dc", dataCategory});
 		assertTrue(new File(output).exists());
+		
+		String gold = output.replace("/output/", "/expected/");
+		assertTrue(fc.compareFilesPerLines(output, gold, "UTF-8"));
 	}
 	
 }
