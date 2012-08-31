@@ -48,6 +48,16 @@ public class ITSTest {
 		process(base+"/TranslateGlobal.xml", Main.DC_TRANSLATE);
 	}
 
+//	@Test
+//	public void testDomain () {
+//		String base = root+"/domain/xml";
+//		removeOutput(base);
+//		process(base+"/Domain1Xml.xml", Main.DC_DOMAIN);
+//		process(base+"/Domain2Xml.xml", Main.DC_DOMAIN);
+//		process(base+"/Domain4Xml.xml", Main.DC_DOMAIN);
+//		process(base+"/Domain5Xml.xml", Main.DC_DOMAIN);
+//	}
+
 	@Test
 	public void testIdValue () {
 		String base = root+"/idvalue/xml";
@@ -57,11 +67,22 @@ public class ITSTest {
 		process(base+"/idvalue3xml.xml", Main.DC_IDVALUE);
 	}
 
+	@Test
+	public void testLocaleFilter () {
+		String base = root+"/localeFilter/xml";
+		removeOutput(base);
+		process(base+"/Locale1Xml.xml", Main.DC_LOCALEFILTER);
+		process(base+"/Locale2Xml.xml", Main.DC_LOCALEFILTER);
+		process(base+"/Locale3Xml.xml", Main.DC_LOCALEFILTER);
+		process(base+"/Locale4Xml.xml", Main.DC_LOCALEFILTER);
+		process(base+"/Locale5Xml.xml", Main.DC_LOCALEFILTER);
+	}
+
 	private void removeOutput (String baseDir) {
 		String outDir = baseDir.replace("/input/", "/output/");
 		Util.deleteDirectory(outDir, true);
 	}
-	
+
 	private void process (String baseName,
 		String dataCategory)
 	{

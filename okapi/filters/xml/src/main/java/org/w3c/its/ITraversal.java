@@ -175,8 +175,8 @@ public interface ITraversal {
 
 	/**
 	 * Gets the locale filter information.
-	 * @return A '+' or '-' (include or exclude) followed by a comma-separated list
-	 * of basic language ranges as defined in BCP-47 (and possibly empty).
+	 * @return A a comma-separated list of extended language ranges as defined in 
+	 * BCP-47 (and possibly empty).
 	 */
 	public String getLocaleFilter ();
 	

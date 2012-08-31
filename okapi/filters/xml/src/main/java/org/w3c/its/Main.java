@@ -29,7 +29,6 @@ import java.util.Stack;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import net.sf.okapi.common.Util;
-import net.sf.okapi.common.XMLWriter;
 
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
@@ -41,6 +40,8 @@ public class Main {
 
 	public static final String DC_TRANSLATE = "translate";
 	public static final String DC_IDVALUE = "idvalue";
+	public static final String DC_DOMAIN = "domain";
+	public static final String DC_LOCALEFILTER = "localefilter";
 
 	public static void main (String[] args) {
  
@@ -126,7 +127,7 @@ public class Main {
 						do {
 							prev = prev.getPreviousSibling();
 						}
-						while (( prev != null ) && ( prev.getNodeType() != node.ELEMENT_NODE ));
+						while (( prev != null ) && ( prev.getNodeType() != Node.ELEMENT_NODE ));
 
 						// If it's the same kind of element, we increment the counter
 						if (( prev != null ) && prev.getNodeName().equals(element.getNodeName()) ) { 
@@ -189,26 +190,31 @@ public class Main {
 		ITraversal trav,
 		Attr attr)
 	{
-		// Get the values for the give data category
-		String outType = "no-value";
+		// Path
+		writer.print(path+"\t");
+
+		// Values
 		String out1 = null;
 		if ( dc.equals(DC_IDVALUE) ) {
 			out1 = trav.getIdValue();
-			if ( out1 != null ) outType = "cannot-detect";
-		}
-		else if ( dc.equals(DC_TRANSLATE) ) {
-			if ( attr != null ) out1 = (trav.translate(attr) ? "yes" : "no");
-			else out1 = (trav.translate() ? "yes" : "no");
-		}
-
-		writer.print(path+"\t");
-		
-		if ( dc.equals(DC_IDVALUE) ) {
 			if ( out1 != null ) writer.print(String.format("its:idValue=\"%s\"",
 				Util.escapeToXML(out1, 3, false, null)));
 		}
 		else if ( dc.equals(DC_TRANSLATE) ) {
+			if ( attr != null ) out1 = (trav.translate(attr) ? "yes" : "no");
+			else out1 = (trav.translate() ? "yes" : "no");
 			if ( out1 != null ) writer.print(String.format("its:translate=\"%s\"",
+				Util.escapeToXML(out1, 3, false, null)));
+		}
+		else if ( dc.equals(DC_DOMAIN) ) {
+			if ( attr != null ) out1 = trav.getDomains(attr);
+			else out1 = trav.getDomains();
+			if ( out1 != null ) writer.print(String.format("its:domains=\"%s\"",
+				Util.escapeToXML(out1, 3, false, null)));
+		}
+		else if ( dc.equals(DC_LOCALEFILTER) ) {
+			out1 = trav.getLocaleFilter();
+			if ( out1 != null ) writer.print(String.format("its:localeFilterList=\"%s\"",
 				Util.escapeToXML(out1, 3, false, null)));
 		}
 		

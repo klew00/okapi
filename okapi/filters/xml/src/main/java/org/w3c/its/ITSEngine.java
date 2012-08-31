@@ -1352,9 +1352,8 @@ public class ITSEngine implements IProcessor, ITraversal {
 			}
 			
 			// locale filter
-//TODO: add span case			
 			if (( (dataCategories & IProcessor.DC_LOCFILTER) > 0 ) && isVersion2() ) {
-				expr = xpath.compile("//*/@"+ITS_NS_PREFIX+":localeFilterList");
+				expr = xpath.compile("//*/@"+ITS_NS_PREFIX+":localeFilterList|//"+ITS_NS_PREFIX+":span/@localeFilterList");
 				NL = (NodeList)expr.evaluate(doc, XPathConstants.NODESET);
 				for ( int i=0; i<NL.getLength(); i++ ) {
 					attr = (Attr)NL.item(i);
@@ -1362,7 +1361,10 @@ public class ITSEngine implements IProcessor, ITraversal {
 					if ( ITS_NS_URI.equals(attr.getOwnerElement().getNamespaceURI())
 						&& "localeFilterRule".equals(attr.getOwnerElement().getLocalName()) ) continue;
 					// Set the flag
-					String value = retrieveLocaleFilterList(attr.getOwnerElement(), true);
+					boolean qualified = true;
+					String ns = attr.getOwnerElement().getNamespaceURI();
+					if ( !Util.isEmpty(ns) ) qualified = !ns.equals(ITS_NS_URI);
+					String value = retrieveLocaleFilterList(attr.getOwnerElement(), qualified);
 					setFlag(attr.getOwnerElement(), FP_LOCFILTER, 'y', attr.getSpecified());
 					setFlag(attr.getOwnerElement(), FP_LOCFILTER_DATA,
 						value, attr.getSpecified()); 
