@@ -29,7 +29,7 @@ public class LogHandlerFactory {
 		String realLogger = localLogger.getClass().getName();
 		if( "org.slf4j.impl.JDK14LoggerAdapter".equals(realLogger) )
 			return new LogHandlerJDK();
-		if( "org.slf4j.impl.3Log4jLoggerAdapter".equals(realLogger) )
+		if( "org.slf4j.impl.Log4jLoggerAdapter".equals(realLogger) )
 			return new LogHandlerLog4j();
 		// if( "org.slf4j.impl.JCLLoggerAdapter".equals(realLogger) )
 		// if( "ch.qos.logback.classic.Logger".equals(realLogger) )
