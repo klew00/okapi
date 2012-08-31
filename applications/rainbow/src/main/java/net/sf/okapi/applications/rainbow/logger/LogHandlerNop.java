@@ -23,7 +23,6 @@ package net.sf.okapi.applications.rainbow.logger;
 import net.sf.okapi.applications.rainbow.lib.ILog;
 
 class LogHandlerNop implements ILogHandler {
-	private int currentLogLevel = LogLevel.INFO;
 
 	public void initialize (ILog log) {
 		if( log == null ) return;
@@ -35,10 +34,7 @@ class LogHandlerNop implements ILogHandler {
 	}
 
 	public void setLogLevel(int level) {
-		currentLogLevel = level;
+		// Do nothing
 	}
 
-	public int getLogLevel() {
-		return currentLogLevel;
-	}
 }

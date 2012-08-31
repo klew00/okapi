@@ -30,21 +30,29 @@ import net.sf.okapi.applications.rainbow.lib.ILog;
 
 class LogHandlerLog4j extends AppenderSkeleton implements ILogHandler {
 	private ILog       log;
-	private int currentLogLevel = LogLevel.INFO;
+
+	protected LogHandlerLog4j(){}
 
 	public void initialize (ILog log) {
 		if( log == null ) return;
 
 		this.log = log;
-		Logger root = Logger.getRootLogger();
-		root.addAppender(this);
+		setThreshold(Level.INFO);
+		Logger.getRootLogger().addAppender(this);
 	}
 
 	public void setLogLevel(int level) {
-		currentLogLevel = level;
-	}
-	public int getLogLevel() {
-		return currentLogLevel;
+		switch ( level ) {
+			case LogLevel.DEBUG:
+				this.setThreshold(Level.DEBUG);
+				break;
+			case LogLevel.TRACE:
+				this.setThreshold(Level.TRACE);
+				break;
+			default:
+				this.setThreshold(Level.INFO);
+				break;
+		}
 	}
 
 	@Override
@@ -54,7 +62,6 @@ class LogHandlerLog4j extends AppenderSkeleton implements ILogHandler {
 
 	@Override
 	public boolean requiresLayout() {
-		// Do nothing
 		return false;
 	}
 
@@ -62,26 +69,32 @@ class LogHandlerLog4j extends AppenderSkeleton implements ILogHandler {
 	protected void append(LoggingEvent record) {
 		if( log == null ) return;
 
+		/*
+		 * LOG4J native levels:
+		 *    Level.OFF   = Integer.MAX_VALUE;
+		 *    Level.FATAL = 50000;
+		 *    Level.ERROR = 40000;
+		 *    Level.WARN  = 30000;
+		 *    Level.INFO  = 20000;
+		 *    Level.DEBUG = 10000;
+		 *    Level.TRACE =  5000;
+		 *    Level.ALL   = Integer.MIN_VALUE;
+		 */
+
 		if ( record.getLevel() == Level.ERROR || record.getLevel() == Level.FATAL ) {
 			log.error(record.getRenderedMessage());
 			ThrowableInformation e = record.getThrowableInformation();
-			if ( e != null )
+			if ( e != null ) {
 				log.message(" @ "+e.toString()); //$NON-NLS-1$
-			return;
+			}
 		}
-		if ( record.getLevel() == Level.WARN && currentLogLevel >= LogLevel.WARN ) {
+		else if ( record.getLevel() == Level.WARN ) {
 			// Filter out Axis warnings
 			if ( "org.apache.axis.utils.JavaUtils".equals(record.getLoggerName()) ) return;
 			// Otherwise print
 			log.warning(record.getRenderedMessage());
-			return;
 		}
-		if ( record.getLevel() == Level.INFO && currentLogLevel >= LogLevel.INFO ) {
+		else // INFO and below
 			log.message(record.getRenderedMessage());
-			return;
-		}
-		if ( currentLogLevel >= LogLevel.TRACE ) {
-			log.message(record.getRenderedMessage());
-		}
 	}
 }

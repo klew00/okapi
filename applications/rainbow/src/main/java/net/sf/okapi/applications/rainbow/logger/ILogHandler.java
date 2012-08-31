@@ -23,7 +23,6 @@ package net.sf.okapi.applications.rainbow.logger;
 import net.sf.okapi.applications.rainbow.lib.ILog;
 
 public interface ILogHandler {
-
 	class LogLevel {
 		public final static int ERROR = 5;
 		public final static int WARN = 4;
@@ -34,5 +33,4 @@ public interface ILogHandler {
 
 	public void initialize(ILog log);
 	public void setLogLevel(int level);
-	public int getLogLevel();
 }
