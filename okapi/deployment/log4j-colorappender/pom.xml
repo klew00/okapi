@@ -1,13 +1,18 @@
-
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
+	<parent>
+		<artifactId>build-okapi</artifactId>
+		<groupId>net.sf.okapi</groupId>
+		<version>0.18-SNAPSHOT</version>
+		<relativePath>../../pom.xml</relativePath>
+	</parent>
+	<packaging>jar</packaging>
 
-    <groupId>okapi-log4j-extras</groupId>
-    <artifactId>log4j-color-appender</artifactId>
-    <version>1.0.0</version>
-    <name>Log4j Color Console Appender</name>
+	<groupId>net.sf.okapi.log4j</groupId>
+	<artifactId>colorappender</artifactId>
+    <name>Okapi Log4j Color Console Appender</name>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

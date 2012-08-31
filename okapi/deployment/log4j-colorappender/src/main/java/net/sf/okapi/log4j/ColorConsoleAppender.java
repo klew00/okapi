@@ -1,14 +1,16 @@
+package net.sf.okapi.log4j;
+
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Level;
 import org.apache.log4j.Priority;
-import org.apache.log4j.spi.LoggingEvent;   
+import org.apache.log4j.spi.LoggingEvent;
 
 /*
-Inspired by: http://blog.uncommons.org/2006/04/09/colour-coded-console-logging-with-log4j/
+ * Inspired by: http://blog.uncommons.org/2006/04/09/colour-coded-console-logging-with-log4j/
 */
- 
+
 /**
- * Colour-coded console appender for Log4J.
+ * Colour-coded console appender for Log4J, with color configuration from outside
  */
 public class ColorConsoleAppender extends ConsoleAppender
 {
@@ -43,13 +45,13 @@ public class ColorConsoleAppender extends ConsoleAppender
     {
         this.qw.write(getColour(event.getLevel()));
         super.subAppend(event);
-        this.qw.write(END_COLOUR);   
- 
+        this.qw.write(END_COLOUR);
+
         if(this.immediateFlush)
         {
             this.qw.flush();
         }
-    }    
+    }
 
     /**
      * Get the appropriate control characters to change

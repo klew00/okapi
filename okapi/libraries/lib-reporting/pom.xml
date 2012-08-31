@@ -5,9 +5,7 @@
     <groupId>net.sf.okapi.lib</groupId>
     <version>0.18-SNAPSHOT</version>
   </parent>
-  <groupId>net.sf.okapi.lib</groupId>
   <artifactId>okapi-lib-reporting</artifactId>
-  <version>0.18-SNAPSHOT</version>
   <name>Okapi Library for Reporting</name>
   <dependencies>
   	<dependency>
