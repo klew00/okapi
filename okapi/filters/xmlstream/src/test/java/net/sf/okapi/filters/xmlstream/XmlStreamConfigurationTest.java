@@ -99,6 +99,17 @@ public class XmlStreamConfigurationTest {
 		rules = new TaggedFilterConfiguration(url);
 		assertTrue(rules.isGlobalPreserveWhitespace());
 	}
+	
+	@Test
+	public void excludeByDefault() {
+		URL url = XmlStreamFilter.class.getResource("/net/sf/okapi/filters/xmlstream/default.yml");
+		TaggedFilterConfiguration rules = new TaggedFilterConfiguration(url);
+		assertFalse(rules.isGlobalExcludeByDefault()); 
+
+		url = XmlStreamConfigurationTest.class.getResource("/excludeByDefault.yml");
+		rules = new TaggedFilterConfiguration(url);
+		assertTrue(rules.isGlobalExcludeByDefault());
+	}
 
 	@Test
 	public void testCodeFinderRules() {

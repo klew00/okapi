@@ -161,7 +161,8 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 		this.currentId = null;
 
 		if (ruleState != null) {
-			ruleState.reset(!getConfig().isGlobalPreserveWhitespace());
+			ruleState.reset(!getConfig().isGlobalPreserveWhitespace(),
+							getConfig().isGlobalExcludeByDefault());
 		}
 
 		if (currentRawDocument != null) {
@@ -386,10 +387,12 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 
 		// default is to preserve whitespace
 		boolean preserveWhitespace = true;
+		boolean defaultExcludeRule = false;
 		if (getConfig() != null) {
 			preserveWhitespace = getConfig().isGlobalPreserveWhitespace();
+			defaultExcludeRule = getConfig().isGlobalExcludeByDefault();
 		}
-		ruleState = new ExtractionRuleState(preserveWhitespace);
+		ruleState = new ExtractionRuleState(preserveWhitespace, defaultExcludeRule);
 		setPreserveWhitespace(ruleState.isPreserveWhitespaceState());
 
 		// This optimizes memory at the expense of performance
