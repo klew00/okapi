@@ -47,6 +47,7 @@ public class Parameters extends BaseParameters {
 	private static final String TARGETSAMEASSOURCE_WITHCODES = "targetSameAsSourceWithCodes";
 	private static final String CODEDIFFERENCE = "codeDifference";
 	private static final String GUESSOPENCLOSE = "guessOpenClose";
+	private static final String CHECKXLIFFSCHEMA = "checkXliffSchema";
 	private static final String CHECKPATTERNS = "checkPatterns";
 	private static final String PATTERNCOUNT = "patternCount";
 	private static final String USEPATTERN = "usePattern";
@@ -101,6 +102,7 @@ public class Parameters extends BaseParameters {
 	boolean targetSameAsSourceWithCodes;
 	boolean codeDifference;
 	boolean guessOpenClose;
+	boolean checkXliffSchema;
 	boolean checkPatterns;
 	List<PatternItem> patterns;
 	boolean checkWithLT;
@@ -404,6 +406,14 @@ public class Parameters extends BaseParameters {
 	public void setGuessOpenClose (boolean guessOpenClose) {
 		this.guessOpenClose = guessOpenClose;
 	}
+
+	public boolean getCheckXliffSchema () {
+		return checkXliffSchema;
+	}
+
+	public void setCheckXliffSchema (boolean schema) {
+		this.checkXliffSchema = schema;
+	}
 	
 	public boolean getCheckPatterns () {
 		return checkPatterns;
@@ -524,6 +534,7 @@ public class Parameters extends BaseParameters {
 		targetSameAsSourceWithCodes = true;
 		codeDifference = true;
 		guessOpenClose = true;
+		checkXliffSchema = true;
 		checkPatterns = true;
 		checkWithLT = false;
 		serverURL = "http://localhost:8081/"; // Default
@@ -654,7 +665,8 @@ public class Parameters extends BaseParameters {
 		termsPath = buffer.getString(TERMSPATH, termsPath);
 		stringMode = buffer.getBoolean(STRINGMODE, stringMode);
 		betweenCodes = buffer.getBoolean(BETWEENCODES, betweenCodes);
-		
+		// XLIFF Schema
+		checkXliffSchema = buffer.getBoolean(CHECKXLIFFSCHEMA, checkXliffSchema);
 		// Patterns
 		checkPatterns = buffer.getBoolean(CHECKPATTERNS, checkPatterns);
 		int count = buffer.getInteger(PATTERNCOUNT, 0);
@@ -733,6 +745,8 @@ public class Parameters extends BaseParameters {
 		buffer.setString(TERMSPATH, termsPath);
 		buffer.setBoolean(STRINGMODE, stringMode);
 		buffer.setBoolean(BETWEENCODES, betweenCodes);
+		// XLIFF Schema
+		buffer.setBoolean(CHECKXLIFFSCHEMA, checkXliffSchema);
 		// Patterns
 		buffer.setBoolean(CHECKPATTERNS, checkPatterns);
 		buffer.setInteger(PATTERNCOUNT, patterns.size());
