@@ -855,6 +855,7 @@ public class TextContainer implements Iterable<TextPart> {
 			newCont.parts.add(part.clone());
 		}
 		newCont.segApplied = segApplied; 
+		newCont.segments.setAlignmentStatus(segments.getAlignmentStatus());
 		// Clone the properties
 		if ( cloneProperties && ( properties != null )) {
 			newCont.properties = new LinkedHashMap<String, Property>();
