@@ -42,6 +42,7 @@ public class Main {
 	public static final String DC_IDVALUE = "idvalue";
 	public static final String DC_DOMAIN = "domain";
 	public static final String DC_LOCALEFILTER = "localefilter";
+	public static final String DC_LOCQUALITYISSUE = "locqualityissue";
 
 	public static void main (String[] args) {
  
@@ -62,7 +63,7 @@ public class Main {
 					i++; rulesFile = new File(args[i]);
 				}
 				else if ( arg.equals("-dc") ) { // Data category
-					i++; dc = args[i];
+					i++; dc = args[i].toLowerCase();
 				}
 				else {
 					if ( inputFile == null ) {
@@ -217,6 +218,27 @@ public class Main {
 			if ( out1 != null ) writer.print(String.format("its:localeFilterList=\"%s\"",
 				Util.escapeToXML(out1, 3, false, null)));
 		}
+		else if ( dc.equals(DC_LOCQUALITYISSUE) ) {
+			out1 = trav.getLocQualityIssuesRef();
+			if ( out1 != null ) writer.print(String.format("its:locQualityIssuesRef=\"%s\"\t",
+				Util.escapeToXML(out1, 3, false, null)));
+			else writer.print("\t");
+			out1 = trav.getLocQualityIssueType();
+			if ( out1 != null ) writer.print(String.format("its:locQualityIssueType=\"%s\"\t",
+				Util.escapeToXML(out1, 3, false, null)));
+			else writer.print("\t");
+			out1 = trav.getLocQualityIssueComment();
+			if ( out1 != null ) writer.print(String.format("its:locQualityIssueComment=\"%s\"\t",
+				Util.escapeToXML(out1, 3, false, null)));
+			else writer.print("\t");
+			out1 = trav.getLocQualityIssueScore();
+			if ( out1 != null ) writer.print(String.format("its:locQualityIssueScore=\"%s\"\t",
+				Util.escapeToXML(out1, 3, false, null)));
+			else writer.print("\t");
+			out1 = trav.getLocQualityIssueProfileRef();
+			if ( out1 != null ) writer.print(String.format("its:locQualityIssueProfileRef=\"%s\"",
+				Util.escapeToXML(out1, 3, false, null)));
+		}
 		
 		writer.print("\n");
 	}
@@ -239,21 +261,4 @@ public class Main {
 		return itsEng;
 	}
 	
-//	private static boolean hasTextChild (Node element) {
-//		NodeList nl = element.getChildNodes();
-//		for ( int i=0; i<nl.getLength(); i++ ) {
-//			if ( nl.item(i).getNodeType() == Node.TEXT_NODE ) return true;
-//		}
-//		return false;
-//	}
-//	
-//	private static void saveDocument (Document doc,
-//		File outputFile)
-//		throws TransformerFactoryConfigurationError, TransformerException, FileNotFoundException
-//	{
-//		Transformer trans = TransformerFactory.newInstance().newTransformer();
-//		FileOutputStream output = new FileOutputStream(outputFile);
-//		trans.transform(new DOMSource(doc), new StreamResult(output));
-//	}
-
 }
