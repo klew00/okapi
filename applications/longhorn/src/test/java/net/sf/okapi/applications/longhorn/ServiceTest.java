@@ -254,6 +254,34 @@ public class ServiceTest {
 		assertNotNull(zippedFile);
 	}
 
+    @Test
+	public void executePipelineForFilesWithNoExtension() throws Exception {
+		URL input = ServiceTest.class.getResource("/test_xml");
+		File inputFileWithNoExtension = new File(input.toURI());
+
+		URL bconfUrl = ServiceTest.class.getResource(
+            "/map_no_extension_to_xml.bconf");
+		File bconf = new File(bconfUrl.toURI());
+
+		emptyProj.addBatchConfiguration(bconf);
+        emptyProj.addInputFile(
+            inputFileWithNoExtension, inputFileWithNoExtension.getName());
+        emptyProj.executePipeline();
+
+		ArrayList<LonghornFile> inputFiles = emptyProj.getInputFiles();
+		ArrayList<LonghornFile> outputFiles = emptyProj.getOutputFiles();
+		
+		// Should be the same number of files with this config
+		assertEquals(inputFiles.size(), outputFiles.size());
+
+		// Are the names as expected?
+		ArrayList<String> relFilePaths = new ArrayList<String>();
+		for (LonghornFile f : outputFiles) {
+			relFilePaths.add(f.getRelativePath());
+		}
+		assertTrue(relFilePaths.contains("test_xml"));
+	}
+	
 	private File downloadFileToTemp(InputStream remoteFile) throws IOException {
 		
 		File tempFile = File.createTempFile("okapi-longhorn", "outfile");
