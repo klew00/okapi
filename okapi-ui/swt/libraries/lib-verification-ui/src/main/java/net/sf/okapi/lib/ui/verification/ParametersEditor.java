@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2010-2011 by the Okapi Framework contributors
+  Copyright (C) 2010-2012 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -369,12 +369,12 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		edDoubledWordExceptions.setLayoutData(gdTmp);
 
 		Group grpFile = new Group(cmpTmp, SWT.NONE);
-		grpFile.setText("File verifications");
+		grpFile.setText("File verification");
 		grpFile.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		grpFile.setLayout(new GridLayout());
 
 		chkXliffSchema = new Button(grpFile, SWT.CHECK);
-		chkXliffSchema.setText("Validate XLIFF files against schema");
+		chkXliffSchema.setText("Validate XLIFF documents against schema");
 		
 		TabItem tiTmp = new TabItem(tabs, SWT.NONE);
 		tiTmp.setText("General");

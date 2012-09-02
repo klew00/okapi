@@ -43,6 +43,7 @@ public class Main {
 	public static final String DC_DOMAIN = "domain";
 	public static final String DC_LOCALEFILTER = "localefilter";
 	public static final String DC_LOCQUALITYISSUE = "locqualityissue";
+	public static final String DC_EXTERNALRESOURCE = "externalresource";
 
 	public static void main (String[] args) {
  
@@ -237,6 +238,12 @@ public class Main {
 			else writer.print("\t");
 			out1 = trav.getLocQualityIssueProfileRef();
 			if ( out1 != null ) writer.print(String.format("its:locQualityIssueProfileRef=\"%s\"",
+				Util.escapeToXML(out1, 3, false, null)));
+		}
+		else if ( dc.equals(DC_EXTERNALRESOURCE) ) {
+			if ( attr != null ) out1 = trav.getExternalResourceRef(attr);
+			else out1 = trav.getExternalResourceRef();
+			if ( out1 != null ) writer.print(String.format("its:externalResource=\"%s\"",
 				Util.escapeToXML(out1, 3, false, null)));
 		}
 		

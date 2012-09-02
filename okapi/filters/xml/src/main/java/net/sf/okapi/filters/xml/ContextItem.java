@@ -45,7 +45,7 @@ class ContextItem {
 		this.locNote = trav.getNote();
 		this.preserveWS = trav.preserveWS();
 		this.domains = trav.getDomains();
-		this.externalRes = trav.getExternalResourcesRef();
+		this.externalRes = trav.getExternalResourceRef();
 	}
 
 }

@@ -316,7 +316,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 					else if ( "preserveSpaceRule".equals(locName) ) {
 						compilePrserveSpaceRule(ruleElem, isInternal);
 					}
-					else if ( "externalResourcesRefRule".equals(locName) ) {
+					else if ( "externalResourceRefRule".equals(locName) ) {
 						compileExternalResourceRule(ruleElem, isInternal);
 					}
 					else if ( "locQualityIssueRule".equals(locName) ) {
@@ -325,7 +325,8 @@ public class ITSEngine implements IProcessor, ITraversal {
 					else if ( "param".equals(locName) ) {
 						processParam(ruleElem);
 					}
-					else if ( !"rules".equals(locName) && !"span".equals(locName) ) {
+					else if ( !"rules".equals(locName) && !"span".equals(locName) 
+						&& !"locQualityIssues".equals(locName) && !"locQualityIssue".equals(locName) ) {
 						logger.warning(String.format("Unknown element '%s'.", ruleElem.getNodeName()));
 					}
 				}
@@ -492,9 +493,9 @@ public class ITSEngine implements IProcessor, ITraversal {
 		rule.selector = elem.getAttribute("selector");
 		rule.isInternal = isInternal;
 				
-		String pointer = elem.getAttribute("externalResourcesRefPointer");
+		String pointer = elem.getAttribute("externalResourceRefPointer");
 		if ( pointer.isEmpty() ) {
-			throw new ITSException("Invalid value for 'externalResourcesRefPointer'.");
+			throw new ITSException("Invalid value for 'externalResourceRefPointer'.");
 		}
 		rule.info = pointer;
 
@@ -1166,7 +1167,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 						String data4 = rule.map.get("score");
 						if ( data4 == null ) {
 							data4 = rule.map.get("scorePointer");
-							if ( !Util.isEmpty(data3) ) data4 = resolvePointer(NL.item(i), data4);
+							if ( !Util.isEmpty(data4) ) data4 = resolvePointer(NL.item(i), data4);
 						}
 						// Get and resolve profile reference
 						String data5 = rule.map.get("profileRef");
@@ -1386,7 +1387,8 @@ public class ITSEngine implements IProcessor, ITraversal {
 			// Localization quality issue
 			if (( (dataCategories & IProcessor.DC_LOCQUALITYISSUE) > 0 ) && isVersion2() ) {
 				expr = xpath.compile("//*/@"+ITS_NS_PREFIX+":locQualityIssueType|//"+ITS_NS_PREFIX+":span/@locQualityIssueType"
-						+"|//*/@"+ITS_NS_PREFIX+":locQualityIssueComment|//"+ITS_NS_PREFIX+":span/@locQualityIssueComment");
+					+"|//*/@"+ITS_NS_PREFIX+":locQualityIssueComment|//"+ITS_NS_PREFIX+":span/@locQualityIssueComment"
+					+"|//*/@"+ITS_NS_PREFIX+":locQualityIssuesRef|//"+ITS_NS_PREFIX+":span/@locQualityIssuesRef");
 				NL = (NodeList)expr.evaluate(doc, XPathConstants.NODESET);
 				for ( int i=0; i<NL.getLength(); i++ ) {
 					attr = (Attr)NL.item(i);
@@ -1758,12 +1760,12 @@ public class ITSEngine implements IProcessor, ITraversal {
 	}
 
 	@Override
-	public String getExternalResourcesRef () {
+	public String getExternalResourceRef () {
 		return trace.peek().externalRes;
 	}
 
 	@Override
-	public String getExternalResourcesRef (Attr attribute) {
+	public String getExternalResourceRef (Attr attribute) {
 		if ( attribute == null ) return null;
 		String tmp;
 		if ( (tmp = (String)attribute.getUserData(FLAGNAME)) == null ) return null;

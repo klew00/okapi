@@ -98,9 +98,9 @@ public interface ITraversal {
 	 */
 	public int getDirectionality (Attr attribute);
 	
-	public String getExternalResourcesRef ();
+	public String getExternalResourceRef ();
 	
-	public String getExternalResourcesRef (Attr attribute);
+	public String getExternalResourceRef (Attr attribute);
 	
 	public String getLocQualityIssuesRef ();
 	

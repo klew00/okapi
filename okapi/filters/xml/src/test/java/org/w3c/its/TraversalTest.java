@@ -292,15 +292,15 @@ public class TraversalTest {
 	public void testExternalResourceRefGlobal () throws SAXException, IOException, ParserConfigurationException {
 		InputSource is = new InputSource(new StringReader("<doc>"
 			+ "<i:rules xmlns:i='"+ITSEngine.ITS_NS_URI+"' version='2.0'>"
-			+ "<i:externalResourcesRefRule selector='//video/@src' externalResourcesRefPointer='.' />"
-			+ "<i:externalResourcesRefRule selector='//video/@poster' externalResourcesRefPointer='.' />"
+			+ "<i:externalResourceRefRule selector='//video/@src' externalResourceRefPointer='.' />"
+			+ "<i:externalResourceRefRule selector='//video/@poster' externalResourceRefPointer='.' />"
 			+ "</i:rules>"
 			+ "<p>Text with <video src=\"http://www.example.com/v2.mp\" poster=\"video-image.png\" /></p></doc>"));
 		Document doc = fact.newDocumentBuilder().parse(is);
 		ITraversal trav = applyITSRules(doc, null, null);
 		Element elem = getElement(trav, "video", 1);
-		assertEquals("http://www.example.com/v2.mp", trav.getExternalResourcesRef(elem.getAttributeNode("src")));
-		assertEquals("video-image.png", trav.getExternalResourcesRef(elem.getAttributeNode("poster")));
+		assertEquals("http://www.example.com/v2.mp", trav.getExternalResourceRef(elem.getAttributeNode("src")));
+		assertEquals("video-image.png", trav.getExternalResourceRef(elem.getAttributeNode("poster")));
 	}
 
 	@Test
