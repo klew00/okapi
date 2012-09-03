@@ -356,7 +356,8 @@ public class XMLFilter implements IFilter {
 		itsEng.applyRules(IProcessor.DC_TRANSLATE | IProcessor.DC_IDVALUE
 			| IProcessor.DC_LOCNOTE | IProcessor.DC_WITHINTEXT | IProcessor.DC_TERMINOLOGY
 			| IProcessor.DC_DOMAIN | IProcessor.DC_TARGETPOINTER | IProcessor.DC_EXTERNALRES
-			| IProcessor.DC_LOCFILTER | IProcessor.DC_PRESERVESPACE | IProcessor.DC_LOCQUALITYISSUE);
+			| IProcessor.DC_LOCFILTER | IProcessor.DC_PRESERVESPACE | IProcessor.DC_LOCQUALITYISSUE
+			| IProcessor.DC_STORAGESIZE);
 
 		// If we have rules with target pointers we must prepare the nodes first
 		prepareTargetPointers(itsEng);
@@ -1044,6 +1045,10 @@ public class XMLFilter implements IFilter {
 		// ITS External resources Reference
 		if ( !Util.isEmpty(context.peek().externalRes) ) {
 			tu.setProperty(new Property(Property.ITS_EXTERNALRESREF, context.peek().externalRes));
+		}
+		// ITS Storage Size
+		if ( context.peek().storageSize != null ) {
+			tu.setProperty(new Property(Property.ITS_STORAGESIZE, context.peek().storageSize));
 		}
 		
 		// Set term info

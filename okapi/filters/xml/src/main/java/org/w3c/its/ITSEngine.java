@@ -68,8 +68,8 @@ public class ITSEngine implements IProcessor, ITraversal {
 	
 	// Must have '?' as many times as there are FP_XXX entries +1
 	// Must have +FLAGSEP as many times as there are FP_XXX_DATA entries +1
-	private static final String   FLAGDEFAULTDATA     = "???????????"
-		+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP;
+	private static final String   FLAGDEFAULTDATA     = "????????????"
+		+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP;
 
 	// Indicator position
 	private static final int      FP_TRANSLATE             = 0;
@@ -83,6 +83,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 	private static final int      FP_EXTERNALRES           = 8;
 	private static final int      FP_LOCFILTER             = 9;
 	private static final int      FP_LQISSUE               = 10;
+	private static final int      FP_STORAGESIZE           = 11;
 	
 	// Data position 
 	private static final int      FP_TERMINOLOGY_DATA      = 0;
@@ -94,6 +95,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 	private static final int      FP_EXTERNALRES_DATA      = 6;
 	private static final int      FP_LOCFILTER_DATA        = 7;
 	private static final int      FP_LQISSUE_DATA          = 8;
+	private static final int      FP_STORAGESIZE_DATA      = 9;
 	
 	private static final int      TERMINFOTYPE_POINTER     = 1;
 	private static final int      TERMINFOTYPE_REF         = 2;
@@ -322,6 +324,9 @@ public class ITSEngine implements IProcessor, ITraversal {
 					else if ( "locQualityIssueRule".equals(locName) ) {
 						compileLocQualityIssueRule(ruleElem, isInternal);
 					}
+					else if ( "storageSizeRule".equals(locName) ) {
+						compileStorageSizeRule(ruleElem, isInternal);
+					}
 					else if ( "param".equals(locName) ) {
 						processParam(ruleElem);
 					}
@@ -503,6 +508,53 @@ public class ITSEngine implements IProcessor, ITraversal {
 		rules.add(rule);
 	}
 
+	private void compileStorageSizeRule (Element elem,
+		boolean isInternal)
+	{
+		ITSRule rule = new ITSRule(IProcessor.DC_STORAGESIZE);
+		rule.selector = elem.getAttribute("selector");
+		rule.isInternal = isInternal;
+		
+		String np[] = retrieveStorageSizeData(elem, false);
+		
+		String storageSizeP = null;
+		if ( elem.hasAttribute("storageSizePointer") )
+			storageSizeP = elem.getAttribute("storageSizePointer");
+		
+		String storageSizeEncodingP = null;
+		if (elem.hasAttribute("storageSizeEncodingPointer"))
+			storageSizeEncodingP = elem.getAttribute("storageSizeEncodingPointer");
+		
+		// Check we have the mandatory attributes
+		if ( Util.isEmpty(np[0]) && Util.isEmpty(storageSizeP) ) {
+			throw new ITSException("You must have at least an attribute storageSize or storageSizePointer.");
+		}
+		
+		rule.map = new HashMap<String, String>();
+
+		if ( !Util.isEmpty(np[0]) ) {
+			if ( !Util.isEmpty(storageSizeP) ) {
+				throw new ITSException("Cannot have both storageSize and storageSizePointer.");
+			}
+			rule.map.put("size", np[0]);
+		}
+		else {
+			rule.map.put("sizePointer", storageSizeP);
+		}
+		if ( !Util.isEmpty(np[1]) ) {
+			if ( !Util.isEmpty(storageSizeEncodingP) ) {
+				throw new ITSException("Cannot have both storageSizeEncoding and storageSizeEncodingPointer.");
+			}
+			rule.map.put("encoding", np[1]);
+		}
+		else {
+			rule.map.put("encodingPointer", storageSizeEncodingP);
+		}
+		
+		// Add the rule
+		rules.add(rule);
+	}
+	
 	private void compileLocQualityIssueRule (Element elem,
 		boolean isInternal)
 	{
@@ -948,6 +1000,12 @@ public class ITSEngine implements IProcessor, ITraversal {
 			if ( values[4] != null ) trace.peek().lqIssueProfileRef = values[4];
 		}
 
+		if ( data.charAt(FP_STORAGESIZE) != '?' ) {
+			String[] tmp = fromSingleString(getFlagData(data, FP_STORAGESIZE_DATA));
+			trace.peek().storeSize = tmp[0];
+			trace.peek().storeSizeEncoding = tmp[1];
+		}
+		
 		trace.peek().targetPointer = getFlagData(data, FP_TARGETPOINTER_DATA);
 		
 		if ( data.charAt(FP_DIRECTIONALITY) != '?' ) {
@@ -1029,6 +1087,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 		    	if ( (dataCategories & rule.ruleType) == 0 ) continue;
 		    	
 		    	// Get the selected nodes for the rule
+		    	String data1;
 				XPathExpression expr = xpath.compile(rule.selector);
 				NodeList NL = (NodeList)expr.evaluate(doc, XPathConstants.NODESET);
 				
@@ -1122,7 +1181,6 @@ public class ITSEngine implements IProcessor, ITraversal {
 						break;
 						
 					case IProcessor.DC_DOMAIN:
-						setFlag(NL.item(i), FP_DOMAIN, 'y', true);
 						List<String> list = resolveExpressionAsList(NL.item(i), rule.info);
 						// Map the values and build the final string
 						StringBuilder tmp = new StringBuilder();
@@ -1135,6 +1193,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 							if ( tmp.length() > 0 ) tmp.append("\t");
 							tmp.append(value);
 						}
+						setFlag(NL.item(i), FP_DOMAIN, 'y', true);
 						setFlag(NL.item(i), FP_DOMAIN_DATA, tmp.toString(), true);
 						break;
 						
@@ -1144,10 +1203,9 @@ public class ITSEngine implements IProcessor, ITraversal {
 						break;
 						
 					case IProcessor.DC_LOCQUALITYISSUE:
-						setFlag(NL.item(i), FP_LQISSUE, 'y', true);
 						// Get and resolve type
 						// Get and resolve issues reference
-						String data1 = rule.map.get("issuesRef");
+						data1 = rule.map.get("issuesRef");
 						if ( data1 == null ) {
 							data1 = rule.map.get("issuesRefPointer");
 							if ( !Util.isEmpty(data1) ) data1 = resolvePointer(NL.item(i), data1);
@@ -1175,9 +1233,24 @@ public class ITSEngine implements IProcessor, ITraversal {
 							data5 = rule.map.get("profileRefPointer");
 							if ( !Util.isEmpty(data5) ) data5 = resolvePointer(NL.item(i), data5);
 						}
+						setFlag(NL.item(i), FP_LQISSUE, 'y', true);
 						setFlag(NL.item(i), FP_LQISSUE_DATA, toSingleString(data1, data2, data3, data4, data5), true);
 						break;
 						
+					case IProcessor.DC_STORAGESIZE:
+						data1 = rule.map.get("size");
+						if ( data1 == null ) {
+							data1 = rule.map.get("sizePointer");
+							if ( !Util.isEmpty(data1) ) data1 = resolvePointer(NL.item(i), data1);
+						}
+						data2 = rule.map.get("encoding");
+						if ( data2 == null ) {
+							data2 = rule.map.get("encodingPointer");
+							if ( !Util.isEmpty(data2) ) data2 = resolvePointer(NL.item(i), data2);
+						}
+						setFlag(NL.item(i), FP_STORAGESIZE, 'y', true);
+						setFlag(NL.item(i), FP_STORAGESIZE_DATA, toSingleString(data1, data2), true);
+						break;
 					}
 				}
 		    }
@@ -1418,6 +1491,35 @@ public class ITSEngine implements IProcessor, ITraversal {
 				}
 			}
 			
+			// Storage size
+			if (( (dataCategories & IProcessor.DC_STORAGESIZE) > 0 ) && isVersion2() ) {
+				expr = xpath.compile("//*/@"+ITS_NS_PREFIX+":storageSize|//"+ITS_NS_PREFIX+":span/@storageSize");
+				NL = (NodeList)expr.evaluate(doc, XPathConstants.NODESET);
+				for ( int i=0; i<NL.getLength(); i++ ) {
+					attr = (Attr)NL.item(i);
+					// Skip irrelevant nodes
+					if ( ITS_NS_URI.equals(attr.getOwnerElement().getNamespaceURI())
+						&& "storageSizeRule".equals(attr.getOwnerElement().getLocalName()) ) continue;
+					// Set the flag
+					boolean qualified = true;
+					String ns = attr.getOwnerElement().getNamespaceURI();
+					if ( !Util.isEmpty(ns) ) qualified = !ns.equals(ITS_NS_URI);
+					String[] values = retrieveStorageSizeData(attr.getOwnerElement(), qualified);
+					// Get the previous data (if any)
+					String oriData = (String)attr.getOwnerElement().getUserData(FLAGNAME);
+					if ( oriData != null ) {
+						String[] ori = fromSingleString(getFlagData(oriData, FP_STORAGESIZE_DATA));
+						// Use original values if local one is not defined
+						if ( values[0] == null ) values[0] = ori[0];
+						if ( values[1] == null ) values[1] = ori[1];
+					}
+					// Set the updated flags
+					setFlag(attr.getOwnerElement(), FP_STORAGESIZE, 'y', attr.getSpecified());
+					setFlag(attr.getOwnerElement(), FP_STORAGESIZE_DATA,
+						toSingleString(values[0], values[1]), attr.getSpecified()); 
+				}
+			}
+
 			// Local targetPointer attribute (ITS 2.0 only)
 			if (( (dataCategories & IProcessor.DC_TARGETPOINTER) > 0 ) && isVersion2() ) {
 				expr = xpath.compile("//*/@"+ITS_NS_PREFIX+":targetPointer");
@@ -1456,6 +1558,27 @@ public class ITSEngine implements IProcessor, ITraversal {
 		else { // Inside a global rule
 			return elem.getAttribute("localeFilterList").trim();
 		}
+	}
+	
+	private String[] retrieveStorageSizeData (Element elem,
+		boolean qualified)
+	{
+		String[] data = new String[2];
+		
+		if ( qualified ) {
+			if ( elem.hasAttributeNS(ITS_NS_URI, "storageSize") )
+				data[0] = elem.getAttributeNS(ITS_NS_URI, "storageSize");
+			if ( elem.hasAttributeNS(ITS_NS_URI, "storageSizeEncoding") )
+				data[1] = elem.getAttributeNS(ITS_NS_URI, "storageSizeEncoding");
+		}
+		else {
+			if ( elem.hasAttribute("storageSize") )
+				data[0] = elem.getAttribute("storageSize");
+			if ( elem.hasAttribute("storageSizeEncoding") )
+				data[1] = elem.getAttribute("storageSizeEncoding");
+		}
+		
+		return data;
 	}
 	
 	/**
@@ -1801,6 +1924,39 @@ public class ITSEngine implements IProcessor, ITraversal {
 	@Override
 	public String getLocQualityIssueProfileRef () {
 		return trace.peek().lqIssueProfileRef;
+	}
+
+	@Override
+	public String getStorageSize () {
+		return trace.peek().storeSize;
+	}
+
+	@Override
+	public String getStorageSize (Attr attribute) {
+		if ( attribute == null ) return null;
+		String tmp;
+		if ( (tmp = (String)attribute.getUserData(FLAGNAME)) == null ) return null;
+		if ( tmp.charAt(FP_STORAGESIZE) != 'y' ) return null;
+		String[] values = fromSingleString(getFlagData(tmp, FP_STORAGESIZE_DATA));
+		return values[0];
+	}
+
+	@Override
+	public String getStorageSizeEncoding () {
+		String tmp = trace.peek().storeSizeEncoding;
+		if ( tmp == null ) return "UTF-8";
+		return tmp;
+	}
+
+	@Override
+	public String getStorageSizeEncoding(Attr attribute) {
+		if ( attribute == null ) return null;
+		String tmp;
+		if ( (tmp = (String)attribute.getUserData(FLAGNAME)) == null ) return null;
+		if ( tmp.charAt(FP_STORAGESIZE) != 'y' ) return null;
+		String[] values = fromSingleString(getFlagData(tmp, FP_STORAGESIZE_DATA));
+		if ( values[1] == null ) return "UTF-8";
+		else return values[1];
 	}
 
 }

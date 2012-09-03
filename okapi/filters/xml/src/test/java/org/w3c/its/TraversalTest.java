@@ -197,6 +197,51 @@ public class TraversalTest {
 		elem = getElement(trav, "pre", 1);
 		assertTrue(trav.preserveWS());
 	}
+	
+	@Test
+	public void testStorageSizeGlobal1 () throws SAXException, IOException, ParserConfigurationException {
+		InputSource is = new InputSource(new StringReader("<doc>"
+			+ "<i:rules xmlns:i='"+ITSEngine.ITS_NS_URI+"' version='2.0'>"
+			+ "<i:storageSizeRule selector='//p' storageSize='255'/>"
+			+ "</i:rules>"
+			+ "<p>Text</p><q>text</q></doc>"));
+		Document doc = fact.newDocumentBuilder().parse(is);
+		ITraversal trav = applyITSRules(doc, null, null);
+		getElement(trav, "p", 1);
+		assertEquals("255", trav.getStorageSize());
+		assertEquals("UTF-8", trav.getStorageSizeEncoding());
+		getElement(trav, "q", 1);
+		assertEquals(null, trav.getStorageSize());
+		assertEquals("UTF-8", trav.getStorageSizeEncoding());
+	}
+
+	@Test
+	public void testStorageSizeGlobal2 () throws SAXException, IOException, ParserConfigurationException {
+		InputSource is = new InputSource(new StringReader("<doc>"
+			+ "<i:rules xmlns:i='"+ITSEngine.ITS_NS_URI+"' version='2.0'>"
+			+ "<i:storageSizeRule selector='//p' storageSizePointer='@max' storageSizeEncodingPointer='@enc'/>"
+			+ "</i:rules>"
+			+ "<p max='222' enc='UTF-16'>Text<b>text</b></p></doc>"));
+		Document doc = fact.newDocumentBuilder().parse(is);
+		ITraversal trav = applyITSRules(doc, null, null);
+		getElement(trav, "p", 1);
+		assertEquals("222", trav.getStorageSize());
+		assertEquals("UTF-16", trav.getStorageSizeEncoding());
+		getElement(trav, "b", 1);
+		assertEquals(null, trav.getStorageSize());
+		assertEquals("UTF-8", trav.getStorageSizeEncoding());
+	}
+	
+	@Test
+	public void testStorageSizeLocal1 () throws SAXException, IOException, ParserConfigurationException {
+		InputSource is = new InputSource(new StringReader("<doc xmlns:i=\"http://www.w3.org/2005/11/its\" version='2.0'>"
+			+ "<p i:storageSizeEncoding='Shift-JIS' i:storageSize='111'>text</p></doc>"));
+		Document doc = fact.newDocumentBuilder().parse(is);
+		ITraversal trav = applyITSRules(doc, null, null);
+		getElement(trav, "p", 1);
+		assertEquals("111", trav.getStorageSize());
+		assertEquals("Shift-JIS", trav.getStorageSizeEncoding());
+	}
 
 	@Test
 	public void testLQIssueGlobal1 () throws SAXException, IOException, ParserConfigurationException {

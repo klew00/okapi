@@ -41,6 +41,8 @@ class ITSTrace {
 	String lqIssueScore;
 	String lqIssueProfileRef;
 	String lqIssuesRef;
+	String storeSize;
+	String storeSizeEncoding;
 
 	ITSTrace () {
 		// Default constructor
@@ -86,6 +88,8 @@ class ITSTrace {
 		lqIssueComment = initialTrace.lqIssueComment;
 		lqIssueScore = initialTrace.lqIssueScore;
 		lqIssueProfileRef = initialTrace.lqIssueProfileRef;
+		
+		// Store size: No inheritance
 		
 		this.isChildDone = isChildDone;
 	}

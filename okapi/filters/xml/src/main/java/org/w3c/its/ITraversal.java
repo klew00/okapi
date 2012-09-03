@@ -194,4 +194,12 @@ public interface ITraversal {
 	 */
 	public String getLanguage ();
 	
+	public String getStorageSize ();
+	
+	public String getStorageSize(Attr attr);
+	
+	public String getStorageSizeEncoding ();
+	
+	public String getStorageSizeEncoding (Attr attr);
+	
 }

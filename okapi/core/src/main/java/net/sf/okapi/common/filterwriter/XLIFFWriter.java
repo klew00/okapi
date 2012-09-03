@@ -452,7 +452,12 @@ public class XLIFFWriter implements IFilterWriter {
 			writer.writeAttributeString("okp:itsExternalResourceRef",
 				tu.getProperty(Property.ITS_EXTERNALRESREF).getValue());
 		}
-		
+		if ( tu.hasProperty(Property.ITS_STORAGESIZE) ) {
+			String[] values = tu.getProperty(Property.ITS_STORAGESIZE).getValue().split("\t", -1);
+			writer.writeAttributeString("maxbytes", values[0]);
+			writer.writeAttributeString("xmlns:its", NS_ITS20);
+			writer.writeAttributeString("its:storageSizeEncoding", values[1]);
+		}
 		writer.writeLineBreak();
 
 		// Get the source container

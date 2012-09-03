@@ -56,7 +56,6 @@ import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.filters.rainbowkit.Manifest;
 import net.sf.okapi.filters.rainbowkit.MergingInfo;
 import net.sf.okapi.lib.xliff.Candidate;
-import net.sf.okapi.lib.xliff.ExtendedAttribute;
 import net.sf.okapi.lib.xliff.ExtendedElement;
 import net.sf.okapi.lib.xliff.Fragment;
 import net.sf.okapi.lib.xliff.Note;
@@ -331,6 +330,13 @@ public class XLIFF2PackageWriter extends BasePackageWriter {
 			unit.getExtendedAttributes().setAttribute(Names.NS_XLIFFOKAPI, "itsExternalResourceRef",
 				tu.getProperty(Property.ITS_EXTERNALRESREF).getValue());
 		}
+		// Storage size
+		if ( tu.hasProperty(Property.ITS_STORAGESIZE) ) {
+			String[] values = tu.getProperty(Property.ITS_EXTERNALRESREF).getValue().split("\t", -1);
+			unit.getExtendedAttributes().setAttribute(Names.NS_XLIFFOKAPI, "storageSize", values[0]);
+			unit.getExtendedAttributes().setAttribute(Names.NS_XLIFFOKAPI, "storageSizeEncoding", values[1]);
+		}
+		
 		// Domains
 		if ( tu.hasProperty(Property.ITS_DOMAINS) ) {
 			ExtendedElement domains = new ExtendedElement(new QName(Names.NS_XLIFFOKAPI, "itsDomains", Names.PREFIX_XLIFFOKAPI), null);
