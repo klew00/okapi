@@ -147,10 +147,14 @@ class QualityChecker {
 		currentDocId = (new File(sd.getName())).toURI();
 		this.sigList = sigList;
 	}
-	
+
+	/**
+	 * Indicates if we have at least one character that is part of the character set for a "word".
+	 * digits are considered part of a "word". 
+	 * @param frag the text fragment to look at.
+	 * @return true if a "word" is detected.
+	 */
 	private boolean hasMeaningfullText (TextFragment frag) {
-		// Do we have at least one character that is part of the character set for a "word"
-		// Note: digits are considered part of a "word"
 		return WORDCHARS.matcher(frag.getCodedText()).find();
 	}
 	
@@ -162,6 +166,11 @@ class QualityChecker {
 		TextContainer srcCont = tu.getSource();
 		TextContainer trgCont = tu.getTarget(trgLoc);
 		
+		// Check ITS Storage size for source
+		if ( params.getCheckStorageSize() ) {
+			checkStorageSize(tu, srcCont, true);
+		}
+		
 		// Check if we have a target (even if option disabled)
 		if ( trgCont == null ) {
 			// No translation available
@@ -171,6 +180,11 @@ class QualityChecker {
 			return;
 		}
 		
+		// Check ITS Storage size for target
+		if ( params.getCheckStorageSize() ) {
+			checkStorageSize(tu, trgCont, false);
+		}
+
 		// Skip non-approved entries if requested
 		if ( params.getScope() != Parameters.SCOPE_ALL ) {
 			Property prop = trgCont.getProperty(Property.APPROVED);
@@ -274,7 +288,7 @@ class QualityChecker {
 				}
 			}
 			
-			// Check length
+			// Check segment length
 			if ( params.getCheckMaxCharLength() || params.getCheckMinCharLength() || params.getCheckAbsoluteMaxCharLength() ) {
 				checkLengths(srcSeg, trgSeg, tu);
 			}
@@ -703,12 +717,6 @@ class QualityChecker {
 		int trgLen = TextUnitUtil.getText(trgSeg.text, null).length();
 		int n;
 
-		// Check ITS Storage size
-		if ( params.getCheckStorageSize() ) {
-			checkStorageSize(tu, tu.getSource(), true);
-			checkStorageSize(tu, tu.getTarget(trgLoc), false);
-		}
-		
 		// Check absolute character length
 		if ( params.getCheckAbsoluteMaxCharLength() ) {
 			if ( trgLen > params.getAbsoluteMaxCharLength() ) {
