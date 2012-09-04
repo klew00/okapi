@@ -40,6 +40,10 @@ distribution.</p>
 	&quot;Leverage Files From Moses&quot; command.</li>
 </ul>
 	</li>
+	<li>CheckMate:<ul>
+	<li>Added several features (See Library / Checker below for details).</li>
+</ul>
+	</li>
 	<li>Longhorn:<ul>
 	<li>Made API available to execute pipelines with multiple target languages</li>
 </ul>
@@ -56,6 +60,7 @@ distribution.</p>
 	Reference data category.</li>
 	<li>Added implementation for the ITS 2.0 Locale Filter data category.</li>
 	<li>Added implementation for the ITS 2.0 Preserve Space data category.</li>
+	<li>Added implementation for the ITS 2.0 Storage Size data category.</li>
 </ul>
 	</li>
 	<li>MIF Filter:<ul>
@@ -99,6 +104,17 @@ distribution.</p>
 	properties</li>
 </ul>
 	</li>
+
+	<li>Checker:
+		<ul>
+			<li>Added XLIFF validation against XLIFF schema (<code>xliff-core-1.2-transitional.xsd</code>) (feature, issue #263)</li>
+			<li>Adding the ability to generate XML report (feature, issue #264)</li>
+			<li>Fixed issue #257: different leading/trailing spaces does not detect inconsistent non-breaking spaces.</li>
+			<li>Added support for validating the ITS Storage Size property for 
+			text unit.</li>
+		</ul>
+	</li>
+
 	<li>Removed extra files leftover from xliff-lib and olifant migration.</li>
 	<li>Added the TARGET_LOCALES step parameter and depracted the TARGET_LOCALE 
 	one.</li>
@@ -108,6 +124,8 @@ distribution.</p>
 	<li>Added support for the External Resources Reference data category.</li>
 	<li>Added support for the Locale Filter data category.</li>
 	<li>Added support for the Preserve Space data category.</li>
+	<li>Added support for the Localization Quality Issue data category.</li>
+	<li>Added support for the Storage Size data category.</li>
 </ul>
 	</li>
 </ul>

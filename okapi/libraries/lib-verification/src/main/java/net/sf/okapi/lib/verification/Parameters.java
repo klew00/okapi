@@ -47,6 +47,7 @@ public class Parameters extends BaseParameters {
 	private static final String TARGETSAMEASSOURCE_WITHCODES = "targetSameAsSourceWithCodes";
 	private static final String CODEDIFFERENCE = "codeDifference";
 	private static final String GUESSOPENCLOSE = "guessOpenClose";
+	private static final String CHECKXLIFFSCHEMA = "checkXliffSchema";
 	private static final String CHECKPATTERNS = "checkPatterns";
 	private static final String PATTERNCOUNT = "patternCount";
 	private static final String USEPATTERN = "usePattern";
@@ -66,6 +67,7 @@ public class Parameters extends BaseParameters {
 	private static final String SESSIONPATH = "sessionPath";
 	private static final String DOUBLEDWORD = "doubledWord";
 	private static final String DOUBLEDWORDEXCEPTIONS = "doubledWordExceptions";
+	private static final String CHECKSTORAGESIZE = "checkStorageSize";
 	private static final String CHECKMAXCHARLENGTH = "checkMaxCharLength";
 	private static final String MAXCHARLENGTHBREAK = "maxCharLengthBreak";
 	private static final String MAXCHARLENGTHABOVE = "maxCharLengthAbove";
@@ -101,6 +103,7 @@ public class Parameters extends BaseParameters {
 	boolean targetSameAsSourceWithCodes;
 	boolean codeDifference;
 	boolean guessOpenClose;
+	boolean checkXliffSchema;
 	boolean checkPatterns;
 	List<PatternItem> patterns;
 	boolean checkWithLT;
@@ -114,6 +117,7 @@ public class Parameters extends BaseParameters {
 	String sessionPath;
 	boolean doubledWord;
 	String doubledWordExceptions;
+	boolean checkStorageSize;
 	boolean checkMaxCharLength;
 	int maxCharLengthBreak;
 	int maxCharLengthAbove;
@@ -197,6 +201,14 @@ public class Parameters extends BaseParameters {
 		this.extraCharsAllowed = extraCharsAllowed;
 	}
 
+	public boolean getCheckStorageSize () {
+		return checkStorageSize;
+	}
+	
+	public void setCheckStorageSize (boolean checkStorageSize) {
+		this.checkStorageSize = checkStorageSize;
+	}
+	
 	public boolean getCheckMaxCharLength () {
 		return checkMaxCharLength;
 	}
@@ -404,6 +416,14 @@ public class Parameters extends BaseParameters {
 	public void setGuessOpenClose (boolean guessOpenClose) {
 		this.guessOpenClose = guessOpenClose;
 	}
+
+	public boolean getCheckXliffSchema () {
+		return checkXliffSchema;
+	}
+
+	public void setCheckXliffSchema (boolean schema) {
+		this.checkXliffSchema = schema;
+	}
 	
 	public boolean getCheckPatterns () {
 		return checkPatterns;
@@ -524,6 +544,7 @@ public class Parameters extends BaseParameters {
 		targetSameAsSourceWithCodes = true;
 		codeDifference = true;
 		guessOpenClose = true;
+		checkXliffSchema = true;
 		checkPatterns = true;
 		checkWithLT = false;
 		serverURL = "http://localhost:8081/"; // Default
@@ -548,6 +569,8 @@ public class Parameters extends BaseParameters {
 		minCharLengthAbove = 45;
 		minCharLengthBelow = 30;
 		
+		checkStorageSize = true;
+
 		checkAbsoluteMaxCharLength = false;
 		absoluteMaxCharLength = 255;
 		
@@ -635,6 +658,7 @@ public class Parameters extends BaseParameters {
 		corruptedCharacters = buffer.getBoolean(CORRUPTEDCHARACTERS, corruptedCharacters);
 		scope = buffer.getInteger(SCOPE, scope);
 		// Length
+		checkStorageSize = buffer.getBoolean(CHECKSTORAGESIZE, checkStorageSize);
 		checkMaxCharLength = buffer.getBoolean(CHECKMAXCHARLENGTH, checkMaxCharLength);
 		maxCharLengthBreak = buffer.getInteger(MAXCHARLENGTHBREAK, maxCharLengthBreak);
 		maxCharLengthAbove = buffer.getInteger(MAXCHARLENGTHABOVE, maxCharLengthAbove);
@@ -654,7 +678,8 @@ public class Parameters extends BaseParameters {
 		termsPath = buffer.getString(TERMSPATH, termsPath);
 		stringMode = buffer.getBoolean(STRINGMODE, stringMode);
 		betweenCodes = buffer.getBoolean(BETWEENCODES, betweenCodes);
-		
+		// XLIFF Schema
+		checkXliffSchema = buffer.getBoolean(CHECKXLIFFSCHEMA, checkXliffSchema);
 		// Patterns
 		checkPatterns = buffer.getBoolean(CHECKPATTERNS, checkPatterns);
 		int count = buffer.getInteger(PATTERNCOUNT, 0);
@@ -714,6 +739,7 @@ public class Parameters extends BaseParameters {
 		buffer.setBoolean(CORRUPTEDCHARACTERS, corruptedCharacters);
 		buffer.setInteger(SCOPE, scope);
 		// Length
+		buffer.setBoolean(CHECKSTORAGESIZE, checkStorageSize);
 		buffer.setBoolean(CHECKMAXCHARLENGTH, checkMaxCharLength);
 		buffer.setInteger(MAXCHARLENGTHBREAK, maxCharLengthBreak);
 		buffer.setInteger(MAXCHARLENGTHABOVE, maxCharLengthAbove);
@@ -733,6 +759,8 @@ public class Parameters extends BaseParameters {
 		buffer.setString(TERMSPATH, termsPath);
 		buffer.setBoolean(STRINGMODE, stringMode);
 		buffer.setBoolean(BETWEENCODES, betweenCodes);
+		// XLIFF Schema
+		buffer.setBoolean(CHECKXLIFFSCHEMA, checkXliffSchema);
 		// Patterns
 		buffer.setBoolean(CHECKPATTERNS, checkPatterns);
 		buffer.setInteger(PATTERNCOUNT, patterns.size());

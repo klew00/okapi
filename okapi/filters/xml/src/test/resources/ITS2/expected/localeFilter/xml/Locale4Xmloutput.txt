@@ -1,0 +1,18 @@
+/book	
+/book/@its:version	
+/book/info[1]	
+/book/info[1]/its:rules[1]	
+/book/info[1]/its:rules[1]/@version	
+/book/info[1]/its:rules[1]/@xlink:href	
+/book/info[1]/its:rules[1]/@xlink:type	
+/book/info[1]/its:rules[2]	
+/book/info[1]/its:rules[2]/@version	
+/book/info[1]/its:rules[2]/its:localeFilterRule[1]	
+/book/info[1]/its:rules[2]/its:localeFilterRule[1]/@localeFilterList	
+/book/info[1]/its:rules[2]/its:localeFilterRule[1]/@selector	
+/book/info[1]/legalnotice[1]	its:localeFilterList="en-CA, fr-CA"
+/book/info[1]/legalnotice[1]/@role	its:localeFilterList="en-CA, fr-CA"
+/book/info[1]/legalnotice[1]/para[1]	its:localeFilterList="en-CA, fr-CA"
+/book/legalnotice[3]	its:localeFilterList="de-DE"
+/book/legalnotice[3]/@role	its:localeFilterList="de-DE"
+/book/legalnotice[3]/para[1]	its:localeFilterList="de-DE"

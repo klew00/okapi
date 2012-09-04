@@ -10,7 +10,7 @@ call ant
 if ERRORLEVEL 1 goto end
 
 cd ../../applications/integration-tests
-call mvn integration-test -Dmaven.test.skip=true
+call mvn integration-test
 
 :end
 pause

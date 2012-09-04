@@ -30,6 +30,7 @@ import net.sf.okapi.common.filterwriter.GenericContent;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.ITextUnit;
+import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextFragment.TagType;
@@ -175,6 +176,25 @@ public class XMLFilterTest {
 	}
 	
 	@Test
+	public void testLocaleFilter6 () {
+		String snippet = "<?xml version=\"1.0\"?>\n"
+			+ "<doc xmlns:its=\"http://www.w3.org/2005/11/its\"><its:rules version=\"2.0\">"
+			+ "<its:localeFilterRule selector=\"//para[@scope='GER']\" localeFilterList='de'/>"
+			+ "</its:rules>"
+			+ "<para scope='GER'>text1</para>"
+			+ "<para scope='ZZZ'>text2</para>"
+			+ "<para scope='ZZZ' its:localeFilterList='fr-*'>text3</para>"
+			+ "</doc>";
+		ArrayList<Event> list = getEvents(snippet);
+		ITextUnit tu = FilterTestDriver.getTextUnit(list, 1);
+		assertNotNull(tu);
+		assertEquals("text2", tu.getSource().toString());
+		tu = FilterTestDriver.getTextUnit(list, 2);
+		assertNotNull(tu);
+		assertEquals("text3", tu.getSource().toString());
+	}
+	
+	@Test
 	public void testComplexIdValue () {
 		String snippet = "<?xml version=\"1.0\"?>\n"
 			+ "<doc><its:rules version=\"1.0\" xmlns:its=\"http://www.w3.org/2005/11/its\""
@@ -294,6 +314,23 @@ public class XMLFilterTest {
 		tu = FilterTestDriver.getTextUnit(list, 3);
 		assertNotNull(tu);
 		assertEquals("xid3", tu.getName()); // xml:id overrides global rule
+	}
+	
+	@Test
+	public void testStorageSize () {
+		String snippet = "<?xml version=\"1.0\"?>\n"
+			+ "<doc><its:rules version=\"2.0\" xmlns:its=\"http://www.w3.org/2005/11/its\""
+			+ " xmlns:itsx=\"http://www.w3.org/2008/12/its-extensions\">"
+			+ "<its:storageSizeRule selector=\"//p\" storageSize='10' storageSizeEncoding='UTF-16'/>"
+			+ "</its:rules>"
+			+ "<p>text</p>"
+			+ "</doc>";
+		ArrayList<Event> list = getEvents(snippet);
+		ITextUnit tu = FilterTestDriver.getTextUnit(list, 1);
+		assertNotNull(tu);
+		Property prop = tu.getProperty(Property.ITS_STORAGESIZE);
+		assertNotNull(prop);
+		assertEquals("10\tUTF-16", prop.getValue());
 	}
 	
 	@Test

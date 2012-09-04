@@ -69,8 +69,7 @@ public interface ITraversal {
 	public boolean translate (Attr attribute);
 
 	/**
-	 * Gets the target pointer for the current element of the traversal. This method
-	 * is used for an extension to ITS 1.0.
+	 * Gets the target pointer for the current element of the traversal.
 	 * @return The XPath relative to the current element to the node where the
 	 * translation should be placed.
 	 */
@@ -99,9 +98,19 @@ public interface ITraversal {
 	 */
 	public int getDirectionality (Attr attribute);
 	
-	public String getExternalResourcesRef ();
+	public String getExternalResourceRef ();
 	
-	public String getExternalResourcesRef (Attr attribute);
+	public String getExternalResourceRef (Attr attribute);
+	
+	public String getLocQualityIssuesRef ();
+	
+	public String getLocQualityIssueType ();
+	
+	public String getLocQualityIssueComment ();
+	
+	public String getLocQualityIssueScore ();
+	
+	public String getLocQualityIssueProfileRef ();
 	
 	/**
 	 * Gets the element-withinText-related information for the current element.
@@ -166,8 +175,8 @@ public interface ITraversal {
 
 	/**
 	 * Gets the locale filter information.
-	 * @return A '+' or '-' (include or exclude) followed by a comma-separated list
-	 * of basic language ranges as defined in BCP-47 (and possibly empty).
+	 * @return A a comma-separated list of extended language ranges as defined in 
+	 * BCP-47 (and possibly empty).
 	 */
 	public String getLocaleFilter ();
 	
@@ -184,5 +193,13 @@ public interface ITraversal {
 	 * @return The language code for the current element. 
 	 */
 	public String getLanguage ();
+	
+	public String getStorageSize ();
+	
+	public String getStorageSize(Attr attr);
+	
+	public String getStorageSizeEncoding ();
+	
+	public String getStorageSizeEncoding (Attr attr);
 	
 }
