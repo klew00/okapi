@@ -36,6 +36,9 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
+/**
+ * Main entry point for generating test files for ITS.
+ */
 public class Main {
 
 	public static final String DC_TRANSLATE = "translate";
@@ -50,21 +53,24 @@ public class Main {
 		PrintWriter writer = null;
 		
 		try {
-			System.out.println("ITSTest");
+			System.out.println("ITSTest - Test File Geneator for ITS");
 			
 			File inputFile = null;
 			File outputFile = null;
 			File rulesFile = null;
 			String dc = "translate";
 			
-			if ( args.length == 0 ) inputFile = new File("inputFile.xml");
-			else for ( int i=0; i<args.length; i++ ) {
+			for ( int i=0; i<args.length; i++ ) {
 				String arg = args[i];
 				if ( arg.equals("-r") ) { // External rule file
 					i++; rulesFile = new File(args[i]);
 				}
 				else if ( arg.equals("-dc") ) { // Data category
 					i++; dc = args[i].toLowerCase();
+				}
+				else if ( arg.equals("-?") ) {
+					showUsage();
+					return;
 				}
 				else {
 					if ( inputFile == null ) {
@@ -74,6 +80,11 @@ public class Main {
 						outputFile = new File(args[i]);
 					}
 				}
+			}
+			
+			if ( inputFile == null ) {
+				showUsage();
+				return;
 			}
 			
 			// Default output
@@ -186,6 +197,14 @@ public class Main {
 		}
 	}
 
+	private static void showUsage () {
+		System.out.println("Usage: <inputFile>[ <outputFile>][ <options>]");
+		System.out.println("Where the options are:");
+		System.out.println(" -? shows this help");
+		System.out.println(" -r <ruleFile> : associates the input with an ITS rule file");
+		System.out.println(" -dc <data-category> : sets the data category to process (default=translate)");
+	}
+	
 	private static void output (PrintWriter writer,
 		String dc,
 		String path,
