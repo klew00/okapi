@@ -129,6 +129,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 	private Text edLTTranslationSource;
 	private Text edLTTranslationTarget;
 	private Text edLTTranslationServiceKey;
+	private Button chkStorageSize;
 	private Button chkAbsoluteMaxCharLength;
 	private Spinner spAbsoluteMaxCharLength;
 	private Button chkMaxCharLength;
@@ -387,6 +388,9 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		cmpTmp.setLayout(new GridLayout());
 		gdTmp = new GridData(GridData.FILL_BOTH);
 		cmpTmp.setLayoutData(gdTmp);
+		
+		chkStorageSize = new Button(cmpTmp, SWT.CHECK);
+		chkStorageSize.setText("Warn if a source or target text unit does not fit its ITS storage size property.");
 		
 		chkAbsoluteMaxCharLength = new Button(cmpTmp, SWT.CHECK);
 		chkAbsoluteMaxCharLength.setText("Warn if a target is longer than:");
@@ -1352,6 +1356,8 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		edDoubledWordExceptions.setText(params.getDoubledWordExceptions());
 		chkCorruptedChars.setSelection(params.getCorruptedCharacters());
 
+		chkStorageSize.setSelection(params.getCheckStorageSize());
+		
 		chkAbsoluteMaxCharLength.setSelection(params.getCheckAbsoluteMaxCharLength());
 		spAbsoluteMaxCharLength.setSelection(params.getAbsoluteMaxCharLength());
 		
@@ -1495,6 +1501,8 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 			}
 		}
 
+		params.setCheckStorageSize(chkStorageSize.getSelection());
+		
 		params.setCheckAbsoluteMaxCharLength(chkAbsoluteMaxCharLength.getSelection());
 		if ( chkAbsoluteMaxCharLength.getSelection() ) {
 			params.setAbsoluteMaxCharLength(spAbsoluteMaxCharLength.getSelection());

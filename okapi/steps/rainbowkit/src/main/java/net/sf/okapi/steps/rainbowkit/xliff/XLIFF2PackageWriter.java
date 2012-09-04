@@ -333,8 +333,8 @@ public class XLIFF2PackageWriter extends BasePackageWriter {
 		// Storage size
 		if ( tu.hasProperty(Property.ITS_STORAGESIZE) ) {
 			String[] values = tu.getProperty(Property.ITS_EXTERNALRESREF).getValue().split("\t", -1);
-			unit.getExtendedAttributes().setAttribute(Names.NS_XLIFFOKAPI, "storageSize", values[0]);
-			unit.getExtendedAttributes().setAttribute(Names.NS_XLIFFOKAPI, "storageSizeEncoding", values[1]);
+			unit.getExtendedAttributes().setAttribute(Names.NS_ITS, "storageSize", values[0]);
+			unit.getExtendedAttributes().setAttribute(Names.NS_ITS, "storageSizeEncoding", values[1]);
 		}
 		
 		// Domains

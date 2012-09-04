@@ -67,6 +67,7 @@ public class Parameters extends BaseParameters {
 	private static final String SESSIONPATH = "sessionPath";
 	private static final String DOUBLEDWORD = "doubledWord";
 	private static final String DOUBLEDWORDEXCEPTIONS = "doubledWordExceptions";
+	private static final String CHECKSTORAGESIZE = "checkStorageSize";
 	private static final String CHECKMAXCHARLENGTH = "checkMaxCharLength";
 	private static final String MAXCHARLENGTHBREAK = "maxCharLengthBreak";
 	private static final String MAXCHARLENGTHABOVE = "maxCharLengthAbove";
@@ -116,6 +117,7 @@ public class Parameters extends BaseParameters {
 	String sessionPath;
 	boolean doubledWord;
 	String doubledWordExceptions;
+	boolean checkStorageSize;
 	boolean checkMaxCharLength;
 	int maxCharLengthBreak;
 	int maxCharLengthAbove;
@@ -199,6 +201,14 @@ public class Parameters extends BaseParameters {
 		this.extraCharsAllowed = extraCharsAllowed;
 	}
 
+	public boolean getCheckStorageSize () {
+		return checkStorageSize;
+	}
+	
+	public void setCheckStorageSize (boolean checkStorageSize) {
+		this.checkStorageSize = checkStorageSize;
+	}
+	
 	public boolean getCheckMaxCharLength () {
 		return checkMaxCharLength;
 	}
@@ -559,6 +569,8 @@ public class Parameters extends BaseParameters {
 		minCharLengthAbove = 45;
 		minCharLengthBelow = 30;
 		
+		checkStorageSize = true;
+
 		checkAbsoluteMaxCharLength = false;
 		absoluteMaxCharLength = 255;
 		
@@ -646,6 +658,7 @@ public class Parameters extends BaseParameters {
 		corruptedCharacters = buffer.getBoolean(CORRUPTEDCHARACTERS, corruptedCharacters);
 		scope = buffer.getInteger(SCOPE, scope);
 		// Length
+		checkStorageSize = buffer.getBoolean(CHECKSTORAGESIZE, checkStorageSize);
 		checkMaxCharLength = buffer.getBoolean(CHECKMAXCHARLENGTH, checkMaxCharLength);
 		maxCharLengthBreak = buffer.getInteger(MAXCHARLENGTHBREAK, maxCharLengthBreak);
 		maxCharLengthAbove = buffer.getInteger(MAXCHARLENGTHABOVE, maxCharLengthAbove);
@@ -726,6 +739,7 @@ public class Parameters extends BaseParameters {
 		buffer.setBoolean(CORRUPTEDCHARACTERS, corruptedCharacters);
 		buffer.setInteger(SCOPE, scope);
 		// Length
+		buffer.setBoolean(CHECKSTORAGESIZE, checkStorageSize);
 		buffer.setBoolean(CHECKMAXCHARLENGTH, checkMaxCharLength);
 		buffer.setInteger(MAXCHARLENGTHBREAK, maxCharLengthBreak);
 		buffer.setInteger(MAXCHARLENGTHABOVE, maxCharLengthAbove);

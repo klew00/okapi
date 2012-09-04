@@ -22,6 +22,8 @@ package net.sf.okapi.lib.verification;
 
 import java.io.File;
 import java.net.URI;
+import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
 import java.util.ArrayList;
@@ -57,7 +59,8 @@ class QualityChecker {
 	private List<String> sigList;
 	private Pattern patDoubledWords;
 	private String doubledWordExceptions;
-	private CharsetEncoder encoder;
+	private CharsetEncoder encoder1;
+	private CharsetEncoder encoder2;
 	private Pattern extraCharsAllowed;
 	private Pattern corruption;
 	
@@ -113,13 +116,13 @@ class QualityChecker {
 		}
 		
 		// Characters check
-		encoder = null;
+		encoder1 = null;
 		extraCharsAllowed = null;
 		if ( params.getCheckCharacters() ) {
 			// Encoding
 			String charsetName = params.charset;
 			if ( !Util.isEmpty(charsetName) ) {
-				encoder = Charset.forName(charsetName).newEncoder();
+				encoder1 = Charset.forName(charsetName).newEncoder();
 			}
 			// Extra characters allowed
 			if ( !params.getExtraCharsAllowed().isEmpty() ) {
@@ -345,8 +348,8 @@ class QualityChecker {
 		for ( int i=0; i<trgOri.length(); i++ ) {
 			char ch = trgOri.charAt(i);
 			
-			if ( encoder != null ) {
-				if ( encoder.canEncode(ch) ) {
+			if ( encoder1 != null ) {
+				if ( encoder1.canEncode(ch) ) {
 					continue; // Allowed, move to the next character
 				}
 				else { // Not included in the target charset
@@ -699,7 +702,14 @@ class QualityChecker {
 		int srcLen = TextUnitUtil.getText(srcSeg.text, null).length();
 		int trgLen = TextUnitUtil.getText(trgSeg.text, null).length();
 		int n;
+
+		// Check ITS Storage size
+		if ( params.getCheckStorageSize() ) {
+			checkStorageSize(tu, tu.getSource(), true);
+			checkStorageSize(tu, tu.getTarget(trgLoc), false);
+		}
 		
+		// Check absolute character length
 		if ( params.getCheckAbsoluteMaxCharLength() ) {
 			if ( trgLen > params.getAbsoluteMaxCharLength() ) {
 				n = trgLen-params.getAbsoluteMaxCharLength();
@@ -739,6 +749,46 @@ class QualityChecker {
 					String.format("The target is suspiciously shorter than its source (%.2f%% of the source).", d),
 					0, -1, 0, -1, Issue.SEVERITY_LOW, 
 					srcSeg.toString(), trgSeg.toString(), null);
+			}
+		}
+	}
+
+	private void checkStorageSize (ITextUnit tu,
+		TextContainer tc,
+		boolean isSource)
+	{
+		if ( tc == null ) return;
+		if ( tu.hasProperty(Property.ITS_STORAGESIZE) ) {
+			try {
+				String[] values = tu.getProperty(Property.ITS_STORAGESIZE).getValue().split("\t", -1);
+				if ( values[0].isEmpty() ) return; // No limits
+				int max = Integer.parseInt(values[0]);
+				if (( encoder2 == null ) || !encoder2.charset().name().equals(values[1]) ) {
+					encoder2 = Charset.forName(values[1]).newEncoder();
+				}
+				
+				// Get the plain text
+				TextFragment tf;
+				if ( tc.contentIsOneSegment() ) tf = tc.getFirstContent();
+				else tf = tc.getUnSegmentedContentCopy();
+				String  tmp = TextUnitUtil.getText(tf);
+				
+				// Compute the byte length
+				ByteBuffer buf = encoder2.encode(CharBuffer.wrap(tmp));
+				int len = buf.limit();
+				if ( len > max ) {
+					reportIssue(isSource ? IssueType.SOURCE_LENGTH : IssueType.TARGET_LENGTH, tu, null,
+						String.format("Number of bytes in the %s (using %s) is: %d. Number allowed: %d.",
+							(isSource ? "source" : "target"), values[1], len, max),
+						0, -1, 0, -1, Issue.SEVERITY_HIGH,
+						(isSource ? tc.toString() : "N/A"), (isSource ? "N/A" : tc.toString()), null);
+				}
+			}
+			catch ( Throwable e ) {
+				reportIssue(isSource ? IssueType.SOURCE_LENGTH : IssueType.TARGET_LENGTH, tu, null,
+					"Problem when trying use use ITS storage size property: "+e.getMessage(),
+					0, -1, 0, -1, Issue.SEVERITY_HIGH,
+					(isSource ? tc.toString() : "N/A"), (isSource ? "N/A" : tc.toString()), null);
 			}
 		}
 	}
