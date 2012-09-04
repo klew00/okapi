@@ -4,39 +4,48 @@
 <body>
 <trans-unit id="1">
 <source xml:lang="en-us">Test char: &amp;=amp, &lt;=lt, '=apos, "=quot</source>
-<target xml:lang="fr-fr">Test charactères: &amp;=amp, &lt;=lt, '=apos, "=quot</target>
+<seg-source><mrk mid="0" mtype="seg">Test char: &amp;=amp, &lt;=lt, '=apos, "=quot</mrk></seg-source>
+<target xml:lang="fr-fr"><mrk mid="0" mtype="seg">Test charactères: &amp;=amp, &lt;=lt, '=apos, "=quot</mrk></target>
 </trans-unit>
 <trans-unit id="2">
 <source xml:lang="en-us">One entry in the TM.</source>
-<target xml:lang="fr-fr">Une entrée dans la MT (file1, group1)</target>
+<seg-source><mrk mid="0" mtype="seg">One entry in the TM.</mrk></seg-source>
+<target xml:lang="fr-fr"><mrk mid="0" mtype="seg">Une entrée dans la MT (file1, group1)</mrk></target>
 </trans-unit>
 <trans-unit id="3">
 <source xml:lang="en-us">One entry in the TM.</source>
-<target xml:lang="fr-fr">Une entrée dans la MT (file1, no group)</target>
+<seg-source><mrk mid="0" mtype="seg">One entry in the TM.</mrk></seg-source>
+<target xml:lang="fr-fr"><mrk mid="0" mtype="seg">Une entrée dans la MT (file1, no group)</mrk></target>
 </trans-unit>
 <trans-unit id="4">
 <source xml:lang="en-us">One entry in the TM.</source>
-<target xml:lang="fr-fr">Une entrée dans la MT (no file, group1)</target>
+<seg-source><mrk mid="0" mtype="seg">One entry in the TM.</mrk></seg-source>
+<target xml:lang="fr-fr"><mrk mid="0" mtype="seg">Une entrée dans la MT (no file, group1)</mrk></target>
 </trans-unit>
 <trans-unit id="5">
 <source xml:lang="en-us">One entry in the TM.</source>
-<target xml:lang="fr-fr">Une entrée dans la MT (file1, group2)</target>
+<seg-source><mrk mid="0" mtype="seg">One entry in the TM.</mrk></seg-source>
+<target xml:lang="fr-fr"><mrk mid="0" mtype="seg">Une entrée dans la MT (file1, group2)</mrk></target>
 </trans-unit>
 <trans-unit id="6">
 <source xml:lang="en-us">One entry in the TM.</source>
-<target xml:lang="fr-fr">Une entrée dans la MT (file2, group2)</target>
+<seg-source><mrk mid="0" mtype="seg">One entry in the TM.</mrk></seg-source>
+<target xml:lang="fr-fr"><mrk mid="0" mtype="seg">Une entrée dans la MT (file2, group2)</mrk></target>
 </trans-unit>
 <trans-unit id="7">
 <source xml:lang="en-us">One entry in the TM.</source>
-<target xml:lang="fr-fr">Une entrée dans la MT (file2, group1)</target>
+<seg-source><mrk mid="0" mtype="seg">One entry in the TM.</mrk></seg-source>
+<target xml:lang="fr-fr"><mrk mid="0" mtype="seg">Une entrée dans la MT (file2, group1)</mrk></target>
 </trans-unit>
 <trans-unit id="8">
 <source xml:lang="en-us">One entry in the TM.</source>
-<target xml:lang="fr-fr">Une entrée dans la MT (no file, no group)</target>
+<seg-source><mrk mid="0" mtype="seg">One entry in the TM.</mrk></seg-source>
+<target xml:lang="fr-fr"><mrk mid="0" mtype="seg">Une entrée dans la MT (no file, no group)</mrk></target>
 </trans-unit>
 <trans-unit id="9">
 <source xml:lang="en-us">Close the <g id="1">application</g>.</source>
-<target xml:lang="fr-fr">Fermer <g id="1">l'application</g>.</target>
+<seg-source><mrk mid="0" mtype="seg">Close the <g id="1">application</g>.</mrk></seg-source>
+<target xml:lang="fr-fr"><mrk mid="0" mtype="seg">Fermer <g id="1">l'application</g>.</mrk></target>
 </trans-unit>
 </body>
 </file>
