@@ -24,6 +24,7 @@ import net.sf.okapi.common.EditorFor;
 import net.sf.okapi.common.ParametersDescription;
 import net.sf.okapi.common.uidescription.EditorDescription;
 import net.sf.okapi.common.uidescription.IEditorDescriptionProvider;
+import net.sf.okapi.common.uidescription.ListSelectionPart;
 
 @EditorFor(Parameters.class)
 public class ParametersUI implements IEditorDescriptionProvider {
@@ -32,9 +33,23 @@ public class ParametersUI implements IEditorDescriptionProvider {
 		EditorDescription desc = new EditorDescription("TMX Filter Parameters", true, false);
 		desc.addCheckboxPart(paramDesc.get("processAllTargets"));
 		desc.addCheckboxPart(paramDesc.get("consolidateDpSkeleton"));
-		desc.addSeparatorPart();
-		desc.addCheckboxPart(paramDesc.get("escapeGT"));
 		desc.addCheckboxPart(paramDesc.get("exitOnInvalid"));
+	
+		String[] values = {String.valueOf(TmxFilter.SEGTYPE_SENTENCE),
+				String.valueOf(TmxFilter.SEGTYPE_PARA),
+				String.valueOf(TmxFilter.SEGTYPE_OR_SENTENCE),
+				String.valueOf(TmxFilter.SEGTYPE_OR_PARA)};
+		String[] labels = {
+				"Segmented, global, ignore Tmx segtype",
+				"Not segmented, global, ignore Tmx segtype",
+				"Use Tmx segtype, default to Segmented",
+				"Use Tmx segtype, default to Not segmented"};
+		ListSelectionPart lsp = desc.addListSelectionPart(paramDesc.get("segType"), values);
+		lsp.setChoicesLabels(labels);
+		
+		desc.addSeparatorPart();
+		
+		desc.addCheckboxPart(paramDesc.get("escapeGT"));
 		return desc;
 	}
 
