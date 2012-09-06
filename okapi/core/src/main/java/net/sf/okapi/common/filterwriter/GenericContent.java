@@ -40,17 +40,17 @@ import net.sf.okapi.common.resource.TextFragment.TagType;
  */
 public class GenericContent {
 
-	private final Pattern patternOpening = Pattern.compile("\\<(\\d+?)\\>");
-	private final Pattern patternClosing = Pattern.compile("\\</(\\d+?)\\>");
-	private final Pattern patternIsolated = Pattern.compile("\\<(\\d+?)/\\>");
-	private final Pattern patternIsolatedB = Pattern.compile("\\<b(\\d+?)/\\>");
-	private final Pattern patternIsolatedE = Pattern.compile("\\<e(\\d+?)/\\>");
+	private static final Pattern patternOpening = Pattern.compile("\\<(\\d+?)\\>");
+	private static final Pattern patternClosing = Pattern.compile("\\</(\\d+?)\\>");
+	private static final Pattern patternIsolated = Pattern.compile("\\<(\\d+?)/\\>");
+	private static final Pattern patternIsolatedB = Pattern.compile("\\<b(\\d+?)/\\>");
+	private static final Pattern patternIsolatedE = Pattern.compile("\\<e(\\d+?)/\\>");
 
-	private final Pattern patternLCOpening = Pattern.compile("\\<g(\\d+?)\\>");
-	private final Pattern patternLCClosing = Pattern.compile("\\</g(\\d+?)\\>");
-	private final Pattern patternLCIsolated = Pattern.compile("\\<x(\\d+?)/\\>");
-	private final Pattern patternLCIsolatedB = Pattern.compile("\\<b(\\d+?)/\\>");
-	private final Pattern patternLCIsolatedE = Pattern.compile("\\<e(\\d+?)/\\>");
+	private static final Pattern patternLCOpening = Pattern.compile("\\<g(\\d+?)\\>");
+	private static final Pattern patternLCClosing = Pattern.compile("\\</g(\\d+?)\\>");
+	private static final Pattern patternLCIsolated = Pattern.compile("\\<x(\\d+?)/\\>");
+	private static final Pattern patternLCIsolatedB = Pattern.compile("\\<b(\\d+?)/\\>");
+	private static final Pattern patternLCIsolatedE = Pattern.compile("\\<e(\\d+?)/\\>");
 
 	private String codedText;
 	private List<Code> codes;
@@ -227,7 +227,7 @@ public class GenericContent {
 	 * @throws InvalidContentException When the generic text is not valid, or does
 	 * not correspond to the existing codes.
 	 */
-	public void updateFragment (String genericText,
+	public static void updateFragment (String genericText,
 		TextFragment fragment,
 		boolean allowCodeDeletion)
 	{
@@ -424,7 +424,7 @@ public class GenericContent {
 	 * provided text fragment, one is created for the output.
 	 * @return the new fragment created from the text.
 	 */
-	public TextFragment fromLetterCodedToFragment (String text,
+	public static TextFragment fromLetterCodedToFragment (String text,
 		TextFragment fragment,
 		boolean reuseCodes)
 	{
@@ -574,7 +574,7 @@ public class GenericContent {
 	 * @param fragment the fragment to convert.
 	 * @return the resulting letter-coded text. 
 	 */
-	public String fromFragmentToLetterCoded (TextFragment fragment) {
+	public static String fromFragmentToLetterCoded (TextFragment fragment) {
 		String codedText = fragment.getCodedText();
 		List<Code> codes = fragment.getCodes();
 		StringBuilder tmp = new StringBuilder();
