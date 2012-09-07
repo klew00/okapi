@@ -36,14 +36,14 @@ public class ParametersUI implements IEditorDescriptionProvider {
 		desc.addCheckboxPart(paramDesc.get("exitOnInvalid"));
 	
 		String[] values = {String.valueOf(TmxFilter.SEGTYPE_SENTENCE),
-				String.valueOf(TmxFilter.SEGTYPE_PARA),
-				String.valueOf(TmxFilter.SEGTYPE_OR_SENTENCE),
-				String.valueOf(TmxFilter.SEGTYPE_OR_PARA)};
+			String.valueOf(TmxFilter.SEGTYPE_PARA),
+			String.valueOf(TmxFilter.SEGTYPE_OR_SENTENCE),
+			String.valueOf(TmxFilter.SEGTYPE_OR_PARA)};
 		String[] labels = {
-				"Segmented, global, ignore Tmx segtype",
-				"Not segmented, global, ignore Tmx segtype",
-				"Use Tmx segtype, default to Segmented",
-				"Use Tmx segtype, default to Not segmented"};
+			"Always creates the segment (ignore segtype attribute)",
+			"Never creates the segment (ignore segtype attribute)",
+			"Creates the segment if segtype is 'sentence' or is undefined",
+			"Creates the segment only if segtype is 'sentence'"};
 		ListSelectionPart lsp = desc.addListSelectionPart(paramDesc.get("segType"), values);
 		lsp.setChoicesLabels(labels);
 		

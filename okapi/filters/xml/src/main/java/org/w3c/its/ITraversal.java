@@ -54,19 +54,12 @@ public interface ITraversal {
 	public boolean backTracking ();
 
 	/**
-	 * Indicates if the current node of the traversal is translatable.
-	 * @return True if the current node is translatable, false otherwise.
-	 */
- 	public boolean translate ();
-	
-	/**
-	 * Indicates if a given attribute of the current element of the traversal is
+	 * Indicates if the current element or one of its attributes is
 	 * translatable.
-	 * @param attribute The attribute to query. The attribute must be in the current
-	 * node of the traversal.
-	 * @return True if the attribute is translatable, false otherwise.
+	 * @param attribute The attribute to query or null to query the element.
+	 * @return True if the queried element or attribute is translatable, false otherwise.
 	 */
-	public boolean translate (Attr attribute);
+	public boolean getTranslate (Attr attribute);
 
 	/**
 	 * Gets the target pointer for the current element of the traversal.
@@ -76,11 +69,12 @@ public interface ITraversal {
 	public String getTargetPointer ();
 	
 	/**
-	 * Gets the id value for the current element of the traversal.
+	 * Gets the id value for the current element of the traversal or one of its attributes.
+	 * @param attribute The attribute to query or null to query the element.
 	 * This method is used for both the ITS 2.0 feature and the deprecated extension to ITS 1.0.
-	 * @return The value of the identifier for this node.
+	 * @return The value of the identifier for the queried part.
 	 */
-	public String getIdValue ();
+	public String getIdValue (Attr attribute);
 	
 	/**
 	 * Gets the directionality for the text of the current node of the
@@ -119,25 +113,20 @@ public interface ITraversal {
 	public int getWithinText ();
 
 	/**
-	 * Indicates if the current node of the traversal is a term.
-	 * @return True if the current node is a tern, false otherwise.
+	 * Indicates if a given attribute of the current element of the traversal or
+	 * one of its attributes is a term.
+	 * @param attribute The attribute to query or null for the element.
+	 * @return True if the queried part is a term, false otherwise.
 	 */
-	public boolean isTerm ();
-
-	/**
-	 * Gets the information associated with a given term node.
-	 * @return the information associated with a given term node.
-	 */
-	public String getTermInfo ();
+	public boolean getTerm (Attr attribute);
 	
 	/**
-	 * Indicates if a given attribute of the current element of the traversal is
-	 * a term.
-	 * @param attribute The attribute to query. The attribute must be in the current
-	 * node of the traversal.
-	 * @return True if the attribute is a term, false otherwise.
+	 * Gets the information associated with a given term node or one of its
+	 * attributes.
+	 * @param attribute The attribute to query or null for the element.
+	 * @return the information associated with the queried part.
 	 */
-	public boolean isTerm (Attr attribute);
+	public String getTermInfo (Attr attribute);
 	
 	/**
 	 * Gets the localization notes of the current element of the traversal, or null
@@ -145,7 +134,7 @@ public interface ITraversal {
 	 * @return the localization note of the current element, or null if the
 	 * node has no localization note.
 	 */
-	public String getNote ();
+	public String getLocNote ();
 	
 	/**
 	 * Gets the localization note of the given attribute of the current element.
@@ -154,7 +143,11 @@ public interface ITraversal {
 	 * @return The localization note of the attribute, or null if the
 	 * attribute has no localization note.
 	 */
-	public String getNote (Attr attribute);
+	public String getLocNote (Attr attribute);
+	
+	public String getLocNoteType ();
+	
+	public String getLocNoteType (Attr attribute);
 	
 	/**
 	 * Gets the domain or domains of the current element of the traversal, or null

@@ -42,6 +42,11 @@ import org.w3c.dom.Node;
 public class Main {
 
 	public static final String DC_TRANSLATE = "translate";
+	public static final String DC_LOCALIZATIONNOTE = "locnote";
+	public static final String DC_TERMINOLOGY = "terminology";
+	public static final String DC_DIRECTIONALITY = "dir";
+	public static final String DC_LANGUAGEINFORMATION = "lang";
+	public static final String DC_WITHINTEXT = "withintext";
 	public static final String DC_IDVALUE = "idvalue";
 	public static final String DC_DOMAIN = "domain";
 	public static final String DC_LOCALEFILTER = "localefilter";
@@ -71,6 +76,20 @@ public class Main {
 				else if ( arg.equals("-?") ) {
 					showUsage();
 					return;
+				}
+				else if ( arg.equals("-l") ) {
+					System.out.println(DC_DIRECTIONALITY
+							+ "\n" + DC_DOMAIN
+							+ "\n" + DC_EXTERNALRESOURCE
+							+ "\n" + DC_IDVALUE
+							+ "\n" + DC_LANGUAGEINFORMATION
+							+ "\n" + DC_LOCALEFILTER
+							+ "\n" + DC_LOCALIZATIONNOTE
+							+ "\n" + DC_LOCQUALITYISSUE
+							+ "\n" + DC_TERMINOLOGY
+							+ "\n" + DC_TRANSLATE
+							+ "\n" + DC_WITHINTEXT
+						);
 				}
 				else {
 					if ( inputFile == null ) {
@@ -202,6 +221,7 @@ public class Main {
 		System.out.println("Where the options are:");
 		System.out.println(" -? shows this help");
 		System.out.println(" -r <ruleFile> : associates the input with an ITS rule file");
+		System.out.println(" -l : lists all the avaibale data categories to use with -dc");
 		System.out.println(" -dc <data-category> : sets the data category to process (default=translate)");
 	}
 	
@@ -216,15 +236,57 @@ public class Main {
 
 		// Values
 		String out1 = null;
-		if ( dc.equals(DC_IDVALUE) ) {
-			out1 = trav.getIdValue();
-			if ( out1 != null ) writer.print(String.format("its:idValue=\"%s\"",
+		if ( dc.equals(DC_TRANSLATE) ) {
+			out1 = (trav.getTranslate(attr) ? "yes" : "no");
+			if ( out1 != null ) writer.print(String.format("its:translate=\"%s\"",
 				Util.escapeToXML(out1, 3, false, null)));
 		}
-		else if ( dc.equals(DC_TRANSLATE) ) {
-			if ( attr != null ) out1 = (trav.translate(attr) ? "yes" : "no");
-			else out1 = (trav.translate() ? "yes" : "no");
-			if ( out1 != null ) writer.print(String.format("its:translate=\"%s\"",
+		else if ( dc.equals(DC_LOCALIZATIONNOTE) ) {
+			if ( attr != null ) out1 = trav.getLocNote(attr);
+			else out1 = trav.getLocNote();
+			if ( out1 != null ) writer.print(String.format("its:locNote=\"%s\"",
+				Util.escapeToXML(out1, 3, false, null)));
+			writer.print("\t");
+			if ( attr != null ) out1 = trav.getLocNoteType(attr);
+			else out1 = trav.getLocNoteType();
+			if ( out1 != null ) writer.print(String.format("its:locNoteType=\"%s\"",
+				Util.escapeToXML(out1, 3, false, null)));
+		}
+		else if ( dc.equals(DC_TERMINOLOGY) ) {
+			out1 = (trav.getTerm(attr) ? "yes" : "no");
+			if ( out1 != null ) writer.print(String.format("its:term=\"%s\"",
+				Util.escapeToXML(out1, 3, false, null)));
+			writer.print("\t");
+			out1 = trav.getTermInfo(attr);
+			if ( out1 != null ) writer.print(String.format("its:termInfo=\"%s\"",
+				Util.escapeToXML(out1, 3, false, null)));
+		}
+		else if ( dc.equals(DC_DIRECTIONALITY) ) {
+			int dir = trav.getDirectionality();
+			if ( attr != null ) dir = trav.getDirectionality(attr);
+			switch ( dir ) {
+			case ITraversal.DIR_LRO: out1 = "lro"; break;
+			case ITraversal.DIR_LTR: out1 = "ltr"; break;
+			case ITraversal.DIR_RLO: out1 = "rlo"; break;
+			case ITraversal.DIR_RTL: out1 = "rtl"; break;
+			}
+			writer.print(String.format("its:dir=\"%s\"",
+				Util.escapeToXML(out1, 3, false, null)));
+		}
+		else if ( dc.equals(DC_LANGUAGEINFORMATION) ) {
+			out1 = trav.getLanguage();
+			if ( out1 != null ) writer.print(String.format("its:lang=\"%s\"",
+				Util.escapeToXML(out1, 3, false, null)));
+		}
+		else if ( dc.equals(DC_WITHINTEXT) ) {
+			if ( attr != null ) return;
+			int wt = trav.getWithinText();
+			switch ( wt ) {
+			case ITraversal.WITHINTEXT_NESTED: out1 = "nested"; break;
+			case ITraversal.WITHINTEXT_NO: out1 = "no"; break;
+			case ITraversal.WITHINTEXT_YES: out1 = "yes"; break;
+			}
+			writer.print(String.format("its:withinText=\"%s\"",
 				Util.escapeToXML(out1, 3, false, null)));
 		}
 		else if ( dc.equals(DC_DOMAIN) ) {
@@ -238,31 +300,36 @@ public class Main {
 			if ( out1 != null ) writer.print(String.format("its:localeFilterList=\"%s\"",
 				Util.escapeToXML(out1, 3, false, null)));
 		}
-		else if ( dc.equals(DC_LOCQUALITYISSUE) ) {
-			out1 = trav.getLocQualityIssuesRef();
-			if ( out1 != null ) writer.print(String.format("its:locQualityIssuesRef=\"%s\"\t",
-				Util.escapeToXML(out1, 3, false, null)));
-			else writer.print("\t");
-			out1 = trav.getLocQualityIssueType();
-			if ( out1 != null ) writer.print(String.format("its:locQualityIssueType=\"%s\"\t",
-				Util.escapeToXML(out1, 3, false, null)));
-			else writer.print("\t");
-			out1 = trav.getLocQualityIssueComment();
-			if ( out1 != null ) writer.print(String.format("its:locQualityIssueComment=\"%s\"\t",
-				Util.escapeToXML(out1, 3, false, null)));
-			else writer.print("\t");
-			out1 = trav.getLocQualityIssueScore();
-			if ( out1 != null ) writer.print(String.format("its:locQualityIssueScore=\"%s\"\t",
-				Util.escapeToXML(out1, 3, false, null)));
-			else writer.print("\t");
-			out1 = trav.getLocQualityIssueProfileRef();
-			if ( out1 != null ) writer.print(String.format("its:locQualityIssueProfileRef=\"%s\"",
-				Util.escapeToXML(out1, 3, false, null)));
-		}
 		else if ( dc.equals(DC_EXTERNALRESOURCE) ) {
 			if ( attr != null ) out1 = trav.getExternalResourceRef(attr);
 			else out1 = trav.getExternalResourceRef();
 			if ( out1 != null ) writer.print(String.format("its:externalResource=\"%s\"",
+				Util.escapeToXML(out1, 3, false, null)));
+		}
+		else if ( dc.equals(DC_IDVALUE) ) {
+			out1 = trav.getIdValue(attr);
+			if ( out1 != null ) writer.print(String.format("its:idValue=\"%s\"",
+				Util.escapeToXML(out1, 3, false, null)));
+		}
+		else if ( dc.equals(DC_LOCQUALITYISSUE) ) {
+			out1 = trav.getLocQualityIssuesRef();
+			if ( out1 != null ) writer.print(String.format("its:locQualityIssuesRef=\"%s\"",
+				Util.escapeToXML(out1, 3, false, null)));
+			writer.print("\t");
+			out1 = trav.getLocQualityIssueType();
+			if ( out1 != null ) writer.print(String.format("its:locQualityIssueType=\"%s\"",
+				Util.escapeToXML(out1, 3, false, null)));
+			writer.print("\t");
+			out1 = trav.getLocQualityIssueComment();
+			if ( out1 != null ) writer.print(String.format("its:locQualityIssueComment=\"%s\"",
+				Util.escapeToXML(out1, 3, false, null)));
+			writer.print("\t");
+			out1 = trav.getLocQualityIssueScore();
+			if ( out1 != null ) writer.print(String.format("its:locQualityIssueScore=\"%s\"",
+				Util.escapeToXML(out1, 3, false, null)));
+			writer.print("\t");
+			out1 = trav.getLocQualityIssueProfileRef();
+			if ( out1 != null ) writer.print(String.format("its:locQualityIssueProfileRef=\"%s\"",
 				Util.escapeToXML(out1, 3, false, null)));
 		}
 		

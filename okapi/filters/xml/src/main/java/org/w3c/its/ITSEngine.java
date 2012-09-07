@@ -436,7 +436,6 @@ public class ITSEngine implements IProcessor, ITraversal {
 		else if ( "lro".equals(value) ) rule.value = DIR_LRO;
 		else if ( "rlo".equals(value) ) rule.value = DIR_RLO;
 		else throw new ITSException("Invalid value for 'dir'.");
-		
 		rules.add(rule);
 	}
 
@@ -976,7 +975,10 @@ public class ITSEngine implements IProcessor, ITraversal {
 			trace.peek().translate = (data.charAt(FP_TRANSLATE) == 'y');
 		}
 		
-		trace.peek().idValue = getFlagData(data, FP_IDVALUE_DATA);
+		String value = getFlagData(data, FP_IDVALUE_DATA);
+		if ( !value.isEmpty() ) {
+			trace.peek().idValue = value;
+		}
 		
 		if ( data.charAt(FP_DOMAIN) != '?' ) {
 			trace.peek().domains = getFlagData(data, FP_DOMAIN_DATA);
@@ -1001,9 +1003,9 @@ public class ITSEngine implements IProcessor, ITraversal {
 		}
 
 		if ( data.charAt(FP_STORAGESIZE) != '?' ) {
-			String[] tmp = fromSingleString(getFlagData(data, FP_STORAGESIZE_DATA));
-			trace.peek().storeSize = tmp[0];
-			trace.peek().storeSizeEncoding = tmp[1];
+			String[] values = fromSingleString(getFlagData(data, FP_STORAGESIZE_DATA));
+			trace.peek().storeSize = values[0];
+			trace.peek().storeSizeEncoding = values[1];
 		}
 		
 		trace.peek().targetPointer = getFlagData(data, FP_TARGETPOINTER_DATA);
@@ -1799,12 +1801,9 @@ public class ITSEngine implements IProcessor, ITraversal {
 		else return "";
 	}
 
-	public boolean translate () {
-		return trace.peek().translate;
-	}
-	
-	public boolean translate (Attr attribute) {
-		if ( attribute == null ) return false;
+	public boolean getTranslate (Attr attribute) {
+		if ( attribute == null ) return trace.peek().translate;
+		// Else: check the attribute
 		String tmp;
 		if ( (tmp = (String)attribute.getUserData(FLAGNAME)) == null ) return false;
 		// '?' and 'n' will return (correctly) false
@@ -1815,8 +1814,12 @@ public class ITSEngine implements IProcessor, ITraversal {
 		return trace.peek().targetPointer;
 	}
 	
-	public String getIdValue () {
-		return trace.peek().idValue;
+	public String getIdValue (Attr attribute) {
+		if ( attribute == null ) return trace.peek().idValue;
+		// Else: check the attribute
+		String tmp;
+		if ( (tmp = (String)attribute.getUserData(FLAGNAME)) == null ) return null;
+		return getFlagData(tmp, FP_IDVALUE_DATA);
 	}
 	
 	public int getDirectionality () {
@@ -1834,27 +1837,27 @@ public class ITSEngine implements IProcessor, ITraversal {
 		return trace.peek().withinText;
 	}
 	
-	public boolean isTerm () {
-		return trace.peek().term;
-	}
-	
-	public String getTermInfo () {
-		return trace.peek().termInfo;
-	}
-
-	public boolean isTerm (Attr attribute) {
-		if ( attribute == null ) return false;
+	public boolean getTerm (Attr attribute) {
+		if ( attribute == null ) return trace.peek().term;
 		String tmp;
 		if ( (tmp = (String)attribute.getUserData(FLAGNAME)) == null ) return false;
 		// '?' and 'n' will return (correctly) false
 		return (tmp.charAt(FP_TERMINOLOGY) == 'y');
 	}
 
-	public String getNote () {
+	public String getTermInfo (Attr attribute) {
+		if ( attribute == null ) return trace.peek().termInfo;;
+		String tmp;
+		if ( (tmp = (String)attribute.getUserData(FLAGNAME)) == null ) return null;
+		if ( tmp.charAt(FP_TERMINOLOGY) != 'y' ) return null;
+		return getFlagData(tmp, FP_TERMINOLOGY_DATA);
+	}
+
+	public String getLocNote () {
 		return trace.peek().locNote;
 	}
 	
-	public String getNote (Attr attribute) {
+	public String getLocNote (Attr attribute) {
 		if ( attribute == null ) return null;
 		String tmp;
 		if ( (tmp = (String)attribute.getUserData(FLAGNAME)) == null ) return null;
@@ -1862,6 +1865,15 @@ public class ITSEngine implements IProcessor, ITraversal {
 		return getFlagData(tmp, FP_LOCNOTE_DATA);
 	}
 
+	public String getLocNoteType () {
+		return "TODO";
+	}
+	
+	public String getLocNoteType (Attr attribute) {
+		if ( attribute == null ) return null;
+		return "TODO";
+	}
+	
 	public String getDomains () {
 		return trace.peek().domains;
 	}

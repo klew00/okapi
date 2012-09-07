@@ -61,10 +61,10 @@ public class TraversalTest {
 		ITraversal trav = applyITSRules(doc, new File(root + "/input.xml").toURI(), null);
 		Element elem = getElement(trav, "p", 1);
 		assertNotNull(elem);
-		assertTrue(trav.translate());
+		assertTrue(trav.getTranslate(null));
 		elem = getElement(trav, "term", 1);
 		assertNotNull(elem);
-		assertFalse(trav.translate());
+		assertFalse(trav.getTranslate(null));
 	}
 
 	@Test
@@ -73,13 +73,13 @@ public class TraversalTest {
 		ITraversal trav = applyITSRules(doc, new File(root + "/input.xml").toURI(), null);
 		Element elem = getElement(trav, "p", 1);
 		assertNotNull(elem);
-		assertFalse(trav.isTerm());
+		assertFalse(trav.getTerm(null));
 		elem = getElement(trav, "term", 1);
 		assertNotNull(elem);
-		assertTrue(trav.isTerm());
+		assertTrue(trav.getTerm(null));
 		// This is empty because ref in id(@ref) is not defined as IDType
 		// So no text is detected
-		assertEquals("", trav.getTermInfo());
+		assertEquals("", trav.getTermInfo(null));
 	}
 
 	@Test
@@ -88,7 +88,7 @@ public class TraversalTest {
 		ITraversal trav = applyITSRules(doc, new File(root + "/input.xml").toURI(), null);
 		Element elem = getElement(trav, "gloss", 1);
 		assertNotNull(elem);
-		assertEquals("TDPV", trav.getIdValue());
+		assertEquals("TDPV", trav.getIdValue(null));
 	}
 
 	@Test
@@ -97,7 +97,7 @@ public class TraversalTest {
 		ITraversal trav = applyITSRules(doc, new File(root + "/Translate1.xml").toURI(), null);
 		Element elem = getElement(trav, "verbatim", 1);
 		assertNotNull(elem);
-		assertFalse(trav.translate());
+		assertFalse(trav.getTranslate(null));
 		assertTrue(trav.getWithinText()==ITraversal.WITHINTEXT_YES);
 	}
 
@@ -133,11 +133,11 @@ public class TraversalTest {
 		ITraversal trav = applyITSRules(doc, null, null);
 		Element elem = getElement(trav, "entry", 1);
 		assertNotNull(elem);
-		assertTrue(trav.translate());
+		assertTrue(trav.getTranslate(null));
 		assertEquals(null, trav.getTargetPointer());
 		elem = getElement(trav, "src", 1);
 		assertNotNull(elem);
-		assertTrue(trav.translate());
+		assertTrue(trav.getTranslate(null));
 		assertEquals("../trg", trav.getTargetPointer());
 	}
 
@@ -171,11 +171,11 @@ public class TraversalTest {
 		ITraversal trav = applyITSRules(doc, null, null);
 		Element elem = getElement(trav, "entry", 1);
 		assertNotNull(elem);
-		assertTrue(trav.translate());
+		assertTrue(trav.getTranslate(null));
 		assertEquals(null, trav.getTargetPointer());
 		elem = getElement(trav, "src", 1);
 		assertNotNull(elem);
-		assertTrue(trav.translate());
+		assertTrue(trav.getTranslate(null));
 		assertEquals("../trg", trav.getTargetPointer());
 	}
 
@@ -306,6 +306,38 @@ public class TraversalTest {
 	}
 
 	@Test
+	public void testIdValueOnAttribute () throws SAXException, IOException, ParserConfigurationException {
+		InputSource is = new InputSource(new StringReader("<doc xmlns:i='"+ITSEngine.ITS_NS_URI+"' i:version='2.0'>"
+			+ "<i:rules xmlns:i='"+ITSEngine.ITS_NS_URI+"' version='2.0'>"
+			+ "<i:translateRule selector='//elem/@myText' translate='yes' />"
+			+ "<i:idValueRule selector='//elem/@myText' idValue='../@myId' />"
+			+ "</i:rules>"
+			+ "<elem myText='text' myId='id1'/>"
+			+ "</doc>"));
+		Document doc = fact.newDocumentBuilder().parse(is);
+		ITraversal trav = applyITSRules(doc, null, null);
+		Element elem = getElement(trav, "elem", 1);
+		assertTrue(trav.getTranslate(elem.getAttributeNode("myText")));
+		assertEquals("id1", trav.getIdValue(elem.getAttributeNode("myText")));
+	}
+
+	@Test
+	public void testTermOnAttribute () throws SAXException, IOException, ParserConfigurationException {
+		InputSource is = new InputSource(new StringReader("<doc xmlns:i='"+ITSEngine.ITS_NS_URI+"' i:version='2.0'>"
+			+ "<i:rules xmlns:i='"+ITSEngine.ITS_NS_URI+"' version='2.0'>"
+			+ "<i:translateRule selector='//elem/@myText' translate='yes' />"
+			+ "<i:termRule selector='//elem/@myText' term='yes' termInfoPointer='../@myInfo' />"
+			+ "</i:rules>"
+			+ "<elem myText='text' myInfo='some info'/>"
+			+ "</doc>"));
+		Document doc = fact.newDocumentBuilder().parse(is);
+		ITraversal trav = applyITSRules(doc, null, null);
+		Element elem = getElement(trav, "elem", 1);
+		assertTrue(trav.getTerm(elem.getAttributeNode("myText")));
+		assertEquals("some info", trav.getTermInfo(elem.getAttributeNode("myText")));
+	}
+	
+	@Test
 	public void testLQIssueLocal1 () throws SAXException, IOException, ParserConfigurationException {
 		InputSource is = new InputSource(new StringReader("<doc xmlns:i='"+ITSEngine.ITS_NS_URI+"' i:version='2.0'>"
 			+ "<p>Text with <z i:locQualityIssueType='other' i:locQualityIssueComment='comment'"
@@ -359,9 +391,9 @@ public class TraversalTest {
 		Document doc = fact.newDocumentBuilder().parse(is);
 		ITraversal trav = applyITSRules(doc, null, null);
 		Element elem = getElement(trav, "par", 1);
-		assertTrue(trav.translate(elem.getAttributeNode("title")));
-		assertTrue(trav.translate(elem.getAttributeNode("alt")));
-		assertFalse(trav.translate(elem.getAttributeNode("test")));
+		assertTrue(trav.getTranslate(elem.getAttributeNode("title")));
+		assertTrue(trav.getTranslate(elem.getAttributeNode("alt")));
+		assertFalse(trav.getTranslate(elem.getAttributeNode("test")));
 	}
 
 	private static Element getElement (ITraversal trav,

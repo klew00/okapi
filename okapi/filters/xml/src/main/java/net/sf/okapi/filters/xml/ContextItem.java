@@ -40,10 +40,10 @@ class ContextItem {
 	{
 		this.node = node;
 		// Context is always an element node
-		this.translate = trav.translate();
+		this.translate = trav.getTranslate(null);
 		this.trgPointer = trav.getTargetPointer();
-		this.idValue = trav.getIdValue();
-		this.locNote = trav.getNote();
+		this.idValue = trav.getIdValue(null);
+		this.locNote = trav.getLocNote();
 		this.preserveWS = trav.preserveWS();
 		this.domains = trav.getDomains();
 		this.externalRes = trav.getExternalResourceRef();

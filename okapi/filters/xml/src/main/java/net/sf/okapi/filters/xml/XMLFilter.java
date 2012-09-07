@@ -456,7 +456,7 @@ public class XMLFilter implements IFilter {
 				// Use !backTracking() to get to the elements only once
 				// and to include the empty elements (for attributes).
 				if ( !tmpTrav.backTracking() ) {
-					if ( tmpTrav.translate() ) {
+					if ( tmpTrav.getTranslate(null) ) {
 						String pointer = tmpTrav.getTargetPointer();
 						if ( pointer != null ) {
 							resolveTargetPointer(itsEng.getXPath(), srcNode, pointer);
@@ -678,7 +678,7 @@ public class XMLFilter implements IFilter {
 					+ ((attr.getPrefix()==null) ? "" : attr.getPrefix()+":")
 					+ attr.getLocalName() + "=\"");
 				// Extract if needed
-				if (( trav.translate(attr) ) && ( attr.getValue().length() > 0 )) {
+				if (( trav.getTranslate(attr) ) && ( attr.getValue().length() > 0 )) {
 					// Store the text part and reset the buffer
 					skel.append(tmp.toString());
 					tmp.setLength(0);
@@ -719,7 +719,7 @@ public class XMLFilter implements IFilter {
 					+ ((attr.getPrefix()==null) ? "" : attr.getPrefix()+":")
 					+ attr.getLocalName() + "=\"");
 				// Extract if needed
-				if (( trav.translate(attr) ) && ( attr.getValue().length() > 0 )) {
+				if (( trav.getTranslate(attr) ) && ( attr.getValue().length() > 0 )) {
 					id = addAttributeTextUnit(attr, false);
 					tmp.append(TextFragment.makeRefMarker(id));
 					tmp.append("\"");
@@ -822,11 +822,11 @@ public class XMLFilter implements IFilter {
 				}
 			}
 			
-			if ( trav.isTerm() ) {
+			if ( trav.getTerm(null) ) {
 				if ( terms == null ) {
 					terms = new TermsAnnotation();
 				}
-				terms.add(node.getTextContent(), trav.getTermInfo());
+				terms.add(node.getTextContent(), trav.getTermInfo(null));
 			}
 		}
 		else { // Else: Start tag
@@ -892,7 +892,7 @@ public class XMLFilter implements IFilter {
 	 */
 	private boolean extract () {
 		// Check ITS translate
-		if ( !trav.translate() ) return false;
+		if ( !trav.getTranslate(null) ) return false;
 		
 		// Check ITS locale filter
 		String list = trav.getLocaleFilter();

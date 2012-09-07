@@ -114,7 +114,7 @@ public class Parameters extends BaseParameters{
 		desc.add("processAllTargets", "Read all target entries", null);
 		desc.add("consolidateDpSkeleton", "Group all document parts skeleton into one", null);
 		desc.add("exitOnInvalid", "Exit when encountering invalid <tu>s (default is to skip invalid <tu>s).", null);
-		desc.add(SEGTYPE, "Set TextUnit Segmentation", null);
+		desc.add(SEGTYPE, "Creates or not a segment for the extracted <Tu>", null);
 		return desc;
 	}
 
