@@ -197,5 +197,148 @@ public class GenericContentTest {
 		tf.append("t3");
 		return tf;
 	}
-	
+
+
+	@Test
+	public void testEncodeLetterCodesPlainOpenCloseTags() {
+		testEncodeLetterCodeTags("<g1><g458></g458></g1>", "<gg1><gg458></gg458></gg1>");
+	}
+
+	@Test
+	public void testDecodeLetterCodesOpenCloseTags() {
+		testDecodeLetterCodeTags("<gg1><gg458></gg458></gg1>", "<g1><g458></g458></g1>");
+	}
+
+	@Test
+	public void testRoundTripLetterCodesOpenCloseTags() {
+		testRoundTripWithInlineCodes("<g1><g458></g458>", "</g1>");
+	}
+
+	@Test
+	public void testEncodeLetterCodesIsolatedTags() {
+		testEncodeLetterCodeTags("<x2/><b34/><e65432/>", "<xx2/><bb34/><ee65432/>");
+	}
+
+	@Test
+	public void testDecodeLetterCodesIsolatedTags() {
+		testDecodeLetterCodeTags("<xx2/><bb34/><ee65432/>", "<x2/><b34/><e65432/>");
+	}
+
+	@Test
+	public void testRoundTripLetterCodesIsolatedTags() {
+		testRoundTripWithInlineCodes("<x2/><b34/><e65432/>", "<b3/><x1/>");
+	}
+
+	@Test
+	public void testEncodeLetterCodesPreEscapedTags() {
+		testEncodeLetterCodeTags("<gg1></gg2><gggg1><xx3/><bb4/><ee5/><xxxx3/><bbbb4/><eeee5/>",
+				                 "<ggg1></ggg2><ggggg1><xxx3/><bbb4/><eee5/><xxxxx3/><bbbbb4/><eeeee5/>");
+	}
+
+	@Test
+	public void testDecodeLetterCodesPreEscapedTags() {
+		testDecodeLetterCodeTags("<ggg1></ggg2><ggggg1><xxx3/><bbb4/><eee5/><xxxxx3/><bbbbb4/><eeeee5/>",
+				                 "<gg1></gg2><gggg1><xx3/><bb4/><ee5/><xxxx3/><bbbb4/><eeee5/>");
+	}
+
+	@Test
+	public void testRoundTripLetterCodesPreEscapedTags() {
+		testRoundTripWithInlineCodes("<gg1></gg2><gggg1><xx3/><bb4/><ee5/>", "<xxxx3/><bbbb4/><eeee5/>");
+	}
+
+	@Test
+	public void testEncodeLetterCodesNonDigitTags() {
+		String nonMatchingCodes = "<g></g><ggg></ggg><x/><xx/><b/><bbbb/><e/><ee/>";
+		testEncodeLetterCodeTags(nonMatchingCodes, nonMatchingCodes);
+	}
+
+	@Test
+	public void testDecodeLetterCodesNonDigitTags() {
+		String nonMatchingCodes = "<g></g><ggg></ggg><x/><xx/><b/><bbbb/><e/><ee/>";
+		testDecodeLetterCodeTags(nonMatchingCodes, nonMatchingCodes);
+	}
+
+	@Test
+	public void testRoundTripLetterCodesNonDigitTags() {
+		testRoundTripWithInlineCodes("<g></g><ggg></ggg><x/>", "<xx/><b/><bbbb/><e/><ee/>");
+	}
+
+	@Test
+	public void testEncodeLetterCodesInappropriateClosing() {
+		String nonMatchingClosingTags = "<x><xx><b><bb><e><ee><x2><b34><e65432> </x></b></e></x2></b34></e65432> <xx3><bb4><ee5> <g/><ggg/>";
+		testEncodeLetterCodeTags(nonMatchingClosingTags, nonMatchingClosingTags);
+	}
+
+	@Test
+	public void testDecodeLetterCodesInappropriateClosing() {
+		String nonMatchingClosingTags = "<x><xx><b><bb><e><ee><x2><b34><e65432> </x></b></e></x2></b34></e65432> <xx3><bb4><ee5> <g/><ggg/>";
+		testDecodeLetterCodeTags(nonMatchingClosingTags, nonMatchingClosingTags);
+	}
+
+	@Test
+	public void testRoundTripLetterCodesInappropriateClosing() {
+		testRoundTripWithInlineCodes("<x><xx><b><bb><e><ee><x2><b34><e65432>", " </x></b></e></x2></b34></e65432> <xx3><bb4><ee5> <g/><ggg/>");
+	}
+
+	@Test
+	public void testEncodeLetterCodesInappropriateLetters() {
+		String inappropriateLettersTags = "<a><a1><z23><y1/></y1>"
+				+ " <ba1><ab1><bab1></ba1></ab1></bab1><ba1/><ab1/><bab1/>"
+				+ " <ex1/><be3/><xb4/><bxb2>"
+				+ " <ggagg2><gygg3/><xxxs7/><bubb43/><evee98/>";
+		testEncodeLetterCodeTags(inappropriateLettersTags, inappropriateLettersTags);
+	}
+
+	@Test
+	public void testDecodeLetterCodesInappropriateLetters() {
+		String inappropriateLettersTags = "<a><a1><z23><y1/></y1>"
+				+ " <ba1><ab1><bab1></ba1></ab1></bab1><ba1/><ab1/><bab1/>"
+				+ " <ex1/><be3/><xb4/><bxb2>"
+				+ " <ggagg2><gygg3/><xxxs7/><bubb43/><evee98/>";
+		testDecodeLetterCodeTags(inappropriateLettersTags, inappropriateLettersTags);
+	}
+
+	@Test
+	public void testRoundTripLetterCodesInappropriateLetters() {
+		testRoundTripWithInlineCodes("<a><a1><z23><y1/></y1> <ba1><ab1><bab1></ba1></ab1></bab1><ba1/><ab1/><bab1/>",
+				" <ex1/><be3/><xb4/><bxb2> <ggagg2><gygg3/><xxxs7/><bubb43/><evee98/>");
+	}
+
+
+	private void testEncodeLetterCodeTags(String originalText,
+			String encodedText) {
+		TextFragment tf = new TextFragment(originalText);
+		String letterCoded = GenericContent.fromFragmentToLetterCoded(tf, true);
+		assertEquals("tags that would match letter code tags should have their first letter prepended",
+				encodedText, letterCoded);
+	}
+
+	private void testDecodeLetterCodeTags(String codedText, String decodedText) {
+		TextFragment tf = GenericContent.fromLetterCodedToFragment(codedText, null, false, true);
+		assertEquals("tags that have been encoded should be decoded to their original state",
+				decodedText, tf.toText());
+	}
+
+	private void testRoundTripWithInlineCodes(String firstPart,
+			String secondPart) {
+		TextFragment tf = createTextFragmentWithCodes(firstPart, secondPart);
+		String before = tf.toText();
+		String letterCoded = GenericContent.fromFragmentToLetterCoded(tf, true);
+		TextFragment decoded = GenericContent.fromLetterCodedToFragment(letterCoded, tf, true, true);
+		String after = decoded.toText();
+		assertEquals("fragment to letter-coded round trip should not change text fragment", before, after);
+	}
+
+	private TextFragment createTextFragmentWithCodes (String firstPart, String secondPart) {
+		TextFragment tf = new TextFragment();
+		tf.append(TagType.OPENING, "a-tag", "[a]");
+		tf.append(TagType.OPENING, "c-tag", "[c]");
+		tf.append(firstPart);
+		tf.append(TagType.PLACEHOLDER, "d-tag", "[d/]");
+		tf.append(secondPart);
+		tf.append(TagType.CLOSING, "c-tag", "[/c]");
+		tf.append(TagType.CLOSING, "a-tag", "[/a]");
+		return tf;
+	}
+
 }
