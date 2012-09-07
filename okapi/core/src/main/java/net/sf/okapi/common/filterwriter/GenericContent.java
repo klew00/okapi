@@ -52,6 +52,17 @@ public class GenericContent {
 	private static final Pattern patternLCIsolatedB = Pattern.compile("\\<b(\\d+?)/\\>");
 	private static final Pattern patternLCIsolatedE = Pattern.compile("\\<e(\\d+?)/\\>");
 
+
+	private static final Pattern patternLCOpenCloseEncode = Pattern.compile("\\<(/?)(g+?\\d+?)\\>");
+	private static final String replacementLCOpenCloseEncode = "<$1g$2>";
+	private static final Pattern patternLCOpenCloseDecode = Pattern.compile("\\<(/)?g(g+?\\d+?)\\>");
+	private static final String replacementLCOpenCloseDecode = "<$1$2>";
+
+	private static final Pattern patternLCAllIsolatedEncode = Pattern.compile("\\<(([xbe])\\2*?\\d+?)/\\>");
+	private static final String replacementLCAllIsolatedEncode = "<$2$1/>";
+	private static final Pattern patternLCAllIsolatedDecode = Pattern.compile("\\<([xbe])(\\1+?\\d+?)/\\>");
+	private static final String replacementLCAllIsolatedDecode = "<$2/>";
+
 	private String codedText;
 	private List<Code> codes;
 
@@ -412,7 +423,7 @@ public class GenericContent {
 //		tf.setCodedText(tmp.toString(), codes, allowCodeDeletion);
 //		return tf;
 //	}
-	
+
 	/**
 	 * Converts a letter-coded text to a fragment.
 	 * <p>A letter-coded text is like "&lt;g1>text&lt;x2/>&lt;/g1>&lt;b3/>".
@@ -425,8 +436,28 @@ public class GenericContent {
 	 * @return the new fragment created from the text.
 	 */
 	public static TextFragment fromLetterCodedToFragment (String text,
+			TextFragment fragment,
+			boolean reuseCodes)
+	{
+		return fromLetterCodedToFragment(text, fragment, reuseCodes, false);
+	}
+
+	/**
+	 * Converts a letter-coded text to a fragment.
+	 * <p>A letter-coded text is like "&lt;g1>text&lt;x2/>&lt;/g1>&lt;b3/>".
+	 * @param text the text to convert.
+	 * @param fragment optional existing fragment where to set the converted data, or null to create a new fragment.
+	 * If an existing fragment is provided, no existing code is preserved: all codes are coming from the parsing
+	 * of the input text, except if reuseCodes is set to true.
+	 * @param reuseCodes true to re-use the codes of the provided text fragment. If a code is not found in the
+	 * provided text fragment, one is created for the output.
+	 * @param decodeEncodedLetterCodes true to reverse previous tag escaping, this should match the value of encodeExistingLetterCodes when the text was tag encoded
+	 * @return the new fragment created from the text.
+	 */
+	public static TextFragment fromLetterCodedToFragment (String text,
 		TextFragment fragment,
-		boolean reuseCodes)
+		boolean reuseCodes,
+		boolean decodeEncodedLetterCodes)
 	{
 		// Case with no in-line codes
 		if ( text.indexOf('<') == -1 ) {
@@ -557,14 +588,23 @@ public class GenericContent {
 			diff += (2-m.group().length());
 			start = n+m.group().length();
 		}
-		
+
+		String codedText = tmp.toString();
+
+		if (decodeEncodedLetterCodes) {
+			m = patternLCOpenCloseDecode.matcher(codedText);
+			codedText = m.replaceAll(replacementLCOpenCloseDecode);
+			m = patternLCAllIsolatedDecode.matcher(codedText);
+			codedText = m.replaceAll(replacementLCAllIsolatedDecode);
+		}
+
 		// Create the fragment or update the existing one
 		if ( fragment != null ) {
-			fragment.setCodedText(tmp.toString(), codes, true);
+			fragment.setCodedText(codedText, codes, true);
 			return fragment;
 		}
 		else {
-			return new TextFragment(tmp.toString(), codes);
+			return new TextFragment(codedText, codes);
 		}
 	}
 
@@ -575,10 +615,32 @@ public class GenericContent {
 	 * @return the resulting letter-coded text. 
 	 */
 	public static String fromFragmentToLetterCoded (TextFragment fragment) {
+		return fromFragmentToLetterCoded(fragment, false);
+	}
+
+	/**
+	 * Converts a text fragment into a letter-coded text, optionally escaping
+	 * tags that will interfere with conversion back to a fragment.
+	 * 
+	 * Use {@link #fromLetterCodedToFragment(String, TextFragment, boolean, boolean)} to
+	 * convert back to a fragment.
+	 * 
+	 * @param fragment the fragment to convert.
+	 * @return the resulting letter-coded text.
+	 */
+	public static String fromFragmentToLetterCoded (TextFragment fragment, boolean encodeExistingLetterCodes) {
 		String codedText = fragment.getCodedText();
 		List<Code> codes = fragment.getCodes();
 		StringBuilder tmp = new StringBuilder();
 		int index;
+
+		if (encodeExistingLetterCodes) {
+			Matcher m = patternLCOpenCloseEncode.matcher(codedText);
+			codedText = m.replaceAll(replacementLCOpenCloseEncode);
+			m = patternLCAllIsolatedEncode.matcher(codedText);
+			codedText = m.replaceAll(replacementLCAllIsolatedEncode);
+		}
+
 		for ( int i=0; i<codedText.length(); i++ ) {
 			switch ( codedText.codePointAt(i) ) {
 			case TextFragment.MARKER_OPENING:
