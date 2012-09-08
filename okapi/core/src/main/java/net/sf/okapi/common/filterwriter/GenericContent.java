@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2011 by the Okapi Framework contributors
+  Copyright (C) 2008-2012 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -51,7 +51,6 @@ public class GenericContent {
 	private static final Pattern patternLCIsolated = Pattern.compile("\\<x(\\d+?)/\\>");
 	private static final Pattern patternLCIsolatedB = Pattern.compile("\\<b(\\d+?)/\\>");
 	private static final Pattern patternLCIsolatedE = Pattern.compile("\\<e(\\d+?)/\\>");
-
 
 	private static final Pattern patternLCOpenCloseEncode = Pattern.compile("\\<(/?)(g+?\\d+?)\\>");
 	private static final String replacementLCOpenCloseEncode = "<$1g$2>";
@@ -435,9 +434,10 @@ public class GenericContent {
 	 * provided text fragment, one is created for the output.
 	 * @return the new fragment created from the text.
 	 */
+	@Deprecated
 	public static TextFragment fromLetterCodedToFragment (String text,
-			TextFragment fragment,
-			boolean reuseCodes)
+		TextFragment fragment,
+		boolean reuseCodes)
 	{
 		return fromLetterCodedToFragment(text, fragment, reuseCodes, false);
 	}
@@ -614,6 +614,7 @@ public class GenericContent {
 	 * @param fragment the fragment to convert.
 	 * @return the resulting letter-coded text. 
 	 */
+	@Deprecated
 	public static String fromFragmentToLetterCoded (TextFragment fragment) {
 		return fromFragmentToLetterCoded(fragment, false);
 	}
@@ -628,7 +629,9 @@ public class GenericContent {
 	 * @param fragment the fragment to convert.
 	 * @return the resulting letter-coded text.
 	 */
-	public static String fromFragmentToLetterCoded (TextFragment fragment, boolean encodeExistingLetterCodes) {
+	public static String fromFragmentToLetterCoded (TextFragment fragment,
+		boolean encodeExistingLetterCodes)
+	{
 		String codedText = fragment.getCodedText();
 		List<Code> codes = fragment.getCodes();
 		StringBuilder tmp = new StringBuilder();

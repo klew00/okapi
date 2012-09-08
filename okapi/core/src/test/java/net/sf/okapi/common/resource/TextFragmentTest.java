@@ -971,7 +971,7 @@ public class TextFragmentTest {
 		fmt = new GenericContent();
 		fmt.setContent(tf);
 		assertEquals("<b1/>A<e1/><b2/><3/><e2/><b4/>B<e4/><b5/><6/><e5/>", fmt.toString());
-		assertEquals("<b1/>A<e1/><b2/><x3/><e2/><b4/>B<e4/><b5/><x6/><e5/>", fmt.fromFragmentToLetterCoded(tf));
+		assertEquals("<b1/>A<e1/><b2/><x3/><e2/><b4/>B<e4/><b5/><x6/><e5/>", GenericContent.fromFragmentToLetterCoded(tf, true));
 		
 		tf = new TextFragment();
 		tf.append(TagType.OPENING, "(4", "[(4]", 4);
@@ -1015,7 +1015,7 @@ public class TextFragmentTest {
 		fmt = new GenericContent();
 		fmt.setContent(tf);
 		assertEquals("<b1/>A<e1/><b2/><3/><e2/><b4/>B<e4/><b5/><6/><e5/>", fmt.toString());
-		assertEquals("<b1/>A<e1/><b2/><x3/><e2/><b4/>B<e4/><b5/><x6/><e5/>", fmt.fromFragmentToLetterCoded(tf));
+		assertEquals("<b1/>A<e1/><b2/><x3/><e2/><b4/>B<e4/><b5/><x6/><e5/>", GenericContent.fromFragmentToLetterCoded(tf, true));
 	}
 
 	/**

@@ -136,7 +136,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		desc.addSeparatorPart();
 		
 		desc.addCheckboxPart(paramsDesc.get(SIMPLIFYCODES));
-		desc.addCheckboxPart(paramsDesc.get(NEWTUONBR));
+//TODO: NOT READY YET		desc.addCheckboxPart(paramsDesc.get(NEWTUONBR));
 		desc.addSeparatorPart();
 		
 		SpinInputPart sip = desc.addSpinInputPart(paramsDesc.get(SKIPTHRESHOLD));
