@@ -6,6 +6,7 @@ import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.pipelinedriver.IPipelineDriver;
 import net.sf.okapi.common.pipelinedriver.PipelineDriver;
 import net.sf.okapi.common.resource.RawDocument;
+import net.sf.okapi.common.TestUtil;
 import net.sf.okapi.steps.common.FilterEventsWriterStep;
 import net.sf.okapi.steps.common.RawDocumentToFilterEventsStep;
 import org.junit.After;
@@ -21,6 +22,7 @@ public class XsltPipelineTest {
 
     private IPipelineDriver driver;
 	private LocaleId locEN = LocaleId.fromString("EN");
+	static String root;
 
     @Before
     public void setUp() throws Exception {
@@ -28,6 +30,7 @@ public class XsltPipelineTest {
     	fcMapper.addConfigurations("net.sf.okapi.filters.xml.XMLFilter");
     	driver = new PipelineDriver();
     	driver.setFilterConfigurationMapper(fcMapper);
+    	root = TestUtil.getParentDir(this.getClass(), "/");
     }
 
     @After
@@ -58,7 +61,7 @@ public class XsltPipelineTest {
 
         RawDocument rd = new RawDocument(inputXml.toURI(), "UTF-8", locEN);
         rd.setFilterConfigId("okf_xml");
-        File outFile = new File("output.xml");
+        File outFile = new File(root, "output.xml");
         driver.addBatchItem(rd, outFile.toURI(), "UTF-8");
         driver.processBatch();
 

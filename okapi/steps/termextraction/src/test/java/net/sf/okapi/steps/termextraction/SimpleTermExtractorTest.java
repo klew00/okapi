@@ -26,6 +26,7 @@ import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.TestUtil;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -39,6 +40,8 @@ public class SimpleTermExtractorTest {
 	@Before
 	public void setUp() {
 		params = new Parameters();
+		String root = TestUtil.getParentDir(this.getClass(), "/");
+		params.setOutputPath(root + "/terms.txt");
 	}
 
 	@Test
