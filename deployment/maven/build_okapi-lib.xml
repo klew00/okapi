@@ -461,7 +461,7 @@
 		<copy todir="${distLib}" file="${depSlf4jApi}/${jarSlf4jApi}"/>
 
 		<echo file="tmpJars" append="yes"> logger/logger.jar</echo>
-		<copy file="${mavenStore}/net/sf/okapi/log4j/binder/${okapilibStamp}/binder-${okapilibStamp}.jar"
+		<copy file="${mavenStore}/net/sf/okapi/logbind/jdk14/${okapilibStamp}/jdk14-${okapilibStamp}.jar"
 		      tofile="${distLogger}/logger.jar" />
 
 		<property name="depSlf4jBind" value="${mavenStore}/org/slf4j/slf4j-log4j12/1.6.6"/>

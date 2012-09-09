@@ -37,7 +37,8 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 	<modules>
-		<module>deployment/log4j-binder</module>
+		<module>deployment/logbind-jdk</module>
+		<module>deployment/logbind-log4j</module>
 		<module>core</module>
 		<module>filters</module>
 		<module>libraries</module>
@@ -68,8 +69,8 @@
 			<version>1.2.17</version>
 		</dependency>
 		<dependency>
-			<groupId>net.sf.okapi.log4j</groupId>
-			<artifactId>binder</artifactId>
+			<groupId>net.sf.okapi.logbind</groupId>
+			<artifactId>log4j</artifactId>
 			<version>${project.version}</version>
 			<scope>runtime</scope>
 		</dependency>

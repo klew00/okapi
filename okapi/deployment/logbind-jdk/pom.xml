@@ -3,8 +3,8 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-	<groupId>net.sf.okapi.log4j</groupId>
-	<artifactId>binder</artifactId>
+	<groupId>net.sf.okapi.logbind</groupId>
+	<artifactId>jdk14</artifactId>
 	<version>0.19-SNAPSHOT</version>
 
     <properties>
@@ -14,7 +14,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-log4j12</artifactId>
+			<artifactId>slf4j-jdk14</artifactId>
 			<version>1.6.6</version>
 			<exclusions>
 				<exclusion>
@@ -22,11 +22,6 @@
 					<artifactId>slf4j-api</artifactId>
 				</exclusion>
 			</exclusions>
-		</dependency>
-		<dependency>
-			<groupId>log4j</groupId>
-			<artifactId>log4j</artifactId>
-			<version>1.2.17</version>
 		</dependency>
 	</dependencies>
 
@@ -57,28 +52,6 @@
 					<target>1.6</target>
 				</configuration>
 			</plugin>
-
-			<plugin>
-				<artifactId>maven-antrun-plugin</artifactId>
-				<executions>
-					<execution>
-						<phase>compile</phase>
-						<configuration>
-							<tasks>
-								<copy todir="${settings.localRepository}/net/sf/okapi/log4j/${project.artifactId}/${project.version}" overwrite="true">
-									<fileset dir="src/resources">
-										<include name="*.properties"/>
-									</fileset>
-								</copy>
-							</tasks>
-						</configuration>
-						<goals>
-							<goal>run</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-
 		</plugins>
 	</build>
 
