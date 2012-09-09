@@ -417,7 +417,7 @@ public class POWriter implements IFilterWriter {
 			String tmp;
 			if ( forExtractMerge ) {
 				if ( tc.contentIsOneSegment() ) {
-					tmp = fmt.fromFragmentToLetterCoded(tc.getFirstContent());
+					tmp = GenericContent.fromFragmentToLetterCoded(tc.getFirstContent(), true);
 				}
 				else { // If the container is segmented
 					// We replace content made of only inter-segments by an empty one
@@ -430,7 +430,7 @@ public class POWriter implements IFilterWriter {
 						}
 					}
 					if ( hasSomeText ) {
-						tmp = fmt.fromFragmentToLetterCoded(tc.getUnSegmentedContentCopy());
+						tmp = GenericContent.fromFragmentToLetterCoded(tc.getUnSegmentedContentCopy(), true);
 					}
 					else {
 						tmp = "";

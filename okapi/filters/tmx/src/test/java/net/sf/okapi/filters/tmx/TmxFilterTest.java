@@ -17,6 +17,7 @@ import net.sf.okapi.common.TestUtil;
 import net.sf.okapi.common.exceptions.OkapiBadFilterInputException;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.filters.FilterConfiguration;
+import net.sf.okapi.common.resource.AlignmentStatus;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.RawDocument;
@@ -56,6 +57,27 @@ public class TmxFilterTest {
 
 	String simpleBilingualSnippet = "<?xml version=\"1.0\"?>\r"
 		+ "<tmx version=\"1.4\"><header creationtool=\"undefined_creationtool\" creationtoolversion=\"undefined_creationversion\" segtype=\"undefined_segtype\" o-tmf=\"undefined_unknown\" adminlang=\"undefined_adminlang\" srclang=\"en-us\" datatype=\"unknown\"></header><body><tu tuid=\"tuid_1\"><tuv xml:lang=\"en-us\"><seg>Hello World!</seg></tuv><tuv xml:lang=\"fr-fr\"><seg>Bonjour le monde!</seg></tuv></tu></body></tmx>\r";
+	
+	String simpleBilingualSnippetWithSentence = "<?xml version=\"1.0\"?>\r"
+			+ "<tmx version=\"1.4\"><header creationtool=\"undefined_creationtool\" creationtoolversion=\"undefined_creationversion\" segtype=\"undefined_segtype\" o-tmf=\"undefined_unknown\" adminlang=\"undefined_adminlang\" srclang=\"en-us\" datatype=\"unknown\"></header><body><tu tuid=\"tuid_1\" segtype=\"sentence\"><tuv xml:lang=\"en-us\"><seg>Hello World!</seg></tuv><tuv xml:lang=\"fr-fr\"><seg>Bonjour le monde!</seg></tuv></tu></body></tmx>\r";
+
+	String simpleBilingualSnippetWithParagraph = "<?xml version=\"1.0\"?>\r"
+			+ "<tmx version=\"1.4\"><header creationtool=\"undefined_creationtool\" creationtoolversion=\"undefined_creationversion\" segtype=\"undefined_segtype\" o-tmf=\"undefined_unknown\" adminlang=\"undefined_adminlang\" srclang=\"en-us\" datatype=\"unknown\"></header><body><tu tuid=\"tuid_1\" segtype=\"paragraph\"><tuv xml:lang=\"en-us\"><seg>Hello World!</seg></tuv><tuv xml:lang=\"fr-fr\"><seg>Bonjour le monde!</seg></tuv></tu></body></tmx>\r";
+
+	String simpleBilingualSnippetWithUnknown = "<?xml version=\"1.0\"?>\r"
+			+ "<tmx version=\"1.4\"><header creationtool=\"undefined_creationtool\" creationtoolversion=\"undefined_creationversion\" segtype=\"undefined_segtype\" o-tmf=\"undefined_unknown\" adminlang=\"undefined_adminlang\" srclang=\"en-us\" datatype=\"unknown\"></header><body><tu tuid=\"tuid_1\" segtype=\"undefined\"><tuv xml:lang=\"en-us\"><seg>Hello World!</seg></tuv><tuv xml:lang=\"fr-fr\"><seg>Bonjour le monde!</seg></tuv></tu></body></tmx>\r";
+
+	String simpleBilingualSnippetHeaderSentence = "<?xml version=\"1.0\"?>\r"
+			+ "<tmx version=\"1.4\"><header creationtool=\"undefined_creationtool\" creationtoolversion=\"undefined_creationversion\" segtype=\"sentence\" o-tmf=\"undefined_unknown\" adminlang=\"undefined_adminlang\" srclang=\"en-us\" datatype=\"unknown\"></header><body><tu tuid=\"tuid_1\"><tuv xml:lang=\"en-us\"><seg>Hello World!</seg></tuv><tuv xml:lang=\"fr-fr\"><seg>Bonjour le monde!</seg></tuv></tu></body></tmx>\r";
+
+	String simpleBilingualSnippetHeaderParagraph = "<?xml version=\"1.0\"?>\r"
+			+ "<tmx version=\"1.4\"><header creationtool=\"undefined_creationtool\" creationtoolversion=\"undefined_creationversion\" segtype=\"paragraph\" o-tmf=\"undefined_unknown\" adminlang=\"undefined_adminlang\" srclang=\"en-us\" datatype=\"unknown\"></header><body><tu tuid=\"tuid_1\"><tuv xml:lang=\"en-us\"><seg>Hello World!</seg></tuv><tuv xml:lang=\"fr-fr\"><seg>Bonjour le monde!</seg></tuv></tu></body></tmx>\r";	
+	
+	String biHeaderSentenceTuPara = "<?xml version=\"1.0\"?>\r"
+			+ "<tmx version=\"1.4\"><header creationtool=\"undefined_creationtool\" creationtoolversion=\"undefined_creationversion\" segtype=\"sentence\" o-tmf=\"undefined_unknown\" adminlang=\"undefined_adminlang\" srclang=\"en-us\" datatype=\"unknown\"></header><body><tu tuid=\"tuid_1\" segtype=\"paragraph\"><tuv xml:lang=\"en-us\"><seg>Hello World!</seg></tuv><tuv xml:lang=\"fr-fr\"><seg>Bonjour le monde!</seg></tuv></tu></body></tmx>\r";
+
+	String biHeaderParaTuSentence = "<?xml version=\"1.0\"?>\r"
+			+ "<tmx version=\"1.4\"><header creationtool=\"undefined_creationtool\" creationtoolversion=\"undefined_creationversion\" segtype=\"paragraph\" o-tmf=\"undefined_unknown\" adminlang=\"undefined_adminlang\" srclang=\"en-us\" datatype=\"unknown\"></header><body><tu tuid=\"tuid_1\" segtype=\"sentence\"><tuv xml:lang=\"en-us\"><seg>Hello World!</seg></tuv><tuv xml:lang=\"fr-fr\"><seg>Bonjour le monde!</seg></tuv></tu></body></tmx>\r";	
 	
 	String tuMissingXmlLangSnippet = "<?xml version=\"1.0\"?>\r"
 		+ "<tmx version=\"1.4\"><header creationtool=\"undefined_creationtool\" creationtoolversion=\"undefined_creationversion\" segtype=\"undefined_segtype\" o-tmf=\"undefined_unknown\" adminlang=\"undefined_adminlang\" srclang=\"en-us\" datatype=\"unknown\"></header><body><tu tuid=\"tuid_1\"><tuv><seg>Hello World!</seg></tuv></tu></body></tmx>\r";
@@ -388,6 +410,176 @@ public class TmxFilterTest {
 		assertNotNull(tu);
 		assertEquals("Hello Universe!", tu.getSource().getFirstContent().toText());
 	}
+	
+	@Test
+	public void testSegTypeSentence () {
+		
+		Parameters params = new Parameters();
+		params.setSegType(TmxFilter.SEGTYPE_SENTENCE);
+		filter.setParameters(params);
+		
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(simpleBilingualSnippetWithSentence, locENUS,locFRFR), 1);
+		assertEquals(tu.getSource().getSegments().getAlignmentStatus(), AlignmentStatus.ALIGNED);
+		assertTrue(tu.getSource().hasBeenSegmented());
+		assertEquals(tu.getTarget(locFRFR).getSegments().getAlignmentStatus(), AlignmentStatus.ALIGNED);
+		assertTrue(tu.getTarget(locFRFR).hasBeenSegmented());
+	}
+	
+	@Test
+	public void testSegTypePara () {
+		
+		Parameters params = new Parameters();
+		params.setSegType(TmxFilter.SEGTYPE_PARA);
+		filter.setParameters(params);
+		
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(simpleBilingualSnippetWithParagraph, locENUS,locFRFR), 1);
+		assertEquals(tu.getSource().getSegments().getAlignmentStatus(), AlignmentStatus.NOT_ALIGNED);
+		assertTrue(!tu.getSource().hasBeenSegmented());
+		assertEquals(tu.getTarget(locFRFR).getSegments().getAlignmentStatus(), AlignmentStatus.NOT_ALIGNED);
+		assertTrue(!tu.getTarget(locFRFR).hasBeenSegmented());
+
+	}
+	
+	@Test
+	public void testSegTypeOrSentence() {
+		
+		Parameters params = new Parameters();
+		params.setSegType(TmxFilter.SEGTYPE_OR_SENTENCE);
+		filter.setParameters(params);
+		
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(simpleBilingualSnippetWithSentence, locENUS,locFRFR), 1);
+		assertEquals(tu.getSource().getSegments().getAlignmentStatus(), AlignmentStatus.ALIGNED);
+		assertTrue(tu.getSource().hasBeenSegmented());
+		assertEquals(tu.getTarget(locFRFR).getSegments().getAlignmentStatus(), AlignmentStatus.ALIGNED);
+		assertTrue(tu.getTarget(locFRFR).hasBeenSegmented());
+	}
+	
+	@Test
+	public void testSegTypeOrParagraph() {
+		
+		Parameters params = new Parameters();
+		params.setSegType(TmxFilter.SEGTYPE_OR_PARA);
+		filter.setParameters(params);
+		
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(simpleBilingualSnippetWithParagraph, locENUS,locFRFR), 1);
+		assertEquals(tu.getSource().getSegments().getAlignmentStatus(), AlignmentStatus.NOT_ALIGNED);
+		assertTrue(!tu.getSource().hasBeenSegmented());
+		assertEquals(tu.getTarget(locFRFR).getSegments().getAlignmentStatus(), AlignmentStatus.NOT_ALIGNED);
+		assertTrue(!tu.getTarget(locFRFR).hasBeenSegmented());
+	}
+	
+	@Test
+	public void testSegTypeOrSentenceDefault() {
+		
+		Parameters params = new Parameters();
+		params.setSegType(TmxFilter.SEGTYPE_OR_SENTENCE);
+		filter.setParameters(params);
+		
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(simpleBilingualSnippet, locENUS,locFRFR), 1);
+		assertEquals(tu.getSource().getSegments().getAlignmentStatus(), AlignmentStatus.NOT_ALIGNED);
+		assertTrue(!tu.getSource().hasBeenSegmented());
+		assertEquals(tu.getTarget(locFRFR).getSegments().getAlignmentStatus(), AlignmentStatus.NOT_ALIGNED);
+		assertTrue(!tu.getTarget(locFRFR).hasBeenSegmented());
+	}
+	
+	@Test
+	public void testSegTypeOrParagraphDefault() {
+		
+		Parameters params = new Parameters();
+		params.setSegType(TmxFilter.SEGTYPE_OR_PARA);
+		filter.setParameters(params);
+		
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(simpleBilingualSnippet, locENUS,locFRFR), 1);
+		assertEquals(tu.getSource().getSegments().getAlignmentStatus(), AlignmentStatus.NOT_ALIGNED);
+		assertTrue(!tu.getSource().hasBeenSegmented());
+		assertEquals(tu.getTarget(locFRFR).getSegments().getAlignmentStatus(), AlignmentStatus.NOT_ALIGNED);
+		assertTrue(!tu.getTarget(locFRFR).hasBeenSegmented());
+	}
+	
+	@Test
+	public void testSegTypeOrSentenceUnknown() {
+		
+		Parameters params = new Parameters();
+		params.setSegType(TmxFilter.SEGTYPE_OR_SENTENCE);
+		filter.setParameters(params);
+		
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(simpleBilingualSnippetWithUnknown, locENUS,locFRFR), 1);
+		assertEquals(tu.getSource().getSegments().getAlignmentStatus(), AlignmentStatus.NOT_ALIGNED);
+		assertTrue(!tu.getSource().hasBeenSegmented());
+		assertEquals(tu.getTarget(locFRFR).getSegments().getAlignmentStatus(), AlignmentStatus.NOT_ALIGNED);
+		assertTrue(!tu.getTarget(locFRFR).hasBeenSegmented());
+	}
+	
+	@Test
+	public void testSegTypeOrParagraphUnknown() {
+		
+		Parameters params = new Parameters();
+		params.setSegType(TmxFilter.SEGTYPE_OR_PARA);
+		filter.setParameters(params);
+		
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(simpleBilingualSnippet, locENUS,locFRFR), 1);
+		assertEquals(tu.getSource().getSegments().getAlignmentStatus(), AlignmentStatus.NOT_ALIGNED);
+		assertTrue(!tu.getSource().hasBeenSegmented());
+		assertEquals(tu.getTarget(locFRFR).getSegments().getAlignmentStatus(), AlignmentStatus.NOT_ALIGNED);
+		assertTrue(!tu.getTarget(locFRFR).hasBeenSegmented());
+	}
+	
+	@Test
+	public void testSegTypeHeaderSentence() {
+		
+		Parameters params = new Parameters();
+		params.setSegType(TmxFilter.SEGTYPE_OR_PARA);
+		filter.setParameters(params);
+		
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(simpleBilingualSnippetHeaderSentence, locENUS,locFRFR), 1);
+		assertEquals(tu.getSource().getSegments().getAlignmentStatus(), AlignmentStatus.ALIGNED);
+		assertTrue(tu.getSource().hasBeenSegmented());
+		assertEquals(tu.getTarget(locFRFR).getSegments().getAlignmentStatus(), AlignmentStatus.ALIGNED);
+		assertTrue(tu.getTarget(locFRFR).hasBeenSegmented());
+	}
+	
+	@Test
+	public void testSegTypeHeaderParagraph() {
+		
+		Parameters params = new Parameters();
+		params.setSegType(TmxFilter.SEGTYPE_OR_SENTENCE);
+		filter.setParameters(params);
+		
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(simpleBilingualSnippetHeaderParagraph, locENUS,locFRFR), 1);
+		assertEquals(tu.getSource().getSegments().getAlignmentStatus(), AlignmentStatus.NOT_ALIGNED);
+		assertTrue(!tu.getSource().hasBeenSegmented());
+		assertEquals(tu.getTarget(locFRFR).getSegments().getAlignmentStatus(), AlignmentStatus.NOT_ALIGNED);
+		assertTrue(!tu.getTarget(locFRFR).hasBeenSegmented());
+	}
+	
+	@Test
+	public void testSegTypeHeaderSentenceOverwrite() {
+		
+		Parameters params = new Parameters();
+		params.setSegType(TmxFilter.SEGTYPE_OR_SENTENCE);
+		filter.setParameters(params);
+		
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(biHeaderSentenceTuPara, locENUS,locFRFR), 1);
+		assertEquals(tu.getSource().getSegments().getAlignmentStatus(), AlignmentStatus.NOT_ALIGNED);
+		assertTrue(!tu.getSource().hasBeenSegmented());
+		assertEquals(tu.getTarget(locFRFR).getSegments().getAlignmentStatus(), AlignmentStatus.NOT_ALIGNED);
+		assertTrue(!tu.getTarget(locFRFR).hasBeenSegmented());
+	}
+	
+	@Test
+	public void testSegTypeHeaderParagraphOverwrite() {
+		
+		Parameters params = new Parameters();
+		params.setSegType(TmxFilter.SEGTYPE_OR_PARA);
+		filter.setParameters(params);
+		
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(biHeaderParaTuSentence, locENUS,locFRFR), 1);
+		assertEquals(tu.getSource().getSegments().getAlignmentStatus(), AlignmentStatus.ALIGNED);
+		assertTrue(tu.getSource().hasBeenSegmented());
+		assertEquals(tu.getTarget(locFRFR).getSegments().getAlignmentStatus(), AlignmentStatus.ALIGNED);
+		assertTrue(tu.getTarget(locFRFR).hasBeenSegmented());
+	}
+	
 	
 	@Test
 	public void testSimpleTransUnit () {

@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009-2011 by the Okapi Framework contributors
+  Copyright (C) 2009-2012 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -158,7 +158,7 @@ public class TextUnitUtilTest {
 		oriFrag.append(TagType.OPENING, "c2", "[c2>]");
 		oriFrag.append(" s3 ");
 		oriFrag.append(TagType.CLOSING, "c2", "[<c2]");
-		TextFragment trgFrag = fmt.fromLetterCodedToFragment("<g2>t3</g2> t1 <x1/> t2", null, false);
+		TextFragment trgFrag = GenericContent.fromLetterCodedToFragment("<g2>t3</g2> t1 <x1/> t2", null, false, true);
 		TextUnitUtil.copySrcCodeDataToMatchingTrgCodes(oriFrag, trgFrag, true, false, null, null);
 		assertEquals("[c2>]t3[<c2] t1 [c1] t2", fmt.setContent(trgFrag).toString(true));
 	}
@@ -168,38 +168,38 @@ public class TextUnitUtilTest {
 		TextFragment oriFrag;
 		TextFragment trgFrag;
 		
-		oriFrag = fmt.fromLetterCodedToFragment("src<x1/>", null, false);
-		trgFrag = fmt.fromLetterCodedToFragment("trg", null, false);
+		oriFrag = GenericContent.fromLetterCodedToFragment("src<x1/>", null, false, true);
+		trgFrag = GenericContent.fromLetterCodedToFragment("trg", null, false, true);
 		TextUnitUtil.copySrcCodeDataToMatchingTrgCodes(oriFrag, trgFrag, true, true, null, null);
 		assertEquals("trg<1/>", fmt.setContent(trgFrag).toString());
 		
-		oriFrag = fmt.fromLetterCodedToFragment("src<x1/>", null, false);
-		trgFrag = fmt.fromLetterCodedToFragment("trg<x2/>", null, false);
+		oriFrag = GenericContent.fromLetterCodedToFragment("src<x1/>", null, false, true);
+		trgFrag = GenericContent.fromLetterCodedToFragment("trg<x2/>", null, false, true);
 		TextUnitUtil.copySrcCodeDataToMatchingTrgCodes(oriFrag, trgFrag, true, true, null, null);
 		assertEquals("trg<2/><1/>", fmt.setContent(trgFrag).toString());
 		
-		oriFrag = fmt.fromLetterCodedToFragment("src<x1/><x2/>", null, false);
-		trgFrag = fmt.fromLetterCodedToFragment("trg<x2/>", null, false);
+		oriFrag = GenericContent.fromLetterCodedToFragment("src<x1/><x2/>", null, false, true);
+		trgFrag = GenericContent.fromLetterCodedToFragment("trg<x2/>", null, false, true);
 		TextUnitUtil.copySrcCodeDataToMatchingTrgCodes(oriFrag, trgFrag, true, true, null, null);
 		assertEquals("trg<2/><1/>", fmt.setContent(trgFrag).toString());
 		
-		oriFrag = fmt.fromLetterCodedToFragment("<x1/>src<x2/>", null, false);
-		trgFrag = fmt.fromLetterCodedToFragment("trg<x2/>", null, false);
+		oriFrag = GenericContent.fromLetterCodedToFragment("<x1/>src<x2/>", null, false, true);
+		trgFrag = GenericContent.fromLetterCodedToFragment("trg<x2/>", null, false, true);
 		TextUnitUtil.copySrcCodeDataToMatchingTrgCodes(oriFrag, trgFrag, true, true, null, null);
 		assertEquals("<1/>trg<2/>", fmt.setContent(trgFrag).toString());
 		
-		oriFrag = fmt.fromLetterCodedToFragment("<x1/> src", null, false);
-		trgFrag = fmt.fromLetterCodedToFragment("trg", null, false);
+		oriFrag = GenericContent.fromLetterCodedToFragment("<x1/> src", null, false, true);
+		trgFrag = GenericContent.fromLetterCodedToFragment("trg", null, false, true);
 		TextUnitUtil.copySrcCodeDataToMatchingTrgCodes(oriFrag, trgFrag, true, true, null, null);
 		assertEquals("<1/>trg", fmt.setContent(trgFrag).toString());
 		
-		oriFrag = fmt.fromLetterCodedToFragment("<x1/> src<x2/>", null, false);
-		trgFrag = fmt.fromLetterCodedToFragment("trg", null, false);
+		oriFrag = GenericContent.fromLetterCodedToFragment("<x1/> src<x2/>", null, false, true);
+		trgFrag = GenericContent.fromLetterCodedToFragment("trg", null, false, true);
 		TextUnitUtil.copySrcCodeDataToMatchingTrgCodes(oriFrag, trgFrag, true, true, null, null);
 		assertEquals("<1/>trg<2/>", fmt.setContent(trgFrag).toString());
 		
-		oriFrag = fmt.fromLetterCodedToFragment("<x1/> src<x2/>", null, false);
-		trgFrag = fmt.fromLetterCodedToFragment("<x2/>trg", null, false);
+		oriFrag = GenericContent.fromLetterCodedToFragment("<x1/> src<x2/>", null, false, true);
+		trgFrag = GenericContent.fromLetterCodedToFragment("<x2/>trg", null, false, true);
 		TextUnitUtil.copySrcCodeDataToMatchingTrgCodes(oriFrag, trgFrag, true, true, null, null);
 		assertEquals("<1/><2/>trg", fmt.setContent(trgFrag).toString());
 	}

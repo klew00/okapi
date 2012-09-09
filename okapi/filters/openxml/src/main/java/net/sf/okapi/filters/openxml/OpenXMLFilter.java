@@ -383,7 +383,6 @@ public class OpenXMLFilter implements IFilter {
 	 * @param a cURI to open and filter
 	 * @param bSquishable true if file should be optimized by combining compatible
 	 *        text runs
-	 * @param nLogLevel a java.util.logging.Level constant
 	 * Level.SEVERE Errors the end user should see. 
 	 * Level.WARNING Important alert messages the end user should see. 
 	 * Level.INFO Additional log information, progress, etc. These messages are also shown to the user. 

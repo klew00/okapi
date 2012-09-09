@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2010-2011 by the Okapi Framework contributors
+  Copyright (C) 2010-2012 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -61,7 +61,6 @@ abstract class AbstractOkapiFilter implements org.omegat.filters2.IFilter {
 	private String filterConfigId;
 	private FilterConfigurationMapper fcMapper;
 	private String name;
-	private GenericContent fmt = new GenericContent();
 
 	protected void initialize (String name,
 		String filterClassName,
@@ -334,7 +333,7 @@ abstract class AbstractOkapiFilter implements org.omegat.filters2.IFilter {
 	
 	private String toOmegat (TextFragment tf) {
 		
-		return fmt.fromFragmentToLetterCoded(tf);
+		return GenericContent.fromFragmentToLetterCoded(tf, true);
 //		
 //		// Use directly the coded text if there is no codes
 //		if ( !tf.hasCode() ) {
@@ -382,7 +381,7 @@ abstract class AbstractOkapiFilter implements org.omegat.filters2.IFilter {
 	private void fromOmegat (String text,
 		TextFragment frag)
 	{
-		fmt.fromLetterCodedToFragment(text, frag, true);
+		GenericContent.fromLetterCodedToFragment(text, frag, true, true);
 //		
 //		// Case with no in-line codes
 //		if ( !frag.hasCode() && ( text.indexOf('<') == -1 )) {

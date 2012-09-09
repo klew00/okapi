@@ -85,6 +85,7 @@ public class TmxFilter implements IFilter {
 	private String lineBreak;
 	private boolean hasUTF8BOM;
 	private boolean skipUtWarning;
+	private int headerSegType = -1;
 	
 	public enum TuvXmlLang {UNDEFINED,SOURCE,TARGET,OTHER}
 
@@ -94,6 +95,11 @@ public class TmxFilter implements IFilter {
 	private EncoderManager encoderManager;
 	
 	private boolean skipInvalidTu = false; 						//--allows processing of slightly invalid tmx files but skips any invalid <tu>s
+	
+	public static final int SEGTYPE_SENTENCE = 0;
+	public static final int SEGTYPE_PARA = 1;
+	public static final int SEGTYPE_OR_SENTENCE = 2;
+	public static final int SEGTYPE_OR_PARA = 3;
 	
 	public TmxFilter () {
 		params = new Parameters();
@@ -358,6 +364,21 @@ public class TmxFilter implements IFilter {
 					
 					return processTranslationUnit();
 				}else{
+					
+					//--read the header segtype--
+					if (reader.getLocalName().equals("header")){
+						String hSegType = reader.getAttributeValue(null, "segtype");
+						if (hSegType != null){
+							if (hSegType.equals("sentence")){
+								headerSegType = SEGTYPE_SENTENCE;	
+							} else {
+								headerSegType = SEGTYPE_PARA;
+							}
+						} else {
+							headerSegType = -1;
+						}
+					}
+					
 					storeStartElement();
 					if (!params.consolidateDpSkeleton) {
 						DocumentPart dp = new DocumentPart(otherId.createId(), false, skel);
@@ -667,9 +688,37 @@ public class TmxFilter implements IFilter {
 	private boolean processTranslationUnit(){
 		
 		LocaleId currentLang;
-		TmxTu tmxTu = new TmxTu(srcLang, trgLang, lineBreak);	//create the TmxTu helper
+		TmxTu tmxTu = new TmxTu(srcLang, trgLang, lineBreak, params.getSegType());	//create the TmxTu helper
 		tmxTu.parseStartElement(reader, params.escapeGT);		//add to TmxTu skelBefore
 
+		//--determine the tu segtype after processing attributes--
+		if (tmxTu.segType > 1){
+			Property segTypeProp = tmxTu.getProp("segtype"); 
+			if ( segTypeProp != null ) {
+				if (segTypeProp.getValue().equals("sentence")){
+					tmxTu.segType = SEGTYPE_SENTENCE;
+				} else {
+					tmxTu.segType = SEGTYPE_PARA;
+				}
+			}
+
+			//--if tu segtype not specified try the header--
+			if (tmxTu.segType > 1 && headerSegType != -1 ) {
+				if (headerSegType == SEGTYPE_SENTENCE){
+					tmxTu.segType = SEGTYPE_SENTENCE;
+				} else if (headerSegType == SEGTYPE_PARA){
+					tmxTu.segType = SEGTYPE_PARA;
+				}
+			}
+			
+			//--if unrecognized value or missing property use specified default
+			if (tmxTu.segType == SEGTYPE_OR_SENTENCE){
+				tmxTu.segType = SEGTYPE_SENTENCE;
+			}else if (tmxTu.segType == SEGTYPE_OR_PARA){
+				tmxTu.segType = SEGTYPE_PARA;
+			} 			
+		}
+		
 		String curLocalName;
 		
 		try {

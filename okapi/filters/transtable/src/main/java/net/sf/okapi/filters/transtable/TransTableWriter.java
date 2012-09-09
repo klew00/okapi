@@ -70,12 +70,10 @@ public class TransTableWriter implements IFilterWriter {
 	private File tempFile;
 	private LocaleId language;
 	private String encoding;
-	private GenericContent fmt;
 	private String crumbs;
 	
 	public TransTableWriter () {
 		params = new Parameters();
-		fmt = new GenericContent();
 	}
 	
 	public void cancel () {
@@ -325,7 +323,7 @@ public class TransTableWriter implements IFilterWriter {
 
 	private void writeQuotedContent (TextFragment tf) {
 		try {
-			String tmp = fmt.fromFragmentToLetterCoded(tf);
+			String tmp = GenericContent.fromFragmentToLetterCoded(tf, true);
 			tmp = escapeIfNeeded(tmp);
 			writer.write("\"");
 			writer.write(tmp); // No wrapping needed
@@ -340,10 +338,10 @@ public class TransTableWriter implements IFilterWriter {
 		try {
 			String tmp;
 			if ( tc.contentIsOneSegment() ) {
-				tmp = fmt.fromFragmentToLetterCoded(tc.getFirstContent());
+				tmp = GenericContent.fromFragmentToLetterCoded(tc.getFirstContent(), true);
 			}
 			else { // If the container is segmented
-				tmp = fmt.fromFragmentToLetterCoded(tc.getUnSegmentedContentCopy());
+				tmp = GenericContent.fromFragmentToLetterCoded(tc.getUnSegmentedContentCopy(), true);
 			}
 			tmp = escapeIfNeeded(tmp);
 			writer.write("\"");

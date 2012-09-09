@@ -21,11 +21,14 @@
 package org.w3c.its;
 
 import java.io.File;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Stack;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import net.sf.okapi.common.Util;
-import net.sf.okapi.common.XMLWriter;
 
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
@@ -33,49 +36,107 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
+/**
+ * Main entry point for generating test files for ITS.
+ */
 public class Main {
 
-	public static void main (String[] args) {
-		XMLWriter writer = null;
-		try {
-			System.out.println("ITSTest");
-			
-			File inputFile;
-			if ( args.length > 0 ) inputFile = new File(args[0]);
-			else inputFile = new File("inputFile.xml"); 
-			System.out.println("   input: " + inputFile.getAbsolutePath());
-			
-			File outputFile;
-			if ( args.length > 1 ) outputFile = new File(args[1]);
-			else {
-				outputFile = new File(Util.getDirectoryName(inputFile.getAbsolutePath())
-					+ File.separator + "nodelist-with-its-information.xml");
-			}
-			System.out.println("  output: " + outputFile.getAbsolutePath());
+	public static final String DC_TRANSLATE = "translate";
+	public static final String DC_LOCALIZATIONNOTE = "locnote";
+	public static final String DC_TERMINOLOGY = "terminology";
+	public static final String DC_DIRECTIONALITY = "dir";
+	public static final String DC_LANGUAGEINFORMATION = "lang";
+	public static final String DC_WITHINTEXT = "withintext";
+	public static final String DC_IDVALUE = "idvalue";
+	public static final String DC_DOMAIN = "domain";
+	public static final String DC_LOCALEFILTER = "localefilter";
+	public static final String DC_LOCQUALITYISSUE = "locqualityissue";
+	public static final String DC_EXTERNALRESOURCE = "externalresource";
 
+	public static void main (String[] args) {
+ 
+		PrintWriter writer = null;
+		
+		try {
+			System.out.println("ITSTest - Test File Geneator for ITS");
+			
+			File inputFile = null;
+			File outputFile = null;
 			File rulesFile = null;
-			if ( args.length > 2 ) rulesFile = new File(args[2]);
-			System.out.print("   rules: ");
-			if ( rulesFile == null ) System.out.print("No external rules file will be used.");
-			else System.out.println(rulesFile.getAbsolutePath());
+			String dc = "translate";
+			
+			for ( int i=0; i<args.length; i++ ) {
+				String arg = args[i];
+				if ( arg.equals("-r") ) { // External rule file
+					i++; rulesFile = new File(args[i]);
+				}
+				else if ( arg.equals("-dc") ) { // Data category
+					i++; dc = args[i].toLowerCase();
+				}
+				else if ( arg.equals("-?") ) {
+					showUsage();
+					return;
+				}
+				else if ( arg.equals("-l") ) {
+					System.out.println(DC_DIRECTIONALITY
+							+ "\n" + DC_DOMAIN
+							+ "\n" + DC_EXTERNALRESOURCE
+							+ "\n" + DC_IDVALUE
+							+ "\n" + DC_LANGUAGEINFORMATION
+							+ "\n" + DC_LOCALEFILTER
+							+ "\n" + DC_LOCALIZATIONNOTE
+							+ "\n" + DC_LOCQUALITYISSUE
+							+ "\n" + DC_TERMINOLOGY
+							+ "\n" + DC_TRANSLATE
+							+ "\n" + DC_WITHINTEXT
+						);
+				}
+				else {
+					if ( inputFile == null ) {
+						inputFile = new File(args[i]);
+					}
+					else {
+						outputFile = new File(args[i]);
+					}
+				}
+			}
+			
+			if ( inputFile == null ) {
+				showUsage();
+				return;
+			}
+			
+			// Default output
+			if ( outputFile == null ) {
+				//String ext = Util.getExtension(inputFile.getAbsolutePath());
+				String name = inputFile.getAbsolutePath();
+				int n = name.lastIndexOf('.');
+				if ( n > -1 ) name = name.substring(0, n);
+				name += "output";
+				name += ".txt";
+				outputFile = new File(name);
+			}
+			
+			// Trace
+			System.out.println("   input: " + inputFile.getAbsolutePath());
+			System.out.println("  output: " + outputFile.getAbsolutePath());
+			if ( rulesFile != null ) {
+				System.out.print("   rules: " + rulesFile.getAbsolutePath());
+			}
 			
 			DocumentBuilderFactory fact = DocumentBuilderFactory.newInstance();
 			fact.setNamespaceAware(true);
 			fact.setValidating(false);
 			
-			writer = new XMLWriter(outputFile.getAbsolutePath());
-			writer.setLineBreak("\n");
-			writer.writeStartDocument();
-			writer.writeStartElement("nodeList");
-			writer.writeAttributeString("xmlns:its", ITSEngine.ITS_NS_URI);
-			writer.writeAttributeString("xmlns:datc", "http://example.com/datacats");
-			writer.writeStartElement("nodeList");
-			writer.writeAttributeString("datacat", "TODO");
+			Util.createDirectories(outputFile.getAbsolutePath());
+			writer = new PrintWriter(outputFile.getAbsolutePath(), "UTF-8");
 			
 			Document doc = fact.newDocumentBuilder().parse(inputFile);
 			ITraversal trav = applyITSRules(doc, inputFile, rulesFile);
 
-			String path = "";
+			String path = null;
+			Stack<Integer> stack = new Stack<Integer>();
+			stack.push(1);
 			
 			// Process the document
 			trav.startTraversal();
@@ -88,30 +149,55 @@ public class Main {
 					if ( trav.backTracking() ) {
 						int n = path.lastIndexOf('/');
 						if ( n > -1 ) path = path.substring(0, n);
+						stack.pop();
 					}
 					else {
 						Element element = (Element)node;
-						path += "/"+element.getLocalName();
 						
-						writer.writeStartElement("node");
-						writer.writeAttributeString("path", path);
-						writer.writeAttributeString("outputType", "TODO");
-						writer.writeStartElement("output");
+						// Get the previous sibling element (if any)
+						Node prev = element;
+						do {
+							prev = prev.getPreviousSibling();
+						}
+						while (( prev != null ) && ( prev.getNodeType() != Node.ELEMENT_NODE ));
+
+						// If it's the same kind of element, we increment the counter
+						if (( prev != null ) && prev.getNodeName().equals(element.getNodeName()) ) { 
+							stack.push(stack.peek()+1);
+						}
+						else {
+							stack.push(1);
+						}
 						
-						writer.writeEndElement(); // output
-						writer.writeEndElement(); // node
+						// If it's a sibling element, remove the other sibling before appending
+						if ( prev != null ) {
+							int n = path.lastIndexOf('/');
+							if ( n > -1 ) path = path.substring(0, n);
+						}
+						if ( element == doc.getDocumentElement() ) {
+							path = "/"+element.getNodeName();
+						}
+						else {
+							path += String.format("/%s[%d]", element.getNodeName(), stack.peek());
+						}
+
+						// Gather and output the values for the element
+						output(writer, dc, path, trav, null);
 
 						if ( element.hasAttributes() ) {
 							NamedNodeMap map = element.getAttributes();
+							
+							ArrayList<String> list = new ArrayList<String>();
 							for ( int i=0; i<map.getLength(); i++ ) {
-								Attr attr = (Attr)map.item(i);
-								writer.writeStartElement("node");
-								writer.writeAttributeString("path", path+"/@"+attr.getName());
-								writer.writeAttributeString("outputType", "TODO");
-								writer.writeStartElement("output");
-								
-								writer.writeEndElement(); // output
-								writer.writeEndElement(); // node
+								list.add(((Attr)map.item(i)).getNodeName());
+							}
+							Collections.sort(list);
+							
+							for ( String attrName : list ) {
+								Attr attr = (Attr)map.getNamedItem(attrName);
+								if ( attr.getNodeName().startsWith("xmlns:") ) continue; // Skip NS declarations
+								// gather and output the values for the attribute
+								output(writer, dc, path+"/@"+attr.getNodeName(), trav, attr);
 							}
 						}
 					}
@@ -124,13 +210,132 @@ public class Main {
 		}
 		finally {
 			if ( writer != null ) {
-				writer.writeEndElement(); // nodeList for datacat
-				writer.writeEndElement(); // root nodeList
+				writer.flush();
 				writer.close();
 			}
 		}
 	}
 
+	private static void showUsage () {
+		System.out.println("Usage: <inputFile>[ <outputFile>][ <options>]");
+		System.out.println("Where the options are:");
+		System.out.println(" -? shows this help");
+		System.out.println(" -r <ruleFile> : associates the input with an ITS rule file");
+		System.out.println(" -l : lists all the avaibale data categories to use with -dc");
+		System.out.println(" -dc <data-category> : sets the data category to process (default=translate)");
+	}
+	
+	private static void output (PrintWriter writer,
+		String dc,
+		String path,
+		ITraversal trav,
+		Attr attr)
+	{
+		// Path
+		writer.print(path+"\t");
+
+		// Values
+		String out1 = null;
+		if ( dc.equals(DC_TRANSLATE) ) {
+			out1 = (trav.getTranslate(attr) ? "yes" : "no");
+			if ( out1 != null ) writer.print(String.format("its:translate=\"%s\"",
+				Util.escapeToXML(out1, 3, false, null)));
+		}
+		else if ( dc.equals(DC_LOCALIZATIONNOTE) ) {
+			if ( attr != null ) out1 = trav.getLocNote(attr);
+			else out1 = trav.getLocNote();
+			if ( out1 != null ) writer.print(String.format("its:locNote=\"%s\"",
+				Util.escapeToXML(out1, 3, false, null)));
+			writer.print("\t");
+			if ( attr != null ) out1 = trav.getLocNoteType(attr);
+			else out1 = trav.getLocNoteType();
+			if ( out1 != null ) writer.print(String.format("its:locNoteType=\"%s\"",
+				Util.escapeToXML(out1, 3, false, null)));
+		}
+		else if ( dc.equals(DC_TERMINOLOGY) ) {
+			out1 = (trav.getTerm(attr) ? "yes" : "no");
+			if ( out1 != null ) writer.print(String.format("its:term=\"%s\"",
+				Util.escapeToXML(out1, 3, false, null)));
+			writer.print("\t");
+			out1 = trav.getTermInfo(attr);
+			if ( out1 != null ) writer.print(String.format("its:termInfo=\"%s\"",
+				Util.escapeToXML(out1, 3, false, null)));
+		}
+		else if ( dc.equals(DC_DIRECTIONALITY) ) {
+			int dir = trav.getDirectionality();
+			if ( attr != null ) dir = trav.getDirectionality(attr);
+			switch ( dir ) {
+			case ITraversal.DIR_LRO: out1 = "lro"; break;
+			case ITraversal.DIR_LTR: out1 = "ltr"; break;
+			case ITraversal.DIR_RLO: out1 = "rlo"; break;
+			case ITraversal.DIR_RTL: out1 = "rtl"; break;
+			}
+			writer.print(String.format("its:dir=\"%s\"",
+				Util.escapeToXML(out1, 3, false, null)));
+		}
+		else if ( dc.equals(DC_LANGUAGEINFORMATION) ) {
+			out1 = trav.getLanguage();
+			if ( out1 != null ) writer.print(String.format("its:lang=\"%s\"",
+				Util.escapeToXML(out1, 3, false, null)));
+		}
+		else if ( dc.equals(DC_WITHINTEXT) ) {
+			if ( attr != null ) return;
+			int wt = trav.getWithinText();
+			switch ( wt ) {
+			case ITraversal.WITHINTEXT_NESTED: out1 = "nested"; break;
+			case ITraversal.WITHINTEXT_NO: out1 = "no"; break;
+			case ITraversal.WITHINTEXT_YES: out1 = "yes"; break;
+			}
+			writer.print(String.format("its:withinText=\"%s\"",
+				Util.escapeToXML(out1, 3, false, null)));
+		}
+		else if ( dc.equals(DC_DOMAIN) ) {
+			if ( attr != null ) out1 = trav.getDomains(attr);
+			else out1 = trav.getDomains();
+			if ( out1 != null ) writer.print(String.format("its:domains=\"%s\"",
+				Util.escapeToXML(out1, 3, false, null)));
+		}
+		else if ( dc.equals(DC_LOCALEFILTER) ) {
+			out1 = trav.getLocaleFilter();
+			if ( out1 != null ) writer.print(String.format("its:localeFilterList=\"%s\"",
+				Util.escapeToXML(out1, 3, false, null)));
+		}
+		else if ( dc.equals(DC_EXTERNALRESOURCE) ) {
+			if ( attr != null ) out1 = trav.getExternalResourceRef(attr);
+			else out1 = trav.getExternalResourceRef();
+			if ( out1 != null ) writer.print(String.format("its:externalResource=\"%s\"",
+				Util.escapeToXML(out1, 3, false, null)));
+		}
+		else if ( dc.equals(DC_IDVALUE) ) {
+			out1 = trav.getIdValue(attr);
+			if ( out1 != null ) writer.print(String.format("its:idValue=\"%s\"",
+				Util.escapeToXML(out1, 3, false, null)));
+		}
+		else if ( dc.equals(DC_LOCQUALITYISSUE) ) {
+			out1 = trav.getLocQualityIssuesRef();
+			if ( out1 != null ) writer.print(String.format("its:locQualityIssuesRef=\"%s\"",
+				Util.escapeToXML(out1, 3, false, null)));
+			writer.print("\t");
+			out1 = trav.getLocQualityIssueType();
+			if ( out1 != null ) writer.print(String.format("its:locQualityIssueType=\"%s\"",
+				Util.escapeToXML(out1, 3, false, null)));
+			writer.print("\t");
+			out1 = trav.getLocQualityIssueComment();
+			if ( out1 != null ) writer.print(String.format("its:locQualityIssueComment=\"%s\"",
+				Util.escapeToXML(out1, 3, false, null)));
+			writer.print("\t");
+			out1 = trav.getLocQualityIssueScore();
+			if ( out1 != null ) writer.print(String.format("its:locQualityIssueScore=\"%s\"",
+				Util.escapeToXML(out1, 3, false, null)));
+			writer.print("\t");
+			out1 = trav.getLocQualityIssueProfileRef();
+			if ( out1 != null ) writer.print(String.format("its:locQualityIssueProfileRef=\"%s\"",
+				Util.escapeToXML(out1, 3, false, null)));
+		}
+		
+		writer.print("\n");
+	}
+	
 	private static ITraversal applyITSRules (Document doc,
 		File inputFile,
 		File rulesFile)
@@ -149,21 +354,4 @@ public class Main {
 		return itsEng;
 	}
 	
-//	private static boolean hasTextChild (Node element) {
-//		NodeList nl = element.getChildNodes();
-//		for ( int i=0; i<nl.getLength(); i++ ) {
-//			if ( nl.item(i).getNodeType() == Node.TEXT_NODE ) return true;
-//		}
-//		return false;
-//	}
-//	
-//	private static void saveDocument (Document doc,
-//		File outputFile)
-//		throws TransformerFactoryConfigurationError, TransformerException, FileNotFoundException
-//	{
-//		Transformer trans = TransformerFactory.newInstance().newTransformer();
-//		FileOutputStream output = new FileOutputStream(outputFile);
-//		trans.transform(new DOMSource(doc), new StreamResult(output));
-//	}
-
 }

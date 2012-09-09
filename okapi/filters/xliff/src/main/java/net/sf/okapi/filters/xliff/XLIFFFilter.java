@@ -657,9 +657,16 @@ public class XLIFFFilter implements IFilter {
 				if ( tmp.equals("yes") ) {
 					approved = 1;
 				}
-				
 			}
 
+			// ITS Storage size (with XLIFF maxbytes)
+			tmp = reader.getAttributeValue(null, "maxbytes");
+			if ( tmp != null ) { // Get encoding info
+				String enc = reader.getAttributeValue(XLIFFWriter.NS_ITS20, "storageSizeEncoding");
+				if ( enc == null ) enc = "UTF-8";
+				tu.setProperty(new Property(Property.ITS_STORAGESIZE, tmp+"\t"+enc));
+			}
+			
 			// Set restype (can be null)
 			tu.setType(reader.getAttributeValue(null, "restype"));
 			

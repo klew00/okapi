@@ -48,6 +48,7 @@ class TmxTu {
 	String lineBreak;
 	LocaleId srcLang;												//Redundant convenience variable
 	LocaleId trgLang;												//Redundant convenience variable
+	int segType;
 	
 	
 	/**
@@ -55,10 +56,11 @@ class TmxTu {
 	 * @param srcLang The source language.
 	 * @param trgLang The target language. 
 	 */		
-	public TmxTu (LocaleId srcLang, LocaleId trgLang, String lineBreak){
+	public TmxTu (LocaleId srcLang, LocaleId trgLang, String lineBreak, int segType){
 		this.srcLang = srcLang;
 		this.trgLang = trgLang;
 		this.lineBreak = lineBreak;
+		this.segType = segType;
 	}
 
 	
@@ -70,7 +72,7 @@ class TmxTu {
 	 */	
 	TmxTuv addTmxTuv(LocaleId lang, TuvXmlLang trgType){
 		int counter = langCount(lang);
-		TmxTuv newTmxTuv = new TmxTuv(lang, trgType, ++counter);
+		TmxTuv newTmxTuv = new TmxTuv(lang, trgType, ++counter, segType);
 		
 		tuvs.add(newTmxTuv);
 		curTuv = newTmxTuv;

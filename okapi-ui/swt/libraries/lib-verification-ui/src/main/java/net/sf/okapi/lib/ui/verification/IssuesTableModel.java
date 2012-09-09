@@ -143,6 +143,7 @@ class IssuesTableModel {
 				case SUSPECT_PATTERN:
 					if ( issueType != 8 ) continue;
 					break;
+				case SOURCE_LENGTH:
 				case TARGET_LENGTH:
 					if ( issueType != 9 ) continue;
 					break;

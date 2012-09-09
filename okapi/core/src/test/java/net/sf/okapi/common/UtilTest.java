@@ -396,15 +396,22 @@ public class UtilTest {
 	public void testNormalizRange() {
 		int nv = Util.normalizeRange(0, 100, 50);
 		assertEquals(50, nv);
-		
 		nv = Util.normalizeRange(-5, 5, 0);
 		assertEquals(50, nv);
-		
 		nv = Util.normalizeRange(-5, 5, 5);
 		assertEquals(100, nv);
-		
 		nv = Util.normalizeRange(-5, 5, -5);
 		assertEquals(0, nv);
+		nv = Util.normalizeRange(-100, 100, -30);
+		assertEquals(35, nv);
+		nv = Util.normalizeRange(-100, 100, 30);
+		assertEquals(65, nv);
+		nv = Util.normalizeRange(-100, 100, 0);
+		assertEquals(50, nv);
+		nv = Util.normalizeRange(-100, 100, -100);
+		assertEquals(0, nv);
+		nv = Util.normalizeRange(-100, 100, 100);
+		assertEquals(100, nv);
 	}
 	
 	private Document createXMLdocument (String data) {

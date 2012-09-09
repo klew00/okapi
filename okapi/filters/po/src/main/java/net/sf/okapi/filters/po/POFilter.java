@@ -131,7 +131,6 @@ public class POFilter implements IFilter {
 	private EncoderManager encoderManager;
 	private String msgContext;
 	private String originalTuId;
-	private GenericContent fmt;
 	
 	public POFilter () {
 		params = new Parameters();
@@ -780,9 +779,8 @@ public class POFilter implements IFilter {
 	private TextFragment toAbstract (TextFragment frag) {
 		// If the entry is from extraction/merge mode try to convert the inline codes
 		if ( originalTuId != null ) {
-			if ( fmt == null ) fmt = new GenericContent();
 			// At this point the fragment should not be segmented nor have any inline codes
-			fmt.fromLetterCodedToFragment(frag.getCodedText(), frag, false);
+			GenericContent.fromLetterCodedToFragment(frag.getCodedText(), frag, false, true);
 		}
 		else { // Else: Normal PO entry
 			// Sets the inline codes

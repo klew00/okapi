@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2009-2012 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -33,19 +33,24 @@ class ContextItem {
 	boolean preserveWS;
 	String domains;
 	String externalRes;
+	String storageSize;
 
 	public ContextItem (Node node,
 		ITraversal trav)
 	{
 		this.node = node;
 		// Context is always an element node
-		this.translate = trav.translate();
+		this.translate = trav.getTranslate(null);
 		this.trgPointer = trav.getTargetPointer();
-		this.idValue = trav.getIdValue();
-		this.locNote = trav.getNote();
+		this.idValue = trav.getIdValue(null);
+		this.locNote = trav.getLocNote();
 		this.preserveWS = trav.preserveWS();
 		this.domains = trav.getDomains();
-		this.externalRes = trav.getExternalResourcesRef();
+		this.externalRes = trav.getExternalResourceRef();
+		
+		if ( trav.getStorageSize() != null ) {
+			this.storageSize = trav.getStorageSize() + "\t" + trav.getStorageSizeEncoding();
+		}
 	}
 
 }
