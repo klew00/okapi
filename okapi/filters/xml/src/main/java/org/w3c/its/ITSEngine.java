@@ -333,7 +333,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 					}
 					else if ( !"rules".equals(locName) && !"span".equals(locName) 
 						&& !"locQualityIssues".equals(locName) && !"locQualityIssue".equals(locName) ) {
-						logger.warning(String.format("Unknown element '%s'.", ruleElem.getNodeName()));
+						logger.warn(String.format("Unknown element '%s'.", ruleElem.getNodeName()));
 					}
 				}
 			}
