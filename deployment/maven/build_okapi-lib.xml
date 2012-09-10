@@ -144,6 +144,8 @@
 			 excludes="**/META-INF/**"/>
 			<fileset dir="../../okapi/filters/transtable/target/classes"
 			 excludes="**/META-INF/**"/>
+			<fileset dir="../../okapi/filters/its/target/classes"
+			 excludes="**/META-INF/**"/>
 			 
 			<!-- lib -->
 			<fileset dir="../../okapi/libraries/lib-segmentation/target/classes"
@@ -450,6 +452,14 @@
 		<property name="jar028" refid="list.contents"/>
 		<echo file="tmpJars" append="yes"> ${jar028}</echo>
 		<copy todir="${distLib}" file="${dep028}/${jar028}"/>		
+
+		<property name="dep029Version" value="1.4"/>
+		<property name="dep029" value="${mavenStore}/nu/validator/htmlparser/htmlparser/${dep029Version}"/>
+		<fileset id="list.contents" dir="${dep029}"
+		 includes="**/htmlparser-${dep029Version}.jar"/>
+		<property name="jar029" refid="list.contents"/>
+		<echo file="tmpJars" append="yes"> ${jar029}</echo>
+		<copy todir="${distLib}" file="${dep029}/${jar029}"/>
 
 		<!-- Create the manifest file -->
 		<property file="tmpJars"/>

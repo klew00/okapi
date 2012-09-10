@@ -44,5 +44,7 @@
 		<module>xini</module>
 		<module>txml</module>
 		<module>transtable</module>
+		<module>html5</module>
+		<module>its</module>
     </modules>
 </project>
