@@ -26,11 +26,14 @@ import net.sf.okapi.common.encoder.XMLEncoder;
 
 public class Parameters extends BaseParameters{
 
+	private final static String SEGTYPE= "segType";
+	
 	//--TODO change back to protected when the testing setup is completed-- 
 	public boolean processAllTargets;
 	public boolean consolidateDpSkeleton;
 	public boolean escapeGT;
 	public boolean exitOnInvalid;
+	public int segType;
 
 	public Parameters () {
 		reset();
@@ -41,6 +44,7 @@ public class Parameters extends BaseParameters{
 		processAllTargets=true;
 		consolidateDpSkeleton=true;
 		exitOnInvalid = false;
+		segType = TmxFilter.SEGTYPE_OR_SENTENCE;
 	}
 	
 	public boolean getProcessAllTargets () {
@@ -74,6 +78,14 @@ public class Parameters extends BaseParameters{
 	public void setExitOnInvalid  (boolean exitOnInvalid) {
 		this.exitOnInvalid = exitOnInvalid;
 	}
+
+	public int getSegType () {
+		return segType;
+	}
+	
+	public void setSegType (int segType) {
+		this.segType = segType;
+	}
 	
 	public void fromString(String data) {
 		reset();
@@ -82,6 +94,7 @@ public class Parameters extends BaseParameters{
 		processAllTargets = buffer.getBoolean("processAllTargets", processAllTargets);
 		consolidateDpSkeleton = buffer.getBoolean("consolidateDpSkeleton", consolidateDpSkeleton);
 		exitOnInvalid = buffer.getBoolean("exitOnInvalid", exitOnInvalid);
+		segType = buffer.getInteger(SEGTYPE, segType);
 	}
 
 	public String toString () {
@@ -90,6 +103,7 @@ public class Parameters extends BaseParameters{
 		buffer.setBoolean("processAllTargets", processAllTargets);
 		buffer.setBoolean("consolidateDpSkeleton", consolidateDpSkeleton);
 		buffer.setBoolean("exitOnInvalid", exitOnInvalid);
+		buffer.setInteger(SEGTYPE, segType);
 		return buffer.toString();
 	}
 
@@ -100,6 +114,7 @@ public class Parameters extends BaseParameters{
 		desc.add("processAllTargets", "Read all target entries", null);
 		desc.add("consolidateDpSkeleton", "Group all document parts skeleton into one", null);
 		desc.add("exitOnInvalid", "Exit when encountering invalid <tu>s (default is to skip invalid <tu>s).", null);
+		desc.add(SEGTYPE, "Creates or not a segment for the extracted <Tu>", null);
 		return desc;
 	}
 

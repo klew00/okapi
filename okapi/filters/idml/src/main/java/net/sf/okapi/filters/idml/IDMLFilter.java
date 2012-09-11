@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2010-2011 by the Okapi Framework contributors
+  Copyright (C) 2010-2012 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -107,6 +107,7 @@ public class IDMLFilter implements IFilter {
 	private HashMap<String, Integer> embeddedElementsPos;
 	private IdGenerator refGen;
 	private IdGenerator tuIdGen;
+	private int deconstructing;
 	
 	public IDMLFilter () {
 		try {
@@ -485,6 +486,7 @@ public class IDMLFilter implements IFilter {
 			tuIdGen = new IdGenerator(null);
 			Node topNode = doc.getDocumentElement();
 			ctx.push(new IDMLContext(false, topNode));
+			deconstructing = 0;
 
 			// Reset the embedded elements position
 			for ( String name : embeddedElementsPos.keySet() ) {
@@ -569,6 +571,20 @@ public class IDMLFilter implements IFilter {
 					continue;
 				}
 			}
+			// IDML format specification show both <Br/> and <br/> used in example
+			else if ( name.equalsIgnoreCase("Br") && params.getNewTuOnBr() ) {
+				if ( ctx.peek().inScope() ) {
+					if ( deconstructing == 0 ) deconstructing++;
+					ctx.peek().addStartTag(elem);
+					// Trigger a text unit, then re-set the context to continue in a new fragment
+					Node tmpNode = ctx.peek().getScopeNode();
+					triggerTextUnit();
+					ctx.peek().enterScope(tmpNode, makeTuId());
+					node = elem.getNextSibling();
+					continue;
+				}
+				// Else: do nothing, like the default case
+			}
 			else {
 				if ( ctx.peek().inScope() ) {
 					ctx.peek().addStartTag(elem);
@@ -583,26 +599,8 @@ public class IDMLFilter implements IFilter {
 			// When coming back from the children
 			if ( name.equals("ParagraphStyleRange") ) {
 				// Trigger the text unit
-				if ( ctx.peek().addToQueue(queue) && params.getSimplifyCodes() ) {
-					// Try to simplify the inline codes if possible
-					// We can access the text this way because it's not segmented yet
-					ITextUnit tu = queue.getLast().getTextUnit();
-					TextFragment tf = tu.getSource().getFirstContent();
-					String[] res = SIMPLIFIER.simplifyAll(tf, true);
-					// Move the native data into the skeleton if needed
-					if ( res != null ) {
-						// Check if the new fragment is empty
-						if ( tu.getSource().isEmpty() ) {
-							// Remove from queue
-							queue.removeLast();
-						}
-						else {
-							IDMLSkeleton skel = (IDMLSkeleton)tu.getSkeleton();
-							skel.addMovedParts(res);
-						}
-					}
-				}
-				ctx.peek().leaveScope();
+				triggerTextUnit();
+				if ( deconstructing > 0 ) deconstructing--;
 			}
 			else if ( embeddedElements.containsKey(name) ) {
 				if ( ctx.peek().inScope() ) {
@@ -619,6 +617,31 @@ public class IDMLFilter implements IFilter {
 			// Then move on to the next sibling
 			node = elem.getNextSibling();
 		}
+	}
+
+	private void triggerTextUnit () {
+		// Trigger the text unit
+		if ( ctx.peek().addToQueue(queue, deconstructing>0) && params.getSimplifyCodes() ) {
+			// Try to simplify the inline codes if possible
+			// We can access the text this way because it's not segmented yet
+			ITextUnit tu = queue.getLast().getTextUnit();
+			TextFragment tf = tu.getSource().getFirstContent();
+			String[] res = SIMPLIFIER.simplifyAll(tf, true);
+			IDMLSkeleton skel = (IDMLSkeleton)tu.getSkeleton();
+			// Move the native data into the skeleton if needed
+			if ( res != null ) {
+				// Check if the new fragment is empty
+				if ( tu.getSource().isEmpty() && ( deconstructing == 0 )) {
+					// Remove from queue
+					queue.removeLast();
+				}
+				else {
+					skel.addMovedParts(res);
+				}
+			}
+			skel.setForced(deconstructing>0); // True for TU triggered by Br for example
+		}
+		ctx.peek().leaveScope();
 	}
 	
 	private NodeReference makeNodeReference (Node targetNode) {
@@ -641,6 +664,7 @@ public class IDMLFilter implements IFilter {
 		if ( list.getLength() > 1 ) {
 			// Several content: no shortcut
 			ctx.peek().enterScope(node, makeTuId());
+			if ( deconstructing > 0 ) deconstructing++; // Push new paragraph in deconstructed block
 			return false;
 		}
 		if ( list.getLength() == 1 ) {
@@ -649,7 +673,10 @@ public class IDMLFilter implements IFilter {
 			// Create the text unit
 			ITextUnit tu = new TextUnit(makeTuId());
 			tu.setSourceContent(processContent(cnt, null));
-			tu.setSkeleton(new IDMLSkeleton(ctx.peek().getTopNode(), cnt)); // Merge directly on Content
+			if ( deconstructing > 0 ) deconstructing++; // Push new paragraph in deconstructed block
+			IDMLSkeleton skl = new IDMLSkeleton(ctx.peek().getTopNode(), cnt);
+			skl.setForced(deconstructing>0);
+			tu.setSkeleton(skl); // Merge directly on Content
 			// And add the new event to the queue
 			queue.add(new Event(EventType.TEXT_UNIT, tu));
 		}

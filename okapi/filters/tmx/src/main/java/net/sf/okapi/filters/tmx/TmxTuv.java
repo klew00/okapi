@@ -23,6 +23,7 @@ package net.sf.okapi.filters.tmx;
 import javax.xml.stream.XMLStreamReader;
 
 import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.resource.AlignmentStatus;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
@@ -45,11 +46,20 @@ public class TmxTuv {
 	 * @param lang Language of tuv
 	 * @param trgType TuvXmlLang.SOURCE, TuvXmlLang.TARGET, TuvXmlLang.OTHER 
 	 * @param counter Higher than 1 indicates the number of duplicate 
+	 * @param segType 0 = sentence = segmented, 1 = paragraph = unsegmented
 	 */		
-	TmxTuv (LocaleId lang, TuvXmlLang trgType, int counter){
+	TmxTuv (LocaleId lang, TuvXmlLang trgType, int counter, int segType){
 		this.lang = lang;
 		this.trgType = trgType;
 		this.langCount= counter;
+				
+		if (segType == 0){
+			tc.setHasBeenSegmentedFlag(true);
+			tc.getSegments().setAlignmentStatus(AlignmentStatus.ALIGNED);
+		}else if (segType == 1){ 
+			tc.setHasBeenSegmentedFlag(false);
+			tc.getSegments().setAlignmentStatus(AlignmentStatus.NOT_ALIGNED);
+		}
 	}
 	
 	

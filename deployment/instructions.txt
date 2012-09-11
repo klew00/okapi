@@ -38,12 +38,11 @@ For example from M10-SNAPSHOT to M10:
 
 /trunk> mvn clean install
 /trunk/deployment/maven> ant
-/trunk/applications/integration-tests> mvn integration-test -Dmaven.test.skip=true
+/trunk/applications/integration-tests> mvn integration-test
 
 This will re-compile, tests, and create the packages.
 Then rebuild all distributions for all platforms.
 Then run the integration tests for the applications
-(The skip option is because you don't need to re-run the unit tests)
 
 NOTE: If you are not using the default local maven repository you will need to update the mavenStore property in build_okapi_apps.xml
 

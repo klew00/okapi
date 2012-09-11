@@ -63,8 +63,6 @@ public class ConvertSegmentsToTextUnitsStep extends BasePipelineStep {
 					if (trgSeg != null) {
 						ITextUnit segmentTu = tu.clone();
 						segmentTu.setId(segmentTu.getId() + ":" + Integer.toString(++segCount));
-						segmentTu.getSource().clear();
-						segmentTu.getTarget(l).clear();
 						segmentTu.setSourceContent(srcSeg.text);
 						segmentTu.setTargetContent(l, trgSeg.text);
 						textUnitEvents.add(new Event(EventType.TEXT_UNIT, segmentTu));

@@ -37,6 +37,7 @@ public class DefaultFilenameFilter implements FilenameFilter {
 	 * @param caseSensitive true to use case-sensitive pattern, false otherwise.
 	 * You can use ? to match any single character and * to match any multiple characters.
 	 * The pattern is not case-sensitive ("test.*" and "TeSt.*" give the same results)
+	 * except if specified otherwise.
 	 */
 	public DefaultFilenameFilter (String pattern,
 		boolean caseSensitive)

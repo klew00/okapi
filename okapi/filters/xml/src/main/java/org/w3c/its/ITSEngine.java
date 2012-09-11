@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,6 +39,8 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
+
+import net.sf.okapi.common.Util;
 
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
@@ -65,7 +68,8 @@ public class ITSEngine implements IProcessor, ITraversal {
 	
 	// Must have '?' as many times as there are FP_XXX entries +1
 	// Must have +FLAGSEP as many times as there are FP_XXX_DATA entries +1
-	private static final String   FLAGDEFAULTDATA     = "??????????"+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP;
+	private static final String   FLAGDEFAULTDATA     = "????????????"
+		+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP;
 
 	// Indicator position
 	private static final int      FP_TRANSLATE             = 0;
@@ -78,6 +82,8 @@ public class ITSEngine implements IProcessor, ITraversal {
 	private static final int      FP_DOMAIN                = 7;
 	private static final int      FP_EXTERNALRES           = 8;
 	private static final int      FP_LOCFILTER             = 9;
+	private static final int      FP_LQISSUE               = 10;
+	private static final int      FP_STORAGESIZE           = 11;
 	
 	// Data position 
 	private static final int      FP_TERMINOLOGY_DATA      = 0;
@@ -88,6 +94,8 @@ public class ITSEngine implements IProcessor, ITraversal {
 	private static final int      FP_DOMAIN_DATA           = 5;
 	private static final int      FP_EXTERNALRES_DATA      = 6;
 	private static final int      FP_LOCFILTER_DATA        = 7;
+	private static final int      FP_LQISSUE_DATA          = 8;
+	private static final int      FP_STORAGESIZE_DATA      = 9;
 	
 	private static final int      TERMINFOTYPE_POINTER     = 1;
 	private static final int      TERMINFOTYPE_REF         = 2;
@@ -111,6 +119,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 	private Stack<ITSTrace> trace;
 	private boolean backTracking;
 	private boolean translatableAttributeRuleTriggered;
+	private boolean targetPointerRuleTriggered;
 	private String version;
 
 	private final Logger logger = Logger.getLogger(getClass().getName());
@@ -146,6 +155,23 @@ public class ITSEngine implements IProcessor, ITraversal {
 	 */
 	public boolean getTranslatableAttributeRuleTriggered () {
 		return translatableAttributeRuleTriggered;
+	}
+	
+	/**
+	 * Indicates if the processed document has triggered a target pointer rule.
+	 * This must be called only after {@link #applyRules(int)}. 
+	 * @return true if the processed document has triggered a target pointer rule.
+	 */
+	public boolean getTargetPointerRuleTriggered () {
+		return targetPointerRuleTriggered;
+	}
+	
+	/**
+	 * Gets internal XPath object used in this ITS engine. 
+	 * @return the internal XPath object used in this ITS engine.
+	 */
+	public XPath getXPath () {
+		return xpath;
 	}
 	
 	public void addExternalRules (URI docURI) {
@@ -258,41 +284,55 @@ public class ITSEngine implements IProcessor, ITraversal {
 				Element ruleElem;
 				for ( int j=0; j<nl2.getLength(); j++ ) {
 					ruleElem = (Element)nl2.item(j);
-					if ( "translateRule".equals(ruleElem.getLocalName()) ) {
+					String locName = ruleElem.getLocalName();
+					if ( "translateRule".equals(locName) ) {
 						compileTranslateRule(ruleElem, isInternal);
 					}
-					else if ( "withinTextRule".equals(ruleElem.getLocalName()) ) {
+					else if ( "withinTextRule".equals(locName) ) {
 						compileWithinTextRule(ruleElem, isInternal);
 					}
-					else if ( "langRule".equals(ruleElem.getLocalName()) ) {
+					else if ( "langRule".equals(locName) ) {
 						compileLangRule(ruleElem, isInternal);
 					}
-					else if ( "dirRule".equals(ruleElem.getLocalName()) ) {
+					else if ( "dirRule".equals(locName) ) {
 						compileDirRule(ruleElem, isInternal);
 					}
-					else if ( "locNoteRule".equals(ruleElem.getLocalName()) ) {
+					else if ( "locNoteRule".equals(locName) ) {
 						compileLocNoteRule(ruleElem, isInternal);
 					}
-					else if ( "termRule".equals(ruleElem.getLocalName()) ) {
+					else if ( "termRule".equals(locName) ) {
 						compileTermRule(ruleElem, isInternal);
 					}
-					else if ( "idValueRule".equals(ruleElem.getLocalName()) ) {
+					else if ( "idValueRule".equals(locName) ) {
 						compileIdValueRule(ruleElem, isInternal);
 					}
-					else if ( "domainRule".equals(ruleElem.getLocalName()) ) {
+					else if ( "domainRule".equals(locName) ) {
 						compileDomainRule(ruleElem, isInternal);
 					}
-					else if ( "targetPointerRule".equals(ruleElem.getLocalName()) ) {
+					else if ( "targetPointerRule".equals(locName) ) {
 						compileTargetPointerRule(ruleElem, isInternal);
 					}
-					else if ( "localeFilterRule".equals(ruleElem.getLocalName()) ) {
+					else if ( "localeFilterRule".equals(locName) ) {
 						compileLocaleFilterRule(ruleElem, isInternal);
 					}
-					else if ( "externalResourcesRefRule".equals(ruleElem.getLocalName()) ) {
+					else if ( "preserveSpaceRule".equals(locName) ) {
+						compilePrserveSpaceRule(ruleElem, isInternal);
+					}
+					else if ( "externalResourceRefRule".equals(locName) ) {
 						compileExternalResourceRule(ruleElem, isInternal);
 					}
-					else if ( "param".equals(ruleElem.getLocalName()) ) {
+					else if ( "locQualityIssueRule".equals(locName) ) {
+						compileLocQualityIssueRule(ruleElem, isInternal);
+					}
+					else if ( "storageSizeRule".equals(locName) ) {
+						compileStorageSizeRule(ruleElem, isInternal);
+					}
+					else if ( "param".equals(locName) ) {
 						processParam(ruleElem);
+					}
+					else if ( !"rules".equals(locName) && !"span".equals(locName) 
+						&& !"locQualityIssues".equals(locName) && !"locQualityIssue".equals(locName) ) {
+						logger.warning(String.format("Unknown element '%s'.", ruleElem.getNodeName()));
 					}
 				}
 			}
@@ -355,23 +395,29 @@ public class ITSEngine implements IProcessor, ITraversal {
 		if ( "yes".equals(value) ) rule.flag = true;
 		else if ( "no".equals(value) ) rule.flag = false;
 		else throw new ITSException("Invalid value for 'translate'.");
-		
-		// If not version 2 or if not there, try extension
+
+		// idValue extension (deprecated but supported)
 		value = elem.getAttributeNS(ITSX_NS_URI, "idValue");
-		if ( version.equals(ITS_VERSION2) && !value.isEmpty() ) {
-			// Warn if the extension is used in ITS 2.0
-			logger.warning(String.format("This document uses the %s:idValue extension instead of the ITS 2.0 idValue attribute.",
-				ITSX_NS_URI));
-		}
 		if ( !value.isEmpty() ) {
+			if ( version.equals(ITS_VERSION2) ) {
+				// Warn if the extension is used in ITS 2.0
+				logger.warning(String.format("This document uses the %s:idValue extension instead of the ITS 2.0 Id Value data category.",
+					ITSX_NS_URI));
+			}
 			rule.idValue = value;
 		}
 		
+		// whiteSpaces extension (deprecated but supported)
 		value = elem.getAttributeNS(ITSX_NS_URI, "whiteSpaces");
-		if ( value.length() > 0 ) {
+		if ( !value.isEmpty() ) {
+			if ( version.equals(ITS_VERSION2) ) {
+				// Warn if the extension is used in ITS 2.0
+				logger.warning(String.format("This document uses the %s:whiteSpaces extension instead of the ITS 2.0 Preserve Space data category.",
+					ITSX_NS_URI));
+			}
 			if ( "preserve".equals(value) ) rule.preserveWS = true;
 			else if ( "default".equals(value) ) rule.preserveWS = false;
-			else throw new ITSException("Invalid value for 'witheSpaces'.");
+			else throw new ITSException("Invalid value for 'whiteSpaces'.");
 		}
 		
 		rules.add(rule);
@@ -390,7 +436,6 @@ public class ITSEngine implements IProcessor, ITraversal {
 		else if ( "lro".equals(value) ) rule.value = DIR_LRO;
 		else if ( "rlo".equals(value) ) rule.value = DIR_RLO;
 		else throw new ITSException("Invalid value for 'dir'.");
-		
 		rules.add(rule);
 	}
 
@@ -452,11 +497,155 @@ public class ITSEngine implements IProcessor, ITraversal {
 		rule.selector = elem.getAttribute("selector");
 		rule.isInternal = isInternal;
 				
-		String pointer = elem.getAttribute("externalResourcesRefPointer");
+		String pointer = elem.getAttribute("externalResourceRefPointer");
 		if ( pointer.isEmpty() ) {
-			throw new ITSException("Invalid value for 'externalResourcesRefPointer'.");
+			throw new ITSException("Invalid value for 'externalResourceRefPointer'.");
 		}
 		rule.info = pointer;
+
+		// Add the rule
+		rules.add(rule);
+	}
+
+	private void compileStorageSizeRule (Element elem,
+		boolean isInternal)
+	{
+		ITSRule rule = new ITSRule(IProcessor.DC_STORAGESIZE);
+		rule.selector = elem.getAttribute("selector");
+		rule.isInternal = isInternal;
+		
+		String np[] = retrieveStorageSizeData(elem, false);
+		
+		String storageSizeP = null;
+		if ( elem.hasAttribute("storageSizePointer") )
+			storageSizeP = elem.getAttribute("storageSizePointer");
+		
+		String storageSizeEncodingP = null;
+		if (elem.hasAttribute("storageSizeEncodingPointer"))
+			storageSizeEncodingP = elem.getAttribute("storageSizeEncodingPointer");
+		
+		// Check we have the mandatory attributes
+		if ( Util.isEmpty(np[0]) && Util.isEmpty(storageSizeP) ) {
+			throw new ITSException("You must have at least an attribute storageSize or storageSizePointer.");
+		}
+		
+		rule.map = new HashMap<String, String>();
+
+		if ( !Util.isEmpty(np[0]) ) {
+			if ( !Util.isEmpty(storageSizeP) ) {
+				throw new ITSException("Cannot have both storageSize and storageSizePointer.");
+			}
+			rule.map.put("size", np[0]);
+		}
+		else {
+			rule.map.put("sizePointer", storageSizeP);
+		}
+		if ( !Util.isEmpty(np[1]) ) {
+			if ( !Util.isEmpty(storageSizeEncodingP) ) {
+				throw new ITSException("Cannot have both storageSizeEncoding and storageSizeEncodingPointer.");
+			}
+			rule.map.put("encoding", np[1]);
+		}
+		else {
+			rule.map.put("encodingPointer", storageSizeEncodingP);
+		}
+		
+		// Add the rule
+		rules.add(rule);
+	}
+	
+	private void compileLocQualityIssueRule (Element elem,
+		boolean isInternal)
+	{
+		ITSRule rule = new ITSRule(IProcessor.DC_LOCQUALITYISSUE);
+		rule.selector = elem.getAttribute("selector");
+		rule.isInternal = isInternal;
+
+		// Get the local attributes
+		String np[] = retrieveLocQualityIssueData(elem, false);
+		
+		String issuesRefP = null;
+		if ( elem.hasAttribute("locQualityIssuesRefPointer") )
+			issuesRefP = elem.getAttribute("locQualityIssuesRefPointer");
+		
+		String typeP = null;
+		if (elem.hasAttribute("locQualityIssueTypePointer"))
+			typeP = elem.getAttribute("locQualityIssueTypePointer");
+		
+		String commentP = null;
+		if ( elem.hasAttribute("locQualityIssueCommentPointer"))
+			commentP = elem.getAttribute("locQualityIssueCommentPointer");
+		
+		// Check we have the mandatory attributes
+		if (( Util.isEmpty(np[0]) && Util.isEmpty(issuesRefP) )
+			&& ( Util.isEmpty(np[1]) && Util.isEmpty(typeP) )
+			&& ( Util.isEmpty(np[2]) && Util.isEmpty(commentP) ))
+		{
+			throw new ITSException("You must have at least a type or a comment or isses reference ainformation defined.");
+		}
+		rule.map = new HashMap<String, String>();
+
+		if ( !Util.isEmpty(np[0]) ) {
+			if ( !Util.isEmpty(issuesRefP) ) {
+				throw new ITSException("Cannot have both locQualityIssuesRef and locQualityIssuesRefPointer.");
+			}
+			rule.map.put("issuesRef", np[0]);
+		}
+		else {
+			rule.map.put("issuesRefPointer", issuesRefP);
+		}
+		
+		if ( !Util.isEmpty(np[1]) ) {
+			if ( !Util.isEmpty(typeP) ) {
+				throw new ITSException("Cannot have both locQualityIssueType and locQualityIssueTypePointer.");
+			}
+			rule.map.put("type", np[1]);
+			// TODO: verify the value?
+		}
+		else {
+			rule.map.put("typePointer", typeP);
+		}
+		
+		// Get the comment
+		if ( !Util.isEmpty(np[2]) ) {
+			if ( !Util.isEmpty(commentP) ) {
+				throw new ITSException("Cannot have both locQualityIssueComment and locQualityIssueCommentPointer.");
+			}
+			rule.map.put("comment", np[2]);
+		}
+		else {
+			rule.map.put("commentPointer", commentP);
+		}
+		
+		// Get the optional score
+		String scoreP = null;
+		if ( elem.hasAttribute("locQualityIssueScorePointer") )
+			scoreP = elem.getAttribute("locQualityIssueScorePointer");
+		if ( !Util.isEmpty(np[3]) ) {
+			if ( !Util.isEmpty(scoreP) ) {
+				throw new ITSException("Cannot have both locQualityIssueScore and locQualityIssueScorePointer.");
+			}
+			// TODO: verify the value? // 0. to 100.00
+			rule.map.put("score", np[3]);
+		}
+		else {
+			rule.map.put("scorePointer", scoreP);
+		}
+		
+		// Get the optional profile reference
+		String profileRefP = null;
+		if ( elem.hasAttribute("locQualityIssueProfileRefPointer"))
+			profileRefP = elem.getAttribute("locQualityIssueProfileRefPointer");
+		if ( !Util.isEmpty(np[4]) ) {
+			if ( !Util.isEmpty(profileRefP) ) {
+				throw new ITSException("Cannot have both locQualityIssueProfileRef and locQualityIssueProfileRefPointer.");
+			}
+			// TODO: verify the value? URI
+			rule.map.put("profileRef", np[4]);
+		}
+		else {
+			rule.map.put("profileRefPointer", profileRefP);
+		}
 
 		// Add the rule
 		rules.add(rule);
@@ -473,6 +662,23 @@ public class ITSEngine implements IProcessor, ITraversal {
 		// Add the rule
 		rules.add(rule);
 	}
+	
+	private void compilePrserveSpaceRule (Element elem,
+		boolean isInternal)
+	{
+		ITSRule rule = new ITSRule(IProcessor.DC_PRESERVESPACE);
+		rule.selector = elem.getAttribute("selector");
+		rule.isInternal = isInternal;
+		// Get the value
+		String value = elem.getAttribute("space");
+		if (( !"preserve".equals(value) ) && ( !"default".equals(value) )) {
+			throw new ITSException("Invalid value for 'space'.");
+		}
+		rule.preserveWS = "preserve".equals(value);
+		// Add the rule
+		rules.add(rule);
+	}
+		
 
 	private void compileTargetPointerRule (Element elem,
 		boolean isInternal)
@@ -679,6 +885,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 
 	public void applyRules (int dataCategories) {
 		translatableAttributeRuleTriggered = false;
+		targetPointerRuleTriggered = false;
 		version = "0"; // Needs to be not null (in case there is no ITS at all in file)
 		processGlobalRules(dataCategories);
 		processLocalRules(dataCategories);
@@ -697,6 +904,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 	public void disapplyRules () {
 		removeFlag(doc.getDocumentElement());
 		translatableAttributeRuleTriggered = false;
+		targetPointerRuleTriggered = false;
 	}
 
 	public boolean backTracking () {
@@ -708,6 +916,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 			startTraversal = false;
 			// Set the initial trace with default behaviors
 			ITSTrace startTrace = new ITSTrace();
+			backTracking = false;
 			startTrace.translate = true;
 			startTrace.isChildDone = true;
 			trace.push(startTrace); // For first child
@@ -766,7 +975,10 @@ public class ITSEngine implements IProcessor, ITraversal {
 			trace.peek().translate = (data.charAt(FP_TRANSLATE) == 'y');
 		}
 		
-		trace.peek().idValue = getFlagData(data, FP_IDVALUE_DATA);
+		String value = getFlagData(data, FP_IDVALUE_DATA);
+		if ( !value.isEmpty() ) {
+			trace.peek().idValue = value;
+		}
 		
 		if ( data.charAt(FP_DOMAIN) != '?' ) {
 			trace.peek().domains = getFlagData(data, FP_DOMAIN_DATA);
@@ -779,9 +991,25 @@ public class ITSEngine implements IProcessor, ITraversal {
 		if ( data.charAt(FP_LOCFILTER) != '?' ) {
 			trace.peek().localeFilter = getFlagData(data, FP_LOCFILTER_DATA);
 		}
+		
+		if ( data.charAt(FP_LQISSUE) != '?' ) {
+			String[] values = fromSingleString(getFlagData(data, FP_LQISSUE_DATA));
+			// Do not override if the value is no defined
+			if ( values[0] != null ) trace.peek().lqIssuesRef = values[0];
+			if ( values[1] != null ) trace.peek().lqIssueType = values[1];
+			if ( values[2] != null ) trace.peek().lqIssueComment = values[2];
+			if ( values[3] != null ) trace.peek().lqIssueScore = values[3];
+			if ( values[4] != null ) trace.peek().lqIssueProfileRef = values[4];
+		}
 
+		if ( data.charAt(FP_STORAGESIZE) != '?' ) {
+			String[] values = fromSingleString(getFlagData(data, FP_STORAGESIZE_DATA));
+			trace.peek().storeSize = values[0];
+			trace.peek().storeSizeEncoding = values[1];
+		}
+		
 		trace.peek().targetPointer = getFlagData(data, FP_TARGETPOINTER_DATA);
-
+		
 		if ( data.charAt(FP_DIRECTIONALITY) != '?' ) {
 			switch ( data.charAt(FP_DIRECTIONALITY) ) {
 			case '0':
@@ -830,7 +1058,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 		if ( data.charAt(FP_LANGINFO) != '?' ) {
 			trace.peek().language = getFlagData(data, FP_LANGINFO_DATA);
 		}
-
+		
 	}
 
 	public void startTraversal () {
@@ -861,6 +1089,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 		    	if ( (dataCategories & rule.ruleType) == 0 ) continue;
 		    	
 		    	// Get the selected nodes for the rule
+		    	String data1;
 				XPathExpression expr = xpath.compile(rule.selector);
 				NodeList NL = (NodeList)expr.evaluate(doc, XPathConstants.NODESET);
 				
@@ -879,6 +1108,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 						if ( rule.idValue != null ) { // For deprecated extension
 							setFlag(NL.item(i), FP_IDVALUE_DATA, resolveExpressionAsString(NL.item(i), rule.idValue), true);							
 						}
+						// For deprecated extension
 						setFlag(NL.item(i), FP_PRESERVEWS, (rule.preserveWS ? 'y' : '?'), true);
 						break;
 						
@@ -940,6 +1170,11 @@ public class ITSEngine implements IProcessor, ITraversal {
 						setFlag(NL.item(i), FP_LOCFILTER_DATA, rule.info, true);
 						break;
 						
+					case IProcessor.DC_PRESERVESPACE:
+						// For new ITS 2.0 rule, but deprecated extension still supported in DC_PRESERVESPACE case
+						setFlag(NL.item(i), FP_PRESERVEWS, (rule.preserveWS ? 'y' : '?'), true);
+						break;
+						
 					case IProcessor.DC_IDVALUE:
 						// For new ITS 2.0 rule, but deprecated extension still supported in DC_TRANSLATE case
 						if ( rule.idValue != null ) {
@@ -948,7 +1183,6 @@ public class ITSEngine implements IProcessor, ITraversal {
 						break;
 						
 					case IProcessor.DC_DOMAIN:
-						setFlag(NL.item(i), FP_DOMAIN, 'y', true);
 						List<String> list = resolveExpressionAsList(NL.item(i), rule.info);
 						// Map the values and build the final string
 						StringBuilder tmp = new StringBuilder();
@@ -961,13 +1195,64 @@ public class ITSEngine implements IProcessor, ITraversal {
 							if ( tmp.length() > 0 ) tmp.append("\t");
 							tmp.append(value);
 						}
+						setFlag(NL.item(i), FP_DOMAIN, 'y', true);
 						setFlag(NL.item(i), FP_DOMAIN_DATA, tmp.toString(), true);
 						break;
 						
 					case IProcessor.DC_TARGETPOINTER:
+						targetPointerRuleTriggered = true;
 						setFlag(NL.item(i), FP_TARGETPOINTER_DATA, rule.info, true);							
 						break;
 						
+					case IProcessor.DC_LOCQUALITYISSUE:
+						// Get and resolve type
+						// Get and resolve issues reference
+						data1 = rule.map.get("issuesRef");
+						if ( data1 == null ) {
+							data1 = rule.map.get("issuesRefPointer");
+							if ( !Util.isEmpty(data1) ) data1 = resolvePointer(NL.item(i), data1);
+						}
+						String data2 = rule.map.get("type");
+						if ( data2 == null ) {
+							data2 = rule.map.get("typePointer");
+							if ( !Util.isEmpty(data2) ) data2 = resolvePointer(NL.item(i), data2);
+						}
+						// Get and resolve comment
+						String data3 = rule.map.get("comment");
+						if ( data3 == null ) {
+							data3 = rule.map.get("commentPointer");
+							if ( !Util.isEmpty(data3) ) data3 = resolvePointer(NL.item(i), data3);
+						}
+						// Get and resolve score
+						String data4 = rule.map.get("score");
+						if ( data4 == null ) {
+							data4 = rule.map.get("scorePointer");
+							if ( !Util.isEmpty(data4) ) data4 = resolvePointer(NL.item(i), data4);
+						}
+						// Get and resolve profile reference
+						String data5 = rule.map.get("profileRef");
+						if ( data5 == null ) {
+							data5 = rule.map.get("profileRefPointer");
+							if ( !Util.isEmpty(data5) ) data5 = resolvePointer(NL.item(i), data5);
+						}
+						setFlag(NL.item(i), FP_LQISSUE, 'y', true);
+						setFlag(NL.item(i), FP_LQISSUE_DATA, toSingleString(data1, data2, data3, data4, data5), true);
+						break;
+						
+					case IProcessor.DC_STORAGESIZE:
+						data1 = rule.map.get("size");
+						if ( data1 == null ) {
+							data1 = rule.map.get("sizePointer");
+							if ( !Util.isEmpty(data1) ) data1 = resolvePointer(NL.item(i), data1);
+						}
+						data2 = rule.map.get("encoding");
+						if ( data2 == null ) {
+							data2 = rule.map.get("encodingPointer");
+							if ( !Util.isEmpty(data2) ) data2 = resolvePointer(NL.item(i), data2);
+						}
+						setFlag(NL.item(i), FP_STORAGESIZE, 'y', true);
+						setFlag(NL.item(i), FP_STORAGESIZE_DATA, toSingleString(data1, data2), true);
+						break;
 					}
 				}
 		    }
@@ -975,6 +1260,29 @@ public class ITSEngine implements IProcessor, ITraversal {
 		catch ( XPathExpressionException e ) {
 			throw new RuntimeException(e);
 		}
+	}
+	
+	/**
+	 * Converts a list of strings arguments to a single string that is delimited with end-of-group characters. 
+	 * @param values the values to store. Null values are ok and mean no value.
+	 * @return a single string with all values.
+	 */
+	private String toSingleString (String ... values) {
+		StringBuilder data = new StringBuilder();
+		for ( String value : values ) {
+			if ( value == null ) data.append("\u001A");
+			if ( value != null ) data.append(value);
+			data.append("\u001D");
+		}
+		return data.toString();
+	}
+	
+	private String[] fromSingleString (String data) {
+		String[] values = data.split("\u001D", -1);
+		for ( int i=0; i<values.length; i++ ) {
+			if ( values[i].equals("\u001A") ) values[i] = null;
+		}
+		return values;
 	}
 	
 	private void processLocalRules (int dataCategories) {
@@ -1023,7 +1331,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 			
 			if ( (dataCategories & IProcessor.DC_TERMINOLOGY) > 0 ) {
 				expr = xpath.compile("//*/@"+ITS_NS_PREFIX+":term|//"+ITS_NS_PREFIX+":span/@term"
-					+"//*/@"+ITS_NS_PREFIX+":termInfoRef|//"+ITS_NS_PREFIX+":span/@termInfoRef");
+					+"|//*/@"+ITS_NS_PREFIX+":termInfoRef|//"+ITS_NS_PREFIX+":span/@termInfoRef");
 				NL = (NodeList)expr.evaluate(doc, XPathConstants.NODESET);
 				String localName;
 				for ( int i=0; i<NL.getLength(); i++ ) {
@@ -1051,7 +1359,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 
 			if ( (dataCategories & IProcessor.DC_LOCNOTE) > 0 ) {
 				expr = xpath.compile("//*/@"+ITS_NS_PREFIX+":locNote|//"+ITS_NS_PREFIX+":span/@locNote"
-					+"//*/@"+ITS_NS_PREFIX+":locNoteRef|//"+ITS_NS_PREFIX+":span/@locNoteRef");
+					+"|//*/@"+ITS_NS_PREFIX+":locNoteRef|//"+ITS_NS_PREFIX+":span/@locNoteRef");
 				NL = (NodeList)expr.evaluate(doc, XPathConstants.NODESET);
 				String localName;
 				for ( int i=0; i<NL.getLength(); i++ ) {
@@ -1083,7 +1391,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 						attr.getValue(), attr.getSpecified());
 				}
 			}
-			
+
 			// Local withinText attribute (ITS 2.0 only)
 			if (( (dataCategories & IProcessor.DC_WITHINTEXT) > 0 ) && isVersion2() ) {
 				expr = xpath.compile("//*/@"+ITS_NS_PREFIX+":withinText");
@@ -1121,7 +1429,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 			
 			// locale filter
 			if (( (dataCategories & IProcessor.DC_LOCFILTER) > 0 ) && isVersion2() ) {
-				expr = xpath.compile("//*/@"+ITS_NS_PREFIX+":localeFilterList");
+				expr = xpath.compile("//*/@"+ITS_NS_PREFIX+":localeFilterList|//"+ITS_NS_PREFIX+":span/@localeFilterList");
 				NL = (NodeList)expr.evaluate(doc, XPathConstants.NODESET);
 				for ( int i=0; i<NL.getLength(); i++ ) {
 					attr = (Attr)NL.item(i);
@@ -1129,7 +1437,10 @@ public class ITSEngine implements IProcessor, ITraversal {
 					if ( ITS_NS_URI.equals(attr.getOwnerElement().getNamespaceURI())
 						&& "localeFilterRule".equals(attr.getOwnerElement().getLocalName()) ) continue;
 					// Set the flag
-					String value = retrieveLocaleFilterList(attr.getOwnerElement(), true);
+					boolean qualified = true;
+					String ns = attr.getOwnerElement().getNamespaceURI();
+					if ( !Util.isEmpty(ns) ) qualified = !ns.equals(ITS_NS_URI);
+					String value = retrieveLocaleFilterList(attr.getOwnerElement(), qualified);
 					setFlag(attr.getOwnerElement(), FP_LOCFILTER, 'y', attr.getSpecified());
 					setFlag(attr.getOwnerElement(), FP_LOCFILTER_DATA,
 						value, attr.getSpecified()); 
@@ -1148,6 +1459,69 @@ public class ITSEngine implements IProcessor, ITraversal {
 				}
 			}
 			
+			// Localization quality issue
+			if (( (dataCategories & IProcessor.DC_LOCQUALITYISSUE) > 0 ) && isVersion2() ) {
+				expr = xpath.compile("//*/@"+ITS_NS_PREFIX+":locQualityIssueType|//"+ITS_NS_PREFIX+":span/@locQualityIssueType"
+					+"|//*/@"+ITS_NS_PREFIX+":locQualityIssueComment|//"+ITS_NS_PREFIX+":span/@locQualityIssueComment"
+					+"|//*/@"+ITS_NS_PREFIX+":locQualityIssuesRef|//"+ITS_NS_PREFIX+":span/@locQualityIssuesRef");
+				NL = (NodeList)expr.evaluate(doc, XPathConstants.NODESET);
+				for ( int i=0; i<NL.getLength(); i++ ) {
+					attr = (Attr)NL.item(i);
+					// Skip irrelevant nodes
+					if ( ITS_NS_URI.equals(attr.getOwnerElement().getNamespaceURI())
+						&& "locQualityIssueRule".equals(attr.getOwnerElement().getLocalName()) ) continue;
+					// Set the flag
+					boolean qualified = true;
+					String ns = attr.getOwnerElement().getNamespaceURI();
+					if ( !Util.isEmpty(ns) ) qualified = !ns.equals(ITS_NS_URI);
+					String[] values = retrieveLocQualityIssueData(attr.getOwnerElement(), qualified);
+					// Get the previous data (if any)
+					String oriData = (String)attr.getOwnerElement().getUserData(FLAGNAME);
+					if ( oriData != null ) {
+						String[] ori = fromSingleString(getFlagData(oriData, FP_LQISSUE_DATA));
+						// Use original values if local one is not defined
+						if ( values[0] == null ) values[0] = ori[0];
+						if ( values[1] == null ) values[1] = ori[1];
+						if ( values[2] == null ) values[2] = ori[2];
+						if ( values[3] == null ) values[3] = ori[3];
+						if ( values[4] == null ) values[4] = ori[4];
+					}
+					// Set the updated flags
+					setFlag(attr.getOwnerElement(), FP_LQISSUE, 'y', attr.getSpecified());
+					setFlag(attr.getOwnerElement(), FP_LQISSUE_DATA,
+						toSingleString(values[0], values[1], values[2], values[3], values[4]), attr.getSpecified()); 
+				}
+			}
+			
+			// Storage size
+			if (( (dataCategories & IProcessor.DC_STORAGESIZE) > 0 ) && isVersion2() ) {
+				expr = xpath.compile("//*/@"+ITS_NS_PREFIX+":storageSize|//"+ITS_NS_PREFIX+":span/@storageSize");
+				NL = (NodeList)expr.evaluate(doc, XPathConstants.NODESET);
+				for ( int i=0; i<NL.getLength(); i++ ) {
+					attr = (Attr)NL.item(i);
+					// Skip irrelevant nodes
+					if ( ITS_NS_URI.equals(attr.getOwnerElement().getNamespaceURI())
+						&& "storageSizeRule".equals(attr.getOwnerElement().getLocalName()) ) continue;
+					// Set the flag
+					boolean qualified = true;
+					String ns = attr.getOwnerElement().getNamespaceURI();
+					if ( !Util.isEmpty(ns) ) qualified = !ns.equals(ITS_NS_URI);
+					String[] values = retrieveStorageSizeData(attr.getOwnerElement(), qualified);
+					// Get the previous data (if any)
+					String oriData = (String)attr.getOwnerElement().getUserData(FLAGNAME);
+					if ( oriData != null ) {
+						String[] ori = fromSingleString(getFlagData(oriData, FP_STORAGESIZE_DATA));
+						// Use original values if local one is not defined
+						if ( values[0] == null ) values[0] = ori[0];
+						if ( values[1] == null ) values[1] = ori[1];
+					}
+					// Set the updated flags
+					setFlag(attr.getOwnerElement(), FP_STORAGESIZE, 'y', attr.getSpecified());
+					setFlag(attr.getOwnerElement(), FP_STORAGESIZE_DATA,
+						toSingleString(values[0], values[1]), attr.getSpecified()); 
+				}
+			}
+
 			// Local targetPointer attribute (ITS 2.0 only)
 			if (( (dataCategories & IProcessor.DC_TARGETPOINTER) > 0 ) && isVersion2() ) {
 				expr = xpath.compile("//*/@"+ITS_NS_PREFIX+":targetPointer");
@@ -1180,23 +1554,83 @@ public class ITSEngine implements IProcessor, ITraversal {
 	private String retrieveLocaleFilterList (Element elem,
 		boolean qualified)
 	{
-		final String LFLIST = "localeFilterList";
-		String list;
-
-		// Get the values
 		if ( qualified ) { // Locally
-			list = elem.getAttributeNS(ITS_NS_URI, "localeFilterList").trim();
+			return elem.getAttributeNS(ITS_NS_URI, "localeFilterList").trim();
 		}
 		else { // Inside a global rule
-			list = elem.getAttribute(LFLIST).trim();
+			return elem.getAttribute("localeFilterList").trim();
+		}
+	}
+	
+	private String[] retrieveStorageSizeData (Element elem,
+		boolean qualified)
+	{
+		String[] data = new String[2];
+		
+		if ( qualified ) {
+			if ( elem.hasAttributeNS(ITS_NS_URI, "storageSize") )
+				data[0] = elem.getAttributeNS(ITS_NS_URI, "storageSize");
+			if ( elem.hasAttributeNS(ITS_NS_URI, "storageSizeEncoding") )
+				data[1] = elem.getAttributeNS(ITS_NS_URI, "storageSizeEncoding");
+		}
+		else {
+			if ( elem.hasAttribute("storageSize") )
+				data[0] = elem.getAttribute("storageSize");
+			if ( elem.hasAttribute("storageSizeEncoding") )
+				data[1] = elem.getAttribute("storageSizeEncoding");
 		}
 		
-		// Check the list
-		if ( list.isEmpty() ) {
-			throw new ITSException(String.format("Missing or invalid value '%s' for '%s'.", list, LFLIST));
-		}
+		return data;
+	}
 	
-		return list;
+	/**
+	 * Retrieves the non-pointer information of the Localization Quality issue data category.
+	 * @param elem the element where to get the data.
+	 * @param qualified true if the attributes are expected to be qualified.
+	 * @return an array of the value: issues reference, type, comment, score, profile reference.
+	 */
+	private String[] retrieveLocQualityIssueData (Element elem,
+		boolean qualified)
+	{
+		String[] data = new String[5];
+		
+		if ( qualified ) {
+			if ( elem.hasAttributeNS(ITS_NS_URI, "locQualityIssuesRef") )
+				data[0] = elem.getAttributeNS(ITS_NS_URI, "locQualityIssuesRef");
+			
+			if ( elem.hasAttributeNS(ITS_NS_URI, "locQualityIssueType") )
+				data[1] = elem.getAttributeNS(ITS_NS_URI, "locQualityIssueType");
+			
+			if ( elem.hasAttributeNS(ITS_NS_URI, "locQualityIssueComment") )
+				data[2] = elem.getAttributeNS(ITS_NS_URI, "locQualityIssueComment");
+			
+			if ( elem.hasAttributeNS(ITS_NS_URI, "locQualityIssueScore") )
+				data[3] = elem.getAttributeNS(ITS_NS_URI, "locQualityIssueScore");
+			
+			if ( elem.hasAttributeNS(ITS_NS_URI, "locQualityIssueProfileRef") )
+				data[4] = elem.getAttributeNS(ITS_NS_URI, "locQualityIssueProfileRef");
+		}
+		else {
+			if ( elem.hasAttribute("locQualityIssuesRef") )
+				data[0] = elem.getAttribute("locQualityIssuesRef");
+			
+			if ( elem.hasAttribute("locQualityIssueType") )
+				data[1] = elem.getAttribute("locQualityIssueType");
+			
+			if ( elem.hasAttribute("locQualityIssueComment") )
+				data[2] = elem.getAttribute("locQualityIssueComment");
+			
+			if ( elem.hasAttribute("locQualityIssueScore") )
+				data[3] = elem.getAttribute("locQualityIssueScore");
+			
+			if ( elem.hasAttribute("locQualityIssueProfileRef") )
+				data[4] = elem.getAttribute("locQualityIssueProfileRef");
+		}
+
+		// Do not check for complete set of required characters
+		// This because we could have a global pointer that defines a non-native way to get the data
+
+		return data;
 	}
 	
 	private boolean isVersion2 () throws XPathExpressionException {
@@ -1258,7 +1692,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 			}
 		}
 		catch (XPathExpressionException e) {
-			return "Bab XPath expression in pointer \""+pointer+"\".";
+			return "Bad XPath expression in pointer \""+pointer+"\".";
 		}
 		return "pointer("+pointer+")";
 	}
@@ -1367,12 +1801,9 @@ public class ITSEngine implements IProcessor, ITraversal {
 		else return "";
 	}
 
-	public boolean translate () {
-		return trace.peek().translate;
-	}
-	
-	public boolean translate (Attr attribute) {
-		if ( attribute == null ) return false;
+	public boolean getTranslate (Attr attribute) {
+		if ( attribute == null ) return trace.peek().translate;
+		// Else: check the attribute
 		String tmp;
 		if ( (tmp = (String)attribute.getUserData(FLAGNAME)) == null ) return false;
 		// '?' and 'n' will return (correctly) false
@@ -1383,8 +1814,12 @@ public class ITSEngine implements IProcessor, ITraversal {
 		return trace.peek().targetPointer;
 	}
 	
-	public String getIdValue () {
-		return trace.peek().idValue;
+	public String getIdValue (Attr attribute) {
+		if ( attribute == null ) return trace.peek().idValue;
+		// Else: check the attribute
+		String tmp;
+		if ( (tmp = (String)attribute.getUserData(FLAGNAME)) == null ) return null;
+		return getFlagData(tmp, FP_IDVALUE_DATA);
 	}
 	
 	public int getDirectionality () {
@@ -1402,27 +1837,27 @@ public class ITSEngine implements IProcessor, ITraversal {
 		return trace.peek().withinText;
 	}
 	
-	public boolean isTerm () {
-		return trace.peek().term;
-	}
-	
-	public String getTermInfo () {
-		return trace.peek().termInfo;
-	}
-
-	public boolean isTerm (Attr attribute) {
-		if ( attribute == null ) return false;
+	public boolean getTerm (Attr attribute) {
+		if ( attribute == null ) return trace.peek().term;
 		String tmp;
 		if ( (tmp = (String)attribute.getUserData(FLAGNAME)) == null ) return false;
 		// '?' and 'n' will return (correctly) false
 		return (tmp.charAt(FP_TERMINOLOGY) == 'y');
 	}
 
-	public String getNote () {
+	public String getTermInfo (Attr attribute) {
+		if ( attribute == null ) return trace.peek().termInfo;;
+		String tmp;
+		if ( (tmp = (String)attribute.getUserData(FLAGNAME)) == null ) return null;
+		if ( tmp.charAt(FP_TERMINOLOGY) != 'y' ) return null;
+		return getFlagData(tmp, FP_TERMINOLOGY_DATA);
+	}
+
+	public String getLocNote () {
 		return trace.peek().locNote;
 	}
 	
-	public String getNote (Attr attribute) {
+	public String getLocNote (Attr attribute) {
 		if ( attribute == null ) return null;
 		String tmp;
 		if ( (tmp = (String)attribute.getUserData(FLAGNAME)) == null ) return null;
@@ -1430,6 +1865,15 @@ public class ITSEngine implements IProcessor, ITraversal {
 		return getFlagData(tmp, FP_LOCNOTE_DATA);
 	}
 
+	public String getLocNoteType () {
+		return "TODO";
+	}
+	
+	public String getLocNoteType (Attr attribute) {
+		if ( attribute == null ) return null;
+		return "TODO";
+	}
+	
 	public String getDomains () {
 		return trace.peek().domains;
 	}
@@ -1451,12 +1895,12 @@ public class ITSEngine implements IProcessor, ITraversal {
 	}
 
 	@Override
-	public String getExternalResourcesRef () {
+	public String getExternalResourceRef () {
 		return trace.peek().externalRes;
 	}
 
 	@Override
-	public String getExternalResourcesRef (Attr attribute) {
+	public String getExternalResourceRef (Attr attribute) {
 		if ( attribute == null ) return null;
 		String tmp;
 		if ( (tmp = (String)attribute.getUserData(FLAGNAME)) == null ) return null;
@@ -1467,6 +1911,64 @@ public class ITSEngine implements IProcessor, ITraversal {
 	@Override
 	public String getLocaleFilter () {
 		return trace.peek().localeFilter;
+	}
+
+	@Override
+	public String getLocQualityIssuesRef () {
+		return trace.peek().lqIssuesRef;
+	}
+
+	@Override
+	public String getLocQualityIssueType () {
+		return trace.peek().lqIssueType;
+	}
+
+	@Override
+	public String getLocQualityIssueComment () {
+		return trace.peek().lqIssueComment;
+	}
+
+	@Override
+	public String getLocQualityIssueScore () {
+		return trace.peek().lqIssueScore;
+	}
+
+	@Override
+	public String getLocQualityIssueProfileRef () {
+		return trace.peek().lqIssueProfileRef;
+	}
+
+	@Override
+	public String getStorageSize () {
+		return trace.peek().storeSize;
+	}
+
+	@Override
+	public String getStorageSize (Attr attribute) {
+		if ( attribute == null ) return null;
+		String tmp;
+		if ( (tmp = (String)attribute.getUserData(FLAGNAME)) == null ) return null;
+		if ( tmp.charAt(FP_STORAGESIZE) != 'y' ) return null;
+		String[] values = fromSingleString(getFlagData(tmp, FP_STORAGESIZE_DATA));
+		return values[0];
+	}
+
+	@Override
+	public String getStorageSizeEncoding () {
+		String tmp = trace.peek().storeSizeEncoding;
+		if ( tmp == null ) return "UTF-8";
+		return tmp;
+	}
+
+	@Override
+	public String getStorageSizeEncoding(Attr attribute) {
+		if ( attribute == null ) return null;
+		String tmp;
+		if ( (tmp = (String)attribute.getUserData(FLAGNAME)) == null ) return null;
+		if ( tmp.charAt(FP_STORAGESIZE) != 'y' ) return null;
+		String[] values = fromSingleString(getFlagData(tmp, FP_STORAGESIZE_DATA));
+		if ( values[1] == null ) return "UTF-8";
+		else return values[1];
 	}
 
 }

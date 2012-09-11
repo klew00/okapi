@@ -36,6 +36,13 @@ class ITSTrace {
 	String localeFilter;
 	String idValue;
 	String domains;
+	String lqIssueType;
+	String lqIssueComment;
+	String lqIssueScore;
+	String lqIssueProfileRef;
+	String lqIssuesRef;
+	String storeSize;
+	String storeSizeEncoding;
 
 	ITSTrace () {
 		// Default constructor
@@ -67,14 +74,22 @@ class ITSTrace {
 		
 		// idValue: No inheritance
 		
-		// external resource reference: Inheritance for child element including attributes
-		externalRes = initialTrace.externalRes;
+		// external resource reference: No inheritance
 		
 		// locale filter:  Inheritance for child element including attributes
 		localeFilter = initialTrace.localeFilter;
 		
 		// domain: Inheritance for child elements including attributes
 		domains = initialTrace.domains;
+		
+		// localization quality issue:
+		lqIssuesRef = initialTrace.lqIssuesRef;
+		lqIssueType = initialTrace.lqIssueType;
+		lqIssueComment = initialTrace.lqIssueComment;
+		lqIssueScore = initialTrace.lqIssueScore;
+		lqIssueProfileRef = initialTrace.lqIssueProfileRef;
+		
+		// Store size: No inheritance
 		
 		this.isChildDone = isChildDone;
 	}

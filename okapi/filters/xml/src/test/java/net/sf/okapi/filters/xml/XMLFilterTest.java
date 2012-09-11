@@ -30,6 +30,7 @@ import net.sf.okapi.common.filterwriter.GenericContent;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.ITextUnit;
+import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextFragment.TagType;
@@ -131,7 +132,7 @@ public class XMLFilterTest {
 	public void testLocaleFilter3 () {
 		String snippet = "<?xml version=\"1.0\"?>\n"
 			+ "<doc><its:rules version=\"2.0\" xmlns:its=\"http://www.w3.org/2005/11/its\">"
-			+ "<its:localeFilterRule selector=\"//para1\" localeFilterList='de-CH, de-AT'/>"
+			+ "<its:localeFilterRule selector=\"//para1\" localeFilterList=''/>"
 			+ "<its:localeFilterRule selector=\"//para2\" localeFilterList='en-CA, fr-*'/>"
 			+ "</its:rules>"
 			+ "<para1>text1</para1>"
@@ -175,6 +176,25 @@ public class XMLFilterTest {
 	}
 	
 	@Test
+	public void testLocaleFilter6 () {
+		String snippet = "<?xml version=\"1.0\"?>\n"
+			+ "<doc xmlns:its=\"http://www.w3.org/2005/11/its\"><its:rules version=\"2.0\">"
+			+ "<its:localeFilterRule selector=\"//para[@scope='GER']\" localeFilterList='de'/>"
+			+ "</its:rules>"
+			+ "<para scope='GER'>text1</para>"
+			+ "<para scope='ZZZ'>text2</para>"
+			+ "<para scope='ZZZ' its:localeFilterList='fr-*'>text3</para>"
+			+ "</doc>";
+		ArrayList<Event> list = getEvents(snippet);
+		ITextUnit tu = FilterTestDriver.getTextUnit(list, 1);
+		assertNotNull(tu);
+		assertEquals("text2", tu.getSource().toString());
+		tu = FilterTestDriver.getTextUnit(list, 2);
+		assertNotNull(tu);
+		assertEquals("text3", tu.getSource().toString());
+	}
+	
+	@Test
 	public void testComplexIdValue () {
 		String snippet = "<?xml version=\"1.0\"?>\n"
 			+ "<doc><its:rules version=\"1.0\" xmlns:its=\"http://www.w3.org/2005/11/its\""
@@ -193,7 +213,7 @@ public class XMLFilterTest {
 		assertNotNull(tu);
 		assertEquals("xid2", tu.getName()); // xml:id overrides global rule
 	}
-	
+
 	@Test
 	public void testIdValueV2 () {
 		String snippet = "<?xml version=\"1.0\"?>\n"
@@ -225,6 +245,29 @@ public class XMLFilterTest {
 			+ "</doc>";
 		ArrayList<Event> list = getEvents(snippet);
 		FilterTestDriver.getTextUnit(list, 1);
+	}
+
+	@Test
+	public void testPreserveSpace1 () {
+		String snippet = "<?xml version=\"1.0\"?>\n"
+			+ "<doc><its:rules version=\"2.0\" xmlns:its=\"http://www.w3.org/2005/11/its\">"
+			+ "<its:preserveSpaceRule selector=\"//grp\" space='preserve'/>"
+			+ "<its:preserveSpaceRule selector=\"//grp/p\" space='default'/>"
+			+ "</its:rules>"
+			+ "<p>  a  b  c  </p>"
+			+ "<grp>"
+			+ "<p>  a  b  c  </p>"
+			+ "</grp>"
+			+ "</doc>";
+		ArrayList<Event> list = getEvents(snippet);
+		ITextUnit tu = FilterTestDriver.getTextUnit(list, 1);
+		assertNotNull(tu);
+		assertEquals(" a b c ", tu.getSource().toString());
+		assertFalse(tu.preserveWhitespaces());
+		tu = FilterTestDriver.getTextUnit(list, 2);
+		assertNotNull(tu);
+		assertEquals("  a  b  c  ", tu.getSource().toString());
+		assertTrue(tu.preserveWhitespaces());
 	}
 	
 	@Test
@@ -271,6 +314,23 @@ public class XMLFilterTest {
 		tu = FilterTestDriver.getTextUnit(list, 3);
 		assertNotNull(tu);
 		assertEquals("xid3", tu.getName()); // xml:id overrides global rule
+	}
+	
+	@Test
+	public void testStorageSize () {
+		String snippet = "<?xml version=\"1.0\"?>\n"
+			+ "<doc><its:rules version=\"2.0\" xmlns:its=\"http://www.w3.org/2005/11/its\""
+			+ " xmlns:itsx=\"http://www.w3.org/2008/12/its-extensions\">"
+			+ "<its:storageSizeRule selector=\"//p\" storageSize='10' storageSizeEncoding='UTF-16'/>"
+			+ "</its:rules>"
+			+ "<p>text</p>"
+			+ "</doc>";
+		ArrayList<Event> list = getEvents(snippet);
+		ITextUnit tu = FilterTestDriver.getTextUnit(list, 1);
+		assertNotNull(tu);
+		Property prop = tu.getProperty(Property.ITS_STORAGESIZE);
+		assertNotNull(prop);
+		assertEquals("10\tUTF-16", prop.getValue());
 	}
 	
 	@Test
@@ -556,6 +616,38 @@ public class XMLFilterTest {
 		//TODO: Implement replacement of the lang value
 		//assertEquals(expect, FilterTestDriver.generateOutput(getEvents(snippet), snippet, "FR"));
 	}*/
+
+	@Test
+	public void testOutputTargetPointer () {
+		String snippet = "<?xml version=\"1.0\"?>\n"
+			+ "<doc xmlns:its=\"http://www.w3.org/2005/11/its\"><its:rules version=\"2.0\">"
+			+ "<its:translateRule selector=\"/doc\" translate=\"no\"/>"
+			+ "<its:translateRule selector=\"//item/src\" translate=\"yes\"/>"
+			+ "<its:targetPointerRule selector=\"//item/src\" targetPointer=\"../trg\"/>"
+			+ "</its:rules>"
+			+ "<item><src>Text</src><trg/></item>"
+			+ "</doc>";
+		String expect = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+			+ "<doc xmlns:its=\"http://www.w3.org/2005/11/its\"><its:rules version=\"2.0\">"
+			+ "<its:translateRule selector=\"/doc\" translate=\"no\"/>"
+			+ "<its:translateRule selector=\"//item/src\" translate=\"yes\"/>"
+			+ "<its:targetPointerRule selector=\"//item/src\" targetPointer=\"../trg\"/>"
+			+ "</its:rules>"
+//TODO:	to implement		+ "<item><src>Text</src><trg>Text</trg></item>"
+			+ "<item><src>Text</src><trg/></item>"
+			+ "</doc>";
+		
+		// Check extraction
+		ArrayList<Event> list = getEvents(snippet);
+		ITextUnit tu = FilterTestDriver.getTextUnit(list, 1);
+		assertNotNull(tu);
+		assertEquals("Text", tu.getSource().getCodedText());
+		
+		// Check output
+		assertEquals(expect, FilterTestDriver.generateOutput(list,
+			filter.getEncoderManager(), LocaleId.FRENCH));
+	}
+	
 	
 	@Test
 	public void testOutputSupplementalChars () {

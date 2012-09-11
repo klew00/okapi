@@ -42,10 +42,17 @@ public class Property {
 	 * Tab-delimited list of ITS Domain values
 	 */
 	public static final String ITS_DOMAINS = "its-domains";
+	
 	/**
 	 * ITS External Resources Reference value
 	 */
-	public static final String ITS_EXTERNALRESREF = "ist-externalResourcesRef"; 
+	public static final String ITS_EXTERNALRESREF = "its-externalResourcesRef";
+	
+	/**
+	 * ITS Storage Size. A tab-separated values of 1=maximum size in byte
+	 * and 2=the encoding to use.
+	 */
+	public static final String ITS_STORAGESIZE = "its-storageSize"; 
 	
 	private final String name;
 	private String value;

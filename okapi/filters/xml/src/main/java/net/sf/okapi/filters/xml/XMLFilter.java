@@ -22,6 +22,7 @@ package net.sf.okapi.filters.xml;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
@@ -30,6 +31,10 @@ import java.util.logging.Logger;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpression;
+import javax.xml.xpath.XPathExpressionException;
 
 import net.sf.okapi.common.BOMNewlineEncodingDetector;
 import net.sf.okapi.common.DefaultEntityResolver;
@@ -79,6 +84,9 @@ import org.xml.sax.SAXException;
 @UsingParameters(Parameters.class)
 public class XMLFilter implements IFilter {
 
+	private static final String SRC_TRGPTRFLAGNAME = "\u10ff"; // Name of the user-data property that holds the target pointer flag in the source
+	private static final String TRG_TRGPTRFLAGNAME = "\u20ff"; // Name of the user-data property that holds the target pointer flag in the target
+
 	private final Logger logger = Logger.getLogger(getClass().getName());
 
 	private String docName;
@@ -101,7 +109,27 @@ public class XMLFilter implements IFilter {
 	private IEncoder cfEncoder;
 	private TermsAnnotation terms;
 	private RawDocument input;
+	private HashMap<Node, TargetPointerEntry> targetTable;
+	private boolean hasTargetPointer;
 
+	private class TargetPointerEntry {
+
+		static final int BEFORE = 0;
+		static final int AFTER = 1;
+		
+		int type;
+		Node srcNode;
+		Node trgNode;
+		ITextUnit tu;
+		
+		TargetPointerEntry (Node srcNode,
+			Node trgNode)
+		{
+			this.srcNode = srcNode;
+			this.trgNode = trgNode;
+		}
+	}
+	
 	public XMLFilter () {
 		params = new Parameters();
 	}
@@ -328,7 +356,11 @@ public class XMLFilter implements IFilter {
 		itsEng.applyRules(IProcessor.DC_TRANSLATE | IProcessor.DC_IDVALUE
 			| IProcessor.DC_LOCNOTE | IProcessor.DC_WITHINTEXT | IProcessor.DC_TERMINOLOGY
 			| IProcessor.DC_DOMAIN | IProcessor.DC_TARGETPOINTER | IProcessor.DC_EXTERNALRES
-			| IProcessor.DC_LOCFILTER);
+			| IProcessor.DC_LOCFILTER | IProcessor.DC_PRESERVESPACE | IProcessor.DC_LOCQUALITYISSUE
+			| IProcessor.DC_STORAGESIZE);
+
+		// If we have rules with target pointers we must prepare the nodes first
+		prepareTargetPointers(itsEng);
 		
 		trav = itsEng;
 		trav.startTraversal();
@@ -386,6 +418,92 @@ public class XMLFilter implements IFilter {
 		queue.add(new Event(EventType.START_DOCUMENT, startDoc));
 	}
 
+	/**
+	 * Prepares the document for using target pointers.
+	 * <p>Because of the way the skeleton is constructed and because target pointer can result in the target
+	 * location being anywhere in the document, we need to perform a first pass to create the targetTable
+	 * table. That table lists all the source nodes that have a target pointer and the corresponding target
+	 * node with its status.
+	 * 
+	 * - check if node has target pointer for target
+	 * - if yes, it's either before or after the corresponding source
+	 * - if it's before;
+	 * -- create a skel placeholder and a TU
+	 * -- move to next node
+	 * - if it's after
+	 * -- get the text unit created when the source node was found
+	 * -- and create the skel placeholder
+	 * 
+	 * @param itsEng the engine to use (just because it's not a global variable)
+	 */
+	private void prepareTargetPointers (ITSEngine itsEng) {
+		hasTargetPointer = false;
+		// If there is no target pointers, just reset the table
+		if ( !itsEng.getTargetPointerRuleTriggered() ) {
+			targetTable = null;
+			return;
+		}
+		// Else: gather the target locations
+		targetTable = new HashMap<Node, XMLFilter.TargetPointerEntry>();
+		ITraversal tmpTrav = itsEng;
+		tmpTrav.startTraversal();
+
+		// Go through the document
+		Node srcNode;
+		while ( (srcNode = tmpTrav.nextNode()) != null ) {
+			switch ( srcNode.getNodeType() ) {
+			case Node.ELEMENT_NODE:
+				// Use !backTracking() to get to the elements only once
+				// and to include the empty elements (for attributes).
+				if ( !tmpTrav.backTracking() ) {
+					if ( tmpTrav.getTranslate(null) ) {
+						String pointer = tmpTrav.getTargetPointer();
+						if ( pointer != null ) {
+							resolveTargetPointer(itsEng.getXPath(), srcNode, pointer);
+							hasTargetPointer = true;
+						}
+					}
+					//TODO: attributes
+				}
+				break; // End switch
+			}
+		}
+	}
+
+	/**
+	 * Resolves the target pointer for a given source node and creates its
+	 * entry in targetTable.
+	 * @param xpath the XPath object to use for the resolution.
+	 * @param srcNode the source node.
+	 * @param pointer the XPath expression pointing to the target node
+	 */
+	private void resolveTargetPointer (XPath xpath,
+		Node srcNode,
+		String pointer)
+	{
+		try {
+			XPathExpression expr = xpath.compile(pointer);
+			Node trgNode = (Node)expr.evaluate(srcNode, XPathConstants.NODE);
+			if ( trgNode == null ) {
+				// No entry available
+				//TODO: try to create the needed node
+				return;
+			}
+			// Check the type
+			if ( srcNode.getNodeType() != trgNode.getNodeType() ) {
+				throw new OkapiIOException(String.format("a source node and its target node must be of the same type ('%s').", pointer));
+			}
+			// Create the entry
+			TargetPointerEntry tpe = new TargetPointerEntry(srcNode, trgNode);
+			// Set the flags on each nod
+			srcNode.setUserData(SRC_TRGPTRFLAGNAME, tpe, null);
+			trgNode.setUserData(TRG_TRGPTRFLAGNAME, tpe, null);
+		}
+		catch ( XPathExpressionException e ) {
+			throw new OkapiIOException(String.format("Bab XPath expression in target pointer ('%s').", pointer));
+		}
+	}
+	
 	private void rebuildDocTypeSection (DocumentType dt) {
 		StringBuilder tmp = new StringBuilder();
 		// Set the start syntax
@@ -560,7 +678,7 @@ public class XMLFilter implements IFilter {
 					+ ((attr.getPrefix()==null) ? "" : attr.getPrefix()+":")
 					+ attr.getLocalName() + "=\"");
 				// Extract if needed
-				if (( trav.translate(attr) ) && ( attr.getValue().length() > 0 )) {
+				if (( trav.getTranslate(attr) ) && ( attr.getValue().length() > 0 )) {
 					// Store the text part and reset the buffer
 					skel.append(tmp.toString());
 					tmp.setLength(0);
@@ -601,7 +719,7 @@ public class XMLFilter implements IFilter {
 					+ ((attr.getPrefix()==null) ? "" : attr.getPrefix()+":")
 					+ attr.getLocalName() + "=\"");
 				// Extract if needed
-				if (( trav.translate(attr) ) && ( attr.getValue().length() > 0 )) {
+				if (( trav.getTranslate(attr) ) && ( attr.getValue().length() > 0 )) {
 					id = addAttributeTextUnit(attr, false);
 					tmp.append(TextFragment.makeRefMarker(id));
 					tmp.append("\"");
@@ -704,17 +822,27 @@ public class XMLFilter implements IFilter {
 				}
 			}
 			
-			if ( trav.isTerm() ) {
+			if ( trav.getTerm(null) ) {
 				if ( terms == null ) {
 					terms = new TermsAnnotation();
 				}
-				terms.add(node.getTextContent(), trav.getTermInfo());
+				terms.add(node.getTextContent(), trav.getTermInfo(null));
 			}
 		}
 		else { // Else: Start tag
+			// Test if this is a target pointer node
+			if ( hasTargetPointer ) {
+				TargetPointerEntry tpe = (TargetPointerEntry)node.getUserData(TRG_TRGPTRFLAGNAME);
+				if ( tpe != null ) {
+					
+				}
+			}
+			
+			// otherwise, treat the tag
 			switch ( trav.getWithinText() ) {
-			case ITraversal.WITHINTEXT_YES:
 			case ITraversal.WITHINTEXT_NESTED: //TODO: deal with nested elements
+				// For now treat them as inline
+			case ITraversal.WITHINTEXT_YES:
 				if ( frag == null ) { // Not yet in extraction
 					//// Strange case: inline without parent???
 					////TODO: do something about this, warning?
@@ -758,13 +886,19 @@ public class XMLFilter implements IFilter {
 		return false;
 	}
 
+	/**
+	 * Indicates if the current node is to be extracted according its ITS state.
+	 * @return true if it is to be extracted, false otherwise.
+	 */
 	private boolean extract () {
 		// Check ITS translate
-		if ( !trav.translate() ) return false;
+		if ( !trav.getTranslate(null) ) return false;
 		
 		// Check ITS locale filter
 		String list = trav.getLocaleFilter();
-		if ( Util.isEmpty(list) || list.equals("*") ) return true;
+		// null is none-defined, so default is '*'
+		if (( list == null ) || list.equals("*") ) return true;
+		if ( list.length() == 0 ) return false; // Empty list is 'none'
 		
 		// More info for extended language range/filtering here:
 		// http://www.rfc-editor.org/rfc/bcp/bcp47.txt
@@ -776,9 +910,6 @@ public class XMLFilter implements IFilter {
 		// Now check with one or more codes
 		return extendedMatch(list, trgLangCode);
 	}
-	
-	// Based on the algorithm described at:
-	// http://tools.ietf.org/html/rfc4647#section-3.3.2
 	
 	/**
 	 * Indicates if a given language tag matches at least one item of a list of extended language ranges.
@@ -915,6 +1046,10 @@ public class XMLFilter implements IFilter {
 		if ( !Util.isEmpty(context.peek().externalRes) ) {
 			tu.setProperty(new Property(Property.ITS_EXTERNALRESREF, context.peek().externalRes));
 		}
+		// ITS Storage Size
+		if ( context.peek().storageSize != null ) {
+			tu.setProperty(new Property(Property.ITS_STORAGESIZE, context.peek().storageSize));
+		}
 		
 		// Set term info
 		if ( terms != null ) {
@@ -922,13 +1057,14 @@ public class XMLFilter implements IFilter {
 			terms = null; // Reset for next time
 		}
 
-		// Null is fine
+		// Set the resname value (or null, which is fine)
 		tu.setName(context.peek().idValue);
 		
+		// Set the information about preserving or not white-spaces
 		if ( context.peek().preserveWS ) {
 			tu.setPreserveWhitespaces(true);
 		}
-		else {
+		else { // We laso unwrap if we don't have to preserve
 			tu.setPreserveWhitespaces(false);
 			tu.getSource().unwrap(false, true);
 		}

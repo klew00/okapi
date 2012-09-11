@@ -21,7 +21,11 @@ distribution.</p>
 	<li>Google Code Project site: <a href="http://code.google.com/p/okapi/">
 	http://code.google.com/p/okapi/</a></li>
 </ul>
-<h2>Changes from M17 to M18-SNAPSHOT</h2>
+<h2>Changes from M18 to M19-SNAPSHOT</h2>
+<ul>
+	<li>None</li>
+</ul>
+<h2>Changes from M17 to M18</h2>
 <ul>
 	<li>Rainbow:<ul>
 	<li>Changed the batch mode so the log and error output go to the 
@@ -31,7 +35,7 @@ distribution.</p>
 </ul>
 	</li>
 	<li>Tikal:<ul>
-	<li>Resoved issue #252: Added <code>-rd</code> option to set the root 
+	<li>Resolved issue #252: Added <code>-rd</code> option to set the root 
 	directory (Patch from Mihai)</li>
 	<li>Fixed issue #254: Added support to change the display encoding using the
 	<code>.Tikal</code> configuration file and the <code>displayEncoding</code> 
@@ -40,8 +44,12 @@ distribution.</p>
 	&quot;Leverage Files From Moses&quot; command.</li>
 </ul>
 	</li>
+	<li>CheckMate:<ul>
+	<li>Added several features (See Library / Checker below for details).</li>
+</ul>
+	</li>
 	<li>Longhorn:<ul>
-	<li>Made API available to execute pipelines with multiple target languages</li>
+	<li>Made API available to execute pipelines with multiple target languages.</li>
 </ul>
 	</li>
 	<li>Filters:<ul>
@@ -51,33 +59,48 @@ distribution.</p>
 </ul>
 	</li>
 	<li>XML Filter:<ul>
-	<li>Added initial implementation for the ITS 2.0 Domain data category.</li>
-	<li>Added initial implementation for the ITS 2.0 External Resources 
-	Reference data category</li>
+	<li>Added implementation for the ITS 2.0 Domain data category.</li>
+	<li>Added implementation for the ITS 2.0 External Resources 
+	Reference data category.</li>
+	<li>Added implementation for the ITS 2.0 Locale Filter data category.</li>
+	<li>Added implementation for the ITS 2.0 Preserve Space data category.</li>
+	<li>Added implementation for the ITS 2.0 Storage Size data category.</li>
 </ul>
 	</li>
+	<li>XLIFF Filter:<ul>
+	<li>Added support for the <code>maxbytes</code> and ITS Storage Size data 
+	category.</li>
+</ul>
+	</li>
+	<li>MIF Filter:<ul>
+	<li>Fixed: For MIF 10 files, the wrong encoding was used to read the files.</li>
+</ul>
+	<li>TMX Filter:<ul>
+	<li>Added option to set TextUnit Segmentation flag based on the filter 
+	configuration.<br>
+	<b>Important: This introduce a change in behavior. Now, by default, TMX 
+	entries that are set to segType=&quot;segment&quot; or not set at all will be marked 
+	as segment in the extracted resource. this may affect some output, for 
+	example XLIFF, where such entries will be noted as segmented as well.</b></li>
+</ul></li>
 </ul>
 	</li>
 	<li>Steps:<ul>
 	<li>Batch Translation Step:<ul>
 	<li>Fixed issue #260 where an error occured at the end of the batch process 
 	when the option &#39;send TMX to the next step&#39; was not set.</li>
-</ul>
-	</li>
+</ul></li>
 	<li>Translation Comparison Step:<ul>
 	<li>Added support for <code>${rootDir}</code>, <code>${inputRootDir}</code> 
 	and locale variables.</li>
-</ul>
-	</li>
+</ul></li>
 	<li>Format Conversion Step:<ul>
 	<li>Added the UI for the option &quot;Do not output entries without text&quot;.</li>
-</ul>
-	</li>
+</ul></li>
 	<li>Segmentation and Desegmentation Step:<ul>
 		<li>Will now affect all target locales, that you are processing.</li>
 	</ul></li>
-</ul>
-	</li>
+</ul></li>
 	<li>Connectors:<ul>
 	<li>Microsoft Translator Connector:<ul>
 	<li>Updated code and interface to use Azure Marketplace Access Tokens 
@@ -93,6 +116,17 @@ distribution.</p>
 	properties</li>
 </ul>
 	</li>
+
+	<li>Checker:
+		<ul>
+			<li>Added XLIFF validation against XLIFF schema (<code>xliff-core-1.2-transitional.xsd</code>) (feature, issue #263)</li>
+			<li>Adding the ability to generate XML report (feature, issue #264)</li>
+			<li>Fixed issue #257: different leading/trailing spaces does not detect inconsistent non-breaking spaces.</li>
+			<li>Added support for validating the ITS Storage Size property for 
+			text unit.</li>
+		</ul>
+	</li>
+
 	<li>Removed extra files leftover from xliff-lib and olifant migration.</li>
 	<li>Added the TARGET_LOCALES step parameter and depracted the TARGET_LOCALE 
 	one.</li>
@@ -101,8 +135,13 @@ distribution.</p>
 	<li>Added support for the Domain data category.</li>
 	<li>Added support for the External Resources Reference data category.</li>
 	<li>Added support for the Locale Filter data category.</li>
+	<li>Added support for the Preserve Space data category.</li>
+	<li>Added support for the Localization Quality Issue data category.</li>
+	<li>Added support for the Storage Size data category.</li>
 </ul>
 	</li>
+	<li>Added options to pre- and post-process text that is being letter-coded
+	to prevent interference with letter-decoding.</li>
 </ul>
 	</li>
 	<li>Trados Utilities Plugin:<ul>

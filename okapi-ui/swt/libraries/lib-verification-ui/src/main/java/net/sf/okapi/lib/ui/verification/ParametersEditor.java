@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2010-2011 by the Okapi Framework contributors
+  Copyright (C) 2010-2012 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -99,6 +99,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 	private Composite mainComposite;
 	private TextAndBrowsePanel pnlOutputPath;
 	private Combo cbOutputType;
+	private Button chkXliffSchema;
 	private Button chkPatterns;
 	private Button chkDoubledWord;
 	private Label stDoubledWordExceptions;
@@ -128,6 +129,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 	private Text edLTTranslationSource;
 	private Text edLTTranslationTarget;
 	private Text edLTTranslationServiceKey;
+	private Button chkStorageSize;
 	private Button chkAbsoluteMaxCharLength;
 	private Spinner spAbsoluteMaxCharLength;
 	private Button chkMaxCharLength;
@@ -366,6 +368,14 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		gdTmp.horizontalIndent = horizIndent;
 		edDoubledWordExceptions.setLayoutData(gdTmp);
+
+		Group grpFile = new Group(cmpTmp, SWT.NONE);
+		grpFile.setText("File verification");
+		grpFile.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		grpFile.setLayout(new GridLayout());
+
+		chkXliffSchema = new Button(grpFile, SWT.CHECK);
+		chkXliffSchema.setText("Validate XLIFF documents against schema");
 		
 		TabItem tiTmp = new TabItem(tabs, SWT.NONE);
 		tiTmp.setText("General");
@@ -378,6 +388,9 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		cmpTmp.setLayout(new GridLayout());
 		gdTmp = new GridData(GridData.FILL_BOTH);
 		cmpTmp.setLayoutData(gdTmp);
+		
+		chkStorageSize = new Button(cmpTmp, SWT.CHECK);
+		chkStorageSize.setText("Warn if a source or target text unit does not fit its ITS storage size property.");
 		
 		chkAbsoluteMaxCharLength = new Button(cmpTmp, SWT.CHECK);
 		chkAbsoluteMaxCharLength.setText("Warn if a target is longer than:");
@@ -859,6 +872,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		cbOutputType = new Combo(grpTmp, SWT.READ_ONLY | SWT.DROP_DOWN);
 		cbOutputType.add("HTML file");
 		cbOutputType.add("Tab-delimited file");
+		cbOutputType.add("XML file");
 		cbOutputType.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				updateOutputPathExtension();
@@ -939,6 +953,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		String tmp = pnlOutputPath.getText();
 		String ext = ".html";
 		if ( cbOutputType.getSelectionIndex() == 1 ) ext = ".txt";
+		if ( cbOutputType.getSelectionIndex() == 2 ) ext = ".xml";
 		if ( tmp.endsWith(ext) ) return;
 		
 		// Change the extension
@@ -1335,11 +1350,14 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		edLTTranslationSource.setText(params.getLtTranslationSource());
 		edLTTranslationTarget.setText(params.getLtTranslationTarget());
 		edLTTranslationServiceKey.setText(params.getLtTranslationServiceKey());
+		chkXliffSchema.setSelection(params.getCheckXliffSchema());
 		chkPatterns.setSelection(params.getCheckPatterns());
 		chkDoubledWord.setSelection(params.getDoubledWord());
 		edDoubledWordExceptions.setText(params.getDoubledWordExceptions());
 		chkCorruptedChars.setSelection(params.getCorruptedCharacters());
 
+		chkStorageSize.setSelection(params.getCheckStorageSize());
+		
 		chkAbsoluteMaxCharLength.setSelection(params.getCheckAbsoluteMaxCharLength());
 		spAbsoluteMaxCharLength.setSelection(params.getAbsoluteMaxCharLength());
 		
@@ -1483,6 +1501,8 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 			}
 		}
 
+		params.setCheckStorageSize(chkStorageSize.getSelection());
+		
 		params.setCheckAbsoluteMaxCharLength(chkAbsoluteMaxCharLength.getSelection());
 		if ( chkAbsoluteMaxCharLength.getSelection() ) {
 			params.setAbsoluteMaxCharLength(spAbsoluteMaxCharLength.getSelection());
@@ -1575,6 +1595,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 				params.setSessionPath(pnlSessionPath.getText());
 			}
 		}
+		params.setCheckXliffSchema(chkXliffSchema.getSelection());
 		params.setCheckPatterns(chkPatterns.getSelection());
 		params.setPatterns(savePatternsData());
 		result = true;

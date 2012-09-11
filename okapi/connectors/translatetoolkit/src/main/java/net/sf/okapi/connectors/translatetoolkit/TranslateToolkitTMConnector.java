@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009-2010 by the Okapi Framework contributors
+  Copyright (C) 2009-2012 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -55,11 +55,9 @@ public class TranslateToolkitTMConnector extends BaseConnector implements ITMQue
 	private int maxHits = 25;
 	private int threshold = 60;
 	private JSONParser parser;
-	private GenericContent fmt;
 	
 	public TranslateToolkitTMConnector () {
 		params = new Parameters();
-		fmt = new GenericContent();
 	}
 	
 	@Override
@@ -159,7 +157,7 @@ public class TranslateToolkitTMConnector extends BaseConnector implements ITMQue
 		// Otherwise, treat the codes depending on the mode
 		String plain;
 		if ( text.hasCode() && params.getSupportCodes() ) {
-			plain = fmt.fromFragmentToLetterCoded(text);
+			plain = GenericContent.fromFragmentToLetterCoded(text, true);
 		}
 		else {
 			plain = text.getCodedText();
@@ -189,8 +187,8 @@ public class TranslateToolkitTMConnector extends BaseConnector implements ITMQue
 	        	if ( qr.getFuzzyScore() < threshold ) break; // Done
 	        	
 	        	if ( text.hasCode() && params.getSupportCodes() ) {
-	        		qr.source = fmt.fromLetterCodedToFragment((String)map.get("source"), null, false);
-	        		qr.target = fmt.fromLetterCodedToFragment((String)map.get("target"), null, false);
+	        		qr.source = GenericContent.fromLetterCodedToFragment((String)map.get("source"), null, false, true);
+	        		qr.target = GenericContent.fromLetterCodedToFragment((String)map.get("target"), null, false, true);
 	        	}
 	        	else {
 	        		qr.source = new TextFragment((String)map.get("source"));

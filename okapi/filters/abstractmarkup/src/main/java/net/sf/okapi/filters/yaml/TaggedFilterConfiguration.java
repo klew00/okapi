@@ -69,6 +69,7 @@ import net.sf.okapi.filters.abstractmarkup.AbstractMarkupFilter;
 public class TaggedFilterConfiguration {
 	public static final String RULETYPES = "ruleTypes";
 	public static final String GLOBAL_PRESERVE_WHITESPACE = "preserve_whitespace";
+	public static final String GLOBAL_EXCLUDE_BY_DEFAULT = "exclude_by_default";
 	public static final String INLINE = "INLINE";
 	public static final String GROUP = "GROUP";
 	public static final String EXCLUDE = "EXCLUDE";
@@ -235,6 +236,15 @@ public class TaggedFilterConfiguration {
 		if (pw == null) {
 			// default is preserve whitespace
 			return true;
+		}
+		return pw.booleanValue();
+	}
+	
+	public boolean isGlobalExcludeByDefault() {
+		Boolean pw = (Boolean) configReader.getProperty(GLOBAL_EXCLUDE_BY_DEFAULT);
+		if (pw == null) {
+			// The default is to include if no other rule is specified
+			return false;
 		}
 		return pw.booleanValue();
 	}

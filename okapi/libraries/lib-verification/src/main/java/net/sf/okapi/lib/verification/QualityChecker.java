@@ -22,6 +22,8 @@ package net.sf.okapi.lib.verification;
 
 import java.io.File;
 import java.net.URI;
+import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
 import java.util.ArrayList;
@@ -57,7 +59,8 @@ class QualityChecker {
 	private List<String> sigList;
 	private Pattern patDoubledWords;
 	private String doubledWordExceptions;
-	private CharsetEncoder encoder;
+	private CharsetEncoder encoder1;
+	private CharsetEncoder encoder2;
 	private Pattern extraCharsAllowed;
 	private Pattern corruption;
 	
@@ -113,13 +116,13 @@ class QualityChecker {
 		}
 		
 		// Characters check
-		encoder = null;
+		encoder1 = null;
 		extraCharsAllowed = null;
 		if ( params.getCheckCharacters() ) {
 			// Encoding
 			String charsetName = params.charset;
 			if ( !Util.isEmpty(charsetName) ) {
-				encoder = Charset.forName(charsetName).newEncoder();
+				encoder1 = Charset.forName(charsetName).newEncoder();
 			}
 			// Extra characters allowed
 			if ( !params.getExtraCharsAllowed().isEmpty() ) {
@@ -144,10 +147,14 @@ class QualityChecker {
 		currentDocId = (new File(sd.getName())).toURI();
 		this.sigList = sigList;
 	}
-	
+
+	/**
+	 * Indicates if we have at least one character that is part of the character set for a "word".
+	 * digits are considered part of a "word". 
+	 * @param frag the text fragment to look at.
+	 * @return true if a "word" is detected.
+	 */
 	private boolean hasMeaningfullText (TextFragment frag) {
-		// Do we have at least one character that is part of the character set for a "word"
-		// Note: digits are considered part of a "word"
 		return WORDCHARS.matcher(frag.getCodedText()).find();
 	}
 	
@@ -159,6 +166,11 @@ class QualityChecker {
 		TextContainer srcCont = tu.getSource();
 		TextContainer trgCont = tu.getTarget(trgLoc);
 		
+		// Check ITS Storage size for source
+		if ( params.getCheckStorageSize() ) {
+			checkStorageSize(tu, srcCont, true);
+		}
+		
 		// Check if we have a target (even if option disabled)
 		if ( trgCont == null ) {
 			// No translation available
@@ -168,6 +180,11 @@ class QualityChecker {
 			return;
 		}
 		
+		// Check ITS Storage size for target
+		if ( params.getCheckStorageSize() ) {
+			checkStorageSize(tu, trgCont, false);
+		}
+
 		// Skip non-approved entries if requested
 		if ( params.getScope() != Parameters.SCOPE_ALL ) {
 			Property prop = trgCont.getProperty(Property.APPROVED);
@@ -271,7 +288,7 @@ class QualityChecker {
 				}
 			}
 			
-			// Check length
+			// Check segment length
 			if ( params.getCheckMaxCharLength() || params.getCheckMinCharLength() || params.getCheckAbsoluteMaxCharLength() ) {
 				checkLengths(srcSeg, trgSeg, tu);
 			}
@@ -345,8 +362,8 @@ class QualityChecker {
 		for ( int i=0; i<trgOri.length(); i++ ) {
 			char ch = trgOri.charAt(i);
 			
-			if ( encoder != null ) {
-				if ( encoder.canEncode(ch) ) {
+			if ( encoder1 != null ) {
+				if ( encoder1.canEncode(ch) ) {
 					continue; // Allowed, move to the next character
 				}
 				else { // Not included in the target charset
@@ -588,6 +605,10 @@ class QualityChecker {
 				0, -1, m.start(), m.end(), Issue.SEVERITY_HIGH, srcOri, trgOri, null);
 		}
 	}
+
+	private boolean isSpaceWeCareAbout(char c) {
+		return Character.isWhitespace(c) || Character.isSpaceChar(c);
+	}
 	
 	private void checkWhiteSpaces (String srcOri,
 		String trgOri,
@@ -598,7 +619,7 @@ class QualityChecker {
 			
 			// Missing ones
 			for ( int i=0; i<srcOri.length(); i++ ) {
-				if ( Character.isWhitespace(srcOri.charAt(i)) ) {
+				if ( isSpaceWeCareAbout(srcOri.charAt(i)) ) {
 					if ( srcOri.length() > i ) {
 						if ( trgOri.charAt(i) != srcOri.charAt(i) ) {
 							reportIssue(IssueType.MISSINGORDIFF_LEADINGWS, tu, null,
@@ -618,7 +639,7 @@ class QualityChecker {
 
 			// Extra ones
 			for ( int i=0; i<trgOri.length(); i++ ) {
-				if ( Character.isWhitespace(trgOri.charAt(i)) ) {
+				if ( isSpaceWeCareAbout(trgOri.charAt(i)) ) {
 					if ( srcOri.length() > i ) {
 						if ( srcOri.charAt(i) != trgOri.charAt(i) ) {
 							reportIssue(IssueType.EXTRAORDIFF_LEADINGWS, tu, null,
@@ -643,7 +664,7 @@ class QualityChecker {
 			// Missing ones
 			int j = trgOri.length()-1;
 			for ( int i=srcOri.length()-1; i>=0; i-- ) {
-				if ( Character.isWhitespace(srcOri.charAt(i)) ) {
+				if ( isSpaceWeCareAbout(srcOri.charAt(i)) ) {
 					if ( j >= 0 ) {
 						if ( trgOri.charAt(j) != srcOri.charAt(i) ) {
 							reportIssue(IssueType.MISSINGORDIFF_TRAILINGWS, tu, null,
@@ -665,7 +686,7 @@ class QualityChecker {
 			// Extra ones
 			j = srcOri.length()-1;
 			for ( int i=trgOri.length()-1; i>=0; i-- ) {
-				if ( Character.isWhitespace(trgOri.charAt(i)) ) {
+				if ( isSpaceWeCareAbout(trgOri.charAt(i)) ) {
 					if ( j >= 0 ) {
 						if ( srcOri.charAt(j) != trgOri.charAt(i) ) {
 							reportIssue(IssueType.EXTRAORDIFF_TRAILINGWS, tu, null,
@@ -695,7 +716,8 @@ class QualityChecker {
 		int srcLen = TextUnitUtil.getText(srcSeg.text, null).length();
 		int trgLen = TextUnitUtil.getText(trgSeg.text, null).length();
 		int n;
-		
+
+		// Check absolute character length
 		if ( params.getCheckAbsoluteMaxCharLength() ) {
 			if ( trgLen > params.getAbsoluteMaxCharLength() ) {
 				n = trgLen-params.getAbsoluteMaxCharLength();
@@ -735,6 +757,46 @@ class QualityChecker {
 					String.format("The target is suspiciously shorter than its source (%.2f%% of the source).", d),
 					0, -1, 0, -1, Issue.SEVERITY_LOW, 
 					srcSeg.toString(), trgSeg.toString(), null);
+			}
+		}
+	}
+
+	private void checkStorageSize (ITextUnit tu,
+		TextContainer tc,
+		boolean isSource)
+	{
+		if ( tc == null ) return;
+		if ( tu.hasProperty(Property.ITS_STORAGESIZE) ) {
+			try {
+				String[] values = tu.getProperty(Property.ITS_STORAGESIZE).getValue().split("\t", -1);
+				if ( values[0].isEmpty() ) return; // No limits
+				int max = Integer.parseInt(values[0]);
+				if (( encoder2 == null ) || !encoder2.charset().name().equals(values[1]) ) {
+					encoder2 = Charset.forName(values[1]).newEncoder();
+				}
+				
+				// Get the plain text
+				TextFragment tf;
+				if ( tc.contentIsOneSegment() ) tf = tc.getFirstContent();
+				else tf = tc.getUnSegmentedContentCopy();
+				String  tmp = TextUnitUtil.getText(tf);
+				
+				// Compute the byte length
+				ByteBuffer buf = encoder2.encode(CharBuffer.wrap(tmp));
+				int len = buf.limit();
+				if ( len > max ) {
+					reportIssue(isSource ? IssueType.SOURCE_LENGTH : IssueType.TARGET_LENGTH, tu, null,
+						String.format("Number of bytes in the %s (using %s) is: %d. Number allowed: %d.",
+							(isSource ? "source" : "target"), values[1], len, max),
+						0, -1, 0, -1, Issue.SEVERITY_HIGH,
+						(isSource ? tc.toString() : "N/A"), (isSource ? "N/A" : tc.toString()), null);
+				}
+			}
+			catch ( Throwable e ) {
+				reportIssue(isSource ? IssueType.SOURCE_LENGTH : IssueType.TARGET_LENGTH, tu, null,
+					"Problem when trying use use ITS storage size property: "+e.getMessage(),
+					0, -1, 0, -1, Issue.SEVERITY_HIGH,
+					(isSource ? tc.toString() : "N/A"), (isSource ? "N/A" : tc.toString()), null);
 			}
 		}
 	}

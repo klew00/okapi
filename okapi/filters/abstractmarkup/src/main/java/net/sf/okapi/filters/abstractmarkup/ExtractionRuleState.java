@@ -60,6 +60,9 @@ public class ExtractionRuleState {
 			this.ruleApplies = ruleApplies;
 		}
 	}
+	
+	// if no other rules are active, what do we do?
+	private boolean excludeByDefault;
 
 	// for rules without primary conditions
 	private Stack<RuleType> preserveWhiteSpaceRuleStack;
@@ -71,11 +74,14 @@ public class ExtractionRuleState {
 	/**
 	 * 
 	 */
-	public ExtractionRuleState(boolean preserveWhitespace) {
-		reset(preserveWhitespace);
+	public ExtractionRuleState(boolean preserveWhitespace,
+								boolean excludeByDefault) {
+		reset(preserveWhitespace, excludeByDefault);
 	}
 
-	public void reset(boolean preserveWhitespace) {
+	public void reset(boolean preserveWhitespace,
+					   boolean excludeByDefault) {
+		this.excludeByDefault = excludeByDefault;
 		preserveWhiteSpaceRuleStack = new Stack<RuleType>();
 		pushPreserverWhitespaceRule(preserveWhitespace);
 		
@@ -87,7 +93,7 @@ public class ExtractionRuleState {
 
 	public boolean isExludedState() {
 		if (excludedIncludedRuleStack.isEmpty()) {
-			return false;
+			return excludeByDefault;
 		}
 		
 		// reverse the stack as we want to see the most recently added first
@@ -102,7 +108,7 @@ public class ExtractionRuleState {
 			}
 		}
 		
-		return false;
+		return excludeByDefault;
 	}
 
 	public boolean isInlineExcludedState() {

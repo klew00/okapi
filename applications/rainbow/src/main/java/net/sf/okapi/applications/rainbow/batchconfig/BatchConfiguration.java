@@ -161,7 +161,7 @@ public class BatchConfiguration {
 				// From the input files first
 				for ( Input input : inputFiles ) {
 					String ext = Util.getExtension(input.relativePath);
-					if ( !Util.isEmpty(ext) && !extMap.containsKey(ext) && !Util.isEmpty(input.filterConfigId)) {
+					if ( !extMap.containsKey(ext) && !Util.isEmpty(input.filterConfigId)) {
 						extMap.put(ext, input.filterConfigId);
 					}
 				}

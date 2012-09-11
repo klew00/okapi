@@ -49,6 +49,7 @@ public enum IssueType {
 	
 	SUSPECT_PATTERN,
 	
+	SOURCE_LENGTH,
 	TARGET_LENGTH,
 	
 	ALLOWED_CHARACTERS,

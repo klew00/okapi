@@ -5,7 +5,7 @@
     <parent>
         <artifactId>build-okapi-ui</artifactId>
         <groupId>net.sf.okapi</groupId>
-        <version>0.18-SNAPSHOT</version>
+        <version>0.19-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>okapi-core-ui</artifactId>
@@ -53,7 +53,7 @@
                 <os>
                     <family>unix</family>
                     <name>mac os x</name>
-					<arch>x64</arch>
+					<arch>x86_64</arch>
                 </os>
             </activation>
             <dependencies>
@@ -123,7 +123,7 @@
         <dependency>
         	<groupId>net.sf.okapi.lib</groupId>
         	<artifactId>okapi-lib-extra</artifactId>
-        	<version>0.18-SNAPSHOT</version>
+        	<version>0.19-SNAPSHOT</version>
         </dependency>
     </dependencies>
 

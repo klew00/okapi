@@ -75,7 +75,6 @@ public class TransTableFilter implements IFilter {
 	private boolean hasUTF8BOM;
 	private EncoderManager encoderManager;
 	private boolean hasNext;
-	private GenericContent fmt;
 	private ITextUnit tu;
 	private ISegments srcSegs;
 	private ISegments trgSegs;
@@ -85,7 +84,7 @@ public class TransTableFilter implements IFilter {
 	private String[] ids;
 	
 	public TransTableFilter () {
-		fmt = new GenericContent();
+		// Need for inistantiation
 	}
 
 	public void cancel () {
@@ -223,7 +222,7 @@ public class TransTableFilter implements IFilter {
 				
 				// Process the source
 				tmp = unescape(parts[1]);
-				TextFragment srcFrag = fmt.fromLetterCodedToFragment(tmp, null, false);
+				TextFragment srcFrag = GenericContent.fromLetterCodedToFragment(tmp, null, false, true);
 				if ( srcSegs == null ) {
 					srcSegs = tu.getSourceSegments();
 				}
@@ -233,7 +232,7 @@ public class TransTableFilter implements IFilter {
 				// Process the target if there is one
 				if ( parts.length > 2 ) {
 					tmp = unescape(parts[2]);
-					TextFragment trgFrag = fmt.fromLetterCodedToFragment(tmp, null, false);
+					TextFragment trgFrag = GenericContent.fromLetterCodedToFragment(tmp, null, false, true);
 					// Synchronizes source and target codes as much as possible
 					trgFrag.alignCodeIds(srcFrag);
 					// Set the content
