@@ -64,7 +64,7 @@ public class HTML5Filter extends ITSFilter {
 			throw new OkapiBadFilterParametersException("Cannot load default parameters.");
 		}
 	}
-	
+
 	@Override
 	public String getName () {
 		return "okf_itshtml5";
@@ -162,7 +162,13 @@ public class HTML5Filter extends ITSFilter {
 		skel.add("<!DOCTYPE html>"+lineBreak);
 	}
 	
-	private void loadLinkedRules (Document doc,
+	/**
+	 * Loads the linked rules of an HTML document.
+	 * @param doc the document to process.
+	 * @param docURI the document URI.
+	 * @param itsEng the engine to use.
+	 */
+	public static void loadLinkedRules (Document doc,
 		URI docURI,
 		ITSEngine itsEng)
 	{

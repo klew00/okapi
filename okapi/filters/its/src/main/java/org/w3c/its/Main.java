@@ -22,6 +22,8 @@ package org.w3c.its;
 
 import java.io.File;
 import java.io.PrintWriter;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Stack;
@@ -29,6 +31,9 @@ import java.util.Stack;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.exceptions.OkapiBadFilterParametersException;
+import net.sf.okapi.filters.its.html5.HTML5Filter;
+import nu.validator.htmlparser.dom.HtmlDocumentBuilder;
 
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
@@ -64,6 +69,7 @@ public class Main {
 			File outputFile = null;
 			File rulesFile = null;
 			String dc = "translate";
+			boolean isHTML5 = false;
 			
 			for ( int i=0; i<args.length; i++ ) {
 				String arg = args[i];
@@ -94,6 +100,7 @@ public class Main {
 				else {
 					if ( inputFile == null ) {
 						inputFile = new File(args[i]);
+						isHTML5 = Util.getExtension(args[i]).toLowerCase().startsWith(".htm");
 					}
 					else {
 						outputFile = new File(args[i]);
@@ -124,15 +131,24 @@ public class Main {
 				System.out.print("   rules: " + rulesFile.getAbsolutePath());
 			}
 			
-			DocumentBuilderFactory fact = DocumentBuilderFactory.newInstance();
-			fact.setNamespaceAware(true);
-			fact.setValidating(false);
-			
 			Util.createDirectories(outputFile.getAbsolutePath());
 			writer = new PrintWriter(outputFile.getAbsolutePath(), "UTF-8");
 			
-			Document doc = fact.newDocumentBuilder().parse(inputFile);
-			ITraversal trav = applyITSRules(doc, inputFile, rulesFile);
+			// Read the document
+			Document doc;
+			if ( isHTML5 ) {
+				HtmlDocumentBuilder docBuilder = new HtmlDocumentBuilder();
+				doc = docBuilder.parse(inputFile);
+			}
+			else {
+				DocumentBuilderFactory fact = DocumentBuilderFactory.newInstance();
+				fact.setNamespaceAware(true);
+				fact.setValidating(false);
+				doc = fact.newDocumentBuilder().parse(inputFile);
+			}
+			
+			// Applies the rules
+			ITraversal trav = applyITSRules(doc, inputFile, rulesFile, isHTML5);
 
 			String path = null;
 			Stack<Integer> stack = new Stack<Integer>();
@@ -338,15 +354,31 @@ public class Main {
 	
 	private static ITraversal applyITSRules (Document doc,
 		File inputFile,
-		File rulesFile)
+		File rulesFile,
+		boolean isHTML5)
 	{
 		// Create the ITS engine
-		boolean isHTML5 = Util.getExtension(inputFile.getPath()).toLowerCase().startsWith(".htm");
 		ITSEngine itsEng = new ITSEngine(doc, inputFile.toURI(), isHTML5);
 		
+		// For HTML5: load the default rules
+		if ( isHTML5 ) {
+			URL url = HTML5Filter.class.getResource("default.fprm");
+			try {
+				itsEng.addExternalRules(url.toURI());
+			}
+			catch ( URISyntaxException e ) {
+				throw new OkapiBadFilterParametersException("Cannot load default parameters.");
+			}
+		}
+
 		// Add any external rules file(s)
 		if ( rulesFile != null ) {
 			itsEng.addExternalRules(rulesFile.toURI());
+		}
+		
+		// Load the linked rules for HTML
+		if ( isHTML5 ) {
+			HTML5Filter.loadLinkedRules(doc, inputFile.toURI(), itsEng);
 		}
 		
 		// Apply the all rules (external and internal) to the document

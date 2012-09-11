@@ -135,6 +135,13 @@ public class ITSEngine implements IProcessor, ITraversal {
 	private final Logger logger = Logger.getLogger(getClass().getName());
 	
 	public ITSEngine (Document doc,
+		URI docURI)
+	{
+		// For backward compatibility
+		this(doc, docURI, false);
+	}
+	
+	public ITSEngine (Document doc,
 		URI docURI,
 		boolean isHTML5)
 	{
@@ -145,6 +152,9 @@ public class ITSEngine implements IProcessor, ITraversal {
 		rules = new ArrayList<ITSRule>();
 		nsContext = new NSContextManager();
 		nsContext.addNamespace(ITS_NS_PREFIX, ITS_NS_URI);
+		if ( isHTML5 ) {
+			nsContext.addNamespace(HTML_NS_PREFIX, HTML_NS_URI);
+		}
 		varResolver = new VariableResolver();
 
 		// Macintosh work-around

@@ -36,7 +36,7 @@ public class ITSTest {
 	private FileCompare fc = new FileCompare();
 	
 	@Test
-	public void testTranslate () {
+	public void testTranslateXML () {
 		String base = root+"/translate/xml";
 		removeOutput(base);
 		process(base+"/Translate1.xml", Main.DC_TRANSLATE);
@@ -49,7 +49,7 @@ public class ITSTest {
 	}
 
 //	@Test
-//	public void testDomain () {
+//	public void testDomainXML () {
 //		String base = root+"/domain/xml";
 //		removeOutput(base);
 //		process(base+"/Domain1Xml.xml", Main.DC_DOMAIN);
@@ -59,7 +59,7 @@ public class ITSTest {
 //	}
 
 	@Test
-	public void testIdValue () {
+	public void testIdValueXML () {
 		String base = root+"/idvalue/xml";
 		removeOutput(base);
 		process(base+"/idvalue1xml.xml", Main.DC_IDVALUE);
@@ -68,7 +68,7 @@ public class ITSTest {
 	}
 
 	@Test
-	public void testLocaleFilter () {
+	public void testLocaleFilterXML () {
 		String base = root+"/localeFilter/xml";
 		removeOutput(base);
 		process(base+"/Locale1Xml.xml", Main.DC_LOCALEFILTER);
@@ -79,16 +79,25 @@ public class ITSTest {
 	}
 
 	@Test
-	public void testExternalResource () {
+	public void testExternalResourceXML () {
 		String base = root+"/externalResource/xml";
 		removeOutput(base);
 		process(base+"/ExternalResource1Xml.xml", Main.DC_EXTERNALRESOURCE);
 		process(base+"/ExternalResource2Xml.xml", Main.DC_EXTERNALRESOURCE);
 		process(base+"/ExternalResource3Xml.xml", Main.DC_EXTERNALRESOURCE);
 	}
+	
+	@Test
+	public void testExternalResourceHTML () {
+		String base = root+"/externalResource/html";
+		removeOutput(base);
+		process(base+"/ExternalResource1Html.html", Main.DC_EXTERNALRESOURCE);
+	}
+	
+	
 
 //	@Test
-//	public void testLocQualityIssue () {
+//	public void testLocQualityIssueXML () {
 //		String base = root+"/locQualityIssue/xml";
 //		removeOutput(base);
 //		process(base+"/EX-locQualityIssue-global-1.xml", Main.DC_LOCQUALITYISSUE);
