@@ -153,6 +153,7 @@ public class Main {
 			String path = null;
 			Stack<Integer> stack = new Stack<Integer>();
 			stack.push(1);
+			int prevCount = 0;
 			
 			// Process the document
 			trav.startTraversal();
@@ -165,11 +166,10 @@ public class Main {
 					if ( trav.backTracking() ) {
 						int n = path.lastIndexOf('/');
 						if ( n > -1 ) path = path.substring(0, n);
-						stack.pop();
+						prevCount = stack.pop();
 					}
 					else {
 						Element element = (Element)node;
-						
 						// Get the previous sibling element (if any)
 						Node prev = element;
 						do {
@@ -179,17 +179,12 @@ public class Main {
 
 						// If it's the same kind of element, we increment the counter
 						if (( prev != null ) && prev.getNodeName().equals(element.getNodeName()) ) { 
-							stack.push(stack.peek()+1);
+							stack.push(prevCount+1);
 						}
 						else {
 							stack.push(1);
 						}
 						
-						// If it's a sibling element, remove the other sibling before appending
-						if ( prev != null ) {
-							int n = path.lastIndexOf('/');
-							if ( n > -1 ) path = path.substring(0, n);
-						}
 						if ( element == doc.getDocumentElement() ) {
 							path = "/"+element.getNodeName();
 						}
@@ -216,6 +211,14 @@ public class Main {
 								output(writer, dc, path+"/@"+attr.getNodeName(), trav, attr);
 							}
 						}
+						
+						// Empty elements:
+						if ( !element.hasChildNodes() ) {
+							int n = path.lastIndexOf('/');
+							if ( n > -1 ) path = path.substring(0, n);
+							prevCount = stack.pop();
+						}
+						
 					}
 					break; // End switch
 				}
@@ -248,33 +251,32 @@ public class Main {
 		Attr attr)
 	{
 		// Path
-		writer.print(path+"\t");
+		writer.print(path);
 
 		// Values
 		String out1 = null;
 		if ( dc.equals(DC_TRANSLATE) ) {
 			out1 = (trav.getTranslate(attr) ? "yes" : "no");
-			if ( out1 != null ) writer.print(String.format("its:translate=\"%s\"",
+			if ( out1 != null ) writer.print(String.format("\tits:translate=\"%s\"",
 				Util.escapeToXML(out1, 3, false, null)));
 		}
 		else if ( dc.equals(DC_LOCALIZATIONNOTE) ) {
 			if ( attr != null ) out1 = trav.getLocNote(attr);
 			else out1 = trav.getLocNote();
-			if ( out1 != null ) writer.print(String.format("its:locNote=\"%s\"",
+			if ( out1 != null ) writer.print(String.format("\tits:locNote=\"%s\"",
 				Util.escapeToXML(out1, 3, false, null)));
-			writer.print("\t");
 			if ( attr != null ) out1 = trav.getLocNoteType(attr);
 			else out1 = trav.getLocNoteType();
-			if ( out1 != null ) writer.print(String.format("its:locNoteType=\"%s\"",
+			if ( out1 != null ) writer.print(String.format("\tits:locNoteType=\"%s\"",
 				Util.escapeToXML(out1, 3, false, null)));
 		}
 		else if ( dc.equals(DC_TERMINOLOGY) ) {
 			out1 = (trav.getTerm(attr) ? "yes" : "no");
-			if ( out1 != null ) writer.print(String.format("its:term=\"%s\"",
+			if ( out1 != null ) writer.print(String.format("\tits:term=\"%s\"",
 				Util.escapeToXML(out1, 3, false, null)));
 			writer.print("\t");
 			out1 = trav.getTermInfo(attr);
-			if ( out1 != null ) writer.print(String.format("its:termInfo=\"%s\"",
+			if ( out1 != null ) writer.print(String.format("\tits:termInfo=\"%s\"",
 				Util.escapeToXML(out1, 3, false, null)));
 		}
 		else if ( dc.equals(DC_DIRECTIONALITY) ) {
@@ -286,12 +288,12 @@ public class Main {
 			case ITraversal.DIR_RLO: out1 = "rlo"; break;
 			case ITraversal.DIR_RTL: out1 = "rtl"; break;
 			}
-			writer.print(String.format("its:dir=\"%s\"",
+			writer.print(String.format("\tits:dir=\"%s\"",
 				Util.escapeToXML(out1, 3, false, null)));
 		}
 		else if ( dc.equals(DC_LANGUAGEINFORMATION) ) {
 			out1 = trav.getLanguage();
-			if ( out1 != null ) writer.print(String.format("its:lang=\"%s\"",
+			if ( out1 != null ) writer.print(String.format("\tits:lang=\"%s\"",
 				Util.escapeToXML(out1, 3, false, null)));
 		}
 		else if ( dc.equals(DC_WITHINTEXT) ) {
@@ -302,50 +304,50 @@ public class Main {
 			case ITraversal.WITHINTEXT_NO: out1 = "no"; break;
 			case ITraversal.WITHINTEXT_YES: out1 = "yes"; break;
 			}
-			writer.print(String.format("its:withinText=\"%s\"",
+			writer.print(String.format("\tits:withinText=\"%s\"",
 				Util.escapeToXML(out1, 3, false, null)));
 		}
 		else if ( dc.equals(DC_DOMAIN) ) {
 			if ( attr != null ) out1 = trav.getDomains(attr);
 			else out1 = trav.getDomains();
-			if ( out1 != null ) writer.print(String.format("its:domains=\"%s\"",
+			if ( out1 != null ) writer.print(String.format("\tits:domains=\"%s\"",
 				Util.escapeToXML(out1, 3, false, null)));
 		}
 		else if ( dc.equals(DC_LOCALEFILTER) ) {
 			out1 = trav.getLocaleFilter();
-			if ( out1 != null ) writer.print(String.format("its:localeFilterList=\"%s\"",
+			if ( out1 != null ) writer.print(String.format("\tits:localeFilterList=\"%s\"",
 				Util.escapeToXML(out1, 3, false, null)));
 		}
 		else if ( dc.equals(DC_EXTERNALRESOURCE) ) {
 			if ( attr != null ) out1 = trav.getExternalResourceRef(attr);
 			else out1 = trav.getExternalResourceRef();
-			if ( out1 != null ) writer.print(String.format("its:externalResource=\"%s\"",
+			if ( out1 != null ) writer.print(String.format("\tits:externalResource=\"%s\"",
 				Util.escapeToXML(out1, 3, false, null)));
 		}
 		else if ( dc.equals(DC_IDVALUE) ) {
 			out1 = trav.getIdValue(attr);
-			if ( out1 != null ) writer.print(String.format("its:idValue=\"%s\"",
+			if ( out1 != null ) writer.print(String.format("\tits:idValue=\"%s\"",
 				Util.escapeToXML(out1, 3, false, null)));
 		}
 		else if ( dc.equals(DC_LOCQUALITYISSUE) ) {
 			out1 = trav.getLocQualityIssuesRef();
-			if ( out1 != null ) writer.print(String.format("its:locQualityIssuesRef=\"%s\"",
+			if ( out1 != null ) writer.print(String.format("\tits:locQualityIssuesRef=\"%s\"",
 				Util.escapeToXML(out1, 3, false, null)));
 			writer.print("\t");
 			out1 = trav.getLocQualityIssueType();
-			if ( out1 != null ) writer.print(String.format("its:locQualityIssueType=\"%s\"",
+			if ( out1 != null ) writer.print(String.format("\tits:locQualityIssueType=\"%s\"",
 				Util.escapeToXML(out1, 3, false, null)));
 			writer.print("\t");
 			out1 = trav.getLocQualityIssueComment();
-			if ( out1 != null ) writer.print(String.format("its:locQualityIssueComment=\"%s\"",
+			if ( out1 != null ) writer.print(String.format("\tits:locQualityIssueComment=\"%s\"",
 				Util.escapeToXML(out1, 3, false, null)));
 			writer.print("\t");
 			out1 = trav.getLocQualityIssueScore();
-			if ( out1 != null ) writer.print(String.format("its:locQualityIssueScore=\"%s\"",
+			if ( out1 != null ) writer.print(String.format("\tits:locQualityIssueScore=\"%s\"",
 				Util.escapeToXML(out1, 3, false, null)));
 			writer.print("\t");
 			out1 = trav.getLocQualityIssueProfileRef();
-			if ( out1 != null ) writer.print(String.format("its:locQualityIssueProfileRef=\"%s\"",
+			if ( out1 != null ) writer.print(String.format("\tits:locQualityIssueProfileRef=\"%s\"",
 				Util.escapeToXML(out1, 3, false, null)));
 		}
 		

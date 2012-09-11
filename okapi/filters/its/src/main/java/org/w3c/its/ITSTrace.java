@@ -33,7 +33,7 @@ class ITSTrace {
 	String language;
 	String targetPointer;
 	String externalRes;
-	String localeFilter;
+	String localeFilter = "*";
 	String idValue;
 	String domains;
 	String lqIssueType;

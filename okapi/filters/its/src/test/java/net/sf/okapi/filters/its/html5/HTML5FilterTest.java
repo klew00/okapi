@@ -2,6 +2,7 @@ package net.sf.okapi.filters.its.html5;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.TestUtil;
+import net.sf.okapi.common.annotation.TermsAnnotation;
 import net.sf.okapi.common.filters.FilterTestDriver;
 import net.sf.okapi.common.filterwriter.GenericContent;
 import net.sf.okapi.common.LocaleId;
@@ -73,17 +74,32 @@ public class HTML5FilterTest {
 		assertEquals("Text <1/>.", fmt.setContent(tu.getSource().getFirstContent()).toString());
 	}
 	
-//	@Test
-//	public void testLocNote () {
-//		String snippet = "<!DOCTYPE html><html lang=\"en\"><head><meta charset=utf-8><title>Title</title></head><body>"
-//			+ "<p its-loc-note=\"text of the note\">Text.</p>"
-//			+ "</body></html>";
-//		ArrayList<Event> list = getEvents(snippet);
-//		ITextUnit tu = FilterTestDriver.getTextUnit(list, 2);
-//		assertNotNull(tu);
-//		assertEquals("Text.", fmt.setContent(tu.getSource().getFirstContent()).toString());
-//		assertEquals("text of the note", tu.getProperty(Property.NOTE));
-//	}
+	@Test
+	public void testLocaleFilterLocal () {
+		String snippet = "<!DOCTYPE html><html lang=en><head><meta charset=utf-8><title>Title</title></head><body>"
+			+ "<p its-locale-filter-list='de'>Text 1</p>"
+			+ "<p its-locale-filter-list='FR'>Text 2</p>"
+			+ "</body></html>";
+		ArrayList<Event> list = getEvents(snippet);
+		ITextUnit tu = FilterTestDriver.getTextUnit(list, 2);
+		assertNotNull(tu);
+		assertEquals("Text 2", fmt.setContent(tu.getSource().getFirstContent()).toString());
+	}
+	
+	@Test
+	public void testTerminologyLocal () {
+		String snippet = "<!DOCTYPE html><html lang=en><head><meta charset=utf-8><title>Title</title></head><body>"
+			+ "<dl><dt its-term=yes its-term-info-ref='some URI'>motherboard</dt><dd>Some text</dd></dl>"
+			+ "</body></html>";
+		ArrayList<Event> list = getEvents(snippet);
+		ITextUnit tu = FilterTestDriver.getTextUnit(list, 2);
+		assertNotNull(tu);
+		assertEquals("motherboard", fmt.setContent(tu.getSource().getFirstContent()).toString());
+		TermsAnnotation ta = tu.getSource().getAnnotation(TermsAnnotation.class);
+		assertNotNull(ta);
+		assertEquals("motherboard", ta.getTerm(0));
+		assertEquals("REF:some URI", ta.getInfo(0));
+	}
 	
 	@Test
 	public void testLink () {
@@ -92,6 +108,19 @@ public class HTML5FilterTest {
 		assertNotNull(tu);
 		assertEquals("Text with <1><2/></1>.", fmt.setContent(tu.getSource().getFirstContent()).toString());
 	}
+	
+	@Test
+	public void testSimpleOutput () {
+		String snippet = "<!DOCTYPE html>\n<html lang=\"en\"><head><meta charset=utf-8><title>Title</title></head><body>"
+			+ "<p>Text <img alt=Text src=test.png>.</p>"
+			+ "</body></html>";
+		String expected = "<!DOCTYPE html>\n<html lang=\"en\"><head><meta charset=\"utf-8\"><title>Title</title></head><body>"
+			+ "<p>Text <img alt=\"Text\" src=\"test.png\">.</p>"
+			+ "</body></html>";
+		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet),
+			filter.getEncoderManager(), locEN));
+	}
+	
 	
 	@Test
 	public void testOpenTwice () throws URISyntaxException {

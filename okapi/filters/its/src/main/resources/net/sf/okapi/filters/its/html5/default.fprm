@@ -7,7 +7,4 @@
  <its:withinTextRule selector="//h:b|//h:code|//h:em|//h:i|//h:img|//h:span" withinText="yes"/>
  <!-- Translatable attribute -->
  <its:translateRule selector="//h:*/@abbr|//h:*/@alt" translate="yes"/>
- <!-- Translate flag -->
- <its:translateRule selector="//h:*[@translate='no']" translate="no"/>
- <its:translateRule selector="//h:*[@translate='yes']" translate="yes"/>
 </its:rules>

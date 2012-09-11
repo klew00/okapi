@@ -524,7 +524,7 @@ public abstract class ITSFilter implements IFilter {
 				}
 			}
 		}
-		if ( !node.hasChildNodes() ) tmp.append("/");
+		if ( !isHTML5 && !node.hasChildNodes() ) tmp.append("/");
 		tmp.append(">");
 		skel.append(tmp.toString());
 	}
@@ -561,7 +561,7 @@ public abstract class ITSFilter implements IFilter {
 				}
 			}
 		}
-		if ( !node.hasChildNodes() ) tmp.append("/");
+		if ( !isHTML5 && !node.hasChildNodes() ) tmp.append("/");
 		tmp.append(">");
 		// Set the inline code
 		Code code = frag.append((node.hasChildNodes() ? TagType.OPENING : TagType.PLACEHOLDER),
@@ -632,6 +632,14 @@ public abstract class ITSFilter implements IFilter {
 	 */
 	private boolean processElementTag (Node node) {
 		if ( trav.backTracking() ) {
+
+			if ( trav.getTerm(null) ) {
+				if ( terms == null ) {
+					terms = new TermsAnnotation();
+				}
+				terms.add(node.getTextContent(), trav.getTermInfo(null));
+			}
+
 			if ( frag == null ) { // Not an extraction: in skeleton
 				skel.add(buildEndTag(node));
 				if ( node.isSameNode(context.peek().node) ) context.pop();
@@ -646,13 +654,6 @@ public abstract class ITSFilter implements IFilter {
 				else { // Within text
 					frag.append(TagType.CLOSING, node.getLocalName(), buildEndTag(node));
 				}
-			}
-			
-			if ( trav.getTerm(null) ) {
-				if ( terms == null ) {
-					terms = new TermsAnnotation();
-				}
-				terms.add(node.getTextContent(), trav.getTermInfo(null));
 			}
 		}
 		else { // Else: Start tag

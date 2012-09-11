@@ -54,19 +54,19 @@ public class ITSEngine implements IProcessor, ITraversal {
 	public static final String    ITS_VERSION1 = "1.0";
 	public static final String    ITS_VERSION2 = "2.0";
 	
-	public static final String    XML_NS_URI = "http://www.w3.org/XML/1998/namespace";
-	public static final String    XML_NS_PREFIX  = "xml";
-	public static final String    ITS_NS_URI = "http://www.w3.org/2005/11/its";
-	public static final String    ITS_NS_PREFIX = "its";
-	public static final String    ITSX_NS_URI = "http://www.w3.org/2008/12/its-extensions";
-	public static final String    ITSX_NS_PREFIX = "itsx";
-	public static final String    XLINK_NS_URI = "http://www.w3.org/1999/xlink";
+	public static final String    XML_NS_URI      = "http://www.w3.org/XML/1998/namespace";
+	public static final String    XML_NS_PREFIX   = "xml";
+	public static final String    ITS_NS_URI      = "http://www.w3.org/2005/11/its";
+	public static final String    ITS_NS_PREFIX   = "its";
+	public static final String    ITSX_NS_URI     = "http://www.w3.org/2008/12/its-extensions";
+	public static final String    ITSX_NS_PREFIX  = "itsx";
+	public static final String    XLINK_NS_URI    = "http://www.w3.org/1999/xlink";
 	public static final String    XLINK_NS_PREFIX = "xlink";
-	public static final String    HTML_NS_URI = "http://www.w3.org/1999/xhtml";
-	public static final String    HTML_NS_PREFIX = "h";
+	public static final String    HTML_NS_URI     = "http://www.w3.org/1999/xhtml";
+	public static final String    HTML_NS_PREFIX  = "h";
 	
-	private static final String   FLAGNAME            = "\u00ff"; // Name of the user-data property that holds the flags
-	private static final String   FLAGSEP             = "\u001c"; // Separator between data categories
+	private static final String   FLAGNAME = "\u00ff"; // Name of the user-data property that holds the flags
+	private static final String   FLAGSEP  = "\u001c"; // Separator between data categories
 	
 	// Must have '?' as many times as there are FP_XXX entries +1
 	// Must have +FLAGSEP as many times as there are FP_XXX_DATA entries +1
@@ -1318,7 +1318,12 @@ public class ITSEngine implements IProcessor, ITraversal {
 		Attr attr;
 		try {
 			if ( (dataCategories & IProcessor.DC_TRANSLATE) > 0 ) {
-				expr = xpath.compile("//*/@"+ITS_NS_PREFIX+":translate|//"+ITS_NS_PREFIX+":span/@translate");
+				if ( isHTML5 ) {
+					expr = xpath.compile("//*/@translate");
+				}
+				else {
+					expr = xpath.compile("//*/@"+ITS_NS_PREFIX+":translate|//"+ITS_NS_PREFIX+":span/@translate");
+				}
 				NL = (NodeList)expr.evaluate(doc, XPathConstants.NODESET);
 				for ( int i=0; i<NL.getLength(); i++ ) {
 					attr = (Attr)NL.item(i);
@@ -1337,7 +1342,14 @@ public class ITSEngine implements IProcessor, ITraversal {
 			}
 			
 			if ( (dataCategories & IProcessor.DC_DIRECTIONALITY) > 0 ) {
-				expr = xpath.compile("//*/@"+ITS_NS_PREFIX+":dir|//"+ITS_NS_PREFIX+":span/@dir");
+				if ( isHTML5 ) {
+					//TODO: Do we need more than this?
+					// Values for HTML5 for sir are ltr|rtl|auto (not rlo|lro)
+					expr = xpath.compile("//*/@dir");
+				}
+				else {
+					expr = xpath.compile("//*/@"+ITS_NS_PREFIX+":dir|//"+ITS_NS_PREFIX+":span/@dir");
+				}
 				NL = (NodeList)expr.evaluate(doc, XPathConstants.NODESET);
 				for ( int i=0; i<NL.getLength(); i++ ) {
 					attr = (Attr)NL.item(i);
@@ -1357,8 +1369,13 @@ public class ITSEngine implements IProcessor, ITraversal {
 			}
 			
 			if ( (dataCategories & IProcessor.DC_TERMINOLOGY) > 0 ) {
-				expr = xpath.compile("//*/@"+ITS_NS_PREFIX+":term|//"+ITS_NS_PREFIX+":span/@term"
-					+"|//*/@"+ITS_NS_PREFIX+":termInfoRef|//"+ITS_NS_PREFIX+":span/@termInfoRef");
+				if ( isHTML5 ) {
+					expr = xpath.compile("//*/@its-term|//*/@its-term-info-ref");
+				}
+				else {
+					expr = xpath.compile("//*/@"+ITS_NS_PREFIX+":term|//"+ITS_NS_PREFIX+":span/@term"
+						+"|//*/@"+ITS_NS_PREFIX+":termInfoRef|//"+ITS_NS_PREFIX+":span/@termInfoRef");
+				}
 				NL = (NodeList)expr.evaluate(doc, XPathConstants.NODESET);
 				String localName;
 				for ( int i=0; i<NL.getLength(); i++ ) {
@@ -1368,7 +1385,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 					if ( ITS_NS_URI.equals(attr.getOwnerElement().getNamespaceURI())
 						&& "termRule".equals(attr.getOwnerElement().getLocalName()) ) continue;
 					// term
-					if ( localName.equals("term") ) {
+					if ( localName.equals("term") || localName.equals("its-term")) {
 						// Validate the value
 						String value = attr.getValue();
 						if (( !"yes".equals(value) ) && ( !"no".equals(value) )) {
@@ -1377,9 +1394,9 @@ public class ITSEngine implements IProcessor, ITraversal {
 						// Set the flag
 						setFlag(attr.getOwnerElement(), FP_TERMINOLOGY, value.charAt(0), attr.getSpecified());
 					}
-					else if ( localName.equals("termInfoPointer") ) {
+					else if ( localName.equals("termInfoRef") || localName.equals("its-term-info-ref") ) {
 						setFlag(attr.getOwnerElement(), FP_TERMINOLOGY_DATA,
-							"REF:+"+resolvePointer(attr.getOwnerElement(), attr.getValue()), attr.getSpecified());
+							"REF:"+attr.getValue(), attr.getSpecified());
 					}
 				}
 			}
@@ -1456,7 +1473,12 @@ public class ITSEngine implements IProcessor, ITraversal {
 			
 			// locale filter
 			if (( (dataCategories & IProcessor.DC_LOCFILTER) > 0 ) && isVersion2() ) {
-				expr = xpath.compile("//*/@"+ITS_NS_PREFIX+":localeFilterList|//"+ITS_NS_PREFIX+":span/@localeFilterList");
+				if ( isHTML5 ) {
+					expr = xpath.compile("//*/@its-locale-filter-list");
+				}
+				else {
+					expr = xpath.compile("//*/@"+ITS_NS_PREFIX+":localeFilterList|//"+ITS_NS_PREFIX+":span/@localeFilterList");
+				}
 				NL = (NodeList)expr.evaluate(doc, XPathConstants.NODESET);
 				for ( int i=0; i<NL.getLength(); i++ ) {
 					attr = (Attr)NL.item(i);
@@ -1581,6 +1603,9 @@ public class ITSEngine implements IProcessor, ITraversal {
 	private String retrieveLocaleFilterList (Element elem,
 		boolean qualified)
 	{
+		if ( isHTML5 ) {
+			return elem.getAttribute("its-locale-filter-list").trim();
+		}
 		if ( qualified ) { // Locally
 			return elem.getAttributeNS(ITS_NS_URI, "localeFilterList").trim();
 		}

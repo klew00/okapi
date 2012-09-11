@@ -174,8 +174,7 @@ public class HTML5Filter extends ITSFilter {
 	{
 		String href = null;
 		try {
-			// The 'h' prefix is coming from the default rules!
-			XPathExpression expr= itsEng.getXPath().compile("//h:link[@rel='its-rules']");
+			XPathExpression expr= itsEng.getXPath().compile("//"+ITSEngine.HTML_NS_PREFIX+":link[@rel='its-rules']");
 			NodeList list = (NodeList)expr.evaluate(doc, XPathConstants.NODESET);
 			for ( int i=0; i<list.getLength(); i++ ) {
 				Element elem = (Element)list.item(i);
