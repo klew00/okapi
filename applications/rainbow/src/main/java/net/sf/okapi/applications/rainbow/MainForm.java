@@ -318,7 +318,7 @@ public class MainForm { //implements IParametersProvider {
 
 		log = new LogForm(shell);
 		log.setTitle(Res.getString("LOG_CAPTION")); //$NON-NLS-1$
- 
+
 		logHandler = LogHandlerFactory.getLogHandler();
 		logHandler.initialize(log);
 		setLogLevel();

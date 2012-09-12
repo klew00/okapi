@@ -537,8 +537,6 @@
 			<packageset dir="../../okapi/core/src/main/java" defaultexcludes="yes"/>
 			<packageset dir="../../okapi/libraries/lib-segmentation/src/main/java" defaultexcludes="yes"/>
 			<packageset dir="../../okapi/libraries/lib-translation/src/main/java" defaultexcludes="yes"/>
-<!--			<link offline="true" href="http://www.slf4j.org/apidocs/" packagelistURL="http://www.slf4j.org/apidocs/"/> -->
-<!--			<link offline="true" href="http://icu-project.org/apiref/icu4j46/" packagelistURL="http://icu-project.org/apiref/icu4j46/"/> -->
 		</javadoc>
 
 	</target>
