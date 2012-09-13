@@ -29,7 +29,8 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.URI;
 import java.util.IllegalFormatException;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -47,7 +48,7 @@ import net.sf.okapi.common.resource.RawDocument;
 @UsingParameters(Parameters.class)
 public class XMLCharFixingStep extends BasePipelineStep {
 
-	private final Logger LOGGER = Logger.getLogger(getClass().getName());
+	private final Logger LOGGER = LoggerFactory.getLogger(getClass());
 	private final Pattern pattern = Pattern.compile("&#(x?)([0-9a-fA-F]+);");
 	
 	private Parameters params;
@@ -185,7 +186,7 @@ public class XMLCharFixingStep extends BasePipelineStep {
 						else start = m.end();
 					}
 					catch ( NumberFormatException e ) {
-						LOGGER.severe(String.format("Invalid NCR: '%s'", m.group()));
+						LOGGER.error(String.format("Invalid NCR: '%s'", m.group()));
 					}
 					
 				}
@@ -205,10 +206,10 @@ public class XMLCharFixingStep extends BasePipelineStep {
 				rd.getSourceLocale(), rd.getTargetLocale()));
 		}
 		catch ( IllegalFormatException e ) {
-			LOGGER.severe(String.format("Invalid replacement format: '%s'", params.getReplacement()));
+			LOGGER.error(String.format("Invalid replacement format: '%s'", params.getReplacement()));
 		}
 		catch ( Exception e ) {
-			LOGGER.severe("Error while processing XML for invalid characters.");
+			LOGGER.error("Error while processing XML for invalid characters.");
 		}
 		finally {
 			try {

@@ -18,54 +18,23 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.applications.rainbow;
-
-import java.util.logging.Handler;
-import java.util.logging.Level;
-import java.util.logging.LogRecord;
+package net.sf.okapi.applications.rainbow.logger;
 
 import net.sf.okapi.applications.rainbow.lib.ILog;
 
-class LogHandler extends Handler {
-	
-	private ILog       log;
-	
+class LogHandlerNop implements ILogHandler {
 
-	public LogHandler (ILog log) {
-		this.log = log;
+	public void initialize (ILog log) {
+		if( log == null ) return;
+
+		if( !log.isVisible() )
+			log.show();
+		log.setTitle("ERROR");
+		log.error("        Unknown underlying logger, cannot capture it's output");
 	}
-	
-	@Override
-	public void close ()
-		throws SecurityException
-	{
+
+	public void setLogLevel(int level) {
 		// Do nothing
-	}
-
-	@Override
-	public void flush () {
-		// Do nothing
-	}
-
-	@Override
-	public void publish (LogRecord record) {
-		if ( record.getLevel() == Level.SEVERE ) {
-			log.error(record.getMessage());
-			Throwable e = record.getThrown();
-			if ( e != null ) {
-				log.message(e.getMessage());
-				log.message(" @ "+e.toString()); //$NON-NLS-1$
-			}
-		}
-		else if ( record.getLevel() == Level.WARNING ) {
-			// Filter out Axis warnings
-			if ( "org.apache.axis.utils.JavaUtils".equals(record.getLoggerName()) ) return;
-			// Otherwise print
-			log.warning(record.getMessage());
-		}
-		else if ( record.getLevel() == Level.INFO ) {
-			log.message(record.getMessage());
-		}
 	}
 
 }

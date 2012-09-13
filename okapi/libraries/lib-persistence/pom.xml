@@ -5,10 +5,8 @@
     <groupId>net.sf.okapi.lib</groupId>
     <version>0.19-SNAPSHOT</version>
   </parent>
-  <groupId>net.sf.okapi.lib</groupId>
   <artifactId>okapi-lib-persistence</artifactId>
   <name>Okapi Library for Persistence</name>
-  <version>0.19-SNAPSHOT</version>
   <dependencies>
         <dependency>
 			<groupId>org.codehaus.jackson</groupId>

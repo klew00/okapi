@@ -26,8 +26,8 @@ package net.sf.okapi.common;
 
 import java.io.*;
 import java.nio.charset.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.exceptions.OkapiUnsupportedEncodingException;
@@ -39,7 +39,7 @@ import net.sf.okapi.common.exceptions.OkapiUnsupportedEncodingException;
  */
 public final class BOMNewlineEncodingDetector {
 
-	private static final Logger LOGGER = Logger.getLogger(BOMNewlineEncodingDetector.class.getName());
+	private final Logger LOGGER = LoggerFactory.getLogger(getClass());
 
 	private static final int MAX_LOOKAHEAD = 1024;
 
@@ -236,7 +236,7 @@ public final class BOMNewlineEncodingDetector {
 				// passed our buffer size if we didn't find any new lines yet
 				// then set the default and warn.
 				if (++count > MAX_LOOKAHEAD) {
-					LOGGER.log(Level.FINE,
+					LOGGER.debug(
 							"Could not find newlines within lookahead buffer. Setting default newline type.");
 					break;
 				}
@@ -465,7 +465,7 @@ public final class BOMNewlineEncodingDetector {
 			hasBom = false;
 			bomSize = 0;
 
-			LOGGER.log(Level.FINE, "BOM not found. Now trying to guess document encoding.");
+			LOGGER.debug("BOM not found. Now trying to guess document encoding.");
 
 			/*
 			 * The best we can do is to provide an encoding that reflects the correct number and ordering of bytes for

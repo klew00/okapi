@@ -26,8 +26,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
 import java.util.Stack;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
@@ -59,7 +59,7 @@ import net.sf.okapi.common.skeleton.GenericSkeleton;
  * HtmlFilter and OpenXmlFilter for examples of using EventBuilder.
  */
 public class EventBuilder {
-	private static final Logger LOGGER = Logger.getLogger(EventBuilder.class.getName());
+	private final Logger LOGGER = LoggerFactory.getLogger(getClass());
 
 	private String mimeType;
 	private IdGenerator groupId;
@@ -482,7 +482,7 @@ public class EventBuilder {
 			startSubDocument = new StartSubDocument(subDocumentId.createId());
 			Event event = new Event(EventType.START_SUBDOCUMENT, startSubDocument);
 			filterEvents.add(event);
-			LOGGER.log(Level.FINE, "Start Sub-Document for " + startSubDocument.getId());			
+			LOGGER.debug("Start Sub-Document for " + startSubDocument.getId());
 		}
 		return startSubDocument;
 	}
@@ -495,7 +495,7 @@ public class EventBuilder {
 			Ending endDocument = new Ending(subDocumentId.createId(IdGenerator.END_SUBDOCUMENT));
 			Event event = new Event(EventType.END_SUBDOCUMENT, endDocument);
 			filterEvents.add(event);
-			LOGGER.log(Level.FINE, "End Sub-Document for " + endDocument.getId());
+			LOGGER.debug("End Sub-Document for " + endDocument.getId());
 		}
 	}
 
@@ -820,7 +820,7 @@ public class EventBuilder {
 			if (endMarker != null) {
 				addDocumentPart(endMarker.toString());
 			}
-			LOGGER.log(Level.FINE, "Trying to end a TextUnit that does not exist.");
+			LOGGER.debug("Trying to end a TextUnit that does not exist.");
 			return null;
 		}
 
@@ -1092,7 +1092,7 @@ public class EventBuilder {
 			if (endMarker != null) {
 				addDocumentPart(endMarker.toString());
 			}
-			LOGGER.log(Level.FINE, "Trying to end a Group that does not exist.  Possible unbalanced Group tags.");
+			LOGGER.debug("Trying to end a Group that does not exist.  Possible unbalanced Group tags.");
 			return;
 		}
 

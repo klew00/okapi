@@ -24,7 +24,8 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.util.ArrayList;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.jacob.activeX.ActiveXComponent;
 import com.jacob.com.Variant;
@@ -43,7 +44,7 @@ import net.sf.okapi.common.resource.RawDocument;
 @UsingParameters(ParametersAnalysis.class)
 public class TradosAnalysisStep extends BasePipelineStep{
 
-	private final Logger logger = Logger.getLogger(getClass().getName());
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 	
 	private ParametersAnalysis params;
 	private ArrayList<String> inputFiles = new ArrayList<String>();

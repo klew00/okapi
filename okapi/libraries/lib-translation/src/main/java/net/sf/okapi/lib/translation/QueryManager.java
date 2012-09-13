@@ -757,7 +757,7 @@ public class QueryManager {
 //				if (( newCode.getData() == null )
 //					|| ( newCode.getData().length() == 0 )) {
 //					// Leave it like that
-//					logger.warning(String.format("The extra target code id='%d' does not have corresponding data (item id='%s', name='%s')",
+//					logger.warn(String.format("The extra target code id='%d' does not have corresponding data (item id='%s', name='%s')",
 //						newCode.getId(), parent.getId(), (parent.getName()==null ? "" : parent.getName())));
 //				}
 //				// Else: This is a new code: keep it
@@ -777,7 +777,7 @@ public class QueryManager {
 //				if ( oriIndices[i] != -1 ) {
 //					Code code = oriCodes.get(oriIndices[i]);
 //					if ( !code.isDeleteable() ) {
-//						logger.warning(String.format("The code id='%d' (%s) is missing in target (item id='%s', name='%s')",
+//						logger.warn(String.format("The code id='%d' (%s) is missing in target (item id='%s', name='%s')",
 //							code.getId(), code.getData(), parent.getId(), (parent.getName()==null ? "" : parent.getName())));
 //						logger.info(String.format("Source='%s'\nTarget='%s'", oriSrc.toText(), newTrg.toText()));
 //					}

@@ -22,8 +22,8 @@ package net.sf.okapi.common.filters;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
@@ -44,7 +44,7 @@ import net.sf.okapi.common.skeleton.ISkeletonWriter;
  * Basic abstract implementation of {@link IFilter}.
  */
 public abstract class AbstractFilter implements IFilter {
-	private static final Logger LOGGER = Logger.getLogger(AbstractFilter.class.getName());
+	private final Logger LOGGER = LoggerFactory.getLogger(getClass());
 
 	List<FilterConfiguration> configList = new ArrayList<FilterConfiguration>();
 	private IdGenerator documentId;
@@ -112,7 +112,7 @@ public abstract class AbstractFilter implements IFilter {
 		startDocument.setFilterWriter(getFilterWriter());
 		startDocument.setName(getDocumentName());
 		startDocument.setMultilingual(isMultilingual());
-		LOGGER.log(Level.FINE, "Start Document for " + startDocument.getId()); //$NON-NLS-1$
+		LOGGER.debug("Start Document for " + startDocument.getId()); //$NON-NLS-1$
 		return new Event(EventType.START_DOCUMENT, startDocument);
 	}
 
@@ -121,7 +121,7 @@ public abstract class AbstractFilter implements IFilter {
 	 */
 	protected Event createEndFilterEvent() {
 		Ending endDocument = new Ending(documentId.getLastId());
-		LOGGER.log(Level.FINE, "End Document for " + endDocument.getId()); //$NON-NLS-1$
+		LOGGER.debug("End Document for " + endDocument.getId()); //$NON-NLS-1$
 		return new Event(EventType.END_DOCUMENT, endDocument);
 	}
 

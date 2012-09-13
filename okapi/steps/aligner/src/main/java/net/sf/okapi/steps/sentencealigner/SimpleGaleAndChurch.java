@@ -23,14 +23,15 @@ package net.sf.okapi.steps.sentencealigner;
 
 import java.util.ResourceBundle;
 import java.util.MissingResourceException;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.steps.gcaligner.AlignmentScorer;
 
 public class SimpleGaleAndChurch implements AlignmentScorer<Segment> {
-	private static final Logger LOGGER = Logger.getLogger(SimpleGaleAndChurch.class.getName());
+	private final Logger LOGGER = LoggerFactory.getLogger(getClass());
 
 	private final static int BIG_DISTANCE = 2500;
 
@@ -48,7 +49,7 @@ public class SimpleGaleAndChurch implements AlignmentScorer<Segment> {
 	 */
 	public void setLocales(LocaleId p_sourceLocale, LocaleId p_targetLocale) {
 		m_charDist = getCharacterDistribution(p_sourceLocale, p_targetLocale);
-		LOGGER.finest("Character Distribution = " + m_charDist);
+		LOGGER.trace("Character Distribution = " + m_charDist);
 	}
 
 	/**

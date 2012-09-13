@@ -20,8 +20,8 @@
 
 package net.sf.okapi.steps.wordcount.common;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import net.sf.okapi.common.ClassUtil;
 import net.sf.okapi.common.IResource;
@@ -34,9 +34,8 @@ import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnitUtil;
 
 abstract public class BaseCounter {
-	
+
 	private static BaseCounter counter = null;	
-	private static Logger logger = null;
 	
 	abstract protected long doCount(String text, LocaleId language);
 	
@@ -81,31 +80,23 @@ abstract public class BaseCounter {
 		
 		return 0;		
 	}
-	
+
 	protected static void instantiateCounter(Class<? extends BaseCounter> classRef) {
 		
 		if (counter != null) return; // Already instantiated
 		
+		Logger localLogger = LoggerFactory.getLogger(BaseCounter.class);
 		try {
 			counter = (BaseCounter) classRef.newInstance();
 			
 		} catch (InstantiationException e) {
 			
-			logMessage(classRef, Level.FINE, "Counter instantiation failed: " + e.getMessage());
+			localLogger.debug("Counter instantiation failed: " + e.getMessage());
 			
 		} catch (IllegalAccessException e) {
 			
-			logMessage(classRef, Level.FINE, "Counter instantiation failed: " + e.getMessage());
+			localLogger.debug("Counter instantiation failed: " + e.getMessage());
 		}
-	}
-	
-	protected static void logMessage(Class<? extends BaseCounter> classRef, Level level, String text) {
-		
-		if (logger == null) 
-			logger = Logger.getLogger(ClassUtil.getClassName(classRef));
-		
-		if (logger != null)
-			logger.log(level, text);
 	}
 
 	private static long getValue(MetricsAnnotation ma, String metricName) {

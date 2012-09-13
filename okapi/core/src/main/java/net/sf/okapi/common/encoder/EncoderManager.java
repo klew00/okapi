@@ -24,7 +24,8 @@ import java.nio.charset.CharsetEncoder;
 import java.security.InvalidParameterException;
 import java.util.Hashtable;
 import java.util.Map.Entry;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.MimeTypeMapper;
@@ -35,7 +36,7 @@ import net.sf.okapi.common.MimeTypeMapper;
  */
 public class EncoderManager implements IEncoder {
 
-	private static final Logger LOGGER = Logger.getLogger(EncoderManager.class.getName());
+	private final Logger LOGGER = LoggerFactory.getLogger(getClass());
 	
 	private Hashtable<String, String> mimeMap;
 	private String mimeType = "";
@@ -112,7 +113,7 @@ public class EncoderManager implements IEncoder {
 				if ( !mimeMap.get(entry.getKey()).equals(entry.getValue()) ) {
 					// Same MIME type, but different encoder:
 					// Generate a warning, and keep the current mapping
-					LOGGER.warning(String.format("The MIME type '%s' is currently mapped to '%s', but conflicts with another mapping ('%s').",
+					LOGGER.warn(String.format("The MIME type '%s' is currently mapped to '%s', but conflicts with another mapping ('%s').",
 						entry.getKey(), mimeMap.get(entry.getKey()), entry.getValue()));
 				}
 				// Else: Same mapping, nothing to do

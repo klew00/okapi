@@ -2,7 +2,8 @@ package net.sf.okapi.lib.ui.translation;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import net.sf.okapi.common.ClassUtil;
 import net.sf.okapi.common.plugins.PluginItem;
@@ -12,7 +13,6 @@ import net.sf.okapi.common.query.IQuery;
 public class DefaultConnectors implements IConnectorList {
 
 	private ArrayList<ConnectorInfo> list;
-	private static final Logger LOGGER = Logger.getLogger(DefaultConnectors.class.getName());
 	
 	@Deprecated 
 	public DefaultConnectors () {
@@ -127,7 +127,8 @@ public class DefaultConnectors implements IConnectorList {
 		try {
 			connector = (IQuery) ClassUtil.instantiateClass(connectorClass, classLoader);
 		} catch (Exception e) {
-			LOGGER.warning(String.format("Cannot instantiate the connector '%s'.", connectorClass));
+			Logger localLogger = LoggerFactory.getLogger(DefaultConnectors.class);
+			localLogger.warn(String.format("Cannot instantiate the connector '%s'.", connectorClass));
 			return "Unknown plug-in connector";
 		}
 		

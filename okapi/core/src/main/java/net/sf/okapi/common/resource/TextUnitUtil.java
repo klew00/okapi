@@ -24,7 +24,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -46,8 +47,6 @@ import net.sf.okapi.common.skeleton.SkeletonUtil;
  */
 public class TextUnitUtil {
 
-	private static final Logger LOGGER = Logger.getLogger(TextUnitUtil.class.getName());
-	
 	// Segment markers
 	private static final String SEG_START = "$seg_start$";
 	private static final String SEG_END = "$seg_end$";
@@ -114,6 +113,7 @@ public class TextUnitUtil {
 		TextFragment newSrc,
 		ITextUnit parent)
 	{
+		Logger localLogger = LoggerFactory.getLogger(TextUnitUtil.class);
 		// If it's the same object, there is no need to transfer
 		if ( newTrg == oriSrc ) {
 			return newTrg;
@@ -185,7 +185,7 @@ public class TextUnitUtil {
 									place = String.format(" (item id='%s', name='%s')",
 										parent.getId(), (parent.getName()==null ? "" : parent.getName()));
 								}
-								LOGGER.warning(String.format("The extra code id='%d' cannot be cloned.",
+								localLogger.warn(String.format("The extra code id='%d' cannot be cloned.",
 									newCode.getId()) + ((place == null) ? "" : place));
 							}
 //							// Work around to allow multiple codes with same ID
@@ -213,7 +213,7 @@ public class TextUnitUtil {
 						place = String.format(" (item id='%s', name='%s')",
 							parent.getId(), (parent.getName()==null ? "" : parent.getName()));
 					}
-					LOGGER.warning(String.format("The extra target code id='%d' does not have corresponding data.",
+					localLogger.warn(String.format("The extra target code id='%d' does not have corresponding data.",
 						newCode.getId()) + ((place == null) ? "" : place));
 				}
 				// Else: This is a new code: keep it
@@ -247,8 +247,8 @@ public class TextUnitUtil {
 //								msg += String.format(" (item id='%s', name='%s')", parent.getId(),
 //									(parent.getName()==null ? "" : parent.getName()));
 //							}
-//							LOGGER.warning(msg);
-//							LOGGER.info(String.format("Source='%s'\nTarget='%s'", oriSrc.toText(), newTrg.toText()));
+//							localLogger.warn(msg);
+//							localLogger.info(String.format("Source='%s'\nTarget='%s'", oriSrc.toText(), newTrg.toText()));
 //						}
 //					}
 				}
@@ -1093,13 +1093,14 @@ public class TextUnitUtil {
 	 * of the source part and place their text in the skeleton.
 	 */
 	public static void simplifyCodes (ITextUnit textUnit, boolean removeLeadingTrailingCodes) {
+		Logger localLogger = LoggerFactory.getLogger(TextUnitUtil.class);
 		if (textUnit == null) {
-			LOGGER.warning("Text unit is null.");
+			localLogger.warn("Text unit is null.");
 			return;
 		}
 		
 		if (textUnit.getTargetLocales().size() > 0) {
-			LOGGER.warning(String.format("Text unit %s has one or more targets, " +
+			localLogger.warn(String.format("Text unit %s has one or more targets, " +
 					"desinchronization of codes in source and targets is possible.", textUnit.getId()));
 		}
 		
@@ -1137,8 +1138,9 @@ public class TextUnitUtil {
 	 * @param removeTargetCodes - remove target codes?
 	 */
 	public static void removeCodes(ITextUnit textUnit, boolean removeTargetCodes) {
+		Logger localLogger = LoggerFactory.getLogger(TextUnitUtil.class);
 		if (textUnit == null) {
-			LOGGER.warning("Text unit is null.");
+			localLogger.warn("Text unit is null.");
 			return;
 		}
 		
@@ -1420,11 +1422,12 @@ public class TextUnitUtil {
 	 * @return the given string if removeFromOriginal == false, or the modified original string with markers removed otherwise
 	 */
 	public static String extractSegMarkers(TextFragment tf, String original, boolean removeFromOriginal) {
+		Logger localLogger = LoggerFactory.getLogger(TextUnitUtil.class);
 		if (tf == null) {
-			LOGGER.warning("Text fragment is null, no codes are added");
+			localLogger.warn("Text fragment is null, no codes are added");
 		}
 		if (original == null) {
-			LOGGER.warning("Original string is null, no processing was performed");
+			localLogger.warn("Original string is null, no processing was performed");
 			return "";
 		}
 		
@@ -1489,6 +1492,7 @@ public class TextUnitUtil {
 	 * @return a test string containing a sequence of markers created by the internal algorithm. Used for tests only. 
 	 */
 	public static String restoreSegmentation(TextContainer tc, TextFragment segStorage) {
+		Logger localLogger = LoggerFactory.getLogger(TextUnitUtil.class);
 		
 		// Empty tc
 		tc.clear();
@@ -1775,7 +1779,7 @@ public class TextUnitUtil {
 						if (start <= d.position)
 							list.add(new Segment(d.id, tf.subSequence(start, d.position)));
 						else
-							LOGGER.warning(String.format("Cannot create the segment %s - incorrect range: (%d - %d)", 
+							localLogger.warn(String.format("Cannot create the segment %s - incorrect range: (%d - %d)", 
 									d.id, start, d.position));
 					}
 					else {
@@ -1787,7 +1791,7 @@ public class TextUnitUtil {
 							list.add(newSeg);
 						}							
 						else
-							LOGGER.warning(String.format("Cannot create the segment %s - incorrect range: (%d - %d)", 
+							localLogger.warn(String.format("Cannot create the segment %s - incorrect range: (%d - %d)", 
 									d.id, start, d.relPos));
 					}
 				}
@@ -1812,7 +1816,7 @@ public class TextUnitUtil {
 						if (start <= d.position)
 							list.add(new TextPart(tf.subSequence(start, d.position)));
 						else
-							LOGGER.warning(String.format("Cannot create a text part - incorrect range: (%d - %d)", start, d.position));
+							localLogger.warn(String.format("Cannot create a text part - incorrect range: (%d - %d)", start, d.position));
 					}
 					else {
 						if (start <= d.relPos) {
@@ -1823,7 +1827,7 @@ public class TextUnitUtil {
 							list.add(newTp);
 						}							
 						else
-							LOGGER.warning(String.format("Cannot create a text part - incorrect range: (%d - %d)", start, d.relPos));
+							localLogger.warn(String.format("Cannot create a text part - incorrect range: (%d - %d)", start, d.relPos));
 					}						
 				}
 				start = -1;

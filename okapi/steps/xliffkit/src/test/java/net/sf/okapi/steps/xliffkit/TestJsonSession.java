@@ -23,8 +23,8 @@ package net.sf.okapi.steps.xliffkit;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import java.io.UnsupportedEncodingException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.ITextUnit;
@@ -52,9 +52,8 @@ public class TestJsonSession {
 //	}
 	
 	private void log(String str) {
-		Logger logger = Logger.getLogger(getClass().getName()); // loggers are cached
-		logger.setLevel(Level.FINE);
-		logger.fine(str);
+		Logger localLogger = LoggerFactory.getLogger(getClass()); // loggers are cached
+		localLogger.debug(str);
 	}
 	
 	// DEBUG 

@@ -21,7 +21,8 @@
 package net.sf.okapi.filters.xliff;
 
 import java.nio.charset.CharsetEncoder;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.LocaleId;
@@ -53,7 +54,7 @@ public class XLIFFSkeletonWriter extends GenericSkeletonWriter {
 	public static final String SEGSOURCEMARKER = "[@#$SEGSRC$#@]";
 	public static final String ALTTRANSMARKER = "[@#$ALTTRANS$#@]";
 	
-	private final Logger logger = Logger.getLogger(getClass().getName());
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 	
 	private Parameters params;
 	private XLIFFContent fmt;
@@ -144,7 +145,7 @@ public class XLIFFSkeletonWriter extends GenericSkeletonWriter {
 		// Else this is a true reference to a referent
 		IReferenceable ref = getReference((String)marker[0]);
 		if ( ref == null ) {
-			logger.warning(String.format("Reference '%s' not found.", (String)marker[0]));
+			logger.warn(String.format("Reference '%s' not found.", (String)marker[0]));
 			return "-ERR:REF-NOT-FOUND-";
 		}
 		if ( ref instanceof ITextUnit ) {
@@ -359,7 +360,7 @@ public class XLIFFSkeletonWriter extends GenericSkeletonWriter {
 				Segment srcSeg = srcSegs.get(trgSeg.id);
 				if ( srcSeg == null ) {
 					// A target segment without a corresponding source: give warning
-					logger.warning(String.format("No source segment found for target segment id='%s':\n\"%s\".",
+					logger.warn(String.format("No source segment found for target segment id='%s':\n\"%s\".",
 						trgSeg.id, trgSeg.text.toText()));
 				}
 
@@ -469,7 +470,7 @@ public class XLIFFSkeletonWriter extends GenericSkeletonWriter {
 		// Check the property we got
 		if ( value == null ) {
 			if ( prop == null ) {
-				logger.warning(String.format("Property '%s' not found.", name));
+				logger.warn(String.format("Property '%s' not found.", name));
 				return "-ERR:PROP-NOT-FOUND-";
 			}
 			// Else process the value
@@ -478,7 +479,7 @@ public class XLIFFSkeletonWriter extends GenericSkeletonWriter {
 		
 		// Now look at the value
 		if ( value == null ) {
-			logger.warning(String.format("Property value for '%s' is null.", name));
+			logger.warn(String.format("Property value for '%s' is null.", name));
 			return "-ERR:PROP-VALUE-NULL-";
 		}
 		// Else: We got the property value

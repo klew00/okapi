@@ -27,8 +27,8 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.util.regex.Pattern;
 
 import net.sf.okapi.common.BOMNewlineEncodingDetector;
@@ -74,7 +74,7 @@ public class PropertiesFilter implements IFilter {
 	private static final int RESULT_ITEM = 1;
 	private static final int RESULT_DATA = 2;
 
-	private final Logger logger = Logger.getLogger(getClass().getName());
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 
 	private Parameters params;
 	private BufferedReader reader;
@@ -546,16 +546,14 @@ public class PropertiesFilter implements IFilter {
 							int nTmp = Integer.parseInt(text.substring(i + 2, i + 6), 16);
 							tmpText.append((char) nTmp);
 						} catch (Exception e) {
-							logMessage(
-									Level.WARNING,
+							logger.warn(
 									String.format(Res.getString("INVALID_UESCAPE"),
 											text.substring(i + 2, i + 6)));
 						}
 						i += 5;
 						continue;
 					} else {
-						logMessage(
-								Level.WARNING,
+						logger.warn(
 								String.format(Res.getString("INVALID_UESCAPE"),
 										text.substring(i + 2)));
 					}
@@ -584,10 +582,6 @@ public class PropertiesFilter implements IFilter {
 				tmpText.append(text.charAt(i));
 		}
 		return tmpText.toString();
-	}
-
-	private void logMessage(Level level, String text) {
-		logger.log(level, String.format(Res.getString("LINE_LOCATION"), lineNumber) + text);
 	}
 
 	private void processWithSubfilter(String parentId, ITextUnit parentTu, String beforeSkeleton,

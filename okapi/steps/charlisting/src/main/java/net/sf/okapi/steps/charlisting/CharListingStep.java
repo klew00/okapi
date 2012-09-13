@@ -25,8 +25,8 @@ import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.Hashtable;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
@@ -40,7 +40,7 @@ import net.sf.okapi.common.resource.ITextUnit;
 @UsingParameters(Parameters.class)
 public class CharListingStep extends BasePipelineStep {
 
-	private final Logger logger = Logger.getLogger(getClass().getName());
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 
 	private Parameters params;
 	private Hashtable<Character, Integer> charList;
@@ -110,11 +110,11 @@ public class CharListingStep extends BasePipelineStep {
 			}
 		}
 		catch ( FileNotFoundException e ) {
-			logger.log(Level.SEVERE,
+			logger.error(
 				String.format("Error with '%s'.", params.getOutputPath()), e);
 		}
 		catch ( UnsupportedEncodingException e ) {
-			logger.log(Level.SEVERE,
+			logger.error(
 				String.format("Encoding error with '%s'.", params.getOutputPath()), e);
 		}
 		finally {

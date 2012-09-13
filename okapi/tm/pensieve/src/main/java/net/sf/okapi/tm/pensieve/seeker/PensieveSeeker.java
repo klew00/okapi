@@ -29,8 +29,8 @@ import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.exceptions.OkapiIOException;
@@ -73,7 +73,7 @@ import org.apache.lucene.store.Directory;
  * @author HARGRAVEJE
  */
 public class PensieveSeeker implements ITmSeeker, Iterable<TranslationUnit> {
-	private static final Logger LOGGER = Logger.getLogger(PensieveSeeker.class.getName());
+	private final Logger LOGGER = LoggerFactory.getLogger(getClass());
 
 	private final static NgramAnalyzer defaultFuzzyAnalyzer = new NgramAnalyzer(Locale.ENGLISH, 4);
 	private final static float MAX_HITS_RATIO = 0.01f;
@@ -655,7 +655,7 @@ public class PensieveSeeker implements ITmSeeker, Iterable<TranslationUnit> {
 				indexReader.close();
 			}
 		} catch (IOException e) {
-			LOGGER.log(Level.WARNING, "Exception closing Pensieve index.", e); //$NON-NLS-1$
+			LOGGER.warn("Exception closing Pensieve index.", e); //$NON-NLS-1$
 		}
 	}
 }

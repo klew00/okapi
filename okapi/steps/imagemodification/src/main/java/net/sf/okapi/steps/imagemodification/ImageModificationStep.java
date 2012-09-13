@@ -30,7 +30,8 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.imageio.ImageIO;
 
@@ -47,7 +48,7 @@ import net.sf.okapi.common.resource.RawDocument;
 @UsingParameters(Parameters.class)
 public class ImageModificationStep extends BasePipelineStep {
 
-	private static final Logger LOGGER = Logger.getLogger(ImageModificationStep.class.getName());
+	private final Logger LOGGER = LoggerFactory.getLogger(getClass());
 
 	private boolean isDone;
 	private Parameters params;
@@ -116,7 +117,7 @@ public class ImageModificationStep extends BasePipelineStep {
 							newFormat = currentSuffix;
 						}
 						else { // No such writer, fall back to "png"
-							LOGGER.warning(String.format("No image writer available for '%s'. Using 'png' instead.", newFormat));
+							LOGGER.warn(String.format("No image writer available for '%s'. Using 'png' instead.", newFormat));
 							currentSuffix = "png";
 							newFormat = "png";
 						}

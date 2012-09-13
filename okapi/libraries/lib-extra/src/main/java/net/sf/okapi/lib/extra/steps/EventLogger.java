@@ -20,8 +20,8 @@
 
 package net.sf.okapi.lib.extra.steps;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
@@ -34,7 +34,7 @@ public class EventLogger extends BasePipelineStep {
 
 	private int indent = 0;
 	private boolean increasing = true;
-	private final Logger logger = Logger.getLogger(getClass().getName());
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 	private StringBuilder sb;
 	
 	@Override
@@ -104,7 +104,6 @@ public class EventLogger extends BasePipelineStep {
 			increasing = false;
 			printEvent(event);
 			if (event.getEventType() == EventType.END_BATCH) {
-				logger.setLevel(Level.INFO);
 				logger.info(sb.toString());
 			}
 			break;		

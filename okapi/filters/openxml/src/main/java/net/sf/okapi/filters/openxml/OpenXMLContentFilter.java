@@ -29,8 +29,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import net.htmlparser.jericho.EndTag;
 import net.htmlparser.jericho.Segment;
@@ -103,8 +103,8 @@ import net.sf.okapi.common.skeleton.GenericSkeleton;
  * work like TEXT_UNIT, TEXT_RUN, and TEXT_MARKER elements combined.
  */
 public class OpenXMLContentFilter extends AbstractMarkupFilter {
-	
-	private Logger LOGGER=null;
+
+	private final Logger LOGGER = LoggerFactory.getLogger(getClass());
 	
 	public final static int MSWORD=1;
 	public final static int MSEXCEL=2;
@@ -191,7 +191,7 @@ public class OpenXMLContentFilter extends AbstractMarkupFilter {
 	public void displayOneEvent(Event event) // DWH 4-22-09 LOGGER
 	{
 		Set<String> setter;
-		if (LOGGER.isLoggable(Level.FINEST))
+		if (LOGGER.isTraceEnabled())
 		{
 			String etyp=event.getEventType().toString();
 			if (event.getEventType() == EventType.TEXT_UNIT) {
@@ -203,19 +203,19 @@ public class OpenXMLContentFilter extends AbstractMarkupFilter {
 	//			assertTrue(event.getResource() instanceof StartGroup || event.getResource() instanceof Ending);
 			}
 			if (etyp.equals("START"))
-				LOGGER.log(Level.FINEST,"\n");
-			LOGGER.log(Level.FINEST,etyp + ": ");
+				LOGGER.trace("\n");
+			LOGGER.trace(etyp + ": ");
 			if (event.getResource() != null) {
-				LOGGER.log(Level.FINEST,"(" + event.getResource().getId()+")");
+				LOGGER.trace("(" + event.getResource().getId()+")");
 				if (event.getResource() instanceof DocumentPart) {
 					setter = ((DocumentPart) event.getResource()).getSourcePropertyNames();
 					for(String seti : setter)
-						LOGGER.log(Level.FINEST,seti);
+						LOGGER.trace(seti);
 				} else {
-					LOGGER.log(Level.FINEST,event.getResource().toString());
+					LOGGER.trace(event.getResource().toString());
 				}
 				if (event.getResource().getSkeleton() != null) {
-					LOGGER.log(Level.FINEST,"*Skeleton: \n" + event.getResource().getSkeleton().toString());
+					LOGGER.trace("*Skeleton: \n" + event.getResource().getSkeleton().toString());
 				}
 			}
 		}		
@@ -699,9 +699,9 @@ public class OpenXMLContentFilter extends AbstractMarkupFilter {
 		    	try
 		    	{
 					  bw.write(s);
-					  LOGGER.log(Level.FINEST,s); //
+					  LOGGER.trace(s); //
 				  } catch (IOException e) {
-					  LOGGER.log(Level.WARNING,"Problem writing piped stream.");
+					  LOGGER.warn("Problem writing piped stream.");
 	//				throw new OkapiIOException("Can't read piped input.");
 					  s = s + " ";
 				  }
@@ -1820,10 +1820,6 @@ public class OpenXMLContentFilter extends AbstractMarkupFilter {
 	protected boolean getBInSettingsFile() // DWH 4-12-10 for <v:textbox
 	{
 		return bInSettingsFile;
-	}
-	public void setLogger(Logger lgr)
-	{
-		LOGGER = lgr;
 	}
 	public void setTsExcludeWordStyles(TreeSet tsExcludeWordStyles)
 	{

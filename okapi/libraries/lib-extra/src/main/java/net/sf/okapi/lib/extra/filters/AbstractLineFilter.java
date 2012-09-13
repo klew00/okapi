@@ -24,7 +24,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.LinkedList;
-import java.util.logging.Level;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import net.sf.okapi.common.BOMNewlineEncodingDetector;
 import net.sf.okapi.common.Event;
@@ -583,10 +584,4 @@ public abstract class AbstractLineFilter extends AbstractBaseFilter {
 //		}
 //	}
 
-	@Override
-	protected void logMessage (Level level, String text) {
-		
-		super.logMessage(level, String.format("Line %d: %s", lineNumber, text));
-	}
-	
 }

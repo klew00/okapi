@@ -32,8 +32,8 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
@@ -77,6 +77,7 @@ import org.junit.Test;
 
 @SuppressWarnings("unused")
 public class XLIFFKitWriterTest {
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 
 //	private final String IN_NAME1 = "Gate Openerss.htm";
 	private final String IN_NAME2 = "TestDocument01.odt";
@@ -673,9 +674,7 @@ public class XLIFFKitWriterTest {
 	}
 
 	private void log(String str) {
-		Logger logger = Logger.getLogger(getClass().getName()); // loggers are cached
-		logger.setLevel(Level.FINE);
-		logger.fine(str);
+		logger.debug(str);
 	}
 
 	// DEBUG 
@@ -1241,7 +1240,6 @@ public class XLIFFKitWriterTest {
 	
 	@Test
 	public void testStaxParser () throws XMLStreamException {		
-		Logger logger = Logger.getLogger(getClass().getName());
 		XMLInputFactory fact = null;
 		XMLStreamReader reader = null;
 		 
@@ -1255,7 +1253,6 @@ public class XLIFFKitWriterTest {
 	
 	@Test
 	public void testStaxParser2 () throws XMLStreamException {		
-		Logger logger = Logger.getLogger(getClass().getName());
 		XMLInputFactory fact = null;
 		XMLStreamReader reader = null;
 		 

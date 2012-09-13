@@ -25,7 +25,8 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLEventReader;
@@ -312,7 +313,7 @@ public class TsFilter implements IFilter {
 	private EncoderManager encoderManager;
 	private String contextName;
 	
-	private final Logger logger = Logger.getLogger(getClass().getName());
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 	
 	public TsFilter(){
 		params = new Parameters();
@@ -575,7 +576,7 @@ public class TsFilter implements IFilter {
 
 						StartElement se = getStartElement("message");
 						if( ts.noSource() ){
-							logger.warning("Message (Line "+se.getLocation().getLineNumber()+" contains no <source>. Message will be ignored.");
+							logger.warn("Message (Line "+se.getLocation().getLineNumber()+" contains no <source>. Message will be ignored.");
 						}
 
 						DocumentPart dp = generateObsoleteTu();
@@ -906,7 +907,7 @@ public class TsFilter implements IFilter {
 						if(approvedProp.getValue().equals("yes")){
 							approvedProp.setValue("no");
 							tu.setTargetProperty(trgLang, approvedProp);
-							logger.warning("Translation (Line "+endElem.getLocation().getLineNumber()+") is empty. type attribute was updated to unfinished.");
+							logger.warn("Translation (Line "+endElem.getLocation().getLineNumber()+") is empty. type attribute was updated to unfinished.");
 						}
 					}
 					procEndElem(endElem);
@@ -1239,12 +1240,12 @@ public class TsFilter implements IFilter {
 
 		String xmlVersion = startDoc.getVersion();
 		if (xmlVersion != null && !xmlVersion.equals("1.0")){
-			logger.warning("Filter will use xml version 1.0");	
+			logger.warn("Filter will use xml version 1.0");
 		}
 
 		String xmlEnc = startDoc.getCharacterEncodingScheme();
 		if (xmlEnc != null && !xmlEnc.equalsIgnoreCase(encoding)){
-			logger.warning("The xml encoding attribute value "+xmlEnc+" is different from " +
+			logger.warn("The xml encoding attribute value "+xmlEnc+" is different from " +
 					"what was detected or specified in the settings. Encoding "+encoding+ " will be used.");	
 		}
 	}

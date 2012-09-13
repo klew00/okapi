@@ -27,8 +27,8 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import net.sf.okapi.applications.rainbow.packages.IReader;
 import net.sf.okapi.applications.rainbow.packages.Manifest;
@@ -54,7 +54,7 @@ import net.sf.okapi.filters.rtf.RTFFilter;
 
 public class Merger {
 
-	private final Logger logger = Logger.getLogger(getClass().getName());
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 
 	private Manifest manifest;
 	private IReader reader;
@@ -139,7 +139,7 @@ public class Merger {
 		catch ( Exception e ) {
 			// Log and move on to the next file
 			Throwable e2 = e.getCause();
-			logger.log(Level.SEVERE, "Conversion error. " + ((e2!=null) ? e2.getMessage() : e.getMessage()), e);
+			logger.error("Conversion error. " + ((e2!=null) ? e2.getMessage() : e.getMessage()), e);
 		}
 		finally {
 			if ( rtfFilter != null ) {
@@ -150,7 +150,7 @@ public class Merger {
 					writer.close();
 				}
 				catch ( IOException e ) {
-					logger.log(Level.SEVERE, "Conversion error when closing file. " + e.getMessage(), e);
+					logger.error("Conversion error when closing file. " + e.getMessage(), e);
 				}
 			}
 		}
@@ -209,7 +209,7 @@ public class Merger {
 		catch ( Exception e ) {
 			// Log and move on to the next file
 			Throwable e2 = e.getCause();
-			logger.log(Level.SEVERE, "Merging error. " + ((e2!=null) ? e2.getMessage() : e.getMessage()), e);
+			logger.error("Merging error. " + ((e2!=null) ? e2.getMessage() : e.getMessage()), e);
 		}
 		finally {
 			if ( reader != null ) {
@@ -239,7 +239,7 @@ public class Merger {
 		while ( true ) {
 			if ( !reader.readItem() ) {
 				// Problem: 
-				logger.log(Level.WARNING,
+				logger.warn(
 					String.format("There is no more items in the package to merge with id=\"%s\".", tu.getId()));
 				// Keep the source
 				return;
@@ -262,7 +262,7 @@ public class Merger {
 //		while ( true ) {
 //			if ( !reader.readItem() ) {
 //				// Problem: 
-//				logger.log(Level.WARNING,
+//				logger.warn(
 //					String.format("There is no more items in the package to merge with id=\"%s\".", tu.getId()));
 //				// Keep the source
 //				return;
@@ -274,7 +274,7 @@ public class Merger {
 //			
 //		if ( !tu.getId().equals(tuFromTrans.getId()) ) {
 //			// Problem: different IDs
-//			logger.warning(String.format("ID mismatch: Original item id=\"%s\" package item id=\"%s\".",
+//			logger.warn(String.format("ID mismatch: Original item id=\"%s\" package item id=\"%s\".",
 //				tu.getId(), tuFromTrans.getId()));
 //			return; // Use the source
 //		}
@@ -282,7 +282,7 @@ public class Merger {
 		if ( !tuFromTrans.hasTarget(trgLoc) ) {
 			// No translation in package
 			if ( !tu.getSource().isEmpty() ) {
-				logger.log(Level.WARNING,
+				logger.warn(
 					String.format("Item id=\"%s\": No translation provided; using source instead.", tu.getId()));
 				return; // Use the source
 			}
@@ -296,7 +296,7 @@ public class Merger {
 		}
 		if ( manifest.useApprovedOnly() && !isTransApproved ) {
 			// Not approved: use the source
-			logger.log(Level.WARNING,
+			logger.warn(
 				String.format("Item id='%s': Target is not approved; using source instead.", tu.getId()));
 			return; // Use the source
 		}
@@ -306,7 +306,7 @@ public class Merger {
 		if ( fromTrans == null ) {
 			if ( tuFromTrans.getSource().isEmpty() ) return;
 			// Else: Missing target in the XLIFF
-			logger.log(Level.WARNING,
+			logger.warn(
 				String.format("Item id='%s': No target in XLIFF; using source instead.", tu.getId()));
 			return; // Use the source
 		}
@@ -369,7 +369,7 @@ public class Merger {
 			}
 		}
 		catch ( RuntimeException e ) {
-			logger.log(Level.SEVERE,
+			logger.error(
 				String.format("Inline code error with item id=\"%s\".\n" + e.getLocalizedMessage(), tu.getId()));
 			// Use the source instead, continue the merge
 			tu.setTarget(trgLoc, tu.getSource());
@@ -414,7 +414,7 @@ public class Merger {
 //			trgCont.setCodedText(fromTrans.getCodedText(), transCodes, false);
 //		}
 //		catch ( RuntimeException e ) {
-//			logger.log(Level.SEVERE,
+//			logger.error(
 //				String.format("Inline code error with item id=\"%s\".\n" + e.getLocalizedMessage(), original.getId()));
 //			// Use the source instead, continue the merge
 //			original.setTarget(trgLang, original.getSource());
@@ -462,7 +462,7 @@ public class Merger {
 //			trgCont.createSegments(ranges);
 //		}
 //		catch ( RuntimeException e ) {
-//			logger.log(Level.SEVERE,
+//			logger.error(
 //				String.format("Inline code error with item id=\"%s\".\n" + e.getLocalizedMessage(), original.getId()));
 //			// Use the source instead, continue the merge
 //			original.setTarget(trgLang, original.getSource());
@@ -510,7 +510,7 @@ public class Merger {
 			if ( oriCode == null ) { // Not found in original (extra in target)
 				if ( !transCode.hasData() ) {
 					// Leave it like that
-					logger.warning(String.format("The extra target code id='%d' does not have corresponding data (item id='%s', name='%s')",
+					logger.warn(String.format("The extra target code id='%d' does not have corresponding data (item id='%s', name='%s')",
 						transCode.getId(), tu.getId(), (tu.getName()==null ? "" : tu.getName())));
 				}
 			}
@@ -532,7 +532,7 @@ public class Merger {
 				if ( oriIndices[i] != -1 ) {
 					Code code = oriCodes.get(oriIndices[i]);
 					if ( !code.isDeleteable() ) {
-						logger.warning(String.format("The code id='%d' (%s) is missing in target (item id='%s', name='%s')",
+						logger.warn(String.format("The code id='%d' (%s) is missing in target (item id='%s', name='%s')",
 							code.getId(), code.getData(), tu.getId(), (tu.getName()==null ? "" : tu.getName())));
 						logger.info("Source='"+tu.getSource().toString()+"'");
 					}

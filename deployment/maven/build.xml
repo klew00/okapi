@@ -43,4 +43,21 @@
 
 	</target>
 
+	<target name="clean">
+		<delete includeEmptyDirs="true" failonerror="false">
+			<fileset dir="dist_cocoa-macosx"/>
+			<fileset dir="dist_cocoa-macosx-x86_64"/>
+			<fileset dir="dist_common"/>
+			<fileset dir="dist_gtk2-linux-x86"/>
+			<fileset dir="dist_gtk2-linux-x86_64"/>
+			<fileset dir="dist_longhorn"/>
+			<fileset dir="dist_omtplugins"/>
+			<fileset dir="dist_plugins"/>
+			<fileset dir="dist_win32-x86"/>
+			<fileset dir="dist_win32-x86_64"/>
+			<fileset dir="done"/>
+			<fileset dir="tmp"/>
+		</delete>
+	</target>
+
 </project>

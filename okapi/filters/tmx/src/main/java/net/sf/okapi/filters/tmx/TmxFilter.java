@@ -25,7 +25,8 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.xml.XMLConstants;
 import javax.xml.stream.XMLInputFactory;
@@ -66,7 +67,7 @@ import net.sf.okapi.common.skeleton.ISkeletonWriter;
 @UsingParameters(Parameters.class)
 public class TmxFilter implements IFilter {
 
-	private final Logger logger = Logger.getLogger(getClass().getName());
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 	
 	private boolean hasNext;
 	private XMLStreamReader reader;	
@@ -629,7 +630,7 @@ public class TmxFilter implements IFilter {
 					}
 					
 					if(curLocalName.equals("ut") && !skipUtWarning){
-						logger.warning("<ut> is been deprecated in tmx 1.4.");
+						logger.warn("<ut> is been deprecated in tmx 1.4.");
 						skipUtWarning=true;
 					}
 					elemStack.push(curLocalName);
@@ -734,9 +735,9 @@ public class TmxFilter implements IFilter {
 						elemStack.clear();
 						Property p = tmxTu.getProp("tuid");
 						if (p != null){
-							logger.warning("Skipping invalid <tu> element with tuid: "+p.getValue()+".");
+							logger.warn("Skipping invalid <tu> element with tuid: "+p.getValue()+".");
 						}else{
-							logger.warning("Skipping invalid <tu> element.");
+							logger.warn("Skipping invalid <tu> element.");
 						}
 						return true;
 					}else{
@@ -798,7 +799,7 @@ public class TmxFilter implements IFilter {
 						if (params.exitOnInvalid) {
 							throw new OkapiBadFilterInputException("Only <note>, <prop>, and <tuv> elements are allowed inside <tu>");
 						} else{
-							logger.warning("Only <note>, <prop>, and <tuv> elements are allowed inside <tu>");
+							logger.warn("Only <note>, <prop>, and <tuv> elements are allowed inside <tu>");
 							skipInvalidTu = true;
 							break;
 						}
@@ -860,14 +861,14 @@ public class TmxFilter implements IFilter {
 					}
 					
 					if(localName.equals("ut") && !skipUtWarning){
-						logger.warning("<ut> is been deprecated in tmx 1.4.");
+						logger.warn("<ut> is been deprecated in tmx 1.4.");
 						skipUtWarning=true;
 					}
 					elemStack.push(localName);
 
 					//--warn about subflow--
 					if("sub".equals(reader.getLocalName())){
-						logger.warning("A <sub> element was detected. It will be included in its parent code as <sub> is currently not supported.");
+						logger.warn("A <sub> element was detected. It will be included in its parent code as <sub> is currently not supported.");
 					}
 					
 					prefix = reader.getPrefix();
@@ -1005,7 +1006,7 @@ public class TmxFilter implements IFilter {
 			if(throwException){
 				throw new OkapiBadFilterInputException("<"+newElem+"> not allowed in <"+curElem+">. Only "+rules+" allowed.");
 			}else{
-				logger.warning("<"+newElem+"> not allowed in <"+curElem+">. Only "+rules+" allowed.");
+				logger.warn("<"+newElem+"> not allowed in <"+curElem+">. Only "+rules+" allowed.");
 				return false;		
 			}
 		}

@@ -20,13 +20,15 @@
 
 package net.sf.okapi.steps.tokenization.common;
 
-import java.util.logging.Level;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.lib.extra.Component;
 import net.sf.okapi.steps.tokenization.tokens.Tokens;
 
 public abstract class AbstractLexer extends Component implements ILexer {
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 
 	private boolean cancelled = false;
 	//private int lexerId = 0;
@@ -49,11 +51,11 @@ public abstract class AbstractLexer extends Component implements ILexer {
 			
 		} catch (InstantiationException e) {
 
-			logMessage(Level.FINE, "Lexer rules instantialion falied: " + e.getMessage());
+			logger.debug("Lexer rules instantialion falied: " + e.getMessage());
 			
 		} catch (IllegalAccessException e) {
 			
-			logMessage(Level.FINE, "Lexer rules instantialion falied: " + e.getMessage());
+			logger.debug("Lexer rules instantialion falied: " + e.getMessage());
 		}
 		
 		
@@ -66,15 +68,15 @@ public abstract class AbstractLexer extends Component implements ILexer {
 //			
 //		} catch (InstantiationException e) {
 //			
-//			logMessage(Level.FINE, "Lexer rules instantialion falied: " + e.getMessage());
+//			logger.debug("Lexer rules instantialion falied: " + e.getMessage());
 //			
 //		} catch (IllegalAccessException e) {
 //			
-//			logMessage(Level.FINE, "Lexer rules instantialion falied: " + e.getMessage());
+//			logger.debug("Lexer rules instantialion falied: " + e.getMessage());
 //			
 //		} catch (ClassNotFoundException e) {
 //			
-//			logMessage(Level.FINE, "Lexer rules instantialion falied: " + e.getMessage());
+//			logger.debug("Lexer rules instantialion falied: " + e.getMessage());
 //		}
 		
 //		System.out.println(rulesClassName);

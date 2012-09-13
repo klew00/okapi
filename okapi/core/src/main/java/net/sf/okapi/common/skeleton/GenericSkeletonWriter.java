@@ -23,7 +23,8 @@ package net.sf.okapi.common.skeleton;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Stack;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
@@ -66,7 +67,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 	// They must be multilingual
 	protected boolean allowEmptyOutputTarget = false;
 	
-	private final Logger logger = Logger.getLogger(getClass().getName());
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 
 	private LinkedHashMap<String, Referent> referents;
 	protected String outputEncoding;
@@ -271,7 +272,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 						seg = tc.getSegments().get(segId);
 					}
 					if (seg == null) {
-						logger.warning(String.format("Segment reference '%s' not found.", (String)marker[0]));
+						logger.warn(String.format("Segment reference '%s' not found.", (String)marker[0]));
 						return "-ERR:INVALID-SEGMENT-REF-";
 					}
 					
@@ -313,7 +314,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 			int end = (Integer) marker[2];
 			
 			if ( ref == null ) {
-				logger.warning(String.format("Reference '%s' not found.", (String)marker[0]));
+				logger.warn(String.format("Reference '%s' not found.", (String)marker[0]));
 				refData = "-ERR:REF-NOT-FOUND-";
 			}
 			else if ( ref instanceof ITextUnit ) {
@@ -339,7 +340,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 		int context)
 	{
 		if ( ref == null ) {
-			logger.warning(String.format("Null reference for '%s'.", propName));
+			logger.warn(String.format("Null reference for '%s'.", propName));
 			return "-ERR:NULL-REF-";
 		}
 		if ( propName != null ) {
@@ -354,7 +355,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 		if ( ref instanceof StorageList ) {
 			return getString((StorageList)ref, locToUse, context);
 		}
-		logger.warning(String.format("Invalid reference type for '%s'.", propName));
+		logger.warn(String.format("Invalid reference type for '%s'.", propName));
 		return "-ERR:INVALID-REFTYPE-";
 	}
 
@@ -495,7 +496,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 				Segment srcSeg = srcCont.getSegments().get(trgSeg.id);
 				if ( srcSeg == null ) {
 					// A target segment without a corresponding source: give warning
-					logger.warning(String.format("No source segment found for target segment id='%s':\n\"%s\".",
+					logger.warn(String.format("No source segment found for target segment id='%s':\n\"%s\".",
 						trgSeg.id, trgFrag.toText()));
 				}
 				else {
@@ -575,7 +576,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 //				Segment srcSeg = srcCont.getSegments().get(trgSeg.id);
 //				if ( srcSeg == null ) {
 //					// A target segment without a corresponding source: give warning
-//					logger.warning(String.format("No source segment found for target segment id='%s':\n\"%s\".",
+//					logger.warn(String.format("No source segment found for target segment id='%s':\n\"%s\".",
 //						trgSeg.id, trgSeg.text.toText()));
 //				}
 //
@@ -956,7 +957,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 			String propName = (String)marker[3];
 			IReferenceable ref = getReference((String)marker[0]);
 			if ( ref == null ) {
-				logger.warning(String.format("Reference '%s' not found.", (String)marker[0]));				
+				logger.warn(String.format("Reference '%s' not found.", (String)marker[0]));
 				tmp.replace(start, end, "-ERR:REF-NOT-FOUND-");
 			}
 			else if ( propName != null ) {
@@ -1032,13 +1033,13 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 		}
 		// Check the property we got
 		if ( prop == null ) {
-			logger.warning(String.format("Property '%s' not found.", name));
+			logger.warn(String.format("Property '%s' not found.", name));
 			return "-ERR:PROP-NOT-FOUND-";
 		}
 		// Else process the value
 		String value = prop.getValue();
 		if ( value == null ) {
-			logger.warning(String.format("Property value for '%s' is null.", name));
+			logger.warn(String.format("Property value for '%s' is null.", name));
 			return "-ERR:PROP-VALUE-NULL-";
 		}
 		

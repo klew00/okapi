@@ -31,8 +31,8 @@ import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.TreeMap;
 import java.util.TreeSet;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -49,7 +49,7 @@ import net.sf.okapi.filters.yaml.TaggedFilterConfiguration.RULE_TYPE;
 
 public class ExcelAnalyzer
 {
-	private Logger LOGGER = Logger.getLogger(OpenXMLFilter.class.getName());
+	private final Logger LOGGER = LoggerFactory.getLogger(getClass());
 
 	private ZipFile zipFile;
 	private ZipEntry entry;
@@ -72,7 +72,7 @@ public class ExcelAnalyzer
 		}
 		catch(IOException e)
 		{
-			LOGGER.log(Level.WARNING,"Error opening zipped Excel file.");
+			LOGGER.warn("Error opening zipped Excel file.");
 			throw new OkapiIOException("Error opening zipped Excel file.");
 		}
 	}
@@ -421,7 +421,7 @@ public class ExcelAnalyzer
 		}
 		catch(IOException e)
 		{
-			LOGGER.log(Level.WARNING,"Error opening XML file within zipped Excel file.");
+			LOGGER.warn("Error opening XML file within zipped Excel file.");
 			throw new OkapiIOException("Error opening XML file within zipped Excel file.");			
 		}
 	}
@@ -447,7 +447,7 @@ public class ExcelAnalyzer
 		}
 		catch(IOException e)
 		{
-			LOGGER.log(Level.WARNING,"Error opening zipped Excel file.");
+			LOGGER.warn("Error opening zipped Excel file.");
 			throw new OkapiIOException("Error opening zipped Excel file.");
 		}
 		finally

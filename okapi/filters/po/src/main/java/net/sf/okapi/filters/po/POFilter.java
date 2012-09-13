@@ -26,7 +26,8 @@ import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -96,7 +97,7 @@ public class POFilter implements IFilter {
 		"(content-type)(\\s*):(.*?)charset(\\s*)=(\\s*)(.*?)([\\\\|;|\\n])",
 		Pattern.CASE_INSENSITIVE);
 			
-	private final Logger logger = Logger.getLogger(getClass().getName());
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 
 	private Parameters params;
 	private BufferedReader reader;
@@ -837,12 +838,12 @@ public class POFilter implements IFilter {
 					}
 					if ( nPlurals < 0 ) {
 						nPlurals = DEFAULT_NPLURALS; // Make sure to reset to default
-						logger.warning(String.format(Res.getString("npluralsInvalid"), data, nPlurals));
+						logger.warn(String.format(Res.getString("npluralsInvalid"), data, nPlurals));
 					}
 				}
 				else { // Missing nplurals field
 					nPlurals = DEFAULT_NPLURALS; // Make sure to reset to default
-					logger.warning(String.format(Res.getString("npluralsNotDetected"), data, nPlurals));
+					logger.warn(String.format(Res.getString("npluralsNotDetected"), data, nPlurals));
 				}
 			}
 			// Else: no plural definition found, use default

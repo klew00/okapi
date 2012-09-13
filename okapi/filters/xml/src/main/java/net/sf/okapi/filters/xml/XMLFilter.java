@@ -26,7 +26,8 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -87,7 +88,7 @@ public class XMLFilter implements IFilter {
 	private static final String SRC_TRGPTRFLAGNAME = "\u10ff"; // Name of the user-data property that holds the target pointer flag in the source
 	private static final String TRG_TRGPTRFLAGNAME = "\u20ff"; // Name of the user-data property that holds the target pointer flag in the target
 
-	private final Logger logger = Logger.getLogger(getClass().getName());
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 
 	private String docName;
 	private String encoding;
@@ -904,7 +905,7 @@ public class XMLFilter implements IFilter {
 		// http://www.rfc-editor.org/rfc/bcp/bcp47.txt
 		if ( trgLangCode == null ) {
 			// Log a warning that the data category cannot be used
-			logger.warning("No target locale specified: Cannot use the provided ITS Locale Filter data category.");
+			logger.warn("No target locale specified: Cannot use the provided ITS Locale Filter data category.");
 			return true;
 		}
 		// Now check with one or more codes

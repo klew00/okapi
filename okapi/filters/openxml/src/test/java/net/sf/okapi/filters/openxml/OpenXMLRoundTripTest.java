@@ -31,8 +31,8 @@ import org.junit.Test;
 import java.io.File;
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This tests OpenXMLFilter (including OpenXMLContentFilter) and
@@ -55,17 +55,13 @@ public class OpenXMLRoundTripTest {
 	private LocaleId locLA = LocaleId.fromString("la");
 	private LocaleId locENUS = LocaleId.fromString("en-us");
 
-	private static Logger LOGGER = Logger.getLogger(OpenXMLRoundTripTest.class.getName());
+	private final Logger LOGGER = LoggerFactory.getLogger(getClass());
 	private boolean allGood=true;
 	private ConditionalParameters cparams; // DWH 6-18-09
 	private boolean bSquishy=true; // DWH 7-16-09
 
 	@Test
 	public void runTest () {
-		LOGGER.setLevel(Level.FINE);
-//		LOGGER.setLevel(Level.FINER);
-//		LOGGER.setLevel(Level.FINEST);
-//		LOGGER.addHandler(new LogHandlerSystemOut());
 		cparams = getParametersFromUserInterface();
 
 		ArrayList<String> themfiles = new ArrayList<String>();
@@ -166,13 +162,12 @@ public class OpenXMLRoundTripTest {
 //				bis = new BufferedInputStream(new FileInputStream(filly));
 //				filter.open(new RawDocument(bis,"UTF-8","en-US"),true,false,Level.FINEST); // DWH 6-09-09			
 
-				filter.open(new RawDocument(uri,"UTF-8", locENUS),true,bSquishy,Level.FINEST); // DWH 7-16-09 squishiness
+				filter.open(new RawDocument(uri,"UTF-8", locENUS),true,bSquishy); // DWH 7-16-09 squishiness
 			}
 			catch(Exception e)
 			{
 				throw new RuntimeException(e);				
 			}
-			filter.setLogger(LOGGER);
 			
 			OpenXMLZipFilterWriter writer = new OpenXMLZipFilterWriter(); // DWH 4-8-09 was just ZipFilterWriter
 
@@ -198,13 +193,13 @@ public class OpenXMLRoundTripTest {
 			rtrued2 = zc.zipsExactlyTheSame(sOutputPath+(bPeeking ? (bTranslating ? "Peek" : "Tag") : (bTranslating ? "Tran" : "Out"))+filename,
 					   					      sGoldPath+(bPeeking ? (bTranslating ? "Peek" : "Tag") : (bTranslating ? "Tran" : "Out"))+filename);
 			if (!rtrued2) // DWH 12-18-09 log only if it failed
-				LOGGER.log(Level.INFO,(bPeeking ? (bTranslating ? "Peek" : "Tag") : (bTranslating ? "Tran" : "Out"))+filename+
+				LOGGER.info((bPeeking ? (bTranslating ? "Peek" : "Tag") : (bTranslating ? "Tran" : "Out"))+filename+
 						   (rtrued2 ? " SUCCEEDED" : " FAILED"));
 			if (!rtrued2)
 				allGood = false;
 		}
 		catch ( Throwable e ) {
-			LOGGER.log(Level.WARNING,e.getMessage());
+			LOGGER.warn(e.getMessage());
 			fail("An unexpected exception was thrown on file '"+filename+"': " + e);
 		}
 		finally {

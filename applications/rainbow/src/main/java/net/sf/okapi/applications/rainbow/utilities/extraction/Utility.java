@@ -21,6 +21,8 @@
 package net.sf.okapi.applications.rainbow.utilities.extraction;
 
 import java.io.File;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import net.sf.okapi.applications.rainbow.packages.IWriter;
 import net.sf.okapi.applications.rainbow.utilities.BaseFilterDrivenUtility;
@@ -41,7 +43,7 @@ import net.sf.okapi.lib.segmentation.SRXDocument;
 import net.sf.okapi.lib.translation.QueryManager;
 
 public class Utility extends BaseFilterDrivenUtility {
-
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 	private Parameters params;
 	private IWriter writer;
 	private int id;
@@ -69,7 +71,7 @@ public class Utility extends BaseFilterDrivenUtility {
 			String src = params.sourceSRX.replace(VAR_PROJDIR, projectDir);
 			SRXDocument doc = new SRXDocument();
 			doc.loadRules(src);
-			if ( doc.hasWarning() ) logger.warning(doc.getWarning());
+			if ( doc.hasWarning() ) logger.warn(doc.getWarning());
 			sourceSeg = doc.compileLanguageRules(srcLang, null);
 
 			// Load the target only if needed
@@ -78,7 +80,7 @@ public class Utility extends BaseFilterDrivenUtility {
 				//TODO: This is not working cross-platform!
 				if ( !src.equalsIgnoreCase(trg) ) {
 					doc.loadRules(trg);
-					if ( doc.hasWarning() ) logger.warning(doc.getWarning());
+					if ( doc.hasWarning() ) logger.warn(doc.getWarning());
 				}
 			}
 			targetSeg = doc.compileLanguageRules(trgLang, null);
@@ -248,7 +250,7 @@ public class Utility extends BaseFilterDrivenUtility {
 				}
 			}
 			catch ( Throwable e ) {
-				logger.severe(String.format("Error segmenting text unit id=%s: "
+				logger.error(String.format("Error segmenting text unit id=%s: "
 					+e.getMessage(), tu.getId()));
 			}
 		}

@@ -23,8 +23,8 @@ package net.sf.okapi.lib.extra;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import net.sf.okapi.common.BaseParameters;
 import net.sf.okapi.common.ListUtil;
@@ -43,7 +43,7 @@ public abstract class AbstractParameters extends BaseParameters implements INoti
 	protected Component owner = null;
 	private String data;
 
-	protected final Logger logger = Logger.getLogger(this.getClass().getName());
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 	
 	public AbstractParameters() {
 		
@@ -141,13 +141,13 @@ public abstract class AbstractParameters extends BaseParameters implements INoti
 			} catch (InstantiationException e) {
 				
 				//e.printStackTrace();
-				logMessage(Level.FINE, "Group element instantiation failed: " + e.getMessage());
+				logger.debug("Group element instantiation failed: " + e.getMessage());
 				return;
 				
 			} catch (IllegalAccessException e) {
 				
 				//e.printStackTrace();
-				logMessage(Level.FINE, "Group element instantiation failed: " + e.getMessage());
+				logger.debug("Group element instantiation failed: " + e.getMessage());
 				return;
 			}
 			
@@ -252,12 +252,6 @@ public abstract class AbstractParameters extends BaseParameters implements INoti
 	public String getData() {
 		
 		return data;
-	}
-	
-	protected void logMessage (Level level, String text) {
-		
-		if (logger != null)
-			logger.log(level, text);
 	}
 }
 

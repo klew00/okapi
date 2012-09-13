@@ -3,13 +3,6 @@ META-INF/
 target/
 MANIFEST.MF
 
-/deployment/maven/dist_common/
-/deployment/maven/dist_gtk2-linux-x86_64/
-/deployment/maven/dist_omtplugins/
-/deployment/maven/dist_plugins/
-/deployment/maven/done/
-/deployment/maven/tmp/
-
 *.pydevproject
 .metadata
 bin/**
@@ -36,19 +29,19 @@ local.properties
 #python specific
 *.pyc
 
+/deployment/maven/dist_cocoa-macosx
+/deployment/maven/dist_cocoa-macosx-x86_64
+/deployment/maven/dist_common/
+/deployment/maven/dist_gtk2-linux-x86
+/deployment/maven/dist_gtk2-linux-x86_64/
+/deployment/maven/dist_longhorn
+/deployment/maven/dist_omtplugins/
+/deployment/maven/dist_plugins/
 /deployment/maven/dist_win32-x86
 /deployment/maven/dist_win32-x86_64
-/deployment/maven/dist_cocoa-macosx-x86_64
-/deployment/maven/dist_gtk2-linux-x86
-/deployment/maven/dist_longhorn
-/deployment/maven/dist_cocoa-macosx
 /deployment/maven/dist_xlifflib
+/deployment/maven/done/
+/deployment/maven/tmp/
 
-/okapi/core/nullout.xlf
-/okapi/integration-tests/genericOutput.txt
-/okapi/integration-tests/output.xml
-/okapi/integration-tests/output1.html
-/okapi/integration-tests/output2.html
-/okapi/steps/termextraction/terms.txt
 /deployment/website/dist
 

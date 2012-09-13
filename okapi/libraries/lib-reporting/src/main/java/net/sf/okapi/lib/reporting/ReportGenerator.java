@@ -26,7 +26,8 @@ import java.text.DecimalFormatSymbols;
 import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import net.sf.okapi.common.ListUtil;
@@ -50,7 +51,7 @@ public class ReportGenerator {
 	private boolean multiItemReport;
 	private boolean htmlReport;
 	
-	private final Logger logger = Logger.getLogger(this.getClass().getName());
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 	
 	public ReportGenerator(String template) {
 		super();
@@ -224,7 +225,7 @@ public class ReportGenerator {
 		    else 
 		    	break;
 	    }
-		logger.fine(sb.toString());
+		logger.debug(sb.toString());
 		return st;
 	}
 	
@@ -374,7 +375,7 @@ public class ReportGenerator {
 	public void setTemplate(String template) {
 		this.template = template;
 		if (Util.isEmpty(template)) {
-			logger.warning("Scoping Report template is not set.");
+			logger.warn("Scoping Report template is not set.");
 			return;
 		}
 		registerFields();

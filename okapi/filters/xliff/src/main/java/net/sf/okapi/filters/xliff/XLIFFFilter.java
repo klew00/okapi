@@ -25,7 +25,8 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.xml.XMLConstants;
 import javax.xml.stream.XMLInputFactory;
@@ -77,7 +78,7 @@ import net.sf.okapi.common.skeleton.ISkeletonWriter;
 @UsingParameters(Parameters.class)
 public class XLIFFFilter implements IFilter {
 
-	private final Logger logger = Logger.getLogger(getClass().getName());
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 	
 	public static final String PROP_BUILDNUM = "build-num";
 	public static final String PROP_EXTRADATA = "extradata";
@@ -250,7 +251,7 @@ public class XLIFFFilter implements IFilter {
 				inStreamReader = new InputStreamReader(input.getStream(), inStreamCharset);
 			}
 			catch ( java.io.UnsupportedEncodingException e ) {
-				logger.warning(String.format("Invalid encoding '%s', using default.", inStreamCharset));
+				logger.warn(String.format("Invalid encoding '%s', using default.", inStreamCharset));
 				inStreamReader = new InputStreamReader(input.getStream());
 			}
 			// When possible, make sure we have a filename associated with the stream
@@ -432,7 +433,7 @@ public class XLIFFFilter implements IFilter {
 		if ( tmp == null ) throw new OkapiIllegalFilterOperationException("Missing attribute 'source-language'.");
 		LocaleId tmpLang = LocaleId.fromString(tmp); 
 		if ( !tmpLang.equals(srcLang) ) { // Warn about source language
-			logger.warning(String.format("The source language declared in <file> is '%s' not '%s'.", tmp, srcLang));
+			logger.warn(String.format("The source language declared in <file> is '%s' not '%s'.", tmp, srcLang));
 		}
 		
 		// Check the target language
@@ -444,7 +445,7 @@ public class XLIFFFilter implements IFilter {
 			}
 			else { // If we do not override the target
 				if ( !tmpLang.sameLanguageAs(trgLang) ) { // Warn about target language
-					logger.warning(String.format("The target language declared in <file> is '%s' not '%s'. '%s' will be used.",
+					logger.warn(String.format("The target language declared in <file> is '%s' not '%s'. '%s' will be used.",
 						prop.getValue(), trgLang, prop.getValue()));
 					trgLang = tmpLang;
 				}
@@ -816,7 +817,7 @@ public class XLIFFFilter implements IFilter {
 				TextContainer cont = tc.clone();
 				cont.getSegments().joinAll();
 				if ( cont.compareTo(tu.getSource(), true) != 0 ) {
-					logger.warning(String.format("The <seg-source> content for the entry id='%s' is different from its <source>. The un-segmented content of <source> will be used.", tu.getId()));
+					logger.warn(String.format("The <seg-source> content for the entry id='%s' is different from its <source>. The un-segmented content of <source> will be used.", tu.getId()));
 				}
 				else { // Same content: use the segmented one
 					tc.setHasBeenSegmentedFlag(true); // Force entries without mrk to single segment entries
@@ -993,7 +994,7 @@ public class XLIFFFilter implements IFilter {
 			Segment seg = tc.getSegments().get(mid);
 			if ( seg == null ) {
 				// No corresponding segment found. We drop that entry
-				logger.warning(String.format("An <alt-trans> element for an unknown segment '%s' was detected. It will be ignored.", mid));
+				logger.warn(String.format("An <alt-trans> element for an unknown segment '%s' was detected. It will be ignored.", mid));
 				processAltTrans = false;
 				return;
 			}
@@ -1226,7 +1227,7 @@ public class XLIFFFilter implements IFilter {
 						tmp = reader.getAttributeValue(null, "pos");
 						TagType tt = TagType.PLACEHOLDER;
 						if ( tmp == null ) {
-							logger.severe("Missing pos attribute for <it> element.");
+							logger.error("Missing pos attribute for <it> element.");
 						}
 						else if ( tmp.equals("close") ) {
 							tt = TagType.CLOSING;
@@ -1235,7 +1236,7 @@ public class XLIFFFilter implements IFilter {
 							tt = TagType.OPENING;
 						}
 						else {
-							logger.severe(String.format("Invalid value '%s' for pos attribute.", tmp));
+							logger.error(String.format("Invalid value '%s' for pos attribute.", tmp));
 						}
 						appendCode(tt, id, name, name, store, current);
 					}
@@ -1310,7 +1311,7 @@ public class XLIFFFilter implements IFilter {
 					if ( store ) storeStartElement(false, false);
 					StringBuilder tmpg = new StringBuilder();
 					if ( reader.getLocalName().equals("sub") ) {
-						logger.warning("A <sub> element was detected. It will be included in its parent code as <sub> is currently not supported.");
+						logger.warn("A <sub> element was detected. It will be included in its parent code as <sub> is currently not supported.");
 					}
 					else if ( tagName.equals(reader.getLocalName()) ) {
 						endStack++; // Take embedded elements into account 

@@ -9,25 +9,23 @@ import org.slf4j.LoggerFactory;
 
 public class ServletCdiInjectorFactory extends CdiInjectorFactory {
 
-	private static final Logger log = LoggerFactory
-			.getLogger(ServletCdiInjectorFactory.class);
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 
 	@Override
 	protected BeanManager lookupBeanManager() {
 		InitialContext ctx = null;
 		try {
-			log.debug("Doing a lookup of BeanManager in java:comp/BeanManager");
+			logger.debug("Doing a lookup of BeanManager in java:comp/BeanManager");
 			ctx = new InitialContext();
 			return (BeanManager) ctx.lookup("java:comp/BeanManager");
 		} catch (NamingException e) {
 			// Workaround for WELDINT-19
 			try {
-				log.debug("Lookup failed. Trying java:app/BeanManager");
+				logger.debug("Lookup failed. Trying java:app/BeanManager");
 				return (BeanManager) ctx.lookup("java:app/BeanManager");
 			} catch (NamingException ne) {
 				try {
-					log
-							.debug("Lookup failed. Trying java:comp/env/BeanManager");
+					logger.debug("Lookup failed. Trying java:comp/env/BeanManager");
 					return (BeanManager) ctx
 							.lookup("java:comp/env/BeanManager");
 				} catch (NamingException nex) {

@@ -18,52 +18,21 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.applications.tikal;
+package net.sf.okapi.applications.rainbow.logger;
 
-import java.io.PrintStream;
-import java.util.logging.Handler;
-import java.util.logging.Level;
-import java.util.logging.LogRecord;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-class LogHandler extends Handler {
-	
-	private PrintStream ps;
-
-	public LogHandler (PrintStream ps) {
-		this.ps = ps;
+public class LogHandlerFactory {
+	static public ILogHandler getLogHandler() {
+		Logger localLogger = LoggerFactory.getLogger(LogHandlerFactory.class);
+		String realLogger = localLogger.getClass().getName();
+		if( "org.slf4j.impl.JDK14LoggerAdapter".equals(realLogger) )
+			return new LogHandlerJDK();
+		if( "org.slf4j.impl.Log4jLoggerAdapter".equals(realLogger) )
+			return new LogHandlerLog4j();
+		// if( "org.slf4j.impl.JCLLoggerAdapter".equals(realLogger) )
+		// if( "ch.qos.logback.classic.Logger".equals(realLogger) )
+		return new LogHandlerNop();
 	}
-	
-	@Override
-	public void close ()
-		throws SecurityException
-	{
-		// Do nothing
-	}
-
-	@Override
-	public void flush () {
-		// Do nothing
-	}
-
-	@Override
-	public void publish (LogRecord record) {
-		if ( record.getLevel() == Level.SEVERE ) {
-			ps.println("Error: " + record.getMessage());
-			Throwable e = record.getThrown();
-			if ( e != null ) {
-				ps.println(e.getMessage());
-				ps.println(" @ "+e.toString()); //$NON-NLS-1$
-			}
-		}
-		else if ( record.getLevel() == Level.WARNING ) {
-			// Filter out Axis warnings
-			if ( "org.apache.axis.utils.JavaUtils".equals(record.getLoggerName()) ) return;
-			// Otherwise print
-			ps.println("Warning: " + record.getMessage());
-		}
-		else if ( record.getLevel() == Level.INFO ) {
-			ps.println(record.getMessage());
-		}
-	}
-
 }

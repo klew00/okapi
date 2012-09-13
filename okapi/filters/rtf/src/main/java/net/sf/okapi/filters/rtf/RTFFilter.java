@@ -34,7 +34,8 @@ import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
@@ -133,7 +134,7 @@ public class RTFFilter implements IFilter {
 	public static final int CW_FLDINST           = 57;
 	public static final int CW_XMLOPEN           = 58;
 
-	private final Logger logger = Logger.getLogger(getClass().getName());
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 	
 	// Tags from S-Tagger that are open/close, all other are isolated
 	private static final String PAIREDTAGS = ":fc:cs:b:i:s:bi:c:c1:c2:cns:el:elf:ti:";
@@ -511,7 +512,7 @@ public class RTFFilter implements IFilter {
 			switch ( getNextToken() ) {
 			case TOKEN_ENDINPUT:
 				if ( !rtfDetected ) {
-					logger.warning("The input does not seem to be an RTF document.");
+					logger.warn("The input does not seem to be an RTF document.");
 				}
 				return false;
 
@@ -659,7 +660,7 @@ public class RTFFilter implements IFilter {
 									endHidden = trgFrag.length();
 								}
 								if ( endHidden-startHidden > 0 ) {
-									logger.warning(String.format("Hidden text detected in target content of text unit '%s'\nTarget=\"%s\"",
+									logger.warn(String.format("Hidden text detected in target content of text unit '%s'\nTarget=\"%s\"",
 										tu.getId(), trgFrag.toText()));
 									tu.setTargetProperty(trgLang, new Property(PROP_HASHIDDENTEXT,
 										String.format("%d;%d", startHidden, endHidden)));
@@ -1028,7 +1029,7 @@ public class RTFFilter implements IFilter {
 							chCurrent = charBuf.get(0);
 						}
 						catch (CharacterCodingException e) {
-							logger.warning(String.format("Encoding issue: %s%s", e.getLocalizedMessage(),
+							logger.warn(String.format("Encoding issue: %s%s", e.getLocalizedMessage(),
 								ctxStack.peek().inText ? " Character replaced by '?' in text." : ""));
 							chCurrent = '?';
 						}
@@ -1051,7 +1052,7 @@ public class RTFFilter implements IFilter {
 									chCurrent = charBuf.get(0);
 								}
 								catch (CharacterCodingException e) {
-									logger.warning(String.format("Issue decoding bytes into character: %s%s", e.getLocalizedMessage(),
+									logger.warn(String.format("Issue decoding bytes into character: %s%s", e.getLocalizedMessage(),
 										ctxStack.peek().inText ? " Character replaced by '?' in text." : ""));
 									chCurrent = '?';
 								}
@@ -1079,7 +1080,7 @@ public class RTFFilter implements IFilter {
 							chCurrent = charBuf.get(0);
 						}
 						catch (CharacterCodingException e) {
-							logger.warning(e.getLocalizedMessage());
+							logger.warn(e.getLocalizedMessage());
 							chCurrent = '?';
 						}
 					}
@@ -1093,11 +1094,11 @@ public class RTFFilter implements IFilter {
 			case TOKEN_ENDINPUT:
 				if ( group > 0 ) {
 					// Missing '{'
-					logger.warning(String.format("Missing '{' = %d.", group));
+					logger.warn(String.format("Missing '{' = %d.", group));
 				}
 				else if ( group < 0 ) {
 					// Extra '}'
-					logger.warning(String.format("Extra '}' = %d.", group));
+					logger.warn(String.format("Extra '}' = %d.", group));
 				}
 				return nRes;
 
@@ -1338,7 +1339,7 @@ public class RTFFilter implements IFilter {
 				}
 				else {
 					// Font undefined: Switch to the default encoding
-					logger.warning(String.format("The font '%d' is undefined. The encoding '%s' is used by default instead.", 
+					logger.warn(String.format("The font '%d' is undefined. The encoding '%s' is used by default instead.", 
 						value, defaultEncoding));
 					loadEncoding(defaultEncoding);
 				}
@@ -1413,7 +1414,7 @@ public class RTFFilter implements IFilter {
 		case CW_ANSICPG:
 			String name = winCodepages.get(value);
 			if ( name == null ) {
-				logger.warning(String.format("The codepage '%d' is undefined. The encoding '%s' is used by default instead.",
+				logger.warn(String.format("The codepage '%d' is undefined. The encoding '%s' is used by default instead.",
 					value, defaultEncoding));
 				ctxStack.peek().encoding = defaultEncoding;
 			}
@@ -1509,7 +1510,7 @@ public class RTFFilter implements IFilter {
 			|| ( "arabic-user".compareTo(encodingName) == 0 )
 			|| ( "hebrew-user".compareTo(encodingName) == 0 ))
 		{
-			logger.warning(String.format("The encoding '%s' is unsupported. The encoding '%s' is used by default instead.", 
+			logger.warn(String.format("The encoding '%s' is unsupported. The encoding '%s' is used by default instead.", 
 				encodingName, defaultEncoding));
 			encodingName = defaultEncoding;
 		}
