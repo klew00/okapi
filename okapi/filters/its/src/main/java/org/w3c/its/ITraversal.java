@@ -62,11 +62,11 @@ public interface ITraversal {
 	public boolean getTranslate (Attr attribute);
 
 	/**
-	 * Gets the target pointer for the current element of the traversal.
+	 * Gets the target pointer for the current element of the traversal or one of its attributes.
 	 * @return The XPath relative to the current element to the node where the
 	 * translation should be placed.
 	 */
-	public String getTargetPointer ();
+	public String getTargetPointer (Attr attribute);
 	
 	/**
 	 * Gets the id value for the current element of the traversal or one of its attributes.
@@ -129,23 +129,11 @@ public interface ITraversal {
 	public String getTermInfo (Attr attribute);
 	
 	/**
-	 * Gets the localization notes of the current element of the traversal, or null
-	 * if the node has no localization notes.
-	 * @return the localization note of the current element, or null if the
-	 * node has no localization note.
-	 */
-	public String getLocNote ();
-	
-	/**
-	 * Gets the localization note of the given attribute of the current element.
+	 * Gets the localization note of the given attribute of the current element or one of its attributes.
 	 * @param attribute the attribute to query. The attribute must be in the current
-	 * node of the traversal.
-	 * @return The localization note of the attribute, or null if the
-	 * attribute has no localization note.
+	 * @return The localization note of the queried part.
 	 */
 	public String getLocNote (Attr attribute);
-	
-	public String getLocNoteType ();
 	
 	public String getLocNoteType (Attr attribute);
 	

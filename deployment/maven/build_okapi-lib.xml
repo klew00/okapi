@@ -128,8 +128,6 @@
 			 excludes="**/META-INF/**"/>
 			<fileset dir="../../okapi/filters/xliff/target/classes"
 			 excludes="**/META-INF/**"/>
-			<fileset dir="../../okapi/filters/xml/target/classes"
-			 excludes="**/META-INF/**"/>
 			<fileset dir="../../okapi/filters/xmlstream/target/classes"
 			 excludes="**/META-INF/**"/>
 			<fileset dir="../../okapi/filters/rainbowkit/target/classes"

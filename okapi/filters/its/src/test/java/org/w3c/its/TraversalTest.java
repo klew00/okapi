@@ -37,6 +37,7 @@ import net.sf.okapi.common.TestUtil;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -92,6 +93,21 @@ public class TraversalTest {
 	}
 
 	@Test
+	public void testLocNote () throws SAXException, IOException, ParserConfigurationException {
+		InputSource is = new InputSource(new StringReader("<doc>"
+			+ "<i:rules xmlns:i='"+ITSEngine.ITS_NS_URI+"' version='2.0'>"
+			+ "<i:locNoteRule selector='//p' locNoteType='description' locNotePointer='@note'/>"
+			+ "</i:rules>"
+			+ "<p note='some note'>text</p></doc>"));
+		Document doc = fact.newDocumentBuilder().parse(is);
+		ITraversal trav = applyITSRules(doc, null, false, null);
+		Element elem = getElement(trav, "p", 1);
+		assertNotNull(elem);
+		assertEquals("some note", trav.getLocNote(null));
+		assertEquals("description", trav.getLocNoteType(null));
+	}
+
+	@Test
 	public void testWithinText () throws SAXException, IOException, ParserConfigurationException {
 		Document doc = fact.newDocumentBuilder().parse(root + "/Translate1.xml");
 		ITraversal trav = applyITSRules(doc, new File(root + "/Translate1.xml").toURI(), false, null);
@@ -134,11 +150,26 @@ public class TraversalTest {
 		Element elem = getElement(trav, "entry", 1);
 		assertNotNull(elem);
 		assertTrue(trav.getTranslate(null));
-		assertEquals(null, trav.getTargetPointer());
+		assertEquals(null, trav.getTargetPointer(null));
 		elem = getElement(trav, "src", 1);
 		assertNotNull(elem);
 		assertTrue(trav.getTranslate(null));
-		assertEquals("../trg", trav.getTargetPointer());
+		assertEquals("../trg", trav.getTargetPointer(null));
+	}
+
+	@Test
+	public void testTargetPointerAttributes () throws SAXException, IOException, ParserConfigurationException {
+		InputSource is = new InputSource(new StringReader("<doc>"
+			+ "<i:rules xmlns:i='"+ITSEngine.ITS_NS_URI+"' version='2.0'>"
+			+ "<i:targetPointerRule selector='//entry/@src' targetPointer='../@trg'/>"
+			+ "</i:rules>"
+			+ "<entry src='source' trg='' /></doc>"));
+		Document doc = fact.newDocumentBuilder().parse(is);
+		ITraversal trav = applyITSRules(doc, null, false, null);
+		Element elem = getElement(trav, "entry", 1);
+		assertNotNull(elem);
+		Attr attr = elem.getAttributeNode("src");
+		assertEquals("../@trg", trav.getTargetPointer(attr));
 	}
 
 	@Test
@@ -172,11 +203,11 @@ public class TraversalTest {
 		Element elem = getElement(trav, "entry", 1);
 		assertNotNull(elem);
 		assertTrue(trav.getTranslate(null));
-		assertEquals(null, trav.getTargetPointer());
+		assertEquals(null, trav.getTargetPointer(null));
 		elem = getElement(trav, "src", 1);
 		assertNotNull(elem);
 		assertTrue(trav.getTranslate(null));
-		assertEquals("../trg", trav.getTargetPointer());
+		assertEquals("../trg", trav.getTargetPointer(null));
 	}
 
 	@Test

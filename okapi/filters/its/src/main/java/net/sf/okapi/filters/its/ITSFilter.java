@@ -315,7 +315,7 @@ public abstract class ITSFilter implements IFilter {
 				// and to include the empty elements (for attributes).
 				if ( !tmpTrav.backTracking() ) {
 					if ( tmpTrav.getTranslate(null) ) {
-						String pointer = tmpTrav.getTargetPointer();
+						String pointer = tmpTrav.getTargetPointer(null);
 						if ( pointer != null ) {
 							resolveTargetPointer(itsEng.getXPath(), srcNode, pointer);
 							hasTargetPointer = true;

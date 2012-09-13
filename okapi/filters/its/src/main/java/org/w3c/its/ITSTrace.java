@@ -29,6 +29,7 @@ class ITSTrace {
 	boolean term;
 	String termInfo;
 	String locNote;
+	String locNoteType;
 	boolean preserveWS;
 	String language;
 	String targetPointer;
@@ -65,6 +66,7 @@ class ITSTrace {
 		
 		// locNote: Inheritance for child elements including attributes
 		locNote = initialTrace.locNote;
+		locNoteType = initialTrace.locNoteType;
 		
 		// preserveWS: Inheritance for child elements but not attributes
 		preserveWS = initialTrace.preserveWS;

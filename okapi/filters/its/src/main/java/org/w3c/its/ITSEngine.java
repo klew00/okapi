@@ -73,11 +73,11 @@ public class ITSEngine implements IProcessor, ITraversal {
 	private static final String   FLAGDEFAULTDATA     = "????????????"
 		+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP;
 
-	private static final int STORAGE_SIZE_ENCODING = 0;
-	
-	private static final String[][] AN = {
-		{"storageSizeEncoding", "storage-size-encoding"}
-	};
+//	private static final int STORAGE_SIZE_ENCODING = 0;
+//	
+//	private static final String[][] AN = {
+//		{"storageSizeEncoding", "storage-size-encoding"}
+//	};
 	
 	// Indicator position
 	private static final int      FP_TRANSLATE             = 0;
@@ -352,8 +352,11 @@ public class ITSEngine implements IProcessor, ITraversal {
 					else if ( "param".equals(locName) ) {
 						processParam(ruleElem);
 					}
-					else if ( !"rules".equals(locName) && !"span".equals(locName) 
-						&& !"locQualityIssues".equals(locName) && !"locQualityIssue".equals(locName) ) {
+					else if ( !"rules".equals(locName)
+						&& !"span".equals(locName) 
+						&& !"locQualityIssues".equals(locName)
+						&& !"locQualityIssue".equals(locName)
+						&& !"locNote".equals(locName) ) {
 						logger.warning(String.format("Unknown element '%s'.", ruleElem.getNodeName()));
 					}
 				}
@@ -844,12 +847,9 @@ public class ITSEngine implements IProcessor, ITraversal {
 		ITSRule rule = new ITSRule(IProcessor.DC_LOCNOTE);
 		rule.selector = elem.getAttribute("selector");
 		rule.isInternal = isInternal;
-		
-		String type = elem.getAttribute("locNoteType");
-		if ( type.length() == 0 ) {
-			throw new ITSException("locNoteType attribute missing.");
-		}
-		
+
+		rule.flag = retrieveLocNoteType(elem, false, true);
+
 		// Try to get the locNote element
 		String value1 = "";
 		NodeList list = elem.getElementsByTagNameNS(ITS_NS_URI, "locNote");
@@ -892,7 +892,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 				}
 			}
 		}
-
+		
 		rules.add(rule);
 	}
 
@@ -1075,6 +1075,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 		
 		if ( data.charAt(FP_LOCNOTE) != '?' ) {
 			trace.peek().locNote = getFlagData(data, FP_LOCNOTE_DATA);
+			trace.peek().locNoteType = (data.charAt(FP_LOCNOTE)=='a' ? "alert" : "description");
 		}
 
 		// Preserve white spaces
@@ -1165,7 +1166,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 						break;
 						
 					case IProcessor.DC_LOCNOTE:
-						setFlag(NL.item(i), FP_LOCNOTE, 'y', true);
+						setFlag(NL.item(i), FP_LOCNOTE, (rule.flag ? 'a' : 'd'), true); // Type alert or description
 						switch ( rule.infoType ) {
 						case LOCNOTETYPE_TEXT:
 							setFlag(NL.item(i), FP_LOCNOTE_DATA, rule.info, true);
@@ -1412,10 +1413,15 @@ public class ITSEngine implements IProcessor, ITraversal {
 					// Skip irrelevant nodes
 					if ( ITS_NS_URI.equals(attr.getOwnerElement().getNamespaceURI())
 						&& "locNoteRule".equals(attr.getOwnerElement().getLocalName()) ) continue;
-					setFlag(attr.getOwnerElement(), FP_LOCNOTE, 'y', attr.getSpecified());
+					// Retreive the type of note
+					boolean qualified = true;
+					String ns = attr.getOwnerElement().getNamespaceURI();
+					if ( !Util.isEmpty(ns) ) qualified = !ns.equals(ITS_NS_URI);
+					boolean alert = retrieveLocNoteType(attr.getOwnerElement(), qualified, false);
+					// Set the flags/data
+					setFlag(attr.getOwnerElement(), FP_LOCNOTE, (alert ? 'a' : 'd'), attr.getSpecified());
 					if ( localName.equals("locNote") ) {
-						setFlag(attr.getOwnerElement(), FP_LOCNOTE_DATA,
-							attr.getValue(), attr.getSpecified());
+						setFlag(attr.getOwnerElement(), FP_LOCNOTE_DATA, attr.getValue(), attr.getSpecified());
 					}
 					else if ( localName.equals("termInfoPointer") ) {
 						setFlag(attr.getOwnerElement(), FP_LOCNOTE_DATA,
@@ -1612,6 +1618,30 @@ public class ITSEngine implements IProcessor, ITraversal {
 		else { // Inside a global rule
 			return elem.getAttribute("localeFilterList").trim();
 		}
+	}
+	
+	private boolean retrieveLocNoteType (Element elem,
+		boolean qualified,
+		boolean required)
+	{
+		String type;
+		if ( qualified ) {
+			type = elem.getAttributeNS(ITS_NS_URI, "locNoteType");
+		}
+		else {
+			type = elem.getAttribute("locNoteType");
+		}
+		
+		if ( type.isEmpty() && required ) {
+			throw new ITSException("locNoteType attribute missing.");
+		}
+		else if ( type.equals("alert") ) {
+			return true; // alert
+		}
+		else if ( !type.equals("description") && !type.isEmpty() ) {
+			throw new ITSException(String.format("Invalide value '%s' for locNoteType.", type));
+		}
+		return false; // description
 	}
 	
 	private String[] retrieveStorageSizeData (Element elem,
@@ -1862,10 +1892,16 @@ public class ITSEngine implements IProcessor, ITraversal {
 		return (tmp.charAt(FP_TRANSLATE) == 'y');
 	}
 
-	public String getTargetPointer () {
-		return trace.peek().targetPointer;
+	@Override
+	public String getTargetPointer (Attr attribute) {
+		if ( attribute == null ) return trace.peek().targetPointer;
+		// Else: check the attribute
+		String tmp;
+		if ( (tmp = (String)attribute.getUserData(FLAGNAME)) == null ) return null;
+		return getFlagData(tmp, FP_TARGETPOINTER_DATA);
 	}
 	
+	@Override
 	public String getIdValue (Attr attribute) {
 		if ( attribute == null ) return trace.peek().idValue;
 		// Else: check the attribute
@@ -1905,25 +1941,21 @@ public class ITSEngine implements IProcessor, ITraversal {
 		return getFlagData(tmp, FP_TERMINOLOGY_DATA);
 	}
 
-	public String getLocNote () {
-		return trace.peek().locNote;
-	}
-	
 	public String getLocNote (Attr attribute) {
-		if ( attribute == null ) return null;
+		if ( attribute == null ) return trace.peek().locNote;
 		String tmp;
 		if ( (tmp = (String)attribute.getUserData(FLAGNAME)) == null ) return null;
-		if ( tmp.charAt(FP_LOCNOTE) != 'y' ) return null;
+		if ( tmp.charAt(FP_LOCNOTE) == '?' ) return null;
 		return getFlagData(tmp, FP_LOCNOTE_DATA);
 	}
 
-	public String getLocNoteType () {
-		return "TODO";
-	}
-	
 	public String getLocNoteType (Attr attribute) {
-		if ( attribute == null ) return null;
-		return "TODO";
+		if ( attribute == null ) return trace.peek().locNoteType;
+		String tmp;
+		if ( (tmp = (String)attribute.getUserData(FLAGNAME)) == null ) return null;
+		if ( tmp.charAt(FP_LOCNOTE) == '?' ) return null;
+		if ( tmp.charAt(FP_LOCNOTE) == 'a' ) return "alert";
+		return "description";
 	}
 	
 	public String getDomains () {

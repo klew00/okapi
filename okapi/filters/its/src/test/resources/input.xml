@@ -5,7 +5,6 @@
    <its:translateRule selector="//@title" translate="yes"/>
    <its:termRule selector="//term" term="yes" termInfoPointer="id(@def)"/>
    <its:termRule selector="//img/@keyword" term="yes"/>
-   <its:locNoteRule locNoteType="warning" selector="//@title" locNotePointer=".."/>
  </its:rules>
  <p title="Text">We may define <term def="TDPV">discoursal point of view</term>
 as <gloss xml:id="TDPV">the relationship, expressed through discourse
