@@ -673,6 +673,7 @@ public class Main {
 		filtersMap.put("okf_versifiedtxt", "net.sf.okapi.filters.versifiedtxt.VersifiedTextFilter");
 		filtersMap.put("okf_xmlstream", "net.sf.okapi.filters.xmlstream.XmlStreamFilter");
 		filtersMap.put("okf_mosestext", "net.sf.okapi.filters.mosestext.MosesTextFilter");
+		filtersMap.put("okf_itshtml5", "net.sf.okapi.filters.its.html5.HTML5Filter");
 
 		if ( specifiedConfigIdPath != null ) {
 			fcMapper.setCustomConfigurationsDirectory(specifiedConfigIdPath);

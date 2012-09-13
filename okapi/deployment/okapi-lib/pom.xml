@@ -197,7 +197,7 @@
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
-			<artifactId>okapi-filter-xml</artifactId>
+			<artifactId>okapi-filter-its</artifactId>
 			<groupId>net.sf.okapi.filters</groupId>
 			<version>${project.version}</version>
 		</dependency>
