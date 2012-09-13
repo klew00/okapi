@@ -34,9 +34,9 @@
 	<property name="okapilibStamp" value="${okapilibVersion}${releaseInfo}" />
 	<property name="mavenStore" value="${user.home}/.m2/repository"/>
 
- 	<property name="tmp" value="tmp"/>
 	<property name="done" value="done"/>
-	<property name="dist_omtplugins" value="dist_omtplugins"/>
+	<property name="dist_omtpluginBase" value="dist_omtplugins"/>
+	<property name="dist_omtplugins" value="${dist_omtpluginBase}/okapi"/>
 	<property name="base_name" value="okapiFiltersForOmegaT"/>
 	<property name="distName" value="${base_name}-${okapilibStamp}"/>
 	<property name="zipName" value="okapi-pluginForOmegaT_all-platforms_${okapilibStamp}"/>
@@ -51,19 +51,11 @@
 			<fileset dir="${dist_omtplugins}"/>
 		</delete>
 		<mkdir dir="${dist_omtplugins}"/>
-		<delete includeEmptyDirs="true" failonerror="false">
-			<fileset dir="${tmp}"/>
-		</delete>
-		<mkdir dir="${tmp}"/>
 	</target>
 
 	<!-- Make the jar files -->
 	<target name="makeJars"> 
 
-	<!-- prepare the classes for the JSON library-->
-	<unzip src="${mavenStore}/com/googlecode/json-simple/json-simple/1.1/json-simple-1.1.jar"
-	 dest="${tmp}"/>
-	
 	<jar destfile="${dist_omtplugins}/${distName}.jar"
 		manifest="../../okapi/libraries/lib-omegat/META-INF/MANIFEST.MF">
 		<!-- Adapter -->
@@ -87,16 +79,19 @@
 		<fileset dir="../../okapi/filters/transifex/target/classes" includes="net/**"/>
 		<fileset dir="../../okapi/libraries/lib-transifex/target/classes" includes="net/**"/>
 		<fileset dir="../../okapi/filters/po/target/classes" includes="net/**"/>
-		<!-- From the JSON library-->
-		<fileset dir="${tmp}" includes="org/json/simple/**"/>
-		
 	</jar>
+
+	<!-- The the JSON library -->
+	<copy todir="${dist_omtplugins}" file="${mavenStore}/com/googlecode/json-simple/json-simple/1.1/json-simple-1.1.jar"/>
+	<!-- The SLF4J library and it's JDK binding -->
+	<copy todir="${dist_omtplugins}" file="${mavenStore}/org/slf4j/slf4j-api/1.7.0/slf4j-api-1.7.0.jar"/>
+	<copy todir="${dist_omtplugins}" file="${mavenStore}/org/slf4j/slf4j-jdk14/1.7.0/slf4j-jdk14-1.7.0.jar"/>
 	
 	<copy tofile="${dist_omtplugins}/${base_name}-readme.html" file="data/omegat-plugins/readme.html"/>
 	<replace file="${dist_omtplugins}/${base_name}-readme.html" token="@version@" value="${okapilibStamp}"/>
 	<replace file="${dist_omtplugins}/${base_name}-readme.html" token="@date@" value="${TODAY}"/>
 
-	<zip destfile="${done}/${zipName}.zip" basedir="${dist_omtplugins}"/>
+	<zip destfile="${done}/${zipName}.zip" basedir="${dist_omtpluginBase}"/>
 
 	</target>
 	
