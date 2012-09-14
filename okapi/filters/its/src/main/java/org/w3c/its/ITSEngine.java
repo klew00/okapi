@@ -544,7 +544,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 		rule.selector = elem.getAttribute("selector");
 		rule.isInternal = isInternal;
 		
-		String np[] = retrieveStorageSizeData(elem, false);
+		String np[] = retrieveStorageSizeData(elem, false, false);
 		
 		String storageSizeP = null;
 		if ( elem.hasAttribute("storageSizePointer") )
@@ -688,7 +688,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 		rule.selector = elem.getAttribute("selector");
 		rule.isInternal = isInternal;
 		// Retrieve the list
-		rule.info = retrieveLocaleFilterList(elem, false);
+		rule.info = retrieveLocaleFilterList(elem, false, false);
 		// Add the rule
 		rules.add(rule);
 	}
@@ -1495,7 +1495,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 					boolean qualified = true;
 					String ns = attr.getOwnerElement().getNamespaceURI();
 					if ( !Util.isEmpty(ns) ) qualified = !ns.equals(ITS_NS_URI);
-					String value = retrieveLocaleFilterList(attr.getOwnerElement(), qualified);
+					String value = retrieveLocaleFilterList(attr.getOwnerElement(), qualified, isHTML5);
 					setFlag(attr.getOwnerElement(), FP_LOCFILTER, 'y', attr.getSpecified());
 					setFlag(attr.getOwnerElement(), FP_LOCFILTER_DATA,
 						value, attr.getSpecified()); 
@@ -1534,12 +1534,14 @@ public class ITSEngine implements IProcessor, ITraversal {
 					String oriData = (String)attr.getOwnerElement().getUserData(FLAGNAME);
 					if ( oriData != null ) {
 						String[] ori = fromSingleString(getFlagData(oriData, FP_LQISSUE_DATA));
-						// Use original values if local one is not defined
-						if ( values[0] == null ) values[0] = ori[0];
-						if ( values[1] == null ) values[1] = ori[1];
-						if ( values[2] == null ) values[2] = ori[2];
-						if ( values[3] == null ) values[3] = ori[3];
-						if ( values[4] == null ) values[4] = ori[4];
+						if ( ori.length > 1 ) {
+							// Use original values if local one is not defined
+							if ( values[0] == null ) values[0] = ori[0];
+							if ( values[1] == null ) values[1] = ori[1];
+							if ( values[2] == null ) values[2] = ori[2];
+							if ( values[3] == null ) values[3] = ori[3];
+							if ( values[4] == null ) values[4] = ori[4];
+						}
 					}
 					// Set the updated flags
 					setFlag(attr.getOwnerElement(), FP_LQISSUE, 'y', attr.getSpecified());
@@ -1550,7 +1552,12 @@ public class ITSEngine implements IProcessor, ITraversal {
 			
 			// Storage size
 			if (( (dataCategories & IProcessor.DC_STORAGESIZE) > 0 ) && isVersion2() ) {
-				expr = xpath.compile("//*/@"+ITS_NS_PREFIX+":storageSize|//"+ITS_NS_PREFIX+":span/@storageSize");
+				if ( isHTML5 ) {
+					expr = xpath.compile("//*/@its-storage-size");
+				}
+				else {
+					expr = xpath.compile("//*/@"+ITS_NS_PREFIX+":storageSize|//"+ITS_NS_PREFIX+":span/@storageSize");
+				}
 				NL = (NodeList)expr.evaluate(doc, XPathConstants.NODESET);
 				for ( int i=0; i<NL.getLength(); i++ ) {
 					attr = (Attr)NL.item(i);
@@ -1561,14 +1568,16 @@ public class ITSEngine implements IProcessor, ITraversal {
 					boolean qualified = true;
 					String ns = attr.getOwnerElement().getNamespaceURI();
 					if ( !Util.isEmpty(ns) ) qualified = !ns.equals(ITS_NS_URI);
-					String[] values = retrieveStorageSizeData(attr.getOwnerElement(), qualified);
+					String[] values = retrieveStorageSizeData(attr.getOwnerElement(), qualified, isHTML5);
 					// Get the previous data (if any)
 					String oriData = (String)attr.getOwnerElement().getUserData(FLAGNAME);
 					if ( oriData != null ) {
 						String[] ori = fromSingleString(getFlagData(oriData, FP_STORAGESIZE_DATA));
-						// Use original values if local one is not defined
-						if ( values[0] == null ) values[0] = ori[0];
-						if ( values[1] == null ) values[1] = ori[1];
+						if ( ori.length > 1 ) {
+							// Use original values if local one is not defined
+							if ( values[0] == null ) values[0] = ori[0];
+							if ( values[1] == null ) values[1] = ori[1];
+						}
 					}
 					// Set the updated flags
 					setFlag(attr.getOwnerElement(), FP_STORAGESIZE, 'y', attr.getSpecified());
@@ -1607,9 +1616,10 @@ public class ITSEngine implements IProcessor, ITraversal {
 	 * @return the final list.
 	 */
 	private String retrieveLocaleFilterList (Element elem,
-		boolean qualified)
+		boolean qualified,
+		boolean useHTML5)
 	{
-		if ( isHTML5 ) {
+		if ( useHTML5 ) {
 			return elem.getAttribute("its-locale-filter-list").trim();
 		}
 		if ( qualified ) { // Locally
@@ -1645,11 +1655,18 @@ public class ITSEngine implements IProcessor, ITraversal {
 	}
 	
 	private String[] retrieveStorageSizeData (Element elem,
-		boolean qualified)
+		boolean qualified,
+		boolean useHTML5)
 	{
 		String[] data = new String[2];
 		
-		if ( qualified ) {
+		if ( useHTML5 ) {
+			if ( elem.hasAttribute("its-storage-size") )
+				data[0] = elem.getAttribute("its-storage-size");
+			if ( elem.hasAttribute("its-storage-size-encoding") )
+				data[1] = elem.getAttribute("its-storage-size-encoding");
+		}
+		else if ( qualified ) {
 			if ( elem.hasAttributeNS(ITS_NS_URI, "storageSize") )
 				data[0] = elem.getAttributeNS(ITS_NS_URI, "storageSize");
 			if ( elem.hasAttributeNS(ITS_NS_URI, "storageSizeEncoding") )

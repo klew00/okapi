@@ -149,7 +149,7 @@ public class ITSTest {
 		assertTrue(new File(output).exists());
 		
 		String gold = output.replace("/output/", "/expected/");
-//		assertTrue(fc.compareFilesPerLines(output, gold, "UTF-8"));
+		assertTrue(fc.compareFilesPerLines(output, gold, "UTF-8"));
 	}
 	
 }

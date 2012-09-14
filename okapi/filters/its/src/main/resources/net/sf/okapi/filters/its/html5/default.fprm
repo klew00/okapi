@@ -3,8 +3,14 @@
 <!-- All configurations to use with the HTML5+ITS filter MUST map 'h' to the HTML namespace. -->
 <its:rules xmlns:its="http://www.w3.org/2005/11/its" version="2.0"
  xmlns:h="http://www.w3.org/1999/xhtml">
+ 
  <!-- Inline elements -->
  <its:withinTextRule selector="//h:b|//h:code|//h:em|//h:i|//h:img|//h:span" withinText="yes"/>
+ 
  <!-- Translatable attribute -->
  <its:translateRule selector="//h:*/@abbr|//h:*/@alt" translate="yes"/>
+ 
+ <!-- Id Value -->
+ <its:idValueRule selector="//h:*[@id]" idValue="@id"/>
+
 </its:rules>

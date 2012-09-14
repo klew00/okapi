@@ -100,6 +100,7 @@ public class Main {
 						+ "\n" + DC_PRESERVESPACE
 						+ "\n" + DC_LOCQUALITYISSUE
 					);
+					return;
 				}
 				else {
 					if ( inputFile == null ) {

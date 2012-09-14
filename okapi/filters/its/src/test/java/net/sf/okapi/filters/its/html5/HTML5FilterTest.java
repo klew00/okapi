@@ -7,6 +7,7 @@ import net.sf.okapi.common.filters.FilterTestDriver;
 import net.sf.okapi.common.filterwriter.GenericContent;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.ITextUnit;
+import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.RawDocument;
 import static org.junit.Assert.*;
 
@@ -84,6 +85,33 @@ public class HTML5FilterTest {
 		ITextUnit tu = FilterTestDriver.getTextUnit(list, 2);
 		assertNotNull(tu);
 		assertEquals("Text 2", fmt.setContent(tu.getSource().getFirstContent()).toString());
+	}
+	
+	@Test
+	public void testIdValueLocal () {
+		String snippet = "<!DOCTYPE html><html lang=en><head><meta charset=utf-8><title>Title</title></head><body>"
+			+ "<p id='n1'>Text 1</p>"
+			+ "</body></html>";
+		ArrayList<Event> list = getEvents(snippet);
+		ITextUnit tu = FilterTestDriver.getTextUnit(list, 2);
+		assertNotNull(tu);
+		assertEquals("n1", tu.getName());
+	}
+	
+	@Test
+	public void testStorageSizeLocal () {
+		String snippet = "<!DOCTYPE html><html lang=en><head><meta charset=utf-8><title>Title</title></head><body>"
+			+ "<ul>"
+			+ "<li its-storage-size='10' its-storage-size-encoding='UTF-8'>1234567890-Extra</li>"
+			+ "<li its-storage-size='22' its-storage-size-encoding='ISO-8859-1'>abcdefghij-Extra</li>"
+			+ "</ul>"
+			+ "</body></html>";
+		ArrayList<Event> list = getEvents(snippet);
+		ITextUnit tu = FilterTestDriver.getTextUnit(list, 2);
+		assertNotNull(tu);
+		assertEquals("10\tUTF-8", tu.getProperty(Property.ITS_STORAGESIZE).getValue());
+		tu = FilterTestDriver.getTextUnit(list, 3);
+		assertEquals("22\tISO-8859-1", tu.getProperty(Property.ITS_STORAGESIZE).getValue());
 	}
 	
 	@Test
