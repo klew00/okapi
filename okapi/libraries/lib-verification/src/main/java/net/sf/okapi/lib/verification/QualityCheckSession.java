@@ -457,7 +457,7 @@ public class QualityCheckSession {
 					// Ruler only after first input document
 					if ( docId != null ) writer.writeRawXML("<hr />");
 					docId = issue.docURI;
-					writer.writeElementString("p", "Input: "+docId.toString());
+					writer.writeElementString("p", "Input: "+docId.getPath());
 				}
 
 				String position = String.format("ID=%s", issue.tuId);
@@ -507,7 +507,7 @@ public class QualityCheckSession {
 				if (( docId == null ) || !docId.equals(issue.docURI) ) {
 					// Ruler only after first input document
 					docId = issue.docURI;
-					writer.println(docId.toString()+"\t\t\t");
+					writer.println(docId.getPath()+"\t\t\t");
 				}
 
 				String position = String.format("ID=%s", issue.tuId);
@@ -543,13 +543,12 @@ public class QualityCheckSession {
 			writer.writeStartElement("issues");				writer.writeLineBreak();
 
 			// Process the issues
-			URI docId = null;
 			for ( Issue issue : issues ) {
 				// Skip disabled issues
 				if ( !issue.enabled ) continue;
 
 				writer.writeStartElement("issue");		writer.writeLineBreak();
-				writeIndentedElementString( writer, "input", issue.docURI.toString());
+				writeIndentedElementString( writer, "input", issue.docURI.getPath());
 				writeIndentedElementString( writer, "tuName", issue.tuName);
 				writeIndentedElementString( writer, "tuId", issue.tuId);
 				writeIndentedElementString( writer, "segId", issue.segId);

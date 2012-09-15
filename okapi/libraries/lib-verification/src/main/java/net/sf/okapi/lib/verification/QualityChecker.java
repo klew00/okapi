@@ -63,6 +63,7 @@ class QualityChecker {
 	private CharsetEncoder encoder2;
 	private Pattern extraCharsAllowed;
 	private Pattern corruption;
+	private boolean monolingual;
 	
 	private final static Pattern WORDCHARS = Pattern.compile("[\\p{Ll}\\p{Lu}\\p{Lt}\\p{Lo}\\p{Nd}]");
 
@@ -146,6 +147,7 @@ class QualityChecker {
 	{
 		currentDocId = (new File(sd.getName())).toURI();
 		this.sigList = sigList;
+		monolingual = !sd.isMultilingual();
 	}
 
 	/**
@@ -171,12 +173,14 @@ class QualityChecker {
 			checkStorageSize(tu, srcCont, true);
 		}
 		
-		// Check if we have a target (even if option disabled)
+		// Check if we have a target
 		if ( trgCont == null ) {
-			// No translation available
-			reportIssue(IssueType.MISSING_TARGETTU, tu, null,
-				"Missing translation.",
-				0, -1, 0, -1, Issue.SEVERITY_HIGH, srcCont.toString(), "", null);
+			if ( !monolingual ) { // No report as error for monolingual files
+				// No translation available
+				reportIssue(IssueType.MISSING_TARGETTU, tu, null,
+					"Missing translation.",
+					0, -1, 0, -1, Issue.SEVERITY_HIGH, srcCont.toString(), "", null);
+			}
 			return;
 		}
 		
