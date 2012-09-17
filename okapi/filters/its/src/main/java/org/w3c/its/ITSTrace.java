@@ -42,8 +42,8 @@ class ITSTrace {
 	String lqIssueScore;
 	String lqIssueProfileRef;
 	String lqIssuesRef;
-	String storeSize;
-	String storeSizeEncoding;
+	String storageSize;
+	String storageEncoding;
 
 	ITSTrace () {
 		// Default constructor

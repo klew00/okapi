@@ -49,7 +49,7 @@ class ContextItem {
 		this.externalRes = trav.getExternalResourceRef();
 		
 		if ( trav.getStorageSize() != null ) {
-			this.storageSize = trav.getStorageSize() + "\t" + trav.getStorageSizeEncoding();
+			this.storageSize = trav.getStorageSize() + "\t" + trav.getStorageEncoding();
 		}
 	}
 

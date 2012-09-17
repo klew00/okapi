@@ -179,8 +179,8 @@ public interface ITraversal {
 	
 	public String getStorageSize(Attr attr);
 	
-	public String getStorageSizeEncoding ();
+	public String getStorageEncoding ();
 	
-	public String getStorageSizeEncoding (Attr attr);
+	public String getStorageEncoding (Attr attr);
 	
 }

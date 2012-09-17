@@ -48,6 +48,7 @@ import net.sf.okapi.common.filters.InlineCodeFinder;
 import net.sf.okapi.common.filterwriter.GenericFilterWriter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.resource.Code;
+import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.Property;
@@ -494,6 +495,9 @@ public abstract class ITSFilter implements IFilter {
 		tmp.append("<"
 			+ ((node.getPrefix()==null) ? "" : node.getPrefix()+":")
 			+ node.getLocalName());
+		
+		boolean checkEncoding = (isHTML5 && node.getLocalName().equals("meta"));
+		
 		if ( node.hasAttributes() ) {
 			NamedNodeMap list = node.getAttributes();
 			Attr attr;
@@ -517,6 +521,24 @@ public abstract class ITSFilter implements IFilter {
 					//TODO: handle xml:lang
 					tmp.append(Util.escapeToXML(attr.getNodeValue(), 3, false, null)
 						+ "\"");
+				}
+				else if ( isHTML5 && attr.getName().equals("lang") ) {
+					//String x = attr.getValue();
+					//TODO: handle xml:lang
+					tmp.append(Util.escapeToXML(attr.getNodeValue(), 3, false, null)
+						+ "\"");
+				}
+				else if ( checkEncoding && attr.getName().equals("charset") ) {
+					// For HTML5 documents: set the property placeholder for the encoding
+					DocumentPart dp = new DocumentPart(otherId.createId(), false);
+					dp.setProperty(new Property(Property.ENCODING, encoding));
+					skel.append(tmp.toString());
+					skel.addValuePlaceholder(dp, Property.ENCODING, LocaleId.EMPTY);
+					skel.append("\"");
+					queue.add(new Event(EventType.DOCUMENT_PART, dp, skel));
+					// Reset the skleeton for next event
+					skel = new GenericSkeleton();
+					tmp.setLength(0);
 				}
 				else { //TODO: escape unsupported chars
 					tmp.append(Util.escapeToXML(attr.getNodeValue(), 3, false, null)
@@ -888,6 +910,11 @@ public abstract class ITSFilter implements IFilter {
 		tu.setName(context.peek().idValue);
 		
 		// Set the information about preserving or not white-spaces
+		if ( isHTML5 ) {
+			if ( node.getNodeName().equals("pre") ) {
+				context.peek().preserveWS = true;
+			}
+		}
 		if ( context.peek().preserveWS ) {
 			tu.setPreserveWhitespaces(true);
 		}

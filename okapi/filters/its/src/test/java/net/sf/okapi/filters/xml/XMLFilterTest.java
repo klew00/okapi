@@ -322,7 +322,7 @@ public class XMLFilterTest {
 		String snippet = "<?xml version=\"1.0\"?>\n"
 			+ "<doc><its:rules version=\"2.0\" xmlns:its=\"http://www.w3.org/2005/11/its\""
 			+ " xmlns:itsx=\"http://www.w3.org/2008/12/its-extensions\">"
-			+ "<its:storageSizeRule selector=\"//p\" storageSize='10' storageSizeEncoding='UTF-16'/>"
+			+ "<its:storageSizeRule selector=\"//p\" storageSize='10' storageEncoding='UTF-16'/>"
 			+ "</its:rules>"
 			+ "<p>text</p>"
 			+ "</doc>";

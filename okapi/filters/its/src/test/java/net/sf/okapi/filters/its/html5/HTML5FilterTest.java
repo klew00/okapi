@@ -76,6 +76,19 @@ public class HTML5FilterTest {
 	}
 	
 	@Test
+	public void testPreserveSpace () {
+		String snippet = "<!DOCTYPE html><html lang=\"en\"><head><meta charset=utf-8><title>Title</title></head><body>"
+				+ "<pre> text  \t\t <b>  etc.  </b>\t </pre>"
+				+ "<p> text  \t\t <b>  etc.  </b>\t </p>"
+			+ "</body></html>";
+		ArrayList<Event> list = getEvents(snippet);
+		ITextUnit tu = FilterTestDriver.getTextUnit(list, 2);
+		assertEquals(" text  \t\t <1>  etc.  </1>\t ", fmt.setContent(tu.getSource().getFirstContent()).toString());
+		tu = FilterTestDriver.getTextUnit(list, 3);
+		assertEquals(" text <1> etc. </1> ", fmt.setContent(tu.getSource().getFirstContent()).toString());
+	}
+	
+	@Test
 	public void testLocaleFilterLocal () {
 		String snippet = "<!DOCTYPE html><html lang=en><head><meta charset=utf-8><title>Title</title></head><body>"
 			+ "<p its-locale-filter-list='de'>Text 1</p>"
@@ -102,8 +115,8 @@ public class HTML5FilterTest {
 	public void testStorageSizeLocal () {
 		String snippet = "<!DOCTYPE html><html lang=en><head><meta charset=utf-8><title>Title</title></head><body>"
 			+ "<ul>"
-			+ "<li its-storage-size='10' its-storage-size-encoding='UTF-8'>1234567890-Extra</li>"
-			+ "<li its-storage-size='22' its-storage-size-encoding='ISO-8859-1'>abcdefghij-Extra</li>"
+			+ "<li its-storage-size='10' its-storage-encoding='UTF-8'>1234567890-Extra</li>"
+			+ "<li its-storage-size='22' its-storage-encoding='ISO-8859-1'>abcdefghij-Extra</li>"
 			+ "</ul>"
 			+ "</body></html>";
 		ArrayList<Event> list = getEvents(snippet);
@@ -130,6 +143,36 @@ public class HTML5FilterTest {
 	}
 	
 	@Test
+	public void testLocNoteLocal () {
+		String snippet = "<!DOCTYPE html><html lang=en><head><meta charset=utf-8><title>Title</title></head><body>"
+			+ "<p its-loc-note='note'>text</p>"
+			+ "<p its-loc-note-ref='note ref'>text</p>"
+			+ "</body></html>";
+		ArrayList<Event> list = getEvents(snippet);
+		ITextUnit tu = FilterTestDriver.getTextUnit(list, 2);
+		assertEquals("note", tu.getProperty(Property.NOTE).getValue());
+		tu = FilterTestDriver.getTextUnit(list, 3);
+		assertEquals("REF:note ref", tu.getProperty(Property.NOTE).getValue());
+	}
+	
+	@Test
+	public void testWithinTextLocal () {
+		String snippet = "<!DOCTYPE html><html lang=en><head><meta charset=utf-8><title>Title</title></head><body>"
+			+ "<p>Text1 <span>inside</span> text2</p>"
+			+ "<p>Text3 <span its-within-text='no'>not-within</span> text4</p>"
+			+ "</body></html>";
+		ArrayList<Event> list = getEvents(snippet);
+		ITextUnit tu = FilterTestDriver.getTextUnit(list, 2);
+		assertEquals("Text1 <1>inside</1> text2", fmt.setContent(tu.getSource().getFirstContent()).toString());
+		tu = FilterTestDriver.getTextUnit(list, 3);
+		assertEquals("Text3 ", fmt.setContent(tu.getSource().getFirstContent()).toString());
+		tu = FilterTestDriver.getTextUnit(list, 4);
+		assertEquals("not-within", fmt.setContent(tu.getSource().getFirstContent()).toString());
+		tu = FilterTestDriver.getTextUnit(list, 5);
+		assertEquals(" text4", fmt.setContent(tu.getSource().getFirstContent()).toString());
+	}
+	
+	@Test
 	public void testLink () {
 		ArrayList<Event> list = getEvents(new File(root+"test02.html"));
 		ITextUnit tu = FilterTestDriver.getTextUnit(list, 2);
@@ -139,10 +182,10 @@ public class HTML5FilterTest {
 	
 	@Test
 	public void testSimpleOutput () {
-		String snippet = "<!DOCTYPE html>\n<html lang=\"en\"><head><meta charset=utf-8><title>Title</title></head><body>"
+		String snippet = "<!DOCTYPE html>\n<html lang=\"en\"><head><meta charset=UTF-8><title>Title</title></head><body>"
 			+ "<p>Text <img alt=Text src=test.png>.</p>"
 			+ "</body></html>";
-		String expected = "<!DOCTYPE html>\n<html lang=\"en\"><head><meta charset=\"utf-8\"><title>Title</title></head><body>"
+		String expected = "<!DOCTYPE html>\n<html lang=\"en\"><head><meta charset=\"UTF-8\"><title>Title</title></head><body>"
 			+ "<p>Text <img alt=\"Text\" src=\"test.png\">.</p>"
 			+ "</body></html>";
 		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet),

@@ -73,12 +73,6 @@ public class ITSEngine implements IProcessor, ITraversal {
 	private static final String   FLAGDEFAULTDATA     = "????????????"
 		+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP;
 
-//	private static final int STORAGE_SIZE_ENCODING = 0;
-//	
-//	private static final String[][] AN = {
-//		{"storageSizeEncoding", "storage-size-encoding"}
-//	};
-	
 	// Indicator position
 	private static final int      FP_TRANSLATE             = 0;
 	private static final int      FP_DIRECTIONALITY        = 1;
@@ -550,9 +544,9 @@ public class ITSEngine implements IProcessor, ITraversal {
 		if ( elem.hasAttribute("storageSizePointer") )
 			storageSizeP = elem.getAttribute("storageSizePointer");
 		
-		String storageSizeEncodingP = null;
-		if (elem.hasAttribute("storageSizeEncodingPointer"))
-			storageSizeEncodingP = elem.getAttribute("storageSizeEncodingPointer");
+		String storageEncodingP = null;
+		if (elem.hasAttribute("storageEncodingPointer"))
+			storageEncodingP = elem.getAttribute("storageEncodingPointer");
 		
 		// Check we have the mandatory attributes
 		if ( Util.isEmpty(np[0]) && Util.isEmpty(storageSizeP) ) {
@@ -571,13 +565,13 @@ public class ITSEngine implements IProcessor, ITraversal {
 			rule.map.put("sizePointer", storageSizeP);
 		}
 		if ( !Util.isEmpty(np[1]) ) {
-			if ( !Util.isEmpty(storageSizeEncodingP) ) {
-				throw new ITSException("Cannot have both storageSizeEncoding and storageSizeEncodingPointer.");
+			if ( !Util.isEmpty(storageEncodingP) ) {
+				throw new ITSException("Cannot have both storageEncoding and storageEncodingPointer.");
 			}
 			rule.map.put("encoding", np[1]);
 		}
 		else {
-			rule.map.put("encodingPointer", storageSizeEncodingP);
+			rule.map.put("encodingPointer", storageEncodingP);
 		}
 		
 		// Add the rule
@@ -848,7 +842,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 		rule.selector = elem.getAttribute("selector");
 		rule.isInternal = isInternal;
 
-		rule.flag = retrieveLocNoteType(elem, false, true);
+		rule.flag = retrieveLocNoteType(elem, false, true, false);
 
 		// Try to get the locNote element
 		String value1 = "";
@@ -1031,8 +1025,8 @@ public class ITSEngine implements IProcessor, ITraversal {
 
 		if ( data.charAt(FP_STORAGESIZE) != '?' ) {
 			String[] values = fromSingleString(getFlagData(data, FP_STORAGESIZE_DATA));
-			trace.peek().storeSize = values[0];
-			trace.peek().storeSizeEncoding = values[1];
+			trace.peek().storageSize = values[0];
+			trace.peek().storageEncoding = values[1];
 		}
 		
 		trace.peek().targetPointer = getFlagData(data, FP_TARGETPOINTER_DATA);
@@ -1403,8 +1397,13 @@ public class ITSEngine implements IProcessor, ITraversal {
 			}
 
 			if ( (dataCategories & IProcessor.DC_LOCNOTE) > 0 ) {
-				expr = xpath.compile("//*/@"+ITS_NS_PREFIX+":locNote|//"+ITS_NS_PREFIX+":span/@locNote"
-					+"|//*/@"+ITS_NS_PREFIX+":locNoteRef|//"+ITS_NS_PREFIX+":span/@locNoteRef");
+				if ( isHTML5 ) {
+					expr = xpath.compile("//*/@its-loc-note|//*/@its-loc-note-ref");
+				}
+				else {
+					expr = xpath.compile("//*/@"+ITS_NS_PREFIX+":locNote|//"+ITS_NS_PREFIX+":span/@locNote"
+						+"|//*/@"+ITS_NS_PREFIX+":locNoteRef|//"+ITS_NS_PREFIX+":span/@locNoteRef");
+				}
 				NL = (NodeList)expr.evaluate(doc, XPathConstants.NODESET);
 				String localName;
 				for ( int i=0; i<NL.getLength(); i++ ) {
@@ -1417,15 +1416,15 @@ public class ITSEngine implements IProcessor, ITraversal {
 					boolean qualified = true;
 					String ns = attr.getOwnerElement().getNamespaceURI();
 					if ( !Util.isEmpty(ns) ) qualified = !ns.equals(ITS_NS_URI);
-					boolean alert = retrieveLocNoteType(attr.getOwnerElement(), qualified, false);
+					boolean alert = retrieveLocNoteType(attr.getOwnerElement(), qualified, false, isHTML5);
 					// Set the flags/data
 					setFlag(attr.getOwnerElement(), FP_LOCNOTE, (alert ? 'a' : 'd'), attr.getSpecified());
-					if ( localName.equals("locNote") ) {
+					if ( localName.equals("locNote") || localName.equals("its-loc-note") ) {
 						setFlag(attr.getOwnerElement(), FP_LOCNOTE_DATA, attr.getValue(), attr.getSpecified());
 					}
-					else if ( localName.equals("termInfoPointer") ) {
+					else if ( localName.equals("locNoteRef") || localName.equals("its-loc-note-ref") ) {
 						setFlag(attr.getOwnerElement(), FP_LOCNOTE_DATA,
-							"REF:"+resolvePointer(attr.getOwnerElement(), attr.getValue()), attr.getSpecified());
+							"REF:"+attr.getValue(), attr.getSpecified());
 					}
 				}
 			}
@@ -1444,7 +1443,12 @@ public class ITSEngine implements IProcessor, ITraversal {
 
 			// Local withinText attribute (ITS 2.0 only)
 			if (( (dataCategories & IProcessor.DC_WITHINTEXT) > 0 ) && isVersion2() ) {
-				expr = xpath.compile("//*/@"+ITS_NS_PREFIX+":withinText");
+				if ( isHTML5 ) {
+					expr = xpath.compile("//*/@its-within-text");
+				}
+				else {
+					expr = xpath.compile("//*/@"+ITS_NS_PREFIX+":withinText");
+				}
 				NL = (NodeList)expr.evaluate(doc, XPathConstants.NODESET);
 				for ( int i=0; i<NL.getLength(); i++ ) {
 					attr = (Attr)NL.item(i);
@@ -1632,10 +1636,14 @@ public class ITSEngine implements IProcessor, ITraversal {
 	
 	private boolean retrieveLocNoteType (Element elem,
 		boolean qualified,
-		boolean required)
+		boolean required,
+		boolean useHTML5)
 	{
 		String type;
-		if ( qualified ) {
+		if ( isHTML5 ) {
+			type = elem.getAttribute("its-loc-note-type");
+		}
+		else if ( qualified ) {
 			type = elem.getAttributeNS(ITS_NS_URI, "locNoteType");
 		}
 		else {
@@ -1643,13 +1651,13 @@ public class ITSEngine implements IProcessor, ITraversal {
 		}
 		
 		if ( type.isEmpty() && required ) {
-			throw new ITSException("locNoteType attribute missing.");
+			throw new ITSException(String.format("%s attribute missing.", (isHTML5 ? "its-loc-note-type" : "locNoteType")));
 		}
 		else if ( type.equals("alert") ) {
 			return true; // alert
 		}
 		else if ( !type.equals("description") && !type.isEmpty() ) {
-			throw new ITSException(String.format("Invalide value '%s' for locNoteType.", type));
+			throw new ITSException(String.format("Invalide value '%s' for localozation note type.", type));
 		}
 		return false; // description
 	}
@@ -1663,20 +1671,20 @@ public class ITSEngine implements IProcessor, ITraversal {
 		if ( useHTML5 ) {
 			if ( elem.hasAttribute("its-storage-size") )
 				data[0] = elem.getAttribute("its-storage-size");
-			if ( elem.hasAttribute("its-storage-size-encoding") )
-				data[1] = elem.getAttribute("its-storage-size-encoding");
+			if ( elem.hasAttribute("its-storage-encoding") )
+				data[1] = elem.getAttribute("its-storage-encoding");
 		}
 		else if ( qualified ) {
 			if ( elem.hasAttributeNS(ITS_NS_URI, "storageSize") )
 				data[0] = elem.getAttributeNS(ITS_NS_URI, "storageSize");
-			if ( elem.hasAttributeNS(ITS_NS_URI, "storageSizeEncoding") )
-				data[1] = elem.getAttributeNS(ITS_NS_URI, "storageSizeEncoding");
+			if ( elem.hasAttributeNS(ITS_NS_URI, "storageEncoding") )
+				data[1] = elem.getAttributeNS(ITS_NS_URI, "storageEncoding");
 		}
 		else {
 			if ( elem.hasAttribute("storageSize") )
 				data[0] = elem.getAttribute("storageSize");
-			if ( elem.hasAttribute("storageSizeEncoding") )
-				data[1] = elem.getAttribute("storageSizeEncoding");
+			if ( elem.hasAttribute("storageEncoding") )
+				data[1] = elem.getAttribute("storageEncoding");
 		}
 		
 		return data;
@@ -2041,7 +2049,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 
 	@Override
 	public String getStorageSize () {
-		return trace.peek().storeSize;
+		return trace.peek().storageSize;
 	}
 
 	@Override
@@ -2055,14 +2063,14 @@ public class ITSEngine implements IProcessor, ITraversal {
 	}
 
 	@Override
-	public String getStorageSizeEncoding () {
-		String tmp = trace.peek().storeSizeEncoding;
+	public String getStorageEncoding () {
+		String tmp = trace.peek().storageEncoding;
 		if ( tmp == null ) return "UTF-8";
 		return tmp;
 	}
 
 	@Override
-	public String getStorageSizeEncoding(Attr attribute) {
+	public String getStorageEncoding(Attr attribute) {
 		if ( attribute == null ) return null;
 		String tmp;
 		if ( (tmp = (String)attribute.getUserData(FLAGNAME)) == null ) return null;

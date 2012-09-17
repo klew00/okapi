@@ -65,7 +65,7 @@ public class Main {
 		PrintWriter writer = null;
 		
 		try {
-			System.out.println("ITSTest - Test File Geneator for ITS");
+			System.out.println("ITSTest - Test File Geneator for XML+ITS and HTML5+ITS");
 			
 			File inputFile = null;
 			File outputFile = null;

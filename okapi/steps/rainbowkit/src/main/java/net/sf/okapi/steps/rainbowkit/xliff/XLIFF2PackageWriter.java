@@ -44,6 +44,7 @@ import net.sf.okapi.common.ISkeleton;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.annotation.AltTranslation;
 import net.sf.okapi.common.annotation.AltTranslationsAnnotation;
+import net.sf.okapi.common.query.QueryResult;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.ISegments;
@@ -332,7 +333,7 @@ public class XLIFF2PackageWriter extends BasePackageWriter {
 		}
 		// Storage size
 		if ( tu.hasProperty(Property.ITS_STORAGESIZE) ) {
-			String[] values = tu.getProperty(Property.ITS_EXTERNALRESREF).getValue().split("\t", -1);
+			String[] values = tu.getProperty(Property.ITS_STORAGESIZE).getValue().split("\t", -1);
 			unit.getExtendedAttributes().setAttribute(Names.NS_ITS, "storageSize", values[0]);
 			unit.getExtendedAttributes().setAttribute(Names.NS_ITS, "storageSizeEncoding", values[1]);
 		}
@@ -418,6 +419,12 @@ public class XLIFF2PackageWriter extends BasePackageWriter {
 		return unit;
 	}
 	
+	/**
+	 * Copies a given AltTranslation annotation into an XLIFF 2.0 candidate object.
+	 * @param alt the annotation to copy.
+	 * @param oriSource the object associated with the annotation.
+	 * @param xObject the XLIFF object to associate with the candidate data.
+	 */
 	private void copyData (AltTranslation alt,
 		TextFragment oriSource,
 		IWithCandidates xObject)
@@ -433,7 +440,9 @@ public class XLIFF2PackageWriter extends BasePackageWriter {
 		}
 		xAlt.setTarget(toXLIFF2Fragment(alt.getTarget().getFirstContent(), cs, true));
 		xAlt.setSimilarity(alt.getFuzzyScore());
-		xAlt.setQuality(alt.getQualityScore());
+//		if ( alt.getQualityScore() != QueryResult.QUALITY_UNDEFINED ) {
+//			xAlt.setQuality(alt.getQualityScore());
+//		}
 		xObject.addCandidate(xAlt);
 	}
 	

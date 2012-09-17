@@ -240,38 +240,38 @@ public class TraversalTest {
 		ITraversal trav = applyITSRules(doc, null, false, null);
 		getElement(trav, "p", 1);
 		assertEquals("255", trav.getStorageSize());
-		assertEquals("UTF-8", trav.getStorageSizeEncoding());
+		assertEquals("UTF-8", trav.getStorageEncoding());
 		getElement(trav, "q", 1);
 		assertEquals(null, trav.getStorageSize());
-		assertEquals("UTF-8", trav.getStorageSizeEncoding());
+		assertEquals("UTF-8", trav.getStorageEncoding());
 	}
 
 	@Test
 	public void testStorageSizeGlobal2 () throws SAXException, IOException, ParserConfigurationException {
 		InputSource is = new InputSource(new StringReader("<doc>"
 			+ "<i:rules xmlns:i='"+ITSEngine.ITS_NS_URI+"' version='2.0'>"
-			+ "<i:storageSizeRule selector='//p' storageSizePointer='@max' storageSizeEncodingPointer='@enc'/>"
+			+ "<i:storageSizeRule selector='//p' storageSizePointer='@max' storageEncodingPointer='@enc'/>"
 			+ "</i:rules>"
 			+ "<p max='222' enc='UTF-16'>Text<b>text</b></p></doc>"));
 		Document doc = fact.newDocumentBuilder().parse(is);
 		ITraversal trav = applyITSRules(doc, null, false, null);
 		getElement(trav, "p", 1);
 		assertEquals("222", trav.getStorageSize());
-		assertEquals("UTF-16", trav.getStorageSizeEncoding());
+		assertEquals("UTF-16", trav.getStorageEncoding());
 		getElement(trav, "b", 1);
 		assertEquals(null, trav.getStorageSize());
-		assertEquals("UTF-8", trav.getStorageSizeEncoding());
+		assertEquals("UTF-8", trav.getStorageEncoding());
 	}
 	
 	@Test
 	public void testStorageSizeLocal1 () throws SAXException, IOException, ParserConfigurationException {
 		InputSource is = new InputSource(new StringReader("<doc xmlns:i=\"http://www.w3.org/2005/11/its\" version='2.0'>"
-			+ "<p i:storageSizeEncoding='Shift-JIS' i:storageSize='111'>text</p></doc>"));
+			+ "<p i:storageEncoding='Shift-JIS' i:storageSize='111'>text</p></doc>"));
 		Document doc = fact.newDocumentBuilder().parse(is);
 		ITraversal trav = applyITSRules(doc, null, false, null);
 		getElement(trav, "p", 1);
 		assertEquals("111", trav.getStorageSize());
-		assertEquals("Shift-JIS", trav.getStorageSizeEncoding());
+		assertEquals("Shift-JIS", trav.getStorageEncoding());
 	}
 
 	@Test

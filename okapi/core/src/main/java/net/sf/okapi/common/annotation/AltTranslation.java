@@ -275,22 +275,22 @@ public class AltTranslation implements Comparable<AltTranslation> {
 		return this.fromOriginal;
 	}
 	
-	public int getFuzzyScore() {
+	public int getFuzzyScore () {
 		return fuzzyScore;
 	}
 
-	public void setFuzzyScore(int fuzzyScore) {
+	public void setFuzzyScore (int fuzzyScore) {
 		if (( fuzzyScore < 0 ) || ( fuzzyScore > 100 )) {
 			throw new InvalidParameterException("Invalid score value.");
 		}
 		this.fuzzyScore = fuzzyScore;
 	}
 
-	public int getQualityScore() {
+	public int getQualityScore () {
 		return qualityScore;
 	}
 
-	public void setQualityScore(int qualityScore) {
+	public void setQualityScore (int qualityScore) {
 		if ((( qualityScore < 0 ) && qualityScore != QueryResult.QUALITY_UNDEFINED ) || ( qualityScore > 100 )) {
 			throw new InvalidParameterException("Invalid quality value.");
 		}
@@ -314,7 +314,7 @@ public class AltTranslation implements Comparable<AltTranslation> {
 	 * Indicator telling if the result is coming from a machine translation engine or not.
 	 * @return true if the result is coming from a machine translation engine, false otherwise.
 	 */
-	public boolean fromMT() {
+	public boolean fromMT () {
 		return (type == MatchType.MT);
 	}
 	

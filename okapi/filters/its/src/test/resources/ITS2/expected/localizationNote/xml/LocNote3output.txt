@@ -15,6 +15,6 @@
 /Res/body[1]/msg[3]/data[1]/@its:locNoteType
 /Res/body[1]/msg[4]	its:locNote="The variable {0} is the name of the host."	its:locNoteType="description"
 /Res/body[1]/msg[4]/@id
-/Res/body[1]/msg[4]/data[1]	its:locNote=""	its:locNoteType="alert"
+/Res/body[1]/msg[4]/data[1]	its:locNote="REF:myLocNotes.htm#CannotLog"	its:locNoteType="alert"
 /Res/body[1]/msg[4]/data[1]/@its:locNoteRef
 /Res/body[1]/msg[4]/data[1]/@its:locNoteType

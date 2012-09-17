@@ -70,7 +70,7 @@ public class IdBasedAlignerStep extends BasePipelineStep {
 	private TMXWriter tmx;
 	private Map<String, ITextUnit> targetTextUnitMap;
 	private boolean useTargetText;
-	private boolean hasIssue;
+	private boolean hasNoMatch;
 
 	public IdBasedAlignerStep() {
 		params = new Parameters();
@@ -144,15 +144,15 @@ public class IdBasedAlignerStep extends BasePipelineStep {
 		if (targetInput == null) {
 			throw new OkapiBadStepInputException("Second input file (target) not configured.");
 		}
-		hasIssue = false;
+		hasNoMatch = false;
 		getTargetTextUnits();
 		return event;
 	}
 
 	@Override
 	protected Event handleEndDocument(Event event) {
-		if ( hasIssue ) {
-			LOGGER.warning("One or more possible issues found.");
+		if ( hasNoMatch ) {
+			LOGGER.warning("One or more entries has no match.");
 		}
 		if (filter != null) {
 			filter.close();
@@ -237,16 +237,16 @@ public class IdBasedAlignerStep extends BasePipelineStep {
 			if ( missingReferenceMatch ) {
 				if ( sourceTu.getName() == null ) {
 					LOGGER.info(String.format("Entry without original identifier (id='%s').", sourceTu.getId()));
-					hasIssue = true;
+					hasNoMatch = true;
 				}
 				else {
 					LOGGER.info("No match found for " + sourceTu.getName());
-					hasIssue = true;
+					hasNoMatch = true;
 				}
 			}
 			else {
 				LOGGER.info("Source texts differ for " + sourceTu.getName());
-				hasIssue = true;
+				hasNoMatch = true;
 			}
 			if ( params.getReplaceWithSource()) {
 				// Use the source text if there is no target
@@ -288,14 +288,14 @@ public class IdBasedAlignerStep extends BasePipelineStep {
 					// check if we have a name value
 					if (tu.getName() == null) {
 						LOGGER.info(String.format("Missing original identifier in target (id='%s').", tu.getId()));
-						hasIssue = true;
+						hasNoMatch = true;
 						continue;
 					}
 
 					// check if we have a duplicate name
 					if (targetTextUnitMap.get(tu.getName()) != null) {
 						LOGGER.info("Duplicate entry for " + tu.getName());
-						hasIssue = true;
+						hasNoMatch = true;
 						continue;
 					}
 					
