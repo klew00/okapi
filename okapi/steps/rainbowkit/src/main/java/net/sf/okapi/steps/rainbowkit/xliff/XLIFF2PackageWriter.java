@@ -28,15 +28,6 @@ import java.util.logging.Logger;
 
 import javax.xml.namespace.QName;
 
-import org.oasisopen.xliff.v2.ICMarker;
-import org.oasisopen.xliff.v2.IDataStore;
-import org.oasisopen.xliff.v2.IFragment;
-import org.oasisopen.xliff.v2.INote;
-import org.oasisopen.xliff.v2.IPart;
-import org.oasisopen.xliff.v2.IWithCandidates;
-import org.oasisopen.xliff.v2.Names;
-import org.oasisopen.xliff.v2.OriginalDataStyle;
-
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.FileUtil;
 import net.sf.okapi.common.IResource;
@@ -44,16 +35,15 @@ import net.sf.okapi.common.ISkeleton;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.annotation.AltTranslation;
 import net.sf.okapi.common.annotation.AltTranslationsAnnotation;
-import net.sf.okapi.common.query.QueryResult;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.ISegments;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextContainer;
-import net.sf.okapi.common.resource.TextPart;
-import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.TextFragment;
+import net.sf.okapi.common.resource.TextPart;
 import net.sf.okapi.filters.rainbowkit.Manifest;
 import net.sf.okapi.filters.rainbowkit.MergingInfo;
 import net.sf.okapi.lib.xliff.Candidate;
@@ -63,6 +53,15 @@ import net.sf.okapi.lib.xliff.Note;
 import net.sf.okapi.lib.xliff.Unit;
 import net.sf.okapi.lib.xliff.XLIFFWriter;
 import net.sf.okapi.steps.rainbowkit.common.BasePackageWriter;
+
+import org.oasisopen.xliff.v2.ICMarker;
+import org.oasisopen.xliff.v2.IDataStore;
+import org.oasisopen.xliff.v2.IFragment;
+import org.oasisopen.xliff.v2.INote;
+import org.oasisopen.xliff.v2.IPart;
+import org.oasisopen.xliff.v2.IWithCandidates;
+import org.oasisopen.xliff.v2.Names;
+import org.oasisopen.xliff.v2.OriginalDataStyle;
 
 public class XLIFF2PackageWriter extends BasePackageWriter {
 
@@ -336,6 +335,11 @@ public class XLIFF2PackageWriter extends BasePackageWriter {
 			String[] values = tu.getProperty(Property.ITS_STORAGESIZE).getValue().split("\t", -1);
 			unit.getExtendedAttributes().setAttribute(Names.NS_ITS, "storageSize", values[0]);
 			unit.getExtendedAttributes().setAttribute(Names.NS_ITS, "storageSizeEncoding", values[1]);
+		}
+		// Allowed characters
+		if ( tu.hasProperty(Property.ITS_ALLOWEDCHARACTERS) ) {
+			unit.getExtendedAttributes().setAttribute(Names.NS_ITS, "allowedCharacters",
+				tu.getProperty(Property.ITS_ALLOWEDCHARACTERS).getValue());
 		}
 		
 		// Domains
