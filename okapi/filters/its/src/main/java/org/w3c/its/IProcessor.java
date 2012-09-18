@@ -41,6 +41,7 @@ public interface IProcessor {
 	public static final int DC_PRESERVESPACE     = 0x1000; // ITS 2.0
 	public static final int DC_LOCQUALITYISSUE   = 0x2000; // ITS 2.0
 	public static final int DC_STORAGESIZE       = 0x4000; // ITS 2.0
+	public static final int DC_ALLOWEDCHARS      = 0x8000; // ITS 2.0
 	public static final int DC_ALL               = 0xFFFF;
 	
 	/**

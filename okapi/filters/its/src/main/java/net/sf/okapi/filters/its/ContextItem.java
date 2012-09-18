@@ -34,6 +34,7 @@ class ContextItem {
 	String domains;
 	String externalRes;
 	String storageSize;
+	String allowedChars;
 
 	public ContextItem (Node node,
 		ITraversal trav)
@@ -47,6 +48,7 @@ class ContextItem {
 		this.preserveWS = trav.preserveWS();
 		this.domains = trav.getDomains();
 		this.externalRes = trav.getExternalResourceRef();
+		this.allowedChars = trav.getAllowedCharacters(null);
 		
 		if ( trav.getStorageSize() != null ) {
 			this.storageSize = trav.getStorageSize() + "\t" + trav.getStorageEncoding();

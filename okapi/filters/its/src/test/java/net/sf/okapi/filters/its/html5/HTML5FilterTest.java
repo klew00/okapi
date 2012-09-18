@@ -110,6 +110,20 @@ public class HTML5FilterTest {
 		assertNotNull(tu);
 		assertEquals("n1", tu.getName());
 	}
+
+	@Test
+	public void testAllowedChars () {
+		String snippet = "<!DOCTYPE html><html lang=en><head><meta charset=utf-8><title>Title</title></head><body>"
+			+ "<p its-allowed-characters='[a-z]'>text</p>"
+			+ "<pre>text</pre>"
+			+ "</body></html>";
+		ArrayList<Event> list = getEvents(snippet);
+		ITextUnit tu = FilterTestDriver.getTextUnit(list, 2);
+		assertNotNull(tu);
+		assertEquals("[a-z]", tu.getProperty(Property.ITS_ALLOWEDCHARACTERS).getValue());
+		tu = FilterTestDriver.getTextUnit(list, 3);
+		assertFalse(tu.hasProperty(Property.ITS_ALLOWEDCHARACTERS));
+	}
 	
 	@Test
 	public void testStorageSizeLocal () {

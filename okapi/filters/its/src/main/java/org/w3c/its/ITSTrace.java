@@ -44,6 +44,7 @@ class ITSTrace {
 	String lqIssuesRef;
 	String storageSize;
 	String storageEncoding;
+	String allowedChars;
 
 	ITSTrace () {
 		// Default constructor
@@ -90,6 +91,9 @@ class ITSTrace {
 		lqIssueComment = initialTrace.lqIssueComment;
 		lqIssueScore = initialTrace.lqIssueScore;
 		lqIssueProfileRef = initialTrace.lqIssueProfileRef;
+		
+		// Allowed chars: Inheritance for child elements but not attributes
+		allowedChars = initialTrace.allowedChars;
 		
 		// Store size: No inheritance
 		

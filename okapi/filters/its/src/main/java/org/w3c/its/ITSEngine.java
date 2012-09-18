@@ -70,8 +70,8 @@ public class ITSEngine implements IProcessor, ITraversal {
 	
 	// Must have '?' as many times as there are FP_XXX entries +1
 	// Must have +FLAGSEP as many times as there are FP_XXX_DATA entries +1
-	private static final String   FLAGDEFAULTDATA     = "????????????"
-		+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP;
+	private static final String   FLAGDEFAULTDATA     = "?????????????"
+		+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP;
 
 	// Indicator position
 	private static final int      FP_TRANSLATE             = 0;
@@ -86,6 +86,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 	private static final int      FP_LOCFILTER             = 9;
 	private static final int      FP_LQISSUE               = 10;
 	private static final int      FP_STORAGESIZE           = 11;
+	private static final int      FP_ALLOWEDCHARS          = 12;
 	
 	// Data position 
 	private static final int      FP_TERMINOLOGY_DATA      = 0;
@@ -98,6 +99,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 	private static final int      FP_LOCFILTER_DATA        = 7;
 	private static final int      FP_LQISSUE_DATA          = 8;
 	private static final int      FP_STORAGESIZE_DATA      = 9;
+	private static final int      FP_ALLOWEDCHARS_DATA     = 10;
 	
 	private static final int      TERMINFOTYPE_POINTER     = 1;
 	private static final int      TERMINFOTYPE_REF         = 2;
@@ -107,6 +109,8 @@ public class ITSEngine implements IProcessor, ITraversal {
 	private static final int      LOCNOTETYPE_POINTER      = 2;
 	private static final int      LOCNOTETYPE_REF          = 3;
 	private static final int      LOCNOTETYPE_REFPOINTER   = 4;
+
+	private static final int      ALLOWEDCHARSTYPE_POINTER = 1;
 
 	private final boolean isHTML5;
 	
@@ -343,6 +347,9 @@ public class ITSEngine implements IProcessor, ITraversal {
 					else if ( "storageSizeRule".equals(locName) ) {
 						compileStorageSizeRule(ruleElem, isInternal);
 					}
+					else if ( "allowedCharactersRule".equals(locName) ) {
+						compileAllowedCharactersRule(ruleElem, isInternal);
+					}
 					else if ( "param".equals(locName) ) {
 						processParam(ruleElem);
 					}
@@ -572,6 +579,38 @@ public class ITSEngine implements IProcessor, ITraversal {
 		}
 		else {
 			rule.map.put("encodingPointer", storageEncodingP);
+		}
+		
+		// Add the rule
+		rules.add(rule);
+	}
+
+	private void compileAllowedCharactersRule (Element elem,
+		boolean isInternal)
+	{
+		ITSRule rule = new ITSRule(IProcessor.DC_ALLOWEDCHARS);
+		rule.selector = elem.getAttribute("selector");
+		rule.isInternal = isInternal;
+		
+		rule.info = retrieveAllowedCharsData(elem, false, false);
+		
+		String allowedCharsP = null;
+		if ( elem.hasAttribute("allowedCharactersPointer") )
+			allowedCharsP = elem.getAttribute("allowedCharactersPointer");
+		
+		// Check we have the mandatory attributes
+		if ( Util.isEmpty(rule.info) && Util.isEmpty(allowedCharsP) ) {
+			throw new ITSException("You must have at least an attribute allowedCharacters or allowedCharactersPointer.");
+		}
+		
+		if ( !Util.isEmpty(rule.info) ) {
+			if ( !Util.isEmpty(allowedCharsP) ) {
+				throw new ITSException("Cannot have both allowedCharacters and allowedCharactersPointer.");
+			}
+		}
+		else {
+			rule.info = allowedCharsP;
+			rule.infoType = ALLOWEDCHARSTYPE_POINTER;
 		}
 		
 		// Add the rule
@@ -1029,6 +1068,10 @@ public class ITSEngine implements IProcessor, ITraversal {
 			trace.peek().storageEncoding = values[1];
 		}
 		
+		if ( data.charAt(FP_ALLOWEDCHARS) != '?' ) {
+			trace.peek().allowedChars = getFlagData(data, FP_ALLOWEDCHARS_DATA);
+		}
+		
 		trace.peek().targetPointer = getFlagData(data, FP_TARGETPOINTER_DATA);
 		
 		if ( data.charAt(FP_DIRECTIONALITY) != '?' ) {
@@ -1259,6 +1302,17 @@ public class ITSEngine implements IProcessor, ITraversal {
 						}
 						setFlag(NL.item(i), FP_LQISSUE, 'y', true);
 						setFlag(NL.item(i), FP_LQISSUE_DATA, toSingleString(data1, data2, data3, data4, data5), true);
+						break;
+
+					case IProcessor.DC_ALLOWEDCHARS:
+						if ( rule.infoType == ALLOWEDCHARSTYPE_POINTER ) {
+							data1 = resolvePointer(NL.item(i), rule.info);
+						}
+						else { // Direct expression
+							data1 = rule.info;
+						}
+						setFlag(NL.item(i), FP_ALLOWEDCHARS, 'y', true);
+						setFlag(NL.item(i), FP_ALLOWEDCHARS_DATA, data1, true);
 						break;
 						
 					case IProcessor.DC_STORAGESIZE:
@@ -1554,6 +1608,31 @@ public class ITSEngine implements IProcessor, ITraversal {
 				}
 			}
 			
+			// Allowed characters
+			if (( (dataCategories & IProcessor.DC_ALLOWEDCHARS) > 0 ) && isVersion2() ) {
+				if ( isHTML5 ) {
+					expr = xpath.compile("//*/@its-allowed-characters");
+				}
+				else {
+					expr = xpath.compile("//*/@"+ITS_NS_PREFIX+":allowedCharacters|//"+ITS_NS_PREFIX+":span/@allowedCharacters");
+				}
+				NL = (NodeList)expr.evaluate(doc, XPathConstants.NODESET);
+				for ( int i=0; i<NL.getLength(); i++ ) {
+					attr = (Attr)NL.item(i);
+					// Skip irrelevant nodes
+					if ( ITS_NS_URI.equals(attr.getOwnerElement().getNamespaceURI())
+						&& "allowedCharactersRule".equals(attr.getOwnerElement().getLocalName()) ) continue;
+					// Set the flag
+					boolean qualified = true;
+					String ns = attr.getOwnerElement().getNamespaceURI();
+					if ( !Util.isEmpty(ns) ) qualified = !ns.equals(ITS_NS_URI);
+					String value = retrieveAllowedCharsData(attr.getOwnerElement(), qualified, isHTML5);
+					// Set the updated flags
+					setFlag(attr.getOwnerElement(), FP_ALLOWEDCHARS, 'y', attr.getSpecified());
+					setFlag(attr.getOwnerElement(), FP_ALLOWEDCHARS_DATA, value, attr.getSpecified()); 
+				}
+			}
+			
 			// Storage size
 			if (( (dataCategories & IProcessor.DC_STORAGESIZE) > 0 ) && isVersion2() ) {
 				if ( isHTML5 ) {
@@ -1661,6 +1740,26 @@ public class ITSEngine implements IProcessor, ITraversal {
 		}
 		return false; // description
 	}
+
+	private String retrieveAllowedCharsData (Element elem,
+		boolean qualified,
+		boolean useHTML5)
+	{
+		if ( useHTML5 ) {
+			if ( elem.hasAttribute("its-allowed-characters") )
+				return elem.getAttribute("its-allowed-characters");
+		}
+		else if ( qualified ) {
+			if ( elem.hasAttributeNS(ITS_NS_URI, "allowedCharacters") )
+				return elem.getAttributeNS(ITS_NS_URI, "allowedCharacters");
+		}
+		else {
+			if ( elem.hasAttribute("allowedCharacters") )
+				return elem.getAttribute("allowedCharacters");
+		}
+		return null;
+	}
+	
 	
 	private String[] retrieveStorageSizeData (Element elem,
 		boolean qualified,
@@ -2070,7 +2169,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 	}
 
 	@Override
-	public String getStorageEncoding(Attr attribute) {
+	public String getStorageEncoding (Attr attribute) {
 		if ( attribute == null ) return null;
 		String tmp;
 		if ( (tmp = (String)attribute.getUserData(FLAGNAME)) == null ) return null;
@@ -2078,6 +2177,15 @@ public class ITSEngine implements IProcessor, ITraversal {
 		String[] values = fromSingleString(getFlagData(tmp, FP_STORAGESIZE_DATA));
 		if ( values[1] == null ) return "UTF-8";
 		else return values[1];
+	}
+
+	@Override
+	public String getAllowedCharacters (Attr attribute) {
+		if ( attribute == null ) return trace.peek().allowedChars;
+		String tmp;
+		if ( (tmp = (String)attribute.getUserData(FLAGNAME)) == null ) return null;
+		if ( tmp.charAt(FP_ALLOWEDCHARS) != '?' ) return getFlagData(tmp, FP_ALLOWEDCHARS_DATA);
+		return null;
 	}
 
 }

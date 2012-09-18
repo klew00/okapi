@@ -615,7 +615,8 @@ public abstract class ITSFilter implements IFilter {
 				}
 			}
 		}
-		
+//TODO: properties for attributes!		
+
 		queue.add(new Event(EventType.TEXT_UNIT, tu));
 		if ( addToSkeleton ) skel.addReference(tu);
 		return id;
@@ -898,6 +899,10 @@ public abstract class ITSFilter implements IFilter {
 		// ITS Storage Size
 		if ( context.peek().storageSize != null ) {
 			tu.setProperty(new Property(Property.ITS_STORAGESIZE, context.peek().storageSize));
+		}
+		// ITS Allowed characters
+		if ( context.peek().allowedChars != null ) {
+			tu.setProperty(new Property(Property.ITS_ALLOWEDCHARACTERS, context.peek().allowedChars));
 		}
 		
 		// Set term info

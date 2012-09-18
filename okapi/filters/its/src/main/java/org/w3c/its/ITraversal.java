@@ -183,4 +183,6 @@ public interface ITraversal {
 	
 	public String getStorageEncoding (Attr attr);
 	
+	public String getAllowedCharacters (Attr attribute);
+	
 }

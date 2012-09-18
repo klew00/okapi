@@ -228,7 +228,33 @@ public class TraversalTest {
 		elem = getElement(trav, "pre", 1);
 		assertTrue(trav.preserveWS());
 	}
-	
+
+	@Test
+	public void testAllowedCharsGlobal () throws SAXException, IOException, ParserConfigurationException {
+		InputSource is = new InputSource(new StringReader("<doc>"
+			+ "<i:rules xmlns:i='"+ITSEngine.ITS_NS_URI+"' version='2.0'>"
+			+ "<i:allowedCharactersRule selector='//p' allowedCharacters='[a-zA-Z]'/>"
+			+ "<i:allowedCharactersRule selector='//p/@abc' allowedCharacters='[0-9]'/>"
+			+ "</i:rules>"
+			+ "<p abc='123'>text</p></doc>"));
+		Document doc = fact.newDocumentBuilder().parse(is);
+		ITraversal trav = applyITSRules(doc, null, false, null);
+		Element elem = getElement(trav, "p", 1);
+		assertEquals("[a-zA-Z]", trav.getAllowedCharacters(null));
+		Attr attr = elem.getAttributeNode("abc");
+		assertEquals("[0-9]", trav.getAllowedCharacters(attr));
+	}
+
+	@Test
+	public void testAllowedCharsLocal () throws SAXException, IOException, ParserConfigurationException {
+		InputSource is = new InputSource(new StringReader("<doc xmlns:i=\"http://www.w3.org/2005/11/its\" version='2.0'>"
+			+ "<p i:allowedCharacters='[abc]'>ab</p></doc>"));
+		Document doc = fact.newDocumentBuilder().parse(is);
+		ITraversal trav = applyITSRules(doc, null, false, null);
+		getElement(trav, "p", 1);
+		assertEquals("[abc]", trav.getAllowedCharacters(null));
+	}
+
 	@Test
 	public void testStorageSizeGlobal1 () throws SAXException, IOException, ParserConfigurationException {
 		InputSource is = new InputSource(new StringReader("<doc>"
