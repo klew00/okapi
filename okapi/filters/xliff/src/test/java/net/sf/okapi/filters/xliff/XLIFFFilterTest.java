@@ -362,6 +362,22 @@ public class XLIFFFilterTest {
 	}
 
 	@Test
+	public void testStorageSizeAndAllowedChars () {
+		String snippet = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+			+ "<xliff version=\"1.2\" xmlns:i='http://www.w3.org/2005/11/its'>"
+			+ "<file source-language=\"en\" target-language=\"fr\" datatype=\"x-test\" original=\"file.ext\">"
+			+ "<body>"
+			+ "<trans-unit id=\"1\" maxbytes='123' i:allowedCharacters='[a-z]'>"
+			+ "<source>t1</source>"
+			+ "</trans-unit>"
+			+ "</body>"
+			+ "</file></xliff>";
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		assertEquals("[a-z]", tu.getProperty(Property.ITS_ALLOWEDCHARACTERS).getValue());
+		assertEquals("123\tUTF-8", tu.getProperty(Property.ITS_STORAGESIZE).getValue());
+	}
+
+	@Test
 	public void testNoTarget () {
 		String snippet = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
 			+ "<xliff version=\"1.2\">"

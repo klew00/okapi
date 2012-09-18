@@ -64,6 +64,8 @@ class QualityChecker {
 	private Pattern extraCharsAllowed;
 	private Pattern corruption;
 	private boolean monolingual;
+	private Pattern itsAllowedChars;
+	private String itsAllowedCharsPattern;
 	
 	private final static Pattern WORDCHARS = Pattern.compile("[\\p{Ll}\\p{Lu}\\p{Lt}\\p{Lo}\\p{Nd}]");
 
@@ -130,6 +132,10 @@ class QualityChecker {
 				extraCharsAllowed = Pattern.compile(params.getExtraCharsAllowed());
 			}
 		}
+		
+		encoder2 = null;
+		itsAllowedChars = null;
+		itsAllowedCharsPattern = "\u0000";
 
 		// Terminology check
 		termChecker = null;
@@ -172,6 +178,9 @@ class QualityChecker {
 		if ( params.getCheckStorageSize() ) {
 			checkStorageSize(tu, srcCont, true);
 		}
+		if ( params.getCheckAllowedCharacters() ) {
+			checkITSAllowedChars(tu, srcCont, true);
+		}
 		
 		// Check if we have a target
 		if ( trgCont == null ) {
@@ -187,6 +196,9 @@ class QualityChecker {
 		// Check ITS Storage size for target
 		if ( params.getCheckStorageSize() ) {
 			checkStorageSize(tu, trgCont, false);
+		}
+		if ( params.getCheckAllowedCharacters() ) {
+			checkITSAllowedChars(tu, trgCont, true);
 		}
 
 		// Skip non-approved entries if requested
@@ -765,6 +777,7 @@ class QualityChecker {
 		}
 	}
 
+	
 	private void checkStorageSize (ITextUnit tu,
 		TextContainer tc,
 		boolean isSource)
@@ -802,6 +815,51 @@ class QualityChecker {
 					0, -1, 0, -1, Issue.SEVERITY_HIGH,
 					(isSource ? tc.toString() : "N/A"), (isSource ? "N/A" : tc.toString()), null);
 			}
+		}
+	}
+	
+	private void checkITSAllowedChars (ITextUnit tu,
+		TextContainer tc,
+		boolean isSource)
+	{
+		if ( tc == null ) return;
+		if ( !tu.hasProperty(Property.ITS_ALLOWEDCHARACTERS) ) return;
+		try {
+			String pattern = tu.getProperty(Property.ITS_ALLOWEDCHARACTERS).getValue();
+			// Re-set the compiled pattern if needed
+			if (( itsAllowedChars == null ) || !itsAllowedCharsPattern.equals(pattern) ) {
+				itsAllowedCharsPattern = pattern; // Remember for next time
+				// Invert the pattern to match on error (character NOT allowed)
+				if ( pattern.startsWith("[^") ) pattern = "["+pattern.substring(2);
+				else if ( pattern.startsWith("[") ) pattern = "[^"+pattern.substring(1);
+				else {
+					throw new RuntimeException("Pattern should start with '[' or '[^'.");
+				}
+				itsAllowedChars = Pattern.compile(pattern);
+			}
+			
+			// Get the plain text
+			TextFragment tf;
+			if ( tc.contentIsOneSegment() ) tf = tc.getFirstContent();
+			else tf = tc.getUnSegmentedContentCopy();
+			String tmp = TextUnitUtil.getText(tf);
+			
+			// Verify if we have a counter match
+			Matcher m = itsAllowedChars.matcher(tmp);
+			if ( !m.find() ) return; // No error
+			// Else, report the first character not allowed
+			reportIssue(IssueType.ALLOWED_CHARACTERS, tu, null,
+				String.format("At least one character not allowed in the %s: '%s'",
+					(isSource ? "source" : "target"), m.group()),
+//TODO: selection for start/end
+					0, -1, 0, -1, Issue.SEVERITY_HIGH,
+					(isSource ? tc.toString() : "N/A"), (isSource ? "N/A" : tc.toString()), null);
+		}
+		catch ( Throwable e ) {
+			reportIssue(IssueType.ALLOWED_CHARACTERS, tu, null,
+				"Error when trying to check ITS allowed characters. "+e.getMessage(),
+				0, -1, 0, -1, Issue.SEVERITY_HIGH,
+				(isSource ? tc.toString() : "N/A"), (isSource ? "N/A" : tc.toString()), null);
 		}
 	}
 	

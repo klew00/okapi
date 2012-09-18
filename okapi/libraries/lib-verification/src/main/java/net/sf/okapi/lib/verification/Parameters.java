@@ -79,6 +79,7 @@ public class Parameters extends BaseParameters {
 	private static final String CHECKABSOLUTEMAXCHARLENGTH = "checkAbsoluteMaxCharLength";
 	private static final String ABSOLUTEMAXCHARLENGTH = "absoluteMaxCharLength";
 	private static final String CHECKCHARACTERS = "checkCharacters";
+	private static final String CHECKALLOWEDCHARACTERS = "checkAllowedCharacters";
 	private static final String CHARSET = "charset";
 	private static final String EXTRACHARSALLOWED = "extraCharsAllowed";
 	private static final String CORRUPTEDCHARACTERS = "corruptedCharacters";
@@ -129,6 +130,7 @@ public class Parameters extends BaseParameters {
 	boolean checkAbsoluteMaxCharLength;
 	int absoluteMaxCharLength;
 	boolean checkCharacters;
+	boolean checkAllowedCharacters;
 	String charset;
 	String extraCharsAllowed;
 	boolean corruptedCharacters;
@@ -175,6 +177,14 @@ public class Parameters extends BaseParameters {
 
 	public void setCorruptedCharacters (boolean corruptedCharacters) {
 		this.corruptedCharacters = corruptedCharacters;
+	}
+
+	public boolean getCheckAllowedCharacters () {
+		return checkAllowedCharacters;
+	}
+
+	public void setCheckAllowedCharacters (boolean checkAllowedCharacters) {
+		this.checkAllowedCharacters = checkAllowedCharacters;
 	}
 
 	public boolean getCheckCharacters () {
@@ -574,6 +584,7 @@ public class Parameters extends BaseParameters {
 		checkAbsoluteMaxCharLength = false;
 		absoluteMaxCharLength = 255;
 		
+		checkAllowedCharacters = true;
 		checkCharacters = false;
 		charset = "ISO-8859-1";
 		extraCharsAllowed = "";
@@ -670,6 +681,7 @@ public class Parameters extends BaseParameters {
 		checkAbsoluteMaxCharLength = buffer.getBoolean(CHECKABSOLUTEMAXCHARLENGTH, checkAbsoluteMaxCharLength);
 		absoluteMaxCharLength = buffer.getInteger(ABSOLUTEMAXCHARLENGTH, absoluteMaxCharLength);
 		// Characters
+		checkAllowedCharacters = buffer.getBoolean(CHECKALLOWEDCHARACTERS, checkAllowedCharacters);
 		checkCharacters = buffer.getBoolean(CHECKCHARACTERS, checkCharacters);
 		charset = buffer.getString(CHARSET, charset);
 		extraCharsAllowed = buffer.getString(EXTRACHARSALLOWED, extraCharsAllowed);
@@ -751,6 +763,7 @@ public class Parameters extends BaseParameters {
 		buffer.setBoolean(CHECKABSOLUTEMAXCHARLENGTH, checkAbsoluteMaxCharLength);
 		buffer.setInteger(ABSOLUTEMAXCHARLENGTH, absoluteMaxCharLength);
 		// Characters
+		buffer.setBoolean(CHECKALLOWEDCHARACTERS, checkAllowedCharacters);
 		buffer.setBoolean(CHECKCHARACTERS, checkCharacters);
 		buffer.setString(CHARSET, charset);
 		buffer.setString(EXTRACHARSALLOWED, extraCharsAllowed);

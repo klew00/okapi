@@ -142,6 +142,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 	private Spinner spMinCharLengthBreak;
 	private Spinner spMinCharLengthAbove;
 	private Spinner spMinCharLengthBelow;
+	private Button chkCheckAllowedCharacters;
 	private Button chkCheckCharacters;
 	private Text edCharset;
 	private Label stExtraCharsAllowed;
@@ -390,7 +391,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		cmpTmp.setLayoutData(gdTmp);
 		
 		chkStorageSize = new Button(cmpTmp, SWT.CHECK);
-		chkStorageSize.setText("Warn if a source or target text unit does not fit its ITS storage size property.");
+		chkStorageSize.setText("Warn if a source or target text unit does not fit its ITS Storage Size property");
 		
 		chkAbsoluteMaxCharLength = new Button(cmpTmp, SWT.CHECK);
 		chkAbsoluteMaxCharLength.setText("Warn if a target is longer than:");
@@ -671,9 +672,12 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		cmpTmp.setLayout(new GridLayout());
 		cmpTmp.setLayoutData(new GridData(GridData.FILL_BOTH));
 		
+		chkCheckAllowedCharacters = new Button(cmpTmp, SWT.CHECK);
+		chkCheckAllowedCharacters.setText("Verify the ITS Allowed Characters property");
+		
 		chkCorruptedChars = new Button(cmpTmp, SWT.CHECK);
 		chkCorruptedChars.setText("Warn if some possibly corrupted characters are found in the target entry");
-		
+
 		chkCheckCharacters = new Button(cmpTmp, SWT.CHECK);
 		chkCheckCharacters.setText("Warn if a character is not included in the following character set encoding:");
 		chkCheckCharacters.addSelectionListener(new SelectionAdapter() {
@@ -1374,6 +1378,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		rdScopeApprovedOnly.setSelection(params.getScope()==Parameters.SCOPE_APPROVEDONLY);
 		rdScopeNotApprovedOnly.setSelection(params.getScope()==Parameters.SCOPE_NOTAPPROVEDONLY);
 		
+		chkCheckAllowedCharacters.setSelection(params.getCheckAllowedCharacters());
 		chkCheckCharacters.setSelection(params.getCheckCharacters());
 		edCharset.setText(params.getCharset());
 		edExtraCharsAllowed.setText(params.getExtraCharsAllowed());
@@ -1577,6 +1582,8 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 				params.setLtTranslationTarget(edLTTranslationTarget.getText());
 			}
 		}
+		
+		params.setCheckAllowedCharacters(chkCheckAllowedCharacters.getSelection());
 		
 		params.setCheckCharacters(chkCheckCharacters.getSelection());
 		if ( chkCheckCharacters.getSelection() ) {
