@@ -198,7 +198,7 @@ class QualityChecker {
 			checkStorageSize(tu, trgCont, false);
 		}
 		if ( params.getCheckAllowedCharacters() ) {
-			checkITSAllowedChars(tu, trgCont, true);
+			checkITSAllowedChars(tu, trgCont, false);
 		}
 
 		// Skip non-approved entries if requested
@@ -848,16 +848,19 @@ class QualityChecker {
 			Matcher m = itsAllowedChars.matcher(tmp);
 			if ( !m.find() ) return; // No error
 			// Else, report the first character not allowed
+//TODO: Update to make it work when there are inline codes			
+			int ss = (isSource ? fromFragmentToString(tf, m.start()) : 0);
+			int ts = (!isSource ? fromFragmentToString(tf, m.start()) : 0);
+			int se = (isSource ? fromFragmentToString(tf, m.end()) : -1);
+			int te = (!isSource ? fromFragmentToString(tf, m.end()) : -1);
 			reportIssue(IssueType.ALLOWED_CHARACTERS, tu, null,
-				String.format("At least one character not allowed in the %s: '%s'",
-					(isSource ? "source" : "target"), m.group()),
-//TODO: selection for start/end
-					0, -1, 0, -1, Issue.SEVERITY_HIGH,
+				String.format("Character not allowed: '%s' (pattern: '%s'", m.group(), itsAllowedCharsPattern),
+					ss, se, ts, te, Issue.SEVERITY_HIGH,
 					(isSource ? tc.toString() : "N/A"), (isSource ? "N/A" : tc.toString()), null);
 		}
 		catch ( Throwable e ) {
 			reportIssue(IssueType.ALLOWED_CHARACTERS, tu, null,
-				"Error when trying to check ITS allowed characters. "+e.getMessage(),
+				String.format("Error when trying to check ITS allowed characters pattern '%s'. "+e.getMessage(), itsAllowedCharsPattern),
 				0, -1, 0, -1, Issue.SEVERITY_HIGH,
 				(isSource ? tc.toString() : "N/A"), (isSource ? "N/A" : tc.toString()), null);
 		}
@@ -1039,7 +1042,7 @@ class QualityChecker {
 	/**
 	 * Gets the position in the string representation of a fragment of a given
 	 * position in that fragment. 
-	 * @param frag the fragment where the poistion is located.
+	 * @param frag the fragment where the position is located.
 	 * @param pos the position.
 	 * @return the same position, but in the string representation of the fragment.
 	 */
