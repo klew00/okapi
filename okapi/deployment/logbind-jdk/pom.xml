@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
 
 	<groupId>net.sf.okapi.logbind</groupId>
-	<artifactId>jdk14</artifactId>
+	<artifactId>build-jdk14</artifactId>
 	<version>0.19-SNAPSHOT</version>
 
     <properties>

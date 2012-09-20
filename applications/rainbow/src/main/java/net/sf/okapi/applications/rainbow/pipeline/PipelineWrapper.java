@@ -256,6 +256,12 @@ public class PipelineWrapper {
 			availableSteps.put(step.stepClass, step);
 
 			ps = (IPipelineStep)Class.forName(
+				"net.sf.okapi.steps.common.ConvertSegmentsToTextUnitsStep").newInstance();
+			step = new StepInfo(ps.getName(), ps.getDescription(), ps.getClass().getName(), null, null);
+			// No parameters
+			availableSteps.put(step.stepClass, step);
+
+			ps = (IPipelineStep)Class.forName(
 				"net.sf.okapi.steps.common.createtarget.CreateTargetStep").newInstance();
 			params = ps.getParameters();
 			step = new StepInfo(ps.getName(), ps.getDescription(), ps.getClass().getName(), null,
