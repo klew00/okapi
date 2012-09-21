@@ -47,12 +47,17 @@ public class VariableResolver implements XPathVariableResolver {
 	 * Adds a variable and its value to this object. If the variable already exists, it is overwritten.
 	 * @param qName the name of the variable.
 	 * @param value the value.
+	 * @param overwrite true to overwrite existing values, false to preserve old value.
 	 */
 	public void add (QName qName,
-		String value)
+		String value,
+		boolean overwrite)
 	{
+		if ( !overwrite && ( table != null )) {
+			if ( table.contains(qName) ) return; // Do not overwrite
+		}
 		if ( table == null ) table = new Hashtable<QName, String>();
 		table.put(qName, value);
 	}
-
+	
 }

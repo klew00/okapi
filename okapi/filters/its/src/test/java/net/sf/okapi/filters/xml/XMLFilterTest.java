@@ -322,37 +322,38 @@ public class XMLFilterTest {
 		String snippet = "<?xml version=\"1.0\"?>\n"
 			+ "<doc><its:rules version=\"2.0\" xmlns:its=\"http://www.w3.org/2005/11/its\""
 			+ " xmlns:itsx=\"http://www.w3.org/2008/12/its-extensions\">"
-//			+ "<its:translateRule selector=\"//p/@title\" translate='yes'/>"
+			+ "<its:translateRule selector=\"//p/@title\" translate='yes'/>"
 			+ "<its:allowedCharactersRule selector=\"//p\" allowedCharacters='[a-z]'/>"
-//			+ "<its:allowedCharactersRule selector=\"//p/@title\" allowedCharacters='[A-Z]'/>"
+			+ "<its:allowedCharactersRule selector=\"//p/@title\" allowedCharacters='[A-Z]'/>"
 			+ "</its:rules>"
 			+ "<p title='ABC'>text</p>"
 			+ "<q>text</q>"
 			+ "</doc>";
 		ArrayList<Event> list = getEvents(snippet);
 		ITextUnit tu = FilterTestDriver.getTextUnit(list, 1);
-//		assertEquals("[A-Z]", tu.getProperty(Property.ITS_ALLOWEDCHARACTERS).getValue());
-//		tu = FilterTestDriver.getTextUnit(list, 2);
-		assertEquals("[a-z]", tu.getProperty(Property.ITS_ALLOWEDCHARACTERS).getValue());
+		assertEquals("[A-Z]", tu.getProperty(Property.ITS_ALLOWEDCHARACTERS).getValue());
 		tu = FilterTestDriver.getTextUnit(list, 2);
+		assertEquals("[a-z]", tu.getProperty(Property.ITS_ALLOWEDCHARACTERS).getValue());
+		tu = FilterTestDriver.getTextUnit(list, 3);
 		assertFalse(tu.hasProperty(Property.ITS_ALLOWEDCHARACTERS));
 	}
-	
+
 	@Test
 	public void testStorageSize () {
 		String snippet = "<?xml version=\"1.0\"?>\n"
 			+ "<doc><its:rules version=\"2.0\" xmlns:its=\"http://www.w3.org/2005/11/its\""
 			+ " xmlns:itsx=\"http://www.w3.org/2008/12/its-extensions\">"
+			+ "<its:translateRule selector=\"//p/@title\" translate='yes'/>"
 			+ "<its:storageSizeRule selector=\"//p\" storageSize='10' storageEncoding='UTF-16'/>"
+			+ "<its:storageSizeRule selector=\"//p/@title\" storageSize='5' storageEncoding='Shift-JIS'/>"
 			+ "</its:rules>"
-			+ "<p>text</p>"
+			+ "<p title='abc'>text</p>"
 			+ "</doc>";
 		ArrayList<Event> list = getEvents(snippet);
 		ITextUnit tu = FilterTestDriver.getTextUnit(list, 1);
-		assertNotNull(tu);
-		Property prop = tu.getProperty(Property.ITS_STORAGESIZE);
-		assertNotNull(prop);
-		assertEquals("10\tUTF-16", prop.getValue());
+		assertEquals("5\tShift-JIS", tu.getProperty(Property.ITS_STORAGESIZE).getValue());
+		tu = FilterTestDriver.getTextUnit(list, 2);
+		assertEquals("10\tUTF-16", tu.getProperty(Property.ITS_STORAGESIZE).getValue());
 	}
 	
 	@Test

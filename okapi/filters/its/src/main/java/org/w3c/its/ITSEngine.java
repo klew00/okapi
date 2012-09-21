@@ -136,12 +136,13 @@ public class ITSEngine implements IProcessor, ITraversal {
 		URI docURI)
 	{
 		// For backward compatibility
-		this(doc, docURI, false);
+		this(doc, docURI, false, null);
 	}
 	
 	public ITSEngine (Document doc,
 		URI docURI,
-		boolean isHTML5)
+		boolean isHTML5,
+		Map<String, String> map)
 	{
 		this.doc = doc;
 		this.docURI = docURI;
@@ -154,6 +155,11 @@ public class ITSEngine implements IProcessor, ITraversal {
 			nsContext.addNamespace(HTML_NS_PREFIX, HTML_NS_URI);
 		}
 		varResolver = new VariableResolver();
+		if ( !Util.isEmpty(map) ) {
+			for ( String name : map.keySet() ) {
+				varResolver.add(new QName(name), map.get(name), true);
+			}
+		}
 
 		// Macintosh work-around
 		// When you use -XstartOnFirstThread as a java -Xarg on Leopard, your ContextClassloader gets set to null.
@@ -166,6 +172,10 @@ public class ITSEngine implements IProcessor, ITraversal {
 		xpath = xpFact.newXPath();
 		xpath.setNamespaceContext(nsContext);
 		xpath.setXPathVariableResolver(varResolver);
+	}
+	
+	public void setVariables (Map<String, String> map) {
+		
 	}
 
 	/**
@@ -377,7 +387,8 @@ public class ITSEngine implements IProcessor, ITraversal {
 		if ( name.isEmpty() ) {
 			throw new ITSException("Invalid value for 'name' in param.");
  		}
-		varResolver.add(new QName(name), value);
+		// Do not overwrite existing values (the element defines defaults)
+		varResolver.add(new QName(name), value, false);
 	}
 	
 	/**
@@ -680,19 +691,19 @@ public class ITSEngine implements IProcessor, ITraversal {
 			rule.map.put("commentPointer", commentP);
 		}
 		
-		// Get the optional score
-		String scoreP = null;
-		if ( elem.hasAttribute("locQualityIssueScorePointer") )
-			scoreP = elem.getAttribute("locQualityIssueScorePointer");
+		// Get the optional severity
+		String severityP = null;
+		if ( elem.hasAttribute("locQualityIssueSeverityPointer") )
+			severityP = elem.getAttribute("locQualityIssueSeverityPointer");
 		if ( !Util.isEmpty(np[3]) ) {
-			if ( !Util.isEmpty(scoreP) ) {
-				throw new ITSException("Cannot have both locQualityIssueScore and locQualityIssueScorePointer.");
+			if ( !Util.isEmpty(severityP) ) {
+				throw new ITSException("Cannot have both locQualityIssueSeverity and locQualityIssueSeverityPointer.");
 			}
 			// TODO: verify the value? // 0. to 100.00
-			rule.map.put("score", np[3]);
+			rule.map.put("severity", np[3]);
 		}
 		else {
-			rule.map.put("scorePointer", scoreP);
+			rule.map.put("severityPointer", severityP);
 		}
 		
 		// Get the optional profile reference
@@ -1058,7 +1069,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 			if ( values[0] != null ) trace.peek().lqIssuesRef = values[0];
 			if ( values[1] != null ) trace.peek().lqIssueType = values[1];
 			if ( values[2] != null ) trace.peek().lqIssueComment = values[2];
-			if ( values[3] != null ) trace.peek().lqIssueScore = values[3];
+			if ( values[3] != null ) trace.peek().lqIssueSeverity = values[3];
 			if ( values[4] != null ) trace.peek().lqIssueProfileRef = values[4];
 		}
 
@@ -1288,10 +1299,10 @@ public class ITSEngine implements IProcessor, ITraversal {
 							data3 = rule.map.get("commentPointer");
 							if ( !Util.isEmpty(data3) ) data3 = resolvePointer(NL.item(i), data3);
 						}
-						// Get and resolve score
-						String data4 = rule.map.get("score");
+						// Get and resolve severity
+						String data4 = rule.map.get("severity");
 						if ( data4 == null ) {
-							data4 = rule.map.get("scorePointer");
+							data4 = rule.map.get("severityPointer");
 							if ( !Util.isEmpty(data4) ) data4 = resolvePointer(NL.item(i), data4);
 						}
 						// Get and resolve profile reference
@@ -1588,19 +1599,20 @@ public class ITSEngine implements IProcessor, ITraversal {
 					String ns = attr.getOwnerElement().getNamespaceURI();
 					if ( !Util.isEmpty(ns) ) qualified = !ns.equals(ITS_NS_URI);
 					String[] values = retrieveLocQualityIssueData(attr.getOwnerElement(), qualified);
-					// Get the previous data (if any)
-					String oriData = (String)attr.getOwnerElement().getUserData(FLAGNAME);
-					if ( oriData != null ) {
-						String[] ori = fromSingleString(getFlagData(oriData, FP_LQISSUE_DATA));
-						if ( ori.length > 1 ) {
-							// Use original values if local one is not defined
-							if ( values[0] == null ) values[0] = ori[0];
-							if ( values[1] == null ) values[1] = ori[1];
-							if ( values[2] == null ) values[2] = ori[2];
-							if ( values[3] == null ) values[3] = ori[3];
-							if ( values[4] == null ) values[4] = ori[4];
-						}
-					}
+//TODO: resolve this issue: if override is complete or not					
+//					// Get the previous data (if any)
+//					String oriData = (String)attr.getOwnerElement().getUserData(FLAGNAME);
+//					if ( oriData != null ) {
+//						String[] ori = fromSingleString(getFlagData(oriData, FP_LQISSUE_DATA));
+//						if ( ori.length > 1 ) {
+//							// Use original values if local one is not defined
+//							if ( values[0] == null ) values[0] = ori[0];
+//							if ( values[1] == null ) values[1] = ori[1];
+//							if ( values[2] == null ) values[2] = ori[2];
+//							if ( values[3] == null ) values[3] = ori[3];
+//							if ( values[4] == null ) values[4] = ori[4];
+//						}
+//					}
 					// Set the updated flags
 					setFlag(attr.getOwnerElement(), FP_LQISSUE, 'y', attr.getSpecified());
 					setFlag(attr.getOwnerElement(), FP_LQISSUE_DATA,
@@ -1652,16 +1664,17 @@ public class ITSEngine implements IProcessor, ITraversal {
 					String ns = attr.getOwnerElement().getNamespaceURI();
 					if ( !Util.isEmpty(ns) ) qualified = !ns.equals(ITS_NS_URI);
 					String[] values = retrieveStorageSizeData(attr.getOwnerElement(), qualified, isHTML5);
-					// Get the previous data (if any)
-					String oriData = (String)attr.getOwnerElement().getUserData(FLAGNAME);
-					if ( oriData != null ) {
-						String[] ori = fromSingleString(getFlagData(oriData, FP_STORAGESIZE_DATA));
-						if ( ori.length > 1 ) {
-							// Use original values if local one is not defined
-							if ( values[0] == null ) values[0] = ori[0];
-							if ( values[1] == null ) values[1] = ori[1];
-						}
-					}
+//TODO: resolve override complete or not					
+//					// Get the previous data (if any)
+//					String oriData = (String)attr.getOwnerElement().getUserData(FLAGNAME);
+//					if ( oriData != null ) {
+//						String[] ori = fromSingleString(getFlagData(oriData, FP_STORAGESIZE_DATA));
+//						if ( ori.length > 1 ) {
+//							// Use original values if local one is not defined
+//							if ( values[0] == null ) values[0] = ori[0];
+//							if ( values[1] == null ) values[1] = ori[1];
+//						}
+//					}
 					// Set the updated flags
 					setFlag(attr.getOwnerElement(), FP_STORAGESIZE, 'y', attr.getSpecified());
 					setFlag(attr.getOwnerElement(), FP_STORAGESIZE_DATA,
@@ -1793,7 +1806,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 	 * Retrieves the non-pointer information of the Localization Quality issue data category.
 	 * @param elem the element where to get the data.
 	 * @param qualified true if the attributes are expected to be qualified.
-	 * @return an array of the value: issues reference, type, comment, score, profile reference.
+	 * @return an array of the value: issues reference, type, comment, severity, profile reference.
 	 */
 	private String[] retrieveLocQualityIssueData (Element elem,
 		boolean qualified)
@@ -1810,8 +1823,8 @@ public class ITSEngine implements IProcessor, ITraversal {
 			if ( elem.hasAttributeNS(ITS_NS_URI, "locQualityIssueComment") )
 				data[2] = elem.getAttributeNS(ITS_NS_URI, "locQualityIssueComment");
 			
-			if ( elem.hasAttributeNS(ITS_NS_URI, "locQualityIssueScore") )
-				data[3] = elem.getAttributeNS(ITS_NS_URI, "locQualityIssueScore");
+			if ( elem.hasAttributeNS(ITS_NS_URI, "locQualityIssueSeverity") )
+				data[3] = elem.getAttributeNS(ITS_NS_URI, "locQualityIssueSeverity");
 			
 			if ( elem.hasAttributeNS(ITS_NS_URI, "locQualityIssueProfileRef") )
 				data[4] = elem.getAttributeNS(ITS_NS_URI, "locQualityIssueProfileRef");
@@ -1826,8 +1839,8 @@ public class ITSEngine implements IProcessor, ITraversal {
 			if ( elem.hasAttribute("locQualityIssueComment") )
 				data[2] = elem.getAttribute("locQualityIssueComment");
 			
-			if ( elem.hasAttribute("locQualityIssueScore") )
-				data[3] = elem.getAttribute("locQualityIssueScore");
+			if ( elem.hasAttribute("locQualityIssueSeverity") )
+				data[3] = elem.getAttribute("locQualityIssueSeverity");
 			
 			if ( elem.hasAttribute("locQualityIssueProfileRef") )
 				data[4] = elem.getAttribute("locQualityIssueProfileRef");
@@ -2034,12 +2047,8 @@ public class ITSEngine implements IProcessor, ITraversal {
 		return getFlagData(tmp, FP_IDVALUE_DATA);
 	}
 	
-	public int getDirectionality () {
-		return trace.peek().dir;
-	}
-
 	public int getDirectionality (Attr attribute) {
-		if ( attribute == null ) return DIR_LTR;
+		if ( attribute == null ) return trace.peek().dir;
 		String tmp;
 		if ( (tmp = (String)attribute.getUserData(FLAGNAME)) == null ) return DIR_LTR;
 		return Integer.valueOf(tmp.charAt(FP_DIRECTIONALITY));
@@ -2082,18 +2091,15 @@ public class ITSEngine implements IProcessor, ITraversal {
 		return "description";
 	}
 	
-	public String getDomains () {
-		return trace.peek().domains;
-	}
-	
 	public String getDomains (Attr attribute) {
-		if ( attribute == null ) return null;
+		if ( attribute == null ) return trace.peek().domains;
 		String tmp;
 		if ( (tmp = (String)attribute.getUserData(FLAGNAME)) == null ) return null;
 		if ( tmp.charAt(FP_DOMAIN) != 'y' ) return null;
 		return getFlagData(tmp, FP_DOMAIN_DATA);
 	}
 
+	@Override
 	public boolean preserveWS () {
 		return trace.peek().preserveWS;
 	}
@@ -2103,13 +2109,8 @@ public class ITSEngine implements IProcessor, ITraversal {
 	}
 
 	@Override
-	public String getExternalResourceRef () {
-		return trace.peek().externalRes;
-	}
-
-	@Override
 	public String getExternalResourceRef (Attr attribute) {
-		if ( attribute == null ) return null;
+		if ( attribute == null ) return trace.peek().externalRes;
 		String tmp;
 		if ( (tmp = (String)attribute.getUserData(FLAGNAME)) == null ) return null;
 		if ( tmp.charAt(FP_EXTERNALRES) != 'y' ) return null;
@@ -2137,8 +2138,8 @@ public class ITSEngine implements IProcessor, ITraversal {
 	}
 
 	@Override
-	public String getLocQualityIssueScore () {
-		return trace.peek().lqIssueScore;
+	public String getLocQualityIssueSeverity () {
+		return trace.peek().lqIssueSeverity;
 	}
 
 	@Override
@@ -2147,13 +2148,8 @@ public class ITSEngine implements IProcessor, ITraversal {
 	}
 
 	@Override
-	public String getStorageSize () {
-		return trace.peek().storageSize;
-	}
-
-	@Override
 	public String getStorageSize (Attr attribute) {
-		if ( attribute == null ) return null;
+		if ( attribute == null ) return trace.peek().storageSize;
 		String tmp;
 		if ( (tmp = (String)attribute.getUserData(FLAGNAME)) == null ) return null;
 		if ( tmp.charAt(FP_STORAGESIZE) != 'y' ) return null;
@@ -2162,16 +2158,13 @@ public class ITSEngine implements IProcessor, ITraversal {
 	}
 
 	@Override
-	public String getStorageEncoding () {
-		String tmp = trace.peek().storageEncoding;
-		if ( tmp == null ) return "UTF-8";
-		return tmp;
-	}
-
-	@Override
 	public String getStorageEncoding (Attr attribute) {
-		if ( attribute == null ) return null;
 		String tmp;
+		if ( attribute == null ) {
+			tmp = trace.peek().storageEncoding;
+			if ( tmp == null ) return "UTF-8";
+			else return tmp;
+		}
 		if ( (tmp = (String)attribute.getUserData(FLAGNAME)) == null ) return null;
 		if ( tmp.charAt(FP_STORAGESIZE) != 'y' ) return null;
 		String[] values = fromSingleString(getFlagData(tmp, FP_STORAGESIZE_DATA));

@@ -77,13 +77,6 @@ public interface ITraversal {
 	public String getIdValue (Attr attribute);
 	
 	/**
-	 * Gets the directionality for the text of the current node of the
-	 * traversal.
-	 * @return One of the DIR_* values.
-	 */
-	public int getDirectionality ();
-	
-	/**
 	 * Gets the directionality for the text of a given attribute of the current 
 	 * node of the traversal.
 	 * @param attribute The attribute to query. The attribute must be in the current
@@ -91,8 +84,6 @@ public interface ITraversal {
 	 * @return One of the DIR_* values.
 	 */
 	public int getDirectionality (Attr attribute);
-	
-	public String getExternalResourceRef ();
 	
 	public String getExternalResourceRef (Attr attribute);
 	
@@ -102,12 +93,13 @@ public interface ITraversal {
 	
 	public String getLocQualityIssueComment ();
 	
-	public String getLocQualityIssueScore ();
+	public String getLocQualityIssueSeverity ();
 	
 	public String getLocQualityIssueProfileRef ();
 	
 	/**
 	 * Gets the element-withinText-related information for the current element.
+	 * This data category applies only to elements.
 	 * @return One of the WINTINTEXT_* values.
 	 */
 	public int getWithinText ();
@@ -137,21 +129,6 @@ public interface ITraversal {
 	
 	public String getLocNoteType (Attr attribute);
 	
-	/**
-	 * Gets the domain or domains of the current element of the traversal, or null
-	 * if the node has no domain.
-	 * @return a tab-delimited list of the domains of the current element of the traversal,
-	 * or null if the node has no domain.
-	 */
-	public String getDomains ();
-	
-	/**
-	 * Gets the domain or domains of the given attribute of the current element.
-	 * @param attribute the attribute to query. the attribute must be in the current
-	 * node of the traversal.
-	 * @return a tab-delimited list of the domains of the given attribute of the current element,
-	 * or null if the attribute has no domain.
-	 */
 	public String getDomains (Attr attribute);
 
 	/**
@@ -175,13 +152,9 @@ public interface ITraversal {
 	 */
 	public String getLanguage ();
 	
-	public String getStorageSize ();
+	public String getStorageSize(Attr attribute);
 	
-	public String getStorageSize(Attr attr);
-	
-	public String getStorageEncoding ();
-	
-	public String getStorageEncoding (Attr attr);
+	public String getStorageEncoding (Attr attribute);
 	
 	public String getAllowedCharacters (Attr attribute);
 	

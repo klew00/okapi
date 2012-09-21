@@ -39,7 +39,7 @@ class ITSTrace {
 	String domains;
 	String lqIssueType;
 	String lqIssueComment;
-	String lqIssueScore;
+	String lqIssueSeverity;
 	String lqIssueProfileRef;
 	String lqIssuesRef;
 	String storageSize;
@@ -89,7 +89,7 @@ class ITSTrace {
 		lqIssuesRef = initialTrace.lqIssuesRef;
 		lqIssueType = initialTrace.lqIssueType;
 		lqIssueComment = initialTrace.lqIssueComment;
-		lqIssueScore = initialTrace.lqIssueScore;
+		lqIssueSeverity = initialTrace.lqIssueSeverity;
 		lqIssueProfileRef = initialTrace.lqIssueProfileRef;
 		
 		// Allowed chars: Inheritance for child elements but not attributes

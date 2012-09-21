@@ -23,6 +23,7 @@ package net.sf.okapi.filters.its;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Stack;
 import java.util.logging.Logger;
 
@@ -101,6 +102,7 @@ public abstract class ITSFilter implements IFilter {
 	private TermsAnnotation terms;
 	private HashMap<Node, TargetPointerEntry> targetTable;
 	private boolean hasTargetPointer;
+	private Map<String, String> variables;
 
 	private class TargetPointerEntry {
 
@@ -128,6 +130,16 @@ public abstract class ITSFilter implements IFilter {
 		this.params = new Parameters();
 	}
 	
+	/**
+	 * Sets the ITS variables to pass to the ITS parameters feature.
+	 * This method should be called before {@link #open(RawDocument, boolean)}.
+	 * Those variables overwrite the default values set in the <code>its;params</code> elements.
+	 * @param map the map of variables to pass. Can be null or empty.
+	 */
+	public void setITSVariables (Map<String, String> map) {
+		variables = map;
+	}
+
 	public void cancel () {
 		canceled = true;
 	}
@@ -225,7 +237,7 @@ public abstract class ITSFilter implements IFilter {
 
 		// Create the ITS engine
 		ITSEngine itsEng;
-		itsEng = new ITSEngine(doc, input.getInputURI(), isHTML5);
+		itsEng = new ITSEngine(doc, input.getInputURI(), isHTML5, variables);
 		// Load the parameters file if there is one
 		if ( params != null ) {
 			if ( params.getDocument() != null ) {
@@ -276,7 +288,7 @@ public abstract class ITSFilter implements IFilter {
 		// Put the start document in the queue
 		queue.add(new Event(EventType.START_DOCUMENT, startDoc));
 	}
-
+	
 	/**
 	 * Prepares the document for using target pointers.
 	 * <p>Because of the way the skeleton is constructed and because target pointer can result in the target
@@ -596,7 +608,7 @@ public abstract class ITSFilter implements IFilter {
 	{
 		String id = String.valueOf(++tuId);
 		ITextUnit tu = new TextUnit(id, attr.getValue(), true, mimeType);
-
+		
 		// Deal with inline codes if needed
 		if ( params.useCodeFinder ) {
 			TextFragment tf = tu.getSource().getFirstContent();
@@ -615,7 +627,29 @@ public abstract class ITSFilter implements IFilter {
 				}
 			}
 		}
-//TODO: properties for attributes!		
+
+		// Set the ITS context for this attribute and set the relevant properties
+		ContextItem ci = new ContextItem(context.peek().node, trav, attr);
+		// ITS Localization Note
+		if ( !Util.isEmpty(ci.locNote) ) {
+			tu.setProperty(new Property(Property.NOTE, ci.locNote));
+		}
+		// ITS Domain
+		if ( !Util.isEmpty(ci.domains) ) {
+			tu.setProperty(new Property(Property.ITS_DOMAINS, ci.domains));
+		}
+		// ITS External resources Reference
+		if ( !Util.isEmpty(ci.externalRes) ) {
+			tu.setProperty(new Property(Property.ITS_EXTERNALRESREF, ci.externalRes));
+		}
+		// ITS Storage Size
+		if ( ci.storageSize != null ) {
+			tu.setProperty(new Property(Property.ITS_STORAGESIZE, ci.storageSize));
+		}
+		// ITS Allowed characters
+		if ( ci.allowedChars != null ) {
+			tu.setProperty(new Property(Property.ITS_ALLOWEDCHARACTERS, ci.allowedChars));
+		}
 
 		queue.add(new Event(EventType.TEXT_UNIT, tu));
 		if ( addToSkeleton ) skel.addReference(tu);

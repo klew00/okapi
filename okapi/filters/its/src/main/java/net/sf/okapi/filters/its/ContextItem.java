@@ -20,6 +20,7 @@
 
 package net.sf.okapi.filters.its;
 
+import org.w3c.dom.Attr;
 import org.w3c.dom.Node;
 import org.w3c.its.ITraversal;
 
@@ -39,19 +40,26 @@ class ContextItem {
 	public ContextItem (Node node,
 		ITraversal trav)
 	{
+		this(node, trav, null);
+	}
+	
+	public ContextItem (Node node,
+		ITraversal trav,
+		Attr attribute)
+	{
 		this.node = node;
 		// Context is always an element node
-		this.translate = trav.getTranslate(null);
-		this.trgPointer = trav.getTargetPointer(null);
-		this.idValue = trav.getIdValue(null);
-		this.locNote = trav.getLocNote(null);
+		this.translate = trav.getTranslate(attribute);
+		this.trgPointer = trav.getTargetPointer(attribute);
+		this.idValue = trav.getIdValue(attribute);
+		this.locNote = trav.getLocNote(attribute);
 		this.preserveWS = trav.preserveWS();
-		this.domains = trav.getDomains();
-		this.externalRes = trav.getExternalResourceRef();
-		this.allowedChars = trav.getAllowedCharacters(null);
+		this.domains = trav.getDomains(attribute);
+		this.externalRes = trav.getExternalResourceRef(attribute);
+		this.allowedChars = trav.getAllowedCharacters(attribute);
 		
-		if ( trav.getStorageSize() != null ) {
-			this.storageSize = trav.getStorageSize() + "\t" + trav.getStorageEncoding();
+		if ( trav.getStorageSize(attribute) != null ) {
+			this.storageSize = trav.getStorageSize(attribute) + "\t" + trav.getStorageEncoding(attribute);
 		}
 	}
 

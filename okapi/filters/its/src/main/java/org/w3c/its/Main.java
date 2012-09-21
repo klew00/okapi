@@ -280,8 +280,7 @@ public class Main {
 			if ( out1 != null ) writer.print(String.format("\tits:termInfo=\"%s\"", escape(out1)));
 		}
 		else if ( dc.equals(DC_DIRECTIONALITY) ) {
-			int dir = trav.getDirectionality();
-			if ( attr != null ) dir = trav.getDirectionality(attr);
+			int dir = trav.getDirectionality(attr);
 			switch ( dir ) {
 			case ITraversal.DIR_LRO: out1 = "lro"; break;
 			case ITraversal.DIR_LTR: out1 = "ltr"; break;
@@ -306,8 +305,7 @@ public class Main {
 			writer.print(String.format("\tits:withinText=\"%s\"", escape(out1)));
 		}
 		else if ( dc.equals(DC_DOMAIN) ) {
-			if ( attr != null ) out1 = trav.getDomains(attr);
-			else out1 = trav.getDomains();
+			out1 = trav.getDomains(attr);
 			if ( out1 != null ) writer.print(String.format("\tits:domains=\"%s\"", escape(out1)));
 		}
 		else if ( dc.equals(DC_LOCALEFILTER) ) {
@@ -315,13 +313,11 @@ public class Main {
 			if ( out1 != null ) writer.print(String.format("\tits:localeFilterList=\"%s\"", escape(out1)));
 		}
 		else if ( dc.equals(DC_EXTERNALRESOURCE) ) {
-			if ( attr != null ) out1 = trav.getExternalResourceRef(attr);
-			else out1 = trav.getExternalResourceRef();
+			out1 = trav.getExternalResourceRef(attr);
 			if ( out1 != null ) writer.print(String.format("\tits:externalResource=\"%s\"", escape(out1)));
 		}
 		else if ( dc.equals(DC_TARGETPOINTER) ) {
-			if ( attr != null ) out1 = trav.getTargetPointer(attr);
-			else out1 = trav.getExternalResourceRef();
+			out1 = trav.getTargetPointer(attr);
 			if ( out1 != null ) writer.print(String.format("\tits:targetPointer=\"%s\"", escape(out1)));
 		}
 		else if ( dc.equals(DC_IDVALUE) ) {
@@ -342,8 +338,8 @@ public class Main {
 			out1 = trav.getLocQualityIssueComment();
 			if ( out1 != null ) writer.print(String.format("\tits:locQualityIssueComment=\"%s\"", escape(out1)));
 			writer.print("\t");
-			out1 = trav.getLocQualityIssueScore();
-			if ( out1 != null ) writer.print(String.format("\tits:locQualityIssueScore=\"%s\"", escape(out1)));
+			out1 = trav.getLocQualityIssueSeverity();
+			if ( out1 != null ) writer.print(String.format("\tits:locQualityIssueSeverity=\"%s\"", escape(out1)));
 			writer.print("\t");
 			out1 = trav.getLocQualityIssueProfileRef();
 			if ( out1 != null ) writer.print(String.format("\tits:locQualityIssueProfileRef=\"%s\"", escape(out1)));
@@ -364,7 +360,7 @@ public class Main {
 		boolean isHTML5)
 	{
 		// Create the ITS engine
-		ITSEngine itsEng = new ITSEngine(doc, inputFile.toURI(), isHTML5);
+		ITSEngine itsEng = new ITSEngine(doc, inputFile.toURI(), isHTML5, null);
 		
 		// For HTML5: load the default rules
 		if ( isHTML5 ) {
