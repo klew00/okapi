@@ -595,7 +595,7 @@
 		<!-- None of these jars should be in tmpJars (to go in classpath) -->
 
 		<!-- our binder (log4j-<okapi_ver>.jar) as ${logBindJar} -->
-		<copy file="${mavenStore}/net/sf/okapi/logbind/jdk14/${okapilibStamp}/jdk14-${okapilibStamp}.jar"
+		<copy file="${mavenStore}/net/sf/okapi/logbind/build-jdk14/${okapilibStamp}/build-jdk14-${okapilibStamp}.jar"
 		      tofile="${distLogger}/${logBindJar}" />
 
 		<!-- slf4j-jdk14-<ver>.jar -->
@@ -623,7 +623,7 @@
 
 		<!-- our binder (log4j-<okapi_ver>.jar) as ${logBindJar}, with log4j.properties removed from inside -->
 		<zip destfile="${distLogger}/${logBindJar}">
-			<zipfileset src="${mavenStore}/net/sf/okapi/logbind/log4j/${okapilibStamp}/log4j-${okapilibStamp}.jar">
+			<zipfileset src="${mavenStore}/net/sf/okapi/logbind/build-log4j/${okapilibStamp}/build-log4j-${okapilibStamp}.jar">
 				<exclude name="log4j.properties"/>
 			</zipfileset>
 		</zip>
