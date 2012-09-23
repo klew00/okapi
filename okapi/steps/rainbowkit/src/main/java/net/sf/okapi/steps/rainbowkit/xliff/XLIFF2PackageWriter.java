@@ -366,6 +366,7 @@ public class XLIFF2PackageWriter extends BasePackageWriter {
 		int srcSegIndex = -1;
 		for ( int i=0; i<srcTc.count(); i++ ) {
 			part = srcTc.get(i);
+			
 			if ( part.isSegment() ) {
 				Segment srcSeg = (Segment)part;
 				srcSegIndex++;
@@ -375,6 +376,8 @@ public class XLIFF2PackageWriter extends BasePackageWriter {
 				
 				// Applies TU-level translatable property to each segment
 				xSeg.setTranslate(tu.isTranslatable());
+				// Applies TU-level white space
+				xSeg.setPreserveWS(tu.preserveWhitespaces());
 				
 				// Target
 				if ( trgSegs != null ) {
@@ -400,6 +403,9 @@ public class XLIFF2PackageWriter extends BasePackageWriter {
 			}
 			else { // Non-segment part
 				IPart xPart = unit.appendNewIgnorable();
+				// Applies TU-level white space
+				xPart.setPreserveWS(tu.preserveWhitespaces());
+				
 				xPart.setSource(toXLIFF2Fragment(part.text, unit.getDataStore(), false));
 				// Target
 				if ( trgTc != null ) {
