@@ -1547,4 +1547,5 @@ public class TsFilter implements IFilter {
 			throw new OkapiBadFilterInputException("Invalid value ("+str+" ) in byte element. ");
 		}
 	}
+	
 }

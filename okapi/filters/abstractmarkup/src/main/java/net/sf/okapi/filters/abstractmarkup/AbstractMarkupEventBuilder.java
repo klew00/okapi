@@ -24,9 +24,11 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.encoder.EncoderContext;
 import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.encoder.IEncoder;
 import net.sf.okapi.common.filters.EventBuilder;
+import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filters.InlineCodeFinder;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.TextFragment;
@@ -47,7 +49,7 @@ public class AbstractMarkupEventBuilder extends EventBuilder {
 	private String encoding;
 	private String lineBreak;
 	
-	public AbstractMarkupEventBuilder(String rootId, boolean subFilter, 
+	public AbstractMarkupEventBuilder(String rootId, IFilter subFilter, 
 			EncoderManager encoderManager, String encoding, String lineBreak) {
 		super(rootId, subFilter);		
 		codeFinder = new InlineCodeFinder();
@@ -101,16 +103,17 @@ public class AbstractMarkupEventBuilder extends EventBuilder {
 		if ( useCodeFinder ) {
 			encoderManager.setDefaultOptions(null, encoding, lineBreak);
 			encoderManager.updateEncoder(textUnit.getMimeType());
-			IEncoder encoder = encoderManager.getEncoder();
+//			IEncoder encoder = encoderManager.getEncoder();
 			codeFinder.process(text);
 			// Escape inline code content
-			List<Code> codes = text.getCodes();
-			for ( Code code : codes ) {
-				// Escape the data of the new inline code (and only them)
-				if ( code.getType().equals(InlineCodeFinder.TAGTYPE) ) {										
-					code.setData(encoder.encode(code.getData(), 1));
-				}
-			}
+//			List<Code> codes = text.getCodes();
+//			for ( Code code : codes ) {
+//				// Escape the data of the new inline code (and only them)
+//				if ( code.getType().equals(InlineCodeFinder.TAGTYPE) ) {										
+//					//code.setData(encoder.encode(code.getData(), EncoderContext.SKELETON));
+//					code.setData(encoder.encode(code.getData(), EncoderContext.INLINE));
+//				}
+//			}
 			
 		}
 		return textUnit;

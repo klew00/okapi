@@ -159,6 +159,5 @@ public interface IFilter {
 	 * Gets the list of all predefined configurations for this filter. 
 	 * @return a list of the all predefined configurations for this filter.
 	 */
-	public List<FilterConfiguration> getConfigurations();
-	
+	public List<FilterConfiguration> getConfigurations();	
 }

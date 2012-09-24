@@ -21,6 +21,7 @@
 package net.sf.okapi.filters.railsyaml;
 
 import net.sf.okapi.common.filters.EventBuilder;
+import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.TextFragment;
 
@@ -32,8 +33,8 @@ public class YamlEventBuilder extends EventBuilder {
 //	private static final String YAML_WHITESPACE_REGEX = "[ ]+";
 //	private static final Pattern YAML_WHITESPACE_PATTERN = Pattern.compile(YAML_WHITESPACE_REGEX);
 
-	public YamlEventBuilder(String rootId, boolean subFilter) {
-		super(rootId, subFilter);
+	public YamlEventBuilder(String rootId, IFilter filter) {
+		super(rootId, filter);
 	}
 	
 	/**

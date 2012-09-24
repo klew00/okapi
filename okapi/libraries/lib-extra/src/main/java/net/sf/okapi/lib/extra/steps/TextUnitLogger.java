@@ -76,7 +76,7 @@ public class TextUnitLogger extends BasePipelineStep {
 	}
 	
 	private static void fillSB(StringBuilder sb, ITextUnit tu, LocaleId srcLoc) {
-		sb.append("tu [" + tu.getId() + "]");
+		sb.append(String.format("tu [id=%s name=%s type=%s]", tu.getId(), tu.getName(), tu.getType()));
 		sb.append(":");
 		if (tu.isReferent()) sb.append(" referent");
 		sb.append("\n");

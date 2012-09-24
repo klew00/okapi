@@ -62,7 +62,7 @@ public class ResourceSimplifierTest {
 	
 	@Test
 	public void testMonolingual() {
-		ResourceSimplifier conv = new ResourceSimplifier(ESES);
+		ResourceSimplifier conv = new ResourceSimplifier("UTF-8", ESES);
 		
 		ITextUnit tu1 = new TextUnit("tu1");
 		tu1.setSource(new TextContainer("text1"));
@@ -84,8 +84,9 @@ public class ResourceSimplifierTest {
 		skel2.add("</p>");
 		
 		Event e = conv.convert(new Event(EventType.TEXT_UNIT, tu1));
-		assertEquals(EventType.TEXT_UNIT, e.getEventType());
-		assertTrue(tu1.isReferent());
+//		assertEquals(EventType.TEXT_UNIT, e.getEventType());
+//		assertTrue(tu1.isReferent());
+		assertEquals(EventType.NO_OP, e.getEventType());
 		
 		e = conv.convert(new Event(EventType.TEXT_UNIT, tu2));
 		assertEquals(EventType.MULTI_EVENT, e.getEventType());
@@ -408,7 +409,8 @@ public class ResourceSimplifierTest {
 		ResourceSimplifier rs = new ResourceSimplifier(ENUS);
 		Event event = rs.convert(new Event(EventType.DOCUMENT_PART, dp1));
 		assertNotNull(event);
-		assertTrue(event.getResource() instanceof DocumentPart);
+		assertEquals(EventType.NO_OP, event.getEventType());
+		assertNull(event.getResource());
 	}
 		
 	@Test // + No refs, the original DP is returned
@@ -419,7 +421,8 @@ public class ResourceSimplifierTest {
 		ResourceSimplifier rs = new ResourceSimplifier(ENUS);
 		Event event = rs.convert(new Event(EventType.DOCUMENT_PART, dp1));
 		assertNotNull(event);
-		assertTrue(event.getResource() instanceof DocumentPart);
+		assertEquals(EventType.NO_OP, event.getEventType());
+		assertNull(event.getResource());
 	}
 	
 	@Test // No refs, the original TU is returned
@@ -827,19 +830,22 @@ public class ResourceSimplifierTest {
 		ResourceSimplifier rs = new ResourceSimplifier(ENUS);
 		Event event;
 		event = rs.convert(new Event(EventType.DOCUMENT_PART, dp6));
-		assertTrue(event.getResource() instanceof DocumentPart);
-		DocumentPart dp = event.getDocumentPart();
-		assertTrue(dp.isReferent());
+		assertNotNull(event);
+		assertEquals(EventType.NO_OP, event.getEventType());
+		assertNull(event.getResource());
+		
+		ITextUnit tu;
+		DocumentPart dp;
 		
 		event = rs.convert(new Event(EventType.TEXT_UNIT, tu3));
-		assertTrue(event.getResource() instanceof TextUnit);
-		ITextUnit tu = event.getTextUnit();
-		assertTrue(tu.isReferent());
+		assertNotNull(event);
+		assertEquals(EventType.NO_OP, event.getEventType());
+		assertNull(event.getResource());
 		
 		event = rs.convert(new Event(EventType.DOCUMENT_PART, dp7));
-		assertTrue(event.getResource() instanceof DocumentPart);
-		dp = event.getDocumentPart();
-		assertTrue(dp.isReferent());
+		assertNotNull(event);
+		assertEquals(EventType.NO_OP, event.getEventType());
+		assertNull(event.getResource());
 		
 		event = rs.convert(new Event(EventType.TEXT_UNIT, tu2));
 		assertTrue(event.getResource() instanceof MultiEvent);

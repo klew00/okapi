@@ -54,7 +54,7 @@ public class OpenXMLEncoder implements IEncoder {
 
 	@Override
 	public String encode (String text, 
-		int context)
+			EncoderContext context)
 	{
 		if ( text == null ) return "";
 		
@@ -97,7 +97,7 @@ public class OpenXMLEncoder implements IEncoder {
 
 	@Override
 	public String encode (char value,
-		int context)
+			EncoderContext context)
 	{
 		switch ( value ) {
 		case '<':
@@ -115,7 +115,7 @@ public class OpenXMLEncoder implements IEncoder {
 
 	@Override
 	public String encode (int value,
-		int context)
+			EncoderContext context)
 	{
 		switch ( value ) {
 		case '<':

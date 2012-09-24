@@ -135,9 +135,11 @@ public class XINIWriter implements IFilterWriter {
 			processEndDocument();
 			break;
 		case START_GROUP:
+		case START_SUBFILTER:
 			processStartGroup((StartGroup)event.getResource());
 			break;
 		case TEXT_UNIT:
+		case END_SUBFILTER:
 			processTextUnit(event.getTextUnit());
 			break;
 		}

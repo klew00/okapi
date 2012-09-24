@@ -168,9 +168,11 @@ public class XLIFFKitWriterStep extends BasePipelineStep {
 			processEndSubDocument((Ending)event.getResource());
 			break;
 		case START_GROUP:
+		case START_SUBFILTER:
 			processStartGroup((StartGroup)event.getResource());
 			break;
 		case END_GROUP:
+		case END_SUBFILTER:
 			processEndGroup((Ending)event.getResource());
 			break;
 		case TEXT_UNIT:

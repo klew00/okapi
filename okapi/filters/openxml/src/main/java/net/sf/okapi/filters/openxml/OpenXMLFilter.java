@@ -799,6 +799,7 @@ public class OpenXMLFilter implements IFilter {
 					return new Event(EventType.END_SUBDOCUMENT, ending, skel);				
 				case DOCUMENT_PART:
 				case START_GROUP:
+				case START_SUBFILTER:
 						if (translator!=null)
 							translator.addToReferents(event);
 						// purposely falls through to default
@@ -895,5 +896,5 @@ public class OpenXMLFilter implements IFilter {
 	public boolean getBPreferenceTranslateWordAllStyles()
 	{
 		return bPreferenceTranslateWordAllStyles;
-	}
+	}	
 }

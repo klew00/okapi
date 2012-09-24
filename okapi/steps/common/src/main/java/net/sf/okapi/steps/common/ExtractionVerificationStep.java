@@ -279,9 +279,12 @@ public class ExtractionVerificationStep extends BasePipelineStep {
 				return verificationUtil.compareStartSubDocument((StartSubDocument)event1.getResource(), (StartSubDocument)event2.getResource());
 			case START_GROUP:
 				return verificationUtil.compareBaseReferenceable(event1.getStartGroup(), event2.getStartGroup());
+			case START_SUBFILTER:
+				return verificationUtil.compareBaseReferenceable(event1.getStartSubfilter(), event2.getStartSubfilter());
 			case END_DOCUMENT:
 			case END_SUBDOCUMENT:
 			case END_GROUP:
+			case END_SUBFILTER:
 				return verificationUtil.compareIResources(event1.getEnding(), event2.getEnding());
 			case DOCUMENT_PART:
 				return verificationUtil.compareBaseReferenceable(event1.getDocumentPart(), event2.getDocumentPart());

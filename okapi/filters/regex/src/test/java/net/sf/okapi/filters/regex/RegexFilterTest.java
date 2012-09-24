@@ -304,6 +304,10 @@ public class RegexFilterTest {
                 break;
             case START_SUBDOCUMENT:
                 break;
+            case START_SUBFILTER:
+                break;
+            case END_SUBFILTER:
+                break;
         }
 	}
 		

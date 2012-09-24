@@ -43,6 +43,8 @@ public class EventListBuilderStep extends BasePipelineStep {
 				break;
 			case START_GROUP:
 			case END_GROUP:
+			case START_SUBFILTER:
+			case END_SUBFILTER:
 			case DOCUMENT_PART:
 			case TEXT_UNIT:
 			{

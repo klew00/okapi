@@ -80,6 +80,7 @@ public class H2Importer {
 					break;
 				
 				case START_GROUP:
+				case START_SUBFILTER:
 					if (( prevItem.firstChild > -1 ) || ( prevItem.itemType == ItemType.TEXT_UNIT )) {
 						addSibling(event.getResource(), ItemType.GROUP);
 					}
@@ -90,6 +91,7 @@ public class H2Importer {
 					
 				case END_SUBDOCUMENT:
 				case END_GROUP:
+				case END_SUBFILTER:
 					parents.pop();
 					level--;
 					prevItem = prevItems.pop();

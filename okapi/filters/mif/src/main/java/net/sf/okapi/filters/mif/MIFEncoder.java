@@ -27,6 +27,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
 
 import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.encoder.EncoderContext;
 import net.sf.okapi.common.encoder.IEncoder;
 
 /**
@@ -41,7 +42,7 @@ public class MIFEncoder implements IEncoder {
 
 	@Override
 	public String encode (String text,
-		int context)
+			EncoderContext context)
 	{
 		StringBuilder escaped = new StringBuilder();
 		char ch;
@@ -105,7 +106,7 @@ public class MIFEncoder implements IEncoder {
 
 	@Override
 	public String encode (char value,
-		int context)
+			EncoderContext context)
 	{
 		switch ( value ) {
 		case '\t':
@@ -155,7 +156,7 @@ public class MIFEncoder implements IEncoder {
 
 	@Override
 	public String encode (int value,
-		int context)
+			EncoderContext context)
 	{
 		switch ( value ) {
 		case '\t':

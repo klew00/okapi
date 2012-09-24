@@ -162,9 +162,11 @@ public class IDMLFilterWriter implements IFilterWriter {
 			processEndDocument();
 			break;
 		case START_GROUP:
+		case START_SUBFILTER:
 			processStartGroup(event.getStartGroup());
 			break;
 		case END_GROUP:
+		case END_SUBFILTER:
 			processEndGroup(event.getEndGroup());
 			break;
 		case TEXT_UNIT:

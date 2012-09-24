@@ -106,6 +106,8 @@ public class FilterEventsToRawDocumentStep extends BasePipelineStep {
 		case START_GROUP:
 		case END_SUBDOCUMENT:
 		case END_GROUP:
+		case START_SUBFILTER:
+		case END_SUBFILTER:
 		case DOCUMENT_PART:
 		case TEXT_UNIT:
 			// handle all the events between START_DOCUMENT and END_DOCUMENT

@@ -67,7 +67,7 @@ public class HtmlEncoder implements IEncoder {
 
 	@Override
 	public String encode (String text,
-		int context)
+			EncoderContext context)
 	{
 		if ( text == null ) return "";
 		boolean escapeGT = false;
@@ -164,8 +164,9 @@ public class HtmlEncoder implements IEncoder {
 		return null;
 	}
 	
+	@Override
 	public String encode (char value,
-		int context)
+			EncoderContext context)
 	{
 		switch ( value ) {
 		case '<':
@@ -202,7 +203,7 @@ public class HtmlEncoder implements IEncoder {
 
 	@Override
 	public String encode (int value,
-		int context)
+			EncoderContext context)
 	{
 		switch ( value ) {
 		case '<':

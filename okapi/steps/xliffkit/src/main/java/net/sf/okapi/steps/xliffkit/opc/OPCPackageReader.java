@@ -184,6 +184,8 @@ public class OPCPackageReader extends AbstractFilter {
 			case START_GROUP:
 			case END_SUBDOCUMENT:
 			case END_GROUP:
+			case START_SUBFILTER:
+			case END_SUBFILTER:
 			case DOCUMENT_PART:
 					writeEvent(event);
 			}

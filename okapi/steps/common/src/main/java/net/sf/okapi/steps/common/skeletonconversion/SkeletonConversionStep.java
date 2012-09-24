@@ -57,7 +57,7 @@ public class SkeletonConversionStep extends TuFilteringStep {
 		
 		writer = sd.getFilterWriter().getSkeletonWriter();
 		if (writer instanceof GenericSkeletonWriter) {
-			simplifier = new ResourceSimplifier((GenericSkeletonWriter) writer, sd.getLocale());
+			simplifier = new ResourceSimplifier((GenericSkeletonWriter) writer, sd.getEncoding(), sd.getLocale());
 		}
 		em = sd.getFilterWriter().getEncoderManager();
 		writer.processStartDocument(sd.getLocale(), sd.getEncoding(), null, em, sd);

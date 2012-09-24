@@ -38,7 +38,8 @@ public class EncoderManager implements IEncoder {
 
 	private final Logger LOGGER = LoggerFactory.getLogger(getClass());
 	
-	private Hashtable<String, String> mimeMap;
+	private Hashtable<String, String> mimeMap; // mimeType to encoder class name map
+	private Hashtable<String, IEncoder> encoders; // mimeType to encoder instance map
 	private String mimeType = "";
 	private IEncoder encoder;
 	private String defEncoding;
@@ -50,6 +51,7 @@ public class EncoderManager implements IEncoder {
 	 */
 	public EncoderManager () {
 		mimeMap = new Hashtable<String, String>();
+		encoders = new Hashtable<String, IEncoder>(); 
 		// All the filters have their mapping, all mapping should be explicit only
 		// Not needed anymore: setAllKnownMappings();
 	}
@@ -78,6 +80,7 @@ public class EncoderManager implements IEncoder {
 	 */
 	public void clearMap () {
 		mimeMap.clear();
+		encoders.clear();
 	}
 	
 	/**
@@ -89,7 +92,24 @@ public class EncoderManager implements IEncoder {
 	public void setMapping (String mimeType,
 		String className)
 	{
+		if (this.mimeType.equals(mimeType)) this.mimeType = "";
+		
 		mimeMap.put(mimeType, className);
+		IEncoder encoder = encoders.get(mimeType);
+		if (encoder != null && !className.equals(encoder.getClass().getName())) {
+			encoders.remove(mimeType);
+		}
+	}
+	
+	public void setMapping (String mimeType, IEncoder encoder) {
+		if (encoder == null) {
+			throw new InvalidParameterException("encoder cannot be null");
+		}
+		
+		if (this.mimeType.equals(mimeType)) this.mimeType = "";
+		
+		mimeMap.put(mimeType, encoder.getClass().getName());
+		encoders.put(mimeType, encoder);
 	}
 	
 	/**
@@ -98,6 +118,7 @@ public class EncoderManager implements IEncoder {
 	 */
 	public void removeMapping (String mimeType) {
 		mimeMap.remove(mimeType);
+		encoders.remove(mimeType);
 	}
 	
 	/**
@@ -111,10 +132,26 @@ public class EncoderManager implements IEncoder {
 			// Check if the MIME type is already mapped
 			if ( mimeMap.containsKey(entry.getKey()) ) {
 				if ( !mimeMap.get(entry.getKey()).equals(entry.getValue()) ) {
-					// Same MIME type, but different encoder:
+					// Same MIME type, but different encoder class name:
 					// Generate a warning, and keep the current mapping
 					LOGGER.warn(String.format("The MIME type '%s' is currently mapped to '%s', but conflicts with another mapping ('%s').",
 						entry.getKey(), mimeMap.get(entry.getKey()), entry.getValue()));
+				}
+				// Else: Same mapping, nothing to do
+			}
+			else { // Add the mapping
+				setMapping(entry.getKey(), entry.getValue());
+			}
+		}
+		
+		for ( Entry<String, IEncoder> entry : otherManager.encoders.entrySet() ) {
+			// Check if the MIME type is already mapped
+			if ( encoders.containsKey(entry.getKey()) ) {
+				if ( !encoders.get(entry.getKey()).equals(entry.getValue()) ) {
+					// Same MIME type, but different encoder:
+					// Generate a warning, and keep the current mapping
+					LOGGER.warn(String.format("The MIME type '%s' is currently mapped to '%s', but conflicts with another mapping ('%s').",
+						entry.getKey(), mimeMap.get(entry.getKey().getClass().getName()), entry.getValue().getClass().getName()));
 				}
 				// Else: Same mapping, nothing to do
 			}
@@ -144,7 +181,13 @@ public class EncoderManager implements IEncoder {
 				encoder = new DefaultEncoder();
 			}
 			else { // Else: Instantiate the encoder based on the class name
-				encoder = (IEncoder)Class.forName(name).newInstance();
+				if (encoders.containsKey(mimeType)) {
+					encoder = encoders.get(mimeType);
+				}
+				else {
+					encoder = (IEncoder)Class.forName(name).newInstance();
+					encoders.put(mimeType, encoder);
+				}				
 			}
 			// And set the options
 			encoder.setOptions(defParams, defEncoding, defLineBreak);
@@ -169,7 +212,7 @@ public class EncoderManager implements IEncoder {
 	 */
 	@Override
 	public String encode (String text,
-		int context)
+			EncoderContext context)
 	{
 		if ( encoder != null ) return encoder.encode(text, context);
 		else return text;
@@ -185,7 +228,7 @@ public class EncoderManager implements IEncoder {
 	 */
 	@Override
 	public String encode (char value,
-		int context)
+			EncoderContext context)
 	{
 		if ( encoder != null ) return encoder.encode(value, context);
 		else return String.valueOf(value); 
@@ -201,7 +244,7 @@ public class EncoderManager implements IEncoder {
 	 */
 	@Override
 	public String encode (int codePoint,
-		int context)
+			EncoderContext context)
 	{
 		if ( encoder != null ) return encoder.encode(codePoint, context);
 		else {

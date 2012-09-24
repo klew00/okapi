@@ -42,17 +42,17 @@ public class ResourceSimplifierStep extends BasePipelineStep {
 	
 	private ResourceSimplifier simplifier;
 	private LocaleId targetLocale;
-	private boolean resolveCodeRefs;
+	//private boolean resolveCodeRefs;
 	
 	public ResourceSimplifierStep() {
 		super();
-		this.resolveCodeRefs = true;
+		//this.resolveCodeRefs = true;
 	}
 	
-	public ResourceSimplifierStep(boolean resolveCodeRefs) {
-		this();
-		this.resolveCodeRefs = resolveCodeRefs;
-	}
+//	public ResourceSimplifierStep(boolean resolveCodeRefs) {
+//		this();
+//		this.resolveCodeRefs = resolveCodeRefs;
+//	}
 
 	@Override
 	public String getDescription() {
@@ -74,13 +74,16 @@ public class ResourceSimplifierStep extends BasePipelineStep {
 	public Event handleEvent(Event event) {
 		switch (event.getEventType()) {
 		case START_DOCUMENT:
-			simplifier = new ResourceSimplifier(null, targetLocale);
-			simplifier.setResolveCodeRefs(resolveCodeRefs);
+			simplifier = new ResourceSimplifier(event.getStartDocument().getEncoding(), 
+					targetLocale);
+			//simplifier.setResolveCodeRefs(resolveCodeRefs);
 		case END_DOCUMENT:
 		case START_SUBDOCUMENT:
 		case END_SUBDOCUMENT:
 		case START_GROUP:
 		case END_GROUP:
+		case START_SUBFILTER:
+		case END_SUBFILTER:
 		case TEXT_UNIT:
 		case DOCUMENT_PART:
 			return simplifier.convert(event);

@@ -90,7 +90,7 @@ public class OpenOfficeFilterTest {
 		list.add(new InputDocument(root+"TestDrawing01.odg", null));
 		list.add(new InputDocument(root+"TestPresentation01.odp", null));
 		RoundTripComparison rtc = new RoundTripComparison();
-		assertTrue(rtc.executeCompare(filter, list, "UTF-8", locEN, locEN, ""));
+		assertTrue(rtc.executeCompare(filter, list, "UTF-8", locEN, locEN, "out"));
 	}
 
 }

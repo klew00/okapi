@@ -49,6 +49,7 @@ import net.sf.okapi.common.MimeTypeMapper;
 import net.sf.okapi.common.UsingParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.annotation.TermsAnnotation;
+import net.sf.okapi.common.encoder.EncoderContext;
 import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.encoder.IEncoder;
 import net.sf.okapi.common.exceptions.OkapiIOException;
@@ -754,19 +755,19 @@ public class XMLFilter implements IFilter {
 		if ( params.useCodeFinder ) {
 			TextFragment tf = tu.getSource().getFirstContent();
 			params.codeFinder.process(tf);
-			// Escape inline code content
-			List<Code> codes = tf.getCodes();
-			for ( Code code : codes ) {
-				// Escape the data of the new inline code (and only them)
-				if ( code.getType().equals(InlineCodeFinder.TAGTYPE) ) {
-					if ( cfEncoder == null ) {
-						cfEncoder = getEncoderManager().getEncoder();
-						//TODO: We should use the proper output encoding here, not force UTF-8, but we do not know it
-						cfEncoder.setOptions(params, "utf-8", lineBreak);
-					}
-					code.setData(cfEncoder.encode(code.getData(), 0));
-				}
-			}
+//			// Escape inline code content
+//			List<Code> codes = tf.getCodes();
+//			for ( Code code : codes ) {
+//				// Escape the data of the new inline code (and only them)
+//				if ( code.getType().equals(InlineCodeFinder.TAGTYPE) ) {
+//					if ( cfEncoder == null ) {
+//						cfEncoder = getEncoderManager().getEncoder();
+//						//TODO: We should use the proper output encoding here, not force UTF-8, but we do not know it
+//						cfEncoder.setOptions(params, "utf-8", lineBreak);
+//					}
+//					code.setData(cfEncoder.encode(code.getData(), EncoderContext.TEXT));
+//				}
+//			}
 		}
 		
 		queue.add(new Event(EventType.TEXT_UNIT, tu));
@@ -995,18 +996,18 @@ public class XMLFilter implements IFilter {
 			if ( params.useCodeFinder ) {
 				params.codeFinder.process(frag);
 				// Escape inline code content
-				List<Code> codes = frag.getCodes();
-				for ( Code code : codes ) {
-					// Escape the data of the new inline code (and only them)
-					if ( code.getType().equals(InlineCodeFinder.TAGTYPE) ) {
-						if ( cfEncoder == null ) {
-							cfEncoder = getEncoderManager().getEncoder();
-							//TODO: We should use the proper output encoding here, not force UTF-8, but we do not know it
-							cfEncoder.setOptions(params, "utf-8", lineBreak);
-						}
-						code.setData(cfEncoder.encode(code.getData(), 0));
-					}
-				}
+//				List<Code> codes = frag.getCodes();
+//				for ( Code code : codes ) {
+//					// Escape the data of the new inline code (and only them)
+//					if ( code.getType().equals(InlineCodeFinder.TAGTYPE) ) {
+//						if ( cfEncoder == null ) {
+//							cfEncoder = getEncoderManager().getEncoder();
+//							//TODO: We should use the proper output encoding here, not force UTF-8, but we do not know it
+//							cfEncoder.setOptions(params, "utf-8", lineBreak);
+//						}
+//						code.setData(cfEncoder.encode(code.getData(), EncoderContext.TEXT));
+//					}
+//				}
 			}
 		
 			// Update the flag after the new codes

@@ -1011,4 +1011,5 @@ public class TmxFilter implements IFilter {
 			}
 		}
 	}
+	
 }

@@ -201,6 +201,8 @@ public class OpenXMLZipFilterWriter implements IFilterWriter {
 		case TEXT_UNIT:
 		case START_GROUP:
 		case END_GROUP:
+		case START_SUBFILTER:
+		case END_SUBFILTER:
 /* now done in OpenXMLContentSkeletonWriter.getContent(TextUnit,LocaleId,int) DWH 10-27-09
 			if (event.getEventType()==EventType.TEXT_UNIT) // DWH 10-27-09 if in a Text box
 			{

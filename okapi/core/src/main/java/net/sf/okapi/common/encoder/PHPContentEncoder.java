@@ -48,7 +48,7 @@ public class PHPContentEncoder implements IEncoder {
 
 	@Override
 	public String encode (String text,
-		int context)
+			EncoderContext context)
 	{
 		StringBuilder escaped = new StringBuilder();
 		char ch;
@@ -84,7 +84,7 @@ public class PHPContentEncoder implements IEncoder {
 
 	@Override
 	public String encode (char value,
-		int context)
+			EncoderContext context)
 	{
 		if ( value > 127 ) {
 			return String.valueOf(value);
@@ -103,7 +103,7 @@ public class PHPContentEncoder implements IEncoder {
 
 	@Override
 	public String encode (int value,
-		int context)
+			EncoderContext context)
 	{
 		if ( value > 127 ) {
 			if ( Character.isSupplementaryCodePoint(value) ) {

@@ -23,6 +23,7 @@ package net.sf.okapi.common.filters;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.UnsupportedEncodingException;
+import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.List;
 import org.slf4j.Logger;
@@ -107,6 +108,7 @@ public class RoundTripComparison {
 		LocaleId trgLoc,
 		String dirSuffix)
 	{
+		if (Util.isEmpty(dirSuffix)) throw new InvalidParameterException("dirSuffix cannot be empty - an attempt to override the source file will be rejected and source file will be compared with itself returning always true");
 		//return executeCompare(filter, inputDocs, defaultEncoding, srcLoc, trgLoc, dirSuffix, (IPipelineStep[]) null);
 		this.filter = filter;
 		this.defaultEncoding = defaultEncoding;
@@ -212,6 +214,8 @@ public class RoundTripComparison {
 					break;
 				case START_GROUP:
 				case END_GROUP:
+				case START_SUBFILTER:
+				case END_SUBFILTER:
 				case TEXT_UNIT:
 					extraction1Events.add(event);
 					subDocEvents.add(subDocEvent);
@@ -250,6 +254,8 @@ public class RoundTripComparison {
 					break;
 				case START_GROUP:
 				case END_GROUP:
+				case START_SUBFILTER:
+				case END_SUBFILTER:
 				case TEXT_UNIT:
 					extraction2Events.add(event);
 					break;
@@ -293,6 +299,8 @@ public class RoundTripComparison {
 					break;
 				case START_GROUP:
 				case END_GROUP:
+				case START_SUBFILTER:
+				case END_SUBFILTER:
 				case TEXT_UNIT:
 					if (event.isTextUnit()) {
 						// Steps can modify the event, but we need to compare events as were from the filter, so we are cloning 
@@ -338,6 +346,8 @@ public class RoundTripComparison {
 					break;
 				case START_GROUP:
 				case END_GROUP:
+				case START_SUBFILTER:
+				case END_SUBFILTER:
 				case TEXT_UNIT:
 					extraction2Events.add(event);
 					break;
@@ -366,6 +376,8 @@ public class RoundTripComparison {
 					break;
 				case START_GROUP:
 				case END_GROUP:
+				case START_SUBFILTER:
+				case END_SUBFILTER:
 				case TEXT_UNIT:
 					extraction2Events.add(event);
 					break;

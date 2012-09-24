@@ -30,8 +30,7 @@ public class StartGroup extends BaseReferenceable {
 	 * @param parentId The identifier of the parent resource for this group.
 	 */
 	public StartGroup (String parentId) {
-		super();
-		this.parentId = parentId;
+		this(parentId, null, false);
 	}
 
 	/**
@@ -43,9 +42,7 @@ public class StartGroup extends BaseReferenceable {
 	public StartGroup (String parentId,
 		String id)
 	{
-		super();
-		this.parentId = parentId;
-		this.id = id;
+		this(parentId, id, false);
 	}
 
 	/**

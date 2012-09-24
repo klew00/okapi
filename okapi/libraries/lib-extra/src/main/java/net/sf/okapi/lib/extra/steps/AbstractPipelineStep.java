@@ -115,6 +115,14 @@ abstract public class AbstractPipelineStep extends OkapiComponent implements IPi
 			event = handleEndGroup(event);
 			break;
 			
+		case START_SUBFILTER:
+			event = handleStartSubfilter(event);
+			break;
+			
+		case END_SUBFILTER:
+			event = handleEndSubfilter(event);
+			break;
+			
 		case TEXT_UNIT:
 			event = handleTextUnit(event);
 			break;
@@ -247,6 +255,22 @@ abstract public class AbstractPipelineStep extends OkapiComponent implements IPi
 	 * @param event the event itself. 
 	 */
 	protected Event handleEndGroup (Event event) {
+		return event;
+	}
+	
+	/**
+	 * Handles the {@link net.sf.okapi.common.EventType#START_SUBFILTER} event.
+	 * @param event the event itself. 
+	 */
+	protected Event handleStartSubfilter (Event event) {
+		return event;
+	}
+
+	/**
+	 * Handles the {@link net.sf.okapi.common.EventType#END_SUBFILTER} event.
+	 * @param event the event itself. 
+	 */
+	protected Event handleEndSubfilter (Event event) {
 		return event;
 	}
 

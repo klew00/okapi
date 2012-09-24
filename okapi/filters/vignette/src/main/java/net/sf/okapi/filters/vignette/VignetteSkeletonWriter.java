@@ -20,37 +20,29 @@
 
 package net.sf.okapi.filters.vignette;
 
-import net.sf.okapi.common.filters.SubFilterAnnotation;
+import net.sf.okapi.common.resource.EndSubfilter;
 import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.StartGroup;
+import net.sf.okapi.common.resource.StartSubfilter;
 import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
 
 public class VignetteSkeletonWriter extends GenericSkeletonWriter {
 
 	@Override
-	public String processStartGroup (StartGroup resource) {
+	public String processStartSubfilter (StartSubfilter resource) {		
 		if ( resource.isReferent() || ( storageStack.size() > 0 )) {
-			return super.processStartGroup(resource);
+			return super.processStartSubfilter(resource);
 		}
 		
-		String tmp = super.processStartGroup(resource);
-		if ( resource.getAnnotation(SubFilterAnnotation.class) != null ) {
-			tmp += "<![CDATA[";
-		}
-		return tmp;
+		return "<![CDATA[";
 	}
 	
 	@Override
-	public String processEndGroup (Ending resource) {
+	public String processEndSubfilter (EndSubfilter resource) {
 		if ( storageStack.size() > 0 ) {
-			return super.processEndGroup(resource);
+			return super.processEndSubfilter(resource);
 		}
 
-		String tmp = super.processEndGroup(resource);
-		if ( resource.getAnnotation(SubFilterAnnotation.class) != null ) {
-			tmp += "]]>";
-		}
-		return tmp;
+		return "]]>";
 	}
-
 }

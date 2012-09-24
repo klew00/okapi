@@ -44,6 +44,7 @@ import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.MimeTypeMapper;
 import net.sf.okapi.common.UsingParameters;
 import net.sf.okapi.common.encoder.DTDEncoder;
+import net.sf.okapi.common.encoder.EncoderContext;
 import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.filters.FilterConfiguration;
@@ -279,7 +280,7 @@ public class DTDFilter implements IFilter {
 					List<Code> codes = tf.getCodes();
 					for ( Code code : codes ) {
 						if ( code.getType().equals(InlineCodeFinder.TAGTYPE) ) {
-							code.setData(encoder.encode(code.getData(), 0));
+							code.setData(encoder.encode(code.getData(), EncoderContext.TEXT));
 						}
 					}
 				}

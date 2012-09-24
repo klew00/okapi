@@ -47,6 +47,7 @@ import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.MimeTypeMapper;
 import net.sf.okapi.common.UsingParameters;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.encoder.EncoderContext;
 import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.exceptions.OkapiBadFilterInputException;
 import net.sf.okapi.common.exceptions.OkapiIllegalFilterOperationException;
@@ -1066,7 +1067,7 @@ public class MIFFilter implements IFilter {
 						tmp.append(tf.getCode(ctext.charAt(++i)));
 					}
 					else {
-						tmp.append(encoder.encode(ch, 1));
+						tmp.append(encoder.encode(ch, EncoderContext.SKELETON));
 					}
 				}
 				GenericSkeletonPart part = skel.getLastPart();
@@ -2210,7 +2211,7 @@ public class MIFFilter implements IFilter {
 				tmp.append(tf.getCode(ctext.charAt(++i)));
 			}
 			else {
-				tmp.append(encoder.encode(ch, 1));
+				tmp.append(encoder.encode(ch, EncoderContext.SKELETON));
 			}
 		}
 		return tmp.toString();
@@ -2221,13 +2222,13 @@ public class MIFFilter implements IFilter {
 			params.getCodeFinder().process(tf);
 		}
 		// Escape inline code content
-		List<Code> codes = tf.getCodes();
-		for ( Code code : codes ) {
-			// Escape the data of the new inline code (and only them)
-			if ( code.getType().equals(InlineCodeFinder.TAGTYPE) ) { 
-				code.setData(encoder.encode(code.getData(), 1));
-			}
-		}
+//		List<Code> codes = tf.getCodes();
+//		for ( Code code : codes ) {
+//			// Escape the data of the new inline code (and only them)
+//			if ( code.getType().equals(InlineCodeFinder.TAGTYPE) ) { 
+//				code.setData(encoder.encode(code.getData(), EncoderContext.SKELETON));
+//			}
+//		}
 	}
 	
 	private String processString (boolean store,
@@ -2440,7 +2441,7 @@ public class MIFFilter implements IFilter {
 		stream.unread(buffer, (n-unread), unread);
 		return stream;
 	}
-	
+
 //	private Object[] guessEncoding (InputStream input)
 //		throws IOException
 //	{

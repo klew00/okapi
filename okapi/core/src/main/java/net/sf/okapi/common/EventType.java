@@ -131,6 +131,9 @@ public enum EventType {
 	 * No operation event that is ignored by all steps. Used as a placeholder
 	 * event when steps need to stay alive without triggering any actions.
 	 */
-	NO_OP
-
+	NO_OP,
+	
+	START_SUBFILTER,
+	
+	END_SUBFILTER
 }

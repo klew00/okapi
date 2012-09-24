@@ -26,9 +26,12 @@ import org.slf4j.LoggerFactory;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
+import net.sf.okapi.common.resource.EndSubfilter;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.StartSubDocument;
 //import net.sf.okapi.steps.xliffkit.common.persistence.sessions.OkapiJsonSession;
+import net.sf.okapi.common.resource.StartSubfilter;
 
 public class EventLogger extends BasePipelineStep {
 
@@ -56,12 +59,16 @@ public class EventLogger extends BasePipelineStep {
 			case TEXT_UNIT:
 				//res = "  " + event.getResource().getId();
 				res = String.format("  [%s]", event.getResource().getId());
+				res +=  "  " + ((ITextUnit) event.getResource()).getName();
 				break;
 			case START_DOCUMENT:
 				res +=  "  " + ((StartDocument) event.getResource()).getName();
 				break;
 			case START_SUBDOCUMENT:
 				res +=  "  " + ((StartSubDocument) event.getResource()).getName();
+				break;
+			case START_SUBFILTER:
+				res +=  "  " + ((StartSubfilter) event.getResource()).getName();
 				break;
 //			case TEXT_UNIT:
 //				if ("30".equals(event.getResource().getId()))
@@ -87,8 +94,9 @@ public class EventLogger extends BasePipelineStep {
 			sb = new StringBuilder("\n\n");
 		case START_DOCUMENT:
 		case START_SUBDOCUMENT:
-		case START_GROUP:		
+		case START_GROUP:
 		case START_BATCH_ITEM:
+		case START_SUBFILTER:
 			if (!increasing) sb.append("\n");
 			printEvent(event);
 			indent++; 
@@ -100,6 +108,7 @@ public class EventLogger extends BasePipelineStep {
 		case END_GROUP:
 		case END_BATCH:
 		case END_BATCH_ITEM:
+		case END_SUBFILTER:
 			if (indent > 0) indent--;
 			increasing = false;
 			printEvent(event);
