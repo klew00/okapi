@@ -45,7 +45,11 @@ import net.sf.okapi.lib.extra.steps.TuDpSsfLogger;
 
 import org.junit.Test;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class ResourceSimplifierStepTest {
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 	private static final LocaleId ENUS = new LocaleId("en", "us");
 	
 	@Test
@@ -157,10 +161,10 @@ public class ResourceSimplifierStepTest {
 		
 		for (Event event : elbs2.getList()) {
 			if (event.isTextUnit()) {
-				System.out.println(TextUnitLogger.getTuInfo(event.getTextUnit(), ENUS));
+				logger.debug(TextUnitLogger.getTuInfo(event.getTextUnit(), ENUS));
 			}
 			else if (event.isDocumentPart()) {
-				System.out.println(DocumentPartLogger.getDpInfo(event.getDocumentPart(), ENUS));
+				logger.debug(DocumentPartLogger.getDpInfo(event.getDocumentPart(), ENUS));
 			}
 		}		
 	}

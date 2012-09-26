@@ -22,7 +22,6 @@ package net.sf.okapi.common.filters;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.logging.Logger;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
@@ -49,6 +48,9 @@ import net.sf.okapi.common.skeleton.GenericSkeletonPart;
 import net.sf.okapi.common.skeleton.ISkeletonWriter;
 import net.sf.okapi.common.skeleton.SkeletonUtil;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Adapter that converts any {@link IFilter} into a subfilter (a filter called from another {@link IFilter}). 
  * Specific implementations can implement this class and override any needed methods to transform {@link Event}s
@@ -59,7 +61,7 @@ import net.sf.okapi.common.skeleton.SkeletonUtil;
 
 public class SubFilter implements IFilter {
 	
-	private final Logger logger = Logger.getLogger(getClass().getName());
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 	
 	private IFilter filter;
 	private SubFilterEventConverter converter;	
@@ -239,7 +241,7 @@ public class SubFilter implements IFilter {
 		}
 		else {
 			if (skel != null) 
-				logger.warning("Unknown skeleton type, ignored.");
+				logger.warn("Unknown skeleton type, ignored.");
 			return createRefEvent();
 		}			
 	}
@@ -254,7 +256,7 @@ public class SubFilter implements IFilter {
 		}
 		else {
 			if (beforeSkeleton != null || afterSkeleton != null)
-				logger.warning("Unknown skeleton type, ignored.");
+				logger.warn("Unknown skeleton type, ignored.");
 			DocumentPart dp = buildRefDP(null, null);
 			return new Event(EventType.DOCUMENT_PART, dp);
 		}			
