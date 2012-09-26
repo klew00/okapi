@@ -643,6 +643,6 @@
 		</zip>
 	</target>
 
-	<target name="all" depends="init, okapiLib, logbind-log4j, tikal, zip"/>
+	<target name="all" depends="init, okapiLib, logbind-jdk, tikal, zip"/>
 
 </project>
