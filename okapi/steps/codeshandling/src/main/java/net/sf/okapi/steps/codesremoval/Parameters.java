@@ -121,9 +121,9 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 
 		String[] values = {"0", "1", "2"};
 		String[] labels = {
-			"Remove code marker, but keep code content  (\"<ph id='1'>[X]</ph>\" ==> \"[X]\")",
-			"Remove code content, but keep code marker  (\"<ph id='1'>[X]</ph>\" ==> \"<ph id='1'/>\")",
-			"Remove code marker and code content  (\"<ph id='1'>[X]</ph>\" ==> \"\")",
+			"Remove code marker, but keep code content  (\"<ph x='1'>[X]</ph>\" ==> \"[X]\")",
+			"Remove code content, but keep code marker  (\"<ph x='1'>[X]</ph>\" ==> \"<ph x='1'/>\")",
+			"Remove code marker and code content  (\"<ph x='1'>[X]</ph>\" ==> \"\")",
 		};
 		ListSelectionPart lsp = desc.addListSelectionPart(paramDesc.get(MODE), values);
 		lsp.setChoicesLabels(labels);
