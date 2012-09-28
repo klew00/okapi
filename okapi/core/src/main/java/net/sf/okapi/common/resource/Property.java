@@ -54,6 +54,11 @@ public class Property {
 	 */
 	public static final String ITS_STORAGESIZE = "its-storageSize"; 
 	
+	/**
+	 * ITS Allowed characters. A character class regular expression matching allowed characters.
+	 */
+	public static final String ITS_ALLOWEDCHARACTERS = "its-allowedCharacters"; 
+	
 	private final String name;
 	private String value;
 	private final boolean isReadOnly;

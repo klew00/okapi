@@ -31,7 +31,6 @@
         <module>tmx</module>
         <module>ts</module>
         <module>xliff</module>
-        <module>xml</module>
         <module>json</module>
         <module>ttx</module>
         <module>vignette</module>
@@ -44,5 +43,6 @@
 		<module>xini</module>
 		<module>txml</module>
 		<module>transtable</module>
+		<module>its</module>
     </modules>
 </project>

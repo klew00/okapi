@@ -29,15 +29,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.xml.namespace.QName;
 
-import org.oasisopen.xliff.v2.ICMarker;
-import org.oasisopen.xliff.v2.IDataStore;
-import org.oasisopen.xliff.v2.IFragment;
-import org.oasisopen.xliff.v2.INote;
-import org.oasisopen.xliff.v2.IPart;
-import org.oasisopen.xliff.v2.IWithCandidates;
-import org.oasisopen.xliff.v2.Names;
-import org.oasisopen.xliff.v2.OriginalDataStyle;
-
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.FileUtil;
 import net.sf.okapi.common.IResource;
@@ -48,12 +39,12 @@ import net.sf.okapi.common.annotation.AltTranslationsAnnotation;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.ISegments;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextContainer;
-import net.sf.okapi.common.resource.TextPart;
-import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.TextFragment;
+import net.sf.okapi.common.resource.TextPart;
 import net.sf.okapi.filters.rainbowkit.Manifest;
 import net.sf.okapi.filters.rainbowkit.MergingInfo;
 import net.sf.okapi.lib.xliff.Candidate;
@@ -63,6 +54,15 @@ import net.sf.okapi.lib.xliff.Note;
 import net.sf.okapi.lib.xliff.Unit;
 import net.sf.okapi.lib.xliff.XLIFFWriter;
 import net.sf.okapi.steps.rainbowkit.common.BasePackageWriter;
+
+import org.oasisopen.xliff.v2.ICMarker;
+import org.oasisopen.xliff.v2.IDataStore;
+import org.oasisopen.xliff.v2.IFragment;
+import org.oasisopen.xliff.v2.INote;
+import org.oasisopen.xliff.v2.IPart;
+import org.oasisopen.xliff.v2.IWithCandidates;
+import org.oasisopen.xliff.v2.Names;
+import org.oasisopen.xliff.v2.OriginalDataStyle;
 
 public class XLIFF2PackageWriter extends BasePackageWriter {
 
@@ -333,9 +333,14 @@ public class XLIFF2PackageWriter extends BasePackageWriter {
 		}
 		// Storage size
 		if ( tu.hasProperty(Property.ITS_STORAGESIZE) ) {
-			String[] values = tu.getProperty(Property.ITS_EXTERNALRESREF).getValue().split("\t", -1);
+			String[] values = tu.getProperty(Property.ITS_STORAGESIZE).getValue().split("\t", -1);
 			unit.getExtendedAttributes().setAttribute(Names.NS_ITS, "storageSize", values[0]);
 			unit.getExtendedAttributes().setAttribute(Names.NS_ITS, "storageSizeEncoding", values[1]);
+		}
+		// Allowed characters
+		if ( tu.hasProperty(Property.ITS_ALLOWEDCHARACTERS) ) {
+			unit.getExtendedAttributes().setAttribute(Names.NS_ITS, "allowedCharacters",
+				tu.getProperty(Property.ITS_ALLOWEDCHARACTERS).getValue());
 		}
 		
 		// Domains
@@ -362,6 +367,7 @@ public class XLIFF2PackageWriter extends BasePackageWriter {
 		int srcSegIndex = -1;
 		for ( int i=0; i<srcTc.count(); i++ ) {
 			part = srcTc.get(i);
+			
 			if ( part.isSegment() ) {
 				Segment srcSeg = (Segment)part;
 				srcSegIndex++;
@@ -371,6 +377,8 @@ public class XLIFF2PackageWriter extends BasePackageWriter {
 				
 				// Applies TU-level translatable property to each segment
 				xSeg.setTranslate(tu.isTranslatable());
+				// Applies TU-level white space
+				xSeg.setPreserveWS(tu.preserveWhitespaces());
 				
 				// Target
 				if ( trgSegs != null ) {
@@ -396,6 +404,9 @@ public class XLIFF2PackageWriter extends BasePackageWriter {
 			}
 			else { // Non-segment part
 				IPart xPart = unit.appendNewIgnorable();
+				// Applies TU-level white space
+				xPart.setPreserveWS(tu.preserveWhitespaces());
+				
 				xPart.setSource(toXLIFF2Fragment(part.text, unit.getDataStore(), false));
 				// Target
 				if ( trgTc != null ) {
@@ -419,6 +430,12 @@ public class XLIFF2PackageWriter extends BasePackageWriter {
 		return unit;
 	}
 	
+	/**
+	 * Copies a given AltTranslation annotation into an XLIFF 2.0 candidate object.
+	 * @param alt the annotation to copy.
+	 * @param oriSource the object associated with the annotation.
+	 * @param xObject the XLIFF object to associate with the candidate data.
+	 */
 	private void copyData (AltTranslation alt,
 		TextFragment oriSource,
 		IWithCandidates xObject)
@@ -434,7 +451,9 @@ public class XLIFF2PackageWriter extends BasePackageWriter {
 		}
 		xAlt.setTarget(toXLIFF2Fragment(alt.getTarget().getFirstContent(), cs, true));
 		xAlt.setSimilarity(alt.getFuzzyScore());
-		xAlt.setQuality(alt.getQualityScore());
+//		if ( alt.getQualityScore() != QueryResult.QUALITY_UNDEFINED ) {
+//			xAlt.setQuality(alt.getQualityScore());
+//		}
 		xObject.addCandidate(xAlt);
 	}
 	

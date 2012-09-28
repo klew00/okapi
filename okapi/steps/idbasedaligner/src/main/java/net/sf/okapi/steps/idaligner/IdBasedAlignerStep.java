@@ -71,6 +71,7 @@ public class IdBasedAlignerStep extends BasePipelineStep {
 	private TMXWriter tmx;
 	private Map<String, ITextUnit> targetTextUnitMap;
 	private boolean useTargetText;
+	private boolean hasNoMatch;
 
 	public IdBasedAlignerStep() {
 		params = new Parameters();
@@ -131,7 +132,7 @@ public class IdBasedAlignerStep extends BasePipelineStep {
 
 	@Override
 	protected Event handleEndBatch(final Event event) {
-		if (tmx != null) {
+		if ( tmx != null ) {
 			tmx.writeEndDocument();
 			tmx.close();
 			tmx = null;
@@ -144,17 +145,16 @@ public class IdBasedAlignerStep extends BasePipelineStep {
 		if (targetInput == null) {
 			throw new OkapiBadStepInputException("Second input file (target) not configured.");
 		}
-		
-		// Use target text if reference file is bilingual, otherwise use the source
-		useTargetText = event.getStartDocument().isMultilingual();
-		targetTextUnitMap = new HashMap<String, ITextUnit>();
+		hasNoMatch = false;
 		getTargetTextUnits();
-
 		return event;
 	}
 
 	@Override
 	protected Event handleEndDocument(Event event) {
+		if ( hasNoMatch ) {
+			LOGGER.warn("One or more entries has no match.");
+		}
 		if (filter != null) {
 			filter.close();
 		}
@@ -163,11 +163,11 @@ public class IdBasedAlignerStep extends BasePipelineStep {
 	}
 
 	@Override
-	protected Event handleTextUnit(Event sourceEvent) {
+	protected Event handleTextUnit (Event sourceEvent) {
 		int score = 100;
 		
 		if (sourceEvent.getTextUnit().getSource().hasBeenSegmented()) {
-			throw new OkapiBadStepInputException("IdBasedAlignerStep only aligns unsegmented TextUnits");
+			throw new OkapiBadStepInputException("IdBasedAlignerStep only aligns unsegmented text units.");
 		}
 
 		ITextUnit sourceTu = sourceEvent.getTextUnit();
@@ -236,10 +236,19 @@ public class IdBasedAlignerStep extends BasePipelineStep {
 		}
 		else { // No match in the reference file
 			if ( missingReferenceMatch ) {
-				LOGGER.warn("No match found for: " + sourceTu.getName());
+				if ( sourceTu.getName() == null ) {
+					LOGGER.info(String.format("Entry without original identifier (id='%s').", sourceTu.getId()));
+					hasNoMatch = true;
+				}
+				else {
+					LOGGER.info("No match found for " + sourceTu.getName());
+					hasNoMatch = true;
+				}
+
 			}
 			else {
-				LOGGER.warn("Source texts differ for: " + sourceTu.getName());
+				LOGGER.info("Source texts differ for " + sourceTu.getName());
+				hasNoMatch = true;
 			}
 			if ( params.getReplaceWithSource()) {
 				// Use the source text if there is no target
@@ -260,6 +269,9 @@ public class IdBasedAlignerStep extends BasePipelineStep {
 
 	private void getTargetTextUnits() {
 		try {
+			// Create the map
+			targetTextUnitMap = new HashMap<String, ITextUnit>();
+			
 			// Initialize the filter to read the translation to compare
 			filter = fcMapper.createFilter(targetInput.getFilterConfigId(), null);
 			// Open the second input for this batch item
@@ -267,32 +279,39 @@ public class IdBasedAlignerStep extends BasePipelineStep {
 
 			while (filter.hasNext()) {
 				final Event event = filter.next();
-				if (event.getEventType() == EventType.TEXT_UNIT) {
+				if ( event.getEventType() == EventType.TEXT_UNIT ) {
 					ITextUnit tu = event.getTextUnit();
 					
-					// check if we have a name value
-					if (tu.getName() == null) {
-						LOGGER.warn("Missing id (name value) and empty target Skipping...");
-						continue;
-					}
-
 					// check if this is a TU without a target (probably a parent tu)
 					if (!tu.getSource().hasText()) {
 						continue;
 					}
 
+					// check if we have a name value
+					if (tu.getName() == null) {
+						LOGGER.info(String.format("Missing original identifier in target (id='%s').", tu.getId()));
+						hasNoMatch = true;
+						continue;
+					}
+
 					// check if we have a duplicate name
 					if (targetTextUnitMap.get(tu.getName()) != null) {
-						LOGGER.warn("Duplicate entry for: " + tu.getName() + " Skipping...");
+						LOGGER.info("Duplicate entry for " + tu.getName());
+						hasNoMatch = true;
 						continue;
 					}
 					
 					// safe to continue storing the match
 					targetTextUnitMap.put(tu.getName(), tu);
 				}
+				else if ( event.getEventType() == EventType.START_DOCUMENT ) {
+					// Use target text if reference file is bilingual, otherwise use the source
+					useTargetText = event.getStartDocument().isMultilingual();
+				}
 			}
-		} finally {
-			if (filter != null) {
+		}
+		finally {
+			if ( filter != null ) {
 				filter.close();
 			}
 		}

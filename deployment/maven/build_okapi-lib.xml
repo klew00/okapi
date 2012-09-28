@@ -131,8 +131,6 @@
 			 excludes="**/META-INF/**"/>
 			<fileset dir="../../okapi/filters/xliff/target/classes"
 			 excludes="**/META-INF/**"/>
-			<fileset dir="../../okapi/filters/xml/target/classes"
-			 excludes="**/META-INF/**"/>
 			<fileset dir="../../okapi/filters/xmlstream/target/classes"
 			 excludes="**/META-INF/**"/>
 			<fileset dir="../../okapi/filters/rainbowkit/target/classes"
@@ -146,6 +144,8 @@
 			<fileset dir="../../okapi/filters/txml/target/classes"
 			 excludes="**/META-INF/**"/>
 			<fileset dir="../../okapi/filters/transtable/target/classes"
+			 excludes="**/META-INF/**"/>
+			<fileset dir="../../okapi/filters/its/target/classes"
 			 excludes="**/META-INF/**"/>
 			 
 			<!-- lib -->
@@ -454,17 +454,23 @@
 		<echo file="tmpJars" append="yes"> ${jar028}</echo>
 		<copy todir="${distLib}" file="${dep028}/${jar028}"/>		
 
+		<property name="dep029Version" value="1.4"/>
+		<property name="dep029" value="${mavenStore}/nu/validator/htmlparser/htmlparser/${dep029Version}"/>
+		<fileset id="list.contents" dir="${dep029}"
+		 includes="**/htmlparser-${dep029Version}.jar"/>
+		<property name="jar029" refid="list.contents"/>
+		<echo file="tmpJars" append="yes"> ${jar029}</echo>
+		<copy todir="${distLib}" file="${dep029}/${jar029}"/>
+
 		<!-- This is the logging part -->
 		<property name="depSlf4jApi" value="${mavenStore}/org/slf4j/slf4j-api/1.7.1"/>
 		<fileset id="list.contents" dir="${depSlf4jApi}" includes="**/slf4j-api-1.7.1.jar"/>
 		<property name="jarSlf4jApi" refid="list.contents"/>
 		<echo file="tmpJars" append="yes"> ${jarSlf4jApi}</echo>
 		<copy todir="${distLib}" file="${depSlf4jApi}/${jarSlf4jApi}"/>
-
 		<echo file="tmpJars" append="yes"> logger/${logBindJar}</echo>
 
-		<!-- Create the manifest file -->
-		<property file="tmpJars"/>
+		<!-- Create the manifest file -->		<property file="tmpJars"/>
 		<copy todir="${tmp}/META-INF">
 			<fileset dir="data/okapi-lib" includes="**/*.txt"/>
 		</copy>

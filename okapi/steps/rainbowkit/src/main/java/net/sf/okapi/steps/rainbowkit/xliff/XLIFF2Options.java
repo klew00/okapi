@@ -42,7 +42,7 @@ public class XLIFF2Options extends BaseParameters implements IEditorDescriptionP
 	
 	@Override
 	public void reset() {
-		inlineStyle = OriginalDataStyle.NODATA.ordinal();
+		inlineStyle = OriginalDataStyle.OUTSIDE.ordinal();
 		createTipPackage = false;
 	}
 

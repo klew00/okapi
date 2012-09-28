@@ -33,6 +33,7 @@ distribution.</p>
 	</li>
 	<li>CheckMate:<ul>
 	<li>Changed the logging system.</li>
+	<li>Added check for the ITS Allowed Characters data category.</li>
 </ul>
 	</li>
 	<li>Filters Plugin for OmegaT:<ul>
@@ -41,10 +42,35 @@ distribution.</p>
 	</li>
 	<li>Steps:<ul>
 	<li>Added the segments to text Units Converter Step.</li>
+	<li>Id-Based Aligner:<ul>
+	<li>Fixed issue where the multilingual files where detected on the source 
+	input rather than the target.</li>
+</ul>
+	</li>
+</ul>
+	</li>
+	<li>Filters:<ul>
+	<li>HTML5+ITS Filter<ul>
+	<li>Added the HTML5+ITS Filter.</li>
+</ul>
+	</li>
+	<li>XML Filter:<ul>
+	<li>Refactored the filter to use a shared code with the HTML5+ITS Filter</li>
+</ul>
+	</li>
+	<li>XLIFF Filter:<ul>
+	<li>Added read support for the <code>its:allowedCharacters</code> attribute.</li>
+</ul>
+	</li>
 </ul>
 	</li>
 	<li>Libraries:<ul>
 	<li>Change the logging system to use SLF4J everywhere.</li>
+	<li>ITS Engine/Filter:<ul>
+	<li>Implemented support for HTML5 syntax</li>
+	<li>Implemented support for the Allowed Characters data category.</li>
+</ul>
+	</li>
 </ul>
 	</li>
 </ul>

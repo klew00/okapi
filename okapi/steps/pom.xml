@@ -48,5 +48,6 @@
 		<module>gttbatchtranslation</module>
 		<module>msbatchtranslation</module>
 		<module>tradosutils</module>
+		<module>enrycher</module>
     </modules>
 </project>

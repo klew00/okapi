@@ -458,6 +458,10 @@ public class XLIFFWriter implements IFilterWriter {
 			writer.writeAttributeString("xmlns:its", NS_ITS20);
 			writer.writeAttributeString("its:storageSizeEncoding", values[1]);
 		}
+		if ( tu.hasProperty(Property.ITS_ALLOWEDCHARACTERS) ) {
+			writer.writeAttributeString("its:allowedCharacters", tu.getProperty(Property.ITS_ALLOWEDCHARACTERS).getValue());
+			writer.writeAttributeString("xmlns:its", NS_ITS20);
+		}
 		writer.writeLineBreak();
 
 		// Get the source container

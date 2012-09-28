@@ -152,6 +152,11 @@
 		</dependency>
 		<dependency>
 			<groupId>net.sf.okapi.filters</groupId>
+			<artifactId>okapi-filter-its</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>net.sf.okapi.filters</groupId>
 			<artifactId>okapi-filter-po</artifactId>
 			<version>${project.version}</version>
 		</dependency>
@@ -202,7 +207,7 @@
 		</dependency>
 		<dependency>
 			<groupId>net.sf.okapi.filters</groupId>
-			<artifactId>okapi-filter-xml</artifactId>
+			<artifactId>okapi-filter-its</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
