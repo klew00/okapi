@@ -20,26 +20,82 @@
 
 package net.sf.okapi.steps.enrycher;
 
-import java.util.logging.Logger;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
 
+import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.LocaleId;
 
 public class EnrycherClient {
 
-//	private static final Logger LOGGER = Logger.getLogger(EnrycherClient.class.getName());
-
 	private Parameters params;
-	private LocaleId sourceLocale;
-
+	private String lang;
+	
 	public EnrycherClient () {
 		params = new Parameters();
+		lang = "en";
 	}
-
-	public Parameters getParameters () {
+	
+	public IParameters getParameters () {
 		return params;
 	}
 	
 	public void setParameters (Parameters params) {
 		this.params = params;
 	}
+	
+	public void setLocale (LocaleId locId) {
+		lang = locId.getLanguage();
+	}
+
+	public String processContent (String text) {
+		OutputStreamWriter wr = null;
+		BufferedReader rd = null;
+		try {
+			// Prepare the request
+			URL url = new URL(params.getBaseUrl()+lang+"/run.html5its2");
+			URLConnection conn = url.openConnection();
+			conn.setDoOutput(true);
+			conn.setRequestProperty("Content-Type", "text/html");
+			wr = new OutputStreamWriter(conn.getOutputStream());
+			//TODO HTML conversion
+			String data = text;
+	    
+			// Post the request
+			wr.write(data);
+			wr.flush();
+
+			// Get the response
+			rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+			StringBuilder sb = new StringBuilder();
+			String line;
+			while ((line = rd.readLine()) != null) {
+				sb.append(line);
+			}
+		    wr.close();
+		    rd.close();
+		    return sb.toString();
+		}
+		catch ( MalformedURLException e ) {
+			throw new RuntimeException("Invalid URL:\n"+e.getMessage());
+		}
+		catch ( IOException e ) {
+			throw new RuntimeException("Input/Output error:\n"+e.getMessage());
+		}
+		finally {
+			try {
+				if ( wr != null ) wr.close();
+				if ( rd != null ) rd.close();
+			}
+			catch ( IOException e ) {
+				// Skip this one
+			}			
+		}
+	}
+	
 }

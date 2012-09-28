@@ -20,22 +20,16 @@
 
 package net.sf.okapi.steps.enrycher;
 
-import java.io.File;
-import java.util.logging.Logger;
-
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.UsingParameters;
-import net.sf.okapi.common.Util;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
 import net.sf.okapi.common.pipeline.annotations.StepParameterMapping;
 import net.sf.okapi.common.pipeline.annotations.StepParameterType;
 
 @UsingParameters(Parameters.class)
 public class EnrycherStep extends BasePipelineStep {
-
-	private static final Logger LOGGER = Logger.getLogger(EnrycherStep.class.getName());
 
 	private EnrycherClient client;
 	private LocaleId sourceLocale;

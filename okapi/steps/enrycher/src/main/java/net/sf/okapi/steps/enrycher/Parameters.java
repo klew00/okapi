@@ -23,60 +23,60 @@ package net.sf.okapi.steps.enrycher;
 import net.sf.okapi.common.BaseParameters;
 import net.sf.okapi.common.EditorFor;
 import net.sf.okapi.common.ParametersDescription;
+import net.sf.okapi.common.Util;
 import net.sf.okapi.common.uidescription.EditorDescription;
 import net.sf.okapi.common.uidescription.IEditorDescriptionProvider;
 
 @EditorFor(Parameters.class)
 public class Parameters extends BaseParameters implements IEditorDescriptionProvider {
 	
-	private static final String HOST = "host";
+	private static final String BASEURL = "baseUrl";
 	
-	private String host;
-
-	public Parameters () {
+	private String baseUrl;
+	
+	public Parameters() {
 		reset();
 	}
 	
-	public String getHost () {
-		return host;
-	}
-
-	public void setHost (String host) {
-		this.host = host;
-	}
 	@Override
-	public void reset () {
-		host = "http://aidemo.ijs.si/mlw/";
+	public void reset() {	
+		setBaseUrl("http://aidemo.ijs.si/mlw");
 	}
 
 	@Override
-	public void fromString (String data) {
+	public void fromString(String data) {
 		reset();
 		buffer.fromString(data);
-		host = buffer.getString(HOST, host);
+		baseUrl = buffer.getString(BASEURL, baseUrl);
 	}
-
+	
 	@Override
 	public String toString() {
 		buffer.reset();
-		buffer.setString(HOST, host);
+		buffer.setParameter(BASEURL, baseUrl);		
 		return buffer.toString();
 	}
-	
+
 	@Override
 	public ParametersDescription getParametersDescription () {
 		ParametersDescription desc = new ParametersDescription(this);
-		desc.add(HOST, "Host", "URL of the Enrycher web service");
+		desc.add(BASEURL, "URL of the Enrycher Web service", null);		
 		return desc;
 	}
 	
 	@Override
-	public EditorDescription createEditorDescription (ParametersDescription paramsDesc) {
+	public EditorDescription createEditorDescription(ParametersDescription paramsDesc) {
 		EditorDescription desc = new EditorDescription("Enrycher", true, false);
-
-		desc.addTextInputPart(paramsDesc.get(HOST));
-
+		desc.addTextInputPart(paramsDesc.get(BASEURL));
 		return desc;
+	}
+	
+	public String getBaseUrl () {
+		return baseUrl;
+	}
+	
+	public void setBaseUrl (String baseUrl) {
+		this.baseUrl = Util.ensureSeparator(baseUrl, true);
 	}
 
 }
