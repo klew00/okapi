@@ -23,9 +23,11 @@ package net.sf.okapi.common.filters;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.UnsupportedEncodingException;
+import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
@@ -37,7 +39,7 @@ import net.sf.okapi.common.pipeline.IPipelineStep;
 import net.sf.okapi.common.resource.RawDocument;
 
 public class RoundTripComparison {
-	private static final Logger LOGGER = Logger.getLogger(RoundTripComparison.class.getName());
+	private final Logger LOGGER = LoggerFactory.getLogger(getClass());
 
 	private IFilter filter;
 	private ArrayList<Event> extraction1Events;
@@ -73,7 +75,7 @@ public class RoundTripComparison {
 		writer = filter.createFilterWriter();
 
 		for (InputDocument doc : inputDocs) {
-			LOGGER.fine("Processing Document: " + doc.path);
+			LOGGER.debug("Processing Document: " + doc.path);
 			
 			// Reset the event lists
 			extraction1Events.clear();
@@ -106,6 +108,7 @@ public class RoundTripComparison {
 		LocaleId trgLoc,
 		String dirSuffix)
 	{
+		if (Util.isEmpty(dirSuffix)) throw new InvalidParameterException("dirSuffix cannot be empty - an attempt to override the source file will be rejected and source file will be compared with itself returning always true");
 		//return executeCompare(filter, inputDocs, defaultEncoding, srcLoc, trgLoc, dirSuffix, (IPipelineStep[]) null);
 		this.filter = filter;
 		this.defaultEncoding = defaultEncoding;
@@ -158,7 +161,7 @@ public class RoundTripComparison {
 		writer = filter.createFilterWriter();
 
 		for (InputDocument doc : inputDocs) {
-			LOGGER.fine("Processing Document: " + doc.path);
+			LOGGER.debug("Processing Document: " + doc.path);
 			// Reset the event lists
 			extraction1Events.clear();
 			extraction2Events.clear();
@@ -211,6 +214,8 @@ public class RoundTripComparison {
 					break;
 				case START_GROUP:
 				case END_GROUP:
+				case START_SUBFILTER:
+				case END_SUBFILTER:
 				case TEXT_UNIT:
 					extraction1Events.add(event);
 					subDocEvents.add(subDocEvent);
@@ -249,6 +254,8 @@ public class RoundTripComparison {
 					break;
 				case START_GROUP:
 				case END_GROUP:
+				case START_SUBFILTER:
+				case END_SUBFILTER:
 				case TEXT_UNIT:
 					extraction2Events.add(event);
 					break;
@@ -292,6 +299,8 @@ public class RoundTripComparison {
 					break;
 				case START_GROUP:
 				case END_GROUP:
+				case START_SUBFILTER:
+				case END_SUBFILTER:
 				case TEXT_UNIT:
 					if (event.isTextUnit()) {
 						// Steps can modify the event, but we need to compare events as were from the filter, so we are cloning 
@@ -337,6 +346,8 @@ public class RoundTripComparison {
 					break;
 				case START_GROUP:
 				case END_GROUP:
+				case START_SUBFILTER:
+				case END_SUBFILTER:
 				case TEXT_UNIT:
 					extraction2Events.add(event);
 					break;
@@ -365,6 +376,8 @@ public class RoundTripComparison {
 					break;
 				case START_GROUP:
 				case END_GROUP:
+				case START_SUBFILTER:
+				case END_SUBFILTER:
 				case TEXT_UNIT:
 					extraction2Events.add(event);
 					break;

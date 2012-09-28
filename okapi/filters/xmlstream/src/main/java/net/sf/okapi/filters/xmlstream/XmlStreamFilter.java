@@ -38,8 +38,6 @@ import net.sf.okapi.filters.yaml.TaggedFilterConfiguration;
 @UsingParameters(Parameters.class)
 public class XmlStreamFilter extends AbstractMarkupFilter {
 
-	//not used for now: private static final Logger LOGGER = Logger.getLogger(XmlStreamFilter.class.getName());
-
 	private Parameters parameters;
 	
 	public XmlStreamFilter() {
@@ -58,6 +56,15 @@ public class XmlStreamFilter extends AbstractMarkupFilter {
 		addConfiguration(new FilterConfiguration(getName()+"-JavaPropertiesHTML", MimeTypeMapper.XML_MIME_TYPE,
 				getClass().getName(), "Java Properties XML + HTML", "Java Properties XML with Embedded HTML", //$NON-NLS-1$
 				Parameters.PROPERTY_XML_PARAMETERS));
+		addConfiguration(new FilterConfiguration(getName()+"-XML_escapedHTML", MimeTypeMapper.XML_MIME_TYPE,
+				getClass().getName(), "XML + Escaped HTML", "XML with Escaped HTML", //$NON-NLS-1$
+				Parameters.XML_ESCAPED_HTML));
+		addConfiguration(new FilterConfiguration(getName()+"-XML_cdata_escapedHTML", MimeTypeMapper.XML_MIME_TYPE,
+				getClass().getName(), "XML + CDATA + Escaped HTML", "XML with CDATA and Escaped HTML", //$NON-NLS-1$
+				Parameters.XML_CDATA_ESCAPED_HTML));
+		addConfiguration(new FilterConfiguration(getName()+"-IDD_escapedHTML", MimeTypeMapper.XML_MIME_TYPE,
+				getClass().getName(), "IDD + Escaped HTML", "WorldServer IDD with Escaped HTML", //$NON-NLS-1$
+				Parameters.IDD_ESCAPED_HTML));
 	}
 
 	/**

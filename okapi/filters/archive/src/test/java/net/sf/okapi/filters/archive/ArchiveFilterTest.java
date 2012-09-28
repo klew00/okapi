@@ -31,8 +31,8 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Enumeration;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
@@ -64,11 +64,10 @@ public class ArchiveFilterTest {
 	private static final LocaleId EN = new LocaleId("en", "us");
 	private static final LocaleId ESES = new LocaleId("es", "es");
 	private String pathBase;
-	private final Logger logger = Logger.getLogger(getClass().getName());
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 	
 	@Before
 	public void setUp() throws URISyntaxException {
-		logger.setLevel(Level.FINE);
 		filter = new ArchiveFilter();
 		pathBase = Util.getDirectoryName(this.getClass().getResource("test1_es.archive").toURI().getPath()) + "/";
 	}

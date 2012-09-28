@@ -21,15 +21,15 @@
 package net.sf.okapi.common.pipeline;
 
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
 
 public class Consumer extends BasePipelineStep {
 	
-	private static final Logger LOGGER = Logger.getLogger(Consumer.class.getName());
+	private final Logger LOGGER = LoggerFactory.getLogger(getClass());
 	
 	public String getName() {
 		return "Consumer";
@@ -41,25 +41,25 @@ public class Consumer extends BasePipelineStep {
 
 	@Override
 	protected Event handleEndBatchItem (Event event) {		
-		LOGGER.log(Level.FINEST, getName() + " end-batch-item");
+		LOGGER.trace(getName() + " end-batch-item");
 		return event;
 	}
 
 	@Override
 	protected Event handleStartBatchItem (Event event) {		
-		LOGGER.log(Level.FINEST, getName() + " start-batch-item");
+		LOGGER.trace(getName() + " start-batch-item");
 		return event;
 	}
 	
 	@Override
 	protected Event handleTextUnit(Event event) {
-		LOGGER.log(Level.FINEST, "EventType: " + event.getEventType().name());
+		LOGGER.trace("EventType: " + event.getEventType().name());
 		return event;
 	}
 	
 	@Override
 	protected Event handleRawDocument(Event event) {		
-		LOGGER.log(Level.FINEST, "EventType: " + event.getEventType().name());
+		LOGGER.trace("EventType: " + event.getEventType().name());
 		return event;
 	}
 

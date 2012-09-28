@@ -29,7 +29,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
@@ -63,7 +64,7 @@ public class RainbowKitFilter implements IFilter {
 	public static final String RAINBOWKIT_PACKAGE_MIME_TYPE = "application/x-rainbowkit-package";
 	public static final String RAINBOWKIT_PACKAGE_EXTENSION = ".rkp";
 	
-	private static final Logger LOGGER = Logger.getLogger(RainbowKitFilter.class.getName());
+	private final Logger LOGGER = LoggerFactory.getLogger(getClass());
 
 	private Parameters params;
 	private boolean canceled;
@@ -241,7 +242,7 @@ public class RainbowKitFilter implements IFilter {
 				}
 			}
 			catch ( Throwable e ) {
-				LOGGER.severe(String.format("Cannot create the editor (%s)\n"+e.getMessage(), className));
+				LOGGER.error(String.format("Cannot create the editor (%s)\n"+e.getMessage(), className));
 				// And move on to the merge
 			}
 		}
@@ -479,7 +480,7 @@ public class RainbowKitFilter implements IFilter {
 		catch ( Exception e ) {
 			// Log and move on to the next file
 			Throwable e2 = e.getCause();
-			LOGGER.severe("RTF Conversion error.\n" + ((e2!=null) ? e2.getMessage() : e.getMessage()));
+			LOGGER.error("RTF Conversion error.\n" + ((e2!=null) ? e2.getMessage() : e.getMessage()));
 		}
 		finally {
 			if ( rtfFilter != null ) {
@@ -490,7 +491,7 @@ public class RainbowKitFilter implements IFilter {
 					writer.close();
 				}
 				catch ( IOException e ) {
-					LOGGER.severe("RTF Conversion error when closing file.\n" + e.getMessage());
+					LOGGER.error("RTF Conversion error when closing file.\n" + e.getMessage());
 				}
 			}
 		}
@@ -501,7 +502,7 @@ public class RainbowKitFilter implements IFilter {
 		// Check if we have a resource id
 		if ( Util.isEmpty(info.getResourceId()) ) {
 			// No resource id in the info: cannot post-process
-			LOGGER.severe(String.format("The file '%s' does not have an associated Transifex resource id.",
+			LOGGER.error(String.format("The file '%s' does not have an associated Transifex resource id.",
 				info.getRelativeInputPath()));
 			return null;
 		}
@@ -524,7 +525,7 @@ public class RainbowKitFilter implements IFilter {
 		String[] res = cli.getResource(info.getResourceId(), manifest.getTargetLocale(), outputPath);
 		if ( res[0] == null ) {
 			// Could not download the file
-			LOGGER.severe("Cannot pull the resource from Transifex.\n"+res[1]);
+			LOGGER.error("Cannot pull the resource from Transifex.\n"+res[1]);
 			return null;
 		}
 		File file = new File(outputPath);

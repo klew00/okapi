@@ -153,5 +153,6 @@ public class XINIFilter implements IFilter {
 	public IFilterWriter createFilterWriter () {
 		return new XINIWriter(params);
 	}
-
+	
 }
+

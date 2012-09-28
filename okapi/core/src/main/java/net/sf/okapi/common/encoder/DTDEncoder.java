@@ -58,7 +58,7 @@ public class DTDEncoder implements IEncoder {
 
 	@Override
 	public String encode (String text, 
-		int context)
+			EncoderContext context)
 	{
 		if ( text == null ) return "";
 		StringBuffer sbTmp = new StringBuffer(text.length());
@@ -112,7 +112,7 @@ public class DTDEncoder implements IEncoder {
 
 	@Override
 	public String encode (char value,
-		int context)
+			EncoderContext context)
 	{
 		switch ( value ) {
 		case '<':
@@ -142,7 +142,7 @@ public class DTDEncoder implements IEncoder {
 
 	@Override
 	public String encode (int value,
-		int context)
+			EncoderContext context)
 	{
 		switch ( value ) {
 		case '<':
@@ -185,7 +185,7 @@ public class DTDEncoder implements IEncoder {
 		String value)
 	{
 		// PROP_ENCODING: Same value in native
-		// PROP_LANGUGE: Same value in native
+		// PROP_LANGUAGE: Same value in native
 		return value;
 	}
 

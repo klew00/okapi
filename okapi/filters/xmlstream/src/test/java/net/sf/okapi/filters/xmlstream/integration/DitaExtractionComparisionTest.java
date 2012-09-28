@@ -109,10 +109,12 @@ public class DitaExtractionComparisionTest {
 				tmp.append(writer.processDocumentPart(dp));
 				break;
 			case START_GROUP:
+			case START_SUBFILTER:
 				StartGroup startGroup = (StartGroup) event.getResource();
 				tmp.append(writer.processStartGroup(startGroup));
 				break;
 			case END_GROUP:
+			case END_SUBFILTER:
 				Ending ending = (Ending) event.getResource();
 				tmp.append(writer.processEndGroup(ending));
 				break;

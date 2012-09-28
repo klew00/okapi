@@ -23,7 +23,9 @@ package net.sf.okapi.filters.openxml;
 import java.io.File;
 import java.io.InputStream;
 import java.util.Enumeration;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -41,7 +43,7 @@ import net.sf.okapi.common.FileCompare;
 
 public class ZipCompare {
 
-	Logger LOGGER = Logger.getLogger(OpenXMLSnippetsTest.class.getName());
+	private final Logger LOGGER = LoggerFactory.getLogger(getClass());
 	private FileCompare fc=null;
 	public ZipCompare()
 	{

@@ -18,37 +18,69 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.applications.rainbow;
+package net.sf.okapi.applications.rainbow.logger;
 
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
+import java.util.logging.Logger;
 
 import net.sf.okapi.applications.rainbow.lib.ILog;
 
-class LogHandler extends Handler {
-	
+class LogHandlerJDK extends Handler implements ILogHandler {
 	private ILog       log;
-	
 
-	public LogHandler (ILog log) {
+	protected LogHandlerJDK(){}
+
+	public void initialize(ILog log) {
+		if( log == null ) return;
+
 		this.log = log;
+		this.setLevel(Level.INFO);
+		Logger.getLogger("").addHandler(this); //$NON-NLS-1$
 	}
-	
+
+	public void setLogLevel(int level) {
+		switch ( level ) {
+			case LogLevel.DEBUG:
+				this.setLevel(Level.FINE);
+				break;
+			case LogLevel.TRACE:
+				this.setLevel(Level.FINEST);
+				break;
+			default:
+				this.setLevel(Level.INFO);
+				break;
+		}
+	}
+
 	@Override
-	public void close ()
-		throws SecurityException
-	{
+	public void close() {
 		// Do nothing
 	}
 
 	@Override
-	public void flush () {
+	public void flush() {
 		// Do nothing
 	}
 
 	@Override
-	public void publish (LogRecord record) {
+	public void publish(LogRecord record) {
+		if( log == null ) return;
+
+		/*
+		 * JDK native levels:
+		 *    Level.OFF     = Integer.MAX_VALUE;
+		 *    Level.SEVERE  = 1000;
+		 *    Level.WARNING =  900;
+		 *    Level.INFO    =  800;
+		 *    Level.CONFIG  =  700;
+		 *    Level.FINE    =  500;
+		 *    Level.FINER   =  400;
+		 *    Level.FINEST  =  300;
+		 *    Level.ALL     = Integer.MIN_VALUE;
+		 */
+
 		if ( record.getLevel() == Level.SEVERE ) {
 			log.error(record.getMessage());
 			Throwable e = record.getThrown();
@@ -63,9 +95,7 @@ class LogHandler extends Handler {
 			// Otherwise print
 			log.warning(record.getMessage());
 		}
-		else if ( record.getLevel() == Level.INFO ) {
+		else // INFO and below
 			log.message(record.getMessage());
-		}
 	}
-
 }

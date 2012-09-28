@@ -3,7 +3,8 @@ package net.sf.okapi.steps.wordcount.categorized.gmx;
 import static org.junit.Assert.assertEquals;
 
 import java.net.URISyntaxException;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.LocaleId;
@@ -31,7 +32,7 @@ public class TestGMXCounts {
 	private Event sdEvent;
 	private ITextUnit tu;
 	private Event tuEvent;
-	private final Logger logger = Logger.getLogger(getClass().getName());
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 	
 	@Before
 	public void startup() {
@@ -70,17 +71,17 @@ public class TestGMXCounts {
 		params.setFillTarget(true);
 		ls.handleEvent(sdEvent);
 		ls.handleEvent(tuEvent);
-		logger.fine(TextUnitLogger.getTuInfo(tu, LocaleId.ENGLISH));
+		logger.debug(TextUnitLogger.getTuInfo(tu, LocaleId.ENGLISH));
 		AltTranslationsAnnotation ata = tu.getTarget(LocaleId.FRENCH).getAnnotation(AltTranslationsAnnotation.class);
 		ata.add(new AltTranslation(LocaleId.ENGLISH, LocaleId.FRENCH, tu.getSource().getFirstContent(), null, null, MatchType.EXACT_UNIQUE_ID, 100, null));
-		logger.fine(TextUnitLogger.getTuInfo(tu, LocaleId.ENGLISH));
+		logger.debug(TextUnitLogger.getTuInfo(tu, LocaleId.ENGLISH));
 		
 		bcs = new GMXLeveragedMatchedWordCountStep();
 		bcs.setSourceLocale(LocaleId.ENGLISH);
 		bcs.setTargetLocale(LocaleId.FRENCH);
 		bcs.handleEvent(sdEvent);
 		bcs.handleEvent(tuEvent);
-		logger.fine(TextUnitLogger.getTuInfo(tu, LocaleId.ENGLISH));
+		logger.debug(TextUnitLogger.getTuInfo(tu, LocaleId.ENGLISH));
 		
 		assertEquals(3, BaseCounter.getCount(tu, GMX.LeveragedMatchedWordCount));
 	}
@@ -103,14 +104,14 @@ public class TestGMXCounts {
 		params.setFillTarget(true);
 		ls.handleEvent(sdEvent);
 		ls.handleEvent(tuEvent);
-		logger.fine(TextUnitLogger.getTuInfo(tu, LocaleId.ENGLISH));
+		logger.debug(TextUnitLogger.getTuInfo(tu, LocaleId.ENGLISH));
 		
 		bcs = new GMXLeveragedMatchedWordCountStep();
 		bcs.setSourceLocale(LocaleId.ENGLISH);
 		bcs.setTargetLocale(LocaleId.FRENCH);
 		bcs.handleEvent(sdEvent);
 		bcs.handleEvent(tuEvent);
-		logger.fine(TextUnitLogger.getTuInfo(tu, LocaleId.ENGLISH));
+		logger.debug(TextUnitLogger.getTuInfo(tu, LocaleId.ENGLISH));
 		
 		assertEquals(3, BaseCounter.getCount(tu, GMX.LeveragedMatchedWordCount)); 
 		assertEquals(0, BaseCounter.getCount(tu, GMX.FuzzyMatchedWordCount));
@@ -134,14 +135,14 @@ public class TestGMXCounts {
 		params.setFillTarget(true);
 		ls.handleEvent(sdEvent);
 		ls.handleEvent(tuEvent);
-		logger.fine(TextUnitLogger.getTuInfo(tu, LocaleId.ENGLISH));
+		logger.debug(TextUnitLogger.getTuInfo(tu, LocaleId.ENGLISH));
 		
 		bcs = new GMXFuzzyMatchWordCountStep();
 		bcs.setSourceLocale(LocaleId.ENGLISH);
 		bcs.setTargetLocale(LocaleId.FRENCH);
 		bcs.handleEvent(sdEvent);
 		bcs.handleEvent(tuEvent);
-		logger.fine(TextUnitLogger.getTuInfo(tu, LocaleId.ENGLISH));
+		logger.debug(TextUnitLogger.getTuInfo(tu, LocaleId.ENGLISH));
 		
 		assertEquals(4, BaseCounter.getCount(tu, GMX.FuzzyMatchedWordCount));
 		assertEquals(0, BaseCounter.getCount(tu, GMX.LeveragedMatchedWordCount));

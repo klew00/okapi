@@ -22,7 +22,8 @@ package net.sf.okapi.steps.tokenization.engine;
 
 import java.io.IOException;
 import java.io.StringReader;
-import java.util.logging.Level;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.steps.tokenization.common.AbstractLexer;
@@ -36,6 +37,7 @@ import net.sf.okapi.steps.tokenization.engine.javacc.WordTokenizerTokenManager;
 import net.sf.okapi.steps.tokenization.tokens.Tokens;
 
 public class JavaCcLexer extends AbstractLexer {
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 
 	private SimpleCharStream stream;
 	private WordTokenizer tokenizer;
@@ -63,22 +65,22 @@ public class JavaCcLexer extends AbstractLexer {
 			
 		} catch (TokenMgrError e) {
 			
-			logMessage(Level.FINE, "JavaCC error: " + e.getMessage());
+			logger.debug("JavaCC error: " + e.getMessage());
 			return null;
 			
 		} catch (Error e) {
 		
-			logMessage(Level.FINE, "JavaCC error: " + e.getMessage());
+			logger.debug("JavaCC error: " + e.getMessage());
 			return null;
 		
 		} catch (ParseException e) {
 
-			logMessage(Level.FINE, "JavaCC parsing exception: " + e.getMessage());
+			logger.debug("JavaCC parsing exception: " + e.getMessage());
 			return null;
 			
 		} catch (IOException e) {
 
-			logMessage(Level.FINE, "JavaCC IO exception: " + e.getMessage());
+			logger.debug("JavaCC IO exception: " + e.getMessage());
 			return null;
 		}
 

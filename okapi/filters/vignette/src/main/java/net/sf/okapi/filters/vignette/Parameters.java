@@ -39,12 +39,14 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	static final String QUOTEMODEDEFINED = "quoteModeDefined";
 	static final String QUOTEMODE = "quoteMode";
 	static final String MONOLINGUAL = "monolingual";
+	static final String USECDATA = "useCDATA";
 	
 	private String partsConfigurations;
 	private String partsNames;
 	private String sourceId;
 	private String localeId;
 	private boolean monolingual;
+	private boolean useCDATA;
 
 	public String getPartsNames () {
 		return partsNames;
@@ -93,6 +95,14 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	public void setMonolingual (boolean monolingual) {
 		this.monolingual = monolingual;
 	}
+	
+	public boolean getUseCDATA() {
+		return useCDATA;
+	}
+
+	public void setUseCDATA(boolean useCDATA) {
+		this.useCDATA = useCDATA;
+	}
 
 	public boolean checkData () {
 		String[] tmp1 = ListUtil.stringAsArray(partsNames);
@@ -118,6 +128,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		sourceId = "SOURCE_ID";
 		localeId = "LOCALE_ID";
 		monolingual = false;
+		useCDATA = true;
 	}
 
 	@Override
@@ -128,6 +139,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		buffer.setString(SOURCEID, sourceId);
 		buffer.setString(LOCALEID, localeId);
 		buffer.setBoolean(MONOLINGUAL, monolingual);
+		buffer.setBoolean(USECDATA, useCDATA);
 		// Plus two *write-only* parameters: always set to true and 0
 		// This is used by the encoder to know how it needs to escape the quotes
 		// It must not be 0 if one of the data part to extract is an attribute
@@ -146,6 +158,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		sourceId = buffer.getString(SOURCEID, sourceId);
 		localeId = buffer.getString(LOCALEID, localeId);
 		monolingual = buffer.getBoolean(MONOLINGUAL, monolingual);
+		useCDATA = buffer.getBoolean(USECDATA, useCDATA);
 	}
 
 	@Override
@@ -156,6 +169,8 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		desc.add(PARTSCONFIGURATIONS, "Corresponding filter configurations (or 'default')",
 			"Comma-separated list of the filter configurations to use, use 'default' for none");
 		desc.add(MONOLINGUAL, "Monolingual mode", null);
+		desc.add(USECDATA, "Use CDATA", 
+				"Create CDATA sections in the output file");
 		desc.add(SOURCEID, "Name for source ID element",
 			"Name of the <attribute> element containing the source ID");
 		desc.add(LOCALEID, "Name for locale ID element",
@@ -173,6 +188,8 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		tip = desc.addTextInputPart(paramDesc.get(Parameters.PARTSCONFIGURATIONS));
 		tip.setHeight(60);
 
+		desc.addCheckboxPart(paramDesc.get(USECDATA));
+		
 		CheckboxPart mono = desc.addCheckboxPart(paramDesc.get(MONOLINGUAL));
 		
 		tip = desc.addTextInputPart(paramDesc.get(Parameters.SOURCEID));
@@ -185,5 +202,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		
 		return desc;
 	}
+
+	
 	
 }

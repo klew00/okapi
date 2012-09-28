@@ -27,7 +27,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
@@ -79,7 +80,7 @@ public class OpenXMLZipFilterWriter implements IFilterWriter {
 	private File tempFile;
 	private File tempZip;
 	private YamlParameters params; // DWH 7-16-09
-	private static final Logger LOGGER = Logger.getLogger(OpenXMLZipFilterWriter.class.getName());
+	private final Logger LOGGER = LoggerFactory.getLogger(getClass());
 	private EncoderManager encoderManager;
 
 	/**
@@ -200,6 +201,8 @@ public class OpenXMLZipFilterWriter implements IFilterWriter {
 		case TEXT_UNIT:
 		case START_GROUP:
 		case END_GROUP:
+		case START_SUBFILTER:
+		case END_SUBFILTER:
 /* now done in OpenXMLContentSkeletonWriter.getContent(TextUnit,LocaleId,int) DWH 10-27-09
 			if (event.getEventType()==EventType.TEXT_UNIT) // DWH 10-27-09 if in a Text box
 			{
@@ -366,7 +369,7 @@ public class OpenXMLZipFilterWriter implements IFilterWriter {
 		catch(Exception e)
 		{
 			nZipType = 0;
-			LOGGER.log(Level.WARNING,"Zip component is not a known file type.");
+			LOGGER.warn("Zip component is not a known file type.");
 		} // leave the zip type as 0 = unknown
 */
 		nZipType = ((ConditionalParameters)res.getFilterParameters()).nFileType; // DWH 6-27-09

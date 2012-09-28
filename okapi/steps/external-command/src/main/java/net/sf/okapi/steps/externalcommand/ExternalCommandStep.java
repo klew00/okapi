@@ -27,8 +27,8 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
@@ -58,7 +58,7 @@ import org.apache.commons.exec.PumpStreamHandler;
 @UsingParameters(Parameters.class)
 public class ExternalCommandStep extends BasePipelineStep {
 	
-	private static final Logger LOGGER = Logger.getLogger(ExternalCommandStep.class.getName());
+	private final Logger LOGGER = LoggerFactory.getLogger(getClass());
 
 	private static final String INPUT_FILE_VAR = "inputPath";
 	private static final String OUTPUT_FILE_VAR = "outputPath";
@@ -150,7 +150,7 @@ public class ExternalCommandStep extends BasePipelineStep {
 		try {
 			psh.start();
 			CommandLine cl = CommandLine.parse(parameters.getCommand(), subtitutions);
-			LOGGER.log(Level.INFO, "External Command: " + cl.toString());
+			LOGGER.info("External Command: " + cl.toString());
 			exitValue = executor.execute(cl);
 		}
 		catch (ExecuteException e) {

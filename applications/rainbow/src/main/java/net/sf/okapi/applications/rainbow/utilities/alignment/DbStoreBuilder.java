@@ -83,9 +83,11 @@ class DbStoreBuilder implements IFilterWriter {
 			processStartDocument((StartDocument)event.getResource());
 			break;
 		case START_GROUP:
+		case START_SUBFILTER:
 			processStartGroup();
 			break;
 		case END_GROUP:
+		case END_SUBFILTER:
 			processEndGroup();
 			break;
 		case TEXT_UNIT:

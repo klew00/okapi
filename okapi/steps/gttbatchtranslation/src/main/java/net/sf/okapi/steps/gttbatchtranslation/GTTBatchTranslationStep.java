@@ -31,7 +31,8 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import net.htmlparser.jericho.Element;
 import net.htmlparser.jericho.HTMLElementName;
@@ -60,7 +61,7 @@ public class GTTBatchTranslationStep extends BasePipelineStep {
 
 	private final static long MAXSIZE =(1020*1024); // Less than 1 MB 
 		
-	private final Logger logger = Logger.getLogger(getClass().getName());
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 	
 	private Parameters params;
 	private QueryUtil qutil;
@@ -355,7 +356,7 @@ public class GTTBatchTranslationStep extends BasePipelineStep {
 				}
 				catch ( Throwable e ) {
 					// Catch issues with inline codes
-					logger.warning(String.format("Skipping entry '%d'.\n", id) + e.getMessage());
+					logger.warn(String.format("Skipping entry '%d'.\n", id) + e.getMessage());
 					continue; // Skip this entry
 				}
 

@@ -23,8 +23,8 @@ package net.sf.okapi.steps.uriconversion;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
@@ -44,7 +44,7 @@ public class UriConversionStep extends BasePipelineStep {
 
 	private static final String FORCEESCAPE = " * -,.";
 
-	private final Logger logger = Logger.getLogger(getClass().getName());
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 
 	private Parameters params;
 	private LocaleId trgLang;
@@ -104,7 +104,7 @@ public class UriConversionStep extends BasePipelineStep {
 			}
 		}
 		catch ( Exception e ) {
-			logger.log(Level.SEVERE, String.format("Error when updating content: '%s'", cont.toString()), e);
+			logger.error(String.format("Error when updating content: '%s'", cont.toString()), e);
 		}
 		
 		return event;
@@ -140,7 +140,7 @@ public class UriConversionStep extends BasePipelineStep {
 			sb.append(URLDecoder.decode(sbTemp.toString(),"UTF-8"));
 		}
 		catch (UnsupportedEncodingException e) {
-			logger.log(Level.SEVERE, String.format("Error when unescaping: '%s'", text), e);
+			logger.error(String.format("Error when unescaping: '%s'", text), e);
 		}
 		return sb.toString();
 	}
@@ -180,7 +180,7 @@ public class UriConversionStep extends BasePipelineStep {
 			}
 		}
 		catch (UnsupportedEncodingException e) {
-			logger.log(Level.SEVERE, String.format("Error when escaping: '%s'", text), e);
+			logger.error(String.format("Error when escaping: '%s'", text), e);
 		}
 		return sb.toString();
 	}

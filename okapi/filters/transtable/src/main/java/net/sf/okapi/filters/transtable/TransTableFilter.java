@@ -27,7 +27,8 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import net.sf.okapi.common.BOMNewlineEncodingDetector;
 import net.sf.okapi.common.Event;
@@ -59,7 +60,7 @@ import net.sf.okapi.common.skeleton.ISkeletonWriter;
 
 public class TransTableFilter implements IFilter {
 
-	private final Logger logger = Logger.getLogger(getClass().getName());
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 
 	private static String MIMETYPE = "text/x-transtable";
 	
@@ -332,7 +333,7 @@ public class TransTableFilter implements IFilter {
 		// Source locale
 		LocaleId srcLoc = LocaleId.fromString(parts[1]);
 		if ( !srcLoc.equals(input.getSourceLocale()) ) {
-			logger.warning(String.format("The source locale declared in the file ('%s') is not the expected one ('%s')\n"
+			logger.warn(String.format("The source locale declared in the file ('%s') is not the expected one ('%s')\n"
 				+ "%s will be used.",
 				srcLoc.toString(), input.getSourceLocale().toString(), input.getSourceLocale().toString()));
 		}
@@ -340,7 +341,7 @@ public class TransTableFilter implements IFilter {
 		trgLoc = LocaleId.fromString(parts[2]);
 		if ( input.getTargetLocale() != null ) {
 			if ( !trgLoc.equals(input.getTargetLocale()) ) {
-				logger.warning(String.format("The target locale declared in the file ('%s') is not the expected one ('%s')\n"
+				logger.warn(String.format("The target locale declared in the file ('%s') is not the expected one ('%s')\n"
 					+ "%s will be used.",
 					trgLoc.toString(), input.getTargetLocale().toString(), input.getTargetLocale().toString()));
 				trgLoc = input.getTargetLocale();

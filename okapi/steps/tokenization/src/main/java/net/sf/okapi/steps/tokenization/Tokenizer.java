@@ -20,7 +20,8 @@
 
 package net.sf.okapi.steps.tokenization;
 
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
@@ -44,7 +45,6 @@ import net.sf.okapi.steps.tokenization.tokens.Tokens;
 public class Tokenizer {
 
 	protected static TokenizationStep ts = new TokenizationStep();
-	private static final Logger logger = Logger.getLogger(Tokenizer.class.getName());
 	
 	/**
 	 * Extracts tokens from the given text.
@@ -94,7 +94,8 @@ public class Tokenizer {
 		
 		if ( text == null ) return null;
 		if ( Util.isNullOrEmpty(language) ) {
-			logger.warning("Language is not set, cannot tokenize.");
+			Logger localLogger = LoggerFactory.getLogger(Tokenizer.class);
+			localLogger.warn("Language is not set, cannot tokenize.");
 			return null;
 		}
 		

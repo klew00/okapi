@@ -31,7 +31,8 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Stack;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
@@ -73,7 +74,7 @@ import net.sf.okapi.common.skeleton.ISkeletonWriter;
 
 public class IDMLFilterWriter implements IFilterWriter {
 
-	private final Logger logger = Logger.getLogger(getClass().getName());
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 
 	private final DocumentBuilder docBuilder;
 	private String outputPath;
@@ -161,9 +162,11 @@ public class IDMLFilterWriter implements IFilterWriter {
 			processEndDocument();
 			break;
 		case START_GROUP:
+		case START_SUBFILTER:
 			processStartGroup(event.getStartGroup());
 			break;
 		case END_GROUP:
+		case END_SUBFILTER:
 			processEndGroup(event.getEndGroup());
 			break;
 		case TEXT_UNIT:
@@ -379,7 +382,7 @@ public class IDMLFilterWriter implements IFilterWriter {
 					String key = marker.getAttribute("id");
 					Node original = map.get(key);
 					if ( original == null ) {
-						logger.severe(String.format("Missing original node for a reference in text unit id='%s'.", tu.getId()));
+						logger.error(String.format("Missing original node for a reference in text unit id='%s'.", tu.getId()));
 						break; // Break now or we'll be in an infinite loop
 					}
 					Element parent = (Element)marker.getParentNode();
@@ -388,7 +391,7 @@ public class IDMLFilterWriter implements IFilterWriter {
 			}
 		}
 		catch ( Throwable e ) {
-			logger.severe(String.format("Error when parsing XML of text unit id='%s'.\n"+e.getMessage(), tu.getId()));
+			logger.error(String.format("Error when parsing XML of text unit id='%s'.\n"+e.getMessage(), tu.getId()));
 		}
 	}
 	

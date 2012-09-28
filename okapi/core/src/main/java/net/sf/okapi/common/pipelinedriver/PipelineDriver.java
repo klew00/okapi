@@ -26,7 +26,8 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.exceptions.OkapiBadStepInputException;
@@ -47,7 +48,7 @@ public class PipelineDriver implements IPipelineDriver {
 	/**
 	 * Logger for this driver.
 	 */
-	protected final Logger logger = Logger.getLogger(getClass().getName());
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 	
 	private IPipeline pipeline;
 	private List<IBatchItemContext> batchItems;

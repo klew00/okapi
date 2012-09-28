@@ -37,6 +37,8 @@ public class IdGenerator {
 	public static final String DOCUMENT_PART = "dp";
 	public static final String START_SUBDOCUMENT = "ssd";
 	public static final String END_SUBDOCUMENT = "esd";
+	public static final String START_SUBFILTER = "ssf";
+	public static final String END_SUBFILTER = "esf";
 	public static final String DEFAULT_ROOT_ID = "noDocName";
 	
 	private long seq = 0;

@@ -20,6 +20,7 @@
 
 package net.sf.okapi.common.encoder;
 
+import net.sf.okapi.common.MimeTypeMapper;
 import net.sf.okapi.common.Util;
 
 import org.junit.Test;
@@ -57,6 +58,23 @@ public class EncoderManagerTest {
 		IEncoder enc = em1.getEncoder();
 		assertNotNull(enc);
 		assertEquals(HTMLENCODER, enc.getClass().getName());
+	}
+	
+	@Test
+	public void testSetMapping() {
+		EncoderManager em = new EncoderManager();
+		em.setDefaultOptions(null, "UTF-16BE", "\r\n");
+		
+		IEncoder e1 = new XMLEncoder("UTF-8", "\n", true, true, false, 1);
+		IEncoder e2 = new XMLEncoder("UTF-8", "\n", true, false, true, 2);
+		
+		em.setMapping(MimeTypeMapper.XML_MIME_TYPE, e1);
+		em.updateEncoder(MimeTypeMapper.XML_MIME_TYPE);
+		assertEquals(e1, em.getEncoder());
+		
+		em.setMapping(MimeTypeMapper.XML_MIME_TYPE, e2);
+		em.updateEncoder(MimeTypeMapper.XML_MIME_TYPE);
+		assertEquals(e2, em.getEncoder());
 	}
 	
 }

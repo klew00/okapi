@@ -257,4 +257,7 @@ public class StorageList extends ArrayList<IResource>
 		return startGroup.getAnnotations();
 	}
 
+	public StartGroup getStartGroup() {
+		return startGroup;
+	}
 }

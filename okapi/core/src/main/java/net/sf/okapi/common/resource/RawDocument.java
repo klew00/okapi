@@ -33,8 +33,8 @@ import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.ISkeleton;
@@ -53,7 +53,7 @@ import net.sf.okapi.common.LocaleId;
  * one) of three input objects: a CharSequence, a URI, or an InputStream.
  */
 public class RawDocument implements IResource {
-	private static final Logger LOGGER = Logger.getLogger(RawDocument.class.getName());
+	private final Logger LOGGER = LoggerFactory.getLogger(getClass());
 
 	public static final String UNKOWN_ENCODING = "null";
 
@@ -281,7 +281,7 @@ public class RawDocument implements IResource {
 				reader.close();
 				reader = null;
 			} catch (IOException e) {	
-				LOGGER.log(Level.WARNING,
+				LOGGER.warn(
 						"Error closing the reader created by RawDocument.", e);
 			}
 		}
@@ -529,13 +529,13 @@ public class RawDocument implements IResource {
 	public void setEncoding (String encoding) {
 		// Cannot reset an encoding on a CharSequence document
 		if (inputCharSequence != null) {
-			LOGGER.log(Level.FINE,
+			LOGGER.debug(
 					"Cannot reset an encoding on a CharSequence input in RawDocument");
 			return;
 		}
 
 		if (hasReaderBeenCalled) {
-			LOGGER.log(Level.WARNING,
+			LOGGER.warn(
 							"Setting an encoding after getReader() has been called is not recommened. "
 									+ "Subsequent calls to getReader() may use the old encoding if the stream can be reset"
 									+ " instead of recreated.");
@@ -574,7 +574,7 @@ public class RawDocument implements IResource {
 				// help free up resources
 				createdStream = null;
 			} catch (IOException e) {
-				LOGGER.log(Level.WARNING,
+				LOGGER.warn(
 				"Error closing the stream created by RawDocument.", e);
 		
 			}
@@ -585,7 +585,7 @@ public class RawDocument implements IResource {
 				// help free up resources
 				inputStream = null;
 			} catch (IOException e) {
-				LOGGER.log(Level.WARNING,
+				LOGGER.warn(
 				"Error closing the inputStream created by RawDocument.", e);
 		
 			}
@@ -596,7 +596,7 @@ public class RawDocument implements IResource {
 				// help free up resources
 				reader = null;
 			} catch (IOException e) {
-				LOGGER.log(Level.WARNING,
+				LOGGER.warn(
 				"Error closing the reader created by RawDocument.", e);
 		
 			}

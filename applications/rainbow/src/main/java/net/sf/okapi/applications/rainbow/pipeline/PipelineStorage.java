@@ -25,7 +25,8 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.Map;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -48,7 +49,7 @@ import net.sf.okapi.common.pipeline.Pipeline;
 
 public class PipelineStorage implements IPipelineWriter, IPipelineReader {
 
-	private final Logger LOGGER = Logger.getLogger(getClass().getName());
+	private final Logger LOGGER = LoggerFactory.getLogger(getClass());
 
 	private String path;
 	private StringWriter strWriter;
@@ -149,7 +150,7 @@ public class PipelineStorage implements IPipelineWriter, IPipelineReader {
 				StepInfo stepInfo = availableSteps.get(className);
 				if ( stepInfo == null ) {
 					// The pipeline has a step that is not currently in the available steps
-					LOGGER.warning(String.format(
+					LOGGER.warn(String.format(
 						"The step '%s' is not among the steps currently available. " +
 						"It will be removed from the loaded pipeline.",
 						className));

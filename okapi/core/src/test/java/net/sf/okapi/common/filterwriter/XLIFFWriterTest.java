@@ -47,7 +47,7 @@ public class XLIFFWriterTest {
 	@Before
 	public void setUp() {
 		writer = new XLIFFWriter();
-		root = TestUtil.getParentDir(this.getClass(), "/test01.properties");
+		root = TestUtil.getParentDir(this.getClass(), "/");
 	}
 
 	@Test

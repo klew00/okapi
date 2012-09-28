@@ -20,15 +20,15 @@
 
 package net.sf.okapi.common.pipeline;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
 
 public class ConsumerProducer extends BasePipelineStep {
 	
-	private static final Logger LOGGER = Logger.getLogger(ConsumerProducer.class.getName());
+	private final Logger LOGGER = LoggerFactory.getLogger(getClass());
 	
 	public String getName() {
 		return "ProducerConsumer";
@@ -40,13 +40,13 @@ public class ConsumerProducer extends BasePipelineStep {
 
 	@Override
 	protected Event handleEndBatchItem (Event event) {		
-		LOGGER.log(Level.FINEST, getName() + " end-batch-item");
+		LOGGER.trace(getName() + " end-batch-item");
 		return event;
 	}
 
 	@Override
 	protected Event handleStartBatchItem (Event event) {		
-		LOGGER.log(Level.FINEST, getName() + " start-batch-item");
+		LOGGER.trace(getName() + " start-batch-item");
 		return event;
 	}
 	

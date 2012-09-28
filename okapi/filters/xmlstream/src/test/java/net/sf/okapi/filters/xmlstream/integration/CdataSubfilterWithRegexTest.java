@@ -32,8 +32,8 @@ public class CdataSubfilterWithRegexTest {
 		root = Util.getDirectoryName(ditaUrl.toURI().getPath()) + File.separator;
 		
 		fcMapper = new FilterConfigurationMapper();
-		fcMapper.addConfigurations("net.sf.okapi.filters.html.HtmlFilter");
-		fcMapper.addConfigurations("net.sf.okapi.filters.xmlstream.XmlStreamFilter");
+		fcMapper.addConfigurations(net.sf.okapi.filters.html.HtmlFilter.class.getName());
+		fcMapper.addConfigurations(net.sf.okapi.filters.xmlstream.XmlStreamFilter.class.getName());
 		fcMapper.setCustomConfigurationsDirectory(root);
         fcMapper.addCustomConfiguration("okf_html@spaces_freemarker_regex");
         fcMapper.addCustomConfiguration("okf_html@spaces_freemarker_no_regex");
@@ -41,7 +41,7 @@ public class CdataSubfilterWithRegexTest {
         xmlStreamFilter.setFilterConfigurationMapper(fcMapper);
 	}
 	
-	//@Test
+	@Test
 	public void testDoubleExtractionWithRegex() throws URISyntaxException, MalformedURLException {
 		xmlStreamFilter.setParametersFromURL(XmlStreamFilter.class.getResource("/okf_xmlstream@freemarker.fprm"));
 		RoundTripComparison rtc = new RoundTripComparison();
@@ -59,7 +59,7 @@ public class CdataSubfilterWithRegexTest {
 		assertTrue(rtc.executeCompare(xmlStreamFilter, list, "UTF-8", locEN, locEN));
 	}
 
-	//@Test
+	@Test
 	public void testDoubleExtractionWithoutSubfilter() throws URISyntaxException, MalformedURLException {
 		xmlStreamFilter.setParametersFromURL(XmlStreamFilter.class.getResource("/okf_html@spaces_freemarker_regex.fprm"));
 		RoundTripComparison rtc = new RoundTripComparison();

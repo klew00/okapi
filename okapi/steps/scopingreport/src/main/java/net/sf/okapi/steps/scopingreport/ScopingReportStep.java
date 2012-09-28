@@ -33,7 +33,8 @@ import java.io.UnsupportedEncodingException;
 import java.text.DateFormat;
 import java.util.Date;
 import java.util.List;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IResource;
@@ -173,7 +174,7 @@ public class ScopingReportStep extends CompoundStep {
 	public static final String ITEM_NOCATEGORY = "ITEM_NOCATEGORY";
 		
 	private static final String DEFAULT_TEMPLATE = "scoping_report.html";
-	private final Logger logger = Logger.getLogger(getClass().getName());
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 	
 	private Parameters params;
 	private ReportGenerator gen;
@@ -202,7 +203,7 @@ public class ScopingReportStep extends CompoundStep {
 			try {
 				return new BufferedInputStream(new FileInputStream(new File(params.getCustomTemplateURI())));
 			} catch (IOException e) {
-				logger.warning("Error opening the custom template, default one is used. " + e.toString());
+				logger.warn("Error opening the custom template, default one is used. " + e.toString());
 				return this.getClass().getResourceAsStream(DEFAULT_TEMPLATE);
 			} 
 		}

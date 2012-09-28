@@ -44,34 +44,34 @@ public class EncodersTest {
 		assertEquals("windows-1252", enc.toNative(Property.ENCODING, "windows-1252"));
 		
 		enc.setOptions(null, "us-ascii", "\n");
-		assertEquals("&#x20000;", enc.encode("\uD840\uDC00", 0));
-		assertEquals("&#x20000;", enc.encode(0x20000, 0));
-		assertEquals("abc", enc.encode("abc", 0));
-		assertEquals("a", enc.encode('a', 0));
-		assertEquals("a", enc.encode((int)'a', 0));
+		assertEquals("&#x20000;", enc.encode("\uD840\uDC00", EncoderContext.TEXT));
+		assertEquals("&#x20000;", enc.encode(0x20000, EncoderContext.TEXT));
+		assertEquals("abc", enc.encode("abc", EncoderContext.TEXT));
+		assertEquals("a", enc.encode('a', EncoderContext.TEXT));
+		assertEquals("a", enc.encode((int)'a', EncoderContext.TEXT));
 
 		enc.setOptions(null, "UTF-8", "\n");
-		assertEquals(0x20000, enc.encode("\uD840\uDC00", 0).codePointAt(0));
-		assertEquals(0x20000, enc.encode(0x20000, 0).codePointAt(0));
-		assertEquals("abc", enc.encode("abc", 0));
-		assertEquals("a", enc.encode((int)'a', 0));
-		assertEquals("\u00a0", enc.encode("\u00a0", 0));
-		assertEquals("\u00a0", enc.encode('\u00a0', 0));
-		assertEquals("\u00a0", enc.encode(0x00a0, 0));
-		assertEquals(">", enc.encode(">", 0));
-		assertEquals(">", enc.encode((int)'>', 0));
-		assertEquals(">", enc.encode('>', 0));
+		assertEquals(0x20000, enc.encode("\uD840\uDC00", EncoderContext.TEXT).codePointAt(0));
+		assertEquals(0x20000, enc.encode(0x20000, EncoderContext.TEXT).codePointAt(0));
+		assertEquals("abc", enc.encode("abc", EncoderContext.TEXT));
+		assertEquals("a", enc.encode((int)'a', EncoderContext.TEXT));
+		assertEquals("\u00a0", enc.encode("\u00a0", EncoderContext.TEXT));
+		assertEquals("\u00a0", enc.encode('\u00a0', EncoderContext.TEXT));
+		assertEquals("\u00a0", enc.encode(0x00a0, EncoderContext.TEXT));
+		assertEquals(">", enc.encode(">", EncoderContext.TEXT));
+		assertEquals(">", enc.encode((int)'>', EncoderContext.TEXT));
+		assertEquals(">", enc.encode('>', EncoderContext.TEXT));
 		
 		DummyParameters params = new DummyParameters();
 		params.setBoolean(XMLEncoder.ESCAPEGT, true);
 		params.setBoolean(XMLEncoder.ESCAPENBSP, true);
 		enc.setOptions(params, "UTF-8", "\n");
-		assertEquals("&#x00a0;", enc.encode("\u00a0", 0));
-		assertEquals("&#x00a0;", enc.encode('\u00a0', 0));
-		assertEquals("&#x00a0;", enc.encode(0x00a0, 0));
-		assertEquals("&gt;", enc.encode(">", 0));
-		assertEquals("&gt;", enc.encode((int)'>', 0));
-		assertEquals("&gt;", enc.encode('>', 0));
+		assertEquals("&#x00a0;", enc.encode("\u00a0", EncoderContext.TEXT));
+		assertEquals("&#x00a0;", enc.encode('\u00a0', EncoderContext.TEXT));
+		assertEquals("&#x00a0;", enc.encode(0x00a0, EncoderContext.TEXT));
+		assertEquals("&gt;", enc.encode(">", EncoderContext.TEXT));
+		assertEquals("&gt;", enc.encode((int)'>', EncoderContext.TEXT));
+		assertEquals("&gt;", enc.encode('>', EncoderContext.TEXT));
 	}
 
 	@Test
@@ -82,18 +82,18 @@ public class EncodersTest {
 		assertEquals("windows-1252", enc.toNative(Property.ENCODING, "windows-1252"));
 		
 		enc.setOptions(null, "us-ascii", "\n");
-		assertEquals("&#x20000;", enc.encode("\uD840\uDC00", 0));
-		assertEquals("&#x20000;", enc.encode(0x20000, 0));
-		assertEquals("abc", enc.encode("abc", 0));
-		assertEquals("a", enc.encode('a', 0));
-		assertEquals("a", enc.encode((int)'a', 0));
+		assertEquals("&#x20000;", enc.encode("\uD840\uDC00", EncoderContext.TEXT));
+		assertEquals("&#x20000;", enc.encode(0x20000, EncoderContext.TEXT));
+		assertEquals("abc", enc.encode("abc", EncoderContext.TEXT));
+		assertEquals("a", enc.encode('a', EncoderContext.TEXT));
+		assertEquals("a", enc.encode((int)'a', EncoderContext.TEXT));
 
 		enc.setOptions(null, "UTF-8", "\r");
-		assertEquals(0x20000, enc.encode("\uD840\uDC00", 0).codePointAt(0));
-		assertEquals(0x20000, enc.encode(0x20000, 0).codePointAt(0));
-		assertEquals("abc\r", enc.encode("abc\n", 0));
-		assertEquals("a", enc.encode('a', 0));
-		assertEquals("a", enc.encode((int)'a', 0));
+		assertEquals(0x20000, enc.encode("\uD840\uDC00", EncoderContext.TEXT).codePointAt(0));
+		assertEquals(0x20000, enc.encode(0x20000, EncoderContext.TEXT).codePointAt(0));
+		assertEquals("abc\r", enc.encode("abc\n", EncoderContext.TEXT));
+		assertEquals("a", enc.encode('a', EncoderContext.TEXT));
+		assertEquals("a", enc.encode((int)'a', EncoderContext.TEXT));
 	}
 
 	@Test
@@ -104,18 +104,18 @@ public class EncodersTest {
 		assertEquals("windows-1252", enc.toNative(Property.ENCODING, "windows-1252"));
 		
 		enc.setOptions(null, "us-ascii", "\n");
-		assertEquals("\\ud840\\udc00", enc.encode("\uD840\uDC00", 0));
-		assertEquals("\\ud840\\udc00", enc.encode(0x20000, 0));
-		assertEquals("abc", enc.encode("abc", 0));
-		assertEquals("a", enc.encode('a', 0));
-		assertEquals("a", enc.encode((int)'a', 0));
+		assertEquals("\\ud840\\udc00", enc.encode("\uD840\uDC00", EncoderContext.TEXT));
+		assertEquals("\\ud840\\udc00", enc.encode(0x20000, EncoderContext.TEXT));
+		assertEquals("abc", enc.encode("abc", EncoderContext.TEXT));
+		assertEquals("a", enc.encode('a', EncoderContext.TEXT));
+		assertEquals("a", enc.encode((int)'a', EncoderContext.TEXT));
 
 		enc.setOptions(null, "UTF-8", "\n");
-		assertEquals(0x20000, enc.encode("\uD840\uDC00", 0).codePointAt(0));
-		assertEquals(0x20000, enc.encode(0x20000, 0).codePointAt(0));
-		assertEquals("abc\\n", enc.encode("abc\n", 0));
-		assertEquals("a", enc.encode('a', 0));
-		assertEquals("a", enc.encode((int)'a', 0));
+		assertEquals(0x20000, enc.encode("\uD840\uDC00", EncoderContext.TEXT).codePointAt(0));
+		assertEquals(0x20000, enc.encode(0x20000, EncoderContext.TEXT).codePointAt(0));
+		assertEquals("abc\\n", enc.encode("abc\n", EncoderContext.TEXT));
+		assertEquals("a", enc.encode('a', EncoderContext.TEXT));
+		assertEquals("a", enc.encode((int)'a', EncoderContext.TEXT));
 	}
 
 	@Test
@@ -126,29 +126,29 @@ public class EncodersTest {
 		assertEquals("windows-1252", enc.toNative(Property.ENCODING, "windows-1252"));
 		
 		enc.setOptions(null, "us-ascii", "\r\n");
-		assertEquals("\uD840\uDC00", enc.encode("\uD840\uDC00", 0));
-		assertEquals("\uD840\uDC00", enc.encode(0x20000, 0));
-		assertEquals("abc\r\n", enc.encode("abc\n", 0));
-		assertEquals("a", enc.encode('a', 0));
-		assertEquals("a", enc.encode((int)'a', 0));
+		assertEquals("\uD840\uDC00", enc.encode("\uD840\uDC00", EncoderContext.TEXT));
+		assertEquals("\uD840\uDC00", enc.encode(0x20000, EncoderContext.TEXT));
+		assertEquals("abc\r\n", enc.encode("abc\n", EncoderContext.TEXT));
+		assertEquals("a", enc.encode('a', EncoderContext.TEXT));
+		assertEquals("a", enc.encode((int)'a', EncoderContext.TEXT));
 
 		enc.setOptions(null, "UTF-8", "\r");
-		assertEquals(0x20000, enc.encode("\uD840\uDC00", 0).codePointAt(0));
-		assertEquals(0x20000, enc.encode(0x20000, 0).codePointAt(0));
-		assertEquals("abc\r", enc.encode("abc\n", 0));
-		assertEquals("a", enc.encode('a', 0));
-		assertEquals("a", enc.encode((int)'a', 0));
+		assertEquals(0x20000, enc.encode("\uD840\uDC00", EncoderContext.TEXT).codePointAt(0));
+		assertEquals(0x20000, enc.encode(0x20000, EncoderContext.TEXT).codePointAt(0));
+		assertEquals("abc\r", enc.encode("abc\n", EncoderContext.TEXT));
+		assertEquals("a", enc.encode('a', EncoderContext.TEXT));
+		assertEquals("a", enc.encode((int)'a', EncoderContext.TEXT));
 	}
 
 	@Test
 	public void testDTDEncoder () {
 		DTDEncoder enc = new DTDEncoder();
 		enc.setOptions(null, "us-ascii", "\n");
-		assertEquals("&lt;&amp;&#37;", enc.encode("<&%", 0));
-		assertEquals("&#x20000;", enc.encode("\uD840\uDC00", 0));
-		assertEquals("&#x20000;", enc.encode(0x20000, 0));
-		assertEquals("&#37;", enc.encode('%', 0));
-		assertEquals("&#37;", enc.encode((int)'%', 0));
+		assertEquals("&lt;&amp;&#37;", enc.encode("<&%", EncoderContext.TEXT));
+		assertEquals("&#x20000;", enc.encode("\uD840\uDC00", EncoderContext.TEXT));
+		assertEquals("&#x20000;", enc.encode(0x20000, EncoderContext.TEXT));
+		assertEquals("&#37;", enc.encode('%', EncoderContext.TEXT));
+		assertEquals("&#37;", enc.encode((int)'%', EncoderContext.TEXT));
 	}
 
 	@Test

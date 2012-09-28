@@ -21,7 +21,8 @@
 package net.sf.okapi.steps.common;
 
 import java.io.File;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
@@ -51,7 +52,7 @@ import net.sf.okapi.common.resource.StartSubDocument;
 @UsingParameters(ExtractionVerificationStepParameters.class) // No parameters
 public class ExtractionVerificationStep extends BasePipelineStep {
 
-	private static final Logger LOGGER = Logger.getLogger(ExtractionVerificationStep.class.getName());
+	private final Logger LOGGER = LoggerFactory.getLogger(getClass());
 	
 	private IFilter filter1, filter2;
 	private IFilterWriter writer;
@@ -178,7 +179,7 @@ public class ExtractionVerificationStep extends BasePipelineStep {
 					// Compare events
 					if ( !identicalEvent(event1, event2) ) {
 						errorCount++;
-						LOGGER.warning("different events");
+						LOGGER.warn("different events");
 						
 						if(errorCount >= limit && limit > 0){
 							reachedMax = true;
@@ -198,14 +199,14 @@ public class ExtractionVerificationStep extends BasePipelineStep {
 			
 			// Compare total number of events
 			if(count1 > count2){
-				LOGGER.warning("ExtractionVerification: Additional events found in the first run");
+				LOGGER.warn("ExtractionVerification: Additional events found in the first run");
 			}else if(count2 > count1){
-				LOGGER.warning("ExtractionVerification: Additional events found in the second run");
+				LOGGER.warn("ExtractionVerification: Additional events found in the second run");
 			}
 			
 			// Compare total number of events
 			if(errorCount > 0){
-				LOGGER.warning("ExtractionVerification: "+errorCount+ " or more events fail.");
+				LOGGER.warn("ExtractionVerification: "+errorCount+ " or more events fail.");
 			}else{
 				LOGGER.info("ExtractionVerification: All events pass.");
 			}
@@ -249,11 +250,11 @@ public class ExtractionVerificationStep extends BasePipelineStep {
 		Event event2)
 	{
 		if (( event1 == null ) && ( event2 != null )) {
-			LOGGER.warning("Event from first run is null");
+			LOGGER.warn("Event from first run is null");
 			return false;
 		}
 		if (( event1 != null ) && ( event2 == null )) {
-			LOGGER.warning("Event from second run is null");
+			LOGGER.warn("Event from second run is null");
 			return false;
 		}
 		if (( event1 == null ) && ( event2 == null )) {
@@ -261,7 +262,7 @@ public class ExtractionVerificationStep extends BasePipelineStep {
 		}
 
 		if ( event1.getEventType() != event2.getEventType() ) {
-			LOGGER.warning("Event Types are different");
+			LOGGER.warn("Event Types are different");
 			return false;
 		}
 
@@ -278,9 +279,12 @@ public class ExtractionVerificationStep extends BasePipelineStep {
 				return verificationUtil.compareStartSubDocument((StartSubDocument)event1.getResource(), (StartSubDocument)event2.getResource());
 			case START_GROUP:
 				return verificationUtil.compareBaseReferenceable(event1.getStartGroup(), event2.getStartGroup());
+			case START_SUBFILTER:
+				return verificationUtil.compareBaseReferenceable(event1.getStartSubfilter(), event2.getStartSubfilter());
 			case END_DOCUMENT:
 			case END_SUBDOCUMENT:
 			case END_GROUP:
+			case END_SUBFILTER:
 				return verificationUtil.compareIResources(event1.getEnding(), event2.getEnding());
 			case DOCUMENT_PART:
 				return verificationUtil.compareBaseReferenceable(event1.getDocumentPart(), event2.getDocumentPart());

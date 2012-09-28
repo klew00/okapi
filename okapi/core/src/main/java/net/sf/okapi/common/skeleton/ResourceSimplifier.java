@@ -22,19 +22,23 @@ package net.sf.okapi.common.skeleton;
 
 import java.security.InvalidParameterException;
 import java.util.List;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.ISkeleton;
 import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.Util;
+import net.sf.okapi.common.encoder.EncoderContext;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.IReferenceable;
 import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.MultiEvent;
 import net.sf.okapi.common.resource.StartDocument;
+import net.sf.okapi.common.resource.StartSubfilter;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextPart;
@@ -46,71 +50,28 @@ import net.sf.okapi.common.resource.TextPart;
  * The sequence of DOCUMENT_PART and TEXT_UNIT events is packed into a single MULTI_EVENT event.
  */
 public class ResourceSimplifier {
-	private final Logger logger = Logger.getLogger(getClass().getName());
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 	private boolean isMultilingual;
 	private LocaleId trgLoc;
-	private String outEncoding = "UTF-16BE";
+	private String outEncoding;
 	private GenericSkeletonWriter writer;
 	private GenericSkeleton newSkel;
-	private boolean useSDEncoding;
-	private boolean useSDLocale;
-	private boolean resolveCodeRefs;
-	
-	public ResourceSimplifier() {
-		this((GenericSkeletonWriter) null);
-	}
 	
 	public ResourceSimplifier(LocaleId trgLoc) {
 		this(null, trgLoc);
 	}
 	
-	public ResourceSimplifier(LocaleId trgLoc, String outEncoding) {
-		this(null, trgLoc, outEncoding);
+	public ResourceSimplifier(String outEncoding, LocaleId trgLoc) {
+		this(null, outEncoding, trgLoc);
 	}
 	
-	public ResourceSimplifier(GenericSkeletonWriter writer) {
-		super();
-		resolveCodeRefs = true;
-		useSDEncoding = true;
-		useSDLocale = true;
-		
+	public ResourceSimplifier(GenericSkeletonWriter writer, String outEncoding, LocaleId trgLoc) {
 		this.writer = (writer == null) ? new GenericSkeletonWriter() : writer;
 		newSkel = new GenericSkeleton();
 		
-		StartDocument sd = new StartDocument("");
-		sd.setMultilingual(false); // Simple resources
-		this.writer.processStartDocument(trgLoc, outEncoding, null, null, sd); // Sets writer fields + activates ref tracking mechanism of GSW
-	}
-	
-	public ResourceSimplifier(GenericSkeletonWriter writer, LocaleId trgLoc) {
-		this(writer);
-		this.trgLoc = trgLoc;
-		useSDLocale = false;
-	}
-	
-	public ResourceSimplifier(GenericSkeletonWriter writer, LocaleId trgLoc, String outEncoding) {
-		this(writer, trgLoc);		
 		this.outEncoding = outEncoding;
-		useSDEncoding = false;
-	}
-
-//	public void setMultilingual(boolean isMultilingual) {
-//		this.isMultilingual = isMultilingual;
-//	}
-//	
-//	public void setTargetLocale(LocaleId trgLoc) {
-//		this.trgLoc = trgLoc;
-//	}
-//	
-//	private void addEvent(MultiEvent me, Event event) {
-//		// TODO merge adjacent DocumentParts 
-//	}
-//	
-//	private void addDP(MultiEvent me, String id, GenericSkeleton skel) {
-//		DocumentPart dp = new DocumentPart(id, false, skel); 
-//		addEvent(me, new Event(EventType.DOCUMENT_PART, dp));
-//	}
-//	
+		this.trgLoc = trgLoc;
+	}	
 	
 	/**
 	 * Merges adjacent document parts into one. Will work for simple resources only.
@@ -155,24 +116,27 @@ public class ResourceSimplifier {
 			throw new InvalidParameterException("Event cannot be null");
 		
 		IResource res = event.getResource();
-		//if (res instanceof StartGroup)
-//		if (res.getId().equals("tu4"))
-//			System.out.println(res.getClass().getName());
 		
-		if (res instanceof IReferenceable) {			
+		if (res instanceof IReferenceable) {
+			if (res instanceof StartSubfilter) 
+				writer.processStartSubfilter((StartSubfilter) res);
+			
 			if  (((IReferenceable) res).isReferent()) {
 				writer.addToReferents(event);
-				// The referent is not processed at this point (only later from a resource referencing it)
-				return event;
-				//return Event.NOOP_EVENT;
+				// Referents will go to the skeleton or inline codes, so no stand-alone events are needed anymore  
+				return Event.NOOP_EVENT;
 			}
 		}
 		
 		if (event.getEventType() == EventType.START_DOCUMENT) {
 			StartDocument sd = (StartDocument) res;
 			isMultilingual = sd.isMultilingual();
-			if (useSDEncoding) this.outEncoding = sd.getEncoding(); // Default setting: output encoding = input encoding
-			if (useSDLocale) this.trgLoc = sd.getLocale();
+			if (Util.isEmpty(outEncoding)) outEncoding = sd.getEncoding(); // Default setting: output encoding = input encoding
+			if (trgLoc == null) trgLoc = sd.getLocale();
+			
+			//StartDocument sd = new StartDocument("");
+			sd.setMultilingual(false); // Simple resources
+			this.writer.processStartDocument(trgLoc, outEncoding, null, null, sd); // Sets writer fields + activates ref tracking mechanism of GSW
 		}
 				
 		if (!isComplex(res)) {
@@ -180,20 +144,6 @@ public class ResourceSimplifier {
 				writer.close(); // Clears the referents cache
 			return event;
 		}
-		
-//		switch (event.getEventType()) {
-//		case START_DOCUMENT:
-//		case END_DOCUMENT:
-//		case START_SUBDOCUMENT:
-//		case END_SUBDOCUMENT:
-//		case START_GROUP:
-//		case END_GROUP:
-//		case TEXT_UNIT:
-//		case DOCUMENT_PART:
-//			break;
-//		default:
-//			return event; // All other events with a skeleton are not processed
-//		}
 		
 		// Process the resource's skeleton
 		MultiEvent me = new MultiEvent();		
@@ -209,6 +159,8 @@ public class ResourceSimplifier {
 		case END_SUBDOCUMENT:
 		case START_GROUP:
 		case END_GROUP:
+		case START_SUBFILTER:
+		case END_SUBFILTER:
 			// Referents are sent to the GSW cache and are accessed there as refs are processed.
 			// Here we deal with non-referents only.
 			// The original event (the skeleton should be deleted) precedes in the resulting multi-event DPs/TUs 
@@ -226,7 +178,7 @@ public class ResourceSimplifier {
 		if (me.size() == 0) 
 			return event;
 		else if (me.size() == 1)
-			return me.iterator().next();
+			return assignIDs(me, res).iterator().next();
 		else
 			return new Event(EventType.MULTI_EVENT, assignIDs(packMultiEvent(me), res));
 	}
@@ -246,12 +198,7 @@ public class ResourceSimplifier {
 				res.setId("" + String.format("dp_%s", id));
 			}
 			else
-				res.setId(resId);
-			
-//			if (res instanceof DocumentPart && resource instanceof DocumentPart)
-//				res.setId(id);
-//			else
-//				res.setId("" + String.format("dp_%s", resId));
+				res.setId(resId);			
 		}
 		return me;
 	}
@@ -283,49 +230,6 @@ public class ResourceSimplifier {
 		
 		return false;
 	}
-
-//	public Event toMultiEvent(Event event, LocaleId targetLocale) {
-//		if (event == null)
-//			throw new InvalidParameterException("Event cannot be null");
-//		
-//		IResource res = event.getResource();
-//		if (res == null)
-//			return wrapEvent(event);
-//		
-//		ISkeleton skel = res.getSkeleton();
-//		if (!(skel instanceof GenericSkeleton)) {
-//			// TODO log
-//			return wrapEvent(event);
-//		}
-//		
-//		MultiEvent me = new MultiEvent(); 
-//		List<GenericSkeletonPart> parts = ((GenericSkeleton) skel).getParts();
-//		
-//		switch (event.getEventType()) {
-//		case TEXT_UNIT:
-//		}
-//	
-//		
-//		
-//		return wrapEvent(event); // TODO replace with real stuff		
-//	}
-//
-//	public static Event fromMultiEvent(Event event) {
-//		if (event == null)
-//			throw new InvalidParameterException("Event cannot be null");
-//		if (event.getEventType() != EventType.MULTI_EVENT)
-//			throw new InvalidParameterException("MULTI_EVENT type is expected");
-//		MultiEvent me = (MultiEvent) event.getResource();
-//		//if (me.iterator().)
-//		
-//		return null;		
-//	}
-//	
-//	private Event wrapEvent(Event event) {
-//		MultiEvent me = new MultiEvent();
-//		me.addEvent(event);
-//		return new Event(EventType.MULTI_EVENT, me);
-//	}
 	
 	private void flushSkeleton(String resId, int dpIndex, MultiEvent me) {
 		if (newSkel.isEmpty()) return;
@@ -340,7 +244,7 @@ public class ResourceSimplifier {
 		if (tuIndex == 1)
 			id = resId;
 		else {
-			logger.warning("Duplicate TU: " + resId);
+			logger.warn("Duplicate TU: " + resId);
 			id = String.format("%s_%d", resId, tuIndex);
 		}
 		
@@ -372,7 +276,7 @@ public class ResourceSimplifier {
 			if (tu.isReferent()) {
 				// Referenced TU, we got here from recursion (see *** below)
 				if (!hasGenericSkeleton) {
-					newSkel.add(writer.getString(tu, trgLoc, 1));
+					newSkel.add(writer.getString(tu, trgLoc, EncoderContext.SKELETON));
 					return;
 				}
 				// Otherwise the skeleton is analyzed below
@@ -386,8 +290,8 @@ public class ResourceSimplifier {
 					for (Code code : tf.getCodes()) {
 						if (code.hasReference()) {
 							// Resolve reference(s) with GSW, replace the original data
-							if (resolveCodeRefs)
-								code.setData(writer.expandCodeContent(code, trgLoc, 0));
+							//if (resolveCodeRefs)
+							code.setData(writer.expandCodeContent(code, trgLoc, EncoderContext.TEXT));
 						}
 					}
 				}
@@ -416,7 +320,7 @@ public class ResourceSimplifier {
 		for (GenericSkeletonPart part : parts) {
 			if (SkeletonUtil.isText(part)) {
 				//newSkel.add(part.toString());
-				newSkel.add(writer.getString(part, 1));
+				newSkel.add(writer.getString(part, EncoderContext.SKELETON));
 			}				
 			else if (SkeletonUtil.isReference(part)) {
 				flushSkeleton(resId, ++dpCounter, me);				
@@ -433,7 +337,7 @@ public class ResourceSimplifier {
 			}
 			else if (SkeletonUtil.isValuePlaceholder(part, resource)) {
 				// For both isMultilingual true/false
-				newSkel.add(writer.getString(part, 1));
+				newSkel.add(writer.getString(part, EncoderContext.SKELETON));
 			}
 			else if (SkeletonUtil.isExtSourcePlaceholder(part, resource)) {
 				checkExtParent(part.getParent(), resId);
@@ -446,7 +350,7 @@ public class ResourceSimplifier {
 			else if (SkeletonUtil.isExtValuePlaceholder(part, resource)) {
 				// For both isMultilingual true/false
 				checkExtParent(part.getParent(), resId);
-				newSkel.add(writer.getString(part, 1));
+				newSkel.add(writer.getString(part, EncoderContext.SKELETON));
 			}
 		}
 		flushSkeleton(resId, ++dpCounter, me); // Flush remaining skeleton tail
@@ -456,9 +360,9 @@ public class ResourceSimplifier {
 			MultiEvent me, String resId, int tuCounter, int dpCounter) {
 		if (isMultilingual) {
 			if (part.parent instanceof ITextUnit)
-				newSkel.add(writer.getContent((ITextUnit)part.parent, null, 0)); // Source goes to skeleton
+				newSkel.add(writer.getContent((ITextUnit)part.parent, null, EncoderContext.TEXT)); // Source goes to skeleton
 			else {
-				logger.warning("The self-reference must be a text-unit: " + resId);
+				logger.warn("The self-reference must be a text-unit: " + resId);
 				newSkel.add(part.parent.toString());
 			}
 		}
@@ -477,7 +381,7 @@ public class ResourceSimplifier {
 		}
 		else {
 			//newSkel.add(writer.getContent((TextUnit) resource, trgLoc, 1));
-			newSkel.add(writer.getContent((ITextUnit)resource, part.getLocale(), 1));			
+			newSkel.add(writer.getContent((ITextUnit)resource, part.getLocale(), EncoderContext.SKELETON));			
 		}
 	}
 	
@@ -485,22 +389,14 @@ public class ResourceSimplifier {
 		if (parent instanceof IReferenceable) {
 			IReferenceable r = (IReferenceable) parent;
 			if (!r.isReferent()) {
-				logger.warning("Referent flag is not set in parent: " + resId);
+				logger.warn("Referent flag is not set in parent: " + resId);
 				return false;
 			}
 			return true;
 		}
 		else {
-			logger.warning("Invalid parent type: " + resId);
+			logger.warn("Invalid parent type: " + resId);
 			return false;
 		}
-	}
-
-	public void setResolveCodeRefs(boolean resolve) {
-		this.resolveCodeRefs = resolve;
-	}
-
-	public boolean getResolveCodeRefs() {
-		return resolveCodeRefs;
 	}
 }

@@ -25,8 +25,6 @@ import java.io.FilenameFilter;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.logging.Level; // DWH 4-22-09
-import java.util.logging.Logger;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.Util;
@@ -47,7 +45,6 @@ import static org.junit.Assert.*;
 
 public class OpenXMLZipFullFileTest {
 
-	private static Logger LOGGER;
 	private OpenXMLFilter openXMLFilter;
 	private String[] testFileList;
 	private LocaleId locEN = LocaleId.fromString("en");
@@ -55,12 +52,7 @@ public class OpenXMLZipFullFileTest {
 
 	@Before
 	public void setUp() throws Exception {
-		LOGGER = Logger.getLogger(OpenXMLZipFullFileTest.class.getName());
-		openXMLFilter = new OpenXMLFilter();	
-		openXMLFilter.setLogger(LOGGER);
-		LOGGER.setLevel(Level.FINE);
-		if (LOGGER.getHandlers().length<1)
-			LOGGER.addHandler(new LogHandlerSystemOut());		
+		openXMLFilter = new OpenXMLFilter();
 		openXMLFilter.setOptions(locEN, "UTF-8", true);
 
 		// read all files in the test html directory
@@ -86,7 +78,7 @@ public class OpenXMLZipFullFileTest {
 			try {
 				URL url = OpenXMLZipFullFileTest.class.getResource("/"+f);
 				//URI uriFf = new URI(fff);
-				openXMLFilter.open(new RawDocument(url.toURI(), "UTF-8", locENUS),true,true,Level.FINEST); // DWH 4-22-09
+				openXMLFilter.open(new RawDocument(url.toURI(), "UTF-8", locENUS),true,true); // DWH 4-22-09
 				while (openXMLFilter.hasNext()) {
 					openXMLFilter.next();
 				}
@@ -104,7 +96,7 @@ public class OpenXMLZipFullFileTest {
 		try
 		{
 			URI uriFf = new URI(filename);
-			openXMLFilter.open(uriFf,true,Level.FINEST); // DWH 4-22-09
+			openXMLFilter.open(uriFf,true); // DWH 4-22-09
 			while (openXMLFilter.hasNext()) {
 				Event event = openXMLFilter.next();
 				assertNotNull(event);

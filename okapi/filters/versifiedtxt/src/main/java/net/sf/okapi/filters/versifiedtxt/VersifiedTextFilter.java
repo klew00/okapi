@@ -24,8 +24,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -74,7 +74,7 @@ public class VersifiedTextFilter extends AbstractFilter {
     	REPLACABLES.put("{ensp}", "\u2002");
     }
                
-	private static final Logger LOGGER = Logger.getLogger(VersifiedTextFilter.class.getName());
+	private final Logger LOGGER = LoggerFactory.getLogger(getClass());
 	private static final int BUFFER_SIZE = 2800;
 
 	private static final String VERSIFIED_ID = "^([0-9]+)$";
@@ -180,12 +180,12 @@ public class VersifiedTextFilter extends AbstractFilter {
 		// may need to override encoding based on what we detect
 		if (detector.isDefinitive()) {
 			detectedEncoding = detector.getEncoding();
-			LOGGER.log(Level.FINE, String.format(
+			LOGGER.debug(String.format(
 					"Overridding user set encoding (if any). Setting auto-detected encoding (%s).",
 					detectedEncoding));
 		} else if (!detector.isDefinitive() && getEncoding().equals(RawDocument.UNKOWN_ENCODING)) {
 			detectedEncoding = detector.getEncoding();
-			LOGGER.log(Level.FINE, String.format(
+			LOGGER.debug(String.format(
 							"Default encoding and detected encoding not found. Using best guess encoding (%s)",
 							detectedEncoding));
 		}
@@ -228,7 +228,7 @@ public class VersifiedTextFilter extends AbstractFilter {
 		if (eventBuilder == null) {
 			eventBuilder = new EventBuilder();
 		} else {
-			eventBuilder.reset(null, isSubFilter());
+			eventBuilder.reset(null, this);
 		}
 	}
 
@@ -242,7 +242,7 @@ public class VersifiedTextFilter extends AbstractFilter {
 			try {
 				versifiedFileReader.close();
 			} catch (IOException e) {
-				LOGGER.log(Level.WARNING, "Error closing the versified text buffered reader.", e);
+				LOGGER.warn("Error closing the versified text buffered reader.", e);
 
 			}
 		}
@@ -352,7 +352,7 @@ public class VersifiedTextFilter extends AbstractFilter {
 			
 			if (!foundBook) {
 				eventBuilder.addFilterEvent(createStartFilterEvent());
-				LOGGER.warning("Missing book marker at start of document: |b");
+				LOGGER.warn("Missing book marker at start of document: |b");
 			}
 			eventBuilder.addFilterEvent(createEndFilterEvent());
 			
@@ -562,7 +562,7 @@ public class VersifiedTextFilter extends AbstractFilter {
 			
 			// treat as monolingual paragraph and log a warning
 			buildTextUnitForNonTrados(text, true);
-			LOGGER.warning("In a Trados bilingual document but found no segment markers. " +
+			LOGGER.warn("In a Trados bilingual document but found no segment markers. " +
 					"Treating as monlingual text: " + text);
 		}
 		

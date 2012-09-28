@@ -27,7 +27,8 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import net.sf.okapi.applications.rainbow.Input;
 import net.sf.okapi.applications.rainbow.Project;
@@ -51,7 +52,7 @@ import net.sf.okapi.steps.leveraging.LeveragingStep;
 
 public class PipelineWrapper {
 	
-	private static final Logger LOGGER = Logger.getLogger(PipelineWrapper.class.getName());
+	private final Logger LOGGER = LoggerFactory.getLogger(getClass());
 
 	private Map<String, StepInfo> availableSteps;
 	private Map<String, ClassLoader> pluginConnectors;
@@ -122,7 +123,7 @@ public class PipelineWrapper {
 					availableSteps.put(stepInfo.stepClass, stepInfo);
 				}
 				catch ( Throwable e ) {
-					LOGGER.warning(String.format("Could not instantiate step '%s' because of error.\n"
+					LOGGER.warn(String.format("Could not instantiate step '%s' because of error.\n"
 						+e.getMessage(), item.getClassName()));
 				}
 			}
@@ -252,6 +253,12 @@ public class PipelineWrapper {
 				step.paramsData = params.toString();
 				peMapper.addDescriptionProvider("net.sf.okapi.steps.common.codesimplifier.Parameters", step.paramsClass);
 			}
+			availableSteps.put(step.stepClass, step);
+
+			ps = (IPipelineStep)Class.forName(
+				"net.sf.okapi.steps.common.ConvertSegmentsToTextUnitsStep").newInstance();
+			step = new StepInfo(ps.getName(), ps.getDescription(), ps.getClass().getName(), null, null);
+			// No parameters
 			availableSteps.put(step.stepClass, step);
 
 			ps = (IPipelineStep)Class.forName(
@@ -753,16 +760,16 @@ public class PipelineWrapper {
 
 		}
 		catch ( InstantiationException e ) {
-			LOGGER.warning("Could not instantiate a step.\n" + e.getMessage());
+			LOGGER.warn("Could not instantiate a step.\n" + e.getMessage());
 		}
 		catch ( IllegalAccessException e ) {
-			LOGGER.warning("Illegal access for a step.\n" + e.getMessage());
+			LOGGER.warn("Illegal access for a step.\n" + e.getMessage());
 		}
 		catch ( ClassNotFoundException e ) {
-			LOGGER.warning("Step class not found.\n" + e.getMessage());
+			LOGGER.warn("Step class not found.\n" + e.getMessage());
 		}
 		catch ( Throwable e ) {
-			LOGGER.warning("Error creating one of the step.\n" + e.getMessage());
+			LOGGER.warn("Error creating one of the step.\n" + e.getMessage());
 		}
 	}
 	

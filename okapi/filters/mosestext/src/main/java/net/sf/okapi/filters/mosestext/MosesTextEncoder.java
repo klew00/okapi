@@ -23,6 +23,7 @@ package net.sf.okapi.filters.mosestext;
 import java.nio.charset.CharsetEncoder;
 
 import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.encoder.EncoderContext;
 import net.sf.okapi.common.encoder.IEncoder;
 
 public class MosesTextEncoder implements IEncoder {
@@ -31,7 +32,7 @@ public class MosesTextEncoder implements IEncoder {
 	
 	@Override
 	public String encode (String text,
-		int context)
+			EncoderContext context)
 	{
 		if ( text == null ) return "";
 		StringBuffer sbTmp = new StringBuffer(text.length());
@@ -72,7 +73,7 @@ public class MosesTextEncoder implements IEncoder {
 
 	@Override
 	public String encode (int value,
-		int context)
+			EncoderContext context)
 	{
 		switch ( value ) {
 		case '<':
@@ -93,7 +94,7 @@ public class MosesTextEncoder implements IEncoder {
 
 	@Override
 	public String encode (char value,
-		int context)
+			EncoderContext context)
 	{
 		switch ( value ) {
 		case '<':

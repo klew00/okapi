@@ -22,7 +22,8 @@ package net.sf.okapi.steps.idaligner;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
@@ -60,7 +61,7 @@ import net.sf.okapi.common.resource.TextUnitUtil;
 @UsingParameters(Parameters.class)
 public class IdBasedAlignerStep extends BasePipelineStep {
 
-	private static final Logger LOGGER = Logger.getLogger(IdBasedAlignerStep.class.getName());
+	private final Logger LOGGER = LoggerFactory.getLogger(getClass());
 	private Parameters params;
 	private IFilter filter = null;
 	private IFilterConfigurationMapper fcMapper;
@@ -152,7 +153,7 @@ public class IdBasedAlignerStep extends BasePipelineStep {
 	@Override
 	protected Event handleEndDocument(Event event) {
 		if ( hasNoMatch ) {
-			LOGGER.warning("One or more entries has no match.");
+			LOGGER.warn("One or more entries has no match.");
 		}
 		if (filter != null) {
 			filter.close();
@@ -243,6 +244,7 @@ public class IdBasedAlignerStep extends BasePipelineStep {
 					LOGGER.info("No match found for " + sourceTu.getName());
 					hasNoMatch = true;
 				}
+
 			}
 			else {
 				LOGGER.info("Source texts differ for " + sourceTu.getName());

@@ -23,7 +23,8 @@ package net.sf.okapi.steps.segmentation;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
@@ -46,7 +47,7 @@ import net.sf.okapi.steps.segmentation.Parameters.SegmStrategy;
 @UsingParameters(Parameters.class)
 public class SegmentationStep extends BasePipelineStep {
 
-	private final Logger logger = Logger.getLogger(getClass().getName());
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 
 	private Parameters params;
 	private ISegmenter srcSeg;
@@ -118,7 +119,7 @@ public class SegmentationStep extends BasePipelineStep {
 			src = Util.fillInputRootDirectoryVariable(src, inputRootDir);			
 			srxDoc.loadRules(src);
 			if ( srxDoc.hasWarning() ) {
-				logger.warning(srxDoc.getWarning());
+				logger.warn(srxDoc.getWarning());
 			}
 			// Change trimming options if requested
 			if ( params.trimSrcLeadingWS != Parameters.TRIM_DEFAULT ) {
@@ -137,9 +138,9 @@ public class SegmentationStep extends BasePipelineStep {
 			if ( Util.isEmpty(src) || !src.equals(trg) ) {
 				srxDoc.loadRules(trg);
 				if ( srxDoc.hasWarning() ) {
-					logger.warning(srxDoc.getWarning());
+					logger.warn(srxDoc.getWarning());
 				}
-				if ( srxDoc.hasWarning() ) logger.warning(srxDoc.getWarning());
+				if ( srxDoc.hasWarning() ) logger.warn(srxDoc.getWarning());
 			}
 			// Change trimming options if requested
 			if ( params.trimTrgLeadingWS != Parameters.TRIM_DEFAULT ) {
@@ -221,7 +222,7 @@ public class SegmentationStep extends BasePipelineStep {
 				if ( params.checkSegments && ( trgCont != null)) {
 					if ( trgCont.getSegments().count() != tu.getSource().getSegments().count() ) {
 						// Not the same number of segments
-						logger.warning(String.format("Text unit id='%s': Source (%s) and target (%s) do not have the same number of segments.",
+						logger.warn(String.format("Text unit id='%s': Source (%s) and target (%s) do not have the same number of segments.",
 							tu.getId(), sourceLocale, targetLocale));
 					}
 					// Otherwise make sure we have matches
@@ -230,7 +231,7 @@ public class SegmentationStep extends BasePipelineStep {
 						for ( Segment seg : tu.getSource().getSegments() ) {
 							if ( trgSegs.get(seg.id) == null ) {
 								// No target segment matching source segment seg.id
-								logger.warning(String.format("Text unit id='%s': No match found for source segment id='%s' in target language '%s'",
+								logger.warn(String.format("Text unit id='%s': No match found for source segment id='%s' in target language '%s'",
 									tu.getId(), seg.id, targetLocale));
 							}
 						}
@@ -249,7 +250,7 @@ public class SegmentationStep extends BasePipelineStep {
 	 */
 	private void deepenSegmentation(TextContainer tc, ISegmenter segmenter) {
 		if (tc == null || segmenter == null) {
-			logger.severe("Parameter cannot be null");
+			logger.error("Parameter cannot be null");
 			return;
 		}
 		

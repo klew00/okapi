@@ -31,7 +31,8 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -85,7 +86,7 @@ public class IDMLFilter implements IFilter {
 	private final static CodeSimplifier SIMPLIFIER = new CodeSimplifier();
 	private final DocumentBuilder docBuilder;
 
-	private final Logger logger = Logger.getLogger(getClass().getName());
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 	
 	private URI docURI;
 	private LinkedList<Event> queue;
@@ -382,7 +383,7 @@ public class IDMLFilter implements IFilter {
 	{
 		// Skip large spreads if needed
 		if ( entry.getSize() > params.getSkipThreshold()*1024 ) {
-			logger.warning(String.format("The spread '%s' is larger than the defined threshold (%d Kb). It will be skipped.",
+			logger.warn(String.format("The spread '%s' is larger than the defined threshold (%d Kb). It will be skipped.",
 				entry.getName(), params.getSkipThreshold()));
 			return 0;
 		}

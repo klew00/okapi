@@ -21,7 +21,8 @@ package net.sf.okapi.steps.paraaligner;
 
 import java.util.Iterator;
 import java.util.List;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.ITextUnit;
@@ -38,7 +39,7 @@ import net.sf.okapi.steps.gcaligner.Penalties;
  */
 
 public class ParagraphAligner {
-	private static final Logger LOGGER = Logger.getLogger(ParagraphAligner.class.getName());
+	private final Logger LOGGER = LoggerFactory.getLogger(getClass());
 	
 	private static final long MAX_CELL_SIZE = 80000L;
 	private List<AlignmentScorer<ITextUnit>> scorerList;
@@ -84,17 +85,17 @@ public class ParagraphAligner {
 				if (cell.getState() == DpMatrixCell.MATCH) {
 					ITextUnit sourceSegment = matrix.getAlignmentElementX(cell.getXindex());
 					ITextUnit targetSegment = matrix.getAlignmentElementY(cell.getYindex());
-				} 				
+				}
 				continue;
 			}			
 			
 			if (cell.getState() == DpMatrixCell.DELETED) {
 				ITextUnit sourceSegment = matrix.getAlignmentElementX(cell.getXindex());				
-				LOGGER.warning(sourceSegment.toString() + 
+				LOGGER.warn(sourceSegment.toString() +
 						"\nTarget segment deleted (TU ID: " + sourceSegment.getName() + "): Non 1-1 match. Please confirm alignment.");
 			} else if (cell.getState() == DpMatrixCell.INSERTED) {
 				ITextUnit targetSegment = matrix.getAlignmentElementY(cell.getYindex());
-				LOGGER.warning(targetSegment.toString() + 
+				LOGGER.warn(targetSegment.toString() +
 						"\nSource segment deleted (TU ID: " + targetSegment.getName() + "): Non 1-1 match. Please confirm alignment.");
 			} else if (cell.getState() == DpMatrixCell.MATCH) {
 				ITextUnit sourceSegment = matrix.getAlignmentElementX(cell.getXindex());
@@ -104,7 +105,7 @@ public class ParagraphAligner {
 						cell.getMultiMatchXIndexBegin(), cell.getMultiMatchXIndexEnd());
 				List<ITextUnit> targetSegments = matrix.getAlignmentElementsY(
 						cell.getMultiMatchYIndexBegin(), cell.getMultiMatchYIndexEnd());
-				LOGGER.warning(sourceSegments.get(0).getSource().toString() 
+				LOGGER.warn(sourceSegments.get(0).getSource().toString()
 						+ "\nMulti-ITextUnit Match (TU ID: " + sourceSegments.get(0).getName() + "): Non 1-1 match. Please confirm alignment.");
 			}
 		}

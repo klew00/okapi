@@ -19,7 +19,7 @@
 ===========================================================================*/
 package net.sf.okapi.filters.openxml;
 
-import java.util.logging.Logger;
+import org.slf4j.Logger;
 
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.filters.openxml.AbstractTranslator;

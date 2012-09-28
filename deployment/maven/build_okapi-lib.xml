@@ -47,6 +47,8 @@
 	<property name="done" value="done"/>
 	<property name="distLib" value="${dist}/lib"/>
 	<property name="distLicenses" value="${distLib}/licenses"/>
+	<property name="distLogger" value="${distLib}/logger"/>
+	<property name="logBindJar" value="logbind.jar"/>
 	<property name="distName" value="${okapilibName}_all-platforms_${okapilibStamp}" />
 	<property name="mavenStore" value="${user.home}/.m2/repository"/>
 
@@ -60,6 +62,7 @@
 		</delete>
 		<mkdir dir="${distLib}"/>
 		<mkdir dir="${distLicenses}"/>
+		<mkdir dir="${distLogger}"/>
 		<mkdir dir="${done}"/>
  	</target>
 
@@ -459,15 +462,22 @@
 		<echo file="tmpJars" append="yes"> ${jar029}</echo>
 		<copy todir="${distLib}" file="${dep029}/${jar029}"/>
 
-		<!-- Create the manifest file -->
-		<property file="tmpJars"/>
+		<!-- This is the logging part -->
+		<property name="depSlf4jApi" value="${mavenStore}/org/slf4j/slf4j-api/1.7.1"/>
+		<fileset id="list.contents" dir="${depSlf4jApi}" includes="**/slf4j-api-1.7.1.jar"/>
+		<property name="jarSlf4jApi" refid="list.contents"/>
+		<echo file="tmpJars" append="yes"> ${jarSlf4jApi}</echo>
+		<copy todir="${distLib}" file="${depSlf4jApi}/${jarSlf4jApi}"/>
+		<echo file="tmpJars" append="yes"> logger/${logBindJar}</echo>
+
+		<!-- Create the manifest file -->		<property file="tmpJars"/>
 		<copy todir="${tmp}/META-INF">
 			<fileset dir="data/okapi-lib" includes="**/*.txt"/>
 		</copy>
 		<manifest file="${tmp}/MANIFEST.MF">
 			<attribute name="Implementation-Title" value="${okapilibName}"/>
 			<attribute name="Implementation-Version" value="${okapilibStamp}"/>
-			<attribute name="Class-Path" value="${okapilibCP}"/>
+			<attribute name="Class-Path" value=". ${okapilibCP}"/>
   		</manifest>
 		
 		<!-- Create the jar file -->
@@ -525,10 +535,14 @@
 		</copy>
 		<copy todir="${dist}/localweb" file="../../website/okapi.css"/>
 		<!-- javadoc files -->
-		<javadoc destdir="${dist}/localweb/javadoc" Encoding="UTF-8">
+		<javadoc destdir="${dist}/localweb/javadoc" Encoding="UTF-8" packagenames="net.sf.okapi.*">
+			<classpath>
+				<pathelement path="${depSlf4jApi}/${jarSlf4jApi}"/>
+				<pathelement path="${dep020}/${jar020}"/>
+			</classpath>
 			<packageset dir="../../okapi/core/src/main/java" defaultexcludes="yes"/>
-			<packageset dir="../../okapi/libraries/lib-segmentation/src/main/java" defaultexcludes="yes"/>			
-			<packageset dir="../../okapi/libraries/lib-translation/src/main/java" defaultexcludes="yes"/>			
+			<packageset dir="../../okapi/libraries/lib-segmentation/src/main/java" defaultexcludes="yes"/>
+			<packageset dir="../../okapi/libraries/lib-translation/src/main/java" defaultexcludes="yes"/>
 		</javadoc>
 
 	</target>
@@ -581,6 +595,48 @@
 		<delete file="tmpJars" quiet="true"/>
 
 	</target>
+
+	<target name="logbind-jdk">
+		<!-- Copies the logger files needed to bind slf4j with jdk -->
+		<!-- None of these jars should be in tmpJars (to go in classpath) -->
+
+		<!-- our binder (log4j-<okapi_ver>.jar) as ${logBindJar} -->
+		<copy file="${mavenStore}/net/sf/okapi/logbind/build-jdk14/${okapilibStamp}/build-jdk14-${okapilibStamp}.jar"
+		      tofile="${distLogger}/${logBindJar}" />
+
+		<!-- slf4j-jdk14-<ver>.jar -->
+		<property name="depSlf4jBind" value="${mavenStore}/org/slf4j/slf4j-jdk14/1.7.1"/>
+		<fileset id="list.contents" dir="${depSlf4jBind}" includes="**/*.jar"/>
+		<property name="jarSlf4jBind" refid="list.contents"/>
+		<copy todir="${distLogger}" file="${depSlf4jBind}/${jarSlf4jBind}"/>
+	</target>
+
+	<target name="logbind-log4j">
+		<!-- Copies the logger files to bind with log4j -->
+		<!-- None of these jars should be in tmpJars (to go in classpath) -->
+
+		<!-- slf4j-log4j12-<ver>.jar -->
+		<property name="depSlf4jBind" value="${mavenStore}/org/slf4j/slf4j-log4j12/1.7.1"/>
+		<fileset id="list.contents" dir="${depSlf4jBind}" includes="**/*.jar"/>
+		<property name="jarSlf4jBind" refid="list.contents"/>
+		<copy todir="${distLogger}" file="${depSlf4jBind}/${jarSlf4jBind}"/>
+
+		<!-- log4j-<ver>.jar -->
+		<property name="depLog4J" value="${mavenStore}/log4j/log4j/1.2.17"/>
+		<fileset id="list.contents" dir="${depLog4J}" includes="**/log4j-1.2.17.jar"/>
+		<property name="jarLog4J" refid="list.contents"/>
+		<copy todir="${distLogger}" file="${depLog4J}/${jarLog4J}"/>
+
+		<!-- our binder (log4j-<okapi_ver>.jar) as ${logBindJar}, with log4j.properties removed from inside -->
+		<zip destfile="${distLogger}/${logBindJar}">
+			<zipfileset src="${mavenStore}/net/sf/okapi/logbind/build-log4j/${okapilibStamp}/build-log4j-${okapilibStamp}.jar">
+				<exclude name="log4j.properties"/>
+			</zipfileset>
+		</zip>
+		<!-- Our "deployment" log4j.properties (could unzip from ${logBindJar}, but we want it to be different that the build one) -->
+		<copy todir="${distLogger}" file="../shared/logger/log4j.properties"/>
+
+	</target>
 		
 	<target name="zip">
 		<zip destfile="${done}/${distName}.zip">
@@ -593,6 +649,6 @@
 		</zip>
 	</target>
 
-	<target name="all" depends="init, okapiLib, tikal, zip"/>
+	<target name="all" depends="init, okapiLib, logbind-jdk, tikal, zip"/>
 
 </project>

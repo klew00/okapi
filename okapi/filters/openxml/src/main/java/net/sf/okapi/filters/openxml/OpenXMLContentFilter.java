@@ -29,8 +29,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import net.htmlparser.jericho.EndTag;
 import net.htmlparser.jericho.Segment;
@@ -39,6 +39,7 @@ import net.htmlparser.jericho.CharacterReference;
 import net.htmlparser.jericho.StartTag;
 import net.htmlparser.jericho.Tag;
 
+import net.sf.okapi.common.encoder.EncoderContext;
 import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.Event;
@@ -52,9 +53,11 @@ import net.sf.okapi.filters.yaml.TaggedFilterConfiguration;
 import net.sf.okapi.filters.yaml.TaggedFilterConfiguration.RULE_TYPE;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.DocumentPart;
+import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.RawDocument;
+import net.sf.okapi.common.resource.StartSubfilter;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
@@ -103,8 +106,8 @@ import net.sf.okapi.common.skeleton.GenericSkeleton;
  * work like TEXT_UNIT, TEXT_RUN, and TEXT_MARKER elements combined.
  */
 public class OpenXMLContentFilter extends AbstractMarkupFilter {
-	
-	private Logger LOGGER=null;
+
+	private final Logger LOGGER = LoggerFactory.getLogger(getClass());
 	
 	public final static int MSWORD=1;
 	public final static int MSEXCEL=2;
@@ -191,7 +194,7 @@ public class OpenXMLContentFilter extends AbstractMarkupFilter {
 	public void displayOneEvent(Event event) // DWH 4-22-09 LOGGER
 	{
 		Set<String> setter;
-		if (LOGGER.isLoggable(Level.FINEST))
+		if (LOGGER.isTraceEnabled())
 		{
 			String etyp=event.getEventType().toString();
 			if (event.getEventType() == EventType.TEXT_UNIT) {
@@ -201,21 +204,24 @@ public class OpenXMLContentFilter extends AbstractMarkupFilter {
 			} else if (event.getEventType() == EventType.START_GROUP
 					|| event.getEventType() == EventType.END_GROUP) {
 	//			assertTrue(event.getResource() instanceof StartGroup || event.getResource() instanceof Ending);
+			} else if (event.getEventType() == EventType.START_SUBFILTER
+					|| event.getEventType() == EventType.END_SUBFILTER) {
+	//				assertTrue(event.getResource() instanceof StartSubfilter || event.getResource() instanceof Ending);
 			}
 			if (etyp.equals("START"))
-				LOGGER.log(Level.FINEST,"\n");
-			LOGGER.log(Level.FINEST,etyp + ": ");
+				LOGGER.trace("\n");
+			LOGGER.trace(etyp + ": ");
 			if (event.getResource() != null) {
-				LOGGER.log(Level.FINEST,"(" + event.getResource().getId()+")");
+				LOGGER.trace("(" + event.getResource().getId()+")");
 				if (event.getResource() instanceof DocumentPart) {
 					setter = ((DocumentPart) event.getResource()).getSourcePropertyNames();
 					for(String seti : setter)
-						LOGGER.log(Level.FINEST,seti);
+						LOGGER.trace(seti);
 				} else {
-					LOGGER.log(Level.FINEST,event.getResource().toString());
+					LOGGER.trace(event.getResource().toString());
 				}
 				if (event.getResource().getSkeleton() != null) {
-					LOGGER.log(Level.FINEST,"*Skeleton: \n" + event.getResource().getSkeleton().toString());
+					LOGGER.trace("*Skeleton: \n" + event.getResource().getSkeleton().toString());
 				}
 			}
 		}		
@@ -699,9 +705,9 @@ public class OpenXMLContentFilter extends AbstractMarkupFilter {
 		    	try
 		    	{
 					  bw.write(s);
-					  LOGGER.log(Level.FINEST,s); //
+					  LOGGER.trace(s); //
 				  } catch (IOException e) {
-					  LOGGER.log(Level.WARNING,"Problem writing piped stream.");
+					  LOGGER.warn("Problem writing piped stream.");
 	//				throw new OkapiIOException("Can't read piped input.");
 					  s = s + " ";
 				  }
@@ -830,7 +836,7 @@ public class OpenXMLContentFilter extends AbstractMarkupFilter {
 					if (filetype==MSEXCEL && txt!=null && txt.length()>0 && txt.charAt(0)=='=')
 						addToTextRun(txt); // DWH 5-13-09 don't treat Excel formula as text to be translated
 					else if (bExcludeTextInRun || bExcludeTextInUnit) // DWH 5-29-09 don't treat as text if excluding text
-						addToTextRun(internalEncManager.encode(txt,0)); // DWH 8-7-09 still have to encode text if not in text unit
+						addToTextRun(internalEncManager.encode(txt, EncoderContext.TEXT)); // DWH 8-7-09 still have to encode text if not in text unit
 					else if (nCurrentSharedString>0 && nCurrentSharedString<nNextSharedStringCount)
 						// DWH 6-13-09 in Excel Shared Strings File, only if some shared strings excluded from translation
 					{
@@ -851,7 +857,7 @@ public class OpenXMLContentFilter extends AbstractMarkupFilter {
 							bInTextRun = true;							
 						}
 						else
-							addToTextRun(internalEncManager.encode(txt,0)); // if not translatable, add as part of code						
+							addToTextRun(internalEncManager.encode(txt, EncoderContext.TEXT)); // if not translatable, add as part of code						
 					}
 					else
 					{
@@ -863,7 +869,7 @@ public class OpenXMLContentFilter extends AbstractMarkupFilter {
 					}
 				}
 				else
-					addToTextRun(internalEncManager.encode(txt,0)); // for <w:delText>text</w:delText> don't translate deleted text (will be inside code)
+					addToTextRun(internalEncManager.encode(txt, EncoderContext.TEXT)); // for <w:delText>text</w:delText> don't translate deleted text (will be inside code)
 			}
 			else
 			{
@@ -876,7 +882,7 @@ public class OpenXMLContentFilter extends AbstractMarkupFilter {
 				{
 					trTextRun = new TextRun();
 					bInTextRun = true;
-					addToTextRun(internalEncManager.encode(txt,0)); // not inside text markers, so this text will become part of a code
+					addToTextRun(internalEncManager.encode(txt, EncoderContext.TEXT)); // not inside text markers, so this text will become part of a code
 				}
 			}
 		}
@@ -1820,10 +1826,6 @@ public class OpenXMLContentFilter extends AbstractMarkupFilter {
 	protected boolean getBInSettingsFile() // DWH 4-12-10 for <v:textbox
 	{
 		return bInSettingsFile;
-	}
-	public void setLogger(Logger lgr)
-	{
-		LOGGER = lgr;
 	}
 	public void setTsExcludeWordStyles(TreeSet tsExcludeWordStyles)
 	{

@@ -23,8 +23,8 @@ package net.sf.okapi.filters.openxml;
 import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.LocaleId;
@@ -49,7 +49,7 @@ import org.junit.Test;
 
 public class OpenXMLSnippetsTest {
 
-	private static Logger LOGGER;
+	private final Logger LOGGER = LoggerFactory.getLogger(getClass());
 	private OpenXMLContentFilter openXMLContentFilter;
 	public final static int MSWORD=1;
 	public final static int MSEXCEL=2;
@@ -62,12 +62,7 @@ public class OpenXMLSnippetsTest {
 	
 	@Before
 	public void setUp()  {
-		LOGGER = Logger.getLogger(OpenXMLSnippetsTest.class.getName());
 		openXMLContentFilter = new OpenXMLContentFilter();	
-		openXMLContentFilter.setLogger(LOGGER);
-		LOGGER.setLevel(Level.FINER);
-		if (LOGGER.getHandlers().length<1)
-			LOGGER.addHandler(new LogHandlerSystemOut());		
 	}
 
 	@After
@@ -188,7 +183,6 @@ public class OpenXMLSnippetsTest {
 */	
 	private ArrayList<Event> getEvents(String snippet, int filetype) {
 		ArrayList<Event> list = new ArrayList<Event>();
-		openXMLContentFilter.setLogger(LOGGER);
 		openXMLContentFilter.setUpConfig(filetype);
 		openXMLContentFilter.open(new RawDocument(snippet, locENUS));
 		while (openXMLContentFilter.hasNext()) {
@@ -220,19 +214,20 @@ public class OpenXMLSnippetsTest {
 				tmp.append(writer.processDocumentPart(dp));
 				break;
 			case START_GROUP:
+			case START_SUBFILTER:
 				StartGroup startGroup = (StartGroup) event.getResource();
 				tmp.append(writer.processStartGroup(startGroup));
 				break;
 			case END_GROUP:
+			case END_SUBFILTER:
 				Ending ending = (Ending) event.getResource();
 				tmp.append(writer.processEndGroup(ending));
 				break;
 			}
 		}		
 
-		LOGGER.setUseParentHandlers(false);
-		LOGGER.log(Level.FINER,"nOriginal: "+original);
-		LOGGER.log(Level.FINER,"Output:    "+tmp.toString());
+		LOGGER.debug("nOriginal: "+original);
+		LOGGER.debug("Output:    "+tmp.toString());
 		writer.close();
 		return tmp.toString();
 	}

@@ -73,9 +73,11 @@ public class RTFLayerWriter {
 			writer.write(skelWriter.processEndSubDocument(event.getEnding()));
 			break;
 		case START_GROUP:
+		case START_SUBFILTER:
 			writer.write(skelWriter.processStartGroup(event.getStartGroup()));
 			break;
 		case END_GROUP:
+		case END_SUBFILTER:
 			writer.write(skelWriter.processEndGroup(event.getEnding()));
 			break;
 		case DOCUMENT_PART:

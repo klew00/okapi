@@ -58,7 +58,7 @@ public class PCdataSubfilterTest {
 		assertTrue(rtc.executeCompare(xmlStreamFilter, list, "UTF-8", locEN, locEN));
 	}
 	
-	//@Test
+	@Test
 	public void testPcdataHrefReference() throws URISyntaxException, MalformedURLException {
 		xmlStreamFilter.setParametersFromURL(XmlStreamFilter.class.getResource("/okf_xmlstream@pcdata_subfilter.fprm"));
 		RoundTripComparison rtc = new RoundTripComparison();

@@ -25,7 +25,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
@@ -40,6 +41,7 @@ import net.sf.okapi.common.ListUtil;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.annotation.TermsAnnotation;
+import net.sf.okapi.common.encoder.EncoderContext;
 import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.encoder.IEncoder;
 import net.sf.okapi.common.exceptions.OkapiIOException;
@@ -74,7 +76,7 @@ public abstract class ITSFilter implements IFilter {
 	private static final String SRC_TRGPTRFLAGNAME = "\u10ff"; // Name of the user-data property that holds the target pointer flag in the source
 	private static final String TRG_TRGPTRFLAGNAME = "\u20ff"; // Name of the user-data property that holds the target pointer flag in the target
 
-	private final Logger logger = Logger.getLogger(getClass().getName());
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 
 	protected Parameters params;
 	protected EncoderManager encoderManager;
@@ -613,19 +615,19 @@ public abstract class ITSFilter implements IFilter {
 		if ( params.useCodeFinder ) {
 			TextFragment tf = tu.getSource().getFirstContent();
 			params.codeFinder.process(tf);
-			// Escape inline code content
-			List<Code> codes = tf.getCodes();
-			for ( Code code : codes ) {
-				// Escape the data of the new inline code (and only them)
-				if ( code.getType().equals(InlineCodeFinder.TAGTYPE) ) {
-					if ( cfEncoder == null ) {
-						cfEncoder = getEncoderManager().getEncoder();
-						//TODO: We should use the proper output encoding here, not force UTF-8, but we do not know it
-						cfEncoder.setOptions(params, "utf-8", lineBreak);
-					}
-					code.setData(cfEncoder.encode(code.getData(), 0));
-				}
-			}
+//			// Escape inline code content
+//			List<Code> codes = tf.getCodes();
+//			for ( Code code : codes ) {
+//				// Escape the data of the new inline code (and only them)
+//				if ( code.getType().equals(InlineCodeFinder.TAGTYPE) ) {
+//					if ( cfEncoder == null ) {
+//						cfEncoder = getEncoderManager().getEncoder();
+//						//TODO: We should use the proper output encoding here, not force UTF-8, but we do not know it
+//						cfEncoder.setOptions(params, "utf-8", lineBreak);
+//					}
+//					code.setData(cfEncoder.encode(code.getData(), EncoderContext.TEXT));
+//				}
+//			}
 		}
 
 		// Set the ITS context for this attribute and set the relevant properties
@@ -788,7 +790,7 @@ public abstract class ITSFilter implements IFilter {
 		// http://www.rfc-editor.org/rfc/bcp/bcp47.txt
 		if ( trgLangCode == null ) {
 			// Log a warning that the data category cannot be used
-			logger.warning("No target locale specified: Cannot use the provided ITS Locale Filter data category.");
+			logger.warn("No target locale specified: Cannot use the provided ITS Locale Filter data category.");
 			return true;
 		}
 		// Now check with one or more codes
@@ -878,18 +880,18 @@ public abstract class ITSFilter implements IFilter {
 			if ( params.useCodeFinder ) {
 				params.codeFinder.process(frag);
 				// Escape inline code content
-				List<Code> codes = frag.getCodes();
-				for ( Code code : codes ) {
-					// Escape the data of the new inline code (and only them)
-					if ( code.getType().equals(InlineCodeFinder.TAGTYPE) ) {
-						if ( cfEncoder == null ) {
-							cfEncoder = getEncoderManager().getEncoder();
-							//TODO: We should use the proper output encoding here, not force UTF-8, but we do not know it
-							cfEncoder.setOptions(params, "utf-8", lineBreak);
-						}
-						code.setData(cfEncoder.encode(code.getData(), 0));
-					}
-				}
+//				List<Code> codes = frag.getCodes();
+//				for ( Code code : codes ) {
+//					// Escape the data of the new inline code (and only them)
+//					if ( code.getType().equals(InlineCodeFinder.TAGTYPE) ) {
+//						if ( cfEncoder == null ) {
+//							cfEncoder = getEncoderManager().getEncoder();
+//							//TODO: We should use the proper output encoding here, not force UTF-8, but we do not know it
+//							cfEncoder.setOptions(params, "utf-8", lineBreak);
+//						}
+//						code.setData(cfEncoder.encode(code.getData(), EncoderContext.TEXT));
+//					}
+//				}
 			}
 		
 			// Update the flag after the new codes

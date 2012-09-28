@@ -22,8 +22,8 @@ package net.sf.okapi.common.filters;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
@@ -44,7 +44,7 @@ import net.sf.okapi.common.skeleton.ISkeletonWriter;
  * Basic abstract implementation of {@link IFilter}.
  */
 public abstract class AbstractFilter implements IFilter {
-	private static final Logger LOGGER = Logger.getLogger(AbstractFilter.class.getName());
+	private final Logger LOGGER = LoggerFactory.getLogger(getClass());
 
 	List<FilterConfiguration> configList = new ArrayList<FilterConfiguration>();
 	private IdGenerator documentId;
@@ -112,7 +112,7 @@ public abstract class AbstractFilter implements IFilter {
 		startDocument.setFilterWriter(getFilterWriter());
 		startDocument.setName(getDocumentName());
 		startDocument.setMultilingual(isMultilingual());
-		LOGGER.log(Level.FINE, "Start Document for " + startDocument.getId()); //$NON-NLS-1$
+		LOGGER.debug("Start Document for " + startDocument.getId()); //$NON-NLS-1$
 		return new Event(EventType.START_DOCUMENT, startDocument);
 	}
 
@@ -121,7 +121,7 @@ public abstract class AbstractFilter implements IFilter {
 	 */
 	protected Event createEndFilterEvent() {
 		Ending endDocument = new Ending(documentId.getLastId());
-		LOGGER.log(Level.FINE, "End Document for " + endDocument.getId()); //$NON-NLS-1$
+		LOGGER.debug("End Document for " + endDocument.getId()); //$NON-NLS-1$
 		return new Event(EventType.END_DOCUMENT, endDocument);
 	}
 
@@ -151,6 +151,7 @@ public abstract class AbstractFilter implements IFilter {
 		return configList.remove(getConfiguration(configId));
 	}
 
+	@Override
 	public List<FilterConfiguration> getConfigurations() {
 		List<FilterConfiguration> configs = new ArrayList<FilterConfiguration>();
 
@@ -161,10 +162,12 @@ public abstract class AbstractFilter implements IFilter {
 		return configs;
 	}
 
+	@Override
 	public void setFilterConfigurationMapper(IFilterConfigurationMapper fcMapper) {
 		this.fcMapper = fcMapper;
 	}
 
+	@Override
 	public EncoderManager getEncoderManager() {
 		if (encoderManager == null) {
 			encoderManager = new EncoderManager();
@@ -306,6 +309,7 @@ public abstract class AbstractFilter implements IFilter {
 	 * 
 	 * @return the mime type
 	 */
+	@Override
 	public String getMimeType() {
 		return mimeType;
 	}
@@ -348,10 +352,12 @@ public abstract class AbstractFilter implements IFilter {
 		this.filterWriter = filterWriter;
 	}
 
+	@Override
 	public ISkeletonWriter createSkeletonWriter() {
 		return new GenericSkeletonWriter();
 	}
 
+	@Override
 	public IFilterWriter createFilterWriter() {
 		if (filterWriter != null) {
 			return filterWriter;
@@ -407,10 +413,12 @@ public abstract class AbstractFilter implements IFilter {
 		this.name = name;
 	}
 
+	@Override
 	public String getName() {
 		return name;
 	}
 
+	@Override
 	public String getDisplayName() {
 		return displayName;
 	}
@@ -423,10 +431,6 @@ public abstract class AbstractFilter implements IFilter {
 		return documentId;
 	}
 
-	public boolean isSubFilter() {
-		return this.getClass().isAnnotationPresent(SubFilter.class);
-	}
-
 	public String getParentId() {
 		return parentId;
 	}
@@ -434,4 +438,5 @@ public abstract class AbstractFilter implements IFilter {
 	public void setParentId(String parentId) {
 		this.parentId = parentId;
 	}
+	
 }

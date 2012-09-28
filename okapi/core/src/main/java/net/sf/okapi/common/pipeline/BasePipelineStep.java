@@ -110,8 +110,14 @@ public abstract class BasePipelineStep implements IPipelineStep {
 		case PIPELINE_PARAMETERS:
 			event = handlePipelineParameters(event);
 			break;
-		// default:
-		// Just pass it through
+		case START_SUBFILTER:
+			event = handleStartSubfilter(event);
+			break;
+		case END_SUBFILTER:
+			event = handleEndSubfilter(event);
+			break;
+		default:
+			break;
 		}
 		return event;
 	}
@@ -269,6 +275,15 @@ public abstract class BasePipelineStep implements IPipelineStep {
 	 */
 	protected Event handleMultiEvent(Event event) {
 		return event;
+	}
+	
+
+	protected Event handleEndSubfilter(Event event) {
+		return event;		
+	}
+
+	protected Event handleStartSubfilter(Event event) {
+		return event;		
 	}
 	
 	/**

@@ -26,8 +26,8 @@ import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.jacob.activeX.ActiveXComponent;
 import com.jacob.com.Variant;
@@ -154,13 +154,13 @@ class TradosUtils {
 
     	//--default src to English if not found--
     	if ( srcLcid.equals("0") ) {
-    		logger.log(Level.WARNING, "Could not map Okapi source locale to Trados locale. Using default EN-US.");
+    		logger.warn("Could not map Okapi source locale to Trados locale. Using default EN-US.");
     		srcLcid = "1033";
     	}
 
     	//--default trg to German if not found--
     	if ( trgLcid.equals("0") ) {
-    		logger.log(Level.WARNING, "Could not map Okapi target locale to Trados locale. Using default DE-DE.");
+    		logger.warn("Could not map Okapi target locale to Trados locale. Using default DE-DE.");
     		trgLcid = "1031";
     	}
     	Variant[] variants = new Variant[5];

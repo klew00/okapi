@@ -30,8 +30,8 @@ import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import net.sf.okapi.common.Event;
@@ -86,9 +86,8 @@ public class TestJackson {
 	}
 	
 	private void log(String str) {
-		Logger logger = Logger.getLogger(getClass().getName()); // loggers are cached
-		logger.setLevel(Level.FINE);
-		logger.fine(str);
+		Logger localLogger = LoggerFactory.getLogger(getClass()); // loggers are cached
+		localLogger.debug(str);
 	}
 	
 	// DEBUG @Test

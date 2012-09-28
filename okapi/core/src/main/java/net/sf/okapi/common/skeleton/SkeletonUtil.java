@@ -104,6 +104,30 @@ public class SkeletonUtil {
 	}
 
 	/**
+	 * Splits a given {@link GenericSkeleton} into 2 parts: before and after the
+	 * content placeholder (self-marker).
+	 * @param skel the given {@link GenericSkeleton}.
+	 * @return array of 2 {@link GenericSkeleton}s before and after self-marker. 
+	 */
+	public static GenericSkeleton[] splitSkeleton(GenericSkeleton skel) {
+		GenericSkeleton[] res = new GenericSkeleton[2];
+		int index = findTuRefInSkeleton(skel);
+		if (index == -1) {
+			res[0] = skel;
+			res[1] = new GenericSkeleton(); // Empty skeleton, not null
+		}
+		else {
+			List<GenericSkeletonPart> parts = skel.getParts();
+			res[0] = new GenericSkeleton();
+			res[0].getParts().addAll(parts.subList(0, index));
+			
+			res[1] = new GenericSkeleton();
+			res[1].getParts().addAll(parts.subList(index + 1, parts.size()));
+		}
+		return res;
+	}
+			
+	/**
 	 * Replaces a part of a given skeleton with another given skeleton part.
 	 * @param skel the skeleton which part is being replaced.
 	 * @param index the index of the skeleton part to be replaced.

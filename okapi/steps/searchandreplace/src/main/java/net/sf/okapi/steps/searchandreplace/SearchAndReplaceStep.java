@@ -29,8 +29,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.URI;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -74,7 +74,7 @@ import net.sf.okapi.common.resource.TextContainer;
 @UsingParameters(Parameters.class)
 public class SearchAndReplaceStep extends BasePipelineStep {
 
-	private final Logger logger = Logger.getLogger(getClass().getName());
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 
 	private Parameters params;
 	private Matcher matcher;
@@ -344,7 +344,7 @@ public class SearchAndReplaceStep extends BasePipelineStep {
 			}
 		} 
 		catch ( Exception e ) {
-			logger.log(Level.WARNING, String.format("Error when updating content: '%s'.\n"+ e.getMessage(), tmp), e);
+			logger.warn(String.format("Error when updating content: '%s'.\n"+ e.getMessage(), tmp), e);
 		}
 
 		return event;

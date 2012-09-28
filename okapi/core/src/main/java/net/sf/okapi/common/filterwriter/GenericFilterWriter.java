@@ -35,17 +35,18 @@ import java.nio.charset.CharsetEncoder;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.exceptions.OkapiFileNotFoundException;
-import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.DocumentPart;
+import net.sf.okapi.common.resource.EndSubfilter;
 import net.sf.okapi.common.resource.Ending;
-import net.sf.okapi.common.resource.MultiEvent;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.StartGroup;
 import net.sf.okapi.common.resource.StartSubDocument;
-import net.sf.okapi.common.resource.ITextUnit;
+import net.sf.okapi.common.resource.StartSubfilter;
 import net.sf.okapi.common.skeleton.ISkeletonWriter;
 
 /**
@@ -58,6 +59,9 @@ public class GenericFilterWriter implements IFilterWriter {
 
 	private LocaleId locale;
 	private String encoding;
+	//private ISkeletonWriter parentSkelWriter;
+	//private IEncoder parentEncoder;
+	//private EncoderManager nativeEncoderManager;
 	private ISkeletonWriter skelWriter;
 	private OutputStream output;
 	private String outputPath;
@@ -67,6 +71,9 @@ public class GenericFilterWriter implements IFilterWriter {
 	public GenericFilterWriter (ISkeletonWriter skelWriter,
 		EncoderManager encoderManager)
 	{
+		//parentSkelWriter = skelWriter;		
+		//nativeEncoderManager = encoderManager;
+		
 		this.skelWriter = skelWriter;
 		this.encoderManager = encoderManager;
 	}
@@ -160,34 +167,40 @@ public class GenericFilterWriter implements IFilterWriter {
 		try {
 			switch ( event.getEventType() ) {
 			case START_DOCUMENT:
-				processStartDocument(locale, encoding, (StartDocument)event.getResource());
+				processStartDocument(locale, encoding, event.getStartDocument());
 				break;
 			case END_DOCUMENT:
-				processEndDocument((Ending)event.getResource());
+				processEndDocument(event.getEnding());
 				close();
 				break;
 			case START_SUBDOCUMENT:
-				processStartSubDocument((StartSubDocument)event.getResource());
+				processStartSubDocument(event.getStartSubDocument());
 				break;
 			case END_SUBDOCUMENT:
-				processEndSubDocument((Ending)event.getResource());
+				processEndSubDocument(event.getEnding());
 				break;
 			case START_GROUP:
-				processStartGroup((StartGroup)event.getResource());
+				processStartGroup(event.getStartGroup());
 				break;
 			case END_GROUP:
-				processEndGroup((Ending)event.getResource());
+				processEndGroup(event.getEnding());
 				break;
 			case TEXT_UNIT:
 				processTextUnit(event.getTextUnit());
 				break;
 			case DOCUMENT_PART:
-				processDocumentPart((DocumentPart)event.getResource());
+				processDocumentPart(event.getDocumentPart());
 				break;
 			case MULTI_EVENT:
-				for (Event e : (MultiEvent) event.getResource()) {
+				for (Event e : event.getMultiEvent()) {
 					handleEvent(e);
 				}
+				break;
+			case START_SUBFILTER:
+				processStartSubfilter(event.getStartSubfilter());
+				break;
+			case END_SUBFILTER:
+				processEndSubfilter(event.getEndSubfilter());
 				break;
 			}
 		}
@@ -216,6 +229,7 @@ public class GenericFilterWriter implements IFilterWriter {
 		}
 		writer.write(skelWriter.processStartDocument(outputLocale,
 			outputEncoding, null, encoderManager, resource));
+		//parentEncoder = encoderManager.getEncoder(); // The encoder used to write StartDocument of the parent filter
 	}
 
 	private void processEndDocument(Ending resource) throws IOException {
@@ -244,6 +258,19 @@ public class GenericFilterWriter implements IFilterWriter {
 
 	private void processDocumentPart (DocumentPart resource) throws IOException {
 		writer.write(skelWriter.processDocumentPart(resource));
+	}
+	
+	private void processStartSubfilter (StartSubfilter resource) throws IOException {
+		writer.write(skelWriter.processStartSubfilter(resource)); // Stores a ref to SSF
+		// When skelWriter refers to a SubFilterSkeletonWriter, writer.write() is called for empty strings and does nothing  
+		//skelWriter = new SubFilterSkeletonWriter(resource, parentEncoder, locale, encoding);		
+		//skelWriter = new SubFilterSkeletonWriter(resource, parentEncoder);
+		//skelWriter = resource.createSkeletonWriter(resource, locale, encoding);
+	}
+
+	private void processEndSubfilter (EndSubfilter resource) throws IOException {
+		//skelWriter = parentSkelWriter; // Restore the parent skeleton writer
+		writer.write(skelWriter.processEndSubfilter(resource));
 	}
 
 	@Override

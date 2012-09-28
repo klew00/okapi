@@ -35,9 +35,8 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
-import java.util.logging.Handler;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -199,17 +198,7 @@ public class Main {
 			// System.out uses the default system encoding that
 			// may not be the right one (e.g. windows-1252 vs cp850)
 			ps = new PrintStream(System.out, true, getConsoleEncodingName());
-			
-			// Disable root console handler
-			Handler[] handlers = Logger.getLogger("").getHandlers();
-			for ( Handler handler : handlers ) {
-				Logger.getLogger("").removeHandler(handler);
-			}
-			// Create our own handler
-			LogHandler logHandler = new LogHandler(ps);
-			logHandler.setLevel(Level.INFO);
-			Logger.getLogger("").addHandler(logHandler); //$NON-NLS-1$
-			
+
 			// Remove all empty arguments
 			// This is to work around the "$1" issue in bash
 			ArrayList<String> args = new ArrayList<String>();

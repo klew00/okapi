@@ -20,8 +20,8 @@
 
 package net.sf.okapi.lib.extra;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import net.sf.okapi.common.Util;
 
@@ -36,7 +36,7 @@ public class Component implements IComponent, INotifiable {
 	private String name;
 	private String description;	
 	
-	private final Logger logger = Logger.getLogger(this.getClass().getName());
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 	
 	public Component() {
 		super();		
@@ -49,11 +49,6 @@ public class Component implements IComponent, INotifiable {
 		this.description = description;
 	}
 
-	protected void logMessage (Level level, String text) {
-		if (logger != null)
-			logger.log(level, text);
-	}
-	
 	protected void setName(String name) {
 		this.name = name;
 	}

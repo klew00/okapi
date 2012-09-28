@@ -29,7 +29,7 @@ public class TSEncoder extends XMLEncoder {
 	
 	@Override
 	public String encode (String text,
-		int context)
+			EncoderContext context)
 	{
 		StringBuilder escaped = new StringBuilder();
 		char ch;

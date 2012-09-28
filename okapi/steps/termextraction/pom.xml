@@ -20,5 +20,12 @@
 			<artifactId>okapi-step-tokenization</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>net.sf.okapi</groupId>
+			<artifactId>okapi-core</artifactId>
+			<scope>test</scope>
+			<classifier>tests</classifier>
+			<version>${project.version}</version>
+   		</dependency>
     </dependencies>
 </project>

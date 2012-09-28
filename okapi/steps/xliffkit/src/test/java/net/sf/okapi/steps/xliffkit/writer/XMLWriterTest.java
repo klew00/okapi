@@ -23,8 +23,8 @@ package net.sf.okapi.steps.xliffkit.writer;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
@@ -158,9 +158,8 @@ public class XMLWriterTest {
 	}
 	
 	private void log(String str) {
-		Logger logger = Logger.getLogger(getClass().getName()); // loggers are cached
-		logger.setLevel(Level.FINE);
-		logger.fine(str);
+		Logger localLogger = LoggerFactory.getLogger(getClass()); // loggers are cached
+		localLogger.debug(str);
 	}
 	
 	// DEBUG @Test

@@ -21,13 +21,15 @@
 package net.sf.okapi.filters.xliff;
 
 import java.nio.charset.CharsetEncoder;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.annotation.AltTranslation;
 import net.sf.okapi.common.annotation.AltTranslationsAnnotation;
+import net.sf.okapi.common.encoder.EncoderContext;
 import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.filterwriter.ILayerProvider;
 import net.sf.okapi.common.filterwriter.XLIFFContent;
@@ -53,7 +55,7 @@ public class XLIFFSkeletonWriter extends GenericSkeletonWriter {
 	public static final String SEGSOURCEMARKER = "[@#$SEGSRC$#@]";
 	public static final String ALTTRANSMARKER = "[@#$ALTTRANS$#@]";
 	
-	private final Logger logger = Logger.getLogger(getClass().getName());
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 	
 	private Parameters params;
 	private XLIFFContent fmt;
@@ -85,7 +87,7 @@ public class XLIFFSkeletonWriter extends GenericSkeletonWriter {
 	
 	@Override
 	protected String getString (GenericSkeletonPart part,
-		int context)
+			EncoderContext context)
 	{
 		// Check for the seg-source special case
 		if ( part.toString().startsWith(SEGSOURCEMARKER) ) {
@@ -98,11 +100,11 @@ public class XLIFFSkeletonWriter extends GenericSkeletonWriter {
 		
 		// If it is not a reference marker, just use the data
 		if ( !part.toString().startsWith(TextFragment.REFMARKER_START) ) {
-			if ( layer == null ) {
+			if ( getLayer() == null ) {
 				return part.toString();
 			}
 			else {
-				return layer.encode(part.toString(), context);
+				return getLayer().encode(part.toString(), context);
 			}
 		}
 		
@@ -123,11 +125,11 @@ public class XLIFFSkeletonWriter extends GenericSkeletonWriter {
 		// Set the locToUse and the contextToUse parameters
 		// If locToUse==null: it's source, so use output locale for monolingual
 		LocaleId locToUse = (part.getLocale()==null) ? outputLoc : part.getLocale();
-		int contextToUse = context;
+		EncoderContext contextToUse = context;
 		if ( isMultilingual ) {
 			locToUse = part.getLocale();
 			// If locToUse==null: it's source, so not text in multilingual
-			contextToUse = (locToUse==null) ? 0 : context;
+			contextToUse = (locToUse==null) ? EncoderContext.TEXT : context;
 		}
 		
 		// If a parent if set, it's a reference to the content of the resource
@@ -144,7 +146,7 @@ public class XLIFFSkeletonWriter extends GenericSkeletonWriter {
 		// Else this is a true reference to a referent
 		IReferenceable ref = getReference((String)marker[0]);
 		if ( ref == null ) {
-			logger.warning(String.format("Reference '%s' not found.", (String)marker[0]));
+			logger.warn(String.format("Reference '%s' not found.", (String)marker[0]));
 			return "-ERR:REF-NOT-FOUND-";
 		}
 		if ( ref instanceof ITextUnit ) {
@@ -163,7 +165,7 @@ public class XLIFFSkeletonWriter extends GenericSkeletonWriter {
 	@Override
 	protected String getContent (ITextUnit tu,
 		LocaleId locToUse,
-		int context)
+		EncoderContext context)
 	{
 		// Update the encoder from the TU's MIME type
 		if ( encoderManager != null ) {
@@ -171,7 +173,7 @@ public class XLIFFSkeletonWriter extends GenericSkeletonWriter {
 		}
 		
 		if ( !tu.isTranslatable() ) {
-			context = 0; // Keep skeleton context
+			context = EncoderContext.TEXT; // Keep skeleton context
 		}
 		
 		// Get the source container
@@ -196,7 +198,7 @@ public class XLIFFSkeletonWriter extends GenericSkeletonWriter {
 		
 		// Process the target content: either with or without segments
 		// With layers: treat non-segmented translatable entries with existing target as segmented
-		if ( doSegments || (( layer != null ) && tu.isTranslatable() && !trgCont.equals(srcCont) )) {
+		if ( doSegments || (( getLayer() != null ) && tu.isTranslatable() && !trgCont.equals(srcCont) )) {
 			return getSegmentedOutput(srcCont, trgCont, locToUse, context);
 		}
 		else {
@@ -223,13 +225,13 @@ public class XLIFFSkeletonWriter extends GenericSkeletonWriter {
 				tmp.append(String.format("<mrk mid=\"%s\" mtype=\"seg\">", srcSeg.id));
 				// Write the segment (note: srcSeg can be null)
 				// If no layer or layer: just write the target
-				tmp.append(getContent(srcSeg.text, null, 1));
+				tmp.append(getContent(srcSeg.text, null, EncoderContext.SKELETON));
 				// Closing marker
 				tmp.append("</mrk>");
 			}
 			else { // Normal text fragment
 				// Target fragment is used
-				tmp.append(getContent(part.text, null, 1));
+				tmp.append(getContent(part.text, null, EncoderContext.SKELETON));
 			}
 		}
 		
@@ -311,7 +313,7 @@ public class XLIFFSkeletonWriter extends GenericSkeletonWriter {
 	
 	private String getUnsegmentedOutput (TextContainer cont,
 		LocaleId locToUse,
-		int context)
+		EncoderContext context)
 	{
 		TextFragment tf = null;
 		if ( cont.contentIsOneSegment() ) {
@@ -322,19 +324,19 @@ public class XLIFFSkeletonWriter extends GenericSkeletonWriter {
 			tf = cont.getUnSegmentedContentCopy();
 		}
 		// Apply the layer if there is one
-		if ( layer == null ) {
+		if ( getLayer() == null ) {
 			return getContent(tf, locToUse, context);
 		}
 		else {
 			switch ( context ) {
-			case 1:
-				return layer.endCode()
-					+ getContent(tf, locToUse, 0)
-					+ layer.startCode();
-			case 2:
-				return layer.endInline()
-					+ getContent(tf, locToUse, 0)
-					+ layer.startInline();
+			case SKELETON:
+				return getLayer().endCode()
+					+ getContent(tf, locToUse, EncoderContext.TEXT)
+					+ getLayer().startCode();
+			case INLINE:
+				return getLayer().endInline()
+					+ getContent(tf, locToUse, EncoderContext.TEXT)
+					+ getLayer().startInline();
 			default:
 				return getContent(tf, locToUse, context);
 			}
@@ -345,7 +347,7 @@ public class XLIFFSkeletonWriter extends GenericSkeletonWriter {
 	private String getSegmentedOutput (TextContainer srcCont,
 		TextContainer trgCont,
 		LocaleId locToUse,
-		int context)
+		EncoderContext context)
 	{
 		StringBuilder tmp = new StringBuilder();
 
@@ -359,43 +361,43 @@ public class XLIFFSkeletonWriter extends GenericSkeletonWriter {
 				Segment srcSeg = srcSegs.get(trgSeg.id);
 				if ( srcSeg == null ) {
 					// A target segment without a corresponding source: give warning
-					logger.warning(String.format("No source segment found for target segment id='%s':\n\"%s\".",
+					logger.warn(String.format("No source segment found for target segment id='%s':\n\"%s\".",
 						trgSeg.id, trgSeg.text.toText()));
 				}
 
 				// Opening marker
 				tmp.append(String.format("<mrk mid=\"%s\" mtype=\"seg\">", trgSeg.id));
 				// Write the segment (note: srcSeg can be null)
-				if ( layer == null ) {
+				if ( getLayer() == null ) {
 					// If no layer: just write the target
 					tmp.append(getContent(trgSeg.text, locToUse, context));
 				}
 				else { // If layer: write the bilingual entry
 					switch ( context ) {
-					case 1:
-						tmp.append(layer.endCode()
-							+ layer.startSegment()
-							+ ((srcSeg==null) ? "" : getContent(srcSeg.text, locToUse, 0))
-							+ layer.midSegment(lev)
-							+ getContent(trgSeg.text, locToUse, 0)
-							+ layer.endSegment()
-							+ layer.startCode());
+					case SKELETON:
+						tmp.append(getLayer().endCode()
+							+ getLayer().startSegment()
+							+ ((srcSeg==null) ? "" : getContent(srcSeg.text, locToUse, EncoderContext.TEXT))
+							+ getLayer().midSegment(lev)
+							+ getContent(trgSeg.text, locToUse, EncoderContext.TEXT)
+							+ getLayer().endSegment()
+							+ getLayer().startCode());
 						break;
-					case 2:
-						tmp.append(layer.endInline()
-							+ layer.startSegment()
-							+ ((srcSeg==null) ? "" : getContent(srcSeg.text, locToUse, 0))
-							+ layer.midSegment(lev)
-							+ getContent(trgSeg.text, locToUse, 0)
-							+ layer.endSegment()
-							+ layer.startInline());
+					case INLINE:
+						tmp.append(getLayer().endInline()
+							+ getLayer().startSegment()
+							+ ((srcSeg==null) ? "" : getContent(srcSeg.text, locToUse, EncoderContext.TEXT))
+							+ getLayer().midSegment(lev)
+							+ getContent(trgSeg.text, locToUse, EncoderContext.TEXT)
+							+ getLayer().endSegment()
+							+ getLayer().startInline());
 						break;
 					default:
-						tmp.append(layer.startSegment()
-							+ ((srcSeg==null) ? "" : getContent(srcSeg.text, locToUse, 0))
-							+ layer.midSegment(lev)
-							+ getContent(trgSeg.text, locToUse, 0)
-							+ layer.endSegment());
+						tmp.append(getLayer().startSegment()
+							+ ((srcSeg==null) ? "" : getContent(srcSeg.text, locToUse, EncoderContext.TEXT))
+							+ getLayer().midSegment(lev)
+							+ getContent(trgSeg.text, locToUse, EncoderContext.TEXT)
+							+ getLayer().endSegment());
 						break;
 					}
 				}
@@ -435,7 +437,7 @@ public class XLIFFSkeletonWriter extends GenericSkeletonWriter {
 	protected String getPropertyValue (INameable resource,
 		String name,
 		LocaleId locToUse,
-		int context)
+		EncoderContext context)
 	{
 		// Update the encoder from the TU's MIME type
 		if ( encoderManager != null ) {
@@ -469,7 +471,7 @@ public class XLIFFSkeletonWriter extends GenericSkeletonWriter {
 		// Check the property we got
 		if ( value == null ) {
 			if ( prop == null ) {
-				logger.warning(String.format("Property '%s' not found.", name));
+				logger.warn(String.format("Property '%s' not found.", name));
 				return "-ERR:PROP-NOT-FOUND-";
 			}
 			// Else process the value
@@ -478,7 +480,7 @@ public class XLIFFSkeletonWriter extends GenericSkeletonWriter {
 		
 		// Now look at the value
 		if ( value == null ) {
-			logger.warning(String.format("Property value for '%s' is null.", name));
+			logger.warn(String.format("Property value for '%s' is null.", name));
 			return "-ERR:PROP-VALUE-NULL-";
 		}
 		// Else: We got the property value
@@ -502,12 +504,12 @@ public class XLIFFSkeletonWriter extends GenericSkeletonWriter {
 		
 		// Return the native value if possible
 		if ( encoderManager == null ) {
-			if ( layer == null ) return value;
-			else return layer.encode(value, context); //TODO: context correct??
+			if ( getLayer() == null ) return value;
+			else return getLayer().encode(value, context); //TODO: context correct??
 		}
 		else {
-			if ( layer == null ) return encoderManager.toNative(name, value);
-			else return layer.encode(encoderManager.toNative(name, value), context);
+			if ( getLayer() == null ) return encoderManager.toNative(name, value);
+			else return getLayer().encode(encoderManager.toNative(name, value), context);
 		}
 	}
 

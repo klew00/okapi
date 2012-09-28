@@ -23,7 +23,8 @@ package net.sf.okapi.filters.txml;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;
@@ -71,7 +72,7 @@ public class TXMLFilter implements IFilter {
 
 	private final static String TARGETLOCALE = "targetlocale";
 	
-	private final Logger logger = Logger.getLogger(getClass().getName());
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 
 	private Parameters params;
 	private boolean hasNext;
@@ -300,7 +301,7 @@ public class TXMLFilter implements IFilter {
 				}
 				else if ( "localizable".equals(name) ) {
 					buildStartElement(true);
-					logger.warning("The <localizable> element is not supported yet: it will not be extracted.");
+					logger.warn("The <localizable> element is not supported yet: it will not be extracted.");
 				}
 				else {
 					buildStartElement(true);
@@ -353,7 +354,7 @@ public class TXMLFilter implements IFilter {
 		String tmp = reader.getAttributeValue(null, "locale");
 		if ( !Util.isEmpty(tmp) ) {
 			 if ( !srcLoc.equals(tmp) ) {
-				 logger.warning(String.format("Specified source was '%s' but source language in the file is '%s'.\nUsing '%s'.",
+				 logger.warn(String.format("Specified source was '%s' but source language in the file is '%s'.\nUsing '%s'.",
 					srcLoc.toString(), tmp, tmp));
 				 srcLoc = LocaleId.fromString(tmp);
 			 }
@@ -363,7 +364,7 @@ public class TXMLFilter implements IFilter {
 		tmp = reader.getAttributeValue(null, TARGETLOCALE);
 		if ( !Util.isEmpty(tmp) ) {
 			 if ( !trgLoc.equals(tmp) ) {
-				 logger.warning(String.format("Specified target was '%s' but target language in the file is '%s'.\nUsing '%s'.",
+				 logger.warn(String.format("Specified target was '%s' but target language in the file is '%s'.\nUsing '%s'.",
 					trgLoc.toString(), tmp, tmp));
 				 trgLoc = LocaleId.fromString(tmp);
 			 }

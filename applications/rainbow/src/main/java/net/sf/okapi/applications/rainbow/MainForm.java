@@ -31,8 +31,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.SortedMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import net.sf.okapi.applications.rainbow.batchconfig.BatchConfiguration;
 import net.sf.okapi.applications.rainbow.lib.CodeFinderEditor;
@@ -45,6 +43,8 @@ import net.sf.okapi.applications.rainbow.lib.LanguageManager;
 import net.sf.okapi.applications.rainbow.lib.LogForm;
 import net.sf.okapi.applications.rainbow.lib.PathBuilderPanel;
 import net.sf.okapi.applications.rainbow.lib.Utils;
+import net.sf.okapi.applications.rainbow.logger.ILogHandler;
+import net.sf.okapi.applications.rainbow.logger.LogHandlerFactory;
 import net.sf.okapi.applications.rainbow.pipeline.BOMConversionPipeline;
 import net.sf.okapi.applications.rainbow.pipeline.BatchTranslationPipeline;
 import net.sf.okapi.applications.rainbow.pipeline.CharListingPipeline;
@@ -163,7 +163,7 @@ public class MainForm { //implements IParametersProvider {
 	private ArrayList<InputTableModel> inputTableMods;
 	private Shell shell;
 	private ILog log;
-	private LogHandler logHandler;
+	private ILogHandler logHandler;
 	private UserConfiguration config;
 	private MRUList mruList;
 	private String appRootFolder;
@@ -318,9 +318,10 @@ public class MainForm { //implements IParametersProvider {
 
 		log = new LogForm(shell);
 		log.setTitle(Res.getString("LOG_CAPTION")); //$NON-NLS-1$
-		logHandler = new LogHandler(log);
+
+		logHandler = LogHandlerFactory.getLogHandler();
+		logHandler.initialize(log);
 		setLogLevel();
-		Logger.getLogger("").addHandler(logHandler); //$NON-NLS-1$
 
 		fcMapper = new FilterConfigurationMapper();
 		// Get pre-defined configurations
@@ -328,7 +329,7 @@ public class MainForm { //implements IParametersProvider {
 		// Discover and add plug-ins
 		pm = new PluginsManager();
 		updatePluginsAndDependencies();
-		
+
 		// Toolbar
 		createToolbar();
 		
@@ -1184,25 +1185,25 @@ public class MainForm { //implements IParametersProvider {
 			wrapper.refreshAvailableStepsList();
 		}
 	}
-	
+
 	private void setLogLevel () {
 		int n = config.getInteger(MainForm.OPT_LOGLEVEL);
 		switch ( n ) {
 		case 1:
-			logHandler.setLevel(Level.FINE);
+			logHandler.setLogLevel(ILogHandler.LogLevel.DEBUG);
 			break;
 		case 2:
-			logHandler.setLevel(Level.FINER);
+			logHandler.setLogLevel(ILogHandler.LogLevel.DEBUG);
 			break;
 		case 3:
-			logHandler.setLevel(Level.FINEST);
+			logHandler.setLogLevel(ILogHandler.LogLevel.TRACE);
 			break;
 		default:
-			logHandler.setLevel(Level.INFO);
+			logHandler.setLogLevel(ILogHandler.LogLevel.INFO);
 			break;
 		}
 	}
-	
+
 	private void createToolbar () {
 		ToolBar toolbar = new ToolBar(shell, SWT.FLAT | SWT.WRAP);
 		GridData gdTmp = new GridData(GridData.FILL_HORIZONTAL);

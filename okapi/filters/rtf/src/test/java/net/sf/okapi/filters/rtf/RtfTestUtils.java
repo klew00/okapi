@@ -13,10 +13,12 @@ import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.DocumentPart;
+import net.sf.okapi.common.resource.EndSubfilter;
 import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.StartGroup;
 import net.sf.okapi.common.resource.ITextUnit;
+import net.sf.okapi.common.resource.StartSubfilter;
 import net.sf.okapi.filters.rtf.RTFFilter;
 
 public class RtfTestUtils {
@@ -42,6 +44,8 @@ public class RtfTestUtils {
 				assertTrue(event.getResource() instanceof DocumentPart);
 			} else if (event.getEventType() == EventType.START_GROUP || event.getEventType() == EventType.END_GROUP) {
 				assertTrue(event.getResource() instanceof StartGroup || event.getResource() instanceof Ending);
+			} else if (event.getEventType() == EventType.START_SUBFILTER || event.getEventType() == EventType.END_SUBFILTER) {
+				assertTrue(event.getResource() instanceof StartSubfilter || event.getResource() instanceof EndSubfilter);
 			}
 			System.out.print(event.getEventType().toString() + ": ");
 			if (event.getResource() != null) {
@@ -70,6 +74,8 @@ public class RtfTestUtils {
 					assertTrue(event.getResource() instanceof DocumentPart);
 				} else if (event.getEventType() == EventType.START_GROUP || event.getEventType() == EventType.END_GROUP) {
 					assertTrue(event.getResource() instanceof StartGroup || event.getResource() instanceof Ending);
+				} else if (event.getEventType() == EventType.START_SUBFILTER || event.getEventType() == EventType.END_GROUP) {
+					assertTrue(event.getResource() instanceof StartSubfilter || event.getResource() instanceof EndSubfilter);
 				}
 				System.out.print(event.getEventType().toString() + ": ");
 				if (event.getResource() != null) {

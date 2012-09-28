@@ -20,7 +20,8 @@
 
 package net.sf.okapi.lib.extra.steps;
 
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.annotation.IAnnotation;
@@ -33,7 +34,7 @@ import net.sf.okapi.common.resource.TextContainer;
 
 public class TextUnitLogger extends BasePipelineStep {
 
-	private final Logger logger = Logger.getLogger(getClass().getName());
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 	private StringBuilder sb;
 	private LocaleId srcLoc;
 	
@@ -75,7 +76,7 @@ public class TextUnitLogger extends BasePipelineStep {
 	}
 	
 	private static void fillSB(StringBuilder sb, ITextUnit tu, LocaleId srcLoc) {
-		sb.append("tu [" + tu.getId() + "]");
+		sb.append(String.format("tu [id=%s name=%s type=%s]", tu.getId(), tu.getName(), tu.getType()));
 		sb.append(":");
 		if (tu.isReferent()) sb.append(" referent");
 		sb.append("\n");

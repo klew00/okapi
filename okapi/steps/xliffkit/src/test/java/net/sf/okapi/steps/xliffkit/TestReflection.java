@@ -35,8 +35,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.resource.ITextUnit;
@@ -102,9 +102,8 @@ public class TestReflection {
 	}
 		
 	private void log(String str) {
-		Logger logger = Logger.getLogger(getClass().getName()); // loggers are cached
-		logger.setLevel(Level.FINE);
-		logger.fine(str);
+		Logger localLogger = LoggerFactory.getLogger(getClass()); // loggers are cached
+		localLogger.debug(str);
 	}
 	
 	private void log(int value) {

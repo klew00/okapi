@@ -37,7 +37,11 @@ import net.sf.okapi.steps.common.RawDocumentToFilterEventsStep;
 import org.junit.Before;
 import org.junit.Test;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class TestCodeSimplifierStep {
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 
 	private GenericContent fmt;
 	private CodeSimplifierStep css;
@@ -197,7 +201,7 @@ public class TestCodeSimplifierStep {
 		//EventListBuilderStep elbs1 = new EventListBuilderStep();
 		EventListBuilderStep elbs2 = new EventListBuilderStep();
 		
-		System.out.println(new File(pathBase).toURI().getPath());
+		logger.debug(new File(pathBase).toURI().getPath());
 		
 		new XPipeline(
 				"Test pipeline for CodeSimplifierStep",
@@ -217,10 +221,10 @@ public class TestCodeSimplifierStep {
 		
 		for (Event event : elbs2.getList()) {
 			if (event.isTextUnit()) {
-				System.out.println(TextUnitLogger.getTuInfo(event.getTextUnit(), EN));
+				logger.debug(TextUnitLogger.getTuInfo(event.getTextUnit(), EN));
 			}
 			else if (event.isDocumentPart()) {
-				System.out.println(DocumentPartLogger.getDpInfo(event.getDocumentPart(), EN));
+				logger.debug(DocumentPartLogger.getDpInfo(event.getDocumentPart(), EN));
 			}
 		}		
 	}
@@ -248,10 +252,10 @@ public class TestCodeSimplifierStep {
 		
 		for (Event event : elbs2.getList()) {
 			if (event.isTextUnit()) {
-				System.out.println(TextUnitLogger.getTuInfo(event.getTextUnit(), EN));
+				logger.debug(TextUnitLogger.getTuInfo(event.getTextUnit(), EN));
 			}
 			else if (event.isDocumentPart()) {
-				System.out.println(DocumentPartLogger.getDpInfo(event.getDocumentPart(), EN));
+				logger.debug(DocumentPartLogger.getDpInfo(event.getDocumentPart(), EN));
 			}
 		}		
 	}

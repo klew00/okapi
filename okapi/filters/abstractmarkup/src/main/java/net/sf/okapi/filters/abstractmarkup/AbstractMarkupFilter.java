@@ -29,8 +29,8 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.util.regex.Pattern;
 
 import net.htmlparser.jericho.Attribute;
@@ -51,7 +51,7 @@ import net.sf.okapi.common.BOMNewlineEncodingDetector;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.MimeTypeMapper;
-import net.sf.okapi.common.Util;
+import net.sf.okapi.common.encoder.XMLEncoder;
 import net.sf.okapi.common.exceptions.OkapiBadFilterInputException;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.filters.AbstractFilter;
@@ -60,9 +60,7 @@ import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filters.PropertyTextUnitPlaceholder;
 import net.sf.okapi.common.filters.PropertyTextUnitPlaceholder.PlaceholderAccessType;
 import net.sf.okapi.common.filters.SubFilter;
-import net.sf.okapi.common.filters.SubFilterEventConverter;
 import net.sf.okapi.common.resource.Code;
-import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.RawDocument;
@@ -70,7 +68,6 @@ import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
-import net.sf.okapi.common.skeleton.GenericSkeletonPart;
 import net.sf.okapi.filters.abstractmarkup.ExtractionRuleState.RuleType;
 import net.sf.okapi.filters.yaml.TaggedFilterConfiguration;
 import net.sf.okapi.filters.yaml.TaggedFilterConfiguration.RULE_TYPE;
@@ -86,7 +83,7 @@ import net.sf.okapi.filters.yaml.TaggedFilterConfiguration.RULE_TYPE;
  * 
  */
 public abstract class AbstractMarkupFilter extends AbstractFilter {
-	private static final Logger LOGGER = Logger.getLogger(AbstractMarkupFilter.class.getName());
+	private final Logger LOGGER = LoggerFactory.getLogger(getClass());
 	private static final String CDATA_START_REGEX = "<\\!\\[CDATA\\[";
 	private static final String CDATA_END_REGEX = "\\]\\]>";
 	private static final Pattern CDATA_START_PATTERN = Pattern.compile(CDATA_START_REGEX);
@@ -101,19 +98,23 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 	private boolean hasBOM;
 	private EventBuilder eventBuilder;
 	private RawDocument currentRawDocument;
-	private ExtractionRuleState ruleState;
-	@SubFilter() // make this IFilter a subfilter 
-	private IFilter cdataSubfilter;
-	@SubFilter() // make this IFilter a subfilter 
-	private IFilter pcdataSubfilter;
+	private ExtractionRuleState ruleState; 
+//	private SubFilter cdataSubfilter; 
+//	private PcdataSubFilter pcdataSubfilter;
 	private String currentId;
 	private boolean documentEncoding;
 	private String currentDocName;
+	private IFilter cdataFilter;
+	private IFilter pcdataFilter;
+	private int cdataSectionIndex;
+	private int pcdataSectionIndex;
 	
 	static {
 		Config.ConvertNonBreakingSpaces = false;
+		Config.IsHTMLEmptyElementTagRecognised = true;
+		Config.ConvertNonBreakingSpaces = false;
 		Config.NewLine = BOMNewlineEncodingDetector.NewlineType.LF.toString();
-		Config.LoggerProvider = LoggerProvider.JAVA;
+		Config.LoggerProvider = LoggerProvider.SLF4J;
 		//Config.CurrentCompatibilityMode = Config.CompatibilityMode.XHTML;
 	}
 
@@ -178,7 +179,7 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 		}
 		this.document = null; // help Java GC
 		
-		LOGGER.log(Level.FINE, getDocumentName() + " has been closed");
+		LOGGER.debug(getDocumentName() + " has been closed");
 	}
 
 	/*
@@ -231,12 +232,11 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 
 		if (detectedEncoding == null && getEncoding() != null) {
 			detectedEncoding = getEncoding();
-			LOGGER.log(Level.FINE, String.format(
+			LOGGER.debug(String.format(
 					"Cannot auto-detect encoding. Using the default encoding (%s)", getEncoding()));
 		} else if (getEncoding() == null) {
 			detectedEncoding = parsedHeader.getEncoding(); // get best guess
-			LOGGER.log(
-					Level.FINE,
+			LOGGER.debug(
 					String.format(
 							"Default encoding and detected encoding not found. Using best guess encoding (%s)",
 							detectedEncoding));
@@ -253,7 +253,7 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 	 */
 	public void open(RawDocument input) {
 		open(input, true);
-		LOGGER.log(Level.FINE, getName() + " has opened an input document");
+		LOGGER.debug(getName() + " has opened an input document");
 	}
 
 	/**
@@ -377,10 +377,10 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 		// order of execution matters
 		if (eventBuilder == null) {
 			eventBuilder = new AbstractMarkupEventBuilder(getParentId(), 
-					isSubFilter(), getEncoderManager(), getEncoding(), getNewlineType());
+					this, getEncoderManager(), getEncoding(), getNewlineType());
 			eventBuilder.setMimeType(getMimeType());
 		} else {
-			eventBuilder.reset(getParentId(), isSubFilter());
+			eventBuilder.reset(getParentId(), this);
 		}		
 
 		eventBuilder.addFilterEvent(createStartFilterEvent());		
@@ -398,19 +398,24 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 		// This optimizes memory at the expense of performance
 		nodeIterator = document.iterator();
 
+		cdataSectionIndex = 0;
+		pcdataSectionIndex = 0;
+		
 		// initialize cdata sub-filter
 		TaggedFilterConfiguration config = getConfig(); 
 		if (config != null && config.getGlobalCDATASubfilter() != null) {
-			cdataSubfilter = getFilterConfigurationMapper().createFilter(
-					getConfig().getGlobalCDATASubfilter(), cdataSubfilter); 
-			getEncoderManager().mergeMappings(cdataSubfilter.getEncoderManager());
+			cdataFilter = getFilterConfigurationMapper().createFilter(
+					getConfig().getGlobalCDATASubfilter(), cdataFilter); 
+			//getEncoderManager().mergeMappings(cdataFilter.getEncoderManager());
+			//cdataSubfilter = new SubFilter(cdataFilter, null, null, null);
 		}
 		
-		// intialize pcdata sub-filter
+		// initialize pcdata sub-filter
 		if (config != null && config.getGlobalPCDATASubfilter() != null) {
 			String subfilterName = getConfig().getGlobalPCDATASubfilter();
-			pcdataSubfilter = getFilterConfigurationMapper().createFilter(subfilterName, pcdataSubfilter); 
-			getEncoderManager().mergeMappings(pcdataSubfilter.getEncoderManager());
+			pcdataFilter = getFilterConfigurationMapper().createFilter(subfilterName, pcdataFilter); 
+			//getEncoderManager().mergeMappings(pcdataFilter.getEncoderManager());
+			//pcdataSubfilter = new PcdataSubFilter(pcdataFilter);
 		}
 	}
 
@@ -584,44 +589,47 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 			// Excluded content
 			addToDocumentPart(tag.toString());
 		} else { // Content to extract
-			if (cdataSubfilter != null) {				
-				String parentId = eventBuilder.findMostRecentParentId();
-				cdataSubfilter.close();
-				
-				parentId = (parentId == null ? getDocumentId().getLastId() : parentId); 
-				SubFilterEventConverter converter = 
-					new SubFilterEventConverter(parentId, 
-							new GenericSkeleton("<![CDATA["), 
-							new GenericSkeleton("]]>"));
+			startTextUnit(new GenericSkeleton("<![CDATA["));
 			
-				// TODO: only AbstractFilter subclasses can be used as subfilters!!!
-				((AbstractFilter)cdataSubfilter).setParentId(parentId);
-				cdataSubfilter.open(new RawDocument(cdataWithoutMarkers, getSrcLoc()));	
-				int tuChildCount = 0;
-				while (cdataSubfilter.hasNext()) {
-					Event event = converter.convertEvent(cdataSubfilter.next());
-					eventBuilder.addFilterEvent(event);
-					// subfiltered textunits inherit any name from a parent TU
-					if (event.isTextUnit()) {
-						if (event.getTextUnit().getName() == null) {
-							String parentName = eventBuilder.findMostRecentTextUnitName();
-							// we need to add a child id so each tu name is unique for this subfiltered content
-							if (parentName != null) {
-								parentName = parentName + "-" + Integer.toString(++tuChildCount); 
-							}
-							event.getTextUnit().setName(parentName);
-						}
-					}
-				}			
-				cdataSubfilter.close();			
+			if (cdataFilter != null) {				
+//				cdataSubfilter.close();
+				
+				String parentId = eventBuilder.findMostRecentParentId();
+				if (parentId == null) parentId = getDocumentId().getLastId();
+				
+				String parentName = eventBuilder.findMostRecentParentName();
+				if (parentName == null) parentName = getDocumentId().getLastId();
+				
+				SubFilter cdataSubfilter = new SubFilter(cdataFilter, 
+						//getEncoderManager().getEncoder(),
+						null, // we don't encode cdata
+						++cdataSectionIndex, parentId, parentName);
+//				FilterState s = new FilterState(FILTER_STATE.STANDALONE_TEXTUNIT,
+//						parentId, 
+//						new GenericSkeleton("<![CDATA["), 
+//						new GenericSkeleton("]]>"),
+//						null);
+//				s.setParentTextUnitName(eventBuilder.findMostRecentTextUnitName());
+//				cdataSubfilter.setState(s);
+//				cdataSubfilter.open(new RawDocument(cdataWithoutMarkers, getSrcLoc()));	
+//				while (cdataSubfilter.hasNext()) {
+//					Event event = cdataSubfilter.next();
+//					eventBuilder.addFilterEvent(event);
+//				}			
+//				cdataSubfilter.close();
+				eventBuilder.addFilterEvents(cdataSubfilter.getEvents(new RawDocument(cdataWithoutMarkers, getSrcLoc())));
+				addToTextUnit(cdataSubfilter.createRefCode());
+				
+//				// Form CDATA section from the subfiltered content
+//				cdataSubfilter.getStartSubFilter().setSkeleton(new GenericSkeleton("<![CDATA["));
+//				cdataSubfilter.getEndSubFilter().setSkeleton(new GenericSkeleton("]]>"));
 			} else {
-				// we assume the CDATA is plain text take it as is
-				startTextUnit(new GenericSkeleton("<![CDATA["));
-				addToTextUnit(cdataWithoutMarkers);
-				setTextUnitType(ITextUnit.TYPE_CDATA);
-				setTextUnitMimeType(MimeTypeMapper.PLAIN_TEXT_MIME_TYPE);			
-				endTextUnit(new GenericSkeleton("]]>"));
+				// we assume the CDATA is plain text take it as is				
+				addToTextUnit(cdataWithoutMarkers);				
 			}
+			setTextUnitType(ITextUnit.TYPE_CDATA);
+			setTextUnitMimeType(MimeTypeMapper.PLAIN_TEXT_MIME_TYPE);			
+			endTextUnit(new GenericSkeleton("]]>"));
 		}
 	}
 
@@ -943,75 +951,54 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 			break;
 		case TEXT_UNIT_ELEMENT:			
 			// if a pcdata subfilter is configured let it do the processsing
-			if (pcdataSubfilter != null && isInsideTextRun()) {		
+			if (pcdataFilter != null && isInsideTextRun()) {		
 				// remove the TextUnit we have accumulated since the start tag
-				ITextUnit pcdata = popTempEvent().getTextUnit();
+				//ITextUnit pcdata = popTempEvent().getTextUnit();
+				ITextUnit pcdata = peekTempEvent().getTextUnit();
+				
+//				pcdataSubfilter.close();
+
+//				String parentId = eventBuilder.findMostRecentParentId();
+//				parentId = (parentId == null ? getDocumentId().getLastId() : parentId);
 				
 				String parentId = eventBuilder.findMostRecentParentId();
-				pcdataSubfilter.close();
+				if (parentId == null) {
+					parentId = pcdata.getId();
+				}
+				if (parentId == null) {
+					parentId = getDocumentId().getLastId();
+				}
 				
-				parentId = (parentId == null ? getDocumentId().getLastId() : parentId); 
-				SubFilterEventConverter converter = new SubFilterEventConverter(parentId,
-						// the first GenericSkekeletonPart should be the start tag
-						new GenericSkeleton(((GenericSkeleton)pcdata.getSkeleton()).getFirstPart().toString()), 
-						new GenericSkeleton(endTag.toString()));
-			
-				// TODO: only AbstractFilter subclasses can be used as subfilters!!!
-				((AbstractFilter)pcdataSubfilter).setParentId(parentId);						
-				pcdataSubfilter.open(new RawDocument(pcdata.getSource().toString(), getSrcLoc()));
-				int tuChildCount = 0;
-				while (pcdataSubfilter.hasNext()) {
-					Event event = converter.convertEvent(pcdataSubfilter.next());
-					// we need to escape back to the original format
-					if ("okf_html".equals(getConfig().getGlobalPCDATASubfilter())) {
-						switch(event.getEventType()) {
-						case DOCUMENT_PART:
-							DocumentPart dp = event.getDocumentPart();
-							dp.setSkeleton(new GenericSkeleton(Util.escapeToXML(dp.getSkeleton().toString(), 0, true, null)));
-							break;
-						case TEXT_UNIT:
-							ITextUnit tu = event.getTextUnit();
-							
-							// subfiltered textunits can inherit name from a parent TU
-							if (tu.getName() == null) {
-								String parentName = eventBuilder.findMostRecentTextUnitName();
-								// we need to add a child id so each tu name is unique for this subfiltered content
-								if (parentName != null) {
-									parentName = parentName + "-" + Integer.toString(++tuChildCount); 
-								}
-								tu.setName(parentName);
-							}
-							
-							// escape the skeleton parts
-							GenericSkeleton s = (GenericSkeleton)tu.getSkeleton();
-							if (s != null) {
-								for (GenericSkeletonPart p : s.getParts()) {
-									if (p.getParent() == null) {
-										p.setData(Util.escapeToXML(p.getData().toString(), 0, true, null));
-									}
-								}							
-								tu.setSkeleton(s);
-							}
-							
-							// now escape all the code content
-							List<Code> codes = tu.getSource().getFirstContent().getCodes();
-							for (Code c : codes) {
-								c.setData(Util.escapeToXML(c.getData(), 0, true, null));
-								if (c.hasOuterData()) {
-									c.setOuterData(Util.escapeToXML(c.getOuterData(), 0, true, null));
-								}								
-							}
-							
-							// now escape any remaining text
-							TextFragment f = new TextFragment(Util.escapeToXML(tu.getSource().getFirstContent().getCodedText(), 0, true, null), codes);
-							tu.setSourceContent(f);
-							break;
-						}
-					}
-					eventBuilder.addFilterEvent(event);
-				}			
-				pcdataSubfilter.close();		
+				String parentName = eventBuilder.findMostRecentParentName();
+				if (parentName == null) parentName = pcdata.getType(); // tag name
+				if (parentName == null) parentName = getDocumentId().getLastId();
 				
+//				PcdataSubFilter pcdataSubfilter = new PcdataSubFilter(pcdataFilter, 
+//						new XMLEncoder(getEncoding(), getNewlineType(), true, true, false, 1), 
+//						++pcdataSectionIndex, parentId, parentName);
+				
+				SubFilter pcdataSubfilter = new SubFilter(pcdataFilter, 
+						new XMLEncoder(getEncoding(), getNewlineType(), true, true, false, 0), 
+						++pcdataSectionIndex, parentId, parentName);
+				
+//				FilterState s = new FilterState(FILTER_STATE.INSIDE_TEXTUNIT, 
+//						parentId, 
+//						new GenericSkeleton(((GenericSkeleton)pcdata.getSkeleton()).getFirstPart().toString()), 
+//						new GenericSkeleton(endTag.toString()),
+//						null);
+//				s.setParentTextUnitName(eventBuilder.findMostRecentTextUnitName());
+//				pcdataSubfilter.setState(s);
+//				pcdataSubfilter.open(new RawDocument(pcdata.getSource().toString(), getSrcLoc()));
+//				while (pcdataSubfilter.hasNext()) {
+//					Event event = pcdataSubfilter.next();
+//					eventBuilder.addFilterEvent(event);
+//				}			
+//				pcdataSubfilter.close();
+				eventBuilder.addFilterEvents(pcdataSubfilter.getEvents(new RawDocument(pcdata.getSource().toString(), getSrcLoc())));
+				// Clear source as we will parse it with the subfilter (skeleton remains)
+				pcdata.getSource().clear();
+				addToTextUnit(pcdataSubfilter.createRefCode()); 
+				endTextUnit(new GenericSkeleton(endTag.toString()));
 			} else {
 				endTextUnit(new GenericSkeleton(endTag.toString()));
 			}

@@ -30,18 +30,12 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 
 import net.sf.okapi.common.BOMNewlineEncodingDetector;
 import net.sf.okapi.common.Event;
@@ -52,16 +46,16 @@ import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.MimeTypeMapper;
 import net.sf.okapi.common.UsingParameters;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.encoder.CDATAEncoder;
 import net.sf.okapi.common.encoder.EncoderManager;
+import net.sf.okapi.common.encoder.IEncoder;
+import net.sf.okapi.common.encoder.XMLEncoder;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.exceptions.OkapiUnsupportedEncodingException;
-import net.sf.okapi.common.filters.AbstractFilter;
 import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filters.IFilterConfigurationMapper;
 import net.sf.okapi.common.filters.SubFilter;
-import net.sf.okapi.common.filters.SubFilterAnnotation;
-import net.sf.okapi.common.filters.SubFilterEventConverter;
 import net.sf.okapi.common.filterwriter.GenericFilterWriter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.resource.DocumentPart;
@@ -69,13 +63,19 @@ import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.StartDocument;
-import net.sf.okapi.common.resource.StartGroup;
 import net.sf.okapi.common.resource.StartSubDocument;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
+import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
 import net.sf.okapi.common.skeleton.ISkeletonWriter;
-import net.sf.okapi.filters.abstractmarkup.AbstractMarkupFilter;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 /**
  * Implements the IFilter interface for Vignette export/import content.
@@ -83,7 +83,7 @@ import net.sf.okapi.filters.abstractmarkup.AbstractMarkupFilter;
 @UsingParameters(Parameters.class)
 public class VignetteFilter implements IFilter {
 
-	private final Logger logger = Logger.getLogger(getClass().getName());
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 
 	private final String STARTBLOCK = "<importContentInstance>";
 	private final String ENDBLOCK = "</importContentInstance>";
@@ -92,14 +92,13 @@ public class VignetteFilter implements IFilter {
 	private String lineBreak;
 	private int tuId;
 	private IdGenerator subDocId;
-	private IdGenerator groupId;
+	private int sectionIndex;
 	private int otherId;
 	private LinkedList<Event> queue;
 	private boolean hasNext;
 	private EncoderManager encoderManager;
 	private BufferedReader reader;
-	@SubFilter()
-	private IFilter subFilter;
+	private SubFilter subFilter;
 	private LocaleId srcLoc;
 	private LocaleId trgLoc;
 	private DocumentBuilder docBuilder;
@@ -117,6 +116,7 @@ public class VignetteFilter implements IFilter {
 	private List<String> listOfPaths;
 	private String rootId;
 	private boolean monolingual;
+	private IFilter filter;
 	
 	public VignetteFilter () {
 		params = new Parameters();
@@ -161,7 +161,8 @@ public class VignetteFilter implements IFilter {
 
 	@Override
 	public ISkeletonWriter createSkeletonWriter() {
-		return new VignetteSkeletonWriter();
+		//return new VignetteSkeletonWriter();
+		return new GenericSkeletonWriter();
 	}
 
 	@Override
@@ -177,6 +178,13 @@ public class VignetteFilter implements IFilter {
 			getClass().getName(),
 			"Vignette Export/Import Content",
 			"Default Vignette Export/Import Content configuration."));
+		list.add(new FilterConfiguration(
+				getName() + "-nocdata",
+				MimeTypeMapper.XML_MIME_TYPE,
+				getClass().getName(),
+				"Vignette Export/Import Content (escaped HTML)",
+				"Vignette files without CDATA sections.",
+				"nocdata.fprm"));
 		return list;
 	}
 
@@ -309,7 +317,7 @@ public class VignetteFilter implements IFilter {
 				// No source
 				if ( !Util.isEmpty(data[1]) ) {
 					// No source but target exists
-					logger.warning(String.format(
+					logger.warn(String.format(
 						"Entry '%s': No corresponding source entry exists for the target '%s'",
 						data[1], trgLoc.toPOSIXLocaleId()));
 				}
@@ -317,7 +325,7 @@ public class VignetteFilter implements IFilter {
 			else { // Source exists
 				if ( Util.isEmpty(data[1]) ) {
 					// Source exists but not the target
-					logger.warning(String.format(
+					logger.warn(String.format(
 						"Entry '%s': No entry exists for the target '%s'",
 						data[0], trgLoc.toPOSIXLocaleId()));
 				}
@@ -328,7 +336,7 @@ public class VignetteFilter implements IFilter {
 			}
 		}
 		if ( toExtract <= 0 ) {
-			logger.warning("There are no entries to extract");
+			logger.warn("There are no entries to extract");
 		}
 
 		// Second pass: extraction
@@ -364,12 +372,15 @@ public class VignetteFilter implements IFilter {
 		//TODO: We may have to work with buffered block to handle very large files
 		readAllData();
 		
-		if ( docName != null ) rootId = docName;
-		else rootId = IdGenerator.DEFAULT_ROOT_ID;
+//		if ( docName != null ) 
+//			rootId = docName;
+//		else 
+			rootId = IdGenerator.DEFAULT_ROOT_ID;
 
 		tuId = 0;
 		subDocId = new IdGenerator(rootId, IdGenerator.START_SUBDOCUMENT);
-		groupId = new IdGenerator(rootId, IdGenerator.START_GROUP);
+		//groupId = new IdGenerator(rootId, IdGenerator.START_GROUP);
+		sectionIndex = 0;
 		otherId = 0;
 		
 		// Set the start event
@@ -601,13 +612,13 @@ public class VignetteFilter implements IFilter {
 		if ( Util.isEmpty(localeId) || Util.isEmpty(sourceId) ) {
 			// Warn during pre-processing, then treat as document part
 			if ( preprocessing ) {
-				logger.warning(String.format(
+				logger.warn(String.format(
 					"Entry with incomplete data at %s number %d\nlocale='%s' sourceId='%s'",
 					STARTBLOCK, counter, localeId, sourceId));
 				return false;
 			}
 			else {
-				logger.warning("Missing data, this section is skipped.");
+				logger.warn("Missing data, this section is skipped.");
 				DocumentPart dp = new DocumentPart(String.valueOf(++otherId), false);
 				dp.setSkeleton(new GenericSkeleton(content.replace("\n", lineBreak)));
 				queue.add(new Event(EventType.DOCUMENT_PART, dp));
@@ -796,7 +807,8 @@ public class VignetteFilter implements IFilter {
 		n = content.indexOf("<", n+1); // Start of value-type element
 		// Meta characters are escaped so we can just do this: 
 		res[0] = content.indexOf(">", n)+1;
-		res[1] = content.indexOf("<", res[0]);
+		String name = content.substring(n + 1, res[0] - 1);
+		res[1] = content.indexOf("</" + name, res[0]); // Not to stumble at tags in CDATA
 		return res;
 	}
 	
@@ -816,56 +828,56 @@ public class VignetteFilter implements IFilter {
 			queue.add(new Event(EventType.TEXT_UNIT, tu));
 		}
 		else {
-			subFilter = fcMapper.createFilter(partConfiguration, subFilter);
-			encoderManager.mergeMappings(subFilter.getEncoderManager());
-			subFilter.close();
-			groupId.createId(); // Create new Id for this group
-			if ( subFilter instanceof AbstractMarkupFilter ) { // For IdGenerator try-out
-				// The root id of is made of: rootId + subDocId + groupId
-				Event event;
-				// convert to true SubFilter
-				SubFilterEventConverter converter = 
-					new SubFilterEventConverter(subDocId.getLastId(), 
-							// we don't add CDATA markers because this filter 
-							// uses a special skeleton writer to output them
-							null, null);
-			
-				((AbstractFilter)subFilter).setParentId(subDocId.getLastId());
-				subFilter.open(new RawDocument(data, srcLoc));
-				while ( subFilter.hasNext() ) {
-					event = converter.convertEvent(subFilter.next());
-					queue.add(event);
-				}
-				subFilter.close();
-			}
-			else {
-				subFilter.open(new RawDocument(data, srcLoc));
+			filter = fcMapper.createFilter(partConfiguration, filter);
+			//encoderManager.mergeMappings(filter.getEncoderManager());
+			//IEncoder encoder = encoderManager.getEncoder();
+						
+			IEncoder encoder = params.getUseCDATA() ? 
+					new CDATAEncoder("UTF-8", lineBreak) :
+					new XMLEncoder("UTF-8", lineBreak, true, false, false, 1);
 					
-				// Change the START_DOCUMENT to START_GROUP
-				Event event = subFilter.next(); // START_DOCUMENT
-				StartDocument sd = (StartDocument)event.getResource();
-				StartGroup sg = new StartGroup(subDocId.getLastId(), groupId.getLastId()); // Group id already created
-				sg.setType("x-"+partName);
-				sg.setMimeType(sd.getMimeType());
-				sg.setSkeleton(sd.getSkeleton());
-				sg.setAnnotation(new SubFilterAnnotation());
-				queue.add(new Event(EventType.START_GROUP, sg));
-				
-				while ( subFilter.hasNext() ) {
-					event = subFilter.next();
-					if ( event.getEventType() == EventType.END_DOCUMENT ) {
-						break;
-					}
-					queue.add(event);
-				}
-				subFilter.close();
-	
-				// Change the END_DOCUMENT to END_GROUP
-				Ending ending = new Ending(groupId.createId());
-				ending.setSkeleton(event.getResource().getSkeleton());
-				ending.setAnnotation(new SubFilterAnnotation());
-				queue.add(new Event(EventType.END_GROUP, ending));
-			}
+			subFilter = new SubFilter(filter, 
+					encoder, ++sectionIndex, partName, partName);
+			
+//			groupId.createId(); // Create new Id for this group
+//			if ( filter instanceof AbstractMarkupFilter ) { // For IdGenerator try-out
+//				// The root id of is made of: rootId + subDocId + groupId
+//				FilterState state = new FilterState(FILTER_STATE.STANDALONE_TEXTUNIT, 
+//						subDocId.getLastId(), null, null, null); 
+//				subFilter.setState(state);
+//				subFilter.open(new RawDocument(data, srcLoc));
+//				while ( subFilter.hasNext() ) {
+//					queue.add(subFilter.next());
+//				}
+//				subFilter.close();
+//			}
+//			else {
+//				subFilter.open(new RawDocument(data, srcLoc));
+//					
+//				// Change the START_DOCUMENT to START_SUBFILTER
+//				Event event = subFilter.next(); // START_DOCUMENT
+//				//StartDocument sd = (StartDocument)event.getResource();
+//				StartSubfilter sg = new StartSubfilter(subDocId.getLastId(), groupId.getLastId(),
+//						event.getStartDocument()); // Group id already created
+//				sg.setType("x-"+partName);
+//				queue.add(new Event(EventType.START_SUBFILTER, sg));
+//				
+//				while ( subFilter.hasNext() ) {
+//					event = subFilter.next();
+//					if ( event.getEventType() == EventType.END_DOCUMENT ) {
+//						break;
+//					}
+//					queue.add(event);
+//				}
+//				subFilter.close();
+//	
+//				// Change the END_DOCUMENT to END_SUBFILTER
+//				EndSubfilter ending = new EndSubfilter(groupId.createId());
+//				ending.setSkeleton(event.getResource().getSkeleton());
+//				queue.add(new Event(EventType.END_SUBFILTER, ending));
+//			}
+			queue.addAll(subFilter.getEvents(new RawDocument(data, srcLoc)));
+			queue.add(subFilter.createRefEvent());
 		}
 	}
 	

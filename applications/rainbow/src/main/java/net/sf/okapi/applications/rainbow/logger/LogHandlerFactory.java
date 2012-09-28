@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2010 by the Okapi Framework contributors
+  Copyright (C) 2008-2009 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -18,29 +18,21 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.lib.beans.v1;
+package net.sf.okapi.applications.rainbow.logger;
 
-import net.sf.okapi.common.filters.SubFilterAnnotation;
-import net.sf.okapi.lib.persistence.IPersistenceSession;
-import net.sf.okapi.lib.persistence.PersistenceBean;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public class SubFilterAnnotationBean extends PersistenceBean<SubFilterAnnotation> {
-
-	@Override
-	protected SubFilterAnnotation createObject(IPersistenceSession session) {
-		return new SubFilterAnnotation();
+public class LogHandlerFactory {
+	static public ILogHandler getLogHandler() {
+		Logger localLogger = LoggerFactory.getLogger(LogHandlerFactory.class);
+		String realLogger = localLogger.getClass().getName();
+		if( "org.slf4j.impl.JDK14LoggerAdapter".equals(realLogger) )
+			return new LogHandlerJDK();
+		if( "org.slf4j.impl.Log4jLoggerAdapter".equals(realLogger) )
+			return new LogHandlerLog4j();
+		// if( "org.slf4j.impl.JCLLoggerAdapter".equals(realLogger) )
+		// if( "ch.qos.logback.classic.Logger".equals(realLogger) )
+		return new LogHandlerNop();
 	}
-
-	@Override
-	protected void fromObject(SubFilterAnnotation obj,
-			IPersistenceSession session) {
-		// No data
-	}
-
-	@Override
-	protected void setObject(SubFilterAnnotation obj,
-			IPersistenceSession session) {
-		// No data
-	}
-
 }

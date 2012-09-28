@@ -1,0 +1,8 @@
+assumeWellformed: true
+global_pcdata_subfilter: okf_html
+preserve_whitespace: false
+
+elements:
+  segment:
+    ruleTypes: [TEXTUNIT]
+    idAttributes: [sequence]

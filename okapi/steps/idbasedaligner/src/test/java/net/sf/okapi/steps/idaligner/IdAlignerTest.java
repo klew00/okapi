@@ -131,25 +131,26 @@ public class IdAlignerTest {
 		assertEquals(EventType.START_BATCH, el.remove(0).getEventType());
 		assertEquals(EventType.START_BATCH_ITEM, el.remove(0).getEventType());
 		assertEquals(EventType.START_DOCUMENT, el.remove(0).getEventType());
-		assertEquals(EventType.START_GROUP, el.remove(0).getEventType());
+		assertEquals(EventType.START_SUBFILTER, el.remove(0).getEventType());
 
 		Event tue = el.remove(0);
 		assertEquals("<b>Cancel</b>", tue.getResource().toString());
-		assertEquals("key.Cancel-1", tue.getTextUnit().getName());
+		assertEquals("key.Cancel_1", tue.getTextUnit().getName());
 		
-		assertEquals(EventType.END_GROUP, el.remove(0).getEventType());
-		assertEquals(EventType.START_GROUP, el.remove(0).getEventType());
+		assertEquals(EventType.END_SUBFILTER, el.remove(0).getEventType());
+		assertEquals(EventType.DOCUMENT_PART, el.remove(0).getEventType());
+		assertEquals(EventType.START_SUBFILTER, el.remove(0).getEventType());
 		
 		tue = el.remove(0);
 		assertEquals("Unable to communicate", tue.getResource().toString());
-		assertEquals("key.server-1", tue.getTextUnit().getName());
+		assertEquals("key.server_1", tue.getTextUnit().getName());
 		
 		assertEquals(EventType.DOCUMENT_PART, el.remove(0).getEventType());
 		assertEquals(EventType.DOCUMENT_PART, el.remove(0).getEventType());
 		
 		tue = el.remove(0);
 		assertEquals("server", tue.getResource().toString());
-		assertEquals("key.server-2", tue.getTextUnit().getName());
+		assertEquals("key.server_4", tue.getTextUnit().getName());
 	}
 
 	@Test
