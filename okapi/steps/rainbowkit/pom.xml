@@ -9,6 +9,14 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>okapi-step-rainbowkit</artifactId>
     <name>Okapi Steps for Creating and Reading Rainbow T-Kits</name>
+    <repositories>
+     <repository>
+      <id>okapi-xliff</id>
+      <name>okapi-xliff-repository</name>
+      <url>http://repository-okapi-xliff.forge.cloudbees.com/snapshot/</url>                       
+      <layout>default</layout>
+     </repository>
+    </repositories>
     <dependencies>
 		<dependency>
      		<groupId>net.sf.okapi</groupId>
