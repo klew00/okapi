@@ -22,6 +22,7 @@
 					<artifactId>slf4j-api</artifactId>
 				</exclusion>
 			</exclusions>
+			<scope>runtime</scope>
 		</dependency>
 	</dependencies>
 
