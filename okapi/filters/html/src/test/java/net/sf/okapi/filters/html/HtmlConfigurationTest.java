@@ -161,9 +161,8 @@ public class HtmlConfigurationTest {
 		cf.compile();
 		ArrayList<String> list = cf.getRules();
 		assertNotNull(list);
-		assertEquals(2, list.size());
-		assertEquals("[eE]", list.get(0));
-		assertEquals("\\bVAR\\d\\b", list.get(1));
+		assertEquals(1, list.size());
+		assertEquals("\\bVAR\\d\\b", list.get(0));
 	}
 
 	@Test

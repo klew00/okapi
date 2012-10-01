@@ -304,9 +304,34 @@ public class HtmlSnippetsTest {
 		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 		assertNotNull(tu);
 		List<Code> list = tu.getSource().getFirstContent().getCodes();
+		assertEquals(1, list.size());
+		assertEquals("VAR2", list.get(0).getData());
+		parameters = originalParameters;
+	}
+
+	@Test
+	public void testCodeFinderInAttributes () {
+		String snippet = "<p title='Title VAR1'>Para VAR2 <img alt='Alt VAR3'> after<p>";
+		URL originalParameters = parameters;
+		parameters = HtmlSnippetsTest.class.getResource("/withCodeFinderRules.yml");
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1); // Title
+		List<Code> list = tu.getSource().getFirstContent().getCodes();
+		assertEquals(1, list.size());
+		assertEquals("VAR1", list.get(0).getData());
+		assertTrue(tu.getSource().getFirstContent().toString().startsWith("Title"));
+		
+		tu = FilterTestDriver.getTextUnit(getEvents(snippet), 2); // Alt
+		list = tu.getSource().getFirstContent().getCodes();
+		assertEquals(1, list.size());
+		assertEquals("VAR3", list.get(0).getData());
+		assertTrue(tu.getSource().getFirstContent().toString().startsWith("Alt"));
+		
+		tu = FilterTestDriver.getTextUnit(getEvents(snippet), 3); // Paragraph
+		list = tu.getSource().getFirstContent().getCodes();
 		assertEquals(2, list.size());
-		assertEquals("e", list.get(0).getData());
 		assertEquals("VAR2", list.get(1).getData());
+		assertTrue(tu.getSource().getFirstContent().toString().startsWith("Para"));
+		
 		parameters = originalParameters;
 	}
 
