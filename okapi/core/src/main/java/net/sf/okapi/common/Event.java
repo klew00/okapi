@@ -187,7 +187,7 @@ public class Event {
 	/**
 	 * Convenience method to tell if this Event is a SubFilter Group
 	 * 
-	 * @return true if {@link Group} and {@link StartSubfilter}, false otherwise
+	 * @return true if {@link StartSubfilter}, false otherwise
 	 */
 	public boolean isStartSubfilter () {
 		return (filterEventType == EventType.START_SUBFILTER);
@@ -196,7 +196,7 @@ public class Event {
 	/**
 	 * Convenience method to tell if this Event is a SubFilter Group
 	 * 
-	 * @return true if {@link Group} and {@link StartSubfilter}, false otherwise
+	 * @return true if {@link StartSubfilter}, false otherwise
 	 */
 	public boolean isEndSubfilter () {
 		return (filterEventType == EventType.END_SUBFILTER);
