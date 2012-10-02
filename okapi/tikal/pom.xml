@@ -81,6 +81,11 @@
         	<version>${project.version}</version>
         </dependency>
         <dependency>
+        	<groupId>net.sf.okapi.filters</groupId>
+        	<artifactId>okapi-filter-rtf</artifactId>
+        	<version>${project.version}</version>
+        </dependency>
+        <dependency>
         	<groupId>net.sf.okapi.steps</groupId>
         	<artifactId>okapi-step-formatconversion</artifactId>
         	<version>${project.version}</version>

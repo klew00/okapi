@@ -584,6 +584,7 @@ public class EventBuilder {
 		skel.add(tag.substring(propOrText.getValueEndPos(), propOrText.getMainEndPos()));
 		tu.setSkeleton(skel);
 
+		postProcessTextUnit(tu);
 		return tu;
 	}
 

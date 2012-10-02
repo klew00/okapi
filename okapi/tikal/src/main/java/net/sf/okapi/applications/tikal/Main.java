@@ -653,6 +653,9 @@ public class Main {
 		extensionsMap.put(".txp", "okf_transifex");
 		filtersMap.put("okf_transifex", "net.sf.okapi.filters.transifex.TransifexFilter");
 
+		extensionsMap.put(".rtf", "okf_tradosrtf");
+		filtersMap.put("okf_tradosrtf", "net.sf.okapi.filters.rtf.RTFFilter");
+
 		extensionsMap.put(".zip", "okf_archive");
 		filtersMap.put("okf_archive", "net.sf.okapi.filters.archive.ArchiveFilter");
 
