@@ -28,6 +28,7 @@ import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.ISegmenter;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Range;
+import net.sf.okapi.common.filterwriter.GenericContent;
 import net.sf.okapi.common.resource.ISegments;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.ITextUnit;
@@ -292,6 +293,21 @@ public class SRXSegmenterTest {
 		assertEquals(2, segmenter.computeSegments("z\u0608")); // z + Arabic ray
 
 		assertEquals(1, segmenter.computeSegments("\u20ac\u1680")); // Euro + Ogham space -> no break
+	}
+	
+	@Test
+	public void testWithWithoutTrailingWhitespace() {
+		ISegmenter seg = createSegmenterWithRules(LocaleId.ENGLISH);		
+		GenericContent fmt = new GenericContent();
+		
+		ITextUnit tu = new TextUnit("1", "This sentence should not be split.");
+		seg.computeSegments(tu.getSource());
+		assertEquals("[This sentence should not be split.]", fmt.printSegmentedContent(tu.getSource(), true));
+		
+		tu = new TextUnit("1", "This sentence should not be split. ");
+		seg.computeSegments(tu.getSource());
+		// why aren't two segments produced? [This sentence should not be split.][ ]
+		assertEquals("[This sentence should not be split. ]", fmt.printSegmentedContent(tu.getSource(), true));
 	}
 	
 	private ISegmenter createSegmenterWithRules (LocaleId locId) {
