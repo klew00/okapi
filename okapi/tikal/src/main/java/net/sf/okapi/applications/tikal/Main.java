@@ -35,8 +35,6 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -566,9 +564,8 @@ public class Main {
 	
 	private void initialize () {
 		// Create the mapper and load it with all parameters editor info
-		// Do not load the filter configurations yet (time consuming)
 		fcMapper = new FilterConfigurationMapper();
-		DefaultFilters.setMappings(fcMapper, false, false);
+		DefaultFilters.setMappings(fcMapper, false, true);
 		
 		// Instead create a map with extensions -> filter
 		extensionsMap = new Hashtable<String, String>();
@@ -670,6 +667,8 @@ public class Main {
 		if ( specifiedConfigIdPath != null ) {
 			fcMapper.setCustomConfigurationsDirectory(specifiedConfigIdPath);
 		}
+		
+		loadFromPluginsAndUpdate();
 	}
 	
 	private String getConfigurationId (String ext) {
@@ -685,9 +684,6 @@ public class Main {
 	private void editAllConfigurations () {
 		initialize();
 		guessMissingLocales(null);
-		// Add all the pre-defined configurations
-		DefaultFilters.setMappings(fcMapper, false, true);
-		loadFromPluginsAndUpdate();
 		// Add the custom configurations
 		fcMapper.updateCustomConfigurations();
 
@@ -740,8 +736,6 @@ public class Main {
 	
 	private void showAllConfigurations () {
 		initialize();
-		DefaultFilters.setMappings(fcMapper, true, true);
-		loadFromPluginsAndUpdate();
 		// Add the custom configurations
 		fcMapper.updateCustomConfigurations();
 

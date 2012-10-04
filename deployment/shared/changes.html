@@ -30,6 +30,8 @@ distribution.</p>
 	<li>Tikal:<ul>
 	<li>Changed the logging system.</li>
 	<li>Fixed issue #278: Added default mapping for the RTF Filter.</li>
+	<li>Changed loading of the filters so all are taken into account on 
+	initialization.</li>
 </ul>
 	</li>
 	<li>CheckMate:<ul>
@@ -46,6 +48,13 @@ distribution.</p>
 	<li>Id-Based Aligner:<ul>
 	<li>Fixed issue where the multilingual files where detected on the source 
 	input rather than the target.</li>
+</ul>
+	</li>
+	<li>Rainbow Translation Kit merging Step:<ul>
+	<li>Fixed issue #281: pre-segmented source is now re-segmented with original 
+	IDs if needed, avoiding to have different segment IDs between source and 
+	target, that cause incorrect source segment ID in the final output if it is 
+	a segmented document like XLIFF.</li>
 </ul>
 	</li>
 </ul>

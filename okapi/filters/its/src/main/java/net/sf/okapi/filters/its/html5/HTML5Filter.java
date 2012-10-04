@@ -58,7 +58,8 @@ public class HTML5Filter extends ITSFilter {
 		super(true, MimeTypeMapper.HTML_MIME_TYPE);
 		URL url = getClass().getResource("default.fprm");
 		try {
-			params.load(url.toURI(), false);
+			// Replace the slashes to work around jython issues
+			params.load(new URI(url.toString().replace('\\', '/')), false);
 		}
 		catch ( URISyntaxException e ) {
 			throw new OkapiBadFilterParametersException("Cannot load default parameters.");

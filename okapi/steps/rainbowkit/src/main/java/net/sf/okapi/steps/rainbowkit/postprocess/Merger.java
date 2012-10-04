@@ -342,6 +342,11 @@ public class Merger {
 		// This allows to move codes anywhere in the text unit, not just each part.
 		// We do remember the ranges because some formats will required to be merged by segments
 		if ( !srcOriCont.contentIsOneSegment() ) {
+			if ( mergeAsSegments ) {
+				// Make sure we remember the source segment if we merge as segments later
+				// Otherwise the segment id of the source and target will defer
+				srcRanges = srcOriCont.getSegments().getRanges();
+			}
 			srcOriCont.joinAll();
 		}
 		if ( forceSegmentationInMerge ) {

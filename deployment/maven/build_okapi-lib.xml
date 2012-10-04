@@ -606,7 +606,7 @@
 
 		<!-- slf4j-jdk14-<ver>.jar -->
 		<property name="depSlf4jBind" value="${mavenStore}/org/slf4j/slf4j-jdk14/1.7.1"/>
-		<fileset id="list.contents" dir="${depSlf4jBind}" includes="**/*.jar"/>
+		<fileset id="list.contents" dir="${depSlf4jBind}" includes="**/slf4j-jdk14-1.7.1.jar"/>
 		<property name="jarSlf4jBind" refid="list.contents"/>
 		<copy todir="${distLogger}" file="${depSlf4jBind}/${jarSlf4jBind}"/>
 	</target>
