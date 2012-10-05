@@ -22,11 +22,8 @@ package net.sf.okapi.filters.its;
 
 import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.Stack;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
@@ -41,13 +38,11 @@ import net.sf.okapi.common.ListUtil;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.annotation.TermsAnnotation;
-import net.sf.okapi.common.encoder.EncoderContext;
 import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.encoder.IEncoder;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filters.IFilterConfigurationMapper;
-import net.sf.okapi.common.filters.InlineCodeFinder;
 import net.sf.okapi.common.filterwriter.GenericFilterWriter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.resource.Code;
@@ -64,6 +59,8 @@ import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
 import net.sf.okapi.common.skeleton.ISkeletonWriter;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;

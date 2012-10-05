@@ -62,6 +62,14 @@ public class HTML5FilterTest {
 	}
 	
 	@Test
+	public void testTranslateOverridenByRule () {
+		ArrayList<Event> list = getEvents(new File(root+"test01.html"));
+		ITextUnit tu = FilterTestDriver.getTextUnit(list, 1);
+		assertNotNull(tu); // Para should be first because the rules associated to test1.html override meta[keywords] as translatable
+		assertEquals("This is a <1>motherboard</1>.", fmt.setContent(tu.getSource().getFirstContent()).toString());
+	}
+	
+	@Test
 	public void testTranslateAttribute () {
 		String snippet = "<!DOCTYPE html><html lang=\"en\"><head><meta charset=utf-8><title>Title</title></head><body>"
 			+ "<p>Text <img src=test.png alt=Text>.</p>"
