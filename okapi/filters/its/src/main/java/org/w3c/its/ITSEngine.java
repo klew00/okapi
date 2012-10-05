@@ -1263,13 +1263,12 @@ public class ITSEngine implements IProcessor, ITraversal {
 						List<String> list = resolveExpressionAsList(NL.item(i), rule.info);
 						// Map the values and build the final string
 						StringBuilder tmp = new StringBuilder();
-						for ( String value : list ) {
-							if ( rule.map != null ) {
-								if ( rule.map.containsKey(value) ) {
-									value = rule.map.get(value);
-								}
-							}
-							if ( tmp.length() > 0 ) tmp.append("\t");
+						List<String> values = null;
+						for ( String item : list ) {
+							values = fromDomainItemToValues(item, rule.map, values);
+						}
+						for ( String value : values ) {
+							if ( tmp.length() > 0 ) tmp.append(", ");
 							tmp.append(value);
 						}
 						setFlag(NL.item(i), FP_DOMAIN, 'y', true);
@@ -1348,6 +1347,28 @@ public class ITSEngine implements IProcessor, ITraversal {
 		catch ( XPathExpressionException e ) {
 			throw new RuntimeException(e);
 		}
+	}
+	
+	private List<String> fromDomainItemToValues (String text,
+		Map<String, String> map,
+		List<String> list)
+	{
+		if ( list == null ) list = new ArrayList<String>();
+		// Split the item on commas, and remove white spaces
+		String[] parts = text.split(",", 0);
+		for ( int i=0; i<parts.length; i++ ) {
+			parts[i] = parts[i].trim();
+		}
+		for ( String part : parts ) {
+			// If there is a map and the part is listed in it
+			if (( map != null ) && map.containsKey(part) ) {
+				part = map.get(part); // Use the mapped value
+			}
+			if ( !list.contains(part) ) {
+				list.add(part);
+			}
+		}
+		return list;
 	}
 	
 	/**

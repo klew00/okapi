@@ -672,6 +672,12 @@ public class XLIFFFilter implements IFilter {
 				tu.setProperty(new Property(Property.ITS_ALLOWEDCHARACTERS, tmp));
 			}
 			
+			// ITS Domain
+			tmp = reader.getAttributeValue(XLIFFWriter.NS_XLIFFOKAPI, "istDomain");
+			if ( tmp != null ) {
+				tu.setProperty(new Property(Property.ITS_DOMAIN, tmp));
+			}
+			
 			// Set restype (can be null)
 			tu.setType(reader.getAttributeValue(null, "restype"));
 			

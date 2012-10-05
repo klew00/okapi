@@ -318,6 +318,47 @@ public class XMLFilterTest {
 	}
 	
 	@Test
+	public void testDomain1 () {
+		String snippet = "<?xml version=\"1.0\"?>\n"
+			+ "<doc><its:rules version=\"1.0\" xmlns:its=\"http://www.w3.org/2005/11/its\">"
+			+ "<its:translateRule selector=\"//head\" translate=\"no\"/>"
+			+ "<its:domainRule selector=\"/doc\" domainPointer=\"//domSet/topic|//domSet/subject\" domainMapping=\"dom1 domA, dom2 domB\"/>"
+			+ "<its:domainRule selector=\"/doc\" domainPointer=\"//domain\" domainMapping=\"dom3 domC, dom4 domD\"/>"
+			+ "</its:rules>"
+			+ "<head><domain>domZ,dom3,   dom4</domain><domain>domZ</domain>"
+			+ "<domSet><topic>dom1</topic><subject>dom2, domY</subject></domSet>"
+			+ "</head>"
+			+ "<p>text</p>"
+			+ "</doc>";
+		ArrayList<Event> list = getEvents(snippet);
+		ITextUnit tu = FilterTestDriver.getTextUnit(list, 1);
+		Property prop = tu.getProperty(Property.ITS_DOMAIN);
+		assertNotNull(prop);
+		assertEquals("domZ, domC, domD", prop.getValue());
+	}
+	
+	@Test
+	public void testDomain2 () {
+		String snippet = "<?xml version=\"1.0\"?>\n"
+			+ "<doc><its:rules version=\"1.0\" xmlns:its=\"http://www.w3.org/2005/11/its\">"
+			+ "<its:translateRule selector=\"//head\" translate=\"no\"/>"
+			// Inverse the rules compared to testDomain1
+			+ "<its:domainRule selector=\"/doc\" domainPointer=\"//domain\" domainMapping=\"dom3 domC, dom4 domD\"/>"
+			+ "<its:domainRule selector=\"/doc\" domainPointer=\"//domSet/topic|//domSet/subject\" domainMapping=\"dom1 domA, dom2 domB\"/>"
+			+ "</its:rules>"
+			+ "<head><domain>domZ,dom3,   dom4</domain><domain>domZ</domain>"
+			+ "<domSet><topic>dom1</topic><subject>dom2, domY</subject></domSet>"
+			+ "</head>"
+			+ "<p>text</p>"
+			+ "</doc>";
+		ArrayList<Event> list = getEvents(snippet);
+		ITextUnit tu = FilterTestDriver.getTextUnit(list, 1);
+		Property prop = tu.getProperty(Property.ITS_DOMAIN);
+		assertNotNull(prop);
+		assertEquals("domA, domB, domY", prop.getValue());
+	}
+	
+	@Test
 	public void testAllowedChars () {
 		String snippet = "<?xml version=\"1.0\"?>\n"
 			+ "<doc><its:rules version=\"2.0\" xmlns:its=\"http://www.w3.org/2005/11/its\""

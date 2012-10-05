@@ -48,6 +48,7 @@ import net.sf.okapi.common.resource.TextPart;
 import net.sf.okapi.filters.rainbowkit.Manifest;
 import net.sf.okapi.filters.rainbowkit.MergingInfo;
 import net.sf.okapi.lib.xliff.Candidate;
+import net.sf.okapi.lib.xliff.ExtendedContent;
 import net.sf.okapi.lib.xliff.ExtendedElement;
 import net.sf.okapi.lib.xliff.Fragment;
 import net.sf.okapi.lib.xliff.Note;
@@ -342,20 +343,11 @@ public class XLIFF2PackageWriter extends BasePackageWriter {
 			unit.getExtendedAttributes().setAttribute(Names.NS_ITS, "allowedCharacters",
 				tu.getProperty(Property.ITS_ALLOWEDCHARACTERS).getValue());
 		}
-		
-		// Domains
-		if ( tu.hasProperty(Property.ITS_DOMAINS) ) {
-			ExtendedElement domains = new ExtendedElement(new QName(Names.NS_XLIFFOKAPI, "itsDomains", Names.PREFIX_XLIFFOKAPI), null);
-			domains.getAttributes().setNamespace("okp", Names.NS_XLIFFOKAPI);
-			//Not used for now domains.getAttributes().setNamespace("dc", "http://purl.org/dc/elements/1.1/");
-			for ( String value : tu.getProperty(Property.ITS_DOMAINS).getValue().split("\t", 0) ) {
-				ExtendedElement item = new ExtendedElement(new QName(Names.NS_XLIFFOKAPI, "item", Names.PREFIX_XLIFFOKAPI), null);
-				item.getAttributes().setAttribute("http://purl.org/dc/elements/1.1/", "subject", value);
-				domains.addChild(item);
-			}
-			unit.getExtendedElements().add(domains);
+		// Domain
+		if ( tu.hasProperty(Property.ITS_DOMAIN) ) {
+			unit.getExtendedAttributes().setAttribute(Names.NS_XLIFFOKAPI, "itsDomain",
+				tu.getProperty(Property.ITS_DOMAIN).getValue());
 		}
-		
 		
 		// Go through the parts: Use the source to drive the order
 		// But match on segment ids

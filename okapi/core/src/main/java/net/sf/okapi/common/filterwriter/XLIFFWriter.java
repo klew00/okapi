@@ -462,6 +462,10 @@ public class XLIFFWriter implements IFilterWriter {
 			writer.writeAttributeString("its:allowedCharacters", tu.getProperty(Property.ITS_ALLOWEDCHARACTERS).getValue());
 			writer.writeAttributeString("xmlns:its", NS_ITS20);
 		}
+		if ( tu.hasProperty(Property.ITS_DOMAIN) ) {
+			writer.writeAttributeString("okp:itsDomain", tu.getProperty(Property.ITS_DOMAIN).getValue());
+		}
+
 		writer.writeLineBreak();
 
 		// Get the source container
@@ -540,18 +544,6 @@ public class XLIFFWriter implements IFilterWriter {
 			writer.writeAttributeString("annotates", "source");
 			writer.writeString("Terms:\n"+ann.toString());
 			writer.writeEndElementLineBreak(); // note
-		}
-
-		// ITS properties (as element)
-		if ( tu.hasProperty(Property.ITS_DOMAINS) ) {
-			writer.writeStartElement("okp:itsDomains");
-			writer.writeAttributeString("xmlns:dc", "http://purl.org/dc/elements/1.1/");
-			for ( String value : tu.getProperty(Property.ITS_DOMAINS).getValue().split("\t", 0) ) {
-				writer.writeStartElement("okp:item");
-				writer.writeAttributeString("dc:subject", value);
-				writer.writeEndElement();
-			}
-			writer.writeEndElement();
 		}
 
 		writer.writeEndElementLineBreak(); // trans-unit

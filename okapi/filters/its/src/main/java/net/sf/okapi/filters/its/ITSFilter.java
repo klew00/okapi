@@ -635,7 +635,7 @@ public abstract class ITSFilter implements IFilter {
 		}
 		// ITS Domain
 		if ( !Util.isEmpty(ci.domains) ) {
-			tu.setProperty(new Property(Property.ITS_DOMAINS, ci.domains));
+			tu.setProperty(new Property(Property.ITS_DOMAIN, ci.domains));
 		}
 		// ITS External resources Reference
 		if ( !Util.isEmpty(ci.externalRes) ) {
@@ -923,7 +923,7 @@ public abstract class ITSFilter implements IFilter {
 		}
 		// ITS Domain
 		if ( !Util.isEmpty(context.peek().domains) ) {
-			tu.setProperty(new Property(Property.ITS_DOMAINS, context.peek().domains));
+			tu.setProperty(new Property(Property.ITS_DOMAIN, context.peek().domains));
 		}
 		// ITS External resources Reference
 		if ( !Util.isEmpty(context.peek().externalRes) ) {

@@ -39,9 +39,9 @@ public class Property {
 	public static final String COORDINATES = "coordinates"; 
 
 	/**
-	 * Tab-delimited list of ITS Domain values
+	 * ITS Domain value (comma-delimited list of domains)
 	 */
-	public static final String ITS_DOMAINS = "its-domains";
+	public static final String ITS_DOMAIN = "its-domains";
 	
 	/**
 	 * ITS External Resources Reference value

@@ -239,7 +239,7 @@ public class XLIFFWriterTest {
 	{
 		writer.create(root+"out.xlf", null, locEN, null, null, "original.ext", null);
 		ITextUnit tu = new TextUnit("tu1", "text");
-		tu.setProperty(new Property(Property.ITS_DOMAINS, "dom1\tdom2"));
+		tu.setProperty(new Property(Property.ITS_DOMAIN, "dom1, dom2"));
 		tu.setProperty(new Property(Property.ITS_EXTERNALRESREF, "http://example.com/res"));
 		writer.writeTextUnit(tu);
 		writer.close();
@@ -249,9 +249,8 @@ public class XLIFFWriterTest {
 			+ "<xliff version=\"1.2\" xmlns=\"urn:oasis:names:tc:xliff:document:1.2\" xmlns:okp=\"okapi-framework:xliff-extensions\">\n"
 			+ "<file original=\"original.ext\" source-language=\"en\" datatype=\"x-undefined\">\n"
 			+ "<body>\n"
-			+ "<trans-unit id=\"tu1\" xmlns:okp=\"okapi-framework:xliff-extensions\" okp:itsExternalResourceRef=\"http://example.com/res\">\n"
+			+ "<trans-unit id=\"tu1\" xmlns:okp=\"okapi-framework:xliff-extensions\" okp:itsExternalResourceRef=\"http://example.com/res\" okp:itsDomain=\"dom1, dom2\">\n"
 			+ "<source xml:lang=\"en\">text</source>\n"
-			+ "<okp:itsDomains xmlns:dc=\"http://purl.org/dc/elements/1.1/\"><okp:item dc:subject=\"dom1\"></okp:item><okp:item dc:subject=\"dom2\"></okp:item></okp:itsDomains>"
 			+ "</trans-unit>\n"
 			+ "</body>\n</file>\n</xliff>\n", result);
 	}
