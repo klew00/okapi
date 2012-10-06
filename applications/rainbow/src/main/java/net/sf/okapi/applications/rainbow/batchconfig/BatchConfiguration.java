@@ -32,6 +32,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -80,7 +81,10 @@ public class BatchConfiguration {
 			dos.writeInt(numPlugins);
 			if (numPlugins > 0) {
 				for (URL url : pm.getURLs()) {
-					String jarPath = new File(url.getPath()).getPath();
+					// Do not do this: String jarPath = new File(url.getPath()).getPath();
+					// Otherwise the escape characters are in the path.
+					String path = URLDecoder.decode(url.getPath(), "UTF-8");
+                    String jarPath = new File(path).getPath();
 					String root = Util.longestCommonDir(true, pm.getPluginsDir().getPath(), jarPath);				
 					String relPath = "";
 					
