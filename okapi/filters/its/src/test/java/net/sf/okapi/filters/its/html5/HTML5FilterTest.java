@@ -97,6 +97,23 @@ public class HTML5FilterTest {
 	}
 	
 	@Test
+	public void testRulesInScripts () {
+		String snippet = "<!DOCTYPE html><html lang=\"en\"><head><meta charset=utf-8><title>Title</title>"
+			+ "<script type=application/its+xml><!--"
+			+ "<its:rules xmlns:its='http://www.w3.org/2005/11/its' version='2.0' "
+			+ "xmlns:h='http://www.w3.org/1999/xhtml'>"
+			+ "<its:translateRule selector='//h:title' translate='no'/>"
+			+ "</its:rules>"
+			+ "--></script>"
+			+ "</head><body>"
+			+ "<p>text</body></html>";
+		ArrayList<Event> list = getEvents(snippet);
+		ITextUnit tu = FilterTestDriver.getTextUnit(list, 1);
+		assertNotNull(tu);
+		assertEquals("text", fmt.setContent(tu.getSource().getFirstContent()).toString());
+	}
+	
+	@Test
 	public void testLocaleFilterLocal () {
 		String snippet = "<!DOCTYPE html><html lang=en><head><meta charset=utf-8><title>Title</title></head><body>"
 			+ "<p its-locale-filter-list='de'>Text 1</p>"

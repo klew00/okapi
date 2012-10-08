@@ -20,6 +20,7 @@
 
 package org.w3c.its;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -48,6 +49,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 public class ITSEngine implements IProcessor, ITraversal {
@@ -65,6 +67,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 	public static final String    XLINK_NS_PREFIX = "xlink";
 	public static final String    HTML_NS_URI     = "http://www.w3.org/1999/xhtml";
 	public static final String    HTML_NS_PREFIX  = "h";
+	public static final String    ITS_MIMETYPE    = "application/its+xml";
 	
 	private static final String   FLAGNAME = "\u00ff"; // Name of the user-data property that holds the flags
 	private static final String   FLAGSEP  = "\u001c"; // Separator between data categories
@@ -205,13 +208,17 @@ public class ITSEngine implements IProcessor, ITraversal {
 		return xpath;
 	}
 	
+	private void ensureDocumentBuilderExist () {
+		if ( fact == null ) { 
+			fact = DocumentBuilderFactory.newInstance();
+			fact.setNamespaceAware(true);
+			fact.setValidating(false);
+		}
+	}
+
 	public void addExternalRules (URI docURI) {
 		try {
-			if ( fact == null ) { 
-				fact = DocumentBuilderFactory.newInstance();
-				fact.setNamespaceAware(true);
-				fact.setValidating(false);
-			}
+			ensureDocumentBuilderExist(); 
 			Document rulesDoc = fact.newDocumentBuilder().parse(docURI.toString());
 			addExternalRules(rulesDoc, docURI);
 		}
@@ -230,6 +237,38 @@ public class ITSEngine implements IProcessor, ITraversal {
 		URI docURI)
 	{
 		compileRules(rulesDoc, docURI, false);
+	}
+	
+	private void compileRulesInScripts (Document hostDoc,
+		URI docURI,
+		boolean isInternal)
+	{
+		try {
+			// Look for all script elements with ITS MIME type
+			XPathExpression expr = xpath.compile("//"+HTML_NS_PREFIX+":script[@type='"+ITS_MIMETYPE+"']");
+			NodeList nl = (NodeList)expr.evaluate(hostDoc, XPathConstants.NODESET);
+			for ( int i=0; i<nl.getLength(); i++ ) {
+				// Process the rules in the order they are declared
+				Element elem = (Element)nl.item(i);
+				String content = elem.getTextContent();
+				if ( content == null ) continue;
+				// Strip encapsulation and white spaces
+				content = content.trim();
+				if ( content.startsWith("<!--")) content = content.substring(4);
+				if ( content.endsWith("-->")) content = content.substring(0, content.length()-3);
+				content = content.trim();
+				// Parse the content
+				ensureDocumentBuilderExist();
+				InputSource is = new InputSource(new ByteArrayInputStream(content.getBytes()));
+				Document scriptDoc = fact.newDocumentBuilder().parse(is);
+				// And compile the rules
+				compileRules(scriptDoc, docURI, isInternal);
+			}
+		}
+		catch ( Throwable e ) {
+			throw new ITSException("Error processing ITS markup in HTML script.\n"+e.getMessage());
+		}
+		
 	}
 	
 	private void compileRules (Document rulesDoc,
@@ -266,10 +305,8 @@ public class ITSEngine implements IProcessor, ITraversal {
 				// Check for link
 				String href = rulesElem.getAttributeNS(XLINK_NS_URI, "href");
 				if ( href.length() > 0 ) {
-					//String id = null;
 					int n = href.lastIndexOf('#');
 					if ( n > -1 ) {
-						//id = href.substring(n+1);
 						href = href.substring(0, n);
 					}
 
@@ -408,11 +445,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 		boolean isInternal)
 	{
 		try {
-			if ( fact == null ) { 
-				fact = DocumentBuilderFactory.newInstance();
-				fact.setNamespaceAware(true);
-				fact.setValidating(false);
-			}
+			ensureDocumentBuilderExist();
 			Document rulesDoc = fact.newDocumentBuilder().parse(docURI.toString());
 			compileRules(rulesDoc, docURI, isInternal);
 		}
@@ -1158,7 +1191,14 @@ public class ITSEngine implements IProcessor, ITraversal {
 		try {
 			// Compile any internal global rules
 			clearInternalGlobalRules();
-			compileRules(doc, docURI, true);
+			
+			if ( isHTML5 ) {
+				// For HTML5 global rules are in scripts
+				compileRulesInScripts(doc, docURI, true);
+			}
+			else { // Process normal in-document global rules
+				compileRules(doc, docURI, true);
+			}
 			
 			// Now apply the compiled rules
 		    for ( ITSRule rule : rules ) {
