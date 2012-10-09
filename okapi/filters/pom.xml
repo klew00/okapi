@@ -44,5 +44,7 @@
 		<module>txml</module>
 		<module>transtable</module>
 		<module>its</module>
+		<module>doxygen</module>
+		<module>wiki</module>
     </modules>
 </project>

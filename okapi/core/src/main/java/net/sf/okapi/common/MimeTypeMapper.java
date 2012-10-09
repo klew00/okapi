@@ -63,6 +63,7 @@ public final class MimeTypeMapper {
 	public static final String TMX_MIME_TYPE = "application/x-tmx+xml";
 	public static final String VERSIFIED_TXT_MIME_TYPE = "text/x-versified-txt";
 	public static final String XINI_MIME_TYPE = "text/x-xini";
+	public static final String DOXYGEN_TXT_MIME_TYPE = "text/x-doxygen-txt";
 
 	static {
 		extensionToMimeMap.put("xml", XML_MIME_TYPE);
@@ -97,7 +98,13 @@ public final class MimeTypeMapper {
 		extensionToMimeMap.put("odp", OPENOFFICE_MIME_TYPE);		
 		extensionToMimeMap.put("odg", OPENOFFICE_MIME_TYPE);		
 		extensionToMimeMap.put("vrsz", VERSIFIED_TXT_MIME_TYPE);	
-		extensionToMimeMap.put("xini", XINI_MIME_TYPE);		
+		extensionToMimeMap.put("xini", XINI_MIME_TYPE);	
+		extensionToMimeMap.put("h", DOXYGEN_TXT_MIME_TYPE);
+		extensionToMimeMap.put("c", DOXYGEN_TXT_MIME_TYPE);
+		extensionToMimeMap.put("cpp", DOXYGEN_TXT_MIME_TYPE);
+		extensionToMimeMap.put("java", DOXYGEN_TXT_MIME_TYPE);
+		extensionToMimeMap.put("py", DOXYGEN_TXT_MIME_TYPE);
+		extensionToMimeMap.put("m", DOXYGEN_TXT_MIME_TYPE);
 	}
 
 	/**

@@ -85,6 +85,12 @@ public class FormatManager {
 		pairs.put(".txp", "okf_transifex");
 		pairs.put(".txml", "okf_txml");
 		pairs.put(".strings", "okf_regex-macStrings");
+		pairs.put(".h", "okf_doxygen");
+		pairs.put(".c", "okf_doxygen");
+		pairs.put(".cpp", "okf_doxygen");
+		pairs.put(".java", "okf_doxygen");
+		pairs.put(".py", "okf_doxygen");
+		pairs.put(".m", "okf_doxygen");
 	}
 	
 	/**
