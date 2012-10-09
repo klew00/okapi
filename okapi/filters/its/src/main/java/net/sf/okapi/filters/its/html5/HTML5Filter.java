@@ -73,7 +73,7 @@ public class HTML5Filter extends ITSFilter {
 	
 	@Override
 	public String getDisplayName () {
-		return "HTML5+ITS Filter";
+		return "HTML5-ITS Filter";
 	}
 
 	@Override
