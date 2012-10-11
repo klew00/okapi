@@ -162,7 +162,6 @@ public class Main {
 	
 	private FilterConfigurationMapper fcMapper;
 	private Hashtable<String, String> extensionsMap;
-	private Hashtable<String, String> filtersMap;
 
 	/**
 	 * Try the guess the encoding of the console.
@@ -569,12 +568,10 @@ public class Main {
 		
 		// Instead create a map with extensions -> filter
 		extensionsMap = new Hashtable<String, String>();
-		filtersMap = new Hashtable<String, String>();
 		
 		extensionsMap.put(".docx", "okf_openxml");
 		extensionsMap.put(".pptx", "okf_openxml");
 		extensionsMap.put(".xlsx", "okf_openxml");
-		filtersMap.put("okf_openxml", "net.sf.okapi.filters.openxml.OpenXMLFilter");
 
 		extensionsMap.put(".odt", "okf_openoffice");
 		extensionsMap.put(".swx", "okf_openoffice");
@@ -584,85 +581,54 @@ public class Main {
 		extensionsMap.put(".sxi", "okf_openoffice");
 		extensionsMap.put(".odg", "okf_openoffice");
 		extensionsMap.put(".sxd", "okf_openoffice");
-		filtersMap.put("okf_openoffice", "net.sf.okapi.filters.openoffice.OpenOfficeFilter");
 
 		extensionsMap.put(".htm", "okf_html");
 		extensionsMap.put(".html", "okf_html");
-		filtersMap.put("okf_html", "net.sf.okapi.filters.html.HtmlFilter");
 		
 		extensionsMap.put(".xlf", "okf_xliff");
 		extensionsMap.put(".xlif", "okf_xliff");
 		extensionsMap.put(".xliff", "okf_xliff");
-		filtersMap.put("okf_xliff", "net.sf.okapi.filters.xliff.XLIFFFilter");
 		
 		extensionsMap.put(".tmx", "okf_tmx");
-		filtersMap.put("okf_tmx", "net.sf.okapi.filters.tmx.TmxFilter");
 		
 		extensionsMap.put(".properties", "okf_properties");
 		extensionsMap.put(".lang", "okf_properties-skypeLang");
-		filtersMap.put("okf_properties", "net.sf.okapi.filters.properties.PropertiesFilter");
 		
 		extensionsMap.put(".po", "okf_po");
-		filtersMap.put("okf_po", "net.sf.okapi.filters.po.POFilter");
 		
 		extensionsMap.put(".xml", "okf_xml");
 		extensionsMap.put(".resx", "okf_xml-resx");
-		filtersMap.put("okf_xml", "net.sf.okapi.filters.xml.XMLFilter");
 		
 		extensionsMap.put(".srt", "okf_regex-srt");
-		filtersMap.put("okf_regex", "net.sf.okapi.filters.regex.RegexFilter");
 		
 		extensionsMap.put(".dtd", "okf_dtd");
 		extensionsMap.put(".ent", "okf_dtd");
-		filtersMap.put("okf_dtd", "net.sf.okapi.filters.dtd.DTDFilter");
 		
 		extensionsMap.put(".ts", "okf_ts");
-		filtersMap.put("okf_ts", "net.sf.okapi.filters.ts.TsFilter");
 		
 		extensionsMap.put(".txt", "okf_plaintext");
-		filtersMap.put("okf_plaintext", "net.sf.okapi.filters.plaintext.PlainTextFilter");
 
 		extensionsMap.put(".csv", "okf_table_csv");
-		filtersMap.put("okf_table", "net.sf.okapi.filters.table.TableFilter");
 
 		extensionsMap.put(".ttx", "okf_ttx");
-		filtersMap.put("okf_ttx", "net.sf.okapi.filters.ttx.TTXFilter");
 
 		extensionsMap.put(".json", "okf_json");
-		filtersMap.put("okf_json", "net.sf.okapi.filters.json.JSONFilter");
-
-		filtersMap.put("okf_phpcontent", "net.sf.okapi.filters.php.PHPContentFilter");
 
 		extensionsMap.put(".pentm", "okf_pensieve");
-		filtersMap.put("okf_pensieve", "net.sf.okapi.filters.pensieve.PensieveFilter");
-
-		filtersMap.put("okf_vignette", "net.sf.okapi.filters.vignette.VignetteFilter");
 
 		extensionsMap.put(".yml", "okf_railsyaml");
-		filtersMap.put("okf_railsyaml", "net.sf.okapi.filters.railsyaml.RailsYamlFilter");
 
 		extensionsMap.put(".idml", "okf_idml");
-		filtersMap.put("okf_idml", "net.sf.okapi.filters.idml.IDMLFilter");
 
 		extensionsMap.put(".mif", "okf_mif");
-		filtersMap.put("okf_mif", "net.sf.okapi.filters.mif.MIFFilter");
 
 		extensionsMap.put(".txp", "okf_transifex");
-		filtersMap.put("okf_transifex", "net.sf.okapi.filters.transifex.TransifexFilter");
 
 		extensionsMap.put(".rtf", "okf_tradosrtf");
-		filtersMap.put("okf_tradosrtf", "net.sf.okapi.filters.rtf.RTFFilter");
 
 		extensionsMap.put(".zip", "okf_archive");
-		filtersMap.put("okf_archive", "net.sf.okapi.filters.archive.ArchiveFilter");
 
 		extensionsMap.put(".txml", "okf_txml");
-		filtersMap.put("okf_txml", "net.sf.okapi.filters.txml.TXMLFilter");
-
-		filtersMap.put("okf_versifiedtxt", "net.sf.okapi.filters.versifiedtxt.VersifiedTextFilter");
-		filtersMap.put("okf_xmlstream", "net.sf.okapi.filters.xmlstream.XmlStreamFilter");
-		filtersMap.put("okf_mosestext", "net.sf.okapi.filters.mosestext.MosesTextFilter");
-		filtersMap.put("okf_itshtml5", "net.sf.okapi.filters.its.html5.HTML5Filter");
 
 		if ( specifiedConfigIdPath != null ) {
 			fcMapper.setCustomConfigurationsDirectory(specifiedConfigIdPath);
@@ -750,35 +716,22 @@ public class Main {
 	}
 	
 	private boolean prepareFilter (String configId) {
-		boolean pluginsDone = false;
-		// Always add okf_html because it's used as sub-filter by several filters
-		//TODO: Find a better way to handle sub-filter cases
-		fcMapper.addConfigurations(filtersMap.get("okf_html"));
-		while ( true ) {
-			// Is it a default configuration?
-			if ( filtersMap.containsKey(configId) ) {
-				// Configuration ID is a default one:
-				// Add its filter to the configuration mapper
-				fcMapper.addConfigurations(filtersMap.get(configId));
+		// Is it a default configuration?
+		if (fcMapper.getConfiguration(configId) != null) {
+			return true;
+		}
+		// Else: Try to find the filter for that configuration
+		Iterator<FilterConfiguration> configs = fcMapper.getAllConfigurations();
+		while (configs.hasNext()) {
+			FilterConfiguration fc = configs.next();
+			if (configId.startsWith(fc.configId)) {
+				// If the given configuration is not one of the pre-defined
+				if ( fcMapper.getConfiguration(configId) == null ) {
+					// Assume it is a custom one
+					fcMapper.addCustomConfiguration(configId);
+				}
 				return true;
 			}
-			// Else: Try to find the filter for that configuration
-			for ( String tmp : filtersMap.keySet() ) {
-				if ( configId.startsWith(tmp) ) {
-					fcMapper.addConfigurations(filtersMap.get(tmp));
-					// If the given configuration is not one of the pre-defined
-					if ( fcMapper.getConfiguration(configId) == null ) {
-						// Assume it is a custom one
-						fcMapper.addCustomConfiguration(configId);
-					}
-					return true;
-				}
-			}
-			// No success yet?
-			if ( pluginsDone ) break;
-			// Try to load the plug-ins if it was not done yet
-			loadFromPluginsAndUpdate();
-			pluginsDone = true;
 		}
 		
 		// Could not guess
@@ -792,14 +745,6 @@ public class Main {
 		PluginsManager mgt = new PluginsManager();
 		mgt.discover(new File(getAppRootDirectory()+File.separator+"dropins"), true);
 		fcMapper.addFromPlugins(mgt);
-		// Now update the filtersMap with new configurations
-		Iterator<FilterConfiguration> iter = fcMapper.getAllConfigurations();
-		while ( iter.hasNext() ) {
-			FilterConfiguration cfg = iter.next();
-			if ( !filtersMap.containsKey(cfg.configId) ) {
-				filtersMap.put(cfg.configId, cfg.filterClass);
-			}
-		}
 	}
 	
 	private void guessMissingLocales (String inputPath) {
