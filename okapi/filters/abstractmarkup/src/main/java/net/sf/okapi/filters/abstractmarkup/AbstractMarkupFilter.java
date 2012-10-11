@@ -881,7 +881,12 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 			if (propertyTextUnitPlaceholders != null && !propertyTextUnitPlaceholders.isEmpty()) {
 				startTextUnit(new GenericSkeleton(tag.toString()), propertyTextUnitPlaceholders);
 			} else {
-				startTextUnit(new GenericSkeleton(tag.toString()));
+				if (!tag.isSyntacticalEmptyElementTag()) {
+					startTextUnit(new GenericSkeleton(tag.toString()));
+				} else {
+					// no attributes and a standalone tag - treat as skeleton
+					addToDocumentPart(tag.toString());
+				}
 			}
 			break;
 		case GROUP_ELEMENT:
