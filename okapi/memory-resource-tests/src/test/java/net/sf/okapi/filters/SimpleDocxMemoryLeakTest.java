@@ -13,7 +13,6 @@ public class SimpleDocxMemoryLeakTest {
 
 	private static FilterConfigurationMapper fcMapper;	
 	private static LocaleId locEN = LocaleId.fromString("EN");
-	private static LocaleId locES = LocaleId.fromString("ES");
 
 	public static void setUp() throws Exception {
 		// Create the mapper

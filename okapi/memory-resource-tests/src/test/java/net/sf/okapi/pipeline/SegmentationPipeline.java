@@ -11,8 +11,6 @@ import net.sf.okapi.common.pipelinedriver.PipelineDriver;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.steps.common.RawDocumentToFilterEventsStep;
 import net.sf.okapi.steps.segmentation.SegmentationStep;
-import net.sf.okapi.steps.wordcount.SimpleWordCountStep;
-import net.sf.okapi.steps.wordcount.WordCountStep;
 
 public class SegmentationPipeline {
 	private static FilterConfigurationMapper fcMapper;	

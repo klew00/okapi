@@ -1,5 +1,5 @@
 /*===========================================================================*/
-/* Copyright (C) 2008-2011 Jim Hargrave                                      */
+/* Copyright (C) 2008-2012 Jim Hargrave                                      */
 /*---------------------------------------------------------------------------*/
 /* This library is free software; you can redistribute it and/or modify it   */
 /* under the terms of the GNU Lesser General Public License as published by  */
@@ -24,19 +24,18 @@ import static org.junit.Assert.assertEquals;
 
 import java.io.File;
 import java.io.UnsupportedEncodingException;
-import java.net.URL;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
+import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.TestUtil;
 import net.sf.okapi.common.filters.FilterConfigurationMapper;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filters.IFilterConfigurationMapper;
-import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.pipelinedriver.IPipelineDriver;
 import net.sf.okapi.common.pipelinedriver.PipelineDriver;
 import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.RawDocument;
-import net.sf.okapi.common.TestUtil;
 import net.sf.okapi.filters.html.HtmlFilter;
 import net.sf.okapi.steps.common.FilterEventsWriterStep;
 import net.sf.okapi.steps.common.RawDocumentToFilterEventsStep;

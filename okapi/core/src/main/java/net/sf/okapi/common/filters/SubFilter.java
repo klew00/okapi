@@ -19,6 +19,7 @@
 ===========================================================================*/
 
 package net.sf.okapi.common.filters;
+
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -36,13 +37,10 @@ import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.EndSubfilter;
 import net.sf.okapi.common.resource.INameable;
-import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.StartSubfilter;
-import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextFragment.TagType;
-import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.common.skeleton.GenericSkeletonPart;
 import net.sf.okapi.common.skeleton.ISkeletonWriter;

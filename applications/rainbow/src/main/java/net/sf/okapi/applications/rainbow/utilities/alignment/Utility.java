@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2011 by the Okapi Framework contributors
+  Copyright (C) 2008-2012 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -42,7 +42,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class Utility extends BaseFilterDrivenUtility {
+	
 	private final Logger logger = LoggerFactory.getLogger(getClass());
+	
 	private Parameters params;
 	private String fileName;
 	private DbStoreBuilder dbStoreBuilder;
@@ -166,10 +168,9 @@ public class Utility extends BaseFilterDrivenUtility {
 	}
 	
 	public void postprocess () {
-		logger.info(String.format("Total translatable text units = %d", countTotal));
-		logger.info(String.format("Total without text = %d", noTextTotal));
-		logger.info(String.format("Total aligned = %d (manually modified = %d)",
-			alignedTotal, manualTotal));
+		logger.info("Total translatable text units = {}", countTotal);
+		logger.info("Total without text = {}", noTextTotal);
+		logger.info("Total aligned = {} (manually modified = {})", alignedTotal, manualTotal);
     	
 		if ( aligner != null ) {
 			aligner.closeWithoutWarning();
@@ -292,10 +293,9 @@ public class Utility extends BaseFilterDrivenUtility {
     	noTextTotal += noText;
     	countTotal += count;
     	manualTotal += manual;
-    	logger.info(String.format("Translatable text units = %d", count));
-    	logger.info(String.format("Without text = %d", noText));
-    	logger.info(String.format("Aligned = %d (manually modified = %d)",
-    		aligned, manual));
+    	logger.info("Translatable text units = {}", count);
+    	logger.info("Without text = {}", noText);
+    	logger.info("Aligned = {} (manually modified = {})", aligned, manual);
     }
 
 	private void processTextUnit (ITextUnit tu) {

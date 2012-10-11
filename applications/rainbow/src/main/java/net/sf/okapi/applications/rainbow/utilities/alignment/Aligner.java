@@ -918,7 +918,7 @@ public class Aligner {
 			if ( accept ) {
 				try {
 					// genericCont is already set with the proper text
-					genericCont.updateFragment(edTrgSeg.getText(),
+					GenericContent.updateFragment(edTrgSeg.getText(),
 						target.getSegments().get(indexActiveSegment).text, true);
 				}
 				catch ( InvalidContentException e ) {

@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2011 by the Okapi Framework contributors
+  Copyright (C) 2008-2012 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -43,7 +43,9 @@ import net.sf.okapi.lib.segmentation.SRXDocument;
 import net.sf.okapi.lib.translation.QueryManager;
 
 public class Utility extends BaseFilterDrivenUtility {
+	
 	private final Logger logger = LoggerFactory.getLogger(getClass());
+	
 	private Parameters params;
 	private IWriter writer;
 	private int id;
@@ -250,8 +252,7 @@ public class Utility extends BaseFilterDrivenUtility {
 				}
 			}
 			catch ( Throwable e ) {
-				logger.error(String.format("Error segmenting text unit id=%s: "
-					+e.getMessage(), tu.getId()));
+				logger.error("Error segmenting text unit id={}: "+e.getMessage(), tu.getId());
 			}
 		}
 		

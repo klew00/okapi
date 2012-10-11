@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2008-2012 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -22,23 +22,20 @@ package net.sf.okapi.applications.rainbow.utilities;
 
 import java.io.File;
 import java.util.ArrayList;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.swing.event.EventListenerList;
 
-import org.eclipse.swt.widgets.Shell;
-
 import net.sf.okapi.common.IHelp;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.FilterConfigurationMapper;
-import net.sf.okapi.common.LocaleId;
+
+import org.eclipse.swt.widgets.Shell;
 
 public abstract class BaseUtility implements IUtility {
 
 	public static final String VAR_PROJDIR = "${ProjDir}";
 	
-	private final Logger logger = LoggerFactory.getLogger(getClass());
 	protected EventListenerList listenerList = new EventListenerList();
 	protected FilterConfigurationMapper mapper;
 	protected Shell shell;

@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008 by the Okapi Framework contributors
+  Copyright (C) 2008-2012 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -30,7 +30,9 @@ import net.sf.okapi.applications.rainbow.utilities.ISimpleUtility;
 import net.sf.okapi.common.IParameters;
 
 public class Utility extends BaseUtility implements ISimpleUtility {
+	
 	private final Logger logger = LoggerFactory.getLogger(getClass());
+	
 	private String manifestPath;
 	private Manifest manifest;
 	private Merger merger;

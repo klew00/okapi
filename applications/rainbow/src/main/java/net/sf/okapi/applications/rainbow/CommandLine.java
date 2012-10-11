@@ -24,10 +24,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.net.URLDecoder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import org.eclipse.swt.widgets.Shell;
 
 import net.sf.okapi.applications.rainbow.lib.FormatManager;
 import net.sf.okapi.applications.rainbow.lib.LanguageManager;
@@ -37,12 +33,14 @@ import net.sf.okapi.applications.rainbow.pipeline.PipelineEditor;
 import net.sf.okapi.applications.rainbow.pipeline.PipelineWrapper;
 import net.sf.okapi.applications.rainbow.pipeline.PreDefinedPipelines;
 import net.sf.okapi.applications.rainbow.utilities.IUtility;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.DefaultFilters;
 import net.sf.okapi.common.filters.FilterConfigurationMapper;
-import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.plugins.PluginsManager;
 import net.sf.okapi.common.ui.BaseHelp;
+
+import org.eclipse.swt.widgets.Shell;
 
 public class CommandLine {
 

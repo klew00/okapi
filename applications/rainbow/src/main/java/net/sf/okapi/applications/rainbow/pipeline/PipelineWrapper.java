@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009-2011 by the Okapi Framework contributors
+  Copyright (C) 2009-2012 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -52,7 +52,7 @@ import net.sf.okapi.steps.leveraging.LeveragingStep;
 
 public class PipelineWrapper {
 	
-	private final Logger LOGGER = LoggerFactory.getLogger(getClass());
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 
 	private Map<String, StepInfo> availableSteps;
 	private Map<String, ClassLoader> pluginConnectors;
@@ -123,8 +123,8 @@ public class PipelineWrapper {
 					availableSteps.put(stepInfo.stepClass, stepInfo);
 				}
 				catch ( Throwable e ) {
-					LOGGER.warn(String.format("Could not instantiate step '%s' because of error.\n"
-						+e.getMessage(), item.getClassName()));
+					logger.warn("Could not instantiate step '{}' because of error.\n"+e.getMessage(),
+						item.getClassName());
 				}
 			}
 			if (fcMapper instanceof FilterConfigurationMapper) {
@@ -760,16 +760,16 @@ public class PipelineWrapper {
 
 		}
 		catch ( InstantiationException e ) {
-			LOGGER.warn("Could not instantiate a step.\n" + e.getMessage());
+			logger.warn("Could not instantiate a step.\n" + e.getMessage());
 		}
 		catch ( IllegalAccessException e ) {
-			LOGGER.warn("Illegal access for a step.\n" + e.getMessage());
+			logger.warn("Illegal access for a step.\n" + e.getMessage());
 		}
 		catch ( ClassNotFoundException e ) {
-			LOGGER.warn("Step class not found.\n" + e.getMessage());
+			logger.warn("Step class not found.\n" + e.getMessage());
 		}
 		catch ( Throwable e ) {
-			LOGGER.warn("Error creating one of the step.\n" + e.getMessage());
+			logger.warn("Error creating one of the step.\n" + e.getMessage());
 		}
 	}
 	
