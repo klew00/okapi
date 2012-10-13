@@ -297,12 +297,12 @@ public abstract class ITSFilter implements IFilter {
 	 * 
 	 * - check if node has target pointer for target
 	 * - if yes, it's either before or after the corresponding source
-	 * - if it's before;
-	 * -- create a skel placeholder and a TU
-	 * -- move to next node
-	 * - if it's after
-	 * -- get the text unit created when the source node was found
-	 * -- and create the skel placeholder
+	 * -- if it's before;
+	 * --- create a skel placeholder and a TU
+	 * --- move to next node
+	 * -- if it's after
+	 * --- get the text unit created when the source node was found
+	 * --- and create the skel placeholder
 	 * 
 	 * @param itsEng the engine to use (just because it's not a global variable)
 	 */

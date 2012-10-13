@@ -457,6 +457,7 @@ public class XLIFFWriter implements IFilterWriter {
 			writer.writeAttributeString("maxbytes", values[0]);
 			writer.writeAttributeString("xmlns:its", NS_ITS20);
 			writer.writeAttributeString("its:storageSizeEncoding", values[1]);
+			writer.writeAttributeString("its:lineBreakType", values[2]);
 		}
 		if ( tu.hasProperty(Property.ITS_ALLOWEDCHARACTERS) ) {
 			writer.writeAttributeString("its:allowedCharacters", tu.getProperty(Property.ITS_ALLOWEDCHARACTERS).getValue());

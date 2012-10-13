@@ -374,7 +374,7 @@ public class XLIFFFilterTest {
 			+ "</file></xliff>";
 		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 		assertEquals("[a-z]", tu.getProperty(Property.ITS_ALLOWEDCHARACTERS).getValue());
-		assertEquals("123\tUTF-8", tu.getProperty(Property.ITS_STORAGESIZE).getValue());
+		assertEquals("123\tUTF-8\tlf", tu.getProperty(Property.ITS_STORAGESIZE).getValue());
 	}
 
 	@Test

@@ -607,6 +607,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 		
 		rule.map = new HashMap<String, String>();
 
+		// Check pointer vs non-pointers
 		if ( !Util.isEmpty(np[0]) ) {
 			if ( !Util.isEmpty(storageSizeP) ) {
 				throw new ITSException("Cannot have both storageSize and storageSizePointer.");
@@ -616,6 +617,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 		else {
 			rule.map.put("sizePointer", storageSizeP);
 		}
+		
 		if ( !Util.isEmpty(np[1]) ) {
 			if ( !Util.isEmpty(storageEncodingP) ) {
 				throw new ITSException("Cannot have both storageEncoding and storageEncodingPointer.");
@@ -624,6 +626,11 @@ public class ITSEngine implements IProcessor, ITraversal {
 		}
 		else {
 			rule.map.put("encodingPointer", storageEncodingP);
+		}
+
+		// No pointer for line break type
+		if ( !Util.isEmpty(np[2]) ) {
+			rule.map.put("linebreak", np[2]);
 		}
 		
 		// Add the rule
@@ -1111,6 +1118,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 			String[] values = fromSingleString(getFlagData(data, FP_STORAGESIZE_DATA));
 			trace.peek().storageSize = values[0];
 			trace.peek().storageEncoding = values[1];
+			trace.peek().lineBreakType = values[2];
 		}
 		
 		if ( data.charAt(FP_ALLOWEDCHARS) != '?' ) {
@@ -1377,8 +1385,13 @@ public class ITSEngine implements IProcessor, ITraversal {
 							data2 = rule.map.get("encodingPointer");
 							if ( !Util.isEmpty(data2) ) data2 = resolvePointer(NL.item(i), data2);
 						}
+						data3 = rule.map.get("linebreak");
+						if ( data3 == null ) {
+							data3 = rule.map.get("linebreakPointer");
+							if ( !Util.isEmpty(data3) ) data3 = resolvePointer(NL.item(i), data3);
+						}
 						setFlag(NL.item(i), FP_STORAGESIZE, 'y', true);
-						setFlag(NL.item(i), FP_STORAGESIZE_DATA, toSingleString(data1, data2), true);
+						setFlag(NL.item(i), FP_STORAGESIZE_DATA, toSingleString(data1, data2, data3), true);
 						break;
 					}
 				}
@@ -1740,7 +1753,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 					// Set the updated flags
 					setFlag(attr.getOwnerElement(), FP_STORAGESIZE, 'y', attr.getSpecified());
 					setFlag(attr.getOwnerElement(), FP_STORAGESIZE_DATA,
-						toSingleString(values[0], values[1]), attr.getSpecified()); 
+						toSingleString(values[0], values[1], values[2]), attr.getSpecified()); 
 				}
 			}
 
@@ -1840,25 +1853,31 @@ public class ITSEngine implements IProcessor, ITraversal {
 		boolean qualified,
 		boolean useHTML5)
 	{
-		String[] data = new String[2];
+		String[] data = new String[3];
 		
 		if ( useHTML5 ) {
 			if ( elem.hasAttribute("its-storage-size") )
 				data[0] = elem.getAttribute("its-storage-size");
 			if ( elem.hasAttribute("its-storage-encoding") )
 				data[1] = elem.getAttribute("its-storage-encoding");
+			if ( elem.hasAttribute("its-line-break-type") )
+				data[2] = elem.getAttribute("its-line-break-type");
 		}
 		else if ( qualified ) {
 			if ( elem.hasAttributeNS(ITS_NS_URI, "storageSize") )
 				data[0] = elem.getAttributeNS(ITS_NS_URI, "storageSize");
 			if ( elem.hasAttributeNS(ITS_NS_URI, "storageEncoding") )
 				data[1] = elem.getAttributeNS(ITS_NS_URI, "storageEncoding");
+			if ( elem.hasAttributeNS(ITS_NS_URI, "lineBreakType") )
+				data[2] = elem.getAttributeNS(ITS_NS_URI, "lineBreakType");
 		}
 		else {
 			if ( elem.hasAttribute("storageSize") )
 				data[0] = elem.getAttribute("storageSize");
 			if ( elem.hasAttribute("storageEncoding") )
 				data[1] = elem.getAttribute("storageEncoding");
+			if ( elem.hasAttribute("lineBreakType") )
+				data[2] = elem.getAttribute("lineBreakType");
 		}
 		
 		return data;
@@ -2232,6 +2251,21 @@ public class ITSEngine implements IProcessor, ITraversal {
 		String[] values = fromSingleString(getFlagData(tmp, FP_STORAGESIZE_DATA));
 		if ( values[1] == null ) return "UTF-8";
 		else return values[1];
+	}
+
+	@Override
+	public String getLineBreakType (Attr attribute) {
+		String tmp;
+		if ( attribute == null ) {
+			tmp = trace.peek().lineBreakType;
+			if ( tmp == null ) return "lf";
+			else return tmp;
+		}
+		if ( (tmp = (String)attribute.getUserData(FLAGNAME)) == null ) return null;
+		if ( tmp.charAt(FP_STORAGESIZE) != 'y' ) return null;
+		String[] values = fromSingleString(getFlagData(tmp, FP_STORAGESIZE_DATA));
+		if ( values[2] == null ) return "lf";
+		else return values[2];
 	}
 
 	@Override

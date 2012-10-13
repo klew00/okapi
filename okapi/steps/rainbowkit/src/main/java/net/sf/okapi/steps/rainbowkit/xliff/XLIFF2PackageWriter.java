@@ -337,6 +337,7 @@ public class XLIFF2PackageWriter extends BasePackageWriter {
 			String[] values = tu.getProperty(Property.ITS_STORAGESIZE).getValue().split("\t", -1);
 			unit.getExtendedAttributes().setAttribute(Names.NS_ITS, "storageSize", values[0]);
 			unit.getExtendedAttributes().setAttribute(Names.NS_ITS, "storageSizeEncoding", values[1]);
+			unit.getExtendedAttributes().setAttribute(Names.NS_ITS, "lineBreakType", values[2]);
 		}
 		// Allowed characters
 		if ( tu.hasProperty(Property.ITS_ALLOWEDCHARACTERS) ) {

@@ -392,9 +392,9 @@ public class XMLFilterTest {
 			+ "</doc>";
 		ArrayList<Event> list = getEvents(snippet);
 		ITextUnit tu = FilterTestDriver.getTextUnit(list, 1);
-		assertEquals("5\tShift-JIS", tu.getProperty(Property.ITS_STORAGESIZE).getValue());
+		assertEquals("5\tShift-JIS\tlf", tu.getProperty(Property.ITS_STORAGESIZE).getValue());
 		tu = FilterTestDriver.getTextUnit(list, 2);
-		assertEquals("10\tUTF-16", tu.getProperty(Property.ITS_STORAGESIZE).getValue());
+		assertEquals("10\tUTF-16\tlf", tu.getProperty(Property.ITS_STORAGESIZE).getValue());
 	}
 	
 	@Test

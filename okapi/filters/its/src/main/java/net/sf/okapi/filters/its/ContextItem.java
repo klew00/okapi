@@ -59,7 +59,9 @@ class ContextItem {
 		this.allowedChars = trav.getAllowedCharacters(attribute);
 		
 		if ( trav.getStorageSize(attribute) != null ) {
-			this.storageSize = trav.getStorageSize(attribute) + "\t" + trav.getStorageEncoding(attribute);
+			this.storageSize = trav.getStorageSize(attribute)
+				+ "\t" + trav.getStorageEncoding(attribute)
+				+ "\t" + trav.getLineBreakType(attribute);
 		}
 	}
 

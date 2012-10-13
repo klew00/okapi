@@ -44,6 +44,7 @@ class ITSTrace {
 	String lqIssuesRef;
 	String storageSize;
 	String storageEncoding;
+	String lineBreakType;
 	String allowedChars;
 
 	ITSTrace () {

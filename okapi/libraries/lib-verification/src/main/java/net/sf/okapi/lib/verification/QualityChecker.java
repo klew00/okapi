@@ -797,6 +797,9 @@ class QualityChecker {
 				if ( tc.contentIsOneSegment() ) tf = tc.getFirstContent();
 				else tf = tc.getUnSegmentedContentCopy();
 				String  tmp = TextUnitUtil.getText(tf);
+				// Convert the line breaks if needed
+				if ( values[2].equals("crlf") ) tmp = tmp.replaceAll("\n", "\r\n");
+				// Else: all other values are a single byte, like the default lf, no need to replace
 				
 				// Compute the byte length
 				ByteBuffer buf = encoder2.encode(CharBuffer.wrap(tmp));
