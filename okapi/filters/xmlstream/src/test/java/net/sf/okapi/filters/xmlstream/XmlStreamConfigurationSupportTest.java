@@ -356,6 +356,24 @@ public class XmlStreamConfigurationSupportTest {
 				.getCode(0).getData());
 	}
 	
+	@Test
+	public void test_INLINE_WITH_EXCLUDE_Regex_Trick () {
+		String config = 
+			    "elements:\n" +
+				"  fo[o]: \n" +
+				"    ruleTypes: [EXCLUDE]\n" + 
+				"  foo: \n" +
+			    "    ruleTypes: [INLINE]";
+		filter.setParameters(new Parameters(config));
+		String snippet = "test1<foo>remove</foo>test2";
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 1);
+		assertEquals("test1test2", tu.getSource().getCodedText());
+		assertEquals("<foo>remove</foo>", tu.getSource().getFirstContent()
+				.getCode(0).getOuterData());
+		assertEquals("remove", tu.getSource().getFirstContent()
+				.getCode(0).getData());
+	}
+	
 	private ArrayList<Event> getEvents(String snippet,
 		LocaleId srcLang,
 		LocaleId trgLang)
