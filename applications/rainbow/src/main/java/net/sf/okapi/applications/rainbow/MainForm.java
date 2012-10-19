@@ -2530,6 +2530,7 @@ public class MainForm { //implements IParametersProvider {
 		PairEditorUserTest dlg = null;
 		try {
 			saveSurfaceData();
+			updateCustomConfigurations();
 			dlg = new PairEditorUserTest(shell, fcMapper, true);
 			dlg.showDialog();
 		}
