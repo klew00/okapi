@@ -46,6 +46,9 @@ import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.lib.search.lucene.analysis.AlphabeticNgramTokenizer;
 import net.sf.okapi.lib.translation.TextMatcher;
+import net.sf.okapi.steps.wordcount.common.GMX;
+import net.sf.okapi.steps.wordcount.common.Metrics;
+import net.sf.okapi.steps.wordcount.common.MetricsAnnotation;
 
 @UsingParameters(Parameters.class)
 public class TranslationComparisonStep extends BasePipelineStep {
@@ -84,6 +87,14 @@ public class TranslationComparisonStep extends BasePipelineStep {
 	private String rootDir;
 	private String inputRootDir;
 	private AlphabeticNgramTokenizer tokenizer;
+	
+	private long wcTotal;
+	private int bracket1;
+	private int bracket2;
+	private int bracket3;
+	private int wcBracket1;
+	private int wcBracket2;
+	private int wcBracket3;
 
 	public TranslationComparisonStep () {
 		params = new Parameters();
@@ -230,6 +241,13 @@ public class TranslationComparisonStep extends BasePipelineStep {
 		fuzzyScoreTotal1to2 = 0;
 		fuzzyScoreTotal1to3 = 0;
 		fuzzyScoreTotal2to3 = 0;
+		wcTotal = 0;
+		bracket1 = 0;
+		bracket2 = 0;
+		bracket3 = 0;
+		wcBracket1 = 0;
+		wcBracket2 = 0;
+		wcBracket3 = 0;
 		
 		itemCount = 0;
 		
@@ -249,33 +267,88 @@ public class TranslationComparisonStep extends BasePipelineStep {
     		writer.writeElementString("p", String.format("", itemCount));
     		if ( itemCount > 0 ) {
 
-    			writer.writeElementString("p", String.format("Number of items = %d.", itemCount));
+    			writer.writeElementString("p", String.format("Number of segments = %d", itemCount));
     			
     			writer.writeStartElement("table"); //$NON-NLS-1$
     			writer.writeRawXML("<tr><td>"); //$NON-NLS-1$
     			writer.writeString("Average Scores:");
     			writer.writeRawXML("</td><td><b>"); //$NON-NLS-1$
-    			writer.writeString(String.format(" %s to %s = %.2f,  ",
+    			writer.writeString(String.format(" %s to %s = %.2f",
     					params.getDocument1Label(), params.getDocument2Label(), (float)scoreTotal1to2 / itemCount));
     			if (scoreTotal1to3 > 0){
-        			writer.writeString(String.format("%s to %s = %.2f,  ",
+        			writer.writeString(String.format(",  %s to %s = %.2f,  ",
         					params.getDocument1Label(), params.getDocument3Label(), (float)scoreTotal1to3 / itemCount));
         			writer.writeString(String.format("%s to %s = %.2f",
         					params.getDocument2Label(), params.getDocument3Label(), (float)scoreTotal2to3 / itemCount));
     			}
     			writer.writeRawXML("</b></td></tr>\n"); //$NON-NLS-1$
+    			
     			writer.writeRawXML("<tr><td>"); //$NON-NLS-1$
     			writer.writeString("Average Fuzzy Scores:");
     			writer.writeRawXML("</td><td><b>"); //$NON-NLS-1$
-    			writer.writeString(String.format(" %s to %s = %.2f,  ",
+    			writer.writeString(String.format(" %s to %s = %.2f",
     					params.getDocument1Label(), params.getDocument2Label(), (float)fuzzyScoreTotal1to2 / itemCount));
     			if (scoreTotal1to3 > 0){
-        			writer.writeString(String.format("%s to %s = %.2f,  ",
+        			writer.writeString(String.format(",  %s to %s = %.2f,  ",
         					params.getDocument1Label(), params.getDocument3Label(), (float)fuzzyScoreTotal1to3 / itemCount));
         			writer.writeString(String.format("%s to %s = %.2f",
         					params.getDocument2Label(), params.getDocument3Label(), (float)fuzzyScoreTotal2to3 / itemCount));
     			}
     			writer.writeRawXML("</b></td></tr>\n"); //$NON-NLS-1$
+    			
+    			writer.writeRawXML("<tr><td>"); //$NON-NLS-1$
+    			writer.writeString("Average Word Count:");
+    			writer.writeRawXML("</td><td><b>"); //$NON-NLS-1$
+    			writer.writeString(String.format("%.2f", (float)wcTotal / itemCount));
+    			writer.writeRawXML("</b></td></tr>\n"); //$NON-NLS-1$
+    			
+    			writer.writeEndElement(); // table
+    			
+    			//--matrix1--
+    			writer.writeElementString("p", " ");
+    			
+    			writer.writeStartElement("table"); //$NON-NLS-1$
+    			writer.writeRawXML("<tr><th style=\"text-align: left; width: 100px;\"> </th><th style=\"text-align: left; width: 100px;\">Segments </th><th style=\"text-align: left; width: 100px;\">% </th><th style=\"text-align: left; width: 100px;\">Words </th><th style=\"text-align: left; width: 100px;\">% </th></tr>");
+    			
+    			writer.writeRawXML("<tr><td>100</td><td>"); //$NON-NLS-1$
+    			writer.writeString(String.format("%d", bracket1));
+    			writer.writeRawXML("</td><td>"); //$NON-NLS-1$
+    			writer.writeString(((itemCount == 0) ? "NA" : String.format("%.0f", (float)bracket1/itemCount*100)));
+    			writer.writeRawXML("</td><td>"); //$NON-NLS-1$
+    			writer.writeString(String.format("%d", wcBracket1));
+    			writer.writeRawXML("</td><td>"); //$NON-NLS-1$
+    			writer.writeString(((wcTotal == 0) ? "NA" : String.format("%.0f", (float)wcBracket1/wcTotal*100)));
+    			writer.writeRawXML("</td></tr>\n"); //$NON-NLS-1$
+  			
+    			writer.writeRawXML("<tr><td>99 - 75</td><td>"); //$NON-NLS-1$
+    			writer.writeString(String.format("%d", bracket2));
+    			writer.writeRawXML("</td><td>"); //$NON-NLS-1$
+    			writer.writeString(((itemCount == 0) ? "NA" : String.format("%.0f", (float)bracket2/itemCount*100)));
+    			writer.writeRawXML("</td><td>"); //$NON-NLS-1$
+    			writer.writeString(String.format("%d", wcBracket2));
+    			writer.writeRawXML("</td><td>"); //$NON-NLS-1$
+    			writer.writeString(((wcTotal == 0) ? "NA" : String.format("%.0f", (float)wcBracket2/wcTotal*100)));
+    			writer.writeRawXML("</td></tr>\n"); //$NON-NLS-1$
+    			
+    			writer.writeRawXML("<tr><td>75 - 0</td><td>"); //$NON-NLS-1$
+    			writer.writeString(String.format("%d", bracket3));
+    			writer.writeRawXML("</td><td>"); //$NON-NLS-1$
+    			writer.writeString(((itemCount == 0) ? "NA" : String.format("%.0f", (float)bracket3/itemCount*100)));
+    			writer.writeRawXML("</td><td>"); //$NON-NLS-1$
+    			writer.writeString(String.format("%d", wcBracket3));
+    			writer.writeRawXML("</td><td>"); //$NON-NLS-1$
+    			writer.writeString(((wcTotal == 0) ? "NA" : String.format("%.0f", (float)wcBracket3/wcTotal*100)));
+    			writer.writeRawXML("</td></tr>\n"); //$NON-NLS-1$
+    			
+    			writer.writeRawXML("<tr><td>Total</td><td>"); //$NON-NLS-1$
+    			writer.writeString(String.format("%d", itemCount));    			
+    			writer.writeRawXML("</td><td>"); //$NON-NLS-1$
+    			writer.writeString("");
+    			writer.writeRawXML("</td><td>"); //$NON-NLS-1$
+    			writer.writeString(String.format("%d", wcTotal));
+    			writer.writeRawXML("</td><td>"); //$NON-NLS-1$
+    			writer.writeString(" ");
+    			writer.writeRawXML("</td></tr>\n"); //$NON-NLS-1$
     			writer.writeEndElement(); // table
     		}
 			writer.writeEndElement(); // body
@@ -449,6 +522,26 @@ public class TranslationComparisonStep extends BasePipelineStep {
 		fuzzyScoreTotal1to3 += fuzzyScore1to3;
 		fuzzyScoreTotal2to3 += fuzzyScore2to3;
 		
+		MetricsAnnotation sma = tu1.getSource().getAnnotation(MetricsAnnotation.class);
+		long srcWC = 0;
+		if (sma != null) {
+			Metrics m = sma.getMetrics();
+			srcWC = m.getMetric(GMX.TotalWordCount);
+			wcTotal += srcWC;
+		}
+		
+		// Populate the matrix
+		if (score1to2 == 100){
+			bracket1++;
+			wcBracket1 += srcWC;
+		}else if (score1to2 >= 75){
+			bracket2++;
+			wcBracket2 += srcWC;
+		}else{
+			bracket3++;
+			wcBracket3 += srcWC;
+		}
+		
 		itemCount++;
 
 		// Output in HTML
@@ -513,8 +606,13 @@ public class TranslationComparisonStep extends BasePipelineStep {
 					params.getDocument2Label(), params.getDocument3Label(), fuzzyScore2to3));
 			}
 			writer.writeRawXML("</b></td></tr>\n"); //$NON-NLS-1$
-		}
 
+			if (sma != null) {
+				writer.writeRawXML("<tr><td>Src Word Count:</td><td><b>");
+				writer.writeString(String.format("%d", srcWC));
+				writer.writeRawXML("</b></td></tr>\n");
+			}
+		}
 		if ( params.isGenerateTMX() ) {
 			ITextUnit tmxTu = new TextUnit(tu1.getId());
 			// Set the source: Use the tu1 if possible
