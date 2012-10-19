@@ -349,7 +349,7 @@ public class XmlStreamConfigurationSupportTest {
 		filter.setParameters(new Parameters(config));
 		String snippet = "test1<foo>remove</foo>test2";
 		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 1);
-		assertEquals("test1removetest2", tu.getSource().getCodedText());
+		assertEquals("test1test2", tu.getSource().getCodedText());
 	}
 	
 	private ArrayList<Event> getEvents(String snippet,
