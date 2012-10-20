@@ -340,6 +340,22 @@ public class XmlStreamConfigurationSupportTest {
 		assertEquals("ltr", tu2.getSource().getProperty("dir").getValue());
 	}
 	
+	@Test
+	public void test_INLINE_WITH_EXCLUDE () {
+		String config = 
+			    "elements:\n" +
+				"  foo: \n" +
+			    "    ruleTypes: [INLINE, EXCLUDE]";
+		filter.setParameters(new Parameters(config));
+		String snippet = "test1<foo>remove</foo>test2";
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 1);
+		assertEquals("test1test2", tu.getSource().getCodedText());
+		assertEquals("<foo>remove</foo>", tu.getSource().getFirstContent()
+				.getCode(0).getOuterData());
+		assertEquals("remove", tu.getSource().getFirstContent()
+				.getCode(0).getData());
+	}
+	
 	private ArrayList<Event> getEvents(String snippet,
 		LocaleId srcLang,
 		LocaleId trgLang)

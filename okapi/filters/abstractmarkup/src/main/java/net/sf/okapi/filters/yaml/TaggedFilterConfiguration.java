@@ -535,15 +535,20 @@ public class TaggedFilterConfiguration {
 		
 		if (type != RULE_TYPE.RULE_NOT_FOUND) {				
 			// make sure this is really an INLINE_EXCLUDED_ELEMENT rule - condition must apply
+			// order of these rules is important!!!
 			if (type == RULE_TYPE.INLINE_EXCLUDED_ELEMENT) {
-				if (doesElementRuleConditionApply(configReader.getRegexElementRule(tag.toLowerCase()), attributes)) {
-					return type;
-				} else if (hasDefinedInlineRule(tag.toLowerCase())) {
+				Map ruleRegex = configReader.getRegexElementRule(tag.toLowerCase());
+				Map rule = configReader.getNonRegexElementRule(tag.toLowerCase());
+				if (doesElementRuleConditionApply(ruleRegex, attributes)) {
+					return type;					
+				} else if (hasDefinedInlineRule(tag.toLowerCase()) && !isRuleType(tag.toLowerCase(), RULE_TYPE.EXCLUDED_ELEMENT)) {
 					if (doesElementRuleConditionApply(configReader.getElementRule(tag.toLowerCase()), attributes)) {
 						return RULE_TYPE.INLINE_ELEMENT;
 					} else {
 						return RULE_TYPE.RULE_NOT_FOUND;
 					}						
+				}  else if (doesElementRuleConditionApply(rule, attributes)) {
+					return type;
 				} else {
 					return RULE_TYPE.RULE_NOT_FOUND;
 				}
@@ -576,7 +581,8 @@ public class TaggedFilterConfiguration {
 		if (rule != null) {
 			List<String> ruleTypes = (List<String>) rule.get("ruleTypes");
 			// ORDER is important!!! These are matched in priority order
-			if (isRuleType(tag, RULE_TYPE.EXCLUDED_ELEMENT, ruleTypes)) {
+			if (isRuleType(tag, RULE_TYPE.EXCLUDED_ELEMENT, ruleTypes) && 
+					!isRuleType(tag, RULE_TYPE.INLINE_ELEMENT, ruleTypes)) {
 				return RULE_TYPE.EXCLUDED_ELEMENT;
 			} else if (isRuleType(tag, RULE_TYPE.GROUP_ELEMENT, ruleTypes)) {
 				return RULE_TYPE.GROUP_ELEMENT;
@@ -584,9 +590,16 @@ public class TaggedFilterConfiguration {
 				return RULE_TYPE.INCLUDED_ELEMENT;
 			} else if (isRuleType(tag, RULE_TYPE.INLINE_ELEMENT, ruleTypes)) {
 				// handle case where inline is excluded by a more general rule
-				Map r = configReader.getRegexElementRule(tag.toLowerCase());
-				if (r != null) {
-					List<String> rt = (List<String>) r.get("ruleTypes");
+				Map r1 = configReader.getRegexElementRule(tag.toLowerCase());
+				Map r2 = configReader.getNonRegexElementRule(tag.toLowerCase());
+				// test regex rule first
+				if (r1 != null) {
+					List<String> rt = (List<String>) r1.get("ruleTypes");
+					if (isRuleType(tag, RULE_TYPE.EXCLUDED_ELEMENT, rt)) {
+						return RULE_TYPE.INLINE_EXCLUDED_ELEMENT;
+					}
+				} else if (r2 != null) {
+					List<String> rt = (List<String>) r2.get("ruleTypes");
 					if (isRuleType(tag, RULE_TYPE.EXCLUDED_ELEMENT, rt)) {
 						return RULE_TYPE.INLINE_EXCLUDED_ELEMENT;
 					}
@@ -748,6 +761,9 @@ public class TaggedFilterConfiguration {
 	}
 
 	private boolean doesElementRuleConditionApply(Map elementRule, Map<String, String> attributes) {
+		if (elementRule == null) {
+			return false;
+		}
 		List conditions = (List) elementRule.get(CONDITIONS);
 		if (conditions != null) {
 			return applyConditions(conditions, attributes);
