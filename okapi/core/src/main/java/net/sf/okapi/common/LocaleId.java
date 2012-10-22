@@ -70,6 +70,10 @@ public final class LocaleId implements Comparable<Object> {
 	 */
     static public final LocaleId JAPANESE = new LocaleId("ja", false);
     /**
+	 * LocaleId constant for "ko".
+	 */
+    static public final LocaleId KOREAN = new LocaleId("ko-kr", false);
+    /**
 	 * LocaleId constant for "pt".
 	 */
     static public final LocaleId PORTUGUESE = new LocaleId("pt", false);
