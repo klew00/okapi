@@ -44,7 +44,7 @@ public class SubFilterSkeletonWriter implements ISkeletonWriter {
 	private IEncoder parentEncoder;
 	private StringBuilder sb;	
 	
-	public SubFilterSkeletonWriter(StartSubfilter resource) { //,
+	public SubFilterSkeletonWriter (StartSubfilter resource) { //,
 //			LocaleId locale, String encoding) {
 		sb = new StringBuilder();
 		IFilterWriter sfFilterWriter = resource.getFilterWriter();
@@ -56,20 +56,23 @@ public class SubFilterSkeletonWriter implements ISkeletonWriter {
 	}
 	
 	@Override
-	public void close() {
+	public void close () {
 		skelWriter.close();		
 	}
 
 	@Override
-	public String processStartDocument(LocaleId outputLocale,
-			String outputEncoding, ILayerProvider layer,
-			EncoderManager encoderManager, StartDocument resource) {
+	public String processStartDocument (LocaleId outputLocale,
+		String outputEncoding,
+		ILayerProvider layer,
+		EncoderManager encoderManager,
+		StartDocument resource)
+	{
 //		if (resource == SET_OPTIONS) {
 //			return "";
 //		}
 //		else {
 			sb.append(skelWriter.processStartDocument(outputLocale, outputEncoding, layer, 
-					encoderManager, resource));
+				encoderManager, resource));
 			return "";
 //		}		
 	}
@@ -83,7 +86,7 @@ public class SubFilterSkeletonWriter implements ISkeletonWriter {
 	 * or an empty string otherwise.  
 	 */
 	@Override
-	public String processEndDocument(Ending resource) {
+	public String processEndDocument (Ending resource) {
 		if (resource == GET_OUTPUT) {
 			return parentEncoder == null ? sb.toString() : parentEncoder.encode(sb.toString(), EncoderContext.TEXT);
 		}
@@ -94,59 +97,61 @@ public class SubFilterSkeletonWriter implements ISkeletonWriter {
 	}
 
 	@Override
-	public String processStartSubDocument(StartSubDocument resource) {
+	public String processStartSubDocument (StartSubDocument resource) {
 		sb.append(skelWriter.processStartSubDocument(resource));
 		return "";
 	}
 
 	@Override
-	public String processEndSubDocument(Ending resource) {
+	public String processEndSubDocument (Ending resource) {
 		sb.append(skelWriter.processEndSubDocument(resource));
 		return "";
 	}
 
 	@Override
-	public String processStartGroup(StartGroup resource) {
+	public String processStartGroup (StartGroup resource) {
 		sb.append(skelWriter.processStartGroup(resource));
 		return "";
 	}
 
 	@Override
-	public String processEndGroup(Ending resource) {
+	public String processEndGroup (Ending resource) {
 		sb.append(skelWriter.processEndGroup(resource));
 		return "";
 	}
 
 	@Override
-	public String processTextUnit(ITextUnit resource) {
+	public String processTextUnit (ITextUnit resource) {
 		sb.append(skelWriter.processTextUnit(resource));
 		return "";
 	}
 
 	@Override
-	public String processDocumentPart(DocumentPart resource) {
+	public String processDocumentPart (DocumentPart resource) {
 		sb.append(skelWriter.processDocumentPart(resource));
 		return "";
 	}
 
 	@Override
-	public String processStartSubfilter(StartSubfilter resource) {
+	public String processStartSubfilter (StartSubfilter resource) {
 		sb.append(skelWriter.processStartSubfilter(resource));
 		return "";
 	}
 
 	@Override
-	public String processEndSubfilter(EndSubfilter resource) {
+	public String processEndSubfilter (EndSubfilter resource) {
 		sb.append(skelWriter.processEndSubfilter(resource));
 		return "";
 	}
 
-	public String getEncodedOutput() {
+	public String getEncodedOutput () {
 		return processEndDocument(GET_OUTPUT);
 	}
 
-	public ISkeletonWriter setOptions(LocaleId outputLocale, String outputEncoding, 
-			StartSubfilter startSubfilter) {
+	public ISkeletonWriter setOptions (LocaleId outputLocale,
+		String outputEncoding, 
+		StartSubfilter startSubfilter)
+	{
 		StartDocument sfStartDoc = startSubfilter.getStartDoc();
 		IFilterWriter sfFilterWriter = sfStartDoc.getFilterWriter();
 		EncoderManager sfEncoderManager = sfFilterWriter.getEncoderManager();

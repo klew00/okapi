@@ -74,8 +74,9 @@ public class ITSEngine implements IProcessor, ITraversal {
 	
 	// Must have '?' as many times as there are FP_XXX entries +1
 	// Must have +FLAGSEP as many times as there are FP_XXX_DATA entries +1
-	private static final String   FLAGDEFAULTDATA     = "?????????????"
-		+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP;
+	private static final String   FLAGDEFAULTDATA     = "??????????????"
+		+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP
+		+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP;
 
 	// Indicator position
 	private static final int      FP_TRANSLATE             = 0;
@@ -91,6 +92,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 	private static final int      FP_LQISSUE               = 10;
 	private static final int      FP_STORAGESIZE           = 11;
 	private static final int      FP_ALLOWEDCHARS          = 12;
+	private static final int      FP_SUBFILTER             = 13;
 	
 	// Data position 
 	private static final int      FP_TERMINOLOGY_DATA      = 0;
@@ -104,6 +106,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 	private static final int      FP_LQISSUE_DATA          = 8;
 	private static final int      FP_STORAGESIZE_DATA      = 9;
 	private static final int      FP_ALLOWEDCHARS_DATA     = 10;
+	private static final int      FP_SUBFILTER_DATA        = 11;
 	
 	private static final int      TERMINFOTYPE_POINTER     = 1;
 	private static final int      TERMINFOTYPE_REF         = 2;
@@ -155,6 +158,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 		rules = new ArrayList<ITSRule>();
 		nsContext = new NSContextManager();
 		nsContext.addNamespace(ITS_NS_PREFIX, ITS_NS_URI);
+		nsContext.addNamespace(ITSX_NS_PREFIX, ITSX_NS_URI);
 		if ( isHTML5 ) {
 			nsContext.addNamespace(HTML_NS_PREFIX, HTML_NS_URI);
 		}
@@ -184,7 +188,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 
 	/**
 	 * Indicates if the processed document has triggered a rule for a translatable attribute.
-	 * This must be called only after {@link #applyRules(int)}.
+	 * This must be called only after {@link #applyRules(long)}.
 	 * @return true if the document has triggered a rule for a translatable attribute.
 	 */
 	public boolean getTranslatableAttributeRuleTriggered () {
@@ -193,7 +197,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 	
 	/**
 	 * Indicates if the processed document has triggered a target pointer rule.
-	 * This must be called only after {@link #applyRules(int)}. 
+	 * This must be called only after {@link #applyRules(long)}. 
 	 * @return true if the processed document has triggered a target pointer rule.
 	 */
 	public boolean getTargetPointerRuleTriggered () {
@@ -345,7 +349,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 				}
 
 				// Process each rule inside its:rules
-				expr = xpath.compile("//"+ITS_NS_PREFIX+":*");
+				expr = xpath.compile("//"+ITS_NS_PREFIX+":*|//"+ITSX_NS_PREFIX+":*");
 				NodeList nl2 = (NodeList)expr.evaluate(rulesElem, XPathConstants.NODESET);
 				if ( nl2.getLength() == 0 ) break; // Nothing to do, move to next its:rules
 				
@@ -397,6 +401,9 @@ public class ITSEngine implements IProcessor, ITraversal {
 					}
 					else if ( "allowedCharactersRule".equals(locName) ) {
 						compileAllowedCharactersRule(ruleElem, isInternal);
+					}
+					else if ( "subFilterRule".equals(locName) ) {
+						compileSubFilterRule(ruleElem, isInternal);
 					}
 					else if ( "param".equals(locName) ) {
 						processParam(ruleElem);
@@ -778,6 +785,18 @@ public class ITSEngine implements IProcessor, ITraversal {
 		rules.add(rule);
 	}
 	
+	private void compileSubFilterRule (Element elem,
+		boolean isInternal)
+	{
+		ITSRule rule = new ITSRule(IProcessor.DC_SUBFILTER);
+		rule.selector = elem.getAttribute("selector");
+		rule.isInternal = isInternal;
+		// Retrieve the list
+		rule.info = retrieveSubFilter(elem, false, false);
+		// Add the rule
+		rules.add(rule);
+	}
+
 	private void compilePrserveSpaceRule (Element elem,
 		boolean isInternal)
 	{
@@ -995,14 +1014,14 @@ public class ITSEngine implements IProcessor, ITraversal {
 		rules.add(rule);
 	}
 
-	public void applyRules (int dataCategories) {
+	public void applyRules (long dataCategories) {
 		translatableAttributeRuleTriggered = false;
 		targetPointerRuleTriggered = false;
 		version = "0"; // Needs to be not null (in case there is no ITS at all in file)
 		processGlobalRules(dataCategories);
 		processLocalRules(dataCategories);
 	}
-
+	
 	private void removeFlag (Node node) {
 		//TODO: Any possible optimization, instead of using recursive calls
 		if ( node == null ) return;
@@ -1177,6 +1196,10 @@ public class ITSEngine implements IProcessor, ITraversal {
 			trace.peek().language = getFlagData(data, FP_LANGINFO_DATA);
 		}
 		
+		if ( data.charAt(FP_SUBFILTER) != '?' ) {
+			trace.peek().subFilter = getFlagData(data, FP_SUBFILTER_DATA);
+		}
+		
 	}
 
 	public void startTraversal () {
@@ -1195,7 +1218,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 		}
 	}
 
-	private void processGlobalRules (int dataCategories) {
+	private void processGlobalRules (long dataCategories) {
 		try {
 			// Compile any internal global rules
 			clearInternalGlobalRules();
@@ -1223,8 +1246,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 				// always override existing flag. override should be set to false
 				// only for default attributes.
 				for ( int i=0; i<NL.getLength(); i++ ) {
-					switch ( rule.ruleType ) {
-					case IProcessor.DC_TRANSLATE:
+					if ( rule.ruleType == IProcessor.DC_TRANSLATE ) {
 						setFlag(NL.item(i), FP_TRANSLATE, (rule.flag ? 'y' : 'n'), true);
 						// Set the hasTranslatabledattribute flag if it is an attribute node
 						if ( NL.item(i).getNodeType() == Node.ATTRIBUTE_NODE ) {
@@ -1235,19 +1257,19 @@ public class ITSEngine implements IProcessor, ITraversal {
 						}
 						// For deprecated extension
 						setFlag(NL.item(i), FP_PRESERVEWS, (rule.preserveWS ? 'y' : '?'), true);
-						break;
-						
-					case IProcessor.DC_DIRECTIONALITY:
+					}
+					
+					else if ( rule.ruleType == IProcessor.DC_DIRECTIONALITY ) {
 						setFlag(NL.item(i), FP_DIRECTIONALITY,
 							String.valueOf(rule.value).charAt(0), true);
-						break;
+					}
 						
-					case IProcessor.DC_WITHINTEXT:
+					else if ( rule.ruleType == IProcessor.DC_WITHINTEXT ) {
 						setFlag(NL.item(i), FP_WITHINTEXT,
 							String.valueOf(rule.value).charAt(0), true);
-						break;
+					}
 						
-					case IProcessor.DC_TERMINOLOGY:
+					else if ( rule.ruleType == IProcessor.DC_TERMINOLOGY ) {
 						setFlag(NL.item(i), FP_TERMINOLOGY, (rule.flag ? 'y' : 'n'), true);
 						switch ( rule.infoType ) {
 						case TERMINFOTYPE_POINTER:
@@ -1260,9 +1282,9 @@ public class ITSEngine implements IProcessor, ITraversal {
 							setFlag(NL.item(i), FP_TERMINOLOGY_DATA, "REF:"+resolvePointer(NL.item(i), rule.info), true);
 							break;
 						}
-						break;
+					}
 						
-					case IProcessor.DC_LOCNOTE:
+					else if ( rule.ruleType == IProcessor.DC_LOCNOTE ) {
 						setFlag(NL.item(i), FP_LOCNOTE, (rule.flag ? 'a' : 'd'), true); // Type alert or description
 						switch ( rule.infoType ) {
 						case LOCNOTETYPE_TEXT:
@@ -1278,36 +1300,36 @@ public class ITSEngine implements IProcessor, ITraversal {
 							setFlag(NL.item(i), FP_LOCNOTE_DATA, "REF:"+resolvePointer(NL.item(i), rule.info), true);
 							break;
 						}
-						break;
+					}
 						
-					case IProcessor.DC_LANGINFO:
+					else if ( rule.ruleType == IProcessor.DC_LANGINFO ) {
 						setFlag(NL.item(i), FP_LANGINFO, 'y', true);
 						setFlag(NL.item(i), FP_LANGINFO_DATA, resolvePointer(NL.item(i), rule.info), true);
-						break;
+					}
 						
-					case IProcessor.DC_EXTERNALRES:
+					else if ( rule.ruleType == IProcessor.DC_EXTERNALRES ) {
 						setFlag(NL.item(i), FP_EXTERNALRES, 'y', true);
 						setFlag(NL.item(i), FP_EXTERNALRES_DATA, resolvePointer(NL.item(i), rule.info), true);
-						break;
+					}
 						
-					case IProcessor.DC_LOCFILTER:
+					else if ( rule.ruleType == IProcessor.DC_LOCFILTER ) {
 						setFlag(NL.item(i), FP_LOCFILTER, 'y', true);
 						setFlag(NL.item(i), FP_LOCFILTER_DATA, rule.info, true);
-						break;
+					}
 						
-					case IProcessor.DC_PRESERVESPACE:
+					else if ( rule.ruleType == IProcessor.DC_PRESERVESPACE ) {
 						// For new ITS 2.0 rule, but deprecated extension still supported in DC_PRESERVESPACE case
 						setFlag(NL.item(i), FP_PRESERVEWS, (rule.preserveWS ? 'y' : '?'), true);
-						break;
+					}
 						
-					case IProcessor.DC_IDVALUE:
+					else if ( rule.ruleType == IProcessor.DC_IDVALUE ) {
 						// For new ITS 2.0 rule, but deprecated extension still supported in DC_TRANSLATE case
 						if ( rule.idValue != null ) {
 							setFlag(NL.item(i), FP_IDVALUE_DATA, resolveExpressionAsString(NL.item(i), rule.idValue), true);							
 						}
-						break;
+					}
 						
-					case IProcessor.DC_DOMAIN:
+					else if ( rule.ruleType == IProcessor.DC_DOMAIN ) {
 						List<String> list = resolveExpressionAsList(NL.item(i), rule.info);
 						// Map the values and build the final string
 						StringBuilder tmp = new StringBuilder();
@@ -1321,14 +1343,14 @@ public class ITSEngine implements IProcessor, ITraversal {
 						}
 						setFlag(NL.item(i), FP_DOMAIN, 'y', true);
 						setFlag(NL.item(i), FP_DOMAIN_DATA, tmp.toString(), true);
-						break;
+					}
 						
-					case IProcessor.DC_TARGETPOINTER:
+					else if ( rule.ruleType == IProcessor.DC_TARGETPOINTER ) {
 						targetPointerRuleTriggered = true;
 						setFlag(NL.item(i), FP_TARGETPOINTER_DATA, rule.info, true);							
-						break;
+					}
 						
-					case IProcessor.DC_LOCQUALITYISSUE:
+					else if ( rule.ruleType == IProcessor.DC_LOCQUALITYISSUE ) {
 						// Get and resolve type
 						// Get and resolve issues reference
 						data1 = rule.map.get("issuesRef");
@@ -1361,9 +1383,9 @@ public class ITSEngine implements IProcessor, ITraversal {
 						}
 						setFlag(NL.item(i), FP_LQISSUE, 'y', true);
 						setFlag(NL.item(i), FP_LQISSUE_DATA, toSingleString(data1, data2, data3, data4, data5), true);
-						break;
+					}
 
-					case IProcessor.DC_ALLOWEDCHARS:
+					else if ( rule.ruleType == IProcessor.DC_ALLOWEDCHARS ) {
 						if ( rule.infoType == ALLOWEDCHARSTYPE_POINTER ) {
 							data1 = resolvePointer(NL.item(i), rule.info);
 						}
@@ -1372,28 +1394,33 @@ public class ITSEngine implements IProcessor, ITraversal {
 						}
 						setFlag(NL.item(i), FP_ALLOWEDCHARS, 'y', true);
 						setFlag(NL.item(i), FP_ALLOWEDCHARS_DATA, data1, true);
-						break;
+					}
 						
-					case IProcessor.DC_STORAGESIZE:
+					else if ( rule.ruleType == IProcessor.DC_STORAGESIZE ) {
 						data1 = rule.map.get("size");
 						if ( data1 == null ) {
 							data1 = rule.map.get("sizePointer");
 							if ( !Util.isEmpty(data1) ) data1 = resolvePointer(NL.item(i), data1);
 						}
-						data2 = rule.map.get("encoding");
+						String data2 = rule.map.get("encoding");
 						if ( data2 == null ) {
 							data2 = rule.map.get("encodingPointer");
 							if ( !Util.isEmpty(data2) ) data2 = resolvePointer(NL.item(i), data2);
 						}
-						data3 = rule.map.get("linebreak");
+						String data3 = rule.map.get("linebreak");
 						if ( data3 == null ) {
 							data3 = rule.map.get("linebreakPointer");
 							if ( !Util.isEmpty(data3) ) data3 = resolvePointer(NL.item(i), data3);
 						}
 						setFlag(NL.item(i), FP_STORAGESIZE, 'y', true);
 						setFlag(NL.item(i), FP_STORAGESIZE_DATA, toSingleString(data1, data2, data3), true);
-						break;
 					}
+
+					else if ( rule.ruleType == IProcessor.DC_SUBFILTER ) {
+						setFlag(NL.item(i), FP_SUBFILTER, 'y', true);
+						setFlag(NL.item(i), FP_SUBFILTER_DATA, rule.info, true);
+					}
+
 				}
 		    }
 		}
@@ -1447,7 +1474,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 		return values;
 	}
 	
-	private void processLocalRules (int dataCategories) {
+	private void processLocalRules (long dataCategories) {
 		XPathExpression expr;
 		NodeList NL;
 		Attr attr;
@@ -1774,6 +1801,34 @@ public class ITSEngine implements IProcessor, ITraversal {
 					}
 				}
 			}
+
+//			// sub filter
+//			if ( (dataCategories & IProcessor.DC_SUBFILTER) > 0 ) {
+//				if ( isHTML5 ) {
+//					expr = xpath.compile("//*/@data-itsx-sub-filter");
+//				}
+//				else {
+//					// Not on inline its:span
+//					ERROR
+//					expr = xpath.compile("//*/@"+ITSX_NS_PREFIX+":subFilter");
+//				}
+//				NL = (NodeList)expr.evaluate(doc, XPathConstants.NODESET);
+//				for ( int i=0; i<NL.getLength(); i++ ) {
+//					attr = (Attr)NL.item(i);
+//					// Skip irrelevant nodes
+//					if ( ITSX_NS_URI.equals(attr.getOwnerElement().getNamespaceURI())
+//						&& "subFilterRule".equals(attr.getOwnerElement().getLocalName()) ) continue;
+//					// Set the flag
+//					boolean qualified = true;
+//					String ns = attr.getOwnerElement().getNamespaceURI();
+//					if ( !Util.isEmpty(ns) ) qualified = !ns.equals(ITSX_NS_URI);
+//					String value = retrieveSubFilter(attr.getOwnerElement(), qualified, isHTML5);
+//					setFlag(attr.getOwnerElement(), FP_SUBFILTER, 'y', attr.getSpecified());
+//					setFlag(attr.getOwnerElement(), FP_SUBFILTER_DATA,
+//						value, attr.getSpecified()); 
+//				}
+//			}
+			
 		}
 		catch ( XPathExpressionException e ) {
 			throw new RuntimeException(e);
@@ -1798,6 +1853,21 @@ public class ITSEngine implements IProcessor, ITraversal {
 		}
 		else { // Inside a global rule
 			return elem.getAttribute("localeFilterList").trim();
+		}
+	}
+	
+	private String retrieveSubFilter (Element elem,
+		boolean qualified,
+		boolean useHTML5)
+	{
+		if ( useHTML5 ) {
+			return elem.getAttribute("data-itsx-sub-filter").trim();
+		}
+		if ( qualified ) { // Locally
+			return elem.getAttributeNS(ITSX_NS_URI, "subFilter").trim();
+		}
+		else { // Inside a global rule
+			return elem.getAttribute("subFilter").trim();
 		}
 	}
 	
@@ -2275,6 +2345,14 @@ public class ITSEngine implements IProcessor, ITraversal {
 		if ( (tmp = (String)attribute.getUserData(FLAGNAME)) == null ) return null;
 		if ( tmp.charAt(FP_ALLOWEDCHARS) != '?' ) return getFlagData(tmp, FP_ALLOWEDCHARS_DATA);
 		return null;
+	}
+	
+	public String getSubFilter (Attr attribute) {
+		if ( attribute == null ) return trace.peek().subFilter;
+		String tmp;
+		if ( (tmp = (String)attribute.getUserData(FLAGNAME)) == null ) return null;
+		if ( tmp.charAt(FP_SUBFILTER) != 'y' ) return null;
+		return getFlagData(tmp, FP_SUBFILTER_DATA);
 	}
 
 }

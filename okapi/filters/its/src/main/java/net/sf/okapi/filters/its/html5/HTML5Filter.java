@@ -153,7 +153,8 @@ public class HTML5Filter extends ITSFilter {
 			| IProcessor.DC_LOCNOTE | IProcessor.DC_WITHINTEXT | IProcessor.DC_TERMINOLOGY
 			| IProcessor.DC_DOMAIN | IProcessor.DC_TARGETPOINTER | IProcessor.DC_EXTERNALRES
 			| IProcessor.DC_LOCFILTER | IProcessor.DC_LOCQUALITYISSUE
-			| IProcessor.DC_STORAGESIZE | IProcessor.DC_ALLOWEDCHARS);
+			| IProcessor.DC_STORAGESIZE | IProcessor.DC_ALLOWEDCHARS
+			| IProcessor.DC_SUBFILTER);
 	}
 
 	@Override

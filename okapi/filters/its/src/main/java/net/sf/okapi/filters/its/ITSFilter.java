@@ -40,9 +40,11 @@ import net.sf.okapi.common.Util;
 import net.sf.okapi.common.annotation.TermsAnnotation;
 import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.encoder.IEncoder;
+import net.sf.okapi.common.exceptions.OkapiBadFilterInputException;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filters.IFilterConfigurationMapper;
+import net.sf.okapi.common.filters.SubFilter;
 import net.sf.okapi.common.filterwriter.GenericFilterWriter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.resource.Code;
@@ -85,6 +87,7 @@ public abstract class ITSFilter implements IFilter {
 	protected String lineBreak;
 	protected boolean hasUTF8BOM;
 	protected GenericSkeleton skel;
+	protected IFilterConfigurationMapper fcMapper;
 	
 	private final String mimeType;
 	private final boolean isHTML5;
@@ -199,6 +202,7 @@ public abstract class ITSFilter implements IFilter {
 	
 	@Override
 	public void setFilterConfigurationMapper (IFilterConfigurationMapper fcMapper) {
+		this.fcMapper = fcMapper;
 	}
 
 	public void setParameters (IParameters params) {
@@ -689,6 +693,13 @@ public abstract class ITSFilter implements IFilter {
 	private boolean processElementTag (Node node) {
 		if ( trav.backTracking() ) {
 
+			// Nodes with sub-filter are processed when opening the tag
+			if ( trav instanceof ITSEngine ) {
+				if ( ((ITSEngine)trav).getSubFilter(null) != null ) {
+					return false; // Skip to next node
+				}
+			}
+			
 			if ( trav.getTerm(null) ) {
 				if ( terms == null ) {
 					terms = new TermsAnnotation();
@@ -717,7 +728,15 @@ public abstract class ITSFilter implements IFilter {
 			if ( hasTargetPointer ) {
 				TargetPointerEntry tpe = (TargetPointerEntry)node.getUserData(TRG_TRGPTRFLAGNAME);
 				if ( tpe != null ) {
-					
+					//TODO
+				}
+			}
+			
+			if ( trav instanceof ITSEngine ) {
+				if ( ((ITSEngine)trav).getSubFilter(null) != null ) {
+					processSubFilterContent(node, ((ITSEngine)trav).getSubFilter(null));
+					moveToEnd(node);
+					return true; // Send the events
 				}
 			}
 			
@@ -767,6 +786,59 @@ public abstract class ITSFilter implements IFilter {
 			}
 		}
 		return false;
+	}
+	
+	private void moveToEnd (Node start) {
+		Node node = null;
+		while ( (node = trav.nextNode()) != null ) {
+			if ( node == start ) return;
+		}
+	}
+	
+	/**
+	 * Process a content with a given sub-filter.
+	 * @param node the node to process.
+	 * @param fltConfig the sub-filter configuration identifier.
+	 */
+	private void processSubFilterContent (Node node,
+		String configId)
+	{
+		// Create the skeleton for the start tag
+		addStartTagToSkeleton(node);
+		queue.add(new Event(EventType.DOCUMENT_PART, new DocumentPart(otherId.createId(), false), skel));
+		skel = new GenericSkeleton();
+		
+		// Instantiate the filter to use as sub-filter
+		IFilter sf = fcMapper.createFilter(configId, null);
+		if ( sf == null ) {
+			throw new OkapiBadFilterInputException(String.format("Could not instantiate subfilter '%s'.", configId));
+		}
+		
+		// Create the sub-filter wrapper
+		// First, make sure we have defaults and set the default encoder
+		//TODO: Issue: the encoding is the input encoding, not the output one
+		encoderManager.setDefaultOptions(getParameters(), this.encoding, this.lineBreak);
+		encoderManager.updateEncoder(getMimeType());
+		// Then create the sub-filter
+		SubFilter subfilter = new SubFilter(sf, 
+			getEncoderManager().getEncoder(),
+			1, // sectionIndex
+			"parentId",
+			null // Parent name
+			);
+
+		// Process the content
+		String content = node.getTextContent();
+		subfilter.open(new RawDocument(content, srcLang));
+		while (subfilter.hasNext()) {
+			queue.add(subfilter.next());
+		}
+		subfilter.close();
+		
+		// Create the skeleton for the end tag
+		skel.add(buildEndTag(node));
+		queue.add(new Event(EventType.DOCUMENT_PART, new DocumentPart(otherId.createId(), false), skel));
+		skel = new GenericSkeleton();
 	}
 
 	/**

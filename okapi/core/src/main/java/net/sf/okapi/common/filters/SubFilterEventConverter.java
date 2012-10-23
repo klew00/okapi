@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008 - 2012 by the Okapi Framework contributors
+  Copyright (C) 2008-2012 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -51,9 +51,9 @@ import net.sf.okapi.common.resource.TextPart;
 public class SubFilterEventConverter {
 
 	private static Pattern REF = Pattern.compile( 			
-					RegexUtil.escape(TextFragment.REFMARKER_START) + 
-					"(.+?)" +							
-					RegexUtil.escape(TextFragment.REFMARKER_END));
+		RegexUtil.escape(TextFragment.REFMARKER_START) + 
+		"(.+?)" +							
+		RegexUtil.escape(TextFragment.REFMARKER_END));
 	private static int REF_GROUP = 1;
 	
 	private IdGenerator idGenerator;
@@ -61,7 +61,9 @@ public class SubFilterEventConverter {
 	private IEncoder parentEncoder;
 	private Map<String, IResource> referents;
 	
-	public SubFilterEventConverter(SubFilter subFilter, IEncoder parentEncoder) {
+	public SubFilterEventConverter (SubFilter subFilter,
+		IEncoder parentEncoder)
+	{
 		//this(parentId, null, null, idGenerator);
 		this.subFilter = subFilter;
 		this.parentEncoder = parentEncoder;
@@ -69,13 +71,13 @@ public class SubFilterEventConverter {
 		referents = new HashMap<String, IResource>();
 	}
 	
-	public void reset() {
+	public void reset () {
 		idGenerator.reset(null);
 		referents.clear();
 	}
 
 	// public to be able to call from subclasses of SubFilter
-	public String convertRefIds(String str) {
+	public String convertRefIds (String str) {
 		Matcher m = REF.matcher(str);
 		StringBuilder buf = new StringBuilder();	    
 	    int start = 0;
@@ -96,7 +98,7 @@ public class SubFilterEventConverter {
 	    return buf.toString();		
 	}
 	
-	private void convertTextContainer(TextContainer tc) {
+	private void convertTextContainer (TextContainer tc) {
 		for (TextPart textPart : tc) {
 			TextFragment tf = textPart.getContent();
 			for (Code code : tf.getCodes()) {
@@ -112,15 +114,15 @@ public class SubFilterEventConverter {
 		}
 	}
 	
-	private void convertRefs(Event event) {
-		if (event.isMultiEvent()) {
+	private void convertRefs (Event event) {
+		if ( event.isMultiEvent() ) {
 			MultiEvent me = event.getMultiEvent();
 			for (Event e : me) {
 				convertRefs(e);
 			}
 		}
 		else {
-			if (event.isTextUnit()) {
+			if ( event.isTextUnit() ) {
 				ITextUnit tu = event.getTextUnit();
 				convertTextContainer(tu.getSource());
 				for (LocaleId locId : tu.getTargetLocales()) {

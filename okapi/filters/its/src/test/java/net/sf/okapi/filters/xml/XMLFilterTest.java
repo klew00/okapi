@@ -23,7 +23,9 @@ package net.sf.okapi.filters.xml;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.TestUtil;
 import net.sf.okapi.common.filters.FilterConfiguration;
+import net.sf.okapi.common.filters.FilterConfigurationMapper;
 import net.sf.okapi.common.filters.FilterTestDriver;
+import net.sf.okapi.common.filters.IFilterConfigurationMapper;
 import net.sf.okapi.common.filters.InputDocument;
 import net.sf.okapi.common.filters.RoundTripComparison;
 import net.sf.okapi.common.filterwriter.GenericContent;
@@ -39,6 +41,7 @@ import static org.junit.Assert.*;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.w3c.its.ITSEngine;
 import org.w3c.its.ITSException;
 
 import java.io.File;
@@ -193,6 +196,17 @@ public class XMLFilterTest {
 		tu = FilterTestDriver.getTextUnit(list, 2);
 		assertNotNull(tu);
 		assertEquals("text3", tu.getSource().toString());
+	}
+	
+	@Test
+	public void testStack () {
+		String snippet = "<?xml version=\"1.0\" encoding='UTF-16'?>"
+			+ "<set lang=\"en\">"
+			+ "<title>Test</title>"
+			+ "</set>";
+		ArrayList<Event> list = getEvents(snippet);
+		ITextUnit tu = FilterTestDriver.getTextUnit(list, 1);
+		assertEquals("Test", tu.getSource().toString());
 	}
 	
 	@Test
@@ -589,6 +603,43 @@ public class XMLFilterTest {
 		assertTrue(list.size()>0);
 	}
 
+	@Test
+	public void testSubFilter () {
+		String snippet = "<?xml version=\"1.0\"?>\n"
+			+ "<doc><its:rules version=\"1.0\" xmlns:its=\"http://www.w3.org/2005/11/its\" "
+			+ "xmlns:ix=\""+ITSEngine.ITSX_NS_URI+"\">"
+			+ "<ix:subFilterRule selector=\"//sf\" subFilter=\"okf_xml\"/>"
+			+ "</its:rules>"
+			+ "<p>Text1</p>"
+			+ "<sf>&lt;doc2>"
+			+ "&lt;its:rules version=\"1.0\" xmlns:its=\"http://www.w3.org/2005/11/its\">"
+			+ "&lt;its:translateRule selector=\"//nt\" translate=\"no\"/>"
+			+ "&lt;/its:rules>"
+			+ "&lt;nt>no-trans&lt;/nt>&lt;p>Text2&lt;/p>&lt;/doc2></sf>"
+			+ "</doc>";
+		String expected = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+			+ "<doc><its:rules version=\"1.0\" xmlns:its=\"http://www.w3.org/2005/11/its\" "
+			+ "xmlns:ix=\""+ITSEngine.ITSX_NS_URI+"\">"
+			+ "<ix:subFilterRule selector=\"//sf\" subFilter=\"okf_xml\"/>"
+			+ "</its:rules>"
+			+ "<p>Text1</p>"
+			+ "<sf>&lt;?xml version=\"1.0\" encoding=\"UTF-8\"?&gt;\n&lt;doc2&gt;"
+			+ "&lt;its:rules version=\"1.0\" xmlns:its=\"http://www.w3.org/2005/11/its\"&gt;"
+			+ "&lt;its:translateRule selector=\"//nt\" translate=\"no\"/&gt;"
+			+ "&lt;/its:rules&gt;"
+			+ "&lt;nt>no-trans&lt;/nt&gt;&lt;p&gt;Text2&lt;/p&gt;&lt;/doc2&gt;</sf>"
+			+ "</doc>";
+
+		ArrayList<Event> list = getEvents(snippet);
+		ITextUnit tu = FilterTestDriver.getTextUnit(list, 1);
+		assertEquals("Text1", tu.getSource().toString());
+		tu = FilterTestDriver.getTextUnit(list, 2);
+		assertEquals("Text2", tu.getSource().toString());
+		
+//		assertEquals(expected, FilterTestDriver.generateOutput(list,
+//			filter.getEncoderManager(), locEN));
+	}
+	
 	@Test
 	public void testStartDocument () {
 		assertTrue("Problem in StartDocument", FilterTestDriver.testStartDocument(filter,
@@ -1009,6 +1060,11 @@ public class XMLFilterTest {
 	private ArrayList<Event> getEvents(String snippet) {
 		ArrayList<Event> list = new ArrayList<Event>();
 		filter.open(new RawDocument(snippet, locEN, LocaleId.FRENCH));
+		
+		IFilterConfigurationMapper fcMapper = new FilterConfigurationMapper();
+		fcMapper.addConfigurations(XMLFilter.class.getCanonicalName());
+		filter.setFilterConfigurationMapper(fcMapper);
+		
 		while ( filter.hasNext() ) {
 			Event event = filter.next();
 			list.add(event);
