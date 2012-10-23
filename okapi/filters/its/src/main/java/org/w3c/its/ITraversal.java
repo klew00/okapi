@@ -156,6 +156,8 @@ public interface ITraversal {
 	
 	public String getStorageEncoding (Attr attribute);
 	
+	public String getLineBreakType (Attr attribute);
+	
 	public String getAllowedCharacters (Attr attribute);
 	
 }

@@ -27,8 +27,6 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import java.util.regex.Pattern;
 
 import net.sf.okapi.common.BOMNewlineEncodingDetector;
@@ -49,13 +47,11 @@ import net.sf.okapi.common.filters.IFilterConfigurationMapper;
 import net.sf.okapi.common.filters.SubFilter;
 import net.sf.okapi.common.filterwriter.GenericFilterWriter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
-import net.sf.okapi.common.resource.EndSubfilter;
 import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.StartDocument;
-import net.sf.okapi.common.resource.StartSubfilter;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
@@ -63,12 +59,16 @@ import net.sf.okapi.common.skeleton.ISkeletonWriter;
 import net.sf.okapi.filters.abstractmarkup.AbstractMarkupEventBuilder;
 import net.sf.okapi.filters.abstractmarkup.AbstractMarkupFilter;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Implements the IFilter interface for properties files.
  */
 @UsingParameters(Parameters.class)
 public class PropertiesFilter implements IFilter {
-	private static final String TU_SELF_REFFERENCE_REGEX = "\\[\\#\\$\\$self\\$\\]";
+
+	//private static final String TU_SELF_REFFERENCE_REGEX = "\\[\\#\\$\\$self\\$\\]";
 
 	private static final int RESULT_END = 0;
 	private static final int RESULT_ITEM = 1;
@@ -83,7 +83,6 @@ public class PropertiesFilter implements IFilter {
 	private ITextUnit tuRes;
 	private LinkedList<Event> queue;
 	private String textLine;
-	private long lineNumber;
 	private long lineSince;
 	private long position;
 	private int tuId;
@@ -161,20 +160,18 @@ public class PropertiesFilter implements IFilter {
 		return list;
 	}
 
-	public EncoderManager getEncoderManager() {
-		if (encoderManager == null) {
+	public EncoderManager getEncoderManager () {
+		if ( encoderManager == null ) {
 			encoderManager = new EncoderManager();
 			// Use this because we have sub-filters, but this work only for
 			// sub-filters that have common encoder
 			// TODO: fix the sub-filters mechanism
 			encoderManager.setAllKnownMappings();
-			// encoderManager.setMapping(MimeTypeMapper.PROPERTIES_MIME_TYPE,
-			// "net.sf.okapi.common.encoder.PropertiesEncoder");
 		}
 		return encoderManager;
 	}
 
-	public IParameters getParameters() {
+	public IParameters getParameters () {
 		return params;
 	}
 
@@ -289,7 +286,6 @@ public class PropertiesFilter implements IFilter {
 		// Initializes the variables
 		tuId = 0;
 		sectionIndex = 0;
-		lineNumber = 0;
 		lineSince = 0;
 		position = 0;
 		// Compile conditions
@@ -540,14 +536,12 @@ public class PropertiesFilter implements IFilter {
 	 * @return True if there was a line to read, false if this is the end of the
 	 *         input.
 	 */
-	private boolean getNextLine() throws IOException {
-		while (true) {
+	private boolean getNextLine () throws IOException {
+		while ( true ) {
 			textLine = reader.readLine();
-			if (textLine != null) {
-				lineNumber++;
+			if ( textLine != null ) {
 				lineSince++;
-				// We count char instead of byte, while the BaseStream.Length is
-				// in byte
+				// We count char instead of byte, while the BaseStream.Length is in byte
 				// Not perfect, but better than nothing.
 				position += textLine.length() + lineBreak.length(); // +n For
 																	// the
@@ -564,7 +558,7 @@ public class PropertiesFilter implements IFilter {
 	 *            The string to convert.
 	 * @return The converted string.
 	 */
-	private String unescape(String text) {
+	private String unescape (String text) {
 		if (text.indexOf('\\') == -1)
 			return text;
 		StringBuilder tmpText = new StringBuilder();

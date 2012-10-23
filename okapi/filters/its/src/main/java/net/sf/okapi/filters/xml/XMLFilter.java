@@ -165,14 +165,13 @@ public class XMLFilter extends ITSFilter {
 		
 		try {
 			InputSource is = new InputSource(input.getStream());
-			//is.setEncoding(input.getEncoding());
 			doc = docBuilder.parse(is);
 		}
 		catch ( SAXException e ) {
-			throw new OkapiIOException("Error when parsing the document.\n"+e.getMessage(), e);
+			throw new OkapiIOException("Parsing error.\n"+e.getMessage(), e);
 		}
 		catch ( IOException e ) {
-			throw new OkapiIOException("Error when reading the document.\n"+e.getMessage(), e);
+			throw new OkapiIOException("IO Error when reading the document.\n"+e.getMessage(), e);
 		}
 
 		encoding = doc.getXmlEncoding();
@@ -194,7 +193,8 @@ public class XMLFilter extends ITSFilter {
 			| IProcessor.DC_LOCNOTE | IProcessor.DC_WITHINTEXT | IProcessor.DC_TERMINOLOGY
 			| IProcessor.DC_DOMAIN | IProcessor.DC_TARGETPOINTER | IProcessor.DC_EXTERNALRES
 			| IProcessor.DC_LOCFILTER | IProcessor.DC_PRESERVESPACE | IProcessor.DC_LOCQUALITYISSUE
-			| IProcessor.DC_STORAGESIZE | IProcessor.DC_ALLOWEDCHARS);
+			| IProcessor.DC_STORAGESIZE | IProcessor.DC_ALLOWEDCHARS
+			| IProcessor.DC_SUBFILTER);
 	}
 	
 	@Override

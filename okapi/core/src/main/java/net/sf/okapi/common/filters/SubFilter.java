@@ -56,7 +56,6 @@ import org.slf4j.LoggerFactory;
  * This class should be used to wrap filters that use {@link GenericSkeleton} and its subclasses. 
  * If a different type of skeleton is used or id/name generation logic should be changed, subclass this class. 
  */
-
 public class SubFilter implements IFilter {
 	
 	private final Logger logger = LoggerFactory.getLogger(getClass());
@@ -70,7 +69,12 @@ public class SubFilter implements IFilter {
 	StartSubfilter startSubfilter;
 	EndSubfilter endSubfilter;
 	
-	public SubFilter(IFilter filter, IEncoder parentEncoder, int sectionIndex, String parentId, String parentName) {
+	public SubFilter (IFilter filter,
+		IEncoder parentEncoder,
+		int sectionIndex,
+		String parentId,
+		String parentName)
+	{
 		filter.close();
 		this.filter = filter;
 		this.parentId = parentId;
@@ -79,16 +83,16 @@ public class SubFilter implements IFilter {
 		this.converter = new SubFilterEventConverter(this, parentEncoder);
 	}
 		
-	public IFilter getFilter() {
+	public IFilter getFilter () {
 		return filter;
 	}
 
-	public SubFilterEventConverter getConverter() {
+	public SubFilterEventConverter getConverter () {
 		return converter;
 	}
 
 	@Override
-	public String getName() {
+	public String getName () {
 		return filter.getName();
 	}
 
@@ -104,69 +108,71 @@ public class SubFilter implements IFilter {
 	}
 
 	@Override
-	public void open(RawDocument input, boolean generateSkeleton) {
+	public void open (RawDocument input,
+		boolean generateSkeleton)
+	{
 		converter.reset();
 		filter.open(input, generateSkeleton);		
 	}
 
 	@Override
-	public void close() {
+	public void close () {
 		filter.close();
 		converter.reset();
 	}
 
 	@Override
-	public boolean hasNext() {
+	public boolean hasNext () {
 		return filter.hasNext();
 	}
 
 	@Override
-	public Event next() {
+	public Event next () {
 		return converter.convertEvent(filter.next());
 	}
 
 	@Override
-	public void cancel() {
+	public void cancel () {
 		filter.cancel();
 	}
 
 	@Override
-	public IParameters getParameters() {
+	public IParameters getParameters () {
 		return filter.getParameters();
 	}
 
 	@Override
-	public void setParameters(IParameters params) {
+	public void setParameters (IParameters params) {
 		filter.setParameters(params);
 	}
 
 	@Override
-	public void setFilterConfigurationMapper(IFilterConfigurationMapper fcMapper) {
+	public void setFilterConfigurationMapper (IFilterConfigurationMapper fcMapper) {
 		filter.setFilterConfigurationMapper(fcMapper);
 	}
 
 	@Override
-	public ISkeletonWriter createSkeletonWriter() {
+	public ISkeletonWriter createSkeletonWriter () {
 		return filter.createSkeletonWriter();
 	}
 
 	@Override
-	public IFilterWriter createFilterWriter() {
+	public IFilterWriter createFilterWriter () {
 		return filter.createFilterWriter();
 	}
 
 	@Override
-	public EncoderManager getEncoderManager() {
+	public EncoderManager getEncoderManager () {
 		return filter.getEncoderManager();
 	}
 
 	@Override
-	public String getMimeType() {
+	public String getMimeType () {
 		return filter.getMimeType();
 	}
 
 	@Override
-	public List<FilterConfiguration> getConfigurations() {
+	public List<FilterConfiguration> getConfigurations () {
 		return filter.getConfigurations();
 	}
 
@@ -174,7 +180,7 @@ public class SubFilter implements IFilter {
 	 * Get events by subfilter at once, without using open()/hasNext()/next()/close().
 	 * @return a list of events created the this subfilter for a given RawDocument input.
 	 */
-	public List<Event> getEvents(RawDocument input) {
+	public List<Event> getEvents (RawDocument input) {
 		List<Event> events = new LinkedList<Event>();
 		open(input);
 		while (hasNext()) {
@@ -184,7 +190,7 @@ public class SubFilter implements IFilter {
 		return Collections.unmodifiableList(events);		
 	}
 	
-	public Code createRefCode() {
+	public Code createRefCode () {
 		startSubfilter.setIsReferent(true);
 		Code c = new Code(TagType.PLACEHOLDER, startSubfilter.getName(), 
 				TextFragment.makeRefMarker(startSubfilter.getId()));
@@ -202,7 +208,9 @@ public class SubFilter implements IFilter {
 //		return tu;
 //	}
 	
-	private DocumentPart buildRefDP(GenericSkeleton beforeSkeleton, GenericSkeleton afterSkeleton) {
+	private DocumentPart buildRefDP (GenericSkeleton beforeSkeleton,
+		GenericSkeleton afterSkeleton)
+	{
 		GenericSkeleton skel = new GenericSkeleton();
 		DocumentPart dp = new DocumentPart(buildRefId(), false, skel);
 		
@@ -227,11 +235,11 @@ public class SubFilter implements IFilter {
 	// Sub-filtered content is accessible only by a reference, so it's the parent
 	// filter's responsibility to invoke creation of such reference.
 	
-	public Event createRefEvent() {
+	public Event createRefEvent () {
 		return createRefEvent(null, null);
 	}
 	
-	public Event createRefEvent(IResource resource) {
+	public Event createRefEvent (IResource resource) {
 		ISkeleton skel = resource.getSkeleton();
 		if (skel instanceof GenericSkeleton) {
 			GenericSkeleton[] parts = SkeletonUtil.splitSkeleton((GenericSkeleton) skel);
@@ -244,20 +252,22 @@ public class SubFilter implements IFilter {
 		}			
 	}
 	
-	public Event createRefEvent(ISkeleton beforeSkeleton, ISkeleton afterSkeleton) {
-		if (beforeSkeleton instanceof GenericSkeleton && 
-				afterSkeleton instanceof GenericSkeleton) {
+	public Event createRefEvent (ISkeleton beforeSkeleton,
+		ISkeleton afterSkeleton)
+	{
+		if ( beforeSkeleton instanceof GenericSkeleton && 
+				afterSkeleton instanceof GenericSkeleton ) {
 			DocumentPart dp = buildRefDP(
 					(GenericSkeleton) beforeSkeleton, 
 					(GenericSkeleton) afterSkeleton);
 			return new Event(EventType.DOCUMENT_PART, dp);
 		}
 		else {
-			if (beforeSkeleton != null || afterSkeleton != null)
+			if ( beforeSkeleton != null || afterSkeleton != null )
 				logger.warn("Unknown skeleton type, ignored.");
 			DocumentPart dp = buildRefDP(null, null);
 			return new Event(EventType.DOCUMENT_PART, dp);
-		}			
+		}
 	}
 
 //	public StartSubfilter getStartSubFilter() {
@@ -274,59 +284,64 @@ public class SubFilter implements IFilter {
 //		return endSubfilter;
 //	}
 	
-	private String buildStartSubfilterId() {
+	private String buildStartSubfilterId () {
 		return String.format("%s_%s%d",
-				getParentId(), IdGenerator.START_SUBFILTER, getSectionIndex());
+			getParentId(), IdGenerator.START_SUBFILTER, getSectionIndex());
 	}
 	
-	private String buildStartSubfilterName() {
+	private String buildStartSubfilterName () {
 		return IFilter.SUB_FILTER + getParentName();
 	}
 	
-	private String buildEndSubfilterId() {
+	private String buildEndSubfilterId () {
 		return String.format("%s_%s%d",
-				getParentId(), IdGenerator.END_SUBFILTER, getSectionIndex());
+			getParentId(), IdGenerator.END_SUBFILTER, getSectionIndex());
 	}
 	
-	protected String buildResourceId(String resId, Class<? extends IResource> resClass) {
-		if (resClass == StartSubfilter.class)
+	protected String buildResourceId (String resId,
+		Class<? extends IResource> resClass)
+	{
+		if ( resClass == StartSubfilter.class )
 			return buildStartSubfilterId();
 		
-		else if (resClass == EndSubfilter.class)
+		else if ( resClass == EndSubfilter.class )
 			return buildEndSubfilterId();
 		
 		else
 			return String.format("%s_%s", getParentId(), resId);		
 	}
 	
-	protected String buildResourceName(String resName, boolean autoGenerated, Class<? extends INameable> resClass) {
-		if (resClass == StartSubfilter.class)
+	protected String buildResourceName (String resName,
+		boolean autoGenerated,
+		Class<? extends INameable> resClass)
+	{
+		if ( resClass == StartSubfilter.class )
 			return buildStartSubfilterName();
 		else
 			return autoGenerated ? String.format("%s_%s", getParentName(), resName) : resName;
 	}
 	
-	protected String buildRefId() {
+	protected String buildRefId () {
 		return String.format("ref-%s%s-%d", IFilter.SUB_FILTER, getParentId(), getSectionIndex());
 	}
 	
-	protected String buildRefName() {
+	protected String buildRefName () {
 		return "ref:" + getParentId();
 	}	
 	
-	protected final String getParentId() {
+	protected final String getParentId () {
 		return parentId;
 	}
 
-	protected final String getParentName() {
+	protected final String getParentName () {
 		return parentName;
 	}
 
-	protected final int getSectionIndex() {
+	protected final int getSectionIndex () {
 		return sectionIndex;
 	}
 
-	protected void convertRefsInSkeleton(ISkeleton skel) {
+	protected void convertRefsInSkeleton (ISkeleton skel) {
 		if (skel instanceof GenericSkeleton) {
 			GenericSkeleton gs = (GenericSkeleton) skel;
 			for (GenericSkeletonPart part : gs.getParts()) {					
@@ -338,4 +353,5 @@ public class SubFilter implements IFilter {
 			}
 		}
 	}
+
 }

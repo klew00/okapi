@@ -161,9 +161,9 @@ public class HTML5FilterTest {
 		ArrayList<Event> list = getEvents(snippet);
 		ITextUnit tu = FilterTestDriver.getTextUnit(list, 2);
 		assertNotNull(tu);
-		assertEquals("10\tUTF-8", tu.getProperty(Property.ITS_STORAGESIZE).getValue());
+		assertEquals("10\tUTF-8\tlf", tu.getProperty(Property.ITS_STORAGESIZE).getValue());
 		tu = FilterTestDriver.getTextUnit(list, 3);
-		assertEquals("22\tISO-8859-1", tu.getProperty(Property.ITS_STORAGESIZE).getValue());
+		assertEquals("22\tISO-8859-1\tlf", tu.getProperty(Property.ITS_STORAGESIZE).getValue());
 	}
 	
 	@Test

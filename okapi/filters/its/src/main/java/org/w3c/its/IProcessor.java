@@ -26,23 +26,26 @@ import org.w3c.dom.Document;
 
 public interface IProcessor {
 	
-	public static final int DC_LANGINFO          = 0x0001;
-	public static final int DC_TRANSLATE         = 0x0002;
-	public static final int DC_WITHINTEXT        = 0x0004;
-	public static final int DC_LOCNOTE           = 0x0008;
-	public static final int DC_TERMINOLOGY       = 0x0010;
-	public static final int DC_DIRECTIONALITY    = 0x0020;
-	public static final int DC_RUBY              = 0x0040;
-	public static final int DC_IDVALUE           = 0x0080; // ITS 2.0
-	public static final int DC_DOMAIN            = 0x0100; // ITS 2.0
-	public static final int DC_TARGETPOINTER     = 0x0200; // ITS 2.0
-	public static final int DC_EXTERNALRES       = 0x0400; // ITS 2.0
-	public static final int DC_LOCFILTER         = 0x0800; // ITS 2.0
-	public static final int DC_PRESERVESPACE     = 0x1000; // ITS 2.0
-	public static final int DC_LOCQUALITYISSUE   = 0x2000; // ITS 2.0
-	public static final int DC_STORAGESIZE       = 0x4000; // ITS 2.0
-	public static final int DC_ALLOWEDCHARS      = 0x8000; // ITS 2.0
-	public static final int DC_ALL               = 0xFFFF;
+	public static final long DC_LANGINFO          = 0x00000001;
+	public static final long DC_TRANSLATE         = 0x00000002;
+	public static final long DC_WITHINTEXT        = 0x00000004;
+	public static final long DC_LOCNOTE           = 0x00000008;
+	public static final long DC_TERMINOLOGY       = 0x00000010;
+	public static final long DC_DIRECTIONALITY    = 0x00000020;
+	public static final long DC_RUBY              = 0x00000040;
+	public static final long DC_IDVALUE           = 0x00000080; // ITS 2.0
+	public static final long DC_DOMAIN            = 0x00000100; // ITS 2.0
+	public static final long DC_TARGETPOINTER     = 0x00000200; // ITS 2.0
+	public static final long DC_EXTERNALRES       = 0x00000400; // ITS 2.0
+	public static final long DC_LOCFILTER         = 0x00000800; // ITS 2.0
+	public static final long DC_PRESERVESPACE     = 0x00001000; // ITS 2.0
+	public static final long DC_LOCQUALITYISSUE   = 0x00002000; // ITS 2.0
+	public static final long DC_STORAGESIZE       = 0x00004000; // ITS 2.0
+	public static final long DC_ALLOWEDCHARS      = 0x00008000; // ITS 2.0
+	
+	public static final long DC_SUBFILTER         = 0x00010000; // Extension
+
+	public static final long DC_ALL               = 0xFFFFFFFF;
 	
 	/**
 	 * Adds a set of global rules to the document to process. The rules are added
@@ -68,14 +71,14 @@ public interface IProcessor {
 	 * different ITS information later.
 	 * @param dataCategories Flag indicating what data categories to apply.
 	 * The value must be one of the DC_* values or several combined with 
-	 * a OR operator. For example:
-	 * applyRules(DC_TRANSLATE | DC_LOCNOTE);
+	 * a OR operator. For example: <code>applyRules(DC_TRANSLATE | DC_LOCNOTE);</code>
+	 * <p>Use DC_ALL to apply all data categories.
 	 */
-	void applyRules (int dataCategories);
+	void applyRules (long dataCategories);
 	
 	/**
 	 * Removes all the special flags added when applying the ITS rules.
-	 * Once you have called this method you should call applyRules() again to be able
+	 * Once you have called this method you should call {@link #applyRules(long)} again to be able
 	 * to use ITS-aware methods again.
 	 */
 	void disapplyRules ();

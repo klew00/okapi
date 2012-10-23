@@ -59,6 +59,7 @@ public class Main {
 	public static final String DC_IDVALUE = "idvalue";
 	public static final String DC_PRESERVESPACE = "preservespace";
 	public static final String DC_LOCQUALITYISSUE = "locqualityissue";
+	public static final String DC_STORAGESIZE = "storagesize";
 
 	public static void main (String[] args) {
  
@@ -99,6 +100,7 @@ public class Main {
 						+ "\n" + DC_IDVALUE
 						+ "\n" + DC_PRESERVESPACE
 						+ "\n" + DC_LOCQUALITYISSUE
+						+ "\n" + DC_STORAGESIZE
 					);
 					return;
 				}
@@ -329,6 +331,7 @@ public class Main {
 			if ( out1 != null ) writer.print(String.format("\tits:preserveSpace=\"%s\"", escape(out1)));
 		}
 		else if ( dc.equals(DC_LOCQUALITYISSUE) ) {
+			//TODO attributes
 			out1 = trav.getLocQualityIssuesRef();
 			if ( out1 != null ) writer.print(String.format("\tits:locQualityIssuesRef=\"%s\"", escape(out1)));
 			writer.print("\t");
@@ -343,6 +346,16 @@ public class Main {
 			writer.print("\t");
 			out1 = trav.getLocQualityIssueProfileRef();
 			if ( out1 != null ) writer.print(String.format("\tits:locQualityIssueProfileRef=\"%s\"", escape(out1)));
+		}
+		else if ( dc.equals(DC_STORAGESIZE) ) {
+			out1 = trav.getStorageSize(attr);
+			if ( out1 != null ) writer.print(String.format("\tits:storageSize=\"%s\"", escape(out1)));
+			writer.print("\t");
+			out1 = trav.getStorageEncoding(attr);
+			if ( out1 != null ) writer.print(String.format("\tits:storageEncoding=\"%s\"", escape(out1)));
+			writer.print("\t");
+			out1 = trav.getLineBreakType(attr);
+			if ( out1 != null ) writer.print(String.format("\tits:lineBreakType=\"%s\"", escape(out1)));
 		}
 		
 		writer.print("\n");

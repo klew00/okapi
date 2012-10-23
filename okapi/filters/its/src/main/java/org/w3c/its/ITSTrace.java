@@ -44,7 +44,9 @@ class ITSTrace {
 	String lqIssuesRef;
 	String storageSize;
 	String storageEncoding;
+	String lineBreakType;
 	String allowedChars;
+	String subFilter;
 
 	ITSTrace () {
 		// Default constructor
@@ -96,6 +98,8 @@ class ITSTrace {
 		allowedChars = initialTrace.allowedChars;
 		
 		// Store size: No inheritance
+		
+		// sub-filter: No inheritance
 		
 		this.isChildDone = isChildDone;
 	}

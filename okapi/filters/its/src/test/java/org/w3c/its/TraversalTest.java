@@ -259,7 +259,7 @@ public class TraversalTest {
 	public void testStorageSizeGlobal1 () throws SAXException, IOException, ParserConfigurationException {
 		InputSource is = new InputSource(new StringReader("<doc>"
 			+ "<i:rules xmlns:i='"+ITSEngine.ITS_NS_URI+"' version='2.0'>"
-			+ "<i:storageSizeRule selector='//p' storageSize='255'/>"
+			+ "<i:storageSizeRule selector='//p' storageSize='255' lineBreakType='crlf'/>"
 			+ "</i:rules>"
 			+ "<p>Text</p><q>text</q></doc>"));
 		Document doc = fact.newDocumentBuilder().parse(is);
@@ -267,16 +267,18 @@ public class TraversalTest {
 		getElement(trav, "p", 1);
 		assertEquals("255", trav.getStorageSize(null));
 		assertEquals("UTF-8", trav.getStorageEncoding(null));
-		getElement(trav, "q", 1);
+		assertEquals("crlf", trav.getLineBreakType(null));
+		getElement(trav, "q", 1); // Not inherited
 		assertEquals(null, trav.getStorageSize(null));
 		assertEquals("UTF-8", trav.getStorageEncoding(null));
+		assertEquals("lf", trav.getLineBreakType(null));
 	}
 
 	@Test
 	public void testStorageSizeGlobal2 () throws SAXException, IOException, ParserConfigurationException {
 		InputSource is = new InputSource(new StringReader("<doc>"
 			+ "<i:rules xmlns:i='"+ITSEngine.ITS_NS_URI+"' version='2.0'>"
-			+ "<i:storageSizeRule selector='//p' storageSizePointer='@max' storageEncodingPointer='@enc'/>"
+			+ "<i:storageSizeRule selector='//p' lineBreakType='cr' storageSizePointer='@max' storageEncodingPointer='@enc'/>"
 			+ "</i:rules>"
 			+ "<p max='222' enc='UTF-16'>Text<b>text</b></p></doc>"));
 		Document doc = fact.newDocumentBuilder().parse(is);
@@ -284,9 +286,11 @@ public class TraversalTest {
 		getElement(trav, "p", 1);
 		assertEquals("222", trav.getStorageSize(null));
 		assertEquals("UTF-16", trav.getStorageEncoding(null));
+		assertEquals("cr", trav.getLineBreakType(null));
 		getElement(trav, "b", 1);
 		assertEquals(null, trav.getStorageSize(null));
 		assertEquals("UTF-8", trav.getStorageEncoding(null));
+		assertEquals("lf", trav.getLineBreakType(null));
 	}
 	
 	@Test
@@ -298,6 +302,7 @@ public class TraversalTest {
 		getElement(trav, "p", 1);
 		assertEquals("111", trav.getStorageSize(null));
 		assertEquals("Shift-JIS", trav.getStorageEncoding(null));
+		assertEquals("lf", trav.getLineBreakType(null));
 	}
 
 	@Test

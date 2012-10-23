@@ -664,7 +664,9 @@ public class XLIFFFilter implements IFilter {
 			if ( tmp != null ) { // Get encoding info
 				String enc = reader.getAttributeValue(XLIFFWriter.NS_ITS20, "storageEncoding");
 				if ( enc == null ) enc = "UTF-8";
-				tu.setProperty(new Property(Property.ITS_STORAGESIZE, tmp+"\t"+enc));
+				String lb = reader.getAttributeValue(XLIFFWriter.NS_ITS20, "lineBreakType");
+				if ( lb == null ) lb = "lf";
+				tu.setProperty(new Property(Property.ITS_STORAGESIZE, tmp+"\t"+enc+"\t"+lb));
 			}
 			// ITS Allowed characters
 			tmp = reader.getAttributeValue(XLIFFWriter.NS_ITS20, "allowedCharacters");

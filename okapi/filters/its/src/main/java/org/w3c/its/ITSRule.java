@@ -24,7 +24,7 @@ import java.util.Map;
 
 class ITSRule {
 	
-	int ruleType;
+	long ruleType;
 	boolean isInternal;
 	String selector;
 	boolean flag;
@@ -35,7 +35,7 @@ class ITSRule {
 	boolean preserveWS;
 	Map<String, String> map;
 
-	public ITSRule (int type) {
+	public ITSRule (long type) {
 		ruleType = type;
 	}
 
