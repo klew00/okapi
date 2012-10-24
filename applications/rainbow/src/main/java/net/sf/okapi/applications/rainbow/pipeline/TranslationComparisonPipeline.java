@@ -22,6 +22,7 @@ package net.sf.okapi.applications.rainbow.pipeline;
 
 import net.sf.okapi.steps.common.RawDocumentToFilterEventsStep;
 import net.sf.okapi.steps.translationcomparison.TranslationComparisonStep;
+import net.sf.okapi.steps.wordcount.SimpleWordCountStep;
 
 public class TranslationComparisonPipeline extends PredefinedPipeline {
 
@@ -29,6 +30,7 @@ public class TranslationComparisonPipeline extends PredefinedPipeline {
 		super("TranslationComparisonPipeline",
 			"Compare Translations");
 		addStep(new RawDocumentToFilterEventsStep());
+		addStep(new SimpleWordCountStep());
 		addStep(new TranslationComparisonStep());
 	}
 	
