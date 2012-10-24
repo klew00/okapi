@@ -54,11 +54,10 @@ public class ITSTest {
 		String base = root+"/translate/html";
 		removeOutput(base);
 		process(base+"/translate1html.html", Main.DC_TRANSLATE);
-		//process(base+"/Translate2Html.html", Main.DC_TRANSLATE);
-		//process(base+"/Translate4Html.html", Main.DC_TRANSLATE);
-		//process(base+"/Translate6Html.html", Main.DC_TRANSLATE);
-		//process(base+"/Translate7Html.html", Main.DC_TRANSLATE);
-		//process(base+"/Translate8Html.html", Main.DC_TRANSLATE);
+		process(base+"/translate2html.html", Main.DC_TRANSLATE);
+		process(base+"/translate3html.html", Main.DC_TRANSLATE);
+		process(base+"/translate4html.html", Main.DC_TRANSLATE);
+		process(base+"/translate5html.html", Main.DC_TRANSLATE);
 	}
 
 //	@Test
