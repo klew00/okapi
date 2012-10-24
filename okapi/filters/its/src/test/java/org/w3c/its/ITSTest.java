@@ -24,7 +24,6 @@ import static org.junit.Assert.*;
 
 import java.io.File;
 
-import net.sf.okapi.common.FileCompare;
 import net.sf.okapi.common.TestUtil;
 import net.sf.okapi.common.Util;
 
