@@ -99,17 +99,19 @@ public class SubFilterEventConverter {
 	}
 	
 	private void convertTextContainer (TextContainer tc) {
-		for (TextPart textPart : tc) {
+		for ( TextPart textPart : tc ) {
 			TextFragment tf = textPart.getContent();
 			for (Code code : tf.getCodes()) {
 				if (!code.hasReference()) continue;
 				
 				String data = code.getOuterData();
 				String newData = convertRefIds(data);
-				if (code.hasOuterData())
+				if ( code.hasOuterData() ) {
 					code.setOuterData(newData);
-				else 
-					code.setData(newData); 
+				}
+				else { 
+					code.setData(newData);
+				}
 			}
 		}
 	}
@@ -140,26 +142,26 @@ public class SubFilterEventConverter {
 	 * @param event the event coming from the sub-filter.
 	 * @return the event after possible conversion.
 	 */
-	public Event convertEvent(Event event) {
+	public Event convertEvent (Event event) {
 		IResource res = event.getResource();
-		if (res instanceof IReferenceable) {
-			IReferenceable r = (IReferenceable) res;
+		if ( res instanceof IReferenceable ) {
+			IReferenceable r = (IReferenceable)res;
 			// referents are keyed by original Id
-			if (r.isReferent()) referents.put(res.getId(), res);
+			if ( r.isReferent() ) referents.put(res.getId(), res);
 		}
 		
 		// we convert START_DOCUMENT to START_SUBFILTER
 		// and END_DOCUMENT to END_SUBFILTER
-		switch (event.getEventType()) {
+		switch ( event.getEventType() ) {
 		case START_DOCUMENT:
 			StartDocument sd = event.getStartDocument();
 			IFilterWriter filterWriter = sd.getFilterWriter();
 			// Initialize encoder manager and skeleton writer
-			if (filterWriter != null) {
+			if ( filterWriter != null ) {
 				EncoderManager em = filterWriter.getEncoderManager();
-				if (em != null) {
-					em.setDefaultOptions(sd.getFilterParameters(), sd.getEncoding(), 
-							sd.getLineBreak());
+				if ( em != null ) {
+					//TODO: the encoding of sd is the input encoding, that may not work in all cases
+					em.setDefaultOptions(sd.getFilterParameters(), sd.getEncoding(), sd.getLineBreak());
 					em.updateEncoder(sd.getMimeType());
 				}
 				// Configured by parent filter writer
@@ -170,10 +172,10 @@ public class SubFilterEventConverter {
 			}
 			
 			StartSubfilter startSubfilter =
-					new StartSubfilter(
-							subFilter.buildResourceId(null, StartSubfilter.class),
-							sd,
-							parentEncoder);			
+				new StartSubfilter(
+					subFilter.buildResourceId(null, StartSubfilter.class),
+					sd,
+					parentEncoder);			
 			subFilter.startSubfilter = startSubfilter;
 			//startSubFilter.setMimeType(((StartDocument) event.getResource()).getMimeType()); // TODO do we need it?
 			//startSubFilter.setSkeleton(startGroupSkeleton); // TODO do we need it?
@@ -186,7 +188,8 @@ public class SubFilterEventConverter {
 		case END_DOCUMENT:
 			EndSubfilter endSubfilter = new EndSubfilter(subFilter.buildResourceId(null, EndSubfilter.class));
 			subFilter.endSubfilter = endSubfilter;
-			//endSubfilter.setSkeleton(endGroupSkeleton);
+			//TODO: we need to get the skeleton from this event into the string output 
+			endSubfilter.setSkeleton(event.getEnding().getSkeleton());
 			event = new Event(EventType.END_SUBFILTER, endSubfilter);
 			break;
 			
@@ -195,11 +198,11 @@ public class SubFilterEventConverter {
 			res.setId(subFilter.buildResourceId(res.getId(), res.getClass()));
 			
 			// Convert resource name
-			if (event.getResource() instanceof INameable) {
-				INameable nres = (INameable) event.getResource();
+			if ( event.getResource() instanceof INameable ) {
+				INameable nres = (INameable)event.getResource();
 				String name = nres.getName();
 				boolean isEmpty = Util.isEmpty(name);
-				if (isEmpty) name = idGenerator.createId();
+				if ( isEmpty ) name = idGenerator.createId();
 				nres.setName(subFilter.buildResourceName(name, isEmpty, nres.getClass()));
 			}
 			

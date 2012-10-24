@@ -342,12 +342,12 @@ public class SubFilter implements IFilter {
 	}
 
 	protected void convertRefsInSkeleton (ISkeleton skel) {
-		if (skel instanceof GenericSkeleton) {
-			GenericSkeleton gs = (GenericSkeleton) skel;
-			for (GenericSkeletonPart part : gs.getParts()) {					
+		if ( skel instanceof GenericSkeleton ) {
+			GenericSkeleton gs = (GenericSkeleton)skel;
+			for ( GenericSkeletonPart part : gs.getParts() ) {					
 				String data = part.getData().toString();
-				if (!data.contains(TextFragment.REFMARKER_START)) continue;
-				
+				if ( !data.contains(TextFragment.REFMARKER_START) ) continue;
+
 				String newData = converter.convertRefIds(data);
 				part.setData(newData);
 			}

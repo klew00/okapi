@@ -31,20 +31,8 @@ import net.sf.okapi.common.skeleton.ISkeletonWriter;
 public class StartSubfilter extends StartGroup {
 	
 	private StartDocument startDoc;
-	//private SubFilter subFilter;
 	private SubFilterSkeletonWriter skelWriter;
 	private IEncoder parentEncoder;
-
-//	/**
-//	 * Creates a new {@link StartSubfilter} object.
-//	 * @param parentId The identifier of the parent resource for this sub filter.
-//	 * @param startDoc The StartDocument resource of the subfilter.
-//	 */
-//	public StartSubfilter(SubFilter subFilter, StartDocument startDoc) {
-//		super(startDoc.getName(), null, false); // Not referenced by default
-//		this.startDoc = startDoc;
-//		this.subFilter = subFilter;
-//	}
 
 	/**
 	 * Creates a new {@link StartSubfilter} object with the identifier of the group's parent
@@ -53,56 +41,61 @@ public class StartSubfilter extends StartGroup {
 	 * @param startDoc The StartDocument resource of the subfilter.
 	 * @param parentEncoder
 	 */
-	public StartSubfilter(String id, StartDocument startDoc, IEncoder parentEncoder) {
+	public StartSubfilter (String id,
+		StartDocument startDoc,
+		IEncoder parentEncoder)
+	{
 		super(startDoc.getName(), null, false); // Not referenced by default
 		this.startDoc = startDoc;
 		this.parentEncoder = parentEncoder;
 		setId(id);		
 	}
 	
-	public LocaleId getLocale() {
+	public LocaleId getLocale () {
 		return startDoc.getLocale();
 	}
 	
-	public String getEncoding() {
+	public String getEncoding () {
 		return startDoc.getEncoding();
 	}
 	
-	public boolean isMultilingual() {
+	public boolean isMultilingual () {
 		return startDoc.isMultilingual();
 	}
 	
-	public IParameters getFilterParameters() {
+	public IParameters getFilterParameters () {
 		return startDoc.getFilterParameters();
 	}
 	
-	public IFilterWriter getFilterWriter() {
+	public IFilterWriter getFilterWriter () {
 		return startDoc.getFilterWriter();
 	}
 	
-	public boolean hasUTF8BOM() {
+	public boolean hasUTF8BOM () {
 		return startDoc.hasUTF8BOM();
 	}
 	
-	public String getLineBreak() {
+	public String getLineBreak () {
 		return startDoc.getLineBreak();
 	}
 
-	public StartDocument getStartDoc() {
+	public StartDocument getStartDoc () {
 		return startDoc;
 	}
 
-	public SubFilterSkeletonWriter getSkeletonWriter() {
+	public SubFilterSkeletonWriter getSkeletonWriter () {
 		return skelWriter;
 	}
 
-	public ISkeletonWriter createSkeletonWriter(StartSubfilter resource,
-			LocaleId outputLocale, String outputEncoding) {
+	public ISkeletonWriter createSkeletonWriter (StartSubfilter resource,
+			LocaleId outputLocale,
+			String outputEncoding)
+	{
 		this.skelWriter = new SubFilterSkeletonWriter(this);
 		return this.skelWriter.setOptions(outputLocale, outputEncoding, this);
 	}
 
-	public IEncoder getParentEncoder() {
+	public IEncoder getParentEncoder () {
 		return parentEncoder;
 	}
 	

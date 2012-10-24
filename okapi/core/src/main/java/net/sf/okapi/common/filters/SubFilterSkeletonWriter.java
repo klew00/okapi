@@ -157,8 +157,8 @@ public class SubFilterSkeletonWriter implements ISkeletonWriter {
 		EncoderManager sfEncoderManager = sfFilterWriter.getEncoderManager();
 		
 		processStartDocument(outputLocale, outputEncoding, null, 
-				sfEncoderManager,
-				startSubfilter.getStartDoc());
+			sfEncoderManager,
+			startSubfilter.getStartDoc());
 		return this;
 	}
 
