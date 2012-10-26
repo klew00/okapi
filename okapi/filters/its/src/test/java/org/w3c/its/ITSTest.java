@@ -59,6 +59,34 @@ public class ITSTest {
 		process(base+"/translate5html.html", Main.DC_TRANSLATE);
 	}
 
+	/*@Test
+	public void testLocalizationNoteXML () {
+		String base = root+"/localizationnote/xml";
+		removeOutput(base);
+		process(base+"/locnote1xml.xml", Main.DC_LOCALIZATIONNOTE);
+		process(base+"/locnote2xml.xml", Main.DC_LOCALIZATIONNOTE);
+		process(base+"/locnote3xml.xml", Main.DC_LOCALIZATIONNOTE);
+		process(base+"/locnote4xml.xml", Main.DC_LOCALIZATIONNOTE);
+		process(base+"/locnote5xml.xml", Main.DC_LOCALIZATIONNOTE);
+		process(base+"/locnote6xml.xml", Main.DC_LOCALIZATIONNOTE);		
+		process(base+"/locnote7xml.xml", Main.DC_LOCALIZATIONNOTE);
+		process(base+"/locnote8xml.xml", Main.DC_LOCALIZATIONNOTE);
+		process(base+"/locnote9xml.xml", Main.DC_LOCALIZATIONNOTE);
+	}
+	
+	@Test
+	public void testLocalizationNoteHTML () {
+		String base = root+"/localizationnote/html";
+		removeOutput(base);
+		process(base+"/locnote1html.html", Main.DC_LOCALIZATIONNOTE);
+		process(base+"/locnote2html.html", Main.DC_LOCALIZATIONNOTE);
+		process(base+"/locnote3html.html", Main.DC_LOCALIZATIONNOTE);
+		process(base+"/locnote4html.html", Main.DC_LOCALIZATIONNOTE);
+		process(base+"/locnote5html.html", Main.DC_LOCALIZATIONNOTE);
+		process(base+"/locnote6html.html", Main.DC_LOCALIZATIONNOTE);
+		process(base+"/locnote7html.html", Main.DC_LOCALIZATIONNOTE);
+	}*/
+	
 //	@Test
 //	public void testDomainXML () {
 //		String base = root+"/domain/xml";
@@ -87,20 +115,6 @@ public class ITSTest {
 		process(base+"/Locale3Xml.xml", Main.DC_LOCALEFILTER);
 		process(base+"/Locale4Xml.xml", Main.DC_LOCALEFILTER);
 		process(base+"/Locale5Xml.xml", Main.DC_LOCALEFILTER);
-	}
-
-	@Test
-	public void testLocalizationNoteXML () {
-		String base = root+"/localizationNote/xml";
-		removeOutput(base);
-		process(base+"/EX-locNote-element-1.xml", Main.DC_LOCALIZATIONNOTE);
-		process(base+"/EX-locNotePointer-attribute-1.xml", Main.DC_LOCALIZATIONNOTE);
-		process(base+"/EX-locNoteRef-attribute-1.xml", Main.DC_LOCALIZATIONNOTE);
-		process(base+"/EX-locNoteRefPointer-attribute-1.xml", Main.DC_LOCALIZATIONNOTE);
-		process(base+"/LocNote1.xml", Main.DC_LOCALIZATIONNOTE);
-		process(base+"/LocNote2.xml", Main.DC_LOCALIZATIONNOTE);
-		process(base+"/LocNote3.xml", Main.DC_LOCALIZATIONNOTE);
-		process(base+"/LocNote4.xml", Main.DC_LOCALIZATIONNOTE);
 	}
 
 	@Test

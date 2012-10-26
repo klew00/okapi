@@ -1877,7 +1877,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 		boolean useHTML5)
 	{
 		String type;
-		if ( isHTML5 ) {
+		if ( useHTML5 ) {
 			type = elem.getAttribute("its-loc-note-type");
 		}
 		else if ( qualified ) {

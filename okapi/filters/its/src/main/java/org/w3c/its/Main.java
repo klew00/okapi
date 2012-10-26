@@ -181,8 +181,10 @@ public class Main {
 						Node prev = element;
 						do {
 							prev = prev.getPreviousSibling();
-						}
-						while (( prev != null ) && ( prev.getNodeType() != Node.ELEMENT_NODE ));
+						}						
+						while (( prev != null ) && 
+								(( prev.getNodeType() != Node.ELEMENT_NODE ) || 
+								(( prev.getNodeType() == Node.ELEMENT_NODE )  && ( !prev.getNodeName().equals(element.getNodeName())))));
 
 						// If it's the same kind of element, we increment the counter
 						if (( prev != null ) && prev.getNodeName().equals(element.getNodeName()) ) { 
