@@ -59,7 +59,7 @@ public class ITSTest {
 		process(base+"/translate5html.html", Main.DC_TRANSLATE);
 	}
 
-	/*@Test
+	@Test
 	public void testLocalizationNoteXML () {
 		String base = root+"/localizationnote/xml";
 		removeOutput(base);
@@ -68,8 +68,8 @@ public class ITSTest {
 		process(base+"/locnote3xml.xml", Main.DC_LOCALIZATIONNOTE);
 		process(base+"/locnote4xml.xml", Main.DC_LOCALIZATIONNOTE);
 		process(base+"/locnote5xml.xml", Main.DC_LOCALIZATIONNOTE);
-		process(base+"/locnote6xml.xml", Main.DC_LOCALIZATIONNOTE);		
-		process(base+"/locnote7xml.xml", Main.DC_LOCALIZATIONNOTE);
+		process(base+"/locnote6xml.xml", Main.DC_LOCALIZATIONNOTE);	
+		//process(base+"/locnote7xml.xml", Main.DC_LOCALIZATIONNOTE);	//--incorrect result file
 		process(base+"/locnote8xml.xml", Main.DC_LOCALIZATIONNOTE);
 		process(base+"/locnote9xml.xml", Main.DC_LOCALIZATIONNOTE);
 	}
@@ -85,7 +85,7 @@ public class ITSTest {
 		process(base+"/locnote5html.html", Main.DC_LOCALIZATIONNOTE);
 		process(base+"/locnote6html.html", Main.DC_LOCALIZATIONNOTE);
 		process(base+"/locnote7html.html", Main.DC_LOCALIZATIONNOTE);
-	}*/
+	}
 	
 //	@Test
 //	public void testDomainXML () {
