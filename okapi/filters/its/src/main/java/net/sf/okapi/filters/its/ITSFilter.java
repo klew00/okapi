@@ -693,13 +693,6 @@ public abstract class ITSFilter implements IFilter {
 	private boolean processElementTag (Node node) {
 		if ( trav.backTracking() ) {
 
-			// Nodes with sub-filter are processed when opening the tag
-			if ( trav instanceof ITSEngine ) {
-				if ( ((ITSEngine)trav).getSubFilter(null) != null ) {
-					return false; // Skip to next node
-				}
-			}
-			
 			if ( trav.getTerm(null) ) {
 				if ( terms == null ) {
 					terms = new TermsAnnotation();
@@ -735,7 +728,7 @@ public abstract class ITSFilter implements IFilter {
 			if ( trav instanceof ITSEngine ) {
 				if ( ((ITSEngine)trav).getSubFilter(null) != null ) {
 					processSubFilterContent(node, ((ITSEngine)trav).getSubFilter(null));
-					moveToEnd(node);
+					moveToEnd(node); // Move to the end of this node
 					return true; // Send the events
 				}
 			}
@@ -804,10 +797,9 @@ public abstract class ITSFilter implements IFilter {
 		String configId)
 	{
 		// Create the skeleton for the start tag
+		// This will be used later
 		addStartTagToSkeleton(node);
-		queue.add(new Event(EventType.DOCUMENT_PART, new DocumentPart(otherId.createId(), false), skel));
-		skel = new GenericSkeleton();
-		
+
 		// Instantiate the filter to use as sub-filter
 		IFilter sf = fcMapper.createFilter(configId, null);
 		if ( sf == null ) {
@@ -836,8 +828,13 @@ public abstract class ITSFilter implements IFilter {
 		subfilter.close();
 		
 		// Create the skeleton for the end tag
-		skel.add(buildEndTag(node));
-		queue.add(new Event(EventType.DOCUMENT_PART, new DocumentPart(otherId.createId(), false), skel));
+		GenericSkeleton skelAfter = new GenericSkeleton();
+		skelAfter.add(buildEndTag(node));
+		
+		// Create the document part holding the re-writing mechanism
+		queue.add(subfilter.createRefEvent(skel, skelAfter));
+		
+		// Just make sure this skeleton is reset for next time
 		skel = new GenericSkeleton();
 	}
 

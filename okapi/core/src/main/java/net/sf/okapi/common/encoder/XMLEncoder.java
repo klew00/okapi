@@ -95,7 +95,8 @@ public class XMLEncoder implements IEncoder {
 		this.lineBreak = lineBreak;
 		// Use an encoder only if the output is not UTF-8/16
 		// since those support all characters
-		if ( "utf-8".equalsIgnoreCase(encoding) || "utf-16".equalsIgnoreCase(encoding) ) {
+		String enclc = encoding.toLowerCase();
+		if ( enclc.equals("utf-8") || enclc.startsWith("utf-16") ) {
 			chsEnc = null;
 		}
 		else {

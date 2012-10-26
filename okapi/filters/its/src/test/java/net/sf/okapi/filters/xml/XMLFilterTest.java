@@ -615,7 +615,7 @@ public class XMLFilterTest {
 			+ "&lt;its:rules version=\"1.0\" xmlns:its=\"http://www.w3.org/2005/11/its\">"
 			+ "&lt;its:translateRule selector=\"//nt\" translate=\"no\"/>"
 			+ "&lt;/its:rules>"
-			+ "&lt;nt>no-trans&lt;/nt>&lt;p>Text2&lt;/p>&lt;/doc2></sf>"
+			+ "&lt;nt>no-trans&lt;/nt>&lt;p>Text2&lt;/p>&lt;/doc2>\n</sf>"
 			+ "</doc>";
 		String expected = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
 			+ "<doc><its:rules version=\"1.0\" xmlns:its=\"http://www.w3.org/2005/11/its\" "
@@ -623,11 +623,11 @@ public class XMLFilterTest {
 			+ "<ix:subFilterRule selector=\"//sf\" subFilter=\"okf_xml\"/>"
 			+ "</its:rules>"
 			+ "<p>Text1</p>"
-			+ "<sf>&lt;?xml version=\"1.0\" encoding=\"UTF-8\"?&gt;\n&lt;doc2&gt;"
-			+ "&lt;its:rules version=\"1.0\" xmlns:its=\"http://www.w3.org/2005/11/its\"&gt;"
-			+ "&lt;its:translateRule selector=\"//nt\" translate=\"no\"/&gt;"
+			+ "<sf>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;\n&lt;doc2&gt;"
+			+ "&lt;its:rules version=&quot;1.0&quot; xmlns:its=&quot;http://www.w3.org/2005/11/its&quot;&gt;"
+			+ "&lt;its:translateRule selector=&quot;//nt&quot; translate=&quot;no&quot;/&gt;"
 			+ "&lt;/its:rules&gt;"
-			+ "&lt;nt>no-trans&lt;/nt&gt;&lt;p&gt;Text2&lt;/p&gt;&lt;/doc2&gt;</sf>"
+			+ "&lt;nt&gt;no-trans&lt;/nt&gt;&lt;p&gt;Text2&lt;/p&gt;&lt;/doc2&gt;</sf>"
 			+ "</doc>";
 
 		ArrayList<Event> list = getEvents(snippet);

@@ -24,7 +24,6 @@ import static org.junit.Assert.*;
 
 import java.io.File;
 
-import net.sf.okapi.common.FileCompare;
 import net.sf.okapi.common.TestUtil;
 import net.sf.okapi.common.Util;
 
@@ -39,24 +38,25 @@ public class ITSTest {
 	public void testTranslateXML () {
 		String base = root+"/translate/xml";
 		removeOutput(base);
-		process(base+"/Translate1.xml", Main.DC_TRANSLATE);
-		process(base+"/Translate3.xml", Main.DC_TRANSLATE);
-		process(base+"/Translate4.xml", Main.DC_TRANSLATE);
-		process(base+"/Translate5.xml", Main.DC_TRANSLATE);
-		process(base+"/Translate6.xml", Main.DC_TRANSLATE);
-		process(base+"/Translate7.xml", Main.DC_TRANSLATE);
-		process(base+"/TranslateGlobal.xml", Main.DC_TRANSLATE);
+		process(base+"/translate1xml.xml", Main.DC_TRANSLATE);
+		process(base+"/translate2xml.xml", Main.DC_TRANSLATE);
+		process(base+"/translate3xml.xml", Main.DC_TRANSLATE);
+		process(base+"/translate4xml.xml", Main.DC_TRANSLATE);
+		process(base+"/translate5xml.xml", Main.DC_TRANSLATE);
+		process(base+"/translate6xml.xml", Main.DC_TRANSLATE);
+		process(base+"/translate7xml.xml", Main.DC_TRANSLATE);
+		process(base+"/translate8xml.xml", Main.DC_TRANSLATE);
 	}
 
 	@Test
 	public void testTranslateHTML () {
 		String base = root+"/translate/html";
 		removeOutput(base);
-		process(base+"/Translate2Html.html", Main.DC_TRANSLATE);
-		process(base+"/Translate4Html.html", Main.DC_TRANSLATE);
-		process(base+"/Translate6Html.html", Main.DC_TRANSLATE);
-		process(base+"/Translate7Html.html", Main.DC_TRANSLATE);
-		process(base+"/Translate8Html.html", Main.DC_TRANSLATE);
+		process(base+"/translate1html.html", Main.DC_TRANSLATE);
+		process(base+"/translate2html.html", Main.DC_TRANSLATE);
+		process(base+"/translate3html.html", Main.DC_TRANSLATE);
+		process(base+"/translate4html.html", Main.DC_TRANSLATE);
+		process(base+"/translate5html.html", Main.DC_TRANSLATE);
 	}
 
 //	@Test
