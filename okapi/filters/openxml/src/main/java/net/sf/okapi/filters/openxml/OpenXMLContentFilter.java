@@ -746,11 +746,11 @@ public class OpenXMLContentFilter extends AbstractMarkupFilter {
 	 * @param text the text to be handled
 	 */
 	@Override
-	protected void handleText(Segment text) {
+	protected void handleText(CharSequence text) {
 		if (text==null) // DWH 4-14-09
 			return;
 		String txt=text.toString();
-		handleSomeText(txt,text.isWhiteSpace()); // DWH 5-14-09
+		handleSomeText(txt, isWhiteSpace(text)); // DWH 5-14-09
 	}
 	
 	private void handleSomeText(String tixt, boolean bWhiteSpace) // DWH 6-25-09 tixt was txt
@@ -904,25 +904,6 @@ public class OpenXMLContentFilter extends AbstractMarkupFilter {
 			addCodeToCurrentTextUnit(tag);				
 	}
 
-	/**
-	 * Handle all numeric entities. Default implementation converts entity to
-	 * Unicode character.
-	 * 
-	 * @param entity
-	 *            - the numeric entity
-	 */
-
-	protected void handleCharacterEntity(Segment entity) { // DWH 5-14-09
-		String decodedText = CharacterReference.decode(entity.toString(), false);
-/*
- 		if (!isCurrentTextUnit()) {
-
-			startTextUnit();
-		}
-		addToTextUnit(decodedText);
-*/		if (decodedText!=null && !decodedText.equals("")) // DWH 5-14-09 treat CharacterEntities like other text
-		  handleSomeText(decodedText,false);
-	}
 	/**
 	 * Handles a start tag.  TEXT_UNIT_ELEMENTs start a new TextUnit.  TEXT_RUN_ELEMENTs
                * start a new text run.  TEXT_MARKER_ELEMENTS set a flag that any following
