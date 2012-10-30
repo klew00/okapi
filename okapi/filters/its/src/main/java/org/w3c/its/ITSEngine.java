@@ -413,7 +413,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 						&& !"locQualityIssues".equals(locName)
 						&& !"locQualityIssue".equals(locName)
 						&& !"locNote".equals(locName) ) {
-						logger.warn(String.format("Unknown element '%s'.", ruleElem.getNodeName()));
+						logger.warn("Unknown element '{}'.", ruleElem.getNodeName());
 					}
 				}
 			}
@@ -484,8 +484,8 @@ public class ITSEngine implements IProcessor, ITraversal {
 		if ( !value.isEmpty() ) {
 			if ( version.equals(ITS_VERSION2) ) {
 				// Warn if the extension is used in ITS 2.0
-				logger.warn(String.format("This document uses the %s:idValue extension instead of the ITS 2.0 Id Value data category.",
-					ITSX_NS_URI));
+				logger.warn("This document uses the {}:idValue extension instead of the ITS 2.0 Id Value data category.",
+					ITSX_NS_URI);
 			}
 			rule.idValue = value;
 		}
@@ -495,8 +495,8 @@ public class ITSEngine implements IProcessor, ITraversal {
 		if ( !value.isEmpty() ) {
 			if ( version.equals(ITS_VERSION2) ) {
 				// Warn if the extension is used in ITS 2.0
-				logger.warn(String.format("This document uses the %s:whiteSpaces extension instead of the ITS 2.0 Preserve Space data category.",
-					ITSX_NS_URI));
+				logger.warn("This document uses the {}:whiteSpaces extension instead of the ITS 2.0 Preserve Space data category.",
+					ITSX_NS_URI);
 			}
 			if ( "preserve".equals(value) ) rule.preserveWS = true;
 			else if ( "default".equals(value) ) rule.preserveWS = false;
@@ -1331,6 +1331,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 						
 					else if ( rule.ruleType == IProcessor.DC_DOMAIN ) {
 						List<String> list = resolveExpressionAsList(NL.item(i), rule.info);
+						if ( list.isEmpty() ) continue;
 						// Map the values and build the final string
 						StringBuilder tmp = new StringBuilder();
 						List<String> values = null;

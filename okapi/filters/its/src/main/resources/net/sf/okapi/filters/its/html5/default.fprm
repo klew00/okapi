@@ -38,5 +38,9 @@
  <its:idValueRule selector="//h:*[@id]" idValue="@id"/>
  
  <!-- Note: Preserve space is not handled by ITS -->
+ 
+ <!-- Domain -->
+ <its:domainRule selector="/h:html"
+ 	domainPointer="/h:html/h:head/h:meta[@name='dcterms.subject' or @name='keywords']/@content"/>
 
 </its:rules>

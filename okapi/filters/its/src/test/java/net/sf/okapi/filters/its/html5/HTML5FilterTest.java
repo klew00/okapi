@@ -97,6 +97,18 @@ public class HTML5FilterTest {
 	}
 	
 	@Test
+	public void testDomain () {
+		String snippet = "<!DOCTYPE html><html lang=\"en\"><head><meta charset=utf-8><title>Title</title>"
+			+ "<meta name='dcterms.subject' content='domA, dom2, domB'>"
+			+ "<meta name='keywords' content='dom1, dom2, dom3'>"
+			+ "</head>";
+		ArrayList<Event> list = getEvents(snippet);
+		ITextUnit tu = FilterTestDriver.getTextUnit(list, 1);
+		assertEquals("Title", fmt.setContent(tu.getSource().getFirstContent()).toString());
+		assertEquals("domA, dom2, domB, dom1, dom3", tu.getProperty(Property.ITS_DOMAIN).getValue());		
+	}
+
+	@Test
 	public void testRulesInScripts () {
 		String snippet = "<!DOCTYPE html><html lang=\"en\"><head><meta charset=utf-8><title>Title</title>"
 			+ "<script type=application/its+xml><!--"
