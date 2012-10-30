@@ -136,8 +136,7 @@ public class PropertiesFilter implements IFilter {
 		list.add(new FilterConfiguration(getName(),
 				MimeTypeMapper.PROPERTIES_MIME_TYPE, getClass().getName(),
 				"Java Properties",
-				"Java properties files (Output used \\uHHHH escapes)", null,
-				".properties;"));
+				"Java properties files (Output used \\uHHHH escapes)", null));
 		list.add(new FilterConfiguration(
 				getName() + "-outputNotEscaped",
 				MimeTypeMapper.PROPERTIES_MIME_TYPE,
@@ -156,7 +155,7 @@ public class PropertiesFilter implements IFilter {
 				MimeTypeMapper.PROPERTIES_MIME_TYPE, getClass().getName(),
 				"Properties with complex HTML Content",
 				"Java Property content processed by an HTML subfilter",
-				"html-subfilter.fprm", ".lang;"));
+				"html-subfilter.fprm"));
 		return list;
 	}
 
@@ -204,17 +203,6 @@ public class PropertiesFilter implements IFilter {
 			case RESULT_ITEM:
 				// It's a text-unit, the skeleton is already set
 				if (sf != null) {
-//					String ss = tuRes.getSkeleton().toString();
-//					String[] skel = ss.split(TU_SELF_REFFERENCE_REGEX);
-//					String beforeSkeleton = null;
-//					String afterSkeleton = null;
-//					if (skel.length >= 2) {
-//						beforeSkeleton = skel[0];
-//						afterSkeleton = skel[1];
-//					} else if (skel.length == 1) {
-//						beforeSkeleton = skel[0];
-//					}
-
 					// Queue up subfilter events
 					processWithSubfilter(tuRes.getName(), tuRes);
 
@@ -611,15 +599,6 @@ public class PropertiesFilter implements IFilter {
 	}
 
 	private void processWithSubfilter(String parentId, ITextUnit parentTu) {
-		// // reset filter for good measure
-		// subfilter.close();
-		//
-		// FilterState s = new FilterState(FILTER_STATE.INSIDE_TEXTUNIT,
-		// parentId, new GenericSkeleton(beforeSkeleton),
-		// new GenericSkeleton(afterSkeleton), idGenerator);
-		// s.setParentTextUnitName(parentTu.getName());
-		// subfilter.setState(s);
-
 		SubFilter subfilter = new SubFilter(sf, 
 				null, // no encoding is needed, html encoding is performed by the subfilter
 				++sectionIndex, parentId, parentTu.getName());
@@ -641,13 +620,6 @@ public class PropertiesFilter implements IFilter {
 			queue.add(e);
 		}
 		subfilter.close();
-
-//		StartSubfilter ssf = subfilter.getStartSubFilter();
-//		ssf.setSkeleton(new GenericSkeleton(beforeSkeleton));
-//
-//		EndSubfilter esf = subfilter.getEndSubFilter();
-//		esf.setSkeleton(new GenericSkeleton(afterSkeleton));
-		
 		queue.add(subfilter.createRefEvent(parentTu));
 	}
 

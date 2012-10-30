@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2011 by the Okapi Framework contributors
+  Copyright (C) 2011-2012 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -20,10 +20,6 @@
 
 package net.sf.okapi.steps.wordcount;
 
-import com.ibm.icu.text.BreakIterator;
-import com.ibm.icu.text.RuleBasedBreakIterator;
-import com.ibm.icu.util.ULocale;
-
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.LocaleId;
@@ -37,19 +33,26 @@ import net.sf.okapi.steps.wordcount.common.GMX;
 import net.sf.okapi.steps.wordcount.common.Metrics;
 import net.sf.okapi.steps.wordcount.common.MetricsAnnotation;
 
+import com.ibm.icu.text.BreakIterator;
+import com.ibm.icu.text.RuleBasedBreakIterator;
+import com.ibm.icu.util.ULocale;
+
+// For now we don't use the parameters
+// @UsingParameters(ParametersSimpleWordCountStep.class)
 public class SimpleWordCountStep extends BasePipelineStep {
+	
 	private RuleBasedBreakIterator srcWordIterator = null;
 	private LocaleId srcLoc;
 	private long srcBatchItemWordCount;
 	private long srcBatchWordCount;
-	private ParametersSimpleWordCountStep params;	
+//	private ParametersSimpleWordCountStep params;	
 	
 	public SimpleWordCountStep() {
-		params = new ParametersSimpleWordCountStep();
+//		params = new ParametersSimpleWordCountStep();
 	}
 	
 	@StepParameterMapping(parameterType = StepParameterType.SOURCE_LOCALE)
-	public void setSourceLocale(LocaleId sourceLocale) {
+	public void setSourceLocale (LocaleId sourceLocale) {
 		this.srcLoc = sourceLocale;
 		srcWordIterator = (RuleBasedBreakIterator) BreakIterator.getWordInstance(ULocale
 				.createCanonical(srcLoc.toString()));
@@ -58,19 +61,19 @@ public class SimpleWordCountStep extends BasePipelineStep {
 	}
 	
 	@Override
-	protected Event handleStartBatch(Event event) {
+	protected Event handleStartBatch (Event event) {
 		srcBatchWordCount = 0;
 		return super.handleStartBatch(event);
 	}
 	
 	@Override
-	protected Event handleStartBatchItem(Event event) {
+	protected Event handleStartBatchItem (Event event) {
 		srcBatchItemWordCount = 0;
 		return super.handleStartBatchItem(event);
 	}
 	
 	@Override
-	protected Event handleEndBatchItem(Event event) {
+	protected Event handleEndBatchItem (Event event) {
 		Ending res = event.getEnding();
 		if (res == null) {
 			res = new Ending("");
@@ -78,7 +81,7 @@ public class SimpleWordCountStep extends BasePipelineStep {
 		}
 			
 		MetricsAnnotation sma = res.getAnnotation(MetricsAnnotation.class);
-		if (sma == null) {
+		if ( sma == null ) {
 			sma = new MetricsAnnotation();
 			res.setAnnotation(sma);
 		}
@@ -91,7 +94,7 @@ public class SimpleWordCountStep extends BasePipelineStep {
 	}
 	
 	@Override
-	protected Event handleEndBatch(Event event) {
+	protected Event handleEndBatch (Event event) {
 		Ending res = event.getEnding();
 		if (res == null) {
 			res = new Ending("");
@@ -110,21 +113,21 @@ public class SimpleWordCountStep extends BasePipelineStep {
 	}
 	
 	@Override
-	protected Event handleTextUnit(Event event) {
+	protected Event handleTextUnit (Event event) {
 		ITextUnit tu = event.getTextUnit();
 		long srcWordCount = 0;
 		
-		if (tu.isEmpty() || !tu.isTranslatable()) {
+		if ( tu.isEmpty() || !tu.isTranslatable() ) {
 			return event;
 		}
 
-		if (!tu.getSource().isEmpty()) {
+		if ( !tu.getSource().isEmpty() ) {
 			srcWordCount = countWords(tu.getSource().getUnSegmentedContentCopy().getText());
 			srcBatchItemWordCount += srcWordCount;
 		}
 		
 		MetricsAnnotation sma = tu.getSource().getAnnotation(MetricsAnnotation.class);
-		if (sma == null) {
+		if ( sma == null ) {
 			sma = new MetricsAnnotation();
 			tu.getSource().setAnnotation(sma);
 		}
@@ -135,27 +138,27 @@ public class SimpleWordCountStep extends BasePipelineStep {
 	}
 	
 	@Override
-	public String getName() {
+	public String getName () {
 		return "Simple Word Count";
 	}
 
 	@Override
-	public String getDescription() {
+	public String getDescription () {
 		return "Annotates each text unit source with a total word count and gives total source word counts for batches"
 			+ " Expects: filter events. Sends back: filter events.";
 	}
 
 	@Override
-	public IParameters getParameters() {		
-		return params;
+	public IParameters getParameters () {		
+		return null; //params;
 	}
 
 	@Override
-	public void setParameters(IParameters params) {	
-		this.params = (ParametersSimpleWordCountStep)params;
+	public void setParameters (IParameters params) {	
+		// this.params = (ParametersSimpleWordCountStep)params;
 	}
 
-	private long countWords(String text) {
+	private long countWords (String text) {
 		long totalWordCount = 0;
 		int current = 0;
 		RuleBasedBreakIterator wordIterator;
@@ -174,7 +177,7 @@ public class SimpleWordCountStep extends BasePipelineStep {
 
 			current = wordIterator.next();
 			// don't count various space and punctuation
-			if (wordIterator.getRuleStatus() != RuleBasedBreakIterator.WORD_NONE) {
+			if ( wordIterator.getRuleStatus() != RuleBasedBreakIterator.WORD_NONE ) {
 				totalWordCount++;
 			}
 		}

@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2010 by the Okapi Framework contributors
+  Copyright (C) 2011-2012 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -21,8 +21,16 @@
 package net.sf.okapi.steps.wordcount;
 
 import net.sf.okapi.common.BaseParameters;
+import net.sf.okapi.common.ParametersDescription;
+import net.sf.okapi.common.uidescription.EditorDescription;
+import net.sf.okapi.common.uidescription.IEditorDescriptionProvider;
 
-public class ParametersSimpleWordCountStep extends BaseParameters {	
+// For now we don't use the parameters
+// @EditorFor(ParametersSimpleWordCountStep.class)
+public class ParametersSimpleWordCountStep extends BaseParameters implements IEditorDescriptionProvider {	
+
+	public static final String COUNTTARGETS = "countTargets";
+	
 	public boolean countTargets;
 	
 	public ParametersSimpleWordCountStep () {
@@ -39,21 +47,36 @@ public class ParametersSimpleWordCountStep extends BaseParameters {
 		reset();
 		// Read the file content as a set of fields
 		buffer.fromString(data);
-		countTargets = buffer.getBoolean("countTargets", countTargets);
+		countTargets = buffer.getBoolean(COUNTTARGETS, countTargets);
 	}
 	
 	@Override
-	public String toString() {
+	public String toString () {
 		buffer.reset();
-		buffer.setBoolean("countTargets", countTargets);		
+		buffer.setBoolean(COUNTTARGETS, countTargets);		
 		return buffer.toString();
 	}
 	
-	public boolean isCountTargets() {
+	public boolean getCountTargets () {
 		return countTargets;
 	}
 	
 	public void setCountTargets(boolean countTargets) {
 		this.countTargets = countTargets;
 	}
+
+	@Override
+	public ParametersDescription getParametersDescription () {
+		ParametersDescription desc = new ParametersDescription(this);
+		desc.add(COUNTTARGETS, "Count also the target entries", null);
+		return desc;
+	}
+
+	@Override
+	public EditorDescription createEditorDescription(ParametersDescription paramsDesc) {
+		EditorDescription desc = new EditorDescription("Translation Comparison", true, false);
+		desc.addCheckboxPart(paramsDesc.get(COUNTTARGETS));
+		return desc;
+	}
+
 }

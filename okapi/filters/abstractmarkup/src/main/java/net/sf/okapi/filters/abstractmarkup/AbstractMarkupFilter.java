@@ -99,8 +99,6 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 	private EventBuilder eventBuilder;
 	private RawDocument currentRawDocument;
 	private ExtractionRuleState ruleState; 
-//	private SubFilter cdataSubfilter; 
-//	private PcdataSubFilter pcdataSubfilter;
 	private String currentId;
 	private boolean documentEncoding;
 	private String currentDocName;
@@ -115,7 +113,6 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 		Config.ConvertNonBreakingSpaces = false;
 		Config.NewLine = BOMNewlineEncodingDetector.NewlineType.LF.toString();
 		Config.LoggerProvider = LoggerProvider.SLF4J;
-		//Config.CurrentCompatibilityMode = Config.CompatibilityMode.XHTML;
 	}
 
 	/**
@@ -349,12 +346,12 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 					}
 				}
 			} else if (segment instanceof CharacterEntityReference) {
-				handleCharacterEntity(segment);
+				handleCharacterEntity((CharacterEntityReference)segment);
 			} else if (segment instanceof NumericCharacterReference) {
-				handleNumericEntity(segment);
+				handleNumericEntity((NumericCharacterReference)segment);
 			} else {
 				// last resort is pure text node
-				handleText(segment);
+				handleText(segment.toString());
 			}
 
 			if (eventBuilder.hasQueuedEvents()) {
@@ -406,16 +403,12 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 		if (config != null && config.getGlobalCDATASubfilter() != null) {
 			cdataFilter = getFilterConfigurationMapper().createFilter(
 					getConfig().getGlobalCDATASubfilter(), cdataFilter); 
-			//getEncoderManager().mergeMappings(cdataFilter.getEncoderManager());
-			//cdataSubfilter = new SubFilter(cdataFilter, null, null, null);
 		}
 		
 		// initialize pcdata sub-filter
 		if (config != null && config.getGlobalPCDATASubfilter() != null) {
 			String subfilterName = getConfig().getGlobalPCDATASubfilter();
 			pcdataFilter = getFilterConfigurationMapper().createFilter(subfilterName, pcdataFilter); 
-			//getEncoderManager().mergeMappings(pcdataFilter.getEncoderManager());
-			//pcdataSubfilter = new PcdataSubFilter(pcdataFilter);
 		}
 	}
 
@@ -592,8 +585,6 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 			startTextUnit(new GenericSkeleton("<![CDATA["));
 			
 			if (cdataFilter != null) {				
-//				cdataSubfilter.close();
-				
 				String parentId = eventBuilder.findMostRecentParentId();
 				if (parentId == null) parentId = getDocumentId().getLastId();
 				
@@ -601,28 +592,10 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 				if (parentName == null) parentName = getDocumentId().getLastId();
 				
 				SubFilter cdataSubfilter = new SubFilter(cdataFilter, 
-						//getEncoderManager().getEncoder(),
 						null, // we don't encode cdata
 						++cdataSectionIndex, parentId, parentName);
-//				FilterState s = new FilterState(FILTER_STATE.STANDALONE_TEXTUNIT,
-//						parentId, 
-//						new GenericSkeleton("<![CDATA["), 
-//						new GenericSkeleton("]]>"),
-//						null);
-//				s.setParentTextUnitName(eventBuilder.findMostRecentTextUnitName());
-//				cdataSubfilter.setState(s);
-//				cdataSubfilter.open(new RawDocument(cdataWithoutMarkers, getSrcLoc()));	
-//				while (cdataSubfilter.hasNext()) {
-//					Event event = cdataSubfilter.next();
-//					eventBuilder.addFilterEvent(event);
-//				}			
-//				cdataSubfilter.close();
 				eventBuilder.addFilterEvents(cdataSubfilter.getEvents(new RawDocument(cdataWithoutMarkers, getSrcLoc())));
 				addToTextUnit(cdataSubfilter.createRefCode());
-				
-//				// Form CDATA section from the subfiltered content
-//				cdataSubfilter.getStartSubFilter().setSkeleton(new GenericSkeleton("<![CDATA["));
-//				cdataSubfilter.getEndSubFilter().setSkeleton(new GenericSkeleton("]]>"));
 			} else {
 				// we assume the CDATA is plain text take it as is				
 				addToTextUnit(cdataWithoutMarkers);				
@@ -638,7 +611,7 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 	 * 
 	 * @param text
 	 */
-	protected void handleText(Segment text) {
+	protected void handleText(CharSequence text) {
 		// if in excluded state everything is skeleton including text
 		if (ruleState.isExludedState()) {
 			addToDocumentPart(text.toString());
@@ -652,7 +625,7 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 		}
 
 		// check for ignorable whitespace and add it to the skeleton
-		if (text.isWhiteSpace() && !isInsideTextRun()) {
+		if (isWhiteSpace(text) && !isInsideTextRun()) {
 			if (bufferedWhitespace.length() <= 0) {
 				// buffer the whitespace until we know that we are not inside
 				// translatable text.
@@ -667,6 +640,15 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 			addToTextUnit(text.toString());
 		}
 	}
+	
+	protected boolean isWhiteSpace(CharSequence text) {
+		for (int i = 0; i < text.length(); i++) {
+		 		if (!Segment.isWhiteSpace(text.charAt(i))) { 
+		 			return false;
+		 		}
+		 	}
+		 	return true;
+	}
 
 	/**
 	 * Handle all Character entities. Default implementation converts entity to Unicode character.
@@ -674,12 +656,8 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 	 * @param entity
 	 *            - the character entity
 	 */
-	protected void handleNumericEntity(Segment entity) {
-		String decodedText = CharacterReference.decode(entity.toString(), false);
-		if (!eventBuilder.isCurrentTextUnit()) {
-			eventBuilder.startTextUnit();
-		}
-		eventBuilder.addToTextUnit(decodedText);
+	protected void handleNumericEntity(NumericCharacterReference entity) {
+		handleText(CharacterReference.decode(entity.toString(), false));
 	}
 
 	/**
@@ -688,12 +666,8 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 	 * @param entity
 	 *            - the numeric entity
 	 */
-	protected void handleCharacterEntity(Segment entity) {
-		String decodedText = CharacterReference.decode(entity.toString(), false);
-		if (!eventBuilder.isCurrentTextUnit()) {
-			eventBuilder.startTextUnit();
-		}
-		eventBuilder.addToTextUnit(decodedText);
+	protected void handleCharacterEntity(CharacterEntityReference entity) {
+		handleText(CharacterReference.decode(entity.toString(), false));
 	}
 
 	/**
@@ -958,14 +932,7 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 			// if a pcdata subfilter is configured let it do the processsing
 			if (pcdataFilter != null && isInsideTextRun()) {		
 				// remove the TextUnit we have accumulated since the start tag
-				//ITextUnit pcdata = popTempEvent().getTextUnit();
 				ITextUnit pcdata = peekTempEvent().getTextUnit();
-				
-//				pcdataSubfilter.close();
-
-//				String parentId = eventBuilder.findMostRecentParentId();
-//				parentId = (parentId == null ? getDocumentId().getLastId() : parentId);
-				
 				String parentId = eventBuilder.findMostRecentParentId();
 				if (parentId == null) {
 					parentId = pcdata.getId();
@@ -978,27 +945,10 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 				if (parentName == null) parentName = pcdata.getType(); // tag name
 				if (parentName == null) parentName = getDocumentId().getLastId();
 				
-//				PcdataSubFilter pcdataSubfilter = new PcdataSubFilter(pcdataFilter, 
-//						new XMLEncoder(getEncoding(), getNewlineType(), true, true, false, 1), 
-//						++pcdataSectionIndex, parentId, parentName);
-				
 				SubFilter pcdataSubfilter = new SubFilter(pcdataFilter, 
 						new XMLEncoder(getEncoding(), getNewlineType(), true, true, false, 0), 
 						++pcdataSectionIndex, parentId, parentName);
 				
-//				FilterState s = new FilterState(FILTER_STATE.INSIDE_TEXTUNIT, 
-//						parentId, 
-//						new GenericSkeleton(((GenericSkeleton)pcdata.getSkeleton()).getFirstPart().toString()), 
-//						new GenericSkeleton(endTag.toString()),
-//						null);
-//				s.setParentTextUnitName(eventBuilder.findMostRecentTextUnitName());
-//				pcdataSubfilter.setState(s);
-//				pcdataSubfilter.open(new RawDocument(pcdata.getSource().toString(), getSrcLoc()));
-//				while (pcdataSubfilter.hasNext()) {
-//					Event event = pcdataSubfilter.next();
-//					eventBuilder.addFilterEvent(event);
-//				}			
-//				pcdataSubfilter.close();
 				eventBuilder.addFilterEvents(pcdataSubfilter.getEvents(new RawDocument(pcdata.getSource().toString(), getSrcLoc())));
 				// Clear source as we will parse it with the subfilter (skeleton remains)
 				pcdata.getSource().clear();
