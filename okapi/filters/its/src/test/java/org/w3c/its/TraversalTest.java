@@ -124,7 +124,7 @@ public class TraversalTest {
 			+ "<i:domainRule selector='//doc' domainPointer='head/subject' "
 			+ " domainMapping=\"dom1 finalDom1, 'dom2 val' 'final dom2'\"/>"
 			+ "</i:rules>"
-			+ "<head><subject>dom1, dom3</subject><subject>dom2 val, dom4</subject></head><p>text</p></doc>"));
+			+ "<head><subject>dom1, dom3</subject><subject>'dom2 val', \"dom4\"</subject></head><p>text</p></doc>"));
 		Document doc = fact.newDocumentBuilder().parse(is);
 		ITraversal trav = applyITSRules(doc, null, false, null);
 		Element elem = getElement(trav, "doc", 1);

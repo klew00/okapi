@@ -39,7 +39,6 @@ import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.annotation.TermsAnnotation;
 import net.sf.okapi.common.encoder.EncoderManager;
-import net.sf.okapi.common.encoder.IEncoder;
 import net.sf.okapi.common.exceptions.OkapiBadFilterInputException;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.filters.IFilter;
@@ -100,12 +99,15 @@ public abstract class ITSFilter implements IFilter {
 	private TextFragment frag;
 	private Stack<ContextItem> context;
 	private boolean canceled;
-	private IEncoder cfEncoder;
+//	private IEncoder cfEncoder;
 	private TermsAnnotation terms;
 	private HashMap<Node, TargetPointerEntry> targetTable;
 	private boolean hasTargetPointer;
 	private Map<String, String> variables;
 
+	/**
+	 * Holds the information on a given entry that has a target pointer.
+	 */
 	private class TargetPointerEntry {
 
 		static final int BEFORE = 0;
@@ -298,16 +300,6 @@ public abstract class ITSFilter implements IFilter {
 	 * location being anywhere in the document, we need to perform a first pass to create the targetTable
 	 * table. That table lists all the source nodes that have a target pointer and the corresponding target
 	 * node with its status.
-	 * 
-	 * - check if node has target pointer for target
-	 * - if yes, it's either before or after the corresponding source
-	 * -- if it's before;
-	 * --- create a skel placeholder and a TU
-	 * --- move to next node
-	 * -- if it's after
-	 * --- get the text unit created when the source node was found
-	 * --- and create the skel placeholder
-	 * 
 	 * @param itsEng the engine to use (just because it's not a global variable)
 	 */
 	private void prepareTargetPointers (ITSEngine itsEng) {
@@ -325,8 +317,7 @@ public abstract class ITSFilter implements IFilter {
 		// Go through the document
 		Node srcNode;
 		while ( (srcNode = tmpTrav.nextNode()) != null ) {
-			switch ( srcNode.getNodeType() ) {
-			case Node.ELEMENT_NODE:
+			if ( srcNode.getNodeType() == Node.ELEMENT_NODE ) {
 				// Use !backTracking() to get to the elements only once
 				// and to include the empty elements (for attributes).
 				if ( !tmpTrav.backTracking() ) {
@@ -334,19 +325,18 @@ public abstract class ITSFilter implements IFilter {
 						String pointer = tmpTrav.getTargetPointer(null);
 						if ( pointer != null ) {
 							resolveTargetPointer(itsEng.getXPath(), srcNode, pointer);
-							hasTargetPointer = true;
 						}
 					}
 					//TODO: attributes
 				}
-				break; // End switch
 			}
 		}
+		hasTargetPointer = !targetTable.isEmpty();
 	}
 
 	/**
 	 * Resolves the target pointer for a given source node and creates its
-	 * entry in targetTable.
+	 * entry in targetTable, and set flag on the node
 	 * @param xpath the XPath object to use for the resolution.
 	 * @param srcNode the source node.
 	 * @param pointer the XPath expression pointing to the target node
@@ -365,7 +355,7 @@ public abstract class ITSFilter implements IFilter {
 			}
 			// Check the type
 			if ( srcNode.getNodeType() != trgNode.getNodeType() ) {
-				throw new OkapiIOException(String.format("a source node and its target node must be of the same type ('%s').", pointer));
+				throw new OkapiIOException(String.format("Issue with target pointer '%s'. A source node and its target node must be of the same type.", pointer));
 			}
 			// Create the entry
 			TargetPointerEntry tpe = new TargetPointerEntry(srcNode, trgNode);
@@ -374,7 +364,7 @@ public abstract class ITSFilter implements IFilter {
 			trgNode.setUserData(TRG_TRGPTRFLAGNAME, tpe, null);
 		}
 		catch ( XPathExpressionException e ) {
-			throw new OkapiIOException(String.format("Bab XPath expression in target pointer ('%s').", pointer));
+			throw new OkapiIOException(String.format("Bab XPath expression in target pointer '%s'.", pointer));
 		}
 	}
 	
@@ -717,12 +707,22 @@ public abstract class ITSFilter implements IFilter {
 			}
 		}
 		else { // Else: Start tag
-			// Test if this is a target pointer node
+			// Test if this node is involved in a source/target pair
 			if ( hasTargetPointer ) {
 				TargetPointerEntry tpe = (TargetPointerEntry)node.getUserData(TRG_TRGPTRFLAGNAME);
 				if ( tpe != null ) {
+					// This node is a target location
 					//TODO
 				}
+				else {
+					tpe = (TargetPointerEntry)node.getUserData(SRC_TRGPTRFLAGNAME);
+					if ( tpe != null ) {
+						// This node is a source with a target location
+						// TODO
+					}
+				}
+				// Else this node is neither the location of a target point, 
+				// nor a source with a target pointer
 			}
 			
 			if ( trav instanceof ITSEngine ) {
@@ -733,7 +733,7 @@ public abstract class ITSFilter implements IFilter {
 				}
 			}
 			
-			// otherwise, treat the tag
+			// Otherwise, treat the tag
 			switch ( trav.getWithinText() ) {
 			case ITraversal.WITHINTEXT_NESTED: //TODO: deal with nested elements
 				// For now treat them as inline

@@ -1439,6 +1439,12 @@ public class ITSEngine implements IProcessor, ITraversal {
 		String[] parts = text.split(",", 0);
 		for ( int i=0; i<parts.length; i++ ) {
 			parts[i] = parts[i].trim();
+			if ( parts[i].startsWith("'") || parts[i].startsWith("\"") ) {
+				parts[i] = parts[i].substring(1);
+			}
+			if ( parts[i].endsWith("'") || parts[i].endsWith("\"") ) {
+				parts[i] = parts[i].substring(0, parts[i].length()-1);
+			}
 		}
 		for ( String part : parts ) {
 			// If there is a map and the part is listed in it
