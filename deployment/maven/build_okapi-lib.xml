@@ -426,7 +426,7 @@
 		<echo file="tmpJars" append="yes"> ${jar024}</echo>
 		<copy todir="${distLib}" file="${dep024}/${jar024}"/>
 
-		<property name="dep025Version" value="0.17-SNAPSHOT"/>
+		<property name="dep025Version" value="0.19-SNAPSHOT"/>
 		<property name="dep025" value="${mavenStore}/net/sf/okapi/lib/okapi-lib-xliff/${dep025Version}"/>
 		<fileset id="list.contents" dir="${dep025}"
 		 includes="**/okapi-lib-xliff-${dep025Version}.jar"/>
