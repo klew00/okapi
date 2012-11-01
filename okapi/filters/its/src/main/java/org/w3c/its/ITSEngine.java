@@ -903,7 +903,8 @@ public class ITSEngine implements IProcessor, ITraversal {
 				if ( map == null ) {
 					map = new LinkedHashMap<String, String>();
 				}
-				map.put(left.toString(), right.toString());
+				// Left value must be lowercase
+				map.put(left.toString().toLowerCase(), right.toString());
 			}
 		}
 		
@@ -1442,6 +1443,15 @@ public class ITSEngine implements IProcessor, ITraversal {
 		}
 	}
 	
+	/**
+	 * Adds the values found in a domain original string to a common result list.
+	 * following the ITS 2.0 algorithm.
+	 * @param text the content of the original string.
+	 * @param map the map where the domain Mapping values are listed (can be null)
+	 * The left values of the list must be in lowercase.
+	 * @param list the list of previously existing resulting values (can be null)
+	 * @return the list of the resulting values.
+	 */
 	private List<String> fromDomainItemToValues (String text,
 		Map<String, String> map,
 		List<String> list)
@@ -1460,7 +1470,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 		}
 		for ( String part : parts ) {
 			// If there is a map and the part is listed in it
-			if (( map != null ) && map.containsKey(part) ) {
+			if (( map != null ) && map.containsKey(part.toLowerCase()) ) {
 				part = map.get(part); // Use the mapped value
 			}
 			if ( !list.contains(part) ) {
