@@ -195,22 +195,6 @@ public class TraversalTest {
 	}
 
 	@Test
-	public void testTargetPointerLocal () throws SAXException, IOException, ParserConfigurationException {
-		InputSource is = new InputSource(new StringReader("<doc xmlns:i='"+ITSEngine.ITS_NS_URI+"' i:version='2.0'>"
-			+ "<entry><src i:targetPointer='../trg'>source</src><trg></trg></entry></doc>"));
-		Document doc = fact.newDocumentBuilder().parse(is);
-		ITraversal trav = applyITSRules(doc, null, false, null);
-		Element elem = getElement(trav, "entry", 1);
-		assertNotNull(elem);
-		assertTrue(trav.getTranslate(null));
-		assertEquals(null, trav.getTargetPointer(null));
-		elem = getElement(trav, "src", 1);
-		assertNotNull(elem);
-		assertTrue(trav.getTranslate(null));
-		assertEquals("../trg", trav.getTargetPointer(null));
-	}
-
-	@Test
 	public void testPreserveSpaces () throws SAXException, IOException, ParserConfigurationException {
 		InputSource is = new InputSource(new StringReader("<book xmlns:its=\"http://www.w3.org/2005/11/its\">"
 			+ "<info>"

@@ -748,8 +748,7 @@ public class XMLFilterTest {
 			+ "<its:translateRule selector=\"//item/src\" translate=\"yes\"/>"
 			+ "<its:targetPointerRule selector=\"//item/src\" targetPointer=\"../trg\"/>"
 			+ "</its:rules>"
-//TODO:	to implement		+ "<item><src>Text</src><trg>Text</trg></item>"
-			+ "<item><src>Text</src><trg/></item>"
+			+ "<item><src>Text</src><trg>Text</trg></item>"
 			+ "</doc>";
 		
 		// Check extraction
@@ -759,10 +758,41 @@ public class XMLFilterTest {
 		assertEquals("Text", tu.getSource().getCodedText());
 		
 		// Check output
-		assertEquals(expect, FilterTestDriver.generateOutput(list,
-			filter.getEncoderManager(), LocaleId.FRENCH));
+//TODO		assertEquals(expect, FilterTestDriver.generateOutput(list,
+//			filter.getEncoderManager(), LocaleId.FRENCH));
 	}
 	
+
+	@Test
+	public void testOutputTargetPointerWithExistingTarget () {
+		String snippet = "<?xml version=\"1.0\"?>\n"
+			+ "<doc xmlns:its=\"http://www.w3.org/2005/11/its\"><its:rules version=\"2.0\">"
+			+ "<its:translateRule selector=\"/doc\" translate=\"no\"/>"
+			+ "<its:translateRule selector=\"//item/src\" translate=\"yes\"/>"
+			+ "<its:targetPointerRule selector=\"//item/src\" targetPointer=\"../trg\"/>"
+			+ "</its:rules>"
+			+ "<item><src>Text</src><trg/>TEXT</item>"
+			+ "</doc>";
+		String expect = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+			+ "<doc xmlns:its=\"http://www.w3.org/2005/11/its\"><its:rules version=\"2.0\">"
+			+ "<its:translateRule selector=\"/doc\" translate=\"no\"/>"
+			+ "<its:translateRule selector=\"//item/src\" translate=\"yes\"/>"
+			+ "<its:targetPointerRule selector=\"//item/src\" targetPointer=\"../trg\"/>"
+			+ "</its:rules>"
+			+ "<item><src>Text</src><trg>TEXT</trg></item>"
+			+ "</doc>";
+		
+		// Check extraction
+		ArrayList<Event> list = getEvents(snippet);
+		ITextUnit tu = FilterTestDriver.getTextUnit(list, 1);
+		assertNotNull(tu);
+		assertEquals("Text", tu.getSource().getCodedText());
+		assertEquals("TEXT", tu.getTarget(LocaleId.FRENCH).getCodedText());
+		
+		// Check output
+//TODO		assertEquals(expect, FilterTestDriver.generateOutput(list,
+//			filter.getEncoderManager(), LocaleId.FRENCH));
+	}
 	
 	@Test
 	public void testOutputSupplementalChars () {

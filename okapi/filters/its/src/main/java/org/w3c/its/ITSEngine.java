@@ -30,8 +30,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -43,7 +41,10 @@ import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.exceptions.OkapiIOException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -52,6 +53,9 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
+/**
+ * Holds the information on a given entry that has a target pointer.
+ */
 public class ITSEngine implements IProcessor, ITraversal {
 
 	public static final String    ITS_VERSION1 = "1.0";
@@ -74,9 +78,12 @@ public class ITSEngine implements IProcessor, ITraversal {
 	
 	// Must have '?' as many times as there are FP_XXX entries +1
 	// Must have +FLAGSEP as many times as there are FP_XXX_DATA entries +1
-	private static final String   FLAGDEFAULTDATA     = "??????????????"
+	private static final String   FLAGDEFAULTDATA     = "???????????????"
 		+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP
 		+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP;
+
+	private static final String SRC_TRGPTRFLAGNAME = "\u10ff"; // Name of the user-data property that holds the target pointer flag in the source
+	private static final String TRG_TRGPTRFLAGNAME = "\u20ff"; // Name of the user-data property that holds the target pointer flag in the target
 
 	// Indicator position
 	private static final int      FP_TRANSLATE             = 0;
@@ -93,6 +100,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 	private static final int      FP_STORAGESIZE           = 11;
 	private static final int      FP_ALLOWEDCHARS          = 12;
 	private static final int      FP_SUBFILTER             = 13;
+	private static final int      FP_TARGETPOINTER         = 14;
 	
 	// Data position 
 	private static final int      FP_TERMINOLOGY_DATA      = 0;
@@ -135,6 +143,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 	private boolean backTracking;
 	private boolean translatableAttributeRuleTriggered;
 	private boolean targetPointerRuleTriggered;
+	private boolean hasTargetPointer;
 	private String version;
 
 	private final Logger logger = LoggerFactory.getLogger(getClass());
@@ -194,7 +203,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 	public boolean getTranslatableAttributeRuleTriggered () {
 		return translatableAttributeRuleTriggered;
 	}
-	
+
 	/**
 	 * Indicates if the processed document has triggered a target pointer rule.
 	 * This must be called only after {@link #applyRules(long)}. 
@@ -1020,6 +1029,9 @@ public class ITSEngine implements IProcessor, ITraversal {
 		version = "0"; // Needs to be not null (in case there is no ITS at all in file)
 		processGlobalRules(dataCategories);
 		processLocalRules(dataCategories);
+		
+		// Prepare for target pointers if needed
+		prepareTargetPointers();
 	}
 	
 	private void removeFlag (Node node) {
@@ -1773,39 +1785,10 @@ public class ITSEngine implements IProcessor, ITraversal {
 					String ns = attr.getOwnerElement().getNamespaceURI();
 					if ( !Util.isEmpty(ns) ) qualified = !ns.equals(ITS_NS_URI);
 					String[] values = retrieveStorageSizeData(attr.getOwnerElement(), qualified, isHTML5);
-//TODO: resolve override complete or not					
-//					// Get the previous data (if any)
-//					String oriData = (String)attr.getOwnerElement().getUserData(FLAGNAME);
-//					if ( oriData != null ) {
-//						String[] ori = fromSingleString(getFlagData(oriData, FP_STORAGESIZE_DATA));
-//						if ( ori.length > 1 ) {
-//							// Use original values if local one is not defined
-//							if ( values[0] == null ) values[0] = ori[0];
-//							if ( values[1] == null ) values[1] = ori[1];
-//						}
-//					}
 					// Set the updated flags
 					setFlag(attr.getOwnerElement(), FP_STORAGESIZE, 'y', attr.getSpecified());
 					setFlag(attr.getOwnerElement(), FP_STORAGESIZE_DATA,
 						toSingleString(values[0], values[1], values[2]), attr.getSpecified()); 
-				}
-			}
-
-			// Local targetPointer attribute (ITS 2.0 only)
-			if (( (dataCategories & IProcessor.DC_TARGETPOINTER) > 0 ) && isVersion2() ) {
-				expr = xpath.compile("//*/@"+ITS_NS_PREFIX+":targetPointer");
-				NL = (NodeList)expr.evaluate(doc, XPathConstants.NODESET);
-				for ( int i=0; i<NL.getLength(); i++ ) {
-					attr = (Attr)NL.item(i);
-					// Skip irrelevant nodes
-					if ( ITS_NS_URI.equals(attr.getOwnerElement().getNamespaceURI())
-						&& "targetPointerRule".equals(attr.getOwnerElement().getLocalName()) ) continue;
-					// Set the flag
-					String value = attr.getValue();
-					if ( value != null ) {
-						setFlag(attr.getOwnerElement(), FP_TARGETPOINTER_DATA,
-							value, attr.getSpecified());
-					}
 				}
 			}
 
@@ -2360,6 +2343,113 @@ public class ITSEngine implements IProcessor, ITraversal {
 		if ( (tmp = (String)attribute.getUserData(FLAGNAME)) == null ) return null;
 		if ( tmp.charAt(FP_SUBFILTER) != 'y' ) return null;
 		return getFlagData(tmp, FP_SUBFILTER_DATA);
+	}
+
+	/**
+	 * Prepares the document for using target pointers.
+	 * <p>Because of the way the skeleton is constructed and because target pointer can result in the target
+	 * location being anywhere in the document, we need to perform a first pass to create the targetTable
+	 * table. That table lists all the source nodes that have a target pointer and the corresponding target
+	 * node with its status.
+	 */
+	private void prepareTargetPointers () {
+		hasTargetPointer = false;
+		try {
+			// If there is no target pointers, just reset the table
+			if ( !getTargetPointerRuleTriggered() ) {
+				return;
+			}
+			// Else: gather the target locations
+			startTraversal();
+	
+			// Go through the document
+			Node srcNode;
+			while ( (srcNode = nextNode()) != null ) {
+				if ( srcNode.getNodeType() == Node.ELEMENT_NODE ) {
+					// Use !backTracking() to get to the elements only once
+					// and to include the empty elements (for attributes).
+					if ( !backTracking() ) {
+						if ( getTranslate(null) ) {
+							String pointer = getTargetPointer(null);
+							if ( pointer != null ) {
+								resolveTargetPointer(getXPath(), srcNode, pointer);
+							}
+						}
+						//TODO: attributes
+					}
+				}
+			}
+		}
+		finally {
+			// Reset the traversal
+			startTraversal();
+		}
+	}
+
+	/**
+	 * Resolves the target pointer for a given source node and creates its
+	 * entry in targetTable, and set flag on the node
+	 * @param xpath the XPath object to use for the resolution.
+	 * @param srcNode the source node.
+	 * @param pointer the XPath expression pointing to the target node
+	 */
+	private void resolveTargetPointer (XPath xpath,
+		Node srcNode,
+		String pointer)
+	{
+		try {
+			XPathExpression expr = xpath.compile(pointer);
+			Node trgNode = (Node)expr.evaluate(srcNode, XPathConstants.NODE);
+			if ( trgNode == null ) {
+				// No entry available
+				//TODO: try to create the needed node
+				return;
+			}
+			// Check the type
+			if ( srcNode.getNodeType() != trgNode.getNodeType() ) {
+				logger.warn("Potential issue with target pointer '{}'.\nThe source and target node are of different types. "
+					+ "Depending on the content of the source, this may or may not be an issue.", pointer);
+			}
+			// Create the entry
+			TargetPointerEntry tpe = new TargetPointerEntry(srcNode, trgNode);
+			// Set the flags on each nod
+			srcNode.setUserData(SRC_TRGPTRFLAGNAME, tpe, null);
+			trgNode.setUserData(TRG_TRGPTRFLAGNAME, tpe, null);
+			hasTargetPointer = true;
+		}
+		catch ( XPathExpressionException e ) {
+			throw new OkapiIOException(String.format("Bab XPath expression in target pointer '%s'.", pointer));
+		}
+	}
+
+	/**
+	 * Indicates if the decorated document has at least one node with a target pointer.
+	 * @return true if the decorated document has at least one node with a target pointer,
+	 * false otherwise.
+	 */
+	public boolean getHasTargetPointer () {
+		return hasTargetPointer;
+	}
+
+	/**
+	 * Gets the target pointer entry for a given node.
+	 * @param node the node to examine.
+	 * @return the target pointer entry for that node, or null if there is none.
+	 */
+	public TargetPointerEntry getTargetPointerEntry (Node node) {
+		TargetPointerEntry tpe = (TargetPointerEntry)node.getUserData(TRG_TRGPTRFLAGNAME);
+		if ( tpe != null ) {
+			// This node is a target location
+			//TODO
+		}
+		else {
+			tpe = (TargetPointerEntry)node.getUserData(SRC_TRGPTRFLAGNAME);
+			if ( tpe != null ) {
+				// This node is a source with a target location
+				// TODO
+			}
+		}
+		return tpe;
 	}
 
 }
