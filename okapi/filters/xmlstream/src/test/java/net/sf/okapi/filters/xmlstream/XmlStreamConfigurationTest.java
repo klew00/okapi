@@ -19,6 +19,7 @@
 
 package net.sf.okapi.filters.xmlstream;
 
+import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -136,5 +137,19 @@ public class XmlStreamConfigurationTest {
 		attributes.put("xml:id", "value");
 		assertTrue(rules.isIdAttribute("p", "xml:id", attributes));
 		assertFalse(rules.isIdAttribute("p", "foo", attributes));
+	}
+	
+	@Test
+	public void loadNonAsciiRuleFile() throws Exception {
+		// nonAscii.yml contains some Japanese characters and it's
+		// encoded in UTF-8. Loading the file shouldn't throw an
+		// exception.
+		URL url = XmlStreamConfigurationTest.class.getResource("/nonAscii.yml");
+		TaggedFilterConfiguration rules = new TaggedFilterConfiguration(url);
+		assertNotNull(rules);
+
+		File file = new File(url.getFile());
+		rules = new TaggedFilterConfiguration(file);
+		assertNotNull(rules);
 	}
 }

@@ -21,11 +21,13 @@
 package net.sf.okapi.filters.yaml;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -71,7 +73,8 @@ public class YamlConfigurationReader {
 	public YamlConfigurationReader(URL configurationPathAsResource) {
 		try {
 			yaml = new Yaml();
-			config = (Map) yaml.load(new InputStreamReader(configurationPathAsResource.openStream()));
+			config = (Map) yaml.load(new InputStreamReader(configurationPathAsResource.openStream(), 
+					Charset.forName("UTF-8")));
 			initialize();
 		} catch (FileNotFoundException e) {
 			throw new RuntimeException(e);
@@ -83,7 +86,8 @@ public class YamlConfigurationReader {
 	public YamlConfigurationReader(File configurationFile) {
 		try {
 			yaml = new Yaml();
-			config = (Map) yaml.load(new FileReader(configurationFile));
+			config = (Map) yaml.load(new InputStreamReader(new FileInputStream(configurationFile), 
+					Charset.forName("UTF-8")));
 			initialize();
 		} catch (FileNotFoundException e) {
 			throw new RuntimeException(e);
