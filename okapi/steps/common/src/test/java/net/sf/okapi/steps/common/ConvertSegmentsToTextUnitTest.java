@@ -21,6 +21,7 @@ import org.junit.Test;
 public class ConvertSegmentsToTextUnitTest {
 	private ConvertSegmentsToTextUnitsStep converter;
 	private ITextUnit segmentedTu;
+	private ITextUnit sourceOnlySegmentedTu;
 	private ITextUnit segmentedTuWithCodes;
 	private ITextUnit nonSegmentedTu;
 	
@@ -40,7 +41,15 @@ public class ConvertSegmentsToTextUnitTest {
 			segmentedTu.getTarget(LocaleId.SPANISH).append(trgSeg);
 		}
 		segmentedTu.getTarget(LocaleId.SPANISH).getSegments().setAlignmentStatus(AlignmentStatus.ALIGNED);
+
+		// set up sourceOnlySegmentedTu
+		sourceOnlySegmentedTu = new TextUnit("sourceOnlysegmentedTU");
 		
+		for (int j = 0; j < 3; j++) {			
+			Segment srcSeg = new Segment(Integer.toString(j), new TextFragment("a segment. "));
+			sourceOnlySegmentedTu.getSource().append(srcSeg);
+		}		
+
 		// set up segmentedTUWithCodes
 		segmentedTuWithCodes = new TextUnit("segmentedTUWithCodes");
 		segmentedTuWithCodes.createTarget(LocaleId.SPANISH, true, IResource.CREATE_EMPTY);
@@ -83,6 +92,19 @@ public class ConvertSegmentsToTextUnitTest {
 		assertEquals(3, count);
 	}
 	
+	@Test
+	public void convertSourceOnlySegmentedTuToMultiple() {
+		Event event = converter.handleTextUnit(new Event(EventType.TEXT_UNIT, sourceOnlySegmentedTu));
+		int count = 0;
+		for (Event e : event.getMultiEvent()) {
+			count++;
+			ITextUnit tu = e.getTextUnit();
+			assertEquals("a segment. ", tu.getSource().toString());
+			assertEquals(false, tu.hasTarget(LocaleId.SPANISH));
+		}
+		
+		assertEquals(3, count);
+	}
 	
 	@Test
 	public void convertSegmentedTuToMultipleWithCodes() {
