@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2011 by the Okapi Framework contributors
+  Copyright (C) 2011-2012 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -26,6 +26,10 @@ import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CoderResult;
 
+/**
+ * Implements CharsetDecoder for the FrameMaker Roman character set.
+ * This goes from the MIF bytes to the Unicode characters.
+ */
 class FrameRomanDecoder extends CharsetDecoder {
 
 	protected FrameRomanDecoder (Charset charset,

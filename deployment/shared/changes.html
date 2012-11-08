@@ -73,6 +73,15 @@ distribution.</p>
 </ul>
 	</li>
 	<li>Filters:<ul>
+	<li>MIF Filter:<ul>
+	<li>Restored the escaping of the original data of inline codes (Issue #285)</li>
+	<li>Reworked the parsing of the lone Strings content for escaped characters. 
+	Now all control characters are mapped or made inline codes. Then if the MIF 
+	version is less than 8, the decoding using the character set is used, 
+	otherwise, the character is enclosed in an inlien code as we can&#39;t know what 
+	it is.</li>
+</ul>
+	</li>
 	<li>Added the HTML5-ITS Filter.</li>
 	<li>Added the Doxygen Filter.</li>
 	<li>Added the Wiki Filter.</li>
