@@ -42,7 +42,7 @@ public class MIFEncoder implements IEncoder {
 
 	@Override
 	public String encode (String text,
-			EncoderContext context)
+		EncoderContext context)
 	{
 		StringBuilder escaped = new StringBuilder();
 		char ch;
@@ -106,7 +106,7 @@ public class MIFEncoder implements IEncoder {
 
 	@Override
 	public String encode (char value,
-			EncoderContext context)
+		EncoderContext context)
 	{
 		switch ( value ) {
 		case '\t':
@@ -156,7 +156,7 @@ public class MIFEncoder implements IEncoder {
 
 	@Override
 	public String encode (int value,
-			EncoderContext context)
+		EncoderContext context)
 	{
 		switch ( value ) {
 		case '\t':
@@ -248,7 +248,12 @@ public class MIFEncoder implements IEncoder {
 		return chsEnc;
 	}
 
-	private String tryCharStatment (int value) {
+	/**
+	 * Maps the value to an escaped character.
+	 * @param value the value to convert
+	 * @return the mapped string, or null if there is no mapping
+	 */
+	protected String tryCharStatment (int value) {
 		String token = "";
 		switch ( value ) {
 		case '\t': token = "Tab"; break;

@@ -55,6 +55,7 @@ import net.sf.okapi.common.exceptions.OkapiUnsupportedEncodingException;
 import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filters.IFilterConfigurationMapper;
+import net.sf.okapi.common.filters.InlineCodeFinder;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.DocumentPart;
@@ -79,6 +80,9 @@ public class MIFFilter implements IFilter {
 	
 	public static final String FRAMEROMAN = "x-FrameRoman";
 
+	static final String ILC_START = "\u169b"; // Rarely used character
+	static final char ILC_END = '\u169c'; // Rarely used character
+	
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 
 	private static final int BLOCKTYPE_TEXTFLOW = 1;
@@ -93,7 +97,8 @@ public class MIFFilter implements IFilter {
 		+ "MarkerTypeCatalog;XRefFormats;Document;BookComponent;InitialAutoNums;Dictionary;AFrames;Page;"; // Must end with ';'
 	
 	private static final String IMPORTOBJECT = "ImportObject";
-	
+	private static final String MIFSTRING_MIME_TYPE = "application/x-mifstring";
+
 	private Parameters params;
 	private String lineBreak;
 	private String docName;
@@ -111,7 +116,7 @@ public class MIFFilter implements IFilter {
 	private EncoderManager encoderManager;
 	private int inBlock;
 	private int blockLevel;
-	private String version;
+	private double dbVersion;
 	private int paraLevel;
 //	private StringBuilder paraBuf;
 	private StringBuilder paraSkelBuf;
@@ -240,6 +245,7 @@ public class MIFFilter implements IFilter {
 		if ( encoderManager == null ) {
 			encoderManager = new EncoderManager();
 			encoderManager.setMapping(MimeTypeMapper.MIF_MIME_TYPE, "net.sf.okapi.filters.mif.MIFEncoder");
+			encoderManager.setMapping(MIFSTRING_MIME_TYPE, "net.sf.okapi.filters.mif.MIFStringEncoder");
 		}
 		return encoderManager;
 	}
@@ -312,7 +318,7 @@ public class MIFFilter implements IFilter {
 			//--- First pass: gather information
 			
 			csProvider = new FrameRomanCharsetProvider();
-			version = "";
+			dbVersion = 0.0;
 
 			// Detect encoding
 			InputStream bomAwareInput = guessEncoding(input);
@@ -767,7 +773,8 @@ public class MIFFilter implements IFilter {
 					else if ( "MIFFile".equals(tag) ) {
 						token = getNextTokenInStatement(false, null, true);
 						if ( token.getType() == MIFToken.TYPE_STRING ) {
-							version = token.getString();
+							token.getString(); // Consume the version
+							// No need to store/convert it it was done already
 						}
 						else {
 							throw new OkapiIOException("MIF version not found.");
@@ -1039,7 +1046,9 @@ public class MIFFilter implements IFilter {
 				tu = new TextUnit(String.valueOf(++tuId));
 				tu.setPreserveWhitespaces(true);
 				tu.setSourceContent(tf);
+				tu.setMimeType(MimeTypeMapper.MIF_MIME_TYPE);
 				tu.setName(resname); resname = null;
+				processILC(tu);
 				queue.add(new Event(EventType.TEXT_UNIT, tu, skel));
 
 				// Try to simplify when there is only one leading code which is a font
@@ -1096,135 +1105,6 @@ public class MIFFilter implements IFilter {
 		}
 	}
 	
-/*============ before changes to extract leading codes
-	private void processPara ()
-		throws IOException
-	{
-		TextFragment tf = new TextFragment();
-		boolean first = true;
-		paraLevel = 1;
-		paraBuf.setLength(0);
-		paraBufNeeded = false;
-		String endString = null;
-		resetToDefaultDecoder();
-		Code code = null;
-		boolean extractedMarker = false;
-
-		// Go to the first ParaLine
-		int res = readUntilText(paraBuf, false);
-		while ( res > 0 ) {
-			
-			// Get the text to append
-			paraLevel--; // We close String or Char outside of readUntilText() 
-			String text = null;
-			switch ( res ) {
-			case 1: // String
-				text = processString(false, null);
-				paraBuf.append("`");
-				break;
-			case 2: // Char
-				text = processChar(false).toString();
-				break;
-			case 3: // Extracted marker
-				code = new Code(TagType.PLACEHOLDER, "index", "'>"+TextFragment.makeRefMarker(refTU.getId())+"<String `");
-				code.setReferenceFlag(true);
-				extractedMarker = true;
-				break;
-			}
-			
-			if ( Util.isEmpty(text) && !extractedMarker ) {
-				// Nothing to do, keep on reading
-				if ( paraBuf.length() > 0 ) {
-					if ( res == 1 ) {
-						// We have inline plus an empty string ("<Dummy 1><String`'>")
-						// We remove the empty string "<String `"
-						paraBuf.delete(paraBuf.length()-9, paraBuf.length());
-					}
-				}
-			}
-			else { // We have text or code with reference
-				if ( first ) { // First text in the fragment: put the codes in the skeleton
-					first = false;
-					skel.append(paraBuf.toString());
-					if ( res != 1 ) skel.append("<String `");
-					endString = "'>";
-				}
-				else { // Put the codes in an inline code 
-					if ( paraBufNeeded && ( paraBuf.length() > 0 )) {
-						if ( res != 1 ) {
-							paraBuf.append("<String `");
-						}
-						tf.append(TagType.PLACEHOLDER, "x", endString + paraBuf.toString());
-					}
-				}
-				
-				if ( code != null ) {
-					tf.append(code);
-					code = null;
-				}
-				else {
-					// Add the text
-					tf.append(text);
-				}
-				// Reset the codes buffer for next sequence
-				paraBuf.setLength(0);
-				paraBufNeeded = false;
-			}
-			
-			// Move to the next text
-			res = readUntilText(paraBuf, true);
-		}
-
-		// Check for inline codes
-		checkInlineCodes(tf);
-
-		ITextUnit tu = null;
-		if ( !tf.isEmpty() ) {
-			if ( tf.hasText() || extractedMarker ) {
-				// Add the text unit to the queue
-				tu = new TextUnit(String.valueOf(++tuId));
-				tu.setPreserveWhitespaces(true);
-				tu.setSourceContent(tf);
-				tu.setName(resname); resname = null;
-				queue.add(new Event(EventType.TEXT_UNIT, tu, skel));
-				skel.addContentPlaceholder(tu);
-			}
-			else { // No text (only codes and/or white spaces) Put back the content/codes in skeleton
-				// We need to escape the text parts (white spaces like tabs)
-				String ctext = tf.getCodedText();
-				StringBuilder tmp = new StringBuilder();
-				for ( int i=0; i<ctext.length(); i++ ) {
-					char ch = ctext.charAt(i);
-					if ( TextFragment.isMarker(ch) ) {
-						tmp.append(tf.getCode(ctext.charAt(++i)));
-					}
-					else {
-						tmp.append(encoder.encode(ch, 1));
-					}
-				}
-				GenericSkeletonPart part = skel.getLastPart();
-				if (( part == null ) || !part.getData().toString().endsWith("<String `") ) {
-					skel.append("<String `");
-					endString = "'>";
-				}
-				skel.append(tmp.toString());
-			}
-		}
-		
-		if ( endString == null ) {
-			skel.append(paraBuf.toString());
-		}
-		else {
-			skel.append(endString + paraBuf.toString());
-		}
-
-		if ( tu != null ) {
-			// New skeleton object for the next parts of the parent statement
-			skel = new GenericSkeleton();
-		}
-	}
-===========*/
-
 	private MIFToken getNextTokenInStatement (boolean store,
 		StringBuilder sb,
 		boolean updateBlockLevel)
@@ -1369,6 +1249,7 @@ public class MIFFilter implements IFilter {
 			refTU.setSourceContent(tf);
 			refTU.setType(resType);
 			refTU.setIsReferent(true);
+			refTU.setMimeType(MIFSTRING_MIME_TYPE);
 
 			// Remove string
 			int n = sb.lastIndexOf("`");
@@ -1379,6 +1260,7 @@ public class MIFFilter implements IFilter {
 			sb.append("'>");
 			skipOverContent(true, sb);
 			refSkel.add(sb.toString());
+			processILC(refTU);
 			queue.add(new Event(EventType.TEXT_UNIT, refTU, refSkel));
 			sb = null; // Now it is in the text unit skeleton
 			res[1] = refTU;
@@ -2178,6 +2060,8 @@ public class MIFFilter implements IFilter {
 						tu.setPreserveWhitespaces(true);
 						tu.setSourceContent(tf);
 						tu.setName(resname); resname = null;
+						tu.setMimeType(MIFSTRING_MIME_TYPE);
+						processILC(tu);
 						queue.add(new Event(EventType.TEXT_UNIT, tu, skel));
 						skel.addContentPlaceholder(tu);
 					}
@@ -2222,13 +2106,13 @@ public class MIFFilter implements IFilter {
 			params.getCodeFinder().process(tf);
 		}
 		// Escape inline code content
-//		List<Code> codes = tf.getCodes();
-//		for ( Code code : codes ) {
-//			// Escape the data of the new inline code (and only them)
-//			if ( code.getType().equals(InlineCodeFinder.TAGTYPE) ) { 
-//				code.setData(encoder.encode(code.getData(), EncoderContext.SKELETON));
-//			}
-//		}
+		List<Code> codes = tf.getCodes();
+		for ( Code code : codes ) {
+			// Escape the data of the new inline code (and only them)
+			if ( code.getType().equals(InlineCodeFinder.TAGTYPE) ) { 
+				code.setData(encoder.encode(code.getData(), EncoderContext.SKELETON));
+			}
+		}
 	}
 	
 	private String processString (boolean store,
@@ -2342,11 +2226,24 @@ public class MIFFilter implements IFilter {
 					if ( c == Integer.MAX_VALUE ) {
 						continue; // warning already logged
 					}
-					if ( !byteMode ) {
-						byteStream.reset();
-						byteMode = true;
+					String res = MIFStringEncoder.convertCtrl(c);
+					if ( res != null ) {
+						strBuffer.append(res);
+						continue;
 					}
-					byteStream.write((char)c);
+					// Else: no mapped string
+					if ( dbVersion < 8.0 ) { // Byte string
+						if ( !byteMode ) {
+							byteStream.reset();
+							byteMode = true;
+						}
+						byteStream.write((char)c);
+					}
+					else { // 8 and above: byte escape in unicode string.
+						logger.warn("Unknow control character found in string.\n"
+							+ "This character will be extracted as an inline code.");
+						strBuffer.append(String.format("%c\\x%02%c", ILC_START, c, ILC_END));
+					}
 					continue;
 				}				
 			}
@@ -2355,7 +2252,7 @@ public class MIFFilter implements IFilter {
 		// Else: Missing end of string error
 		throw new OkapiIllegalFilterOperationException("End of string is missing.");
 	}
-
+	
 	private int readHexa (int length,
 		boolean readExtraSpace,
 		boolean store,
@@ -2430,10 +2327,18 @@ public class MIFFilter implements IFilter {
 		if ( !tmp.startsWith("<MIFFile ") ) {
 			throw new OkapiIOException("Invalid MIF header.");
 		}
+
+		int p = tmp.indexOf(' ', 9);
+		if ( p == -1 ) p = tmp.indexOf('>', 9);
+		if ( p == -1 ) p = tmp.indexOf('\n', 9);
+		String version;
+		if ( p == -1 ) version = tmp.substring(9);
+		else version = tmp.substring(9, 9+p);
 		
-		version = tmp.substring(9,13);
-		double dblVer = Double.valueOf(version);
-		if ( dblVer < 8.00 ) {
+		p = version.indexOf('.');
+		if ( p != -1 ) version = version.substring(0, p);
+		dbVersion = Double.valueOf(version);
+		if ( dbVersion < 8.00 ) {
 			baseEncoding = FRAMEROMAN;
 		}
 		
@@ -2467,4 +2372,40 @@ public class MIFFilter implements IFilter {
 //		return res;
 //	}
 
+	/**
+	 * Look a the source content of a text unit to see if any part of the text
+	 * is bracketed by ILC_START/ILC_END and needs conversion to inline codes.
+	 * @param tu the text unit to update.
+	 */
+	private void processILC (ITextUnit tu) {
+		TextFragment tf = tu.getSource().getFirstContent();
+		String ct = tf.getCodedText();
+		int start = 0;
+		int diff = 0; // No code found
+		
+		// Convert each ILC span into inlinbe code
+		while ( true ) {
+			start = ct.indexOf(ILC_START, start);
+			if ( start == -1 ) break; // No more markers
+			int end = ct.indexOf(ILC_END, start);
+			if ( end == -1 ) {
+				throw new OkapiIllegalFilterOperationException("Expected ILC_END marker not found.");
+			}
+			diff = tf.changeToCode(start, end+1, TagType.PLACEHOLDER, "ctrl");
+			start = end+diff;
+			ct = tf.getCodedText();
+		}
+		
+		// Remove the markers if needed
+		if ( diff != 0 ) { // This means we have at least one code
+			for ( Code code : tf.getCodes() ) {
+				if ( code.getData().startsWith(ILC_START) ) {
+					String data = code.getData();
+					// Trim both start and end markers
+					code.setData(data.substring(1, data.length()-1));
+				}
+			}
+		}
+	}
+	
 }
