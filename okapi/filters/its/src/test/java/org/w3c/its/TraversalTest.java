@@ -122,20 +122,20 @@ public class TraversalTest {
 		InputSource is = new InputSource(new StringReader("<doc>"
 			+ "<i:rules xmlns:i='"+ITSEngine.ITS_NS_URI+"' version='2.0'>"
 			+ "<i:domainRule selector='//doc' domainPointer='head/subject' "
-			+ " domainMapping=\"dom1 finalDom1, 'dom2 val' 'final dom2'\"/>"
+			+ " domainMapping=\"dom1 finalDom1, 'dom2 VAL' 'final dom2'\"/>"
 			+ "</i:rules>"
-			+ "<head><subject>dom1, dom3</subject><subject>'dom2 val', \"dom4\"</subject></head><p>text</p></doc>"));
+			+ "<head><subject>dom1, dom3</subject><subject>'dom2 val', \"Dom4\"</subject></head><p>text</p></doc>"));
 		Document doc = fact.newDocumentBuilder().parse(is);
 		ITraversal trav = applyITSRules(doc, null, false, null);
 		Element elem = getElement(trav, "doc", 1);
 		assertNotNull(elem);
-		assertEquals("finalDom1, dom3, final dom2, dom4", trav.getDomains(null));
+		assertEquals("finalDom1, dom3, final dom2, Dom4", trav.getDomains(null));
 		elem = getElement(trav, "head", 1);
 		assertNotNull(elem);
-		assertEquals("finalDom1, dom3, final dom2, dom4", trav.getDomains(null));
+		assertEquals("finalDom1, dom3, final dom2, Dom4", trav.getDomains(null));
 		elem = getElement(trav, "p", 1);
 		assertNotNull(elem);
-		assertEquals("finalDom1, dom3, final dom2, dom4", trav.getDomains(null));
+		assertEquals("finalDom1, dom3, final dom2, Dom4", trav.getDomains(null));
 	}
 
 	@Test
