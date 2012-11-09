@@ -60,6 +60,7 @@ public class Main {
 	public static final String DC_PRESERVESPACE = "preservespace";
 	public static final String DC_LOCQUALITYISSUE = "locqualityissue";
 	public static final String DC_STORAGESIZE = "storagesize";
+	public static final String DC_ALLOWEDCHARACTERS = "allowedcharacters";
 
 	public static void main (String[] args) {
  
@@ -101,6 +102,7 @@ public class Main {
 						+ "\n" + DC_PRESERVESPACE
 						+ "\n" + DC_LOCQUALITYISSUE
 						+ "\n" + DC_STORAGESIZE
+						+ "\n" + DC_ALLOWEDCHARACTERS
 					);
 					return;
 				}
@@ -358,6 +360,10 @@ public class Main {
 			writer.print("\t");
 			out1 = trav.getLineBreakType(attr);
 			if ( out1 != null ) writer.print(String.format("\tits:lineBreakType=\"%s\"", escape(out1)));
+		}
+		else if ( dc.equals(DC_ALLOWEDCHARACTERS) ) {
+			out1 = trav.getAllowedCharacters(attr);
+			if ( out1 != null ) writer.print(String.format("\tits:allowedCharacters=\"%s\"", escape(out1)));
 		}
 		
 		writer.print("\n");
