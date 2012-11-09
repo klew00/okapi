@@ -66,9 +66,24 @@ public class ConvertSegmentsToTextUnitsStep extends BasePipelineStep {
 		}		
 		
 		List<Event> textUnitEvents = new LinkedList<Event>();
+		
+		// if there are no targets then work off of source segments
+		if (tu.getTargetLocales().isEmpty()) {
+			int segCount = 0;
+			for (Segment srcSeg: tu.getSourceSegments()) {  
+				if (srcSeg != null) {
+					ITextUnit segmentTu = tu.clone();
+					segmentTu.setId(segmentTu.getId() + ":" + Integer.toString(++segCount));
+					segmentTu.setSourceContent(srcSeg.text);
+					textUnitEvents.add(new Event(EventType.TEXT_UNIT, segmentTu));
+				}
+			}
+			
+			return new Event(EventType.MULTI_EVENT, new MultiEvent(textUnitEvents));
+		}
 
+		// otherwise work off the aligned targets
 		IAlignedSegments alignedSegments = tu.getAlignedSegments();
-
 		for (LocaleId variantTrgLoc : tu.getTargetLocales()) {
 			// get iterator on source variant segments
 			Iterator<Segment> variantSegments = alignedSegments.iterator(variantTrgLoc);
