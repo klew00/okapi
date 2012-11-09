@@ -1653,22 +1653,22 @@ public class TextUnitUtil {
 					@Override
 					public int compare(Token t1, Token t2) {
 						// If a text part (from leading plain text) appears before seg end, move it forward behind the seg end
-						if (t1.type == TokenType.SEG_END && t2.type == TokenType.TP) {
+						if (t1.type == TokenType.SEG_END && t2.type == TokenType.TP)
 							return -1;
-						}
-						// If a text part (from trailing plain text) appears after seg start, move it backwards before seg start
-						else if (t1.type == TokenType.SEG_START && t2.type == TokenType.TP) {
+						if (t2.type == TokenType.SEG_END && t1.type == TokenType.TP)
 							return 1;
-						}
+						// If a text part (from trailing plain text) appears after seg start, move it backwards before seg start
+						if (t1.type == TokenType.SEG_START && t2.type == TokenType.TP)
+							return 1;
+						if (t2.type == TokenType.SEG_START && t1.type == TokenType.TP)
+							return -1;
 						// Otherwise text parts and other type combinations are sorted by start position
-						else {
-							if (t1.textRange.start < t2.textRange.start) 
-								return -1;
-							else if (t1.textRange.start > t2.textRange.start) 
-								return 1;
-							else
-								return 0;
-						}				
+						if (t1.textRange.start < t2.textRange.start)
+							return -1;
+						else if (t1.textRange.start > t2.textRange.start)
+							return 1;
+						else
+							return 0;
 					}
 					
 				});
