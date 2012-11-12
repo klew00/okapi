@@ -927,6 +927,7 @@ public class Main {
 			ps.println("Filter configuration: "+configId);
 			ps.println("XLIFF: "+input);
 			ps.println(String.format("Output: %s", (output==null) ? "<auto-defined>" : output));
+
 			stepMrg.handleRawDocument(skelRawDoc);
 			break;
 
@@ -984,7 +985,7 @@ public class Main {
 			ps.println("Default input encoding: "+inputEncoding);
 			ps.println("Filter configuration: "+configId);
 			ps.println("Output: "+output);
-			
+			ps.println( rd.getInputURI() != null ? "Input: "+rd.getInputURI().getPath() : "Input (No path available)");			
 			convertFile(rd, outputURI);
 			break;
 		}
@@ -1461,6 +1462,7 @@ public class Main {
 		ps.println("Default input encoding: "+inputEncoding);
 		ps.println("Filter configuration: "+configId);
 		ps.println("Output: "+tmp);
+		ps.println( rd.getInputURI() != null ? "Input: "+rd.getInputURI().getPath() : "Input (No path available)");
 
 		// Process
 		driver.processBatch();
@@ -1493,6 +1495,7 @@ public class Main {
 		ps.println("Output encoding: "+outputEncoding);
 		ps.println("Filter configuration: "+configId);
 		ps.println("Output: "+output);
+		ps.println( rd.getInputURI() != null ? "Input: "+rd.getInputURI().getPath() : "Input (No path available)");
 		
 		driver.addBatchItem(rd, new File(output).toURI(), outputEncoding);
 
@@ -1611,10 +1614,7 @@ public class Main {
 		ps.println("Output encoding: "+outputEncoding);
 		ps.println("Filter configuration: "+configId);
 		ps.println("Output: "+output);
-		if (rd.getInputURI() != null)
-			ps.println("Input: "+rd.getInputURI().getPath());
-		else
-			ps.println("Input (No path available)");
+		ps.println( rd.getInputURI() != null ? "Input: "+rd.getInputURI().getPath() : "Input (No path available)");
 
 		driver.addBatchItem(rd, new File(output).toURI(), outputEncoding);
 
