@@ -107,7 +107,8 @@ public final class LocaleId implements Comparable<Object> {
 	//	{ Java ID,      LocaleId,
 		{ "ja_JP_JP",   "ja-jp-x-calja"},
 		{ "no_NO_NY",   "nn-no"},
-		{ "th_TH_TH",   "th-th-x-numth"}
+		{ "th_TH_TH",   "th-th-x-numth"},
+		{ "th_TH_TH_#u-nu-thai", "th-th-x-numth"}
 	};
 
 	// Pattern to parser/validate BCP-47 language tags

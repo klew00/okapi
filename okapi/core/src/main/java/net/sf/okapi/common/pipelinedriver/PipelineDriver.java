@@ -221,11 +221,10 @@ public class PipelineDriver implements IPipelineDriver {
 	 */
 	protected void displayInput (IBatchItemContext item) {
 		if ( item.getRawDocument(0).getInputURI() != null ) {
-			logger.info(String.format("\n-- Input: %s",
-				item.getRawDocument(0).getInputURI().getPath()));
+			logger.debug("Input: {}",item.getRawDocument(0).getInputURI().getPath());
 		}
 		else {
-			logger.info("\n-- Input (No path available)");
+			logger.debug("Input (No path available)");
 		}
 	}
 

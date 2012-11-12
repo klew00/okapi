@@ -1611,7 +1611,11 @@ public class Main {
 		ps.println("Output encoding: "+outputEncoding);
 		ps.println("Filter configuration: "+configId);
 		ps.println("Output: "+output);
-		
+		if (rd.getInputURI() != null)
+			ps.println("Input: "+rd.getInputURI().getPath());
+		else
+			ps.println("Input (No path available)");
+
 		driver.addBatchItem(rd, new File(output).toURI(), outputEncoding);
 
 		// Process
