@@ -939,6 +939,8 @@ public class Main {
 			if ( !prepareFilter(configId) ) return; // Next input
 			file = new File(input);
 			rd = new RawDocument(file.toURI(), inputEncoding, srcLoc, trgLoc, configId);
+			ps.println( rd.getInputURI() != null ? "Input: "+rd.getInputURI().getPath() : "Input (No path available)");
+
 			leverageFileWithMoses(rd);
 			break;
 			
@@ -986,6 +988,7 @@ public class Main {
 			ps.println("Filter configuration: "+configId);
 			ps.println("Output: "+output);
 			ps.println( rd.getInputURI() != null ? "Input: "+rd.getInputURI().getPath() : "Input (No path available)");			
+
 			convertFile(rd, outputURI);
 			break;
 		}
@@ -1570,6 +1573,7 @@ public class Main {
 		}
 		ps.println("Default input encoding: "+inputEncoding);
 		ps.println("Filter configuration: "+configId);
+		ps.println( rd.getInputURI() != null ? "Input: "+rd.getInputURI().getPath() : "Input (No path available)");
 
 		// Process
 		driver.processBatch();
