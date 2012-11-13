@@ -84,8 +84,8 @@
 	<!-- The the JSON library -->
 	<copy todir="${dist_omtplugins}" file="${mavenStore}/com/googlecode/json-simple/json-simple/1.1/json-simple-1.1.jar"/>
 	<!-- The SLF4J library and it's JDK binding -->
-	<copy todir="${dist_omtplugins}" file="${mavenStore}/org/slf4j/slf4j-api/1.7.1/slf4j-api-1.7.1.jar"/>
-	<copy todir="${dist_omtplugins}" file="${mavenStore}/org/slf4j/slf4j-jdk14/1.7.1/slf4j-jdk14-1.7.1.jar"/>
+	<copy todir="${dist_omtplugins}" file="${mavenStore}/org/slf4j/slf4j-api/1.7.2/slf4j-api-1.7.2.jar"/>
+	<copy todir="${dist_omtplugins}" file="${mavenStore}/org/slf4j/slf4j-jdk14/1.7.2/slf4j-jdk14-1.7.2.jar"/>
 	
 	<copy tofile="${dist_omtplugins}/${base_name}-readme.html" file="data/omegat-plugins/readme.html"/>
 	<replace file="${dist_omtplugins}/${base_name}-readme.html" token="@version@" value="${okapilibStamp}"/>
