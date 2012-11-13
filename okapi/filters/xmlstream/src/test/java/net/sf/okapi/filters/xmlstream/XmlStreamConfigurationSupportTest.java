@@ -357,6 +357,20 @@ public class XmlStreamConfigurationSupportTest {
 	}
 	
 	@Test
+	public void test_INLINE_WITH_EXCLUDE_standalone () {
+		String config = 
+			    "elements:\n" +
+				"  foo: \n" +
+			    "    ruleTypes: [INLINE, EXCLUDE]";
+		filter.setParameters(new Parameters(config));
+		String snippet = "test1<foo/>test2";
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 1);
+		assertEquals("test1test2", tu.getSource().getCodedText());
+		assertEquals("<foo/>", tu.getSource().getFirstContent()
+				.getCode(0).getOuterData());
+	}
+	
+	@Test
 	public void test_INLINE_WITH_EXCLUDE_Regex_Trick () {
 		String config = 
 			    "elements:\n" +
