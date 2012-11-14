@@ -200,15 +200,19 @@ public class XMLFilterTest {
 	
 	@Test
 	public void testStack () {
-		String snippet = "<?xml version=\"1.0\" encoding='UTF-16'?>"
+		String snippet = "<?xml version=\"1.0\"?>"
+			+ "<!DOCTYPE set PUBLIC \"-//OASIS//DTD DocBook XML V4.5//EN\" \"../docbook/docbookx.dtd\">"
 			+ "<set lang=\"en\">"
+			+ "<its:rules xmlns:its=\"http://www.w3.org/2005/11/its\" version=\"1.0\">"
+			+ "<its:translateRule selector=\"//set/@lang\" translate=\"yes\"/>"
+			+ "</its:rules>"
 			+ "<title>Test</title>"
-			+ "</set>";
+			+ "</set>"; 
 		ArrayList<Event> list = getEvents(snippet);
 		ITextUnit tu = FilterTestDriver.getTextUnit(list, 1);
-		assertEquals("Test", tu.getSource().toString());
+		assertEquals("en", tu.getSource().toString());
 	}
-	
+
 	@Test
 	public void testComplexIdValue () {
 		String snippet = "<?xml version=\"1.0\"?>\n"
@@ -980,7 +984,7 @@ public class XMLFilterTest {
 		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet),
 			filter.getEncoderManager(), locEN));
 	}
-
+	
 	@Test
 	public void testTranslatableAttributesOutputAllowUnescapedQuoteButEscape () {
 		String snippet = "<?xml version=\"1.0\"?>\n"

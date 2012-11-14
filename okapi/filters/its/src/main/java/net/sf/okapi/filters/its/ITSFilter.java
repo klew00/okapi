@@ -512,7 +512,8 @@ public abstract class ITSFilter implements IFilter {
 		}
 
 		// Set the ITS context for this attribute and set the relevant properties
-		ContextItem ci = new ContextItem(context.peek().node, trav, attr);
+		ContextItem ci = new ContextItem((context.isEmpty() ? attr.getParentNode() : context.peek().node),
+			trav, attr);
 		// ITS Localization Note
 		if ( !Util.isEmpty(ci.locNote) ) {
 			tu.setProperty(new Property(Property.NOTE, ci.locNote));
