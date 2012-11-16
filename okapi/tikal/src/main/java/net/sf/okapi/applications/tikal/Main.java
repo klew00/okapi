@@ -38,6 +38,12 @@ import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import net.sf.okapi.applications.tikal.logger.ILogHandler;
+import net.sf.okapi.applications.tikal.logger.LogHandlerFactory;
+
 import net.sf.okapi.common.FileUtil;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.LocaleId;
@@ -83,6 +89,7 @@ import net.sf.okapi.steps.moses.MergingStep;
 import net.sf.okapi.steps.segmentation.SegmentationStep;
 
 public class Main {
+	private static final Logger logger = LoggerFactory.getLogger(Main.class);
 	
 	protected final static int CMD_EXTRACT = 0;
 	protected final static int CMD_MERGE = 1;
@@ -102,7 +109,7 @@ public class Main {
 	private static final String DEFAULT_SEGRULES = "-";
 	private static final String MSG_ONLYWITHUICOMP = "UI-based commands are available only in the distributions with UI components.";
 
-	private static PrintStream ps;
+	private static ILogHandler logHandler;
 	
 	protected ArrayList<String> inputs;
 	protected String skeleton;
@@ -189,18 +196,33 @@ public class Main {
 	public static void main (String[] originalArgs) {
 		Main prog = new Main();
 	
+		boolean useLogger = false;
 		boolean showTrace = false;
 		try {
-			// Create an encoding-aware output for the console
-			// System.out uses the default system encoding that
-			// may not be the right one (e.g. windows-1252 vs cp850)
-			ps = new PrintStream(System.out, true, getConsoleEncodingName());
 
 			// Remove all empty arguments
 			// This is to work around the "$1" issue in bash
 			ArrayList<String> args = new ArrayList<String>();
 			for ( String tmp : originalArgs ) {
 				if ( tmp.length() > 0 ) args.add(tmp);
+			}
+
+			// Check early so the option does not get 'eaten' by a bad syntax
+			if ( args.contains("-trace") )
+				showTrace = true;
+			if ( args.contains("-logger") )
+				useLogger = true;
+
+			// Create an encoding-aware output for the console
+			// System.out uses the default system encoding that
+			// may not be the right one (e.g. windows-1252 vs cp850)
+			if (!useLogger) {
+				PrintStream ps = new PrintStream(System.out, true, getConsoleEncodingName());
+
+				logHandler = LogHandlerFactory.getLogHandler();
+				logHandler.initialize(ps);
+				if (showTrace)
+					logHandler.setLogLevel(ILogHandler.LogLevel.TRACE);
 			}
 			
 			prog.printBanner();
@@ -219,10 +241,6 @@ public class Main {
 			if ( args.contains("-i") || args.contains("--info")  || args.contains("-info") ) {
 				prog.showInfo();
 				return; // Overrides all arguments 
-			}
-			if ( args.contains("-trace") ) {
-				// Check early so the option does not get 'eaten' by a bad syntax
-				showTrace = true;
 			}
 			
 			for ( int i=0; i<args.size(); i++ ) {
@@ -470,9 +488,8 @@ public class Main {
 						}
 					}
 				}
-				else if ( arg.equals("-trace") ) {
-					// Trace aAlready set. this is just to avoid
-					// seeing -trace as invalid parameter
+				else if ( arg.equals("-trace") || arg.equals("-logger") ) {
+					// Already set. This is just to avoid warnings about invalid parameters
 				}
 				//=== Input file or error
 				else if ( !arg.startsWith("-") ) {
@@ -499,7 +516,7 @@ public class Main {
 			
 			// Check inputs and command
 			if ( prog.command == -1 ) {
-				ps.println("No command specified. Please use one of the command described below:");
+				logger.warn("No command specified. Please use one of the command described below:");
 				prog.printUsage();
 				return;
 			}
@@ -531,7 +548,7 @@ public class Main {
 			// Process all input files
 			for ( int i=0; i<prog.inputs.size(); i++ ) {
 				if ( i > 0 ) {
-					ps.println("------------------------------------------------------------"); //$NON-NLS-1$
+					logger.info("------------------------------------------------------------"); //$NON-NLS-1$
 				}
 				prog.process(prog.inputs.get(i));
 			}
@@ -539,10 +556,10 @@ public class Main {
 		catch ( Throwable e ) {
 			if ( showTrace ) e.printStackTrace();
 			else {
-				ps.println("ERROR: "+e.getMessage());
+				logger.error(e.getMessage());
 				Throwable e2 = e.getCause();
-				if ( e2 != null ) ps.println(e2.getMessage());
-				if ( prog.showTraceHint ) ps.println("You can use the -trace option for more details.");
+				if ( e2 != null ) logger.error(e2.getMessage());
+				if ( prog.showTraceHint ) logger.info("You can use the -trace option for more details.");
 			}
 			System.exit(1); // Error
 		}
@@ -705,13 +722,12 @@ public class Main {
 		// Add the custom configurations
 		fcMapper.updateCustomConfigurations();
 
-		ps.println("List of all filter configurations available:");
+		logger.info("List of all filter configurations available:");
 		Iterator<FilterConfiguration> iter = fcMapper.getAllConfigurations();
 		FilterConfiguration config;
 		while ( iter.hasNext() ) {
 			config = iter.next();
-			ps.println(String.format(" - %s = %s",
-				config.configId, config.description));
+			logger.info(String.format(" - {} = {}", config.configId, config.description));
 		}
 	}
 	
@@ -735,8 +751,7 @@ public class Main {
 		}
 		
 		// Could not guess
-		ps.println(String.format(
-			"ERROR: Could not guess the filter for the configuration '%s'", configId));
+		logger.error("Could not guess the filter for the configuration '{}'", configId);
 		return false;
 	}
 
@@ -863,7 +878,7 @@ public class Main {
 		
 		switch ( command ) {
 		case CMD_TRANSLATE:
-			ps.println("Translation");
+			logger.info("Translation");
 			guessMissingParameters(input);
 			if ( !prepareFilter(configId) ) return; // Next input
 			guessMissingLocales(input);
@@ -874,7 +889,7 @@ public class Main {
 			break;
 			
 		case CMD_SEGMENTATION:
-			ps.println("Segmentation");
+			logger.info("Segmentation");
 			guessMissingParameters(input);
 			if ( !prepareFilter(configId) ) return; // Next input
 			guessMissingLocales(input);
@@ -885,7 +900,7 @@ public class Main {
 			break;
 			
 		case CMD_EXTRACT:
-			ps.println("Extraction");
+			logger.info("Extraction");
 			guessMissingParameters(input);
 			if ( !prepareFilter(configId) ) return; // Next input
 			guessMissingLocales(input);
@@ -896,7 +911,7 @@ public class Main {
 			break;
 			
 		case CMD_EXTRACTTOMOSES:
-			ps.println("Extraction to Moses InlineText");
+			logger.info("Extraction to Moses InlineText");
 			guessMissingParameters(input);
 			if ( !prepareFilter(configId) ) return; // Next input
 			guessMissingLocales(input);
@@ -907,7 +922,7 @@ public class Main {
 			break;
 			
 		case CMD_MERGE:
-			ps.println("Merging");
+			logger.info("Merging");
 			guessMergingArguments(input);
 			guessMissingParameters(skeleton);
 			if ( !prepareFilter(configId) ) return; // Next input
@@ -920,26 +935,25 @@ public class Main {
 			stepMrg.setXliffPath(input);
 			stepMrg.setOutputPath(output);
 			stepMrg.setOutputEncoding(outputEncoding);
-			ps.println("Source language: "+srcLoc);
-			ps.println("Target language: "+trgLoc);
-			ps.println("Default input encoding: "+inputEncoding);
-			ps.println("Output encoding: "+outputEncoding);
-			ps.println("Filter configuration: "+configId);
-			ps.println("XLIFF: "+input);
-			ps.println(String.format("Output: %s", (output==null) ? "<auto-defined>" : output));
+			logger.info("Source language: {}", srcLoc);
+			logger.info("Target language: {}", trgLoc);
+			logger.info("Default input encoding: {}", inputEncoding);
+			logger.info("Output encoding: {}", outputEncoding);
+			logger.info("Filter configuration: {}", configId);
+			logger.info("XLIFF: {}", input);
+			logger.info("Output: {}", (output==null) ? "<auto-defined>" : output);
 
 			stepMrg.handleRawDocument(skelRawDoc);
 			break;
 
 		case CMD_LEVERAGEMOSES:
-			ps.println("Merging Moses InlineText");
+			logger.info("Merging Moses InlineText");
 			guessMissingLocales(input);
 			guessMergingMosesArguments(input);
 			guessMissingParameters(input);
 			if ( !prepareFilter(configId) ) return; // Next input
 			file = new File(input);
 			rd = new RawDocument(file.toURI(), inputEncoding, srcLoc, trgLoc, configId);
-			ps.println( rd.getInputURI() != null ? "Input: "+rd.getInputURI().getPath() : "Input (No path available)");
 
 			leverageFileWithMoses(rd);
 			break;
@@ -949,16 +963,16 @@ public class Main {
 		case CMD_CONV2PEN:
 		case CMD_CONV2TABLE:
 			if ( command == CMD_CONV2PO ) {
-				ps.println("Conversion to PO");
+				logger.info("Conversion to PO");
 			}
 			else if ( command == CMD_CONV2TMX ) {
-				ps.println("Conversion to TMX");
+				logger.info("Conversion to TMX");
 			}
 			else if ( command == CMD_CONV2TABLE ) {
-				ps.println("Conversion to Table");
+				logger.info("Conversion to Table");
 			}
 			else {
-				ps.println("Importing to Pensieve TM");
+				logger.info("Importing to Pensieve TM");
 			}
 			guessMissingParameters(input);
 			if ( !prepareFilter(configId) ) return; // Next input
@@ -982,43 +996,42 @@ public class Main {
 			rd = new RawDocument(file.toURI(), inputEncoding, srcLoc, trgLoc);
 			rd.setFilterConfigId(configId);
 			
-			ps.println("Source language: "+srcLoc);
-			ps.println("Target language: "+trgLoc);
-			ps.println("Default input encoding: "+inputEncoding);
-			ps.println("Filter configuration: "+configId);
-			ps.println("Output: "+output);
-			ps.println( rd.getInputURI() != null ? "Input: "+rd.getInputURI().getPath() : "Input (No path available)");			
+			logger.info("Source language: {}", srcLoc);
+			logger.info("Target language: {}", trgLoc);
+			logger.info("Default input encoding: {}", inputEncoding);
+			logger.info("Filter configuration: {}", configId);
+			logger.info("Output: {}", output);
 
 			convertFile(rd, outputURI);
 			break;
 		}
-		ps.println("Done");
+		logger.info("Done");
 		
 	}
 	
 	private void printBanner () {
-		ps.println("-------------------------------------------------------------------------------"); //$NON-NLS-1$
-		ps.println("Okapi Tikal - Localization Toolset");
+		logger.info("-------------------------------------------------------------------------------"); //$NON-NLS-1$
+		logger.info("Okapi Tikal - Localization Toolset");
 		// The version will show as 'null' until the code is build as a JAR.
-		ps.println(String.format("Version: %s", getClass().getPackage().getImplementationVersion()));
-		ps.println("-------------------------------------------------------------------------------"); //$NON-NLS-1$
+		logger.info("Version: {}", getClass().getPackage().getImplementationVersion());
+		logger.info("-------------------------------------------------------------------------------"); //$NON-NLS-1$
 	}
 
 	private void showInfo () {
 		Runtime rt = Runtime.getRuntime();
 		rt.runFinalization();
 		rt.gc();
-		ps.println("Java version: " + System.getProperty("java.version")); //$NON-NLS-1$
-		ps.println(String.format("Platform: %s, %s, %s",
+		logger.info("Java version: {}", System.getProperty("java.version")); //$NON-NLS-1$
+		logger.info("Platform: {}, {}, {}",
 			System.getProperty("os.name"), //$NON-NLS-1$ 
 			System.getProperty("os.arch"), //$NON-NLS-1$
-			System.getProperty("os.version"))); //$NON-NLS-1$
+			System.getProperty("os.version")); //$NON-NLS-1$
 		NumberFormat nf = NumberFormat.getInstance();
-		ps.println(String.format("Java VM memory: free=%s KB, total=%s KB", //$NON-NLS-1$
+		logger.info("Java VM memory: free={} KB, total={} KB", //$NON-NLS-1$
 			nf.format(rt.freeMemory()/1024),
-			nf.format(rt.totalMemory()/1024)));
-		ps.println(String.format("Tikal display encoding: %s", getConsoleEncodingName()));
-		ps.println("-------------------------------------------------------------------------------"); //$NON-NLS-1$
+			nf.format(rt.totalMemory()/1024));
+		logger.info("Tikal display encoding: {}", getConsoleEncodingName());
+		logger.info("-------------------------------------------------------------------------------"); //$NON-NLS-1$
 	}
 	
 	private String getAppRootDirectory () {
@@ -1040,64 +1053,68 @@ public class Main {
 	}
 	
 	private void printUsage () {
-		ps.println("Shows this screen: -?");
-		ps.println("Shows version and other information: -i or --info");
-		ps.println("Opens the user guide page: -h or --help");
-		ps.println("Lists all available filter configurations: -lfc or --listconf");
-		ps.println("Edits or view filter configurations (UI-dependent command):");
-		ps.println("   -e [[-fc] configId]");
-		ps.println("Extracts a file to XLIFF (and optionally segment and pre-translate):");
-		ps.println("   -x inputFile [inputFile2...] [-fc configId] [-ie encoding] [-sl srcLang]");
-		ps.println("      [-tl trgLang] [-seg [srxFile]] [-tt [hostname[:port]]|-mm [key]");
-		ps.println("      |-pen tmDirectory|-gs configFile|-apertium [configFile]");
-		ps.println("      |-ms configFile|-tda configFile|-gg configFile]");
-		ps.println("      [-maketmx [tmxFile]] [-opt threshold] [-od outputDirectory]");
-		ps.println("      [-rd rootDirectory] [-nocopy] [-noalttrans]");
-		ps.println("Merges an XLIFF document back to its original format:");
-		ps.println("   -m xliffFile [xliffFile2...] [-fc configId] [-ie encoding] [-oe encoding]");
-		ps.println("      [-sd sourceDirectory] [-od outputDirectory]");
-		ps.println("      [-sl srcLang] [-tl trgLang]");
-		ps.println("Translates a file:");
-		ps.println("   -t inputFile [inputFile2...] [-fc configId] [-ie encoding] [-oe encoding]");
-		ps.println("      [-sl srcLang] [-tl trgLang] [-seg [srxFile]] [-tt [hostname[:port]]");
-		ps.println("      |-mm [key]|-pen tmDirectory|-gs configFile|-apertium [configFile]");
-		ps.println("      |-ms configFile|-tda configFile|-gg configFile] [-rd rootDirectory]");
-		ps.println("      [-maketmx [tmxFile]] [-opt threshold]");
-		ps.println("Extracts a file to Moses InlineText:");
-		ps.println("   -xm inputFile [-fc configId] [-ie encoding] [-seg [srxFile]] [-2]");
-		ps.println("      [-sl srcLang] [-tl trgLang] [-to srcOutputFile] [-rd rootDirectory]");
-		ps.println("Leverages a file with Moses InlineText:");
-		ps.println("   -lm inputFile [-fc configId] [-ie encoding] [-oe encoding] [-sl srcLang]");
-		ps.println("      [-tl trgLang] [-seg [srxFile]] [-totrg|-overtrg] [-bpt]");
-		ps.println("      [-from mosesFile] [-to outputFile] [-rd rootDirectory] [-noalttrans]");
-		ps.println("Segments a file:");
-		ps.println("   -s inputFile [-fc configId] [-ie encoding] [-rd rootDirectory]");
-		ps.println("      [-sl srcLang] [-tl trgLang] [-seg [srxFile]]");
-		ps.println("Queries translation resources:");
-		ps.println("   -q \"source text\" [-sl srcLang] [-tl trgLang] [-opentran]");
-		ps.println("      [-tt [hostname[:port]]] [-mm [key]] [-pen tmDirectory] [-gs configFile]");
-		ps.println("      [-apertium [configFile]] [-ms configFile] [-tda configFile]");
-		ps.println("      [-gg configFile] [-opt threshold[:maxhits]]");
-		ps.println("Adds translation to a resources:");
-		ps.println("   -a \"source text\" \"target text\" [rating] [-sl srcLang] [-tl trgLang]");
-		ps.println("      -ms configFile");
-		ps.println("Converts to PO format:");
-		ps.println("   -2po inputFile [inputFile2...] [-fc configId] [-ie encoding] [-all] [-generic]");
-		ps.println("      [-sl srcLang] [-tl trgLang] [-trgsource|-trgempty] [-rd rootDirectory]");
-		ps.println("Converts to TMX format:");
-		ps.println("   -2tmx inputFile [inputFile2...] [-fc configId] [-ie encoding] [-all]");
-		ps.println("      [-sl srcLang] [-tl trgLang] [-trgsource|-trgempty] [-rd rootDirectory]");
-		ps.println("Converts to table format:");
-		ps.println("   -2tbl inputFile [inputFile2...] [-fc configId] [-ie encoding]");
-		ps.println("      [-sl srcLang] [-tl trgLang] [-trgsource|-trgempty] [-csv|-tab]");
-		ps.println("      [-xliff|-xliffgx|-tmx|-generic] [-all] [-rd rootDirectory]");
-		ps.println("Imports to Pensieve TM:");
-		ps.println("   -imp tmDirectory inputFile [inputFile2...] [-fc configId] [-ie encoding]");
-		ps.println("      [-sl srcLang] [-tl trgLang] [-trgsource|-trgempty] [-all] [-over]");
-		ps.println("      [-rd rootDirectory]");
-		ps.println("Exports Pensieve TM as TMX:");
-		ps.println("   -exp tmDirectory1 [tmDirectory2...] [-sl srcLang] [-tl trgLang]");
-		ps.println("      [-trgsource|-trgempty] [-all]");
+		logger.info("Shows this screen: -?");
+		logger.info("Shows version and other information: -i or --info");
+		logger.info("Opens the user guide page: -h or --help");
+		logger.info("Lists all available filter configurations: -lfc or --listconf");
+		logger.info("Global option - output all messages to the current logger instead of the console:");
+		logger.info("   -logger");
+		logger.info("Global option - output debug messages when in console mode (no effect on logger):");
+		logger.info("   -trace");
+		logger.info("Edits or view filter configurations (UI-dependent command):");
+		logger.info("   -e [[-fc] configId]");
+		logger.info("Extracts a file to XLIFF (and optionally segment and pre-translate):");
+		logger.info("   -x inputFile [inputFile2...] [-fc configId] [-ie encoding] [-sl srcLang]");
+		logger.info("      [-tl trgLang] [-seg [srxFile]] [-tt [hostname[:port]]|-mm [key]");
+		logger.info("      |-pen tmDirectory|-gs configFile|-apertium [configFile]");
+		logger.info("      |-ms configFile|-tda configFile|-gg configFile]");
+		logger.info("      [-maketmx [tmxFile]] [-opt threshold] [-od outputDirectory]");
+		logger.info("      [-rd rootDirectory] [-nocopy] [-noalttrans]");
+		logger.info("Merges an XLIFF document back to its original format:");
+		logger.info("   -m xliffFile [xliffFile2...] [-fc configId] [-ie encoding] [-oe encoding]");
+		logger.info("      [-sd sourceDirectory] [-od outputDirectory]");
+		logger.info("      [-sl srcLang] [-tl trgLang]");
+		logger.info("Translates a file:");
+		logger.info("   -t inputFile [inputFile2...] [-fc configId] [-ie encoding] [-oe encoding]");
+		logger.info("      [-sl srcLang] [-tl trgLang] [-seg [srxFile]] [-tt [hostname[:port]]");
+		logger.info("      |-mm [key]|-pen tmDirectory|-gs configFile|-apertium [configFile]");
+		logger.info("      |-ms configFile|-tda configFile|-gg configFile] [-rd rootDirectory]");
+		logger.info("      [-maketmx [tmxFile]] [-opt threshold]");
+		logger.info("Extracts a file to Moses InlineText:");
+		logger.info("   -xm inputFile [-fc configId] [-ie encoding] [-seg [srxFile]] [-2]");
+		logger.info("      [-sl srcLang] [-tl trgLang] [-to srcOutputFile] [-rd rootDirectory]");
+		logger.info("Leverages a file with Moses InlineText:");
+		logger.info("   -lm inputFile [-fc configId] [-ie encoding] [-oe encoding] [-sl srcLang]");
+		logger.info("      [-tl trgLang] [-seg [srxFile]] [-totrg|-overtrg] [-bpt]");
+		logger.info("      [-from mosesFile] [-to outputFile] [-rd rootDirectory] [-noalttrans]");
+		logger.info("Segments a file:");
+		logger.info("   -s inputFile [-fc configId] [-ie encoding] [-rd rootDirectory]");
+		logger.info("      [-sl srcLang] [-tl trgLang] [-seg [srxFile]]");
+		logger.info("Queries translation resources:");
+		logger.info("   -q \"source text\" [-sl srcLang] [-tl trgLang] [-opentran]");
+		logger.info("      [-tt [hostname[:port]]] [-mm [key]] [-pen tmDirectory] [-gs configFile]");
+		logger.info("      [-apertium [configFile]] [-ms configFile] [-tda configFile]");
+		logger.info("      [-gg configFile] [-opt threshold[:maxhits]]");
+		logger.info("Adds translation to a resources:");
+		logger.info("   -a \"source text\" \"target text\" [rating] [-sl srcLang] [-tl trgLang]");
+		logger.info("      -ms configFile");
+		logger.info("Converts to PO format:");
+		logger.info("   -2po inputFile [inputFile2...] [-fc configId] [-ie encoding] [-all] [-generic]");
+		logger.info("      [-sl srcLang] [-tl trgLang] [-trgsource|-trgempty] [-rd rootDirectory]");
+		logger.info("Converts to TMX format:");
+		logger.info("   -2tmx inputFile [inputFile2...] [-fc configId] [-ie encoding] [-all]");
+		logger.info("      [-sl srcLang] [-tl trgLang] [-trgsource|-trgempty] [-rd rootDirectory]");
+		logger.info("Converts to table format:");
+		logger.info("   -2tbl inputFile [inputFile2...] [-fc configId] [-ie encoding]");
+		logger.info("      [-sl srcLang] [-tl trgLang] [-trgsource|-trgempty] [-csv|-tab]");
+		logger.info("      [-xliff|-xliffgx|-tmx|-generic] [-all] [-rd rootDirectory]");
+		logger.info("Imports to Pensieve TM:");
+		logger.info("   -imp tmDirectory inputFile [inputFile2...] [-fc configId] [-ie encoding]");
+		logger.info("      [-sl srcLang] [-tl trgLang] [-trgsource|-trgempty] [-all] [-over]");
+		logger.info("      [-rd rootDirectory]");
+		logger.info("Exports Pensieve TM as TMX:");
+		logger.info("   -exp tmDirectory1 [tmDirectory2...] [-sl srcLang] [-tl trgLang]");
+		logger.info("      [-trgsource|-trgempty] [-all]");
 	}
 
 	private void displayQuery (IQuery conn,
@@ -1117,29 +1134,30 @@ public class Main {
 			count = conn.query(query);
 		}
 
-		ps.println(String.format("\n= From %s (%s->%s)", conn.getName(),
-			conn.getSourceLanguage(), conn.getTargetLanguage()));
+		// tzu: check the new line thing
+		logger.info("\n= From {} ({}->{})", conn.getName(),
+			conn.getSourceLanguage(), conn.getTargetLanguage());
 		if ( isTM ) {
 			ITMQuery tmConn = (ITMQuery)conn;
-			ps.println(String.format("  Threshold=%d, Maximum hits=%d",
-				tmConn.getThreshold(), tmConn.getMaximumHits()));
+			logger.info("  Threshold={}, Maximum hits={}", 
+				tmConn.getThreshold(), tmConn.getMaximumHits());
 		}
 		
 		if ( count > 0 ) {
 			QueryResult qr;
 			while ( conn.hasNext() ) {
 				qr = conn.next();
-				ps.println(String.format("score: %d, origin: '%s'%s",
+				logger.info("score: {}, origin: '{}'{}",
 					qr.getCombinedScore(),
 					(qr.origin==null ? "" : qr.origin),
-					(qr.fromMT() ? " (from MT)" : "")));
-				ps.println(String.format("  Source: \"%s\"", qr.source.toText()));
-				ps.println(String.format("  Target: \"%s\"", qr.target.toText()));
+					(qr.fromMT() ? " (from MT)" : ""));
+				logger.info("  Source: \"{}\"", qr.source.toText());
+				logger.info("  Target: \"{}\"", qr.target.toText());
 			}
 		}
 		else {
-			ps.println(String.format("  Source: \"%s\"", query));
-			ps.println("  <No translation has been found>");
+			logger.info("  Source: \"{}\"", query);
+			logger.info("  <No translation has been found>");
 		}	
 	}
 	
@@ -1158,10 +1176,10 @@ public class Main {
 			conn.open();
 			int res = conn.addTranslation(parseToTextFragment(query), parseToTextFragment(addTransTrans), addTransRating);
 			if ( res == 200 ) {
-				ps.println("Done");
+				logger.info("Done");
 			}
 			else {
-				ps.println(String.format("Error code %d.", res));
+				logger.error("Error code {}.", res);
 			}
 			conn.close();
 		}
@@ -1370,7 +1388,7 @@ public class Main {
 		File f = new File(segRules);
 		segParams.setSourceSrxPath(f.getAbsolutePath());
 		segParams.setTargetSrxPath(f.getAbsolutePath());
-		ps.println("Segmentation: " + f.getAbsolutePath());
+		logger.info("Segmentation: {}", f.getAbsolutePath());
 		return segStep;
 	}
 
@@ -1460,12 +1478,11 @@ public class Main {
 		tmp = pathChangeFolder(outputDir, tmp);
 		driver.addBatchItem(rd, new File(tmp).toURI(), outputEncoding);
 
-		ps.println("Source language: "+srcLoc);
-		ps.println("Target language: "+trgLoc);
-		ps.println("Default input encoding: "+inputEncoding);
-		ps.println("Filter configuration: "+configId);
-		ps.println("Output: "+tmp);
-		ps.println( rd.getInputURI() != null ? "Input: "+rd.getInputURI().getPath() : "Input (No path available)");
+		logger.info("Source language: {}", srcLoc);
+		logger.info("Target language: {}", trgLoc);
+		logger.info("Default input encoding: {}", inputEncoding);
+		logger.info("Filter configuration: {}", configId);
+		logger.info("Output: {}", tmp);
 
 		// Process
 		driver.processBatch();
@@ -1492,13 +1509,12 @@ public class Main {
 
 		output = pathInsertOutBeforeExt(tmp);
 
-		ps.println("Source language: "+srcLoc);
-		ps.println("Target language: "+trgLoc);
-		ps.println("Default input encoding: "+inputEncoding);
-		ps.println("Output encoding: "+outputEncoding);
-		ps.println("Filter configuration: "+configId);
-		ps.println("Output: "+output);
-		ps.println( rd.getInputURI() != null ? "Input: "+rd.getInputURI().getPath() : "Input (No path available)");
+		logger.info("Source language: {}", srcLoc);
+		logger.info("Target language: {}", trgLoc);
+		logger.info("Default input encoding: {}", inputEncoding);
+		logger.info("Output encoding: {}", outputEncoding);
+		logger.info("Filter configuration: {}", configId);
+		logger.info("Output: {}", output);
 		
 		driver.addBatchItem(rd, new File(output).toURI(), outputEncoding);
 
@@ -1567,13 +1583,12 @@ public class Main {
 		}
 		driver.addBatchItem(rd, new File(mosesToPath).toURI(), "UTF-8");
 
-		ps.println("Source language: "+srcLoc);
+		logger.info("Source language: {}", srcLoc);
 		if ( moses2Outputs ) {
-			ps.println("Target language: "+trgLoc);
+			logger.info("Target language: {}", trgLoc);
 		}
-		ps.println("Default input encoding: "+inputEncoding);
-		ps.println("Filter configuration: "+configId);
-		ps.println( rd.getInputURI() != null ? "Input: "+rd.getInputURI().getPath() : "Input (No path available)");
+		logger.info("Default input encoding: {}", inputEncoding);
+		logger.info("Filter configuration: {}", configId);
 
 		// Process
 		driver.processBatch();
@@ -1600,7 +1615,7 @@ public class Main {
 			driver.addStep(addLeveragingStep());
 		}
 		else { // Or indicate that we won't translate
-			ps.println("No valid translation resource has been specified: The text will not be modified.");
+			logger.info("No valid translation resource has been specified: The text will not be modified.");
 		}
 		
 		// Filter events to raw document final step
@@ -1612,13 +1627,12 @@ public class Main {
 
 		output = pathInsertOutBeforeExt(tmp);
 
-		ps.println("Source language: "+srcLoc);
-		ps.println("Target language: "+trgLoc);
-		ps.println("Default input encoding: "+inputEncoding);
-		ps.println("Output encoding: "+outputEncoding);
-		ps.println("Filter configuration: "+configId);
-		ps.println("Output: "+output);
-		ps.println( rd.getInputURI() != null ? "Input: "+rd.getInputURI().getPath() : "Input (No path available)");
+		logger.info("Source language: {}", srcLoc);
+		logger.info("Target language: {}", trgLoc);
+		logger.info("Default input encoding: {}", inputEncoding);
+		logger.info("Output encoding: {}", outputEncoding);
+		logger.info("Filter configuration: {}", configId);
+		logger.info("Output: {}", output);
 
 		driver.addBatchItem(rd, new File(output).toURI(), outputEncoding);
 
