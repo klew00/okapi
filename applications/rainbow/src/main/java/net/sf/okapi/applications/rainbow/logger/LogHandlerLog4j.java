@@ -45,12 +45,15 @@ class LogHandlerLog4j extends AppenderSkeleton implements ILogHandler {
 		switch ( level ) {
 			case LogLevel.DEBUG:
 				this.setThreshold(Level.DEBUG);
+				Logger.getRootLogger().setLevel(Level.DEBUG);
 				break;
 			case LogLevel.TRACE:
 				this.setThreshold(Level.TRACE);
+				Logger.getRootLogger().setLevel(Level.TRACE);
 				break;
 			default:
 				this.setThreshold(Level.INFO);
+				Logger.getRootLogger().setLevel(Level.INFO);
 				break;
 		}
 	}
@@ -81,14 +84,15 @@ class LogHandlerLog4j extends AppenderSkeleton implements ILogHandler {
 		 *    Level.ALL   = Integer.MIN_VALUE;
 		 */
 
-		if ( record.getLevel() == Level.ERROR || record.getLevel() == Level.FATAL ) {
+		Level lev = record.getLevel();
+		if ( lev == Level.ERROR || lev == Level.FATAL ) {
 			log.error(record.getRenderedMessage());
 			ThrowableInformation e = record.getThrowableInformation();
 			if ( e != null ) {
 				log.message(" @ "+e.toString()); //$NON-NLS-1$
 			}
 		}
-		else if ( record.getLevel() == Level.WARN ) {
+		else if ( lev == Level.WARN ) {
 			// Filter out Axis warnings
 			if ( "org.apache.axis.utils.JavaUtils".equals(record.getLoggerName()) ) return;
 			// Otherwise print

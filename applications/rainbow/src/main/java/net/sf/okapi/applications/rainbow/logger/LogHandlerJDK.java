@@ -44,12 +44,15 @@ class LogHandlerJDK extends Handler implements ILogHandler {
 		switch ( level ) {
 			case LogLevel.DEBUG:
 				this.setLevel(Level.FINE);
+				Logger.getLogger("").setLevel(Level.FINE);
 				break;
 			case LogLevel.TRACE:
 				this.setLevel(Level.FINEST);
+				Logger.getLogger("").setLevel(Level.FINEST);
 				break;
 			default:
 				this.setLevel(Level.INFO);
+				Logger.getLogger("").setLevel(Level.INFO);
 				break;
 		}
 	}
@@ -81,15 +84,15 @@ class LogHandlerJDK extends Handler implements ILogHandler {
 		 *    Level.ALL     = Integer.MIN_VALUE;
 		 */
 
-		if ( record.getLevel() == Level.SEVERE ) {
+		Level lev = record.getLevel();
+		if ( lev == Level.SEVERE ) {
 			log.error(record.getMessage());
 			Throwable e = record.getThrown();
 			if ( e != null ) {
-				log.message(e.getMessage());
 				log.message(" @ "+e.toString()); //$NON-NLS-1$
 			}
 		}
-		else if ( record.getLevel() == Level.WARNING ) {
+		else if ( lev == Level.WARNING ) {
 			// Filter out Axis warnings
 			if ( "org.apache.axis.utils.JavaUtils".equals(record.getLoggerName()) ) return;
 			// Otherwise print
