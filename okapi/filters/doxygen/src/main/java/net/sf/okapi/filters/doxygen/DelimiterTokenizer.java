@@ -112,19 +112,4 @@ public class DelimiterTokenizer extends RegexTokenizer implements Iterable<Delim
 			throw new UnsupportedOperationException();
 		}
 	}
-	
-	public static void main(String[] argv)
-	{
-		
-		IdentityHashMap<Pattern, Object> set = new IdentityHashMap<Pattern, Object>();
-		set.put(Pattern.compile("(?=\\d)"), null);
-		set.put(Pattern.compile("(?<=\\d)"), null);
-		
-		DelimiterTokenizer t = new DelimiterTokenizer(set, "fla1foo2bar3baz4flo");
-		
-		for (Token u : t) {
-			System.out.println("Delimiter: " + u.delimiter());
-			System.out.println("Token: " + u.toString() + "\n");
-		}
-	}
 }

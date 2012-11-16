@@ -26,7 +26,9 @@ import static org.junit.Assert.assertTrue;
 
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.IdentityHashMap;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.LocaleId;
@@ -37,6 +39,7 @@ import net.sf.okapi.common.filters.InputDocument;
 import net.sf.okapi.common.filters.RoundTripComparison;
 import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.RawDocument;
+import net.sf.okapi.filters.doxygen.DelimiterTokenizer.Token;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -313,6 +316,64 @@ public class DoxygenFilterTest {
 		filter.open(rawDoc);
 		filter.open(rawDoc);
 		filter.close();
+	}
+	
+	@Test
+	public void testDelimiterTokenizer() {
+		IdentityHashMap<Pattern, Object> set = new IdentityHashMap<Pattern, Object>();
+		set.put(Pattern.compile("(?=\\d)"), null);
+		set.put(Pattern.compile("(?<=\\d)"), null);
+		
+		DelimiterTokenizer t = new DelimiterTokenizer(set, "foo1bar");
+		
+		assertTrue(t.iterator().hasNext());
+		Token u = t.iterator().next();
+		assertEquals(u.delimiter(), null);
+		assertEquals(u.toString(), "foo");
+		u = t.iterator().next();
+		assertEquals(u.delimiter(), "");
+		assertEquals(u.toString(), "1");
+		u= t.iterator().next();
+		assertEquals(u.delimiter(), "");
+		assertEquals(u.toString(), "bar");
+		assertTrue(!t.iterator().hasNext());
+	}
+
+	@Test
+	public void testPrefixSuffixTokenizer() {
+		IdentityHashMap<Pattern, Pattern> set = new IdentityHashMap<Pattern, Pattern>();
+		set.put(Pattern.compile("(?=1)"), Pattern.compile("(?=2)"));
+		set.put(Pattern.compile("(?=2)"), Pattern.compile("(?=4)"));
+		
+		PrefixSuffixTokenizer t = new PrefixSuffixTokenizer(set, "1foo2bar3baz4");
+		
+		assertTrue(t.iterator().hasNext());
+		// 0
+		PrefixSuffixTokenizer.Token u = t.iterator().next();
+		assertEquals(u.prefix(), null);
+		assertEquals(u.toString(), "");
+		assertEquals(u.suffix(), "");
+		// 1
+		u = t.iterator().next();
+		assertEquals(u.prefix(), "");
+		assertEquals(u.toString(), "1foo");
+		assertEquals(u.suffix(), "");
+		// 2
+		u = t.iterator().next();
+		assertEquals(u.prefix(), "");
+		assertEquals(u.toString(), "");
+		assertEquals(u.suffix(), "");
+		// 3
+		u = t.iterator().next();
+		assertEquals(u.prefix(), "");
+		assertEquals(u.toString(), "2bar3baz");
+		assertEquals(u.suffix(), "");
+		// 4
+		u = t.iterator().next();
+		assertEquals(u.prefix(), "");
+		assertEquals(u.toString(), "4");
+		assertEquals(u.suffix(), null);
+		assertTrue(!t.iterator().hasNext());
 	}
 	
 	private ArrayList<Event> getEvents (String snippet) {

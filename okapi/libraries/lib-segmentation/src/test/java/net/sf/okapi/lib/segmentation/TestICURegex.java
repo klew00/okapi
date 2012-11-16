@@ -237,7 +237,7 @@ public class TestICURegex {
 		testBreak("before\u200BAfter", "\\s", "A", "before\u200B", "After");
 		testBreak("before\tAfter", "\\s", "A", "before\t", "After");
 		testBreak("before After", "[\\s\\t]", "A", "before ", "After");
-		testBreak("before\tAfter", "[\\s\\t]", "A", "before\t", "After");
+		testBreak("before\tAfter", "[\\s\\t]", "A", "before\t", "After");		
 		
 		//* \S
 		testBreak("   beforeAfter", "\\S", "A", "   before", "After");
@@ -375,6 +375,11 @@ public class TestICURegex {
 		testBreak("before\bAfter", "e\bA", "f", "before\bA", "fter");
 		
 		// TODO Test combined rules (several meta-characters in the rule)
+		
+		testBreak("Sentence 1. Sentence 2.", "\\.", "\\s|<br/?>", "Sentence 1.", " Sentence 2.");
+		testBreak("Sentence 1.<br>Sentence 2.", "\\.", "\\s|<br/?>", "Sentence 1.", "<br>Sentence 2.");
+		testBreak("Sentence 1.<br/>Sentence 2.", "\\.", "\\s|<br/?>", "Sentence 1.", "<br/>Sentence 2.");
+		
 		// TODO Test back refs with word boundaries used
 	}
 	

@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.Map;
+import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -138,18 +139,18 @@ public abstract class RegexTokenizer {
 		
 		public String toString()
 		{
-			int start = f != null ? f.end : 0;
+			int start = f != null ? f.result.end() : 0;
 			
 			if (start >= s.length()) return "";
 			
-			int end = b != null ? b.start : s.length();
+			int end = b != null ? b.result.start() : s.length();
 			
 			return s.substring(start, end);
 		}
 		
 		public String prefix()
 		{
-			return f != null ? f.group : null;
+			return f != null ? f.result.group() : null;
 		}
 		
 		public Pattern prefixPattern()
@@ -159,7 +160,7 @@ public abstract class RegexTokenizer {
 		
 		public String suffix()
 		{
-			return b != null ? b.group : null;
+			return b != null ? b.result.group() : null;
 		}
 		
 		public Pattern suffixPattern()
@@ -170,16 +171,12 @@ public abstract class RegexTokenizer {
 	
 	public final class MatchRecord
 	{
-		public final int start;
-		public final int end;
-		public final String group;
+		public final MatchResult result;
 		public final Pattern pattern;
 		
 		public MatchRecord(Matcher m)
 		{
-			start = m.start();
-			end = m.end();
-			group = m.group();
+			result = m.toMatchResult();
 			pattern = m.pattern();
 		}
 	}
