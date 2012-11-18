@@ -41,6 +41,8 @@ import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.annotation.GenericAnnotation;
+import net.sf.okapi.common.annotation.GenericAnnotations;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 
 import org.slf4j.Logger;
@@ -84,6 +86,16 @@ public class ITSEngine implements IProcessor, ITraversal {
 
 	private static final String SRC_TRGPTRFLAGNAME = "\u10ff"; // Name of the user-data property that holds the target pointer flag in the source
 	private static final String TRG_TRGPTRFLAGNAME = "\u20ff"; // Name of the user-data property that holds the target pointer flag in the target
+	
+	private static final String LQISSUE = "its-lqi";
+	private static final String LQIISSUESREF = "lqiIssuesRef";
+	private static final String LQITYPE = "lqiType";
+	private static final String LQICOMMENT = "lqiComment";
+	private static final String LQISEVERITY = "lqiSeverity";
+	private static final String LQIPROFILEREF = "lqiProfileRef";
+	private static final String LQIENABLED = "lqiEnabled";
+
+	private static final String PTRPREFIX = "@@"; // If length of PTRPREFIX changes: code needs to be updated
 
 	// Indicator position
 	private static final int      FP_TRANSLATE             = 0;
@@ -116,16 +128,10 @@ public class ITSEngine implements IProcessor, ITraversal {
 	private static final int      FP_ALLOWEDCHARS_DATA     = 10;
 	private static final int      FP_SUBFILTER_DATA        = 11;
 	
-	private static final int      TERMINFOTYPE_POINTER     = 1;
-	private static final int      TERMINFOTYPE_REF         = 2;
-	private static final int      TERMINFOTYPE_REFPOINTER  = 3;
-	
-	private static final int      LOCNOTETYPE_TEXT         = 1;
-	private static final int      LOCNOTETYPE_POINTER      = 2;
-	private static final int      LOCNOTETYPE_REF          = 3;
-	private static final int      LOCNOTETYPE_REFPOINTER   = 4;
-
-	private static final int      ALLOWEDCHARSTYPE_POINTER = 1;
+	private static final int      INFOTYPE_TEXT            = 0;
+	private static final int      INFOTYPE_REF             = 1;
+	private static final int      INFOTYPE_POINTER         = 2;
+	private static final int      INFOTYPE_REFPOINTER      = 3;
 
 	private final boolean isHTML5;
 	
@@ -678,7 +684,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 		}
 		else {
 			rule.info = allowedCharsP;
-			rule.infoType = ALLOWEDCHARSTYPE_POINTER;
+			rule.infoType = INFOTYPE_POINTER;
 		}
 		
 		// Add the rule
@@ -714,27 +720,32 @@ public class ITSEngine implements IProcessor, ITraversal {
 		{
 			throw new ITSException("You must have at least a type or a comment or isses reference ainformation defined.");
 		}
-		rule.map = new HashMap<String, String>();
-
+		rule.annotations = new GenericAnnotations();
+		GenericAnnotation ann = rule.annotations.add(LQISSUE);
+		
 		if ( !Util.isEmpty(np[0]) ) {
 			if ( !Util.isEmpty(issuesRefP) ) {
 				throw new ITSException("Cannot have both locQualityIssuesRef and locQualityIssuesRefPointer.");
 			}
-			rule.map.put("issuesRef", np[0]);
+			rule.info = np[0];
+			rule.infoType = INFOTYPE_REF;
 		}
 		else {
-			rule.map.put("issuesRefPointer", issuesRefP);
+			rule.info = issuesRefP;
+			rule.infoType = INFOTYPE_REFPOINTER;
 		}
+
+		// For the annotation info, we add '@@' in front if it is a pointer
 		
 		if ( !Util.isEmpty(np[1]) ) {
 			if ( !Util.isEmpty(typeP) ) {
 				throw new ITSException("Cannot have both locQualityIssueType and locQualityIssueTypePointer.");
 			}
-			rule.map.put("type", np[1]);
+			ann.setString(LQITYPE, np[1]);
 			// TODO: verify the value?
 		}
 		else {
-			rule.map.put("typePointer", typeP);
+			ann.setString(LQITYPE, PTRPREFIX+typeP);
 		}
 		
 		// Get the comment
@@ -742,10 +753,10 @@ public class ITSEngine implements IProcessor, ITraversal {
 			if ( !Util.isEmpty(commentP) ) {
 				throw new ITSException("Cannot have both locQualityIssueComment and locQualityIssueCommentPointer.");
 			}
-			rule.map.put("comment", np[2]);
+			ann.setString(LQICOMMENT, np[2]);
 		}
 		else {
-			rule.map.put("commentPointer", commentP);
+			ann.setString(LQICOMMENT, PTRPREFIX+commentP);
 		}
 		
 		// Get the optional severity
@@ -756,11 +767,11 @@ public class ITSEngine implements IProcessor, ITraversal {
 			if ( !Util.isEmpty(severityP) ) {
 				throw new ITSException("Cannot have both locQualityIssueSeverity and locQualityIssueSeverityPointer.");
 			}
-			// TODO: verify the value? // 0. to 100.00
-			rule.map.put("severity", np[3]);
+			// Do not convert the float yet, this is done when triggering the rule
+			ann.setString(LQISEVERITY, np[3]);
 		}
 		else {
-			rule.map.put("severityPointer", severityP);
+			ann.setString(LQISEVERITY, PTRPREFIX+severityP);
 		}
 		
 		// Get the optional profile reference
@@ -771,11 +782,10 @@ public class ITSEngine implements IProcessor, ITraversal {
 			if ( !Util.isEmpty(profileRefP) ) {
 				throw new ITSException("Cannot have both locQualityIssueProfileRef and locQualityIssueProfileRefPointer.");
 			}
-			// TODO: verify the value? URI
-			rule.map.put("profileRef", np[4]);
+			ann.setString(LQIPROFILEREF, np[4]);
 		}
 		else {
-			rule.map.put("profileRefPointer", profileRefP);
+			ann.setString(LQIPROFILEREF, PTRPREFIX+profileRefP);
 		}
 
 		// Add the rule
@@ -929,7 +939,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 		String value3 = elem.getAttribute("termInfoRefPointer");
 		
 		if ( value.length() > 0 ) {
-			rule.infoType = TERMINFOTYPE_POINTER;
+			rule.infoType = INFOTYPE_POINTER;
 			rule.info = value;
 			if (( value2.length() > 0 ) || ( value3.length() > 0 )) {
 				throw new ITSException("Too many termInfo attributes specified");
@@ -937,7 +947,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 		}
 		else {
 			if ( value2.length() > 0 ) {
-				rule.infoType = TERMINFOTYPE_REF;
+				rule.infoType = INFOTYPE_REF;
 				rule.info = value2;
 				if ( value3.length() > 0 ) {
 					throw new ITSException("Too many termInfo attributes specified");
@@ -945,7 +955,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 			}
 			else {
 				if ( value3.length() > 0 ) {
-					rule.infoType = TERMINFOTYPE_REFPOINTER;
+					rule.infoType = INFOTYPE_REFPOINTER;
 					rule.info = value3;
 				}
 				// Else: No associate information, rule.termInfo is null
@@ -976,7 +986,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 		String value4 = elem.getAttribute("locNoteRefPointer");
 		
 		if ( value1.length() > 0 ) {
-			rule.infoType = LOCNOTETYPE_TEXT;
+			rule.infoType = INFOTYPE_TEXT;
 			rule.info = value1;
 			if (( value2.length() > 0 ) || ( value3.length() > 0 ) || ( value4.length() > 0 )) {
 				throw new ITSException("Too many locNote attributes specified");
@@ -984,7 +994,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 		}
 		else {
 			if ( value2.length() > 0 ) {
-				rule.infoType = LOCNOTETYPE_POINTER;
+				rule.infoType = INFOTYPE_POINTER;
 				rule.info = value2;
 				if (( value3.length() > 0 ) || ( value4.length() > 0 )) {
 					throw new ITSException("Too many locNote attributes specified");
@@ -992,7 +1002,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 			}
 			else {
 				if ( value3.length() > 0 ) {
-					rule.infoType = LOCNOTETYPE_REF;
+					rule.infoType = INFOTYPE_REF;
 					rule.info = value3;
 					if ( value4.length() > 0 ) {
 						throw new ITSException("Too many locNote attributes specified");
@@ -1000,7 +1010,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 				}
 				else {
 					if ( value4.length() > 0 ) {
-						rule.infoType = LOCNOTETYPE_REFPOINTER;
+						rule.infoType = INFOTYPE_REFPOINTER;
 						rule.info = value4;
 					}
 				}
@@ -1137,13 +1147,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 		}
 		
 		if ( data.charAt(FP_LQISSUE) != '?' ) {
-			String[] values = fromSingleString(getFlagData(data, FP_LQISSUE_DATA));
-			// Do not override if the value is no defined
-			if ( values[0] != null ) trace.peek().lqIssuesRef = values[0];
-			if ( values[1] != null ) trace.peek().lqIssueType = values[1];
-			if ( values[2] != null ) trace.peek().lqIssueComment = values[2];
-			if ( values[3] != null ) trace.peek().lqIssueSeverity = values[3];
-			if ( values[4] != null ) trace.peek().lqIssueProfileRef = values[4];
+			trace.peek().lqIssues = new GenericAnnotations(getFlagData(data, FP_LQISSUE_DATA));
 		}
 
 		if ( data.charAt(FP_STORAGESIZE) != '?' ) {
@@ -1285,13 +1289,13 @@ public class ITSEngine implements IProcessor, ITraversal {
 					else if ( rule.ruleType == IProcessor.DC_TERMINOLOGY ) {
 						setFlag(NL.item(i), FP_TERMINOLOGY, (rule.flag ? 'y' : 'n'), true);
 						switch ( rule.infoType ) {
-						case TERMINFOTYPE_POINTER:
+						case INFOTYPE_POINTER:
 							setFlag(NL.item(i), FP_TERMINOLOGY_DATA, resolvePointer(NL.item(i), rule.info), true);
 							break;
-						case TERMINFOTYPE_REF:
+						case INFOTYPE_REF:
 							setFlag(NL.item(i), FP_TERMINOLOGY_DATA, "REF:"+rule.info, true);
 							break;
-						case TERMINFOTYPE_REFPOINTER:
+						case INFOTYPE_REFPOINTER:
 							setFlag(NL.item(i), FP_TERMINOLOGY_DATA, "REF:"+resolvePointer(NL.item(i), rule.info), true);
 							break;
 						}
@@ -1300,16 +1304,16 @@ public class ITSEngine implements IProcessor, ITraversal {
 					else if ( rule.ruleType == IProcessor.DC_LOCNOTE ) {
 						setFlag(NL.item(i), FP_LOCNOTE, (rule.flag ? 'a' : 'd'), true); // Type alert or description
 						switch ( rule.infoType ) {
-						case LOCNOTETYPE_TEXT:
+						case INFOTYPE_TEXT:
 							setFlag(NL.item(i), FP_LOCNOTE_DATA, rule.info, true);
 							break;
-						case LOCNOTETYPE_POINTER:
+						case INFOTYPE_POINTER:
 							setFlag(NL.item(i), FP_LOCNOTE_DATA, resolvePointer(NL.item(i), rule.info), true);
 							break;
-						case LOCNOTETYPE_REF:
+						case INFOTYPE_REF:
 							setFlag(NL.item(i), FP_LOCNOTE_DATA, "REF:"+rule.info, true);
 							break;
-						case LOCNOTETYPE_REFPOINTER:
+						case INFOTYPE_REFPOINTER:
 							setFlag(NL.item(i), FP_LOCNOTE_DATA, "REF:"+resolvePointer(NL.item(i), rule.info), true);
 							break;
 						}
@@ -1365,42 +1369,61 @@ public class ITSEngine implements IProcessor, ITraversal {
 					}
 						
 					else if ( rule.ruleType == IProcessor.DC_LOCQUALITYISSUE ) {
-						// Get and resolve type
-						// Get and resolve issues reference
-						data1 = rule.map.get("issuesRef");
-						if ( data1 == null ) {
-							data1 = rule.map.get("issuesRefPointer");
-							if ( !Util.isEmpty(data1) ) data1 = resolvePointer(NL.item(i), data1);
+						GenericAnnotations anns = null;
+						data1 = rule.info;
+						if ( data1 != null ) {
+							if ( rule.infoType == INFOTYPE_REFPOINTER) {
+								data1 = resolvePointer(NL.item(i), data1);
+							}
+							// Fetch the stand-off data
+							anns = fetchLocQualityStandoffData(data1);
 						}
-						String data2 = rule.map.get("type");
-						if ( data2 == null ) {
-							data2 = rule.map.get("typePointer");
-							if ( !Util.isEmpty(data2) ) data2 = resolvePointer(NL.item(i), data2);
+						else {
+							// Not a stand-off annotation
+							GenericAnnotation ann = rule.annotations.getAnnotations(LQISSUE).get(0);
+							anns = new GenericAnnotations();
+							GenericAnnotation upd = anns.add(LQISSUE);
+							// Get and resolve 'type'
+							data1 = ann.getString(LQITYPE);
+							if ( data1 != null ) {
+								if ( data1.startsWith(PTRPREFIX) ) {
+									data1 = resolvePointer(NL.item(i), data1.substring(2));
+								}
+								upd.setString(LQITYPE, data1);
+							}
+							// Get and resolve 'comment'
+							data1 = ann.getString(LQICOMMENT);
+							if ( data1 != null ) {
+								if ( data1.startsWith(PTRPREFIX) ) {
+									data1 = resolvePointer(NL.item(i), data1.substring(2));
+								}
+								upd.setString(LQICOMMENT, data1);
+							}
+							// Get and resolve 'severity'
+							data1  = ann.getString(LQISEVERITY);
+							if ( data1 != null ) {
+								if ( data1.startsWith(PTRPREFIX) ) {
+									data1 = resolvePointer(NL.item(i), data1.substring(2));
+								}
+								// Convert the string to the float value
+								upd.setFloat(LQISEVERITY, Float.parseFloat(data1));
+							}
+							// Get and resolve 'profile reference'
+							data1 = ann.getString(LQIPROFILEREF);
+							if ( data1 != null ) {
+								if ( data1.startsWith(PTRPREFIX) ) {
+									data1 = resolvePointer(NL.item(i), data1.substring(2));
+								}
+								upd.setString(LQIPROFILEREF, data1);
+							}
 						}
-						// Get and resolve comment
-						String data3 = rule.map.get("comment");
-						if ( data3 == null ) {
-							data3 = rule.map.get("commentPointer");
-							if ( !Util.isEmpty(data3) ) data3 = resolvePointer(NL.item(i), data3);
-						}
-						// Get and resolve severity
-						String data4 = rule.map.get("severity");
-						if ( data4 == null ) {
-							data4 = rule.map.get("severityPointer");
-							if ( !Util.isEmpty(data4) ) data4 = resolvePointer(NL.item(i), data4);
-						}
-						// Get and resolve profile reference
-						String data5 = rule.map.get("profileRef");
-						if ( data5 == null ) {
-							data5 = rule.map.get("profileRefPointer");
-							if ( !Util.isEmpty(data5) ) data5 = resolvePointer(NL.item(i), data5);
-						}
+						// Decorate the node with the resolved annotation data
 						setFlag(NL.item(i), FP_LQISSUE, 'y', true);
-						setFlag(NL.item(i), FP_LQISSUE_DATA, toSingleString(data1, data2, data3, data4, data5), true);
+						setFlag(NL.item(i), FP_LQISSUE_DATA, anns.toString(), true);
 					}
 
 					else if ( rule.ruleType == IProcessor.DC_ALLOWEDCHARS ) {
-						if ( rule.infoType == ALLOWEDCHARSTYPE_POINTER ) {
+						if ( rule.infoType == INFOTYPE_POINTER ) {
 							data1 = resolvePointer(NL.item(i), rule.info);
 						}
 						else { // Direct expression
@@ -1730,24 +1753,23 @@ public class ITSEngine implements IProcessor, ITraversal {
 					String ns = attr.getOwnerElement().getNamespaceURI();
 					if ( !Util.isEmpty(ns) ) qualified = !ns.equals(ITS_NS_URI);
 					String[] values = retrieveLocQualityIssueData(attr.getOwnerElement(), qualified);
-//TODO: resolve this issue: if override is complete or not					
-//					// Get the previous data (if any)
-//					String oriData = (String)attr.getOwnerElement().getUserData(FLAGNAME);
-//					if ( oriData != null ) {
-//						String[] ori = fromSingleString(getFlagData(oriData, FP_LQISSUE_DATA));
-//						if ( ori.length > 1 ) {
-//							// Use original values if local one is not defined
-//							if ( values[0] == null ) values[0] = ori[0];
-//							if ( values[1] == null ) values[1] = ori[1];
-//							if ( values[2] == null ) values[2] = ori[2];
-//							if ( values[3] == null ) values[3] = ori[3];
-//							if ( values[4] == null ) values[4] = ori[4];
-//						}
-//					}
+					// Convert the values into an annotation
+					GenericAnnotations anns = null;
+					if ( values[0] != null ) { // stand-off reference
+						// Fetch the stand-off data 
+						anns = fetchLocQualityStandoffData(values[0]);
+					}
+					else { // Not an stand-off reference
+						anns = new GenericAnnotations();
+						GenericAnnotation ann = anns.add(LQISSUE);
+						if ( values[1] != null ) ann.setString(LQITYPE, values[1]);
+						if ( values[2] != null ) ann.setString(LQICOMMENT, values[2]);
+						if ( values[3] != null ) ann.setFloat(LQISEVERITY, Float.parseFloat(values[3]));
+						if ( values[4] != null ) ann.setString(LQIPROFILEREF, values[4]);
+					}
 					// Set the updated flags
 					setFlag(attr.getOwnerElement(), FP_LQISSUE, 'y', attr.getSpecified());
-					setFlag(attr.getOwnerElement(), FP_LQISSUE_DATA,
-						toSingleString(values[0], values[1], values[2], values[3], values[4]), attr.getSpecified()); 
+					setFlag(attr.getOwnerElement(), FP_LQISSUE_DATA, anns.toString(), attr.getSpecified()); 
 				}
 			}
 			
@@ -2001,6 +2023,15 @@ public class ITSEngine implements IProcessor, ITraversal {
 		// This because we could have a global pointer that defines a non-native way to get the data
 
 		return data;
+	}
+	
+	private GenericAnnotations fetchLocQualityStandoffData (String ref) {
+		GenericAnnotations anns = new GenericAnnotations();
+		
+		GenericAnnotation ann = anns.add(LQISSUE);
+		ann.setString(LQIISSUESREF, ref); // For information only
+		
+		return anns;
 	}
 	
 	private boolean isVersion2 () throws XPathExpressionException {
@@ -2275,27 +2306,46 @@ public class ITSEngine implements IProcessor, ITraversal {
 
 	@Override
 	public String getLocQualityIssuesRef () {
-		return trace.peek().lqIssuesRef;
+		if ( trace.peek().lqIssues == null ) return null;
+		// We can use 0 for the index as the stand-off reference is always the same for a set
+		return trace.peek().lqIssues.getAnnotations(LQISSUE).get(0).getString(LQIISSUESREF);
+	}
+	
+	@Override
+	public int getLocQualityIssueCount () {
+		GenericAnnotations lqi = trace.peek().lqIssues;
+		if ( lqi == null ) return 0;
+		return lqi.size();
 	}
 
 	@Override
-	public String getLocQualityIssueType () {
-		return trace.peek().lqIssueType;
+	public String getLocQualityIssueType (int index) {
+		if ( trace.peek().lqIssues == null ) return null;
+		return trace.peek().lqIssues.getAnnotations(LQISSUE).get(index).getString(LQITYPE);
 	}
 
 	@Override
-	public String getLocQualityIssueComment () {
-		return trace.peek().lqIssueComment;
+	public String getLocQualityIssueComment (int index) {
+		if ( trace.peek().lqIssues == null ) return null;
+		return trace.peek().lqIssues.getAnnotations(LQISSUE).get(index).getString(LQICOMMENT);
 	}
 
 	@Override
-	public String getLocQualityIssueSeverity () {
-		return trace.peek().lqIssueSeverity;
+	public Float getLocQualityIssueSeverity (int index) {
+		if ( trace.peek().lqIssues == null ) return null;
+		return trace.peek().lqIssues.getAnnotations(LQISSUE).get(index).getFloat(LQISEVERITY);
 	}
 
 	@Override
-	public String getLocQualityIssueProfileRef () {
-		return trace.peek().lqIssueProfileRef;
+	public String getLocQualityIssueProfileRef (int index) {
+		if ( trace.peek().lqIssues == null ) return null;
+		return trace.peek().lqIssues.getAnnotations(LQISSUE).get(index).getString(LQIPROFILEREF);
+	}
+
+	@Override
+	public Boolean getLocQualityIssueEnabled (int index) {
+		if ( trace.peek().lqIssues == null ) return null;
+		return trace.peek().lqIssues.getAnnotations(LQISSUE).get(index).getBoolean(LQIENABLED);
 	}
 
 	@Override

@@ -59,6 +59,15 @@ public class GenericAnnotations extends InlineAnnotation {
 	}
 	
 	/**
+	 * Gets the number of annotations in this annotation set.
+	 * @return the number of annotations in this annotation set.
+	 */
+	public int size () {
+		if ( list == null ) return 0;
+		else return list.size();
+	}
+	
+	/**
 	 * Gets a list of all the annotations of a given type.
 	 * <p>The returned list is a new lits but its items are the same as the items in the original list.
 	 * @param type the type of annotation to look for.

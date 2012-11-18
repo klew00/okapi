@@ -22,6 +22,8 @@ package org.w3c.its;
 
 import java.util.Map;
 
+import net.sf.okapi.common.annotation.GenericAnnotations;
+
 class ITSRule {
 	
 	long ruleType;
@@ -34,6 +36,7 @@ class ITSRule {
 	String idValue;
 	boolean preserveWS;
 	Map<String, String> map;
+	GenericAnnotations annotations;
 
 	public ITSRule (long type) {
 		ruleType = type;

@@ -70,7 +70,7 @@ public class GenericAnnotation {
 		Object obj = map.get(name);
 		if ( obj == null ) return null;
 		if ( !(obj instanceof String) ) {
-			throw new InvalidParameterException(String.format("The field '%s' is not a string."));
+			throw new InvalidParameterException(String.format("The field '%s' is not a string.", name));
 		}
 		return (String)obj;
 	}
@@ -91,7 +91,7 @@ public class GenericAnnotation {
 		Object obj = map.get(name);
 		if ( obj == null ) return null;
 		if ( !(obj instanceof Boolean) ) {
-			throw new InvalidParameterException(String.format("The field '%s' is not a boolean."));
+			throw new InvalidParameterException(String.format("The field '%s' is not a boolean.", name));
 		}
 		return (Boolean)obj;
 	}
@@ -107,7 +107,7 @@ public class GenericAnnotation {
 		Object obj = map.get(name);
 		if ( obj == null ) return null;
 		if ( !(obj instanceof Float) ) {
-			throw new InvalidParameterException(String.format("The field '%s' is not a float."));
+			throw new InvalidParameterException(String.format("The field '%s' is not a float.", name));
 		}
 		return (Float)obj;
 	}
@@ -129,6 +129,7 @@ public class GenericAnnotation {
 			sb.append(PART_SEPARATOR);
 			if ( value instanceof String ) sb.append('s');
 			else if ( value instanceof Boolean ) sb.append('b');
+			else if ( value instanceof Float ) sb.append('f');
 			sb.append(PART_SEPARATOR);
 			sb.append(value); // Value
 		}
@@ -145,6 +146,9 @@ public class GenericAnnotation {
 			}
 			else if ( parts[1].equals("b") ) {
 				setBoolean(parts[0], parts[2].equals("true"));
+			}
+			else if ( parts[1].equals("f") ) {
+				setFloat(parts[0], Float.parseFloat(parts[2]));
 			}
 			else {
 				throw new RuntimeException(String.format("Unknow field type in annotation: '%s'", parts[1]));

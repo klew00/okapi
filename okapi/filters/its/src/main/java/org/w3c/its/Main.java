@@ -268,22 +268,22 @@ public class Main {
 		String out1 = null;
 		if ( dc.equals(DC_TRANSLATE) ) {
 			out1 = (trav.getTranslate(attr) ? "yes" : "no");
-			writer.print(String.format("\tits:translate=\"%s\"", escape(out1)));
+			writer.print(String.format("\ttranslate=\"%s\"", escape(out1)));
 		}
 		else if ( dc.equals(DC_LOCALIZATIONNOTE) ) {
 			out1 = trav.getLocNote(attr);
 			if ( out1 != null ) {
-				writer.print(String.format("\tits:locNote=\"%s\"", escape(out1)));
+				writer.print(String.format("\tlocNote=\"%s\"", escape(out1)));
 				out1 = trav.getLocNoteType(attr);
-				writer.print(String.format("\tits:locNoteType=\"%s\"", escape(out1)));
+				writer.print(String.format("\tlocNoteType=\"%s\"", escape(out1)));
 			}
 		}
 		else if ( dc.equals(DC_TERMINOLOGY) ) {
 			out1 = (trav.getTerm(attr) ? "yes" : "no");
-			if ( out1 != null ) writer.print(String.format("\tits:term=\"%s\"", escape(out1)));
+			if ( out1 != null ) writer.print(String.format("\tterm=\"%s\"", escape(out1)));
 			writer.print("\t");
 			out1 = trav.getTermInfo(attr);
-			if ( out1 != null ) writer.print(String.format("\tits:termInfo=\"%s\"", escape(out1)));
+			if ( out1 != null ) writer.print(String.format("\ttermInfo=\"%s\"", escape(out1)));
 		}
 		else if ( dc.equals(DC_DIRECTIONALITY) ) {
 			int dir = trav.getDirectionality(attr);
@@ -293,12 +293,12 @@ public class Main {
 			case ITraversal.DIR_RLO: out1 = "rlo"; break;
 			case ITraversal.DIR_RTL: out1 = "rtl"; break;
 			}
-			writer.print(String.format("\tits:dir=\"%s\"",
+			writer.print(String.format("\tdir=\"%s\"",
 				escape(out1)));
 		}
 		else if ( dc.equals(DC_LANGUAGEINFORMATION) ) {
 			out1 = trav.getLanguage();
-			if ( out1 != null ) writer.print(String.format("\tits:lang=\"%s\"", escape(out1)));
+			if ( out1 != null ) writer.print(String.format("\tlang=\"%s\"", escape(out1)));
 		}
 		else if ( dc.equals(DC_WITHINTEXT) ) {
 			if ( attr != null ) return;
@@ -308,62 +308,62 @@ public class Main {
 			case ITraversal.WITHINTEXT_NO: out1 = "no"; break;
 			case ITraversal.WITHINTEXT_YES: out1 = "yes"; break;
 			}
-			writer.print(String.format("\tits:withinText=\"%s\"", escape(out1)));
+			writer.print(String.format("\twithinText=\"%s\"", escape(out1)));
 		}
 		else if ( dc.equals(DC_DOMAIN) ) {
 			out1 = trav.getDomains(attr);
-			if ( out1 != null ) writer.print(String.format("\tits:domains=\"%s\"", escape(out1)));
+			if ( out1 != null ) writer.print(String.format("\tdomains=\"%s\"", escape(out1)));
 		}
 		else if ( dc.equals(DC_LOCALEFILTER) ) {
 			out1 = trav.getLocaleFilter();
-			if ( out1 != null ) writer.print(String.format("\tits:localeFilterList=\"%s\"", escape(out1)));
+			if ( out1 != null ) writer.print(String.format("\tlocaleFilterList=\"%s\"", escape(out1)));
 		}
 		else if ( dc.equals(DC_EXTERNALRESOURCE) ) {
 			out1 = trav.getExternalResourceRef(attr);
-			if ( out1 != null ) writer.print(String.format("\tits:externalResource=\"%s\"", escape(out1)));
+			if ( out1 != null ) writer.print(String.format("\texternalResource=\"%s\"", escape(out1)));
 		}
 		else if ( dc.equals(DC_TARGETPOINTER) ) {
 			out1 = trav.getTargetPointer(attr);
-			if ( out1 != null ) writer.print(String.format("\tits:targetPointer=\"%s\"", escape(out1)));
+			if ( out1 != null ) writer.print(String.format("\ttargetPointer=\"%s\"", escape(out1)));
 		}
 		else if ( dc.equals(DC_IDVALUE) ) {
 			out1 = trav.getIdValue(attr);
-			if ( out1 != null ) writer.print(String.format("\tits:idValue=\"%s\"", escape(out1)));
+			if ( out1 != null ) writer.print(String.format("\tidValue=\"%s\"", escape(out1)));
 		}
 		else if ( dc.equals(DC_PRESERVESPACE) ) {
 			out1 = (trav.preserveWS() ? "preserve" : "default");
-			if ( out1 != null ) writer.print(String.format("\tits:preserveSpace=\"%s\"", escape(out1)));
+			if ( out1 != null ) writer.print(String.format("\tpreserveSpace=\"%s\"", escape(out1)));
 		}
 		else if ( dc.equals(DC_LOCQUALITYISSUE) ) {
 			//TODO attributes
 			out1 = trav.getLocQualityIssuesRef();
-			if ( out1 != null ) writer.print(String.format("\tits:locQualityIssuesRef=\"%s\"", escape(out1)));
+			if ( out1 != null ) writer.print(String.format("\tlocQualityIssuesRef=\"%s\"", escape(out1)));
 			writer.print("\t");
-			out1 = trav.getLocQualityIssueType();
-			if ( out1 != null ) writer.print(String.format("\tits:locQualityIssueType=\"%s\"", escape(out1)));
+			out1 = trav.getLocQualityIssueType(0);
+			if ( out1 != null ) writer.print(String.format("\tlocQualityIssueType=\"%s\"", escape(out1)));
 			writer.print("\t");
-			out1 = trav.getLocQualityIssueComment();
-			if ( out1 != null ) writer.print(String.format("\tits:locQualityIssueComment=\"%s\"", escape(out1)));
+			out1 = trav.getLocQualityIssueComment(0);
+			if ( out1 != null ) writer.print(String.format("\tlocQualityIssueComment=\"%s\"", escape(out1)));
 			writer.print("\t");
-			out1 = trav.getLocQualityIssueSeverity();
-			if ( out1 != null ) writer.print(String.format("\tits:locQualityIssueSeverity=\"%s\"", escape(out1)));
+			Float outFloat1 = trav.getLocQualityIssueSeverity(0);
+			if ( outFloat1 != null ) writer.print(String.format("\tlocQualityIssueSeverity=\"%f\"", outFloat1));
 			writer.print("\t");
-			out1 = trav.getLocQualityIssueProfileRef();
-			if ( out1 != null ) writer.print(String.format("\tits:locQualityIssueProfileRef=\"%s\"", escape(out1)));
+			out1 = trav.getLocQualityIssueProfileRef(0);
+			if ( out1 != null ) writer.print(String.format("\tlocQualityIssueProfileRef=\"%s\"", escape(out1)));
 		}
 		else if ( dc.equals(DC_STORAGESIZE) ) {
 			out1 = trav.getStorageSize(attr);
-			if ( out1 != null ) writer.print(String.format("\tits:storageSize=\"%s\"", escape(out1)));
+			if ( out1 != null ) writer.print(String.format("\tstorageSize=\"%s\"", escape(out1)));
 			writer.print("\t");
 			out1 = trav.getStorageEncoding(attr);
-			if ( out1 != null ) writer.print(String.format("\tits:storageEncoding=\"%s\"", escape(out1)));
+			if ( out1 != null ) writer.print(String.format("\tstorageEncoding=\"%s\"", escape(out1)));
 			writer.print("\t");
 			out1 = trav.getLineBreakType(attr);
-			if ( out1 != null ) writer.print(String.format("\tits:lineBreakType=\"%s\"", escape(out1)));
+			if ( out1 != null ) writer.print(String.format("\tlineBreakType=\"%s\"", escape(out1)));
 		}
 		else if ( dc.equals(DC_ALLOWEDCHARACTERS) ) {
 			out1 = trav.getAllowedCharacters(attr);
-			if ( out1 != null ) writer.print(String.format("\tits:allowedCharacters=\"%s\"", escape(out1)));
+			if ( out1 != null ) writer.print(String.format("\tallowedCharacters=\"%s\"", escape(out1)));
 		}
 		
 		writer.print("\n");

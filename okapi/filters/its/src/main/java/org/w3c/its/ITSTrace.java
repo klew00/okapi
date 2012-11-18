@@ -20,6 +20,8 @@
 
 package org.w3c.its;
 
+import net.sf.okapi.common.annotation.GenericAnnotations;
+
 class ITSTrace {
 	
 	boolean isChildDone;
@@ -37,16 +39,13 @@ class ITSTrace {
 	String localeFilter = "*";
 	String idValue;
 	String domains;
-	String lqIssueType;
-	String lqIssueComment;
-	String lqIssueSeverity;
-	String lqIssueProfileRef;
-	String lqIssuesRef;
 	String storageSize;
 	String storageEncoding;
 	String lineBreakType;
 	String allowedChars;
 	String subFilter;
+	String lqIssuesRef;
+	GenericAnnotations lqIssues;
 
 	ITSTrace () {
 		// Default constructor
@@ -89,10 +88,7 @@ class ITSTrace {
 		
 		// localization quality issue:
 		lqIssuesRef = initialTrace.lqIssuesRef;
-		lqIssueType = initialTrace.lqIssueType;
-		lqIssueComment = initialTrace.lqIssueComment;
-		lqIssueSeverity = initialTrace.lqIssueSeverity;
-		lqIssueProfileRef = initialTrace.lqIssueProfileRef;
+		lqIssues = initialTrace.lqIssues;
 		
 		// Allowed chars: Inheritance for child elements but not attributes
 		allowedChars = initialTrace.allowedChars;
