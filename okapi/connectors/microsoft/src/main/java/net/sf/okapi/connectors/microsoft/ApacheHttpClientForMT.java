@@ -46,8 +46,10 @@ public class ApacheHttpClientForMT {
 	private static final boolean USEHTTPCLIENT = true;
 	
 	public static String getAzureAccessToken(String sUral, 
-			String sClientID, String sEcret) {
-		if (USEHTTPCLIENT) {
+		String sClientID,
+		String sEcret)
+	{
+		if ( USEHTTPCLIENT ) {
 			return getExpensiveAzureAccessToken(sUral, sClientID, sEcret);
 		}
 		else {
@@ -55,8 +57,10 @@ public class ApacheHttpClientForMT {
 		}
 	}
 	
-	public static String getExpensiveAzureAccessToken(String sUral, 
-			String sClientID, String sEcret) {
+	public static String getExpensiveAzureAccessToken (String sUral, 
+		String sClientID,
+		String sEcret)
+	{
 		String sResult=null;
 		HttpClient client=null;
 		UrlEncodedFormEntity uefe;

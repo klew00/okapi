@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2009-2012 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -23,10 +23,10 @@ package net.sf.okapi.common.resource;
 import net.sf.okapi.common.annotation.IAnnotation;
 
 /**
- * Base implementation of the annotation used on inline codes. Inline annotations
- * must have a {@link #toString()} and {@link #fromString(String)} methods to
- * write and read themselves to and from a string.
- * This basic annotation has only a string data. Its usage depends of the type 
+ * Base implementation of an annotation that can be used on inline codes.
+ * Inline annotations must have a {@link #toString()} and {@link #fromString(String)} 
+ * methods to write and read themselves to and from a string.
+ * <p>This basic annotation has only a string data. Its usage depends of the type 
  * of the annotation.
  */
 public class InlineAnnotation implements IAnnotation {
