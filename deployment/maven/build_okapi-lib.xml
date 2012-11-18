@@ -467,8 +467,8 @@
 		<copy todir="${distLib}" file="${dep029}/${jar029}"/>
 
 		<!-- This is the logging part -->
-		<property name="depSlf4jApi" value="${mavenStore}/org/slf4j/slf4j-api/1.7.1"/>
-		<fileset id="list.contents" dir="${depSlf4jApi}" includes="**/slf4j-api-1.7.1.jar"/>
+		<property name="depSlf4jApi" value="${mavenStore}/org/slf4j/slf4j-api/1.7.2"/>
+		<fileset id="list.contents" dir="${depSlf4jApi}" includes="**/slf4j-api-1.7.2.jar"/>
 		<property name="jarSlf4jApi" refid="list.contents"/>
 		<echo file="tmpJars" append="yes"> ${jarSlf4jApi}</echo>
 		<copy todir="${distLib}" file="${depSlf4jApi}/${jarSlf4jApi}"/>
@@ -609,8 +609,8 @@
 		      tofile="${distLogger}/${logBindJar}" />
 
 		<!-- slf4j-jdk14-<ver>.jar -->
-		<property name="depSlf4jBind" value="${mavenStore}/org/slf4j/slf4j-jdk14/1.7.1"/>
-		<fileset id="list.contents" dir="${depSlf4jBind}" includes="**/slf4j-jdk14-1.7.1.jar"/>
+		<property name="depSlf4jBind" value="${mavenStore}/org/slf4j/slf4j-jdk14/1.7.2"/>
+		<fileset id="list.contents" dir="${depSlf4jBind}" includes="**/slf4j-jdk14-1.7.2.jar"/>
 		<property name="jarSlf4jBind" refid="list.contents"/>
 		<copy todir="${distLogger}" file="${depSlf4jBind}/${jarSlf4jBind}"/>
 	</target>
@@ -620,7 +620,7 @@
 		<!-- None of these jars should be in tmpJars (to go in classpath) -->
 
 		<!-- slf4j-log4j12-<ver>.jar -->
-		<property name="depSlf4jBind" value="${mavenStore}/org/slf4j/slf4j-log4j12/1.7.1"/>
+		<property name="depSlf4jBind" value="${mavenStore}/org/slf4j/slf4j-log4j12/1.7.2"/>
 		<fileset id="list.contents" dir="${depSlf4jBind}" includes="**/*.jar"/>
 		<property name="jarSlf4jBind" refid="list.contents"/>
 		<copy todir="${distLogger}" file="${depSlf4jBind}/${jarSlf4jBind}"/>

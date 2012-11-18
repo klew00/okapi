@@ -716,6 +716,11 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 				String d = eventBuilder.getCurrentCode().getData();
 				eventBuilder.getCurrentCode().setData("");
 				eventBuilder.getCurrentCode().setOuterData(d);
+				
+				// if this is a standalone tag go ahead and end the code - we are done
+				if (startTag.isSyntacticalEmptyElementTag()) {
+					eventBuilder.endCode();	
+				}
 				break;
 			case INLINE_ELEMENT:
 				// check to see if we are inside a inline run that is excluded 

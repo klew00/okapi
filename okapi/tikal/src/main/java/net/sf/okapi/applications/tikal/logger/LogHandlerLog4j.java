@@ -18,7 +18,9 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.applications.rainbow.logger;
+package net.sf.okapi.applications.tikal.logger;
+
+import java.io.PrintStream;
 
 import org.apache.log4j.AppenderSkeleton;
 import org.apache.log4j.Level;
@@ -26,18 +28,20 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.spi.LoggingEvent;   
 import org.apache.log4j.spi.ThrowableInformation;
 
-import net.sf.okapi.applications.rainbow.lib.ILog;
-
 class LogHandlerLog4j extends AppenderSkeleton implements ILogHandler {
-	private ILog       log;
+	private PrintStream       ps;
 
 	protected LogHandlerLog4j(){}
 
-	public void initialize (ILog log) {
-		if( log == null ) return;
+	public void initialize (PrintStream ps) {
+		if( ps == null ) return;
 
-		this.log = log;
+		this.ps = ps;
 		setThreshold(Level.INFO);
+
+		// Disable root appenders
+		Logger.getRootLogger().removeAllAppenders();
+
 		Logger.getRootLogger().addAppender(this);
 	}
 
@@ -70,7 +74,7 @@ class LogHandlerLog4j extends AppenderSkeleton implements ILogHandler {
 
 	@Override
 	protected void append(LoggingEvent record) {
-		if( log == null ) return;
+		if( ps == null ) return;
 
 		/*
 		 * LOG4J native levels:
@@ -86,19 +90,21 @@ class LogHandlerLog4j extends AppenderSkeleton implements ILogHandler {
 
 		Level lev = record.getLevel();
 		if ( lev == Level.ERROR || lev == Level.FATAL ) {
-			log.error(record.getRenderedMessage());
+			ps.println("Error: " + record.getRenderedMessage());
 			ThrowableInformation e = record.getThrowableInformation();
 			if ( e != null ) {
-				log.message(" @ "+e.toString()); //$NON-NLS-1$
+				ps.println(" @ "+e.toString()); //$NON-NLS-1$
 			}
 		}
 		else if ( lev == Level.WARN ) {
 			// Filter out Axis warnings
 			if ( "org.apache.axis.utils.JavaUtils".equals(record.getLoggerName()) ) return;
 			// Otherwise print
-			log.warning(record.getRenderedMessage());
+			ps.println("Warning: " + record.getRenderedMessage());
 		}
-		else // INFO and below
-			log.message(record.getRenderedMessage());
+		else if ( lev == Level.INFO )
+			ps.println(record.getRenderedMessage());
+		else // below INFO
+			ps.println("Trace: " + record.getRenderedMessage());
 	}
 }

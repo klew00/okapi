@@ -34,6 +34,10 @@ distribution.</p>
 	<li>Fixed issue #278: Added default mapping for the RTF Filter.</li>
 	<li>Changed loading of the filters so all are taken into account on 
 	initialization.</li>
+	<li>Added -logger flag, to output all messages to the current logger instead of the console.
+	Might be pretty noisy, but you have full control by tweaking the logger configuration.</li>
+	<li>Changed the existing -trace flag to also output all debug messages from other components
+	when in console mode (no effect on logger).</li>
 </ul>
 	</li>
 	<li>CheckMate:<ul>
@@ -88,6 +92,11 @@ distribution.</p>
 	<li>HTML Filter:<ul>
 	<li>Fixed issue #276: Code finder is now applied also to extracted text from 
 	attributes.</li>
+</ul>
+	</li>
+	<li>XML Stream Filter:<ul>
+	<li>Fixed issue #290: Incorrect output when configuring empty element with 
+	[INLINE, EXCLUDE]</li>
 </ul>
 	</li>
 	<li>XML Filter:<ul>

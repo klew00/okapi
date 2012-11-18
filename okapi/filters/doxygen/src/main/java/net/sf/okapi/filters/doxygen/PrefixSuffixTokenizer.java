@@ -92,21 +92,4 @@ public class PrefixSuffixTokenizer extends RegexTokenizer implements Iterable<Pr
 			}
 		};
 	}
-	
-	public static void main(String[] argv)
-	{
-		
-		IdentityHashMap<Pattern, Pattern> set = new IdentityHashMap<Pattern, Pattern>();
-		set.put(Pattern.compile("(?=1)"), Pattern.compile("(?=2)"));
-		set.put(Pattern.compile("(?=2)"), Pattern.compile("(?=4)"));
-		
-		PrefixSuffixTokenizer t = new PrefixSuffixTokenizer(set, "1foo2bar3baz4");
-		
-		for (Token u : t) {
-			System.out.println("Prefix: " + u.prefix());
-			System.out.println("Token: " + u.toString());
-			System.out.println("Suffix: " + u.suffix() + "\n");
-		}
-	}
-	
 }
