@@ -276,6 +276,15 @@ public class DoxygenFilterTest {
 			filter.getEncoderManager(), LocaleId.FRENCH);
 		assertEquals(expected, result);
 	}
+	
+	@Test
+	public void testOrphanedEndCommand() {
+		String snippet = " /// Orphaned end command: </summary>";
+		String expected = "Orphaned end command: ";
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		assertNotNull(tu);
+		assertEquals(expected, tu.getSource().getCodedText());
+	}
 
 	
 	@Test
