@@ -313,19 +313,24 @@ public class TraversalTest {
 			+ "<i:locQualityIssueRule selector='//z' locQualityIssuesRefPointer='@ref' />"
 			+ "</i:rules>"
 			+ "<p>Text with <z ref='#id1'>error</z></p>"
-			+ "<i:locQualityIssues id='id1'>"
-			+ "<i:locQualityIssue locQualityComment='comment'/>"
+			+ "<i:locQualityIssues xml:id='id1'>"
+			+ "<i:locQualityIssue locQualityIssueComment='comment1'/>"
+			+ "<i:locQualityIssue locQualityIssueProfileRef='pref2' locQualityIssueSeverity='50' locQualityIssueComment='comment2'/>"
 			+ "</i:locQualityIssues>"
 			+ "</doc>"));
 		Document doc = fact.newDocumentBuilder().parse(is);
 		ITraversal trav = applyITSRules(doc, null, false, null);
 		getElement(trav, "z", 1);
 		assertEquals("#id1", trav.getLocQualityIssuesRef());
-		assertEquals(1, trav.getLocQualityIssueCount());
+		assertEquals(2, trav.getLocQualityIssueCount());
 		assertEquals(null, trav.getLocQualityIssueType(0));
-		assertEquals(null, trav.getLocQualityIssueComment(0));
+		assertEquals(null, trav.getLocQualityIssueType(1));
+		assertEquals("comment1", trav.getLocQualityIssueComment(0));
+		assertEquals("comment2", trav.getLocQualityIssueComment(1));
 		assertEquals(null, trav.getLocQualityIssueSeverity(0));
+		assertEquals(50.0, trav.getLocQualityIssueSeverity(1), 0);
 		assertEquals(null, trav.getLocQualityIssueProfileRef(0));
+		assertEquals("pref2", trav.getLocQualityIssueProfileRef(1));
 	}
 
 	@Test

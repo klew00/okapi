@@ -24,6 +24,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -2026,11 +2027,75 @@ public class ITSEngine implements IProcessor, ITraversal {
 	}
 	
 	private GenericAnnotations fetchLocQualityStandoffData (String ref) {
+		if ( Util.isEmpty(ref) ) {
+			throw new InvalidParameterException("The reference URI cannot be null or empty.");
+		}
+		// Identify the type of reference (internal/external)
+		// and get the element
+		int n = ref.lastIndexOf('#');
+		String id = null;
+		String firstPart = null;
+		if ( n > -1 ) {
+			id = ref.substring(n+1);
+			firstPart = ref.substring(0, n);
+		}
+		else {
+			// No ID
+			//TODO: is this an issue?
+		}
+
+//		// Load the document and the rules
+//		URI uri = new URI(ref);
+//		Document standoffDoc = fact.newDocumentBuilder().parse(uri.toString());
+		
+		Element elem1;
+		try {
+			String tmp = String.format("//%s:%s[@xml:id='%s']",
+				(isHTML5 ? HTML_NS_PREFIX : ITS_NS_PREFIX ),
+				(isHTML5 ? "script" : "locQualityIssues"),
+				id);
+			XPathExpression expr = xpath.compile(tmp);
+			elem1 = (Element)expr.evaluate(doc, XPathConstants.NODE);
+		}
+		catch ( XPathExpressionException e ) {
+			throw new RuntimeException("XPath error.", e);
+		}
+		if ( elem1 == null ) {
+			// Entry not found
+			logger.warn("Cannot find standoff markup for '{}'", ref);
+			GenericAnnotations anns = new GenericAnnotations();
+			GenericAnnotation ann = anns.add(LQISSUE);
+			ann.setString(LQIISSUESREF, ref); // For information only
+			return anns;
+		}
+		
+		// If it's a HTML5 markup, the element will be inside a script
+		if ( isHTML5 ) {
+			//TODO
+		}
+		
+		// Create the new annotation set
 		GenericAnnotations anns = new GenericAnnotations();
-		
-		GenericAnnotation ann = anns.add(LQISSUE);
-		ann.setString(LQIISSUESREF, ref); // For information only
-		
+
+		// Then get the list of items in the element
+		NodeList items = elem1.getElementsByTagNameNS(ITS_NS_URI, "locQualityIssue");
+		for ( int i=0; i<items.getLength(); i++ ) {
+			// For each entry 
+			Element elem2 = (Element)items.item(i);
+			// Add the annotation to the set
+			GenericAnnotation ann = anns.add(LQISSUE);
+			ann.setString(LQIISSUESREF, ref); // For information only
+			// Gather the local information
+			String[] values = retrieveLocQualityIssueData(elem2, false);
+			if ( values[0] != null ) {
+				logger.warn("Cannot have a standoff reference in a standoff element (reference='{}').", ref);
+			}
+			if ( values[1] != null ) ann.setString(LQITYPE, values[1]);
+			if ( values[2] != null ) ann.setString(LQICOMMENT, values[2]);
+			if ( values[3] != null ) ann.setFloat(LQISEVERITY, Float.parseFloat(values[3]));
+			if ( values[4] != null ) ann.setString(LQIPROFILEREF, values[4]);
+		}
+
 		return anns;
 	}
 	
