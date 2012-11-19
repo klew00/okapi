@@ -1,7 +1,6 @@
 package net.sf.okapi.filters.doxygen;
 
 import java.util.HashMap;
-import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -30,7 +29,7 @@ public class DelimiterTokenizer extends RegexTokenizer implements Iterable<Delim
 		
 		if (string != null)
 			for (Entry<Pattern, Object> e : patterns.entrySet())
-				matchers.put(e.getKey().matcher(string), true);
+				matchers.put(e.getKey().matcher(string), null);
 	}
 
 	private MatchRecord getLastMatch()
@@ -55,10 +54,11 @@ public class DelimiterTokenizer extends RegexTokenizer implements Iterable<Delim
 			@Override
 			public boolean hasNext()
 			{
-				return s != null  && s.length() > 0 && (
-						getPrefixMatcher() != null
-						|| getLastMatch() != null
-						|| firstRun);
+				if (s == null || s.length() < 1) return false;
+				
+				if (firstRun) return true;
+				
+				return getPrefixMatcher() != null || getLastMatch() != null;
 			}
 			
 			@Override
