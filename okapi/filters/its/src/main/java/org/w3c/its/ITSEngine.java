@@ -722,7 +722,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 			throw new ITSException("You must have at least a type or a comment or isses reference ainformation defined.");
 		}
 		rule.annotations = new GenericAnnotations();
-		GenericAnnotation ann = rule.annotations.add(LQISSUE);
+		GenericAnnotation ann = addIssueItem(rule.annotations);
 		
 		if ( !Util.isEmpty(np[0]) ) {
 			if ( !Util.isEmpty(issuesRefP) ) {
@@ -787,6 +787,16 @@ public class ITSEngine implements IProcessor, ITraversal {
 		}
 		else {
 			ann.setString(LQIPROFILEREF, PTRPREFIX+profileRefP);
+		}
+
+		// Get the optional enabled
+		String enabledP = null;
+		if ( elem.hasAttribute("locQualityIssueEnabledPointer")) {
+			profileRefP = elem.getAttribute("locQualityIssueEnabledPointer");
+			ann.setString(LQIENABLED, PTRPREFIX+enabledP);
+		}
+		else { // either default or set value
+			ann.setString(LQIENABLED, np[5]);
 		}
 
 		// Add the rule
@@ -1383,7 +1393,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 							// Not a stand-off annotation
 							GenericAnnotation ann = rule.annotations.getAnnotations(LQISSUE).get(0);
 							anns = new GenericAnnotations();
-							GenericAnnotation upd = anns.add(LQISSUE);
+							GenericAnnotation upd = addIssueItem(anns);
 							// Get and resolve 'type'
 							data1 = ann.getString(LQITYPE);
 							if ( data1 != null ) {
@@ -1416,6 +1426,14 @@ public class ITSEngine implements IProcessor, ITraversal {
 									data1 = resolvePointer(NL.item(i), data1.substring(2));
 								}
 								upd.setString(LQIPROFILEREF, data1);
+							}
+							// Get and resolve 'enabled'
+							data1 = ann.getString(LQIENABLED);
+							if ( data1 != null ) {
+								if ( data1.startsWith(PTRPREFIX) ) {
+									data1 = resolvePointer(NL.item(i), data1.substring(2));
+								}
+								upd.setBoolean(LQIENABLED, data1.equals("yes"));
 							}
 						}
 						// Decorate the node with the resolved annotation data
@@ -1465,6 +1483,17 @@ public class ITSEngine implements IProcessor, ITraversal {
 		catch ( XPathExpressionException e ) {
 			throw new RuntimeException(e);
 		}
+	}
+	
+	/**
+	 * Adds an issue annotation to a given set and sets its default values.
+	 * @param anns the set where to add the annotation.
+	 * @return the annotation that has been added.
+	 */
+	private GenericAnnotation addIssueItem (GenericAnnotations anns) {
+		GenericAnnotation ann = anns.add(LQISSUE);
+		ann.setBoolean(LQIENABLED, true); // default
+		return ann;
 	}
 	
 	/**
@@ -1762,11 +1791,12 @@ public class ITSEngine implements IProcessor, ITraversal {
 					}
 					else { // Not an stand-off reference
 						anns = new GenericAnnotations();
-						GenericAnnotation ann = anns.add(LQISSUE);
+						GenericAnnotation ann = addIssueItem(anns);
 						if ( values[1] != null ) ann.setString(LQITYPE, values[1]);
 						if ( values[2] != null ) ann.setString(LQICOMMENT, values[2]);
 						if ( values[3] != null ) ann.setFloat(LQISEVERITY, Float.parseFloat(values[3]));
 						if ( values[4] != null ) ann.setString(LQIPROFILEREF, values[4]);
+						if ( values[5] != null ) ann.setBoolean(LQIENABLED, values[5].equals("yes"));
 					}
 					// Set the updated flags
 					setFlag(attr.getOwnerElement(), FP_LQISSUE, 'y', attr.getSpecified());
@@ -1980,12 +2010,12 @@ public class ITSEngine implements IProcessor, ITraversal {
 	 * Retrieves the non-pointer information of the Localization Quality issue data category.
 	 * @param elem the element where to get the data.
 	 * @param qualified true if the attributes are expected to be qualified.
-	 * @return an array of the value: issues reference, type, comment, severity, profile reference.
+	 * @return an array of the value: issues reference, type, comment, severity, profile reference, enabled.
 	 */
 	private String[] retrieveLocQualityIssueData (Element elem,
 		boolean qualified)
 	{
-		String[] data = new String[5];
+		String[] data = new String[6];
 		
 		if ( qualified ) {
 			if ( elem.hasAttributeNS(ITS_NS_URI, "locQualityIssuesRef") )
@@ -2002,6 +2032,11 @@ public class ITSEngine implements IProcessor, ITraversal {
 			
 			if ( elem.hasAttributeNS(ITS_NS_URI, "locQualityIssueProfileRef") )
 				data[4] = elem.getAttributeNS(ITS_NS_URI, "locQualityIssueProfileRef");
+
+			if ( elem.hasAttributeNS(ITS_NS_URI, "locQualityIssueEnabled") )
+				data[5] = elem.getAttributeNS(ITS_NS_URI, "locQualityIssueEnabled");
+			else
+				data[5] = "yes"; // Default
 		}
 		else {
 			if ( elem.hasAttribute("locQualityIssuesRef") )
@@ -2018,6 +2053,11 @@ public class ITSEngine implements IProcessor, ITraversal {
 			
 			if ( elem.hasAttribute("locQualityIssueProfileRef") )
 				data[4] = elem.getAttribute("locQualityIssueProfileRef");
+
+			if ( elem.hasAttribute("locQualityIssueEnabled") )
+				data[5] = elem.getAttribute("locQualityIssueEnabled");
+			else
+				data[5] = "yes"; // Default
 		}
 
 		// Do not check for complete set of required characters
@@ -2064,7 +2104,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 			// Entry not found
 			logger.warn("Cannot find standoff markup for '{}'", ref);
 			GenericAnnotations anns = new GenericAnnotations();
-			GenericAnnotation ann = anns.add(LQISSUE);
+			GenericAnnotation ann = addIssueItem(anns);
 			ann.setString(LQIISSUESREF, ref); // For information only
 			return anns;
 		}
@@ -2083,7 +2123,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 			// For each entry 
 			Element elem2 = (Element)items.item(i);
 			// Add the annotation to the set
-			GenericAnnotation ann = anns.add(LQISSUE);
+			GenericAnnotation ann = addIssueItem(anns);
 			ann.setString(LQIISSUESREF, ref); // For information only
 			// Gather the local information
 			String[] values = retrieveLocQualityIssueData(elem2, false);
@@ -2094,6 +2134,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 			if ( values[2] != null ) ann.setString(LQICOMMENT, values[2]);
 			if ( values[3] != null ) ann.setFloat(LQISEVERITY, Float.parseFloat(values[3]));
 			if ( values[4] != null ) ann.setString(LQIPROFILEREF, values[4]);
+			if ( values[5] != null ) ann.setBoolean(LQIENABLED, values[5].equals("yes"));
 		}
 
 		return anns;
@@ -2381,6 +2422,10 @@ public class ITSEngine implements IProcessor, ITraversal {
 		GenericAnnotations lqi = trace.peek().lqIssues;
 		if ( lqi == null ) return 0;
 		return lqi.size();
+	}
+	
+	public GenericAnnotations getLocQualityIssues () {
+		return trace.peek().lqIssues;
 	}
 
 	@Override

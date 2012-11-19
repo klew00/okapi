@@ -304,6 +304,7 @@ public class TraversalTest {
 		assertEquals("comment", trav.getLocQualityIssueComment(0));
 		assertEquals(1.0, trav.getLocQualityIssueSeverity(0), 0);
 		assertEquals("uri", trav.getLocQualityIssueProfileRef(0));
+		assertEquals(true, trav.getLocQualityIssueEnabled(0));
 	}
 
 	@Test
@@ -314,7 +315,7 @@ public class TraversalTest {
 			+ "</i:rules>"
 			+ "<p>Text with <z ref='#id1'>error</z></p>"
 			+ "<i:locQualityIssues xml:id='id1'>"
-			+ "<i:locQualityIssue locQualityIssueComment='comment1'/>"
+			+ "<i:locQualityIssue locQualityIssueEnabled='no' locQualityIssueComment='comment1'/>"
 			+ "<i:locQualityIssue locQualityIssueProfileRef='pref2' locQualityIssueSeverity='50' locQualityIssueComment='comment2'/>"
 			+ "</i:locQualityIssues>"
 			+ "</doc>"));
@@ -323,6 +324,7 @@ public class TraversalTest {
 		getElement(trav, "z", 1);
 		assertEquals("#id1", trav.getLocQualityIssuesRef());
 		assertEquals(2, trav.getLocQualityIssueCount());
+		// Values
 		assertEquals(null, trav.getLocQualityIssueType(0));
 		assertEquals(null, trav.getLocQualityIssueType(1));
 		assertEquals("comment1", trav.getLocQualityIssueComment(0));
@@ -331,6 +333,8 @@ public class TraversalTest {
 		assertEquals(50.0, trav.getLocQualityIssueSeverity(1), 0);
 		assertEquals(null, trav.getLocQualityIssueProfileRef(0));
 		assertEquals("pref2", trav.getLocQualityIssueProfileRef(1));
+		assertEquals(false, trav.getLocQualityIssueEnabled(0));
+		assertEquals(true, trav.getLocQualityIssueEnabled(1));
 	}
 
 	@Test
@@ -351,6 +355,7 @@ public class TraversalTest {
 		assertEquals(null, trav.getLocQualityIssueSeverity(0));
 		assertEquals("terminology", trav.getLocQualityIssueType(0));
 		assertEquals("thisUri", trav.getLocQualityIssueProfileRef(0));
+		assertEquals(true, trav.getLocQualityIssueEnabled(0));
 	}
 
 	@Test
