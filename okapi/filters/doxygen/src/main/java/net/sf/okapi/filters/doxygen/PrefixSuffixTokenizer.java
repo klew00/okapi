@@ -1,6 +1,5 @@
 package net.sf.okapi.filters.doxygen;
 
-import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -36,7 +35,7 @@ public class PrefixSuffixTokenizer extends RegexTokenizer implements Iterable<Pr
 		Matcher p = getPrefixMatcher();
 		
 		if (p != null && !firstRun) {
-			Matcher s = (Matcher) matchers.get(p);
+			Matcher s = matchers.get(p);
 			newMatcher = s.find(p.end()) ? s : null;
 		}
 		
@@ -54,11 +53,11 @@ public class PrefixSuffixTokenizer extends RegexTokenizer implements Iterable<Pr
 			@Override
 			public boolean hasNext()
 			{
-				return s != null && s.length() > 0 && (
-						getPrefixMatcher() != null 
-						|| getSuffixMatcher() != null 
-						|| firstRun
-						);
+				if (s == null || s.length() < 1) return false;
+				
+				if (firstRun) return true;
+				
+				return getPrefixMatcher() != null || getSuffixMatcher() != null;
 			}
 			
 			@Override

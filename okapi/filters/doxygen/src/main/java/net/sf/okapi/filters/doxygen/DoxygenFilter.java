@@ -22,6 +22,7 @@ package net.sf.okapi.filters.doxygen;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.util.EmptyStackException;
 import java.util.IdentityHashMap;
 import java.util.Map.Entry;
 import java.util.Stack;
@@ -455,7 +456,7 @@ public class DoxygenFilter extends AbstractFilter {
 				}
 			}
 			
-			Code code = new Code(cmdInfo.getTagType(), cmdInfo.getCanonicalName(), cmd);;
+			Code code = new Code(cmdInfo.getTagType(), cmdInfo.getCanonicalName(), cmd);
 			
 			if (cmdInfo.getTagType() == TagType.CLOSING && !cmdInfo.isInline()) {
 				// Encountered a closing tag.
@@ -464,7 +465,11 @@ public class DoxygenFilter extends AbstractFilter {
 				eventBuilder.endTextUnit();
 				eventBuilder.startTextUnit();
 				
-				commandStack.pop();
+				try {
+					commandStack.pop();
+				} catch (EmptyStackException e) {
+					LOGGER.warn("Orphaned end command: " + cmd);
+				}
 				
 			} else if (cmdInfo.isInline()) {
 				// Append inline (usually placeholder) tag.
@@ -500,6 +505,8 @@ public class DoxygenFilter extends AbstractFilter {
 				parsePlainText(remainingText);
 			}
 		}
+		
+		assert(commandStack.isEmpty());
 	}
 
 	/**

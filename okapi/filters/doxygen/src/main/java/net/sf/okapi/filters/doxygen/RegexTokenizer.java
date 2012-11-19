@@ -14,7 +14,7 @@ public abstract class RegexTokenizer {
 	protected int i = 0;
 	
 	protected boolean firstRun = true;
-	protected IdentityHashMap<Matcher, Object> matchers = new IdentityHashMap<Matcher, Object>();
+	protected IdentityHashMap<Matcher, Matcher> matchers = new IdentityHashMap<Matcher, Matcher>();
 	protected Matcher currentPrefixMatcher = null;
 	
 	private HashMap<Matcher, HashSet<Tuple>> history = new HashMap<Matcher, HashSet<Tuple>>();
@@ -32,7 +32,7 @@ public abstract class RegexTokenizer {
 		
 			int location = s.length();
 			
-			for (Map.Entry<Matcher, Object> e : matchers.entrySet()) {
+			for (Map.Entry<Matcher, Matcher> e : matchers.entrySet()) {
 				Matcher m = e.getKey();
 				if (m.find(i) && m.start() < location) {
 					newMatcher = m;
