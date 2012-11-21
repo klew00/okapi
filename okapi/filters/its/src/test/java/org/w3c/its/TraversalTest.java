@@ -367,11 +367,11 @@ public class TraversalTest {
 		Document doc = fact.newDocumentBuilder().parse(is);
 		ITraversal trav = applyITSRules(doc, null, false, null);
 		getElement(trav, "group", 1);
-		assertEquals("mtconfidence|uri1 terminology|uri2", trav.getToolsRef(null));
+		assertEquals("mtconfidence|uri1 terminology|uri2", trav.getToolsRef());
 		getElement(trav, "p", 1);
-		assertEquals("disambuguation|uriDisamb mtconfidence|uri1 terminology|uri2", trav.getToolsRef(null));
+		assertEquals("disambuguation|uriDisamb mtconfidence|uri1 terminology|uri2", trav.getToolsRef());
 		getElement(trav, "z", 1);
-		assertEquals("disambuguation|uriDisamb mtconfidence|uri1 terminology|uri3", trav.getToolsRef(null));
+		assertEquals("disambuguation|uriDisamb mtconfidence|uri1 terminology|uri3", trav.getToolsRef());
 	}
 	
 	@Test

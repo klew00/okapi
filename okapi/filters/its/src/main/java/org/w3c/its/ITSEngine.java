@@ -26,7 +26,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -2450,11 +2449,6 @@ public class ITSEngine implements IProcessor, ITraversal {
 		return trace.peek().preserveWS;
 	}
 
-	@Override
-	public String getToolsRef () {
-		return trace.peek().toolsRef;
-	}
-	
 	public String getLanguage () {
 		return trace.peek().language;
 	}
@@ -2587,12 +2581,8 @@ public class ITSEngine implements IProcessor, ITraversal {
 		return getFlagData(tmp, FP_SUBFILTER_DATA);
 	}
 
-	public String getToolsRef (Attr attribute) {
-		if ( attribute == null ) return trace.peek().toolsRef;
-		String tmp;
-		if ( (tmp = (String)attribute.getUserData(FLAGNAME)) == null ) return null;
-		if ( tmp.charAt(FP_TOOLSREF) != 'y' ) return null;
-		return getFlagData(tmp, FP_TOOLSREF_DATA);
+	public String getToolsRef () {
+		return trace.peek().toolsRef;
 	}
 	
 	/**

@@ -151,8 +151,6 @@ public interface ITraversal {
 	 */
 	public boolean preserveWS ();
 
-	public String getToolsRef ();
-	
 	/**
 	 * Gets the language for the current element of the traversal.
 	 * @return The language code for the current element. 
@@ -168,12 +166,10 @@ public interface ITraversal {
 	public String getAllowedCharacters (Attr attribute);
 
 	/**
-	 * Gets the tools references associated with the current element of the traversal or
-	 * one of its attributes.
+	 * Gets the tools references associated with the current element of the traversal (and its attributes).
 	 * <p>The returned value is sorted by data category and hold all data categories within scope
 	 * (not just the ones set on the given node).
-	 * @param attribute The attribute to query or null for the element.
 	 * @return the tools references associated with the queried part.
 	 */
-	public String getToolsRef (Attr attribute);
+	public String getToolsRef ();
 }
