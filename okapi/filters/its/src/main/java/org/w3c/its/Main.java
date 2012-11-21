@@ -336,7 +336,7 @@ public class Main {
 		}
 		else if ( dc.equals(DC_LOCQUALITYISSUE) ) {
 			//TODO attributes
-			out1 = trav.getLocQualityIssuesRef();
+			out1 = trav.getLocQualityIssuesRef(attr);
 			if ( out1 != null ) writer.print(String.format("\tlocQualityIssuesRef=\"%s\"", escape(out1)));
 			writer.print("\t");
 			out1 = trav.getLocQualityIssueType(0);

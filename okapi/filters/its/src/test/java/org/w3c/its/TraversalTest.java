@@ -322,7 +322,7 @@ public class TraversalTest {
 		Document doc = fact.newDocumentBuilder().parse(is);
 		ITraversal trav = applyITSRules(doc, null, false, null);
 		getElement(trav, "z", 1);
-		assertEquals("#id1", trav.getLocQualityIssuesRef());
+		assertEquals("#id1", trav.getLocQualityIssuesRef(null));
 		assertEquals(2, trav.getLocQualityIssueCount());
 		// Values
 		assertEquals(null, trav.getLocQualityIssueType(0));
@@ -350,7 +350,7 @@ public class TraversalTest {
 		ITraversal trav = applyITSRules(doc, null, false, null);
 		getElement(trav, "z", 1);
 		// Local markup overrides everything, even undefined data (complete overring rule in ITS)
-		assertEquals(null, trav.getLocQualityIssuesRef());
+		assertEquals(null, trav.getLocQualityIssuesRef(null));
 		assertEquals(null, trav.getLocQualityIssueComment(0));
 		assertEquals(null, trav.getLocQualityIssueSeverity(0));
 		assertEquals("terminology", trav.getLocQualityIssueType(0));
@@ -358,6 +358,22 @@ public class TraversalTest {
 		assertEquals(true, trav.getLocQualityIssueEnabled(0));
 	}
 
+	@Test
+	public void testToolsRef () throws SAXException, IOException, ParserConfigurationException {
+		InputSource is = new InputSource(new StringReader("<doc xmlns:i='"+ITSEngine.ITS_NS_URI+"' i:version='2.0'>"
+			+ "<group i:toolsRef='terminology|uri2 mtconfidence|uri1'>"
+			+ "<p i:toolsRef='disambuguation|uriDisamb'>Text with <z i:toolsRef='terminology|uri3'"
+			+ " i:term='yes'>a term</z></p></group></doc>"));
+		Document doc = fact.newDocumentBuilder().parse(is);
+		ITraversal trav = applyITSRules(doc, null, false, null);
+		getElement(trav, "group", 1);
+		assertEquals("mtconfidence|uri1 terminology|uri2", trav.getToolsRef(null));
+		getElement(trav, "p", 1);
+		assertEquals("disambuguation|uriDisamb mtconfidence|uri1 terminology|uri2", trav.getToolsRef(null));
+		getElement(trav, "z", 1);
+		assertEquals("disambuguation|uriDisamb mtconfidence|uri1 terminology|uri3", trav.getToolsRef(null));
+	}
+	
 	@Test
 	public void testIdValueOnAttribute () throws SAXException, IOException, ParserConfigurationException {
 		InputSource is = new InputSource(new StringReader("<doc xmlns:i='"+ITSEngine.ITS_NS_URI+"' i:version='2.0'>"

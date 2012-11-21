@@ -26,11 +26,13 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
+import java.util.TreeMap;
 
 import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -81,9 +83,9 @@ public class ITSEngine implements IProcessor, ITraversal {
 	
 	// Must have '?' as many times as there are FP_XXX entries +1
 	// Must have +FLAGSEP as many times as there are FP_XXX_DATA entries +1
-	private static final String   FLAGDEFAULTDATA     = "???????????????"
+	private static final String   FLAGDEFAULTDATA     = "????????????????"
 		+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP
-		+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP;
+		+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP;
 
 	private static final String SRC_TRGPTRFLAGNAME = "\u10ff"; // Name of the user-data property that holds the target pointer flag in the source
 	private static final String TRG_TRGPTRFLAGNAME = "\u20ff"; // Name of the user-data property that holds the target pointer flag in the target
@@ -114,6 +116,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 	private static final int      FP_ALLOWEDCHARS          = 12;
 	private static final int      FP_SUBFILTER             = 13;
 	private static final int      FP_TARGETPOINTER         = 14;
+	private static final int      FP_TOOLSREF              = 15;
 	
 	// Data position 
 	private static final int      FP_TERMINOLOGY_DATA      = 0;
@@ -128,6 +131,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 	private static final int      FP_STORAGESIZE_DATA      = 9;
 	private static final int      FP_ALLOWEDCHARS_DATA     = 10;
 	private static final int      FP_SUBFILTER_DATA        = 11;
+	private static final int      FP_TOOLSREF_DATA         = 12;
 	
 	private static final int      INFOTYPE_TEXT            = 0;
 	private static final int      INFOTYPE_REF             = 1;
@@ -1228,6 +1232,39 @@ public class ITSEngine implements IProcessor, ITraversal {
 			trace.peek().subFilter = getFlagData(data, FP_SUBFILTER_DATA);
 		}
 		
+		if ( data.charAt(FP_TOOLSREF) != '?' ) {
+			// Update each data category
+			Map<String, String> oldMap = toolsRefToMap(trace.peek().toolsRef);
+			Map<String, String> newMap = toolsRefToMap(getFlagData(data, FP_TOOLSREF_DATA));
+			oldMap.putAll(newMap); // Add or override if needed
+			trace.peek().toolsRef = mapToToolsRef(oldMap);
+		}
+	}
+	
+	private Map<String, String> toolsRefToMap (String data) {
+		TreeMap<String, String> map = new TreeMap<String, String>();
+		if ( Util.isEmpty(data) ) return map; // Empty map
+		// Else: fill the map
+		String[] list = data.split(" ", 0);
+		for ( String tmp : list ) {
+			int n = tmp.indexOf('|');
+			if ( n == -1 ) {
+				logger.warn("Invalid toolsRef value '{}'", tmp);
+				continue;
+			}
+			map.put(tmp.substring(0, n), tmp.substring(n+1));
+		}
+		return map;
+	}
+	
+	private String mapToToolsRef (Map<String, String> map) {
+		StringBuilder sb = new StringBuilder();
+		
+		for ( String dc : map.keySet() ) {
+			if ( sb.length() > 0 ) sb.append(' ');
+			sb.append(dc+"|"+map.get(dc));
+		}
+		return sb.toString();
 	}
 
 	public void startTraversal () {
@@ -1729,6 +1766,27 @@ public class ITSEngine implements IProcessor, ITraversal {
 				setFlag(attr.getOwnerElement(), FP_PRESERVEWS,
 					("preserve".equals(value) ? 'y' : '?'), attr.getSpecified());
 			}
+			
+			// its:toolsRef always applied
+			if ( isHTML5 ) {
+				expr = xpath.compile("//*/@its-tools-ref");
+			}
+			else {
+				expr = xpath.compile("//*/@"+ITS_NS_PREFIX+":toolsRef");
+			}
+			NL = (NodeList)expr.evaluate(doc, XPathConstants.NODESET);
+			for ( int i=0; i<NL.getLength(); i++ ) {
+				attr = (Attr)NL.item(i);
+				// Validate the value
+				String value = attr.getValue();
+				
+				// Set the flag
+				setFlag(attr.getOwnerElement(), FP_TOOLSREF,
+					(value!=null ? 'y' : '?'), attr.getSpecified());
+				setFlag(attr.getOwnerElement(), FP_TOOLSREF_DATA,
+						value, attr.getSpecified()); 
+			}
+			
 			
 			// locale filter
 			if (( (dataCategories & IProcessor.DC_LOCFILTER) > 0 ) && isVersion2() ) {
@@ -2392,6 +2450,11 @@ public class ITSEngine implements IProcessor, ITraversal {
 		return trace.peek().preserveWS;
 	}
 
+	@Override
+	public String getToolsRef () {
+		return trace.peek().toolsRef;
+	}
+	
 	public String getLanguage () {
 		return trace.peek().language;
 	}
@@ -2411,10 +2474,19 @@ public class ITSEngine implements IProcessor, ITraversal {
 	}
 
 	@Override
-	public String getLocQualityIssuesRef () {
-		if ( trace.peek().lqIssues == null ) return null;
-		// We can use 0 for the index as the stand-off reference is always the same for a set
-		return trace.peek().lqIssues.getAnnotations(LQISSUE).get(0).getString(LQIISSUESREF);
+	public String getLocQualityIssuesRef (Attr attribute) {
+		if ( attribute == null ) {
+			if ( trace.peek().lqIssues == null ) return null;
+			// We can use 0 for the index as the stand-off reference is always the same for a set
+			return trace.peek().lqIssues.getAnnotations(LQISSUE).get(0).getString(LQIISSUESREF);
+		}
+		String tmp;
+		if ( (tmp = (String)attribute.getUserData(FLAGNAME)) == null ) return null;
+		if ( tmp.charAt(FP_LQISSUE) != 'y' ) return null;
+		
+		//return getFlagData(tmp, FP_EXTERNALRES_DATA);
+//TODO
+		return null;
 	}
 	
 	@Override
@@ -2515,6 +2587,14 @@ public class ITSEngine implements IProcessor, ITraversal {
 		return getFlagData(tmp, FP_SUBFILTER_DATA);
 	}
 
+	public String getToolsRef (Attr attribute) {
+		if ( attribute == null ) return trace.peek().toolsRef;
+		String tmp;
+		if ( (tmp = (String)attribute.getUserData(FLAGNAME)) == null ) return null;
+		if ( tmp.charAt(FP_TOOLSREF) != 'y' ) return null;
+		return getFlagData(tmp, FP_TOOLSREF_DATA);
+	}
+	
 	/**
 	 * Prepares the document for using target pointers.
 	 * <p>Because of the way the skeleton is constructed and because target pointer can result in the target

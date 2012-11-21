@@ -46,6 +46,7 @@ class ITSTrace {
 	String subFilter;
 	String lqIssuesRef;
 	GenericAnnotations lqIssues;
+	String toolsRef;
 
 	ITSTrace () {
 		// Default constructor
@@ -97,7 +98,9 @@ class ITSTrace {
 		
 		// sub-filter: No inheritance
 		
-		this.isChildDone = isChildDone;
+		this.isChildDone = isChildDone; // From parameter
+		
+		this.toolsRef = initialTrace.toolsRef;
 	}
 
 }

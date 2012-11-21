@@ -87,7 +87,7 @@ public interface ITraversal {
 	
 	public String getExternalResourceRef (Attr attribute);
 	
-	public String getLocQualityIssuesRef ();
+	public String getLocQualityIssuesRef (Attr attribute);
 	
 	public int getLocQualityIssueCount ();
 	
@@ -125,8 +125,9 @@ public interface ITraversal {
 	public String getTermInfo (Attr attribute);
 	
 	/**
-	 * Gets the localization note of the given attribute of the current element or one of its attributes.
-	 * @param attribute the attribute to query. The attribute must be in the current
+	 * Gets the localization note of the current element of the traversal or
+	 * one of its attributes.
+	 * @param attribute the attribute to query or null for the element.
 	 * @return The localization note of the queried part.
 	 */
 	public String getLocNote (Attr attribute);
@@ -150,6 +151,8 @@ public interface ITraversal {
 	 */
 	public boolean preserveWS ();
 
+	public String getToolsRef ();
+	
 	/**
 	 * Gets the language for the current element of the traversal.
 	 * @return The language code for the current element. 
@@ -163,5 +166,14 @@ public interface ITraversal {
 	public String getLineBreakType (Attr attribute);
 	
 	public String getAllowedCharacters (Attr attribute);
-	
+
+	/**
+	 * Gets the tools references associated with the current element of the traversal or
+	 * one of its attributes.
+	 * <p>The returned value is sorted by data category and hold all data categories within scope
+	 * (not just the ones set on the given node).
+	 * @param attribute The attribute to query or null for the element.
+	 * @return the tools references associated with the queried part.
+	 */
+	public String getToolsRef (Attr attribute);
 }
