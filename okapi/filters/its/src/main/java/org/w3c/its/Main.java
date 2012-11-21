@@ -339,16 +339,16 @@ public class Main {
 			out1 = trav.getLocQualityIssuesRef(attr);
 			if ( out1 != null ) writer.print(String.format("\tlocQualityIssuesRef=\"%s\"", escape(out1)));
 			writer.print("\t");
-			out1 = trav.getLocQualityIssueType(0);
+			out1 = trav.getLocQualityIssueType(attr, 0);
 			if ( out1 != null ) writer.print(String.format("\tlocQualityIssueType=\"%s\"", escape(out1)));
 			writer.print("\t");
-			out1 = trav.getLocQualityIssueComment(0);
+			out1 = trav.getLocQualityIssueComment(attr, 0);
 			if ( out1 != null ) writer.print(String.format("\tlocQualityIssueComment=\"%s\"", escape(out1)));
 			writer.print("\t");
-			Float outFloat1 = trav.getLocQualityIssueSeverity(0);
+			Float outFloat1 = trav.getLocQualityIssueSeverity(attr, 0);
 			if ( outFloat1 != null ) writer.print(String.format("\tlocQualityIssueSeverity=\"%f\"", outFloat1));
 			writer.print("\t");
-			out1 = trav.getLocQualityIssueProfileRef(0);
+			out1 = trav.getLocQualityIssueProfileRef(attr, 0);
 			if ( out1 != null ) writer.print(String.format("\tlocQualityIssueProfileRef=\"%s\"", escape(out1)));
 		}
 		else if ( dc.equals(DC_STORAGESIZE) ) {

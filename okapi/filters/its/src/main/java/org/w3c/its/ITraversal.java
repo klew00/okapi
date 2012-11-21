@@ -89,17 +89,22 @@ public interface ITraversal {
 	
 	public String getLocQualityIssuesRef (Attr attribute);
 	
-	public int getLocQualityIssueCount ();
+	public int getLocQualityIssueCount (Attr attribute);
 	
-	public String getLocQualityIssueType (int index);
+	public String getLocQualityIssueType (Attr attribute,
+		int index);
 	
-	public String getLocQualityIssueComment (int index);
+	public String getLocQualityIssueComment (Attr attribute,
+		int index);
 	
-	public Float getLocQualityIssueSeverity (int index);
+	public Float getLocQualityIssueSeverity (Attr attribute,
+		int index);
 	
-	public String getLocQualityIssueProfileRef (int index);
+	public String getLocQualityIssueProfileRef (Attr attribute,
+		int index);
 	
-	public Boolean getLocQualityIssueEnabled (int index);
+	public Boolean getLocQualityIssueEnabled (Attr attribute,
+		int index);
 	
 	/**
 	 * Gets the element-withinText-related information for the current element.

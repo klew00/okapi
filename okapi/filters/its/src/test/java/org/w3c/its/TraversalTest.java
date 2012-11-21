@@ -300,11 +300,11 @@ public class TraversalTest {
 		Document doc = fact.newDocumentBuilder().parse(is);
 		ITraversal trav = applyITSRules(doc, null, false, null);
 		getElement(trav, "z", 1);
-		assertEquals("other", trav.getLocQualityIssueType(0));
-		assertEquals("comment", trav.getLocQualityIssueComment(0));
-		assertEquals(1.0, trav.getLocQualityIssueSeverity(0), 0);
-		assertEquals("uri", trav.getLocQualityIssueProfileRef(0));
-		assertEquals(true, trav.getLocQualityIssueEnabled(0));
+		assertEquals("other", trav.getLocQualityIssueType(null, 0));
+		assertEquals("comment", trav.getLocQualityIssueComment(null, 0));
+		assertEquals(1.0, trav.getLocQualityIssueSeverity(null, 0), 0);
+		assertEquals("uri", trav.getLocQualityIssueProfileRef(null, 0));
+		assertEquals(true, trav.getLocQualityIssueEnabled(null, 0));
 	}
 
 	@Test
@@ -323,18 +323,18 @@ public class TraversalTest {
 		ITraversal trav = applyITSRules(doc, null, false, null);
 		getElement(trav, "z", 1);
 		assertEquals("#id1", trav.getLocQualityIssuesRef(null));
-		assertEquals(2, trav.getLocQualityIssueCount());
+		assertEquals(2, trav.getLocQualityIssueCount(null));
 		// Values
-		assertEquals(null, trav.getLocQualityIssueType(0));
-		assertEquals(null, trav.getLocQualityIssueType(1));
-		assertEquals("comment1", trav.getLocQualityIssueComment(0));
-		assertEquals("comment2", trav.getLocQualityIssueComment(1));
-		assertEquals(null, trav.getLocQualityIssueSeverity(0));
-		assertEquals(50.0, trav.getLocQualityIssueSeverity(1), 0);
-		assertEquals(null, trav.getLocQualityIssueProfileRef(0));
-		assertEquals("pref2", trav.getLocQualityIssueProfileRef(1));
-		assertEquals(false, trav.getLocQualityIssueEnabled(0));
-		assertEquals(true, trav.getLocQualityIssueEnabled(1));
+		assertEquals(null, trav.getLocQualityIssueType(null, 0));
+		assertEquals(null, trav.getLocQualityIssueType(null, 1));
+		assertEquals("comment1", trav.getLocQualityIssueComment(null, 0));
+		assertEquals("comment2", trav.getLocQualityIssueComment(null, 1));
+		assertEquals(null, trav.getLocQualityIssueSeverity(null, 0));
+		assertEquals(50.0, trav.getLocQualityIssueSeverity(null, 1), 0);
+		assertEquals(null, trav.getLocQualityIssueProfileRef(null, 0));
+		assertEquals("pref2", trav.getLocQualityIssueProfileRef(null, 1));
+		assertEquals(false, trav.getLocQualityIssueEnabled(null, 0));
+		assertEquals(true, trav.getLocQualityIssueEnabled(null, 1));
 	}
 
 	@Test
@@ -349,13 +349,43 @@ public class TraversalTest {
 		Document doc = fact.newDocumentBuilder().parse(is);
 		ITraversal trav = applyITSRules(doc, null, false, null);
 		getElement(trav, "z", 1);
-		// Local markup overrides everything, even undefined data (complete overring rule in ITS)
+		// Local markup overrides everything, even undefined data (complete overriding rule in ITS)
 		assertEquals(null, trav.getLocQualityIssuesRef(null));
-		assertEquals(null, trav.getLocQualityIssueComment(0));
-		assertEquals(null, trav.getLocQualityIssueSeverity(0));
-		assertEquals("terminology", trav.getLocQualityIssueType(0));
-		assertEquals("thisUri", trav.getLocQualityIssueProfileRef(0));
-		assertEquals(true, trav.getLocQualityIssueEnabled(0));
+		assertEquals(null, trav.getLocQualityIssueComment(null, 0));
+		assertEquals(null, trav.getLocQualityIssueSeverity(null, 0));
+		assertEquals("terminology", trav.getLocQualityIssueType(null, 0));
+		assertEquals("thisUri", trav.getLocQualityIssueProfileRef(null, 0));
+		assertEquals(true, trav.getLocQualityIssueEnabled(null, 0));
+	}
+
+	@Test
+	public void testLQIssueOnAttributes () throws SAXException, IOException, ParserConfigurationException {
+		InputSource is = new InputSource(new StringReader("<doc xmlns:i='"+ITSEngine.ITS_NS_URI+"' i:version='2.0'>"
+			+ "<i:rules xmlns:i='"+ITSEngine.ITS_NS_URI+"' version='2.0'>"
+			+ "<i:locQualityIssueRule selector='//p/@abc' locQualityIssuesRef='#id1'/>"
+			+ "</i:rules>"
+			+ "<p abc='some text'>Text</p>"
+			+ "<i:locQualityIssues xml:id='id1'>"
+			+ "<i:locQualityIssue locQualityIssueEnabled='no' locQualityIssueComment='comment1'/>"
+			+ "<i:locQualityIssue locQualityIssueProfileRef='pref2' locQualityIssueSeverity='50' locQualityIssueComment='comment2'/>"
+			+ "</i:locQualityIssues>"
+			+ "</doc>"));
+		Document doc = fact.newDocumentBuilder().parse(is);
+		ITraversal trav = applyITSRules(doc, null, false, null);
+		Element elem = getElement(trav, "p", 1);
+		Attr attr = elem.getAttributeNode("abc");
+		assertEquals("#id1", trav.getLocQualityIssuesRef(attr));
+		assertEquals(2, trav.getLocQualityIssueCount(attr));
+		assertEquals(null, trav.getLocQualityIssueType(attr, 0));
+		assertEquals(null, trav.getLocQualityIssueType(attr, 1));
+		assertEquals("comment1", trav.getLocQualityIssueComment(attr, 0));
+		assertEquals("comment2", trav.getLocQualityIssueComment(attr, 1));
+		assertEquals(null, trav.getLocQualityIssueSeverity(attr, 0));
+		assertEquals(50.0, trav.getLocQualityIssueSeverity(attr, 1), 0);
+		assertEquals(null, trav.getLocQualityIssueProfileRef(attr, 0));
+		assertEquals("pref2", trav.getLocQualityIssueProfileRef(attr, 1));
+		assertEquals(false, trav.getLocQualityIssueEnabled(attr, 0));
+		assertEquals(true, trav.getLocQualityIssueEnabled(attr, 1));
 	}
 
 	@Test
@@ -414,10 +444,10 @@ public class TraversalTest {
 		Document doc = fact.newDocumentBuilder().parse(is);
 		ITraversal trav = applyITSRules(doc, null, false, null);
 		getElement(trav, "z", 1);
-		assertEquals("other", trav.getLocQualityIssueType(0));
-		assertEquals("comment", trav.getLocQualityIssueComment(0));
-		assertEquals(1.0, trav.getLocQualityIssueSeverity(0), 0);
-		assertEquals("uri", trav.getLocQualityIssueProfileRef(0));
+		assertEquals("other", trav.getLocQualityIssueType(null, 0));
+		assertEquals("comment", trav.getLocQualityIssueComment(null, 0));
+		assertEquals(1.0, trav.getLocQualityIssueSeverity(null, 0), 0);
+		assertEquals("uri", trav.getLocQualityIssueProfileRef(null, 0));
 	}
 	
 	@Test
@@ -428,10 +458,10 @@ public class TraversalTest {
 		Document doc = fact.newDocumentBuilder().parse(is);
 		ITraversal trav = applyITSRules(doc, null, false, null);
 		getElement(trav, "i:span", 1);
-		assertEquals("other", trav.getLocQualityIssueType(0));
-		assertEquals("comment", trav.getLocQualityIssueComment(0));
-		assertEquals(1.0, trav.getLocQualityIssueSeverity(0), 0);
-		assertEquals("uri", trav.getLocQualityIssueProfileRef(0));
+		assertEquals("other", trav.getLocQualityIssueType(null, 0));
+		assertEquals("comment", trav.getLocQualityIssueComment(null, 0));
+		assertEquals(1.0, trav.getLocQualityIssueSeverity(null, 0), 0);
+		assertEquals("uri", trav.getLocQualityIssueProfileRef(null, 0));
 	}
 	
 	@Test

@@ -2469,25 +2469,21 @@ public class ITSEngine implements IProcessor, ITraversal {
 
 	@Override
 	public String getLocQualityIssuesRef (Attr attribute) {
-		if ( attribute == null ) {
-			if ( trace.peek().lqIssues == null ) return null;
-			// We can use 0 for the index as the stand-off reference is always the same for a set
-			return trace.peek().lqIssues.getAnnotations(LQISSUE).get(0).getString(LQIISSUESREF);
-		}
-		String tmp;
-		if ( (tmp = (String)attribute.getUserData(FLAGNAME)) == null ) return null;
-		if ( tmp.charAt(FP_LQISSUE) != 'y' ) return null;
-		
-		//return getFlagData(tmp, FP_EXTERNALRES_DATA);
-//TODO
-		return null;
+		return getLQIValue(LQIISSUESREF, attribute, 0);
 	}
 	
 	@Override
-	public int getLocQualityIssueCount () {
-		GenericAnnotations lqi = trace.peek().lqIssues;
-		if ( lqi == null ) return 0;
-		return lqi.size();
+	public int getLocQualityIssueCount (Attr attribute) {
+		if ( attribute == null ) {
+			GenericAnnotations lqi = trace.peek().lqIssues;
+			if ( lqi == null ) return 0;
+			return lqi.size();
+		}
+		String tmp;
+		if ( (tmp = (String)attribute.getUserData(FLAGNAME)) == null ) return 0;
+		if ( tmp.charAt(FP_LQISSUE) != 'y' ) return 0;
+		GenericAnnotations anns = new GenericAnnotations(getFlagData(tmp, FP_LQISSUE_DATA));
+		return anns.getAnnotations(LQISSUE).size();
 	}
 	
 	public GenericAnnotations getLocQualityIssues () {
@@ -2495,33 +2491,69 @@ public class ITSEngine implements IProcessor, ITraversal {
 	}
 
 	@Override
-	public String getLocQualityIssueType (int index) {
-		if ( trace.peek().lqIssues == null ) return null;
-		return trace.peek().lqIssues.getAnnotations(LQISSUE).get(index).getString(LQITYPE);
+	public String getLocQualityIssueType (Attr attribute,
+		int index)
+	{
+		return getLQIValue(LQITYPE, attribute, index);
 	}
 
 	@Override
-	public String getLocQualityIssueComment (int index) {
-		if ( trace.peek().lqIssues == null ) return null;
-		return trace.peek().lqIssues.getAnnotations(LQISSUE).get(index).getString(LQICOMMENT);
+	public String getLocQualityIssueComment (Attr attribute,
+		int index)
+	{
+		return getLQIValue(LQICOMMENT, attribute, index);
 	}
 
 	@Override
-	public Float getLocQualityIssueSeverity (int index) {
-		if ( trace.peek().lqIssues == null ) return null;
-		return trace.peek().lqIssues.getAnnotations(LQISSUE).get(index).getFloat(LQISEVERITY);
+	public Float getLocQualityIssueSeverity (Attr attribute,
+		int index)
+	{
+		if ( attribute == null ) {
+			if ( trace.peek().lqIssues == null ) return null;
+			return trace.peek().lqIssues.getAnnotations(LQISSUE).get(index).getFloat(LQISEVERITY);
+		}
+		String tmp;
+		if ( (tmp = (String)attribute.getUserData(FLAGNAME)) == null ) return null;
+		if ( tmp.charAt(FP_LQISSUE) != 'y' ) return null;
+		GenericAnnotations anns = new GenericAnnotations(getFlagData(tmp, FP_LQISSUE_DATA));
+		return anns.getAnnotations(LQISSUE).get(index).getFloat(LQISEVERITY);
 	}
 
 	@Override
-	public String getLocQualityIssueProfileRef (int index) {
-		if ( trace.peek().lqIssues == null ) return null;
-		return trace.peek().lqIssues.getAnnotations(LQISSUE).get(index).getString(LQIPROFILEREF);
+	public String getLocQualityIssueProfileRef (Attr attribute,
+		int index)
+	{
+		return getLQIValue(LQIPROFILEREF, attribute, index);
 	}
 
 	@Override
-	public Boolean getLocQualityIssueEnabled (int index) {
-		if ( trace.peek().lqIssues == null ) return null;
-		return trace.peek().lqIssues.getAnnotations(LQISSUE).get(index).getBoolean(LQIENABLED);
+	public Boolean getLocQualityIssueEnabled (Attr attribute,
+		int index)
+	{
+		if ( attribute == null ) {
+			if ( trace.peek().lqIssues == null ) return null;
+			return trace.peek().lqIssues.getAnnotations(LQISSUE).get(index).getBoolean(LQIENABLED);
+		}
+		String tmp;
+		if ( (tmp = (String)attribute.getUserData(FLAGNAME)) == null ) return null;
+		if ( tmp.charAt(FP_LQISSUE) != 'y' ) return null;
+		GenericAnnotations anns = new GenericAnnotations(getFlagData(tmp, FP_LQISSUE_DATA));
+		return anns.getAnnotations(LQISSUE).get(index).getBoolean(LQIENABLED);
+	}
+	
+	private String getLQIValue (String fieldName,
+		Attr attribute,
+		int index)
+	{
+		if ( attribute == null ) {
+			if ( trace.peek().lqIssues == null ) return null;
+			return trace.peek().lqIssues.getAnnotations(LQISSUE).get(index).getString(fieldName);
+		}
+		String tmp;
+		if ( (tmp = (String)attribute.getUserData(FLAGNAME)) == null ) return null;
+		if ( tmp.charAt(FP_LQISSUE) != 'y' ) return null;
+		GenericAnnotations anns = new GenericAnnotations(getFlagData(tmp, FP_LQISSUE_DATA));
+		return anns.getAnnotations(LQISSUE).get(index).getString(fieldName);
 	}
 
 	@Override
