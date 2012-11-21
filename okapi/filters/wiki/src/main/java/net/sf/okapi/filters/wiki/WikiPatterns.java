@@ -68,34 +68,34 @@ public class WikiPatterns {
 	public static final String LIST_ITEM_END = "\\s*\\n";
 	public static final Pattern LIST_ITEM_END_PATTERN = Pattern.compile(LIST_ITEM_END);
 	
-	public static final String HTML_START = "(?i)<html[^>]*>";
+	public static final String HTML_START = "(?i)<html\\b[^>]*>";
 	@Block(pair="HTML_END_PATTERN")
 	@Untranslatable
 	public static final Pattern HTML_START_PATTERN = Pattern.compile(HTML_START);
 	public static final String HTML_END = "(?i)</html>";
 	public static final Pattern HTML_END_PATTERN = Pattern.compile(HTML_END);
 	
-	public static final String PHP_START = "(?i)<php[^>]*>";
+	public static final String PHP_START = "(?i)<php\\b[^>]*>";
 	@Block(pair="PHP_END_PATTERN")
 	@Untranslatable
 	public static final Pattern PHP_START_PATTERN = Pattern.compile(PHP_START);
 	public static final String PHP_END = "(?i)</php>";
 	public static final Pattern PHP_END_PATTERN = Pattern.compile(PHP_END);
 	
-	public static final String WRAP_START = "(?i)<wrap[^>]*>";
+	public static final String WRAP_START = "(?i)<wrap\\b[^>]*>";
 	@Block(pair="WRAP_END_PATTERN")
 	public static final Pattern WRAP_START_PATTERN = Pattern.compile(WRAP_START);
 	public static final String WRAP_END = "(?i)</wrap>";
 	public static final Pattern WRAP_END_PATTERN = Pattern.compile(WRAP_END);
 	
-	public static final String CODE_TAG_START = "(?i)<code[^>]*>";
+	public static final String CODE_TAG_START = "(?i)<code\\b[^>]*>";
 	@Block(pair="CODE_TAG_END_PATTERN")
 	@Untranslatable
 	public static final Pattern CODE_TAG_START_PATTERN = Pattern.compile(CODE_TAG_START);
 	public static final String CODE_TAG_END = "(?i)</code>";
 	public static final Pattern CODE_TAG_END_PATTERN = Pattern.compile(CODE_TAG_END);
 	
-	public static final String FILE_START = "(?i)<file[^>]*>";
+	public static final String FILE_START = "(?i)<file\\b[^>]*>";
 	@Block(pair="FILE_END_PATTERN")
 	@Untranslatable
 	public static final Pattern FILE_START_PATTERN = Pattern.compile(FILE_START);
@@ -155,25 +155,25 @@ public class WikiPatterns {
 	public static final Pattern NOWIKI_START_PATTERN = Pattern.compile(NOWIKI);
 	public static final Pattern NOWIKI_END_PATTERN = Pattern.compile(NOWIKI);
 	
-	public static final String NOWIKI_TAG_START = "(?i)<nowiki[^>]*>";
+	public static final String NOWIKI_TAG_START = "(?i)<nowiki\\b[^>]*>";
 	@Inline(pair="NOWIKI_TAG_END_PATTERN")
 	public static final Pattern NOWIKI_TAG_START_PATTERN = Pattern.compile(NOWIKI_TAG_START);
 	public static final String NOWIKI_TAG_END = "(?i)</nowiki>";
 	public static final Pattern NOWIKI_TAG_END_PATTERN = Pattern.compile(NOWIKI_TAG_END);
 	
-	public static final String SUP_START = "(?i)<sup[^>]*>";
+	public static final String SUP_START = "(?i)<sup\\b[^>]*>";
 	@Inline(pair="SUP_END_PATTERN")
 	public static final Pattern SUP_START_PATTERN = Pattern.compile(SUP_START);
 	public static final String SUP_END = "(?i)</sup>";
 	public static final Pattern SUP_END_PATTERN = Pattern.compile(SUP_END);
 	
-	public static final String SUB_START = "(?i)<sub[^>]*>";
+	public static final String SUB_START = "(?i)<sub\\b[^>]*>";
 	@Inline(pair="SUB_END_PATTERN")
 	public static final Pattern SUB_START_PATTERN = Pattern.compile(SUB_START);
 	public static final String SUB_END = "(?i)</sub>";
 	public static final Pattern SUB_END_PATTERN = Pattern.compile(SUB_END);
 	
-	public static final String DEL_START = "(?i)<del[^>]*>";
+	public static final String DEL_START = "(?i)<del\\b[^>]*>";
 	@Inline(pair="DEL_END_PATTERN")
 	public static final Pattern DEL_START_PATTERN = Pattern.compile(DEL_START);
 	public static final String DEL_END = "(?i)</del>";

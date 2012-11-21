@@ -121,6 +121,22 @@ public class WikiFilterTest {
 	}
 	
 	@Test
+	public void testSimilarHtmlTags() {
+		// Actual tag here makes markup malformed, cuts off TU.
+		String snippet = "This is <file> a test.";
+		ArrayList<Event> events = getEvents(snippet);
+		ITextUnit tu1 = FilterTestDriver.getTextUnit(events, 1);
+		assertNotNull(tu1);
+		assertEquals("This is", tu1.getSource().toString());
+		// Slightly different tag should not be interpreted as markup.
+		snippet = "This is <files> a test.";
+		events = getEvents(snippet);
+		tu1 = FilterTestDriver.getTextUnit(events, 1);
+		assertNotNull(tu1);
+		assertEquals("This is <files> a test.", tu1.getSource().toString());
+	}
+	
+	@Test
 	public void testDoubleExtraction() throws URISyntaxException {
 		ArrayList<InputDocument> list = new ArrayList<InputDocument>();
 		list.add(new InputDocument(root+"dokuwiki.txt", null));		

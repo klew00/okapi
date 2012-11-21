@@ -137,6 +137,7 @@ public class MSBatchTranslationStep extends BasePipelineStep {
 		net.sf.okapi.connectors.microsoft.Parameters prm = (net.sf.okapi.connectors.microsoft.Parameters)conn.getParameters();
 		prm.setClientId(params.getClientId());
 		prm.setSecret(params.getSecret());
+		prm.setCategory(params.getCategory());
 		conn.setLanguages(sourceLocale, targetLocale);
 		conn.setMaximumHits(params.getMaxMatches());
 		conn.setThreshold(params.getThreshold());
