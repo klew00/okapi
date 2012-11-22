@@ -545,6 +545,15 @@ public class PipelineWrapper {
 			availableSteps.put(step.stepClass, step);
 			
 			ps = (IPipelineStep)Class.forName(
+					"net.sf.okapi.steps.enrycher.EnrycherStep").newInstance();
+				step = new StepInfo(ps.getName(), ps.getDescription(), ps.getClass().getName(), null, null);
+				params = ps.getParameters();
+				if ( params != null ) {
+					step.paramsData = params.toString();
+				}
+				availableSteps.put(step.stepClass, step);
+			
+			ps = (IPipelineStep)Class.forName(
 				"net.sf.okapi.steps.rtfconversion.RTFConversionStep").newInstance();
 			params = ps.getParameters();
 			step = new StepInfo(ps.getName(), ps.getDescription(), ps.getClass().getName(), null,

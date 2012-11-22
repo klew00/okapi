@@ -14,6 +14,11 @@
             <groupId>net.sf.okapi</groupId>
             <artifactId>okapi-core</artifactId>
             <version>${project.version}</version>
-        </dependency>        
+        </dependency>
+        <dependency>
+			<groupId>net.htmlparser.jericho</groupId>
+			<artifactId>jericho-html</artifactId>
+			<version>3.2</version>
+		</dependency>        
     </dependencies>
 </project>

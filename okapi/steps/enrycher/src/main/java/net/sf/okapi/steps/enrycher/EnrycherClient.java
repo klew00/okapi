@@ -75,7 +75,7 @@ public class EnrycherClient {
 			StringBuilder sb = new StringBuilder();
 			String line;
 			while ((line = rd.readLine()) != null) {
-				sb.append(line);
+				sb.append(line + "\n");
 			}
 		    wr.close();
 		    rd.close();
@@ -96,6 +96,5 @@ public class EnrycherClient {
 				// Skip this one
 			}			
 		}
-	}
-	
+	}	
 }
