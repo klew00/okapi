@@ -6,6 +6,7 @@ import java.util.regex.Pattern;
 public class DoxygenPatterns {
 	
 	public static final IdentityHashMap<Pattern, Pattern> tokenizerDelimiters;
+	public static final IdentityHashMap<Pattern, Pattern> chunkDelimiters;
 	
 	/**
 	 * Matches blank lines that separate paragraphs.
@@ -115,18 +116,31 @@ public class DoxygenPatterns {
 	public static final Pattern DOXYGEN_COMMAND_PATTERN = Pattern.compile(DOXYGEN_COMMAND);
 	
 	/**
-	 * Matches list delimiters and "here-comments".
+	 * Matches member comments.
+	 * Ex:
+	 * <pre>
+	 * 		bool mybool; ///< Paragraph 4
+	 * </pre>
+	 */
+	public static final String MEMBER_COMMENT_PREFIX = "^<\\s+";
+	public static final Pattern MEMBER_COMMENT_PREFIX_PATTERN = Pattern.compile(MEMBER_COMMENT_PREFIX, Pattern.MULTILINE);
+	public static final Pattern MEMBER_COMMENT_SUFFIX_PATTERN = Pattern.compile(CPP_COMMENT_SUFFIX);
+	
+	/**
+	 * Matches list delimiters.
 	 * Ex:
 	 * <pre>
 	 * 		/// Paragraph 1
 	 * 		/// - Paragraph 2
 	 * 		///  -# Paragraph 3
-	 * 		bool mybool; ///< Paragraph 4
+	 * 		///  2. Paragraph 4
 	 * </pre>
 	 */
-	public static final String DOXYGEN_CHUNK = "^(?:<\\s+|\\s*-#?\\s*)";
-	public static final Pattern DOXYGEN_CHUNK_PATTERN = Pattern.compile(DOXYGEN_CHUNK, Pattern.MULTILINE);
+	public static final String LIST_ITEM_PREFIX = "^(?:\\s*(?:[-+*]#?|\\d+\\.)\\s*|\\s*\\.\\s*$)";
+	public static final Pattern LIST_ITEM_PREFIX_PATTERN = Pattern.compile(LIST_ITEM_PREFIX, Pattern.MULTILINE);
 
+	public static final String LIST_ITEM_SUFFIX = "^(?:\\s*(?:[-+*]#?|\\d+\\.)\\s*|\\s*\\.\\s*$)";
+	public static final Pattern LIST_ITEM_SUFFIX_PATTERN = Pattern.compile(LIST_ITEM_SUFFIX, Pattern.MULTILINE);
 	
 	static
 	{
@@ -140,5 +154,9 @@ public class DoxygenPatterns {
 		tokenizerDelimiters.put(DOUBLE_QUOTE_STRING_PREFIX_PATTERN, DOUBLE_QUOTE_STRING_SUFFIX_PATTERN);
 		tokenizerDelimiters.put(CPP_EXCLUDE_COMMENT_PREFIX_PATTERN, CPP_EXCLUDE_COMMENT_SUFFIX_PATTERN);
 		tokenizerDelimiters.put(JAVADOC_EXCLUDE_COMMENT_PREFIX_PATTERN, JAVADOC_EXCLUDE_COMMENT_SUFFIX_PATTERN);
+	
+		chunkDelimiters = new IdentityHashMap<Pattern, Pattern>();
+		chunkDelimiters.put(MEMBER_COMMENT_PREFIX_PATTERN, MEMBER_COMMENT_SUFFIX_PATTERN);
+		chunkDelimiters.put(LIST_ITEM_PREFIX_PATTERN,LIST_ITEM_SUFFIX_PATTERN);
 	}
 }

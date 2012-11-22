@@ -90,7 +90,7 @@ public class DoxygenFilterTest {
 	
 	@Test
 	public void testOneLiner() {
-		String snippet = "int foo; ///< This is a test. \nint bar; ///< New paragraph.";
+		String snippet = "int foo; ///< This is a test. \n/// New paragraph.";
 		ArrayList<Event> events = getEvents(snippet);
 		ITextUnit tu1 = FilterTestDriver.getTextUnit(events, 1);
 		assertNotNull(tu1);
@@ -315,6 +315,14 @@ public class DoxygenFilterTest {
 	public void testDoubleExtractionSpecialCommands() throws URISyntaxException {
 		ArrayList<InputDocument> list = new ArrayList<InputDocument>();
 		list.add(new InputDocument(root+"special_commands.h", null));		
+		RoundTripComparison rtc = new RoundTripComparison(false);
+		assertTrue(rtc.executeCompare(filter, list, "utf-8", LocaleId.ENGLISH, LocaleId.ENGLISH));
+	}
+	
+	@Test
+	public void testDoubleExtractionLists() throws URISyntaxException {
+		ArrayList<InputDocument> list = new ArrayList<InputDocument>();
+		list.add(new InputDocument(root+"lists.h", null));		
 		RoundTripComparison rtc = new RoundTripComparison(false);
 		assertTrue(rtc.executeCompare(filter, list, "utf-8", LocaleId.ENGLISH, LocaleId.ENGLISH));
 	}
