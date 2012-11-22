@@ -36,14 +36,14 @@ public class ITSTest_TestSuite {
 	public static final String HTML = "html";
 	
 	private String root = TestUtil.getParentDir(this.getClass(), "/input.xml") + "/its2.0/inputdata";
-	//private FileCompare fc = new FileCompare();
+	private FileCompare fc = new FileCompare();
 	
 
 	@Test
 	public void process () throws URISyntaxException {
 		
 		processBatches(root+"/translate", Main.DC_TRANSLATE);
-		processBatches(root+"/localizationnote", Main.DC_LOCALIZATIONNOTE);
+		/*processBatches(root+"/localizationnote", Main.DC_LOCALIZATIONNOTE);
 		processBatches(root+"/terminology", Main.DC_TERMINOLOGY);
 		processBatches(root+"/directionality", Main.DC_DIRECTIONALITY);
 		processBatches(root+"/languageinformation", Main.DC_LANGUAGEINFORMATION);
@@ -56,7 +56,7 @@ public class ITSTest_TestSuite {
 		processBatches(root+"/preservespace", Main.DC_PRESERVESPACE);
 		processBatches(root+"/locqualityissue", Main.DC_LOCQUALITYISSUE);
 		processBatches(root+"/storagesize", Main.DC_STORAGESIZE);
-		processBatches(root+"/allowedcharacters", Main.DC_ALLOWEDCHARACTERS);
+		processBatches(root+"/allowedcharacters", Main.DC_ALLOWEDCHARACTERS);*/
 
 	}
 	
@@ -112,8 +112,8 @@ public class ITSTest_TestSuite {
 		Main.main(new String[]{input, output, "-dc", dataCategory});
 		assertTrue(new File(output).exists());
 		
-		//String gold = output.replace("/output/", "/expected/");
-		//assertTrue(fc.compareFilesPerLines(output, gold, "UTF-8"));
+		String gold = output.replace("/output/", "/expected/");
+		assertTrue(fc.compareFilesPerLines(output, gold, "UTF-8"));
 	}
 	
 }
