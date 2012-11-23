@@ -67,7 +67,7 @@ public class EnrycherStep extends BasePipelineStep {
 
 	@Override
 	public String getDescription () {
-		return "Applies Enrycher ITS annotations to the content. "
+		return "Applies Enrycher ITS annotations to the source content. "
 			+ "Expects: filter events. Sends back: filter events.";
 	}
 
@@ -88,7 +88,6 @@ public class EnrycherStep extends BasePipelineStep {
 		maxEvents = MAXEVENTS;
 		//maxEvents = params.getMaxEvents();
 		if (( maxEvents < 1 ) || ( maxEvents > 1000 )) maxEvents = MAXEVENTS;
-		
 		return event;
 	}
 	
@@ -213,7 +212,8 @@ public class EnrycherStep extends BasePipelineStep {
 					
 					//TODO: Handle segmented TextUnits
 					
-				}else{
+				}
+				else {
 					//System.out.println("TU ID: " + tu.getId());
 					Element p = source.getElementById(tu.getId());
 
@@ -236,8 +236,7 @@ public class EnrycherStep extends BasePipelineStep {
 	/**
 	 * Converts from coded text to coded HTML. Copied from QueryUtil.java
 	 * The resulting string is also valid XML.
-	 * @param fragment
-	 *            the fragment to convert.
+	 * @param fragment the fragment to convert.
 	 * @return The resulting HTML string.
 	 */
 	public String toCodedHTML (TextFragment fragment) {
@@ -281,7 +280,10 @@ public class EnrycherStep extends BasePipelineStep {
 	 * @param itsSpans
 	 * @return
 	 */
-	List<Insertion> getInsertions(String firstStr, String secondStr, List<Element> itsSpans){
+	List<Insertion> getInsertions (String firstStr,
+		String secondStr,
+		List<Element> itsSpans)
+	{
 
 		List<Insertion> insertions = new LinkedList<Insertion>();		
 		
@@ -310,7 +312,12 @@ public class EnrycherStep extends BasePipelineStep {
 	 * @param span
 	 * @return
 	 */
-	Insertion getInsertion(int firstPos, String firstStr, int secondPos, String secondStr, Element span){
+	Insertion getInsertion (int firstPos,
+		String firstStr,
+		int secondPos,
+		String secondStr,
+		Element span)
+	{
 		
 		Insertion insertion = new Insertion();
 		
@@ -326,7 +333,7 @@ public class EnrycherStep extends BasePipelineStep {
 	 * @param itsSpan
 	 * @return
 	 */
-	GenericAnnotations createAnnotation(Element itsSpan){
+	GenericAnnotations createAnnotation (Element itsSpan) {
 		GenericAnnotations gas = new GenericAnnotations();
 		GenericAnnotation ga = gas.add("disambiguation");
 
@@ -348,7 +355,12 @@ public class EnrycherStep extends BasePipelineStep {
 	 * @param secondMaxPos
 	 * @return
 	 */
-	int getInsertionPosition(int firstPos, String firstStr, int secondPos, String secondStr, int secondMaxPos ){
+	int getInsertionPosition (int firstPos,
+		String firstStr,
+		int secondPos,
+		String secondStr,
+		int secondMaxPos )
+	{
 		while( secondPos < secondMaxPos){
 			//System.out.println(secondPos + ": " + firstStr.charAt(firstPos) + "=" + secondStr.charAt(secondPos));
 			if( firstStr.charAt(firstPos) == secondStr.charAt(secondPos)){
@@ -374,7 +386,9 @@ public class EnrycherStep extends BasePipelineStep {
 	 * @param tf
 	 * @param insertions
 	 */
-	void annotateFragment(TextFragment tf, List<Insertion> insertions){
+	void annotateFragment (TextFragment tf,
+		List<Insertion> insertions)
+	{
 		int offset = 0;
 		//System.out.println("Before Annotation: "+tf);
 		for (Insertion insertion : insertions) {
@@ -389,7 +403,7 @@ public class EnrycherStep extends BasePipelineStep {
 	 * @param doc
 	 * @return
 	 */
-	List<Element> getItsElements(Source doc){
+	List<Element> getItsElements (Source doc) {
 		List<Element> itsSpans = new LinkedList<Element>();
 		for (Element span : doc.getAllElements("span")) {
 			
@@ -412,4 +426,5 @@ public class EnrycherStep extends BasePipelineStep {
 		public int end;
 		public GenericAnnotations genAnn;
 	}
+
 }
