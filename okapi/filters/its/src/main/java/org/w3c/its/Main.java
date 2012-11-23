@@ -335,21 +335,38 @@ public class Main {
 			if ( out1 != null ) writer.print(String.format("\tpreserveSpace=\"%s\"", escape(out1)));
 		}
 		else if ( dc.equals(DC_LOCQUALITYISSUE) ) {
-			//TODO attributes
+			int count = trav.getLocQualityIssueCount(attr);
+			if ( count == 0 ) {
+				writer.print("\n");
+				return; // Done for this node
+			}
+			// Else: print the entries
+			// IssuesRef
 			out1 = trav.getLocQualityIssuesRef(attr);
-			if ( out1 != null ) writer.print(String.format("\tlocQualityIssuesRef=\"%s\"", escape(out1)));
+			writer.print(String.format("\tlocQualityIssuesRef=\"%s\"", escape(out1==null ? "" : out1)));
 			writer.print("\t");
-			out1 = trav.getLocQualityIssueType(attr, 0);
-			if ( out1 != null ) writer.print(String.format("\tlocQualityIssueType=\"%s\"", escape(out1)));
-			writer.print("\t");
-			out1 = trav.getLocQualityIssueComment(attr, 0);
-			if ( out1 != null ) writer.print(String.format("\tlocQualityIssueComment=\"%s\"", escape(out1)));
-			writer.print("\t");
-			Float outFloat1 = trav.getLocQualityIssueSeverity(attr, 0);
-			if ( outFloat1 != null ) writer.print(String.format("\tlocQualityIssueSeverity=\"%f\"", outFloat1));
-			writer.print("\t");
-			out1 = trav.getLocQualityIssueProfileRef(attr, 0);
-			if ( out1 != null ) writer.print(String.format("\tlocQualityIssueProfileRef=\"%s\"", escape(out1)));
+			for ( int i=0; i<count; i++ ) {
+				// Enabled
+				Boolean outBool1 = trav.getLocQualityIssueEnabled(attr, i);
+				writer.print(String.format("\tlocQualityIssueEnabled[%d]=\"%s\"", i,
+					outBool1==null ? "false" : (outBool1 ? "yes" : "no")));
+				writer.print("\t");
+				// Comment
+				out1 = trav.getLocQualityIssueComment(attr, i);
+				writer.print(String.format("\tlocQualityIssueComment[%d]=\"%s\"", i, escape(out1==null ? "" : out1)));
+				writer.print("\t");
+				// ProfileRef
+				out1 = trav.getLocQualityIssueProfileRef(attr, i);
+				writer.print(String.format("\tlocQualityIssueProfileRef[%d]=\"%s\"", i, escape(out1==null ? "" : out1)));
+				writer.print("\t");
+				// Severity
+				Float outFloat1 = trav.getLocQualityIssueSeverity(attr, i);
+				writer.print(String.format("\tlocQualityIssueSeverity[%d]=\"%f\"", i, outFloat1==null ? 0 : outFloat1));
+				writer.print("\t");
+				// Type
+				out1 = trav.getLocQualityIssueType(attr, i);
+				writer.print(String.format("\tlocQualityIssueType[%d]=\"%s\"", i, escape(out1==null ? "" : out1)));
+			}
 		}
 		else if ( dc.equals(DC_STORAGESIZE) ) {
 			out1 = trav.getStorageSize(attr);

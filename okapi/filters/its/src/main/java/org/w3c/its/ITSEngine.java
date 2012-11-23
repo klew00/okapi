@@ -734,7 +734,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 			rule.info = np[0];
 			rule.infoType = INFOTYPE_REF;
 		}
-		else {
+		else if ( issuesRefP != null ) {
 			rule.info = issuesRefP;
 			rule.infoType = INFOTYPE_REFPOINTER;
 		}
@@ -748,7 +748,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 			ann.setString(LQITYPE, np[1]);
 			// TODO: verify the value?
 		}
-		else {
+		else if ( typeP != null ) {
 			ann.setString(LQITYPE, PTRPREFIX+typeP);
 		}
 		
@@ -759,7 +759,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 			}
 			ann.setString(LQICOMMENT, np[2]);
 		}
-		else {
+		else if ( commentP != null ) {
 			ann.setString(LQICOMMENT, PTRPREFIX+commentP);
 		}
 		
@@ -774,7 +774,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 			// Do not convert the float yet, this is done when triggering the rule
 			ann.setString(LQISEVERITY, np[3]);
 		}
-		else {
+		else if ( severityP != null ) {
 			ann.setString(LQISEVERITY, PTRPREFIX+severityP);
 		}
 		
@@ -788,7 +788,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 			}
 			ann.setString(LQIPROFILEREF, np[4]);
 		}
-		else {
+		else if ( profileRefP != null ) {
 			ann.setString(LQIPROFILEREF, PTRPREFIX+profileRefP);
 		}
 
