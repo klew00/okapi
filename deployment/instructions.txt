@@ -92,12 +92,19 @@ This revision is the one for this release.
 - create a tag for the release (e.g. m17)
 
 
+--- 9bis)
+
+- Update the okapi-xliff project to increment the version, even if it is just snapshot.
+- Make sure the new version is available on the continous build site.
+
 --- 10) Update the versions numbers in the files for the next version
+- change also the version references to okapi-xliff
 - All the POM.XML files
 - trunk/deployment/shared/release.properties
 - trunk/deployment/shared/changes.html (make the Changes Log ready for next set of changes)
 - Rebuild all. Make sure tests pass.
 - Commit all changed files.
+
 Now any new build will be a snapshot of the next release
 
 
