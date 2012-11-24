@@ -2486,8 +2486,20 @@ public class ITSEngine implements IProcessor, ITraversal {
 		return anns.getAnnotations(LQISSUE).size();
 	}
 	
-	public GenericAnnotations getLocQualityIssues () {
-		return trace.peek().lqIssues;
+	/**
+	 * Gets the localization quality issue annotation set for the current element
+	 * or one of its attributes. 
+	 * @param attribute the attribute to look up, or null for the element.
+	 * @return the annotation set for the queried node (can be null).
+	 */
+	public GenericAnnotations getLocQualityIssues (Attr attribute) {
+		if ( attribute == null ) {
+			return trace.peek().lqIssues;
+		}
+		String tmp;
+		if ( (tmp = (String)attribute.getUserData(FLAGNAME)) == null ) return null;
+		if ( tmp.charAt(FP_LQISSUE) != 'y' ) return null;
+		return new GenericAnnotations(getFlagData(tmp, FP_LQISSUE_DATA));
 	}
 
 	@Override
