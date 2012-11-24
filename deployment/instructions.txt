@@ -24,6 +24,8 @@ For example from M10-SNAPSHOT to M10:
 - search is the are any existing <version>0.10</version>. If there are you'll need to remmember them and change them back manually when moving to M11-SNAPSHOT.
 - search all pom for <version>0.10-SNAPSHOT</version> and replace by <version>0.10</version>
 
+- Check that all references to okapi-lib-xliff points to the proper version (maybe a snapshot)
+
 - trunk/deployment/shared/release.properties
 
 - The Change Log has its titles set with the proper versions
@@ -80,6 +82,10 @@ Password: same as for the shared documents
 Start directory: okapi
 
 The structure in the okapi directory is the same as in trunk/website
+
+- upload the files in:
+\trunk\deployment\maven\dist_plugins
+to the plugins directory of the web site.
 
 
 --- 8.bis) Update the Main Page in the OkapiWiki
