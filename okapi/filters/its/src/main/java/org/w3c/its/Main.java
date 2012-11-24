@@ -53,12 +53,15 @@ public class Main {
 	public static final String DC_LANGUAGEINFORMATION = "lang";
 	public static final String DC_WITHINTEXT = "withintext";
 	public static final String DC_DOMAIN = "domain";
+	// TODO: public static final String DC_DISAMBIGUATION = "disambiguation";
 	public static final String DC_LOCALEFILTER = "localefilter";
+	// TODO: public static final String DC_PROVENANCE = "provenance";
 	public static final String DC_EXTERNALRESOURCE = "externalresource";
 	public static final String DC_TARGETPOINTER = "targetpointer";
 	public static final String DC_IDVALUE = "idvalue";
 	public static final String DC_PRESERVESPACE = "preservespace";
 	public static final String DC_LOCQUALITYISSUE = "locqualityissue";
+	// TODO: public static final String DC_MTCONFIDENCE = "mtconfidence";
 	public static final String DC_STORAGESIZE = "storagesize";
 	public static final String DC_ALLOWEDCHARACTERS = "allowedcharacters";
 
