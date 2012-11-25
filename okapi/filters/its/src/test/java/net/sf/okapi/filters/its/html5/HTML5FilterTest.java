@@ -115,12 +115,12 @@ public class HTML5FilterTest {
 	@Test
 	public void testRulesInScripts () {
 		String snippet = "<!DOCTYPE html><html lang=\"en\"><head><meta charset=utf-8><title>Title</title>"
-			+ "<script type=application/its+xml><!--"
+			+ "<script type=application/its+xml>"
 			+ "<its:rules xmlns:its='http://www.w3.org/2005/11/its' version='2.0' "
 			+ "xmlns:h='http://www.w3.org/1999/xhtml'>"
 			+ "<its:translateRule selector='//h:title' translate='no'/>"
 			+ "</its:rules>"
-			+ "--></script>"
+			+ "</script>"
 			+ "</head><body>"
 			+ "<p>text</body></html>";
 		ArrayList<Event> list = getEvents(snippet);
@@ -225,6 +225,33 @@ public class HTML5FilterTest {
 		assertEquals("not-within", fmt.setContent(tu.getSource().getFirstContent()).toString());
 		tu = FilterTestDriver.getTextUnit(list, 5);
 		assertEquals(" text4", fmt.setContent(tu.getSource().getFirstContent()).toString());
+	}
+
+	@Test
+	public void testGlobalLocQualityIssues () {
+		String snippet = "<!DOCTYPE html><html lang=en><head><meta charset=utf-8><title>Title</title>"
+			+ "<script type=application/its+xml>"
+			+ "<its:rules xmlns:its='http://www.w3.org/2005/11/its' version='2.0' "
+			+ "xmlns:h='http://www.w3.org/1999/xhtml'>"
+			+ "<its:locQualityIssueRule selector='//h:p/@title' locQualityIssueComment='comment'/>"
+			+ "</its:rules>"
+			+ "</script>"
+			+ "</head><body>"
+			+ "<p title='Text'>text paragraph</p>"
+			+ "</body></html>";
+		ArrayList<Event> list = getEvents(snippet);
+		ITextUnit tu = FilterTestDriver.getTextUnit(list, 2);
+		assertEquals("Text", tu.getSource().toString());
+		GenericAnnotations anns = tu.getSource().getAnnotation(GenericAnnotations.class);
+		assertNotNull(anns);
+		List<GenericAnnotation> res = anns.getAnnotations(GenericAnnotationType.LQI);
+		assertEquals(1, res.size());
+		assertEquals("comment", res.get(0).getString(GenericAnnotationType.LQI_COMMENT));
+		assertEquals(null, res.get(0).getString(GenericAnnotationType.LQI_TYPE));
+		assertEquals(null, res.get(0).getString(GenericAnnotationType.LQI_SEVERITY));
+		assertEquals(null, res.get(0).getString(GenericAnnotationType.LQI_PROFILEREF));
+		assertEquals(null, res.get(0).getString(GenericAnnotationType.LQI_ISSUESREF));
+		assertEquals(true, res.get(0).getBoolean(GenericAnnotationType.LQI_ENABLED));
 	}
 	
 	@Test
