@@ -20,9 +20,11 @@
 
 package net.sf.okapi.filters.its;
 
+import net.sf.okapi.common.annotation.GenericAnnotations;
+
 import org.w3c.dom.Attr;
 import org.w3c.dom.Node;
-import org.w3c.its.ITraversal;
+import org.w3c.its.ITSEngine;
 
 class ContextItem {
 	
@@ -36,15 +38,16 @@ class ContextItem {
 	String externalRes;
 	String storageSize;
 	String allowedChars;
+	GenericAnnotations lqIssues;
 
 	public ContextItem (Node node,
-		ITraversal trav)
+		ITSEngine trav)
 	{
 		this(node, trav, null);
 	}
 	
 	public ContextItem (Node node,
-		ITraversal trav,
+		ITSEngine trav,
 		Attr attribute)
 	{
 		this.node = node;
@@ -63,6 +66,8 @@ class ContextItem {
 				+ "\t" + trav.getStorageEncoding(attribute)
 				+ "\t" + trav.getLineBreakType(attribute);
 		}
+		
+		this.lqIssues = trav.getLocQualityIssues(attribute);
 	}
 
 }

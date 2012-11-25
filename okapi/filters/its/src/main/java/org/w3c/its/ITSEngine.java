@@ -21,7 +21,6 @@
 package org.w3c.its;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.InvalidParameterException;
@@ -35,7 +34,6 @@ import java.util.TreeMap;
 
 import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
@@ -44,6 +42,7 @@ import javax.xml.xpath.XPathFactory;
 
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.annotation.GenericAnnotation;
+import net.sf.okapi.common.annotation.GenericAnnotationType;
 import net.sf.okapi.common.annotation.GenericAnnotations;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 
@@ -55,7 +54,6 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 
 /**
  * Holds the information on a given entry that has a target pointer.
@@ -89,14 +87,6 @@ public class ITSEngine implements IProcessor, ITraversal {
 	private static final String SRC_TRGPTRFLAGNAME = "\u10ff"; // Name of the user-data property that holds the target pointer flag in the source
 	private static final String TRG_TRGPTRFLAGNAME = "\u20ff"; // Name of the user-data property that holds the target pointer flag in the target
 	
-	private static final String LQISSUE = "its-lqi";
-	private static final String LQIISSUESREF = "lqiIssuesRef";
-	private static final String LQITYPE = "lqiType";
-	private static final String LQICOMMENT = "lqiComment";
-	private static final String LQISEVERITY = "lqiSeverity";
-	private static final String LQIPROFILEREF = "lqiProfileRef";
-	private static final String LQIENABLED = "lqiEnabled";
-
 	private static final String PTRPREFIX = "@@"; // If length of PTRPREFIX changes: code needs to be updated
 
 	// Indicator position
@@ -245,13 +235,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 			Document rulesDoc = fact.newDocumentBuilder().parse(docURI.toString());
 			addExternalRules(rulesDoc, docURI);
 		}
-		catch ( SAXException e ) {
-			throw new RuntimeException(e);
-		}
-		catch ( ParserConfigurationException e ) {
-			throw new RuntimeException(e);
-		}
-		catch ( IOException e ) {
+		catch ( Throwable e ) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -475,13 +459,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 			Document rulesDoc = fact.newDocumentBuilder().parse(docURI.toString());
 			compileRules(rulesDoc, docURI, isInternal);
 		}
-		catch ( SAXException e ) {
-			throw new RuntimeException(e);
-		}
-		catch ( ParserConfigurationException e ) {
-			throw new RuntimeException(e);
-		}
-		catch ( IOException e ) {
+		catch ( Throwable e ) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -703,7 +681,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 		rule.isInternal = isInternal;
 
 		// Get the local attributes
-		String np[] = retrieveLocQualityIssueData(elem, false);
+		String np[] = retrieveLocQualityIssueData(elem, false, false);
 		
 		String issuesRefP = null;
 		if ( elem.hasAttribute("locQualityIssuesRefPointer") )
@@ -745,11 +723,11 @@ public class ITSEngine implements IProcessor, ITraversal {
 			if ( !Util.isEmpty(typeP) ) {
 				throw new ITSException("Cannot have both locQualityIssueType and locQualityIssueTypePointer.");
 			}
-			ann.setString(LQITYPE, np[1]);
+			ann.setString(GenericAnnotationType.LQI, np[1]);
 			// TODO: verify the value?
 		}
 		else if ( typeP != null ) {
-			ann.setString(LQITYPE, PTRPREFIX+typeP);
+			ann.setString(GenericAnnotationType.LQI_TYPE, PTRPREFIX+typeP);
 		}
 		
 		// Get the comment
@@ -757,10 +735,10 @@ public class ITSEngine implements IProcessor, ITraversal {
 			if ( !Util.isEmpty(commentP) ) {
 				throw new ITSException("Cannot have both locQualityIssueComment and locQualityIssueCommentPointer.");
 			}
-			ann.setString(LQICOMMENT, np[2]);
+			ann.setString(GenericAnnotationType.LQI_COMMENT, np[2]);
 		}
 		else if ( commentP != null ) {
-			ann.setString(LQICOMMENT, PTRPREFIX+commentP);
+			ann.setString(GenericAnnotationType.LQI_COMMENT, PTRPREFIX+commentP);
 		}
 		
 		// Get the optional severity
@@ -772,10 +750,10 @@ public class ITSEngine implements IProcessor, ITraversal {
 				throw new ITSException("Cannot have both locQualityIssueSeverity and locQualityIssueSeverityPointer.");
 			}
 			// Do not convert the float yet, this is done when triggering the rule
-			ann.setString(LQISEVERITY, np[3]);
+			ann.setString(GenericAnnotationType.LQI_SEVERITY, np[3]);
 		}
 		else if ( severityP != null ) {
-			ann.setString(LQISEVERITY, PTRPREFIX+severityP);
+			ann.setString(GenericAnnotationType.LQI_SEVERITY, PTRPREFIX+severityP);
 		}
 		
 		// Get the optional profile reference
@@ -786,20 +764,20 @@ public class ITSEngine implements IProcessor, ITraversal {
 			if ( !Util.isEmpty(profileRefP) ) {
 				throw new ITSException("Cannot have both locQualityIssueProfileRef and locQualityIssueProfileRefPointer.");
 			}
-			ann.setString(LQIPROFILEREF, np[4]);
+			ann.setString(GenericAnnotationType.LQI_PROFILEREF, np[4]);
 		}
 		else if ( profileRefP != null ) {
-			ann.setString(LQIPROFILEREF, PTRPREFIX+profileRefP);
+			ann.setString(GenericAnnotationType.LQI_PROFILEREF, PTRPREFIX+profileRefP);
 		}
 
 		// Get the optional enabled
 		String enabledP = null;
 		if ( elem.hasAttribute("locQualityIssueEnabledPointer")) {
 			profileRefP = elem.getAttribute("locQualityIssueEnabledPointer");
-			ann.setString(LQIENABLED, PTRPREFIX+enabledP);
+			ann.setString(GenericAnnotationType.LQI_ENABLED, PTRPREFIX+enabledP);
 		}
 		else { // either default or set value
-			ann.setString(LQIENABLED, np[5]);
+			ann.setString(GenericAnnotationType.LQI_ENABLED, np[5]);
 		}
 
 		// Add the rule
@@ -1427,49 +1405,49 @@ public class ITSEngine implements IProcessor, ITraversal {
 						}
 						else {
 							// Not a stand-off annotation
-							GenericAnnotation ann = rule.annotations.getAnnotations(LQISSUE).get(0);
+							GenericAnnotation ann = rule.annotations.getAnnotations(GenericAnnotationType.LQI).get(0);
 							anns = new GenericAnnotations();
 							GenericAnnotation upd = addIssueItem(anns);
 							// Get and resolve 'type'
-							data1 = ann.getString(LQITYPE);
+							data1 = ann.getString(GenericAnnotationType.LQI_TYPE);
 							if ( data1 != null ) {
 								if ( data1.startsWith(PTRPREFIX) ) {
 									data1 = resolvePointer(NL.item(i), data1.substring(2));
 								}
-								upd.setString(LQITYPE, data1);
+								upd.setString(GenericAnnotationType.LQI_TYPE, data1);
 							}
 							// Get and resolve 'comment'
-							data1 = ann.getString(LQICOMMENT);
+							data1 = ann.getString(GenericAnnotationType.LQI_COMMENT);
 							if ( data1 != null ) {
 								if ( data1.startsWith(PTRPREFIX) ) {
 									data1 = resolvePointer(NL.item(i), data1.substring(2));
 								}
-								upd.setString(LQICOMMENT, data1);
+								upd.setString(GenericAnnotationType.LQI_COMMENT, data1);
 							}
 							// Get and resolve 'severity'
-							data1  = ann.getString(LQISEVERITY);
+							data1  = ann.getString(GenericAnnotationType.LQI_SEVERITY);
 							if ( data1 != null ) {
 								if ( data1.startsWith(PTRPREFIX) ) {
 									data1 = resolvePointer(NL.item(i), data1.substring(2));
 								}
 								// Convert the string to the float value
-								upd.setFloat(LQISEVERITY, Float.parseFloat(data1));
+								upd.setFloat(GenericAnnotationType.LQI_SEVERITY, Float.parseFloat(data1));
 							}
 							// Get and resolve 'profile reference'
-							data1 = ann.getString(LQIPROFILEREF);
+							data1 = ann.getString(GenericAnnotationType.LQI_PROFILEREF);
 							if ( data1 != null ) {
 								if ( data1.startsWith(PTRPREFIX) ) {
 									data1 = resolvePointer(NL.item(i), data1.substring(2));
 								}
-								upd.setString(LQIPROFILEREF, data1);
+								upd.setString(GenericAnnotationType.LQI_PROFILEREF, data1);
 							}
 							// Get and resolve 'enabled'
-							data1 = ann.getString(LQIENABLED);
+							data1 = ann.getString(GenericAnnotationType.LQI_ENABLED);
 							if ( data1 != null ) {
 								if ( data1.startsWith(PTRPREFIX) ) {
 									data1 = resolvePointer(NL.item(i), data1.substring(2));
 								}
-								upd.setBoolean(LQIENABLED, data1.equals("yes"));
+								upd.setBoolean(GenericAnnotationType.LQI_ENABLED, data1.equals("yes"));
 							}
 						}
 						// Decorate the node with the resolved annotation data
@@ -1527,8 +1505,8 @@ public class ITSEngine implements IProcessor, ITraversal {
 	 * @return the annotation that has been added.
 	 */
 	private GenericAnnotation addIssueItem (GenericAnnotations anns) {
-		GenericAnnotation ann = anns.add(LQISSUE);
-		ann.setBoolean(LQIENABLED, true); // default
+		GenericAnnotation ann = anns.add(GenericAnnotationType.LQI);
+		ann.setBoolean(GenericAnnotationType.LQI_ENABLED, true); // default
 		return ann;
 	}
 	
@@ -1826,9 +1804,15 @@ public class ITSEngine implements IProcessor, ITraversal {
 			
 			// Localization quality issue
 			if (( (dataCategories & IProcessor.DC_LOCQUALITYISSUE) > 0 ) && isVersion2() ) {
-				expr = xpath.compile("//*/@"+ITS_NS_PREFIX+":locQualityIssueType|//"+ITS_NS_PREFIX+":span/@locQualityIssueType"
-					+"|//*/@"+ITS_NS_PREFIX+":locQualityIssueComment|//"+ITS_NS_PREFIX+":span/@locQualityIssueComment"
-					+"|//*/@"+ITS_NS_PREFIX+":locQualityIssuesRef|//"+ITS_NS_PREFIX+":span/@locQualityIssuesRef");
+				if ( isHTML5 ) {
+					expr = xpath.compile("//*/@its-loc-quality-issue-type|//*/@its-loc-quality-issue-comment|//*/@its-loc-quality-issues-ref");
+				}
+				else {
+					expr = xpath.compile("//*/@"+ITS_NS_PREFIX+":locQualityIssueType|//"+ITS_NS_PREFIX+":span/@locQualityIssueType"
+						+"|//*/@"+ITS_NS_PREFIX+":locQualityIssueComment|//"+ITS_NS_PREFIX+":span/@locQualityIssueComment"
+						+"|//*/@"+ITS_NS_PREFIX+":locQualityIssuesRef|//"+ITS_NS_PREFIX+":span/@locQualityIssuesRef");
+				}
+
 				NL = (NodeList)expr.evaluate(doc, XPathConstants.NODESET);
 				for ( int i=0; i<NL.getLength(); i++ ) {
 					attr = (Attr)NL.item(i);
@@ -1839,7 +1823,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 					boolean qualified = true;
 					String ns = attr.getOwnerElement().getNamespaceURI();
 					if ( !Util.isEmpty(ns) ) qualified = !ns.equals(ITS_NS_URI);
-					String[] values = retrieveLocQualityIssueData(attr.getOwnerElement(), qualified);
+					String[] values = retrieveLocQualityIssueData(attr.getOwnerElement(), qualified, isHTML5);
 					// Convert the values into an annotation
 					GenericAnnotations anns = null;
 					if ( values[0] != null ) { // stand-off reference
@@ -1849,11 +1833,11 @@ public class ITSEngine implements IProcessor, ITraversal {
 					else { // Not an stand-off reference
 						anns = new GenericAnnotations();
 						GenericAnnotation ann = addIssueItem(anns);
-						if ( values[1] != null ) ann.setString(LQITYPE, values[1]);
-						if ( values[2] != null ) ann.setString(LQICOMMENT, values[2]);
-						if ( values[3] != null ) ann.setFloat(LQISEVERITY, Float.parseFloat(values[3]));
-						if ( values[4] != null ) ann.setString(LQIPROFILEREF, values[4]);
-						if ( values[5] != null ) ann.setBoolean(LQIENABLED, values[5].equals("yes"));
+						if ( values[1] != null ) ann.setString(GenericAnnotationType.LQI_TYPE, values[1]);
+						if ( values[2] != null ) ann.setString(GenericAnnotationType.LQI_COMMENT, values[2]);
+						if ( values[3] != null ) ann.setFloat(GenericAnnotationType.LQI_SEVERITY, Float.parseFloat(values[3]));
+						if ( values[4] != null ) ann.setString(GenericAnnotationType.LQI_PROFILEREF, values[4]);
+						if ( values[5] != null ) ann.setBoolean(GenericAnnotationType.LQI_ENABLED, values[5].equals("yes"));
 					}
 					// Set the updated flags
 					setFlag(attr.getOwnerElement(), FP_LQISSUE, 'y', attr.getSpecified());
@@ -2070,11 +2054,28 @@ public class ITSEngine implements IProcessor, ITraversal {
 	 * @return an array of the value: issues reference, type, comment, severity, profile reference, enabled.
 	 */
 	private String[] retrieveLocQualityIssueData (Element elem,
-		boolean qualified)
+		boolean qualified,
+		boolean useHTML5)
 	{
 		String[] data = new String[6];
 		
-		if ( qualified ) {
+		if ( useHTML5 ) {
+			if ( elem.hasAttribute("its-loc-quality-issues-ref") )
+				data[0] = elem.getAttribute("its-loc-quality-issues-ref");
+			if ( elem.hasAttribute("its-loc-quality-issue-type") )
+				data[1] = elem.getAttribute("its-loc-quality-issue-type");
+			if ( elem.hasAttribute("its-loc-quality-issue-comment") )
+				data[2] = elem.getAttribute("its-loc-quality-issue-comment");
+			if ( elem.hasAttribute("its-loc-quality-issue-severity") )
+				data[3] = elem.getAttribute("its-loc-quality-issue-severity");
+			if ( elem.hasAttribute("its-loc-quality-issue-profile-ref") )
+				data[4] = elem.getAttribute("its-loc-quality-issue-profile-ref");
+			if ( elem.hasAttribute("its-loc-quality-issue-enabled") )
+				data[5] = elem.getAttribute("its-loc-quality-issue-enabled");
+			else
+				data[5] = "yes"; // Default
+		}
+		else if ( qualified ) {
 			if ( elem.hasAttributeNS(ITS_NS_URI, "locQualityIssuesRef") )
 				data[0] = elem.getAttributeNS(ITS_NS_URI, "locQualityIssuesRef");
 			
@@ -2144,15 +2145,62 @@ public class ITSEngine implements IProcessor, ITraversal {
 //		// Load the document and the rules
 //		URI uri = new URI(ref);
 //		Document standoffDoc = fact.newDocumentBuilder().parse(uri.toString());
+		boolean useHTML5 = isHTML5;
 		
+		// Create the new annotation set
+		GenericAnnotations anns = new GenericAnnotations();
+
+		Document issuesDoc = null;
+		XPath issuesXPath = null;
+		
+		if ( useHTML5 ) {
+			// If the standoff markup is inside an HTML file:
+			// Get the script that holds the its:locQualityIssues element
+			try {
+				String tmp = String.format("//%s:script[@id='%s']", HTML_NS_PREFIX, id);
+				//String tmp = String.format("//script[@id='%s']", id);
+				XPathExpression expr = xpath.compile(tmp);
+				Element scriptElem = (Element)expr.evaluate(doc, XPathConstants.NODE);
+				if ( scriptElem == null ) {
+					logger.warn("Cannot find standoff script element for '{}'", ref);
+					GenericAnnotation ann = addIssueItem(anns);
+					ann.setString(GenericAnnotationType.LQI_ISSUESREF, ref); // For information only
+					return anns;
+				}
+				// Else: parse the locQualityIssues element inside the script
+				String content = scriptElem.getTextContent();
+				// Strip white spaces
+				content = content.trim();
+				// Create the context and XPath engine 
+				issuesXPath = xpFact.newXPath();
+				NSContextManager nsc = new NSContextManager();
+				nsc.addNamespace(ITS_NS_PREFIX, ITS_NS_URI);
+				issuesXPath.setNamespaceContext(nsc);
+				// Parse the content
+				InputSource is = new InputSource(new ByteArrayInputStream(content.getBytes()));
+				ensureDocumentBuilderExist();
+				try {
+					issuesDoc = fact.newDocumentBuilder().parse(is);
+				}
+				catch ( Throwable e ) {
+					throw new RuntimeException("Error parsing a script element.", e);
+				}
+			}
+			catch ( XPathExpressionException e ) {
+				throw new RuntimeException("XPath error.", e);
+			}
+		}
+		else {
+			issuesDoc = doc;
+			issuesXPath = xpath;
+		}
+		
+		// Now get the element holding the list of issues
 		Element elem1;
 		try {
-			String tmp = String.format("//%s:%s[@xml:id='%s']",
-				(isHTML5 ? HTML_NS_PREFIX : ITS_NS_PREFIX ),
-				(isHTML5 ? "script" : "locQualityIssues"),
-				id);
-			XPathExpression expr = xpath.compile(tmp);
-			elem1 = (Element)expr.evaluate(doc, XPathConstants.NODE);
+			String tmp = String.format("//%s:locQualityIssues[@xml:id='%s']", ITS_NS_PREFIX, id);
+			XPathExpression expr = issuesXPath.compile(tmp);
+			elem1 = (Element)expr.evaluate(issuesDoc, XPathConstants.NODE);
 		}
 		catch ( XPathExpressionException e ) {
 			throw new RuntimeException("XPath error.", e);
@@ -2160,20 +2208,11 @@ public class ITSEngine implements IProcessor, ITraversal {
 		if ( elem1 == null ) {
 			// Entry not found
 			logger.warn("Cannot find standoff markup for '{}'", ref);
-			GenericAnnotations anns = new GenericAnnotations();
 			GenericAnnotation ann = addIssueItem(anns);
-			ann.setString(LQIISSUESREF, ref); // For information only
+			ann.setString(GenericAnnotationType.LQI_ISSUESREF, ref); // For information only
 			return anns;
 		}
 		
-		// If it's a HTML5 markup, the element will be inside a script
-		if ( isHTML5 ) {
-			//TODO
-		}
-		
-		// Create the new annotation set
-		GenericAnnotations anns = new GenericAnnotations();
-
 		// Then get the list of items in the element
 		NodeList items = elem1.getElementsByTagNameNS(ITS_NS_URI, "locQualityIssue");
 		for ( int i=0; i<items.getLength(); i++ ) {
@@ -2181,17 +2220,17 @@ public class ITSEngine implements IProcessor, ITraversal {
 			Element elem2 = (Element)items.item(i);
 			// Add the annotation to the set
 			GenericAnnotation ann = addIssueItem(anns);
-			ann.setString(LQIISSUESREF, ref); // For information only
-			// Gather the local information
-			String[] values = retrieveLocQualityIssueData(elem2, false);
+			ann.setString(GenericAnnotationType.LQI_ISSUESREF, ref); // For information only
+			// Gather the local information (never in HTML since if it's HTML it's inside a script)
+			String[] values = retrieveLocQualityIssueData(elem2, false, false);
 			if ( values[0] != null ) {
 				logger.warn("Cannot have a standoff reference in a standoff element (reference='{}').", ref);
 			}
-			if ( values[1] != null ) ann.setString(LQITYPE, values[1]);
-			if ( values[2] != null ) ann.setString(LQICOMMENT, values[2]);
-			if ( values[3] != null ) ann.setFloat(LQISEVERITY, Float.parseFloat(values[3]));
-			if ( values[4] != null ) ann.setString(LQIPROFILEREF, values[4]);
-			if ( values[5] != null ) ann.setBoolean(LQIENABLED, values[5].equals("yes"));
+			if ( values[1] != null ) ann.setString(GenericAnnotationType.LQI_TYPE, values[1]);
+			if ( values[2] != null ) ann.setString(GenericAnnotationType.LQI_COMMENT, values[2]);
+			if ( values[3] != null ) ann.setFloat(GenericAnnotationType.LQI_SEVERITY, Float.parseFloat(values[3]));
+			if ( values[4] != null ) ann.setString(GenericAnnotationType.LQI_PROFILEREF, values[4]);
+			if ( values[5] != null ) ann.setBoolean(GenericAnnotationType.LQI_ENABLED, values[5].equals("yes"));
 		}
 
 		return anns;
@@ -2469,7 +2508,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 
 	@Override
 	public String getLocQualityIssuesRef (Attr attribute) {
-		return getLQIValue(LQIISSUESREF, attribute, 0);
+		return getLQIValue(GenericAnnotationType.LQI_ISSUESREF, attribute, 0);
 	}
 	
 	@Override
@@ -2483,7 +2522,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 		if ( (tmp = (String)attribute.getUserData(FLAGNAME)) == null ) return 0;
 		if ( tmp.charAt(FP_LQISSUE) != 'y' ) return 0;
 		GenericAnnotations anns = new GenericAnnotations(getFlagData(tmp, FP_LQISSUE_DATA));
-		return anns.getAnnotations(LQISSUE).size();
+		return anns.getAnnotations(GenericAnnotationType.LQI).size();
 	}
 	
 	/**
@@ -2506,14 +2545,14 @@ public class ITSEngine implements IProcessor, ITraversal {
 	public String getLocQualityIssueType (Attr attribute,
 		int index)
 	{
-		return getLQIValue(LQITYPE, attribute, index);
+		return getLQIValue(GenericAnnotationType.LQI_TYPE, attribute, index);
 	}
 
 	@Override
 	public String getLocQualityIssueComment (Attr attribute,
 		int index)
 	{
-		return getLQIValue(LQICOMMENT, attribute, index);
+		return getLQIValue(GenericAnnotationType.LQI_COMMENT, attribute, index);
 	}
 
 	@Override
@@ -2522,20 +2561,20 @@ public class ITSEngine implements IProcessor, ITraversal {
 	{
 		if ( attribute == null ) {
 			if ( trace.peek().lqIssues == null ) return null;
-			return trace.peek().lqIssues.getAnnotations(LQISSUE).get(index).getFloat(LQISEVERITY);
+			return trace.peek().lqIssues.getAnnotations(GenericAnnotationType.LQI).get(index).getFloat(GenericAnnotationType.LQI_SEVERITY);
 		}
 		String tmp;
 		if ( (tmp = (String)attribute.getUserData(FLAGNAME)) == null ) return null;
 		if ( tmp.charAt(FP_LQISSUE) != 'y' ) return null;
 		GenericAnnotations anns = new GenericAnnotations(getFlagData(tmp, FP_LQISSUE_DATA));
-		return anns.getAnnotations(LQISSUE).get(index).getFloat(LQISEVERITY);
+		return anns.getAnnotations(GenericAnnotationType.LQI).get(index).getFloat(GenericAnnotationType.LQI_SEVERITY);
 	}
 
 	@Override
 	public String getLocQualityIssueProfileRef (Attr attribute,
 		int index)
 	{
-		return getLQIValue(LQIPROFILEREF, attribute, index);
+		return getLQIValue(GenericAnnotationType.LQI_PROFILEREF, attribute, index);
 	}
 
 	@Override
@@ -2544,13 +2583,13 @@ public class ITSEngine implements IProcessor, ITraversal {
 	{
 		if ( attribute == null ) {
 			if ( trace.peek().lqIssues == null ) return null;
-			return trace.peek().lqIssues.getAnnotations(LQISSUE).get(index).getBoolean(LQIENABLED);
+			return trace.peek().lqIssues.getAnnotations(GenericAnnotationType.LQI).get(index).getBoolean(GenericAnnotationType.LQI_ENABLED);
 		}
 		String tmp;
 		if ( (tmp = (String)attribute.getUserData(FLAGNAME)) == null ) return null;
 		if ( tmp.charAt(FP_LQISSUE) != 'y' ) return null;
 		GenericAnnotations anns = new GenericAnnotations(getFlagData(tmp, FP_LQISSUE_DATA));
-		return anns.getAnnotations(LQISSUE).get(index).getBoolean(LQIENABLED);
+		return anns.getAnnotations(GenericAnnotationType.LQI).get(index).getBoolean(GenericAnnotationType.LQI_ENABLED);
 	}
 	
 	private String getLQIValue (String fieldName,
@@ -2559,13 +2598,13 @@ public class ITSEngine implements IProcessor, ITraversal {
 	{
 		if ( attribute == null ) {
 			if ( trace.peek().lqIssues == null ) return null;
-			return trace.peek().lqIssues.getAnnotations(LQISSUE).get(index).getString(fieldName);
+			return trace.peek().lqIssues.getAnnotations(GenericAnnotationType.LQI).get(index).getString(fieldName);
 		}
 		String tmp;
 		if ( (tmp = (String)attribute.getUserData(FLAGNAME)) == null ) return null;
 		if ( tmp.charAt(FP_LQISSUE) != 'y' ) return null;
 		GenericAnnotations anns = new GenericAnnotations(getFlagData(tmp, FP_LQISSUE_DATA));
-		return anns.getAnnotations(LQISSUE).get(index).getString(fieldName);
+		return anns.getAnnotations(GenericAnnotationType.LQI).get(index).getString(fieldName);
 	}
 
 	@Override
