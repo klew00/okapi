@@ -243,4 +243,83 @@ public class ReportGeneratorTest {
 		assertFalse(gen.isHtmlReport());
 		assertFalse(gen.isMultiItemReport());
 	}
+	
+	@Test
+	public void tableReportTest9() {
+		ReportGenerator gen = new ReportGenerator(this.getClass().getResourceAsStream("test_template1.txt"));
+		assertFalse(gen.isHtmlReport());
+		assertTrue(gen.isMultiItemReport());
+		
+		gen.setField("IMPORT", "import1");
+		gen.setField("IMPORT", "import2");
+		gen.setField("IMPORT", "import3");
+		
+		assertEquals("import1;\nimport2;\nimport3;", gen.generate());
+	}
+	
+	@Test
+	public void tableReportTest10() {
+		ReportGenerator gen = new ReportGenerator(this.getClass().getResourceAsStream("test_template2.txt"));
+		assertFalse(gen.isHtmlReport());
+		assertTrue(gen.isMultiItemReport());
+		
+		gen.setField("IMPORT", "import1");
+		gen.setField("IMPORT", "import2");
+		gen.setField("IMPORT", "import3");
+		
+		assertEquals("   import import1;\n   import import2;\n   import import3;", gen.generate());
+	}
+	
+	@Test
+	public void tableReportTest11() {
+		ReportGenerator gen = new ReportGenerator(this.getClass().getResourceAsStream("test_template3.txt"));
+		assertFalse(gen.isHtmlReport());
+		assertTrue(gen.isMultiItemReport());
+		
+		gen.setField("IMPORT", "import1");
+		gen.setField("IMPORT", "import2");
+		gen.setField("IMPORT", "import3");
+		
+		gen.setField("IMPORT_DESCR", "description 1");
+		gen.setField("IMPORT_DESCR", "description 2");
+		gen.setField("IMPORT_DESCR", "description 3");
+		
+		assertEquals("   import import1; // description 1\n   import import2; " +
+				"// description 2\n   import import3; // description 3", 
+				gen.generate());
+	}
+	
+	@Test
+	public void tableReportTest11_missing_field_value() {
+		ReportGenerator gen = new ReportGenerator(this.getClass().getResourceAsStream("test_template3.txt"));
+		assertFalse(gen.isHtmlReport());
+		assertTrue(gen.isMultiItemReport());
+		
+		gen.setField("IMPORT", "import1");
+		gen.setField("IMPORT", "import2");
+		gen.setField("IMPORT", "import3");
+		
+		// IMPORT_DESCR values are missing
+		
+		assertEquals("   import import1; // [?IMPORT_DESCR]\n   import import2; " +
+				"// [?IMPORT_DESCR]\n   import import3; // [?IMPORT_DESCR]", 
+				gen.generate());
+	}
+	
+	@Test
+	public void tableReportTest11_missing_field_value2() {
+		ReportGenerator gen = new ReportGenerator(this.getClass().getResourceAsStream("test_template3.txt"));
+		assertFalse(gen.isHtmlReport());
+		assertTrue(gen.isMultiItemReport());
+
+		// IMPORT values are missing
+		
+		gen.setField("IMPORT_DESCR", "description 1");
+		gen.setField("IMPORT_DESCR", "description 2");
+		gen.setField("IMPORT_DESCR", "description 3");
+		
+		assertEquals("   import [?IMPORT]; // description 1\n   import [?IMPORT]; " +
+				"// description 2\n   import [?IMPORT]; // description 3", 
+				gen.generate());
+	}
 }
