@@ -388,6 +388,25 @@ public class XmlStreamConfigurationSupportTest {
 				.getCode(0).getData());
 	}
 	
+	@Test
+	public void test_ISSUE_282() {
+		String config = 
+			    "assumeWellformed: true\n" +
+			    "preserve_whitespace: false\n" +
+			    "exclude_by_default: true\n\n" +
+			    "elements:\n" +
+				"  foo: \n" +
+			    "    conditions: [translate, EQUALS, y]\n" +
+			    "    ruleTypes: [TEXTUNIT]";
+		filter.setParameters(new Parameters(config));
+		String snippet = "<xml><foo translate=\"y\">1: Translate me.</foo><foo translate=\"n\">2: Don't Translate me.</foo><foo>3: Don't Translate me.</foo><foo translate=\"y\">4: Translate me.</foo></xml>";
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 1);
+		assertNotNull(tu);
+		assertEquals("1: Translate me.", tu.getSource().toString());
+		tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 2);
+		assertEquals("4: Translate me.", tu.getSource().toString());
+	}
+	
 	private ArrayList<Event> getEvents(String snippet,
 		LocaleId srcLang,
 		LocaleId trgLang)

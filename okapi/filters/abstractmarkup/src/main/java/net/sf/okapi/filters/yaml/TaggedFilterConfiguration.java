@@ -562,7 +562,7 @@ public class TaggedFilterConfiguration {
 						
 			// short cut test - if there are no conditions and no attributes the default rule applies
 			if (attributes.isEmpty() && 
-					configReader.getElementRule(tag.toLowerCase()).get(CONDITIONS) == null)  {
+					configReader.getElementRule(tag.toLowerCase()).get(CONDITIONS) == null)  {				
 				return type;
 			}
 			

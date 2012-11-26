@@ -686,6 +686,17 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 		// set a TextUnit name that id from a far out tag
 		currentId = null;
 		
+		// if exclude is true by default then push "not exclude" to enable this rule
+		if (getConfig().isGlobalExcludeByDefault()) {
+			switch (ruleType) {
+			case TEXT_UNIT_ELEMENT:
+				ruleState.pushIncludedRule(startTag.getName());
+				break;
+			default:
+				break;
+			}			
+		}
+		
 		try {
 			// if in excluded state everything is skeleton including text
 			if (ruleState.isExludedState()) {
@@ -906,6 +917,17 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 		}
 		
 		ruleType = updateEndTagRuleState(endTag);
+		
+		// if exclude is true by default then pop "not exclude" added in handleStartTag
+		if (getConfig().isGlobalExcludeByDefault()) {
+			switch (ruleType) {
+			case TEXT_UNIT_ELEMENT:
+				ruleState.popExcludedIncludedRule();
+				break;
+			default:
+				break;
+			}			
+		}
 
 		switch (ruleType) {
 		case INLINE_EXCLUDED_ELEMENT:
