@@ -725,7 +725,7 @@ public class Main {
 		FilterConfiguration config;
 		while ( iter.hasNext() ) {
 			config = iter.next();
-			logger.info(String.format(" - {} = {}", config.configId, config.description));
+			logger.info(" - {} = {}", config.configId, config.description);
 		}
 	}
 	
