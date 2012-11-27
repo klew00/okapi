@@ -45,6 +45,7 @@ import net.sf.okapi.common.annotation.GenericAnnotation;
 import net.sf.okapi.common.annotation.GenericAnnotationType;
 import net.sf.okapi.common.annotation.GenericAnnotations;
 import net.sf.okapi.common.exceptions.OkapiIOException;
+import nu.validator.htmlparser.dom.HtmlDocumentBuilder;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -129,7 +130,8 @@ public class ITSEngine implements IProcessor, ITraversal {
 
 	private final boolean isHTML5;
 	
-	private DocumentBuilderFactory fact; 
+	private DocumentBuilderFactory xmlFactory;
+	
 	private Document doc;
 	private URI docURI;
 	private NSContextManager nsContext;
@@ -221,18 +223,47 @@ public class ITSEngine implements IProcessor, ITraversal {
 		return xpath;
 	}
 	
-	private void ensureDocumentBuilderExist () {
-		if ( fact == null ) { 
-			fact = DocumentBuilderFactory.newInstance();
-			fact.setNamespaceAware(true);
-			fact.setValidating(false);
+	private void ensureDocumentBuilderFactoryExists () {
+		if ( xmlFactory == null ) { 
+			xmlFactory = DocumentBuilderFactory.newInstance();
+			xmlFactory.setNamespaceAware(true);
+			xmlFactory.setValidating(false);
+		}
+	}
+	
+	private Document parseXMLDocument (String uriString) {
+		ensureDocumentBuilderFactoryExists();
+		try {
+			return xmlFactory.newDocumentBuilder().parse(uriString);
+		}
+		catch ( Throwable e ) {
+			throw new RuntimeException("Error parsing an XML document.\n"+e.getMessage(), e);
+		}
+	}
+	
+	private Document parseXMLDocument (InputSource is) {
+		ensureDocumentBuilderFactoryExists();
+		try {
+			return xmlFactory.newDocumentBuilder().parse(is);
+		}
+		catch ( Throwable e ) {
+			throw new RuntimeException("Error parsing an XML document.\n"+e.getMessage(), e);
+		}
+	}
+	
+	private Document parseHTMLDocument (String uriString) {
+		HtmlDocumentBuilder docBuilder = new HtmlDocumentBuilder();
+		try {
+			return docBuilder.parse(uriString);
+		}
+		catch ( Throwable e ) {
+			throw new RuntimeException("Error parsing an HTML document.\n"+e.getMessage(), e);
 		}
 	}
 
 	public void addExternalRules (URI docURI) {
 		try {
-			ensureDocumentBuilderExist(); 
-			Document rulesDoc = fact.newDocumentBuilder().parse(docURI.toString());
+			Document rulesDoc = parseXMLDocument(docURI.toString());
 			addExternalRules(rulesDoc, docURI);
 		}
 		catch ( Throwable e ) {
@@ -265,9 +296,8 @@ public class ITSEngine implements IProcessor, ITraversal {
 				if ( content.endsWith("-->")) content = content.substring(0, content.length()-3);
 				content = content.trim();
 				// Parse the content
-				ensureDocumentBuilderExist();
 				InputSource is = new InputSource(new ByteArrayInputStream(content.getBytes()));
-				Document scriptDoc = fact.newDocumentBuilder().parse(is);
+				Document scriptDoc = parseXMLDocument(is);
 				// And compile the rules
 				compileRules(scriptDoc, docURI, isInternal);
 			}
@@ -455,8 +485,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 		boolean isInternal)
 	{
 		try {
-			ensureDocumentBuilderExist();
-			Document rulesDoc = fact.newDocumentBuilder().parse(docURI.toString());
+			Document rulesDoc = parseXMLDocument(docURI.toString());
 			compileRules(rulesDoc, docURI, isInternal);
 		}
 		catch ( Throwable e ) {
@@ -2046,6 +2075,15 @@ public class ITSEngine implements IProcessor, ITraversal {
 		
 		return data;
 	}
+
+	private XPath createXPath () {
+		XPath xpath = xpFact.newXPath();
+		NSContextManager nsc = new NSContextManager();
+		nsc.addNamespace(ITS_NS_PREFIX, ITS_NS_URI);
+		nsc.addNamespace(HTML_NS_PREFIX, HTML_NS_URI);
+		xpath.setNamespaceContext(nsc);
+		return xpath;
+	}
 	
 	/**
 	 * Retrieves the non-pointer information of the Localization Quality issue data category.
@@ -2138,31 +2176,68 @@ public class ITSEngine implements IProcessor, ITraversal {
 			firstPart = ref.substring(0, n);
 		}
 		else {
-			// No ID
-			//TODO: is this an issue?
+			// No ID in the URI
+			throw new RuntimeException(String.format("URI to standoff markup does not have an id: '%s'.", ref));
 		}
 
-//		// Load the document and the rules
-//		URI uri = new URI(ref);
-//		Document standoffDoc = fact.newDocumentBuilder().parse(uri.toString());
 		boolean useHTML5 = isHTML5;
+		Document containerDoc = null;
+		XPath containerXPath = null;
+		
+		if ( !Util.isEmpty(firstPart) ) {
+			// Load the document and the rules
+			try {
+				String baseFolder = "";
+				if ( docURI != null) baseFolder = getPartBeforeFile(docURI);
+				if ( baseFolder.length() > 0 ) {
+					if ( baseFolder.endsWith("/") )
+						baseFolder = baseFolder.substring(0, baseFolder.length()-1);
+					if ( !ref.startsWith("/") ) ref = baseFolder + "/" + ref;
+					else ref = baseFolder + ref;
+				}
+
+				// Remove the ID if any
+				int p = ref.lastIndexOf('#');
+				if ( p > -1 ) {
+					ref = ref.substring(0, p);
+				}
+				// Detect format based on extension: .html and .html as HTML, everything else as XML.
+				useHTML5 = ( ref.endsWith(".html") || ref.endsWith(".htm") );
+				if ( useHTML5 ) {
+					containerDoc = parseHTMLDocument(ref);
+				}
+				else {
+					containerDoc = parseXMLDocument(ref);
+				}
+				containerXPath = createXPath();
+				// Update useHTML5 in case the pointer file is not the same format as the annotated one
+				Element elem = containerDoc.getDocumentElement();
+			}
+			catch ( Throwable e) {
+				throw new RuntimeException(String.format("Error with URI '%s'.\n"+e.getMessage(), ref));
+			}
+		}
+		else {
+			// Else, the standoff markup is in the same document as the annotated content
+			containerDoc = doc;
+			containerXPath = xpath;
+		}
 		
 		// Create the new annotation set
 		GenericAnnotations anns = new GenericAnnotations();
-
 		Document issuesDoc = null;
 		XPath issuesXPath = null;
-		
+
 		if ( useHTML5 ) {
 			// If the standoff markup is inside an HTML file:
 			// Get the script that holds the its:locQualityIssues element
 			try {
 				String tmp = String.format("//%s:script[@id='%s']", HTML_NS_PREFIX, id);
 				//String tmp = String.format("//script[@id='%s']", id);
-				XPathExpression expr = xpath.compile(tmp);
-				Element scriptElem = (Element)expr.evaluate(doc, XPathConstants.NODE);
+				XPathExpression expr = containerXPath.compile(tmp);
+				Element scriptElem = (Element)expr.evaluate(containerDoc, XPathConstants.NODE);
 				if ( scriptElem == null ) {
-					logger.warn("Cannot find standoff script element for '{}'", ref);
+					logger.warn("Cannot find standoff script element for '{}'", id);
 					GenericAnnotation ann = addIssueItem(anns);
 					ann.setString(GenericAnnotationType.LQI_ISSUESREF, ref); // For information only
 					return anns;
@@ -2172,15 +2247,11 @@ public class ITSEngine implements IProcessor, ITraversal {
 				// Strip white spaces
 				content = content.trim();
 				// Create the context and XPath engine 
-				issuesXPath = xpFact.newXPath();
-				NSContextManager nsc = new NSContextManager();
-				nsc.addNamespace(ITS_NS_PREFIX, ITS_NS_URI);
-				issuesXPath.setNamespaceContext(nsc);
+				issuesXPath = createXPath();
 				// Parse the content
-				InputSource is = new InputSource(new ByteArrayInputStream(content.getBytes()));
-				ensureDocumentBuilderExist();
 				try {
-					issuesDoc = fact.newDocumentBuilder().parse(is);
+					InputSource is = new InputSource(new ByteArrayInputStream(content.getBytes()));
+					issuesDoc = parseXMLDocument(is);
 				}
 				catch ( Throwable e ) {
 					throw new RuntimeException("Error parsing a script element.", e);
@@ -2191,8 +2262,8 @@ public class ITSEngine implements IProcessor, ITraversal {
 			}
 		}
 		else {
-			issuesDoc = doc;
-			issuesXPath = xpath;
+			issuesDoc = containerDoc;
+			issuesXPath = containerXPath;
 		}
 		
 		// Now get the element holding the list of issues

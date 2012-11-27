@@ -255,6 +255,41 @@ public class HTML5FilterTest {
 	}
 	
 	@Test
+	public void testLocQualityIssuesExternalXMLStandoff () {
+		ArrayList<Event> list = getEvents(new File(root+"lqi-test1.html"));
+		
+		// First paragraph
+		ITextUnit tu = FilterTestDriver.getTextUnit(list, 2);
+		assertEquals("Paragraph 1", tu.getSource().toString());
+		GenericAnnotations anns = tu.getSource().getAnnotation(GenericAnnotations.class);
+		assertNotNull(anns);
+		List<GenericAnnotation> res = anns.getAnnotations(GenericAnnotationType.LQI);
+		assertEquals(2, res.size());
+		assertEquals("lqi3-comment1", res.get(0).getString(GenericAnnotationType.LQI_COMMENT));
+		assertEquals("lqi3-comment2", res.get(1).getString(GenericAnnotationType.LQI_COMMENT));
+		
+		// Attribute of paragraph 2
+		tu = FilterTestDriver.getTextUnit(list, 3);
+		assertEquals("Text", tu.getSource().toString());
+		anns = tu.getSource().getAnnotation(GenericAnnotations.class);
+		assertNotNull(anns);
+		res = anns.getAnnotations(GenericAnnotationType.LQI);
+		assertEquals(2, res.size());
+		assertEquals("lqi1-comment1", res.get(0).getString(GenericAnnotationType.LQI_COMMENT));
+		assertEquals("lqi1-comment2", res.get(1).getString(GenericAnnotationType.LQI_COMMENT));
+		
+		// Paragraph 2
+		tu = FilterTestDriver.getTextUnit(list, 4);
+		assertEquals("Paragraph 2", tu.getSource().toString());
+		anns = tu.getSource().getAnnotation(GenericAnnotations.class);
+		assertNotNull(anns);
+		res = anns.getAnnotations(GenericAnnotationType.LQI);
+		assertEquals(2, res.size());
+		assertEquals("lqi2-comment1", res.get(0).getString(GenericAnnotationType.LQI_COMMENT));
+		assertEquals("lqi2-comment2", res.get(1).getString(GenericAnnotationType.LQI_COMMENT));
+	}
+
+	@Test
 	public void testStandofftLocQualityIssues () {
 		String snippet = "<!DOCTYPE html><html lang=en><head><meta charset=utf-8><title>Title</title>"
 			+ "<script id='lqi1'>"
