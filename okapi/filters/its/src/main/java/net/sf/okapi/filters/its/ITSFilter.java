@@ -512,8 +512,9 @@ public abstract class ITSFilter implements IFilter {
 		}
 
 		// Set the ITS context for this attribute and set the relevant properties
-		ContextItem ci = new ContextItem((context.isEmpty() ? attr.getParentNode() : context.peek().node),
-			trav, attr);
+		ContextItem ci = new ContextItem(
+			(context.isEmpty() ? attr.getParentNode() : context.peek().node), trav, attr);
+		
 		// ITS Localization Note
 		if ( !Util.isEmpty(ci.locNote) ) {
 			tu.setProperty(new Property(Property.NOTE, ci.locNote));
@@ -533,6 +534,10 @@ public abstract class ITSFilter implements IFilter {
 		// ITS Allowed characters
 		if ( ci.allowedChars != null ) {
 			tu.setProperty(new Property(Property.ITS_ALLOWEDCHARACTERS, ci.allowedChars));
+		}
+		// ITS Localization Quality Issue
+		if ( ci.lqIssues != null ) {
+			tu.getSource().setAnnotation(ci.lqIssues);
 		}
 
 		queue.add(new Event(EventType.TEXT_UNIT, tu));
@@ -893,6 +898,10 @@ public abstract class ITSFilter implements IFilter {
 		// ITS Allowed characters
 		if ( context.peek().allowedChars != null ) {
 			tu.setProperty(new Property(Property.ITS_ALLOWEDCHARACTERS, context.peek().allowedChars));
+		}
+		// ITS Localization Quality Issue
+		if ( context.peek().lqIssues != null ) {
+			tu.getSource().setAnnotation(context.peek().lqIssues);
 		}
 		
 		// Set term info
