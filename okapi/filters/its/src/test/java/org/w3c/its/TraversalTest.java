@@ -405,6 +405,18 @@ public class TraversalTest {
 	}
 	
 	@Test
+	public void testToolsRefBadValue () throws SAXException, IOException, ParserConfigurationException {
+		// Should pass without exception, but generate an error in the log.
+		InputSource is = new InputSource(new StringReader("<doc xmlns:i='"+ITSEngine.ITS_NS_URI+"' i:version='2.0'>"
+			+ "<group i:toolsRef='Invalid-value-for-test|uri1'>"
+			+ "<p>Text with</p></group></doc>"));
+		Document doc = fact.newDocumentBuilder().parse(is);
+		ITraversal trav = applyITSRules(doc, null, false, null);
+		getElement(trav, "group", 1);
+		assertEquals("Invalid-value-for-test|uri1", trav.getToolsRef());
+	}
+	
+	@Test
 	public void testIdValueOnAttribute () throws SAXException, IOException, ParserConfigurationException {
 		InputSource is = new InputSource(new StringReader("<doc xmlns:i='"+ITSEngine.ITS_NS_URI+"' i:version='2.0'>"
 			+ "<i:rules xmlns:i='"+ITSEngine.ITS_NS_URI+"' version='2.0'>"
