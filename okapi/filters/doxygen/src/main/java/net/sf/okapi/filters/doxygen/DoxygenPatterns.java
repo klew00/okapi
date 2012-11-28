@@ -122,7 +122,7 @@ public class DoxygenPatterns {
 	 * 		bool mybool; ///< Paragraph 4
 	 * </pre>
 	 */
-	public static final String MEMBER_COMMENT_PREFIX = "^<\\s+";
+	public static final String MEMBER_COMMENT_PREFIX = "^<[^\\S\\r\\n]+";
 	public static final Pattern MEMBER_COMMENT_PREFIX_PATTERN = Pattern.compile(MEMBER_COMMENT_PREFIX, Pattern.MULTILINE);
 	public static final Pattern MEMBER_COMMENT_SUFFIX_PATTERN = Pattern.compile(CPP_COMMENT_SUFFIX);
 	
