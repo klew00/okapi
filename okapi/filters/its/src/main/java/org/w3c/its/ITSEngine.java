@@ -1784,8 +1784,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 			for ( int i=0; i<NL.getLength(); i++ ) {
 				attr = (Attr)NL.item(i);
 				// Validate the value
-				String value = attr.getValue();
-				
+				String value = validateToolsRefValue(attr.getValue());
 				// Set the flag
 				setFlag(attr.getOwnerElement(), FP_TOOLSREF,
 					(value!=null ? 'y' : '?'), attr.getSpecified());
@@ -1958,6 +1957,17 @@ public class ITSEngine implements IProcessor, ITraversal {
 		}
 	}
 
+	private String validateToolsRefValue (String data) {
+		if ( Util.isEmpty(data) || ( ("allowed-characters|directionality|disambiguation|domain|elements-within-text|"
+			+ "external-resource|id-value|language-information|locale-filter|localization-note|lq-issue|lq-precis|"
+			+ "mt-confidence|provenance|ruby|storage-size|target-pointer|terminology|translate").indexOf(data)==-1 ))
+		{
+			// Log an error, but don't stop the process
+			logger.error("Invalid value for toolsRef/its-tools-ref: '{}'", data);
+		}
+		return data;
+	}
+	
 	/**
 	 * Retrieve the final list to use for a locale filter data category
 	 * @param elem the element where the attributes are defined.
