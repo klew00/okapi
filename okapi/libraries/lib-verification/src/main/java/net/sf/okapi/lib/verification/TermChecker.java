@@ -31,6 +31,7 @@ import net.sf.okapi.common.Range;
 import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.ITextUnit;
+import net.sf.okapi.common.resource.TextUnitUtil;
 import net.sf.okapi.lib.terminology.TermHit;
 import net.sf.okapi.lib.terminology.simpletb.SimpleTB;
 
@@ -91,6 +92,8 @@ public class TermChecker {
 			Issue issue = new Issue(docId, IssueType.TERMINOLOGY, tu.getId(), srcSeg.getId(),
 				String.format("In the glossary \"%s\" is translated \"%s\".", th.sourceTerm.getText(), th.targetTerm.getText()),
 				-1, 0, -1, 0, Issue.SEVERITY_LOW, tu.getName());
+				//QualityChecker.fromFragmentToString(srcSeg.text, th.range.start), QualityChecker.fromFragmentToString(srcSeg.text, th.range.end),
+				// -1, 0, Issue.SEVERITY_LOW, tu.getName());
 			issues.add(issue);
 		}
 		return issues.size();
@@ -140,7 +143,7 @@ public class TermChecker {
 	public static List<TermHit> getExistingTargetTerms (TextFragment frag,
 		List<TermHit> sourceHits)
 	{
-		String text = frag.getCodedText().toLowerCase();
+		String text = TextUnitUtil.getText(frag).toLowerCase(); // Strip inline codes and convert to lowercase
 		List<String> parts = Arrays.asList(text.split("\\s"));
 		List<TermHit> res = new ArrayList<TermHit>();
 	
