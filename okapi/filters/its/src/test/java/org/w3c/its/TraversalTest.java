@@ -34,6 +34,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import net.sf.okapi.common.TestUtil;
+import net.sf.okapi.common.resource.TextFragment;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -391,8 +392,8 @@ public class TraversalTest {
 	@Test
 	public void testToolsRef () throws SAXException, IOException, ParserConfigurationException {
 		InputSource is = new InputSource(new StringReader("<doc xmlns:i='"+ITSEngine.ITS_NS_URI+"' i:version='2.0'>"
-			+ "<group i:toolsRef='terminology|uri2 mtconfidence|uri1'>"
-			+ "<p i:toolsRef='disambuguation|uriDisamb'>Text with <z i:toolsRef='terminology|uri3'"
+			+ "<group i:toolsRef='terminology|uri2 mt-confidence|uri1'>"
+			+ "<p i:toolsRef='disambiguation|uriDisamb'>Text with <z i:toolsRef='terminology|uri3'"
 			+ " i:term='yes'>a term</z></p></group></doc>"));
 		Document doc = fact.newDocumentBuilder().parse(is);
 		ITraversal trav = applyITSRules(doc, null, false, null);
@@ -414,6 +415,33 @@ public class TraversalTest {
 		ITraversal trav = applyITSRules(doc, null, false, null);
 		getElement(trav, "group", 1);
 		assertEquals("Invalid-value-for-test|uri1", trav.getToolsRef());
+	}
+	
+	@Test
+	public void testQueryLanguage () throws SAXException, IOException, ParserConfigurationException {
+		InputSource is = new InputSource(new StringReader("<doc>"
+			+ "<i:rules xmlns:i='"+ITSEngine.ITS_NS_URI+"' queryLanguage='xpath2' version='2.0'>"
+			+ "<i:translateRule selector='//par/@title' translate='yes' />"
+			+ "<i:translateRule selector='//par/@alt' translate='yes' />"
+			+ "</i:rules>"
+			+ "<par title='title text' test='test' alt='alt text'>Text</par></doc>"));
+		// Passes but should generate a warning in the log
+		Document doc = fact.newDocumentBuilder().parse(is);
+		ITraversal trav = applyITSRules(doc, null, false, null);
+		Element elem = getElement(trav, "par", 1);
+		assertTrue(trav.getTranslate(elem.getAttributeNode("title")));
+	}
+
+	@Test (expected=ITSException.class)
+	public void testBadQueryLanguage () throws SAXException, IOException, ParserConfigurationException {
+		InputSource is = new InputSource(new StringReader("<doc>"
+			+ "<i:rules xmlns:i='"+ITSEngine.ITS_NS_URI+"' queryLanguage='invalid-value' version='2.0'>"
+			+ "<i:translateRule selector='//par/@title' translate='yes' />"
+			+ "<i:translateRule selector='//par/@alt' translate='yes' />"
+			+ "</i:rules>"
+			+ "<par title='title text' test='test' alt='alt text'>Text</par></doc>"));
+		Document doc = fact.newDocumentBuilder().parse(is);
+		ITraversal trav = applyITSRules(doc, null, false, null);
 	}
 	
 	@Test

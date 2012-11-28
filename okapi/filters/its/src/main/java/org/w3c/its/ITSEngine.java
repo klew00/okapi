@@ -338,6 +338,18 @@ public class ITSEngine implements IProcessor, ITraversal {
 				if ( !version.equals(ITS_VERSION1) && !version.equals(ITS_VERSION2) ) {
 					throw new ITSException(String.format("Invalid or missing ITS version (\"%s\")", version));
 				}
+				
+				// Check queryLanguage
+				String qlang = rulesElem.getAttributeNS(null, "queryLanguage");
+				if ( !Util.isEmpty(qlang) ) {
+					if ( !qlang.startsWith("xpath") ) {
+						throw new ITSException(String.format("ITS queryLanguage is '%s', but this implementation supports only XPath.", qlang));
+					}
+					if ( !qlang.equals("xpath") ) {
+						// Some version other than 1.0 of XPath: proceed, but warn of the potential issues
+						logger.warn(String.format("ITS queryLanguage is '%s', but this implementation supports only XPath 1.0: You may or may not run into problems.'", qlang));
+					}
+				}
 
 				// Check for link
 				String href = rulesElem.getAttributeNS(XLINK_NS_URI, "href");
@@ -1784,7 +1796,12 @@ public class ITSEngine implements IProcessor, ITraversal {
 			for ( int i=0; i<NL.getLength(); i++ ) {
 				attr = (Attr)NL.item(i);
 				// Validate the value
-				String value = validateToolsRefValue(attr.getValue());
+				String value = attr.getValue();
+				// Validate the values
+				Map<String, String> map = toolsRefToMap(value);
+				for ( String dc : map.keySet() ) {
+					validateToolsRefValue(dc);
+				}
 				// Set the flag
 				setFlag(attr.getOwnerElement(), FP_TOOLSREF,
 					(value!=null ? 'y' : '?'), attr.getSpecified());
@@ -2220,8 +2237,6 @@ public class ITSEngine implements IProcessor, ITraversal {
 					containerDoc = parseXMLDocument(ref);
 				}
 				containerXPath = createXPath();
-				// Update useHTML5 in case the pointer file is not the same format as the annotated one
-				Element elem = containerDoc.getDocumentElement();
 			}
 			catch ( Throwable e) {
 				throw new RuntimeException(String.format("Error with URI '%s'.\n"+e.getMessage(), ref));
