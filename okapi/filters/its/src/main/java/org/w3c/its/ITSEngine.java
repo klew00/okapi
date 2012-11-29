@@ -2353,6 +2353,12 @@ public class ITSEngine implements IProcessor, ITraversal {
 		String pointer)
 	{
 		try {
+			//--temporary fix to get resolve the variable in some cases--
+			//--but the problem seems to be more serious and requires attention--
+			if (pointer.startsWith("$")){
+				XPathExpression expr = xpath.compile(pointer);
+				pointer = expr.evaluate(node);
+			}
 			XPathExpression expr = xpath.compile(pointer);
 			NodeList list = (NodeList)expr.evaluate(node, XPathConstants.NODESET);
 			if (( list == null ) || ( list.getLength() == 0 )) {
