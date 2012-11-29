@@ -32,6 +32,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.exceptions.OkapiBadFilterParametersException;
+import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.filters.its.html5.HTML5Filter;
 import nu.validator.htmlparser.dom.HtmlDocumentBuilder;
 
@@ -64,6 +65,8 @@ public class Main {
 	// TODO: public static final String DC_MTCONFIDENCE = "mtconfidence";
 	public static final String DC_STORAGESIZE = "storagesize";
 	public static final String DC_ALLOWEDCHARACTERS = "allowedcharacters";
+	
+	public static final String DC_REF_PREFIX = "REF:";
 
 	public static void main (String[] args) {
  
@@ -276,7 +279,15 @@ public class Main {
 		else if ( dc.equals(DC_LOCALIZATIONNOTE) ) {
 			out1 = trav.getLocNote(attr);
 			if ( out1 != null ) {
-				writer.print(String.format("\tlocNote=\"%s\"", escape(out1)));
+				//--somewhat ugly hack to remove white spaces.--
+				//--TODO: May need to be done more selectively--
+				out1 = unwrap(out1);
+				//--re-formatting the refs--
+				if ( out1.startsWith(DC_REF_PREFIX) ) {
+					writer.print(String.format("\tlocNoteRef=\"%s\"", escape(out1.substring(DC_REF_PREFIX.length())).replace("&quot;", "\"")));
+				}else{
+					writer.print(String.format("\tlocNote=\"%s\"", escape(out1).replace("&quot;", "\"")));					
+				}
 				out1 = trav.getLocNoteType(attr);
 				writer.print(String.format("\tlocNoteType=\"%s\"", escape(out1)));
 			}
@@ -284,9 +295,17 @@ public class Main {
 		else if ( dc.equals(DC_TERMINOLOGY) ) {
 			out1 = (trav.getTerm(attr) ? "yes" : "no");
 			if ( out1 != null ) writer.print(String.format("\tterm=\"%s\"", escape(out1)));
-			writer.print("\t");
+			//writer.print("\t");
 			out1 = trav.getTermInfo(attr);
-			if ( out1 != null ) writer.print(String.format("\ttermInfo=\"%s\"", escape(out1)));
+			if ( out1 != null ){
+				if (out1.startsWith(DC_REF_PREFIX)){
+					writer.print(String.format("\ttermInfoRef=\"%s\"", escape(out1.substring(DC_REF_PREFIX.length()) )));
+				}else{
+					if( !Util.isEmpty(out1) ){
+						writer.print(String.format("\ttermInfo=\"%s\"", escape(unwrap(out1))));
+					}
+				}
+			}
 		}
 		else if ( dc.equals(DC_DIRECTIONALITY) ) {
 			int dir = trav.getDirectionality(attr);
@@ -387,6 +406,12 @@ public class Main {
 		}
 		
 		writer.print("\n");
+	}
+	
+	private static String unwrap (String text){
+		TextFragment tf = new TextFragment(text);
+		TextFragment.unwrap(tf);
+		return tf.toString();
 	}
 	
 	private static String escape (String text) {
