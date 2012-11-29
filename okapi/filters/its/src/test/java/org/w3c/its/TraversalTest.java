@@ -400,9 +400,9 @@ public class TraversalTest {
 		getElement(trav, "group", 1);
 		assertEquals("mt-confidence|uri1 terminology|uri2", trav.getToolsRef());
 		getElement(trav, "p", 1);
-		assertEquals("disambuguation|uriDisamb mt-confidence|uri1 terminology|uri2", trav.getToolsRef());
+		assertEquals("disambiguation|uriDisamb mt-confidence|uri1 terminology|uri2", trav.getToolsRef());
 		getElement(trav, "z", 1);
-		assertEquals("disambuguation|uriDisamb mt-confidence|uri1 terminology|uri3", trav.getToolsRef());
+		assertEquals("disambiguation|uriDisamb mt-confidence|uri1 terminology|uri3", trav.getToolsRef());
 	}
 	
 	@Test
