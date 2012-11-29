@@ -281,13 +281,12 @@ public class Main {
 			if ( out1 != null ) {
 				//--somewhat ugly hack to remove white spaces.--
 				//--TODO: May need to be done more selectively--
-				TextFragment tf = new TextFragment(out1);
-				TextFragment.unwrap(tf);
+				out1 = unwrap(out1);
 				//--re-formatting the refs--
-				if ( tf.toString().startsWith(DC_REF_PREFIX) ) {
-					writer.print(String.format("\tlocNoteRef=\"%s\"", escape(tf.toString().substring(DC_REF_PREFIX.length())).replace("&quot;", "\"")));
+				if ( out1.startsWith(DC_REF_PREFIX) ) {
+					writer.print(String.format("\tlocNoteRef=\"%s\"", escape(out1.substring(DC_REF_PREFIX.length())).replace("&quot;", "\"")));
 				}else{
-					writer.print(String.format("\tlocNote=\"%s\"", escape(tf.toString()).replace("&quot;", "\"")));					
+					writer.print(String.format("\tlocNote=\"%s\"", escape(out1).replace("&quot;", "\"")));					
 				}
 				out1 = trav.getLocNoteType(attr);
 				writer.print(String.format("\tlocNoteType=\"%s\"", escape(out1)));
@@ -302,7 +301,9 @@ public class Main {
 				if (out1.startsWith(DC_REF_PREFIX)){
 					writer.print(String.format("\ttermInfoRef=\"%s\"", escape(out1.substring(DC_REF_PREFIX.length()) )));
 				}else{
-					writer.print(String.format("\ttermInfo=\"%s\"", escape(out1)));					
+					if( !Util.isEmpty(out1) ){
+						writer.print(String.format("\ttermInfo=\"%s\"", escape(unwrap(out1))));
+					}
 				}
 			}
 		}
@@ -405,6 +406,12 @@ public class Main {
 		}
 		
 		writer.print("\n");
+	}
+	
+	private static String unwrap (String text){
+		TextFragment tf = new TextFragment(text);
+		TextFragment.unwrap(tf);
+		return tf.toString();
 	}
 	
 	private static String escape (String text) {
