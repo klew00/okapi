@@ -338,6 +338,18 @@ public class ITSEngine implements IProcessor, ITraversal {
 				if ( !version.equals(ITS_VERSION1) && !version.equals(ITS_VERSION2) ) {
 					throw new ITSException(String.format("Invalid or missing ITS version (\"%s\")", version));
 				}
+				
+				// Check queryLanguage
+				String qlang = rulesElem.getAttributeNS(null, "queryLanguage");
+				if ( !Util.isEmpty(qlang) ) {
+					if ( !qlang.startsWith("xpath") ) {
+						throw new ITSException(String.format("ITS queryLanguage is '%s', but this implementation supports only XPath.", qlang));
+					}
+					if ( !qlang.equals("xpath") ) {
+						// Some version other than 1.0 of XPath: proceed, but warn of the potential issues
+						logger.warn(String.format("ITS queryLanguage is '%s', but this implementation supports only XPath 1.0: You may or may not run into problems.'", qlang));
+					}
+				}
 
 				// Check for link
 				String href = rulesElem.getAttributeNS(XLINK_NS_URI, "href");
@@ -1785,7 +1797,11 @@ public class ITSEngine implements IProcessor, ITraversal {
 				attr = (Attr)NL.item(i);
 				// Validate the value
 				String value = attr.getValue();
-				
+				// Validate the values
+				Map<String, String> map = toolsRefToMap(value);
+				for ( String dc : map.keySet() ) {
+					validateToolsRefValue(dc);
+				}
 				// Set the flag
 				setFlag(attr.getOwnerElement(), FP_TOOLSREF,
 					(value!=null ? 'y' : '?'), attr.getSpecified());
@@ -1958,6 +1974,17 @@ public class ITSEngine implements IProcessor, ITraversal {
 		}
 	}
 
+	private String validateToolsRefValue (String data) {
+		if ( Util.isEmpty(data) || ( ("allowed-characters|directionality|disambiguation|domain|elements-within-text|"
+			+ "external-resource|id-value|language-information|locale-filter|localization-note|lq-issue|lq-precis|"
+			+ "mt-confidence|provenance|ruby|storage-size|target-pointer|terminology|translate").indexOf(data)==-1 ))
+		{
+			// Log an error, but don't stop the process
+			logger.error("Invalid value for toolsRef/its-tools-ref: '{}'", data);
+		}
+		return data;
+	}
+	
 	/**
 	 * Retrieve the final list to use for a locale filter data category
 	 * @param elem the element where the attributes are defined.
@@ -2210,8 +2237,6 @@ public class ITSEngine implements IProcessor, ITraversal {
 					containerDoc = parseXMLDocument(ref);
 				}
 				containerXPath = createXPath();
-				// Update useHTML5 in case the pointer file is not the same format as the annotated one
-				Element elem = containerDoc.getDocumentElement();
 			}
 			catch ( Throwable e) {
 				throw new RuntimeException(String.format("Error with URI '%s'.\n"+e.getMessage(), ref));

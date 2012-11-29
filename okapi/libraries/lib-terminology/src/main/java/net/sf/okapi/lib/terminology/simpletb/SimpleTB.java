@@ -36,6 +36,7 @@ import net.sf.okapi.common.Range;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.resource.TextFragment;
+import net.sf.okapi.common.resource.TextUnitUtil;
 import net.sf.okapi.lib.terminology.ConceptEntry;
 import net.sf.okapi.lib.terminology.IGlossaryReader;
 import net.sf.okapi.lib.terminology.LangEntry;
@@ -254,7 +255,7 @@ public class SimpleTB {
 		LocaleId fragmentLoc,
 		LocaleId otherLoc)
 	{
-		String text = frag.getCodedText().toLowerCase();
+		String text = TextUnitUtil.getText(frag).toLowerCase(); // Strip inline codes and convert to lowercase
 		List<String> parts = Arrays.asList(text.split("\\s"));
 		List<TermHit> res = new ArrayList<TermHit>();
 	
