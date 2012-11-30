@@ -89,8 +89,9 @@ public class TraversalTest {
 	public void testTermPointer () throws SAXException, IOException, ParserConfigurationException {
 		InputSource is = new InputSource(new StringReader("<doc>"
 			+ "<its:rules xmlns:its=\"http://www.w3.org/2005/11/its\" version=\"2.0\">"
-			+ "<its:param name=\"termInfoRefPointer\">@target</its:param>"
-			+ "<its:termRule selector=\"//term\" term=\"yes\" termInfoRefPointer=\"$termInfoRefPointer\"/>"
+			+ "<its:param name=\"termInfoRefPointer\">target</its:param>"
+			+ "<its:termRule selector=\"//term\" term=\"yes\" "
+			+ " termInfoRefPointer=\"@*[local-name() = $termInfoRefPointer]\"/>"
 			+ "</its:rules>"
 			+ "<p>We may define<term target=\"#TDPV\">discoursal point of view</term> as <gloss xml:id=\"TDPV\">the "
 			+ "relationship, etc.</gloss></p>"
