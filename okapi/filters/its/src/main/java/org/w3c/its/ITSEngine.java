@@ -76,14 +76,16 @@ public class ITSEngine implements IProcessor, ITraversal {
 	public static final String    HTML_NS_PREFIX  = "h";
 	public static final String    ITS_MIMETYPE    = "application/its+xml";
 	
+	public static final String    REF_PREFIX = "REF:"; // Prefix added at the front of the information that are references
+
 	private static final String   FLAGNAME = "\u00ff"; // Name of the user-data property that holds the flags
 	private static final String   FLAGSEP  = "\u001c"; // Separator between data categories
 	
 	// Must have '?' as many times as there are FP_XXX entries +1
 	// Must have +FLAGSEP as many times as there are FP_XXX_DATA entries +1
-	private static final String   FLAGDEFAULTDATA     = "????????????????"
+	private static final String   FLAGDEFAULTDATA     = "?????????????????"
 		+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP
-		+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP;
+		+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP;
 
 	private static final String SRC_TRGPTRFLAGNAME = "\u10ff"; // Name of the user-data property that holds the target pointer flag in the source
 	private static final String TRG_TRGPTRFLAGNAME = "\u20ff"; // Name of the user-data property that holds the target pointer flag in the target
@@ -107,6 +109,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 	private static final int      FP_SUBFILTER             = 13;
 	private static final int      FP_TARGETPOINTER         = 14;
 	private static final int      FP_TOOLSREF              = 15;
+	private static final int      FP_MTCONFIDENCE          = 16;
 	
 	// Data position 
 	private static final int      FP_TERMINOLOGY_DATA      = 0;
@@ -122,6 +125,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 	private static final int      FP_ALLOWEDCHARS_DATA     = 10;
 	private static final int      FP_SUBFILTER_DATA        = 11;
 	private static final int      FP_TOOLSREF_DATA         = 12;
+	private static final int      FP_MTCONFIDENCE_DATA     = 13;
 	
 	private static final int      INFOTYPE_TEXT            = 0;
 	private static final int      INFOTYPE_REF             = 1;
@@ -1361,10 +1365,10 @@ public class ITSEngine implements IProcessor, ITraversal {
 							setFlag(NL.item(i), FP_TERMINOLOGY_DATA, resolvePointer(NL.item(i), rule.info), true);
 							break;
 						case INFOTYPE_REF:
-							setFlag(NL.item(i), FP_TERMINOLOGY_DATA, "REF:"+rule.info, true);
+							setFlag(NL.item(i), FP_TERMINOLOGY_DATA, REF_PREFIX+rule.info, true);
 							break;
 						case INFOTYPE_REFPOINTER:
-							setFlag(NL.item(i), FP_TERMINOLOGY_DATA, "REF:"+resolvePointer(NL.item(i), rule.info), true);
+							setFlag(NL.item(i), FP_TERMINOLOGY_DATA, REF_PREFIX+resolvePointer(NL.item(i), rule.info), true);
 							break;
 						}
 					}
@@ -1379,10 +1383,10 @@ public class ITSEngine implements IProcessor, ITraversal {
 							setFlag(NL.item(i), FP_LOCNOTE_DATA, resolvePointer(NL.item(i), rule.info), true);
 							break;
 						case INFOTYPE_REF:
-							setFlag(NL.item(i), FP_LOCNOTE_DATA, "REF:"+rule.info, true);
+							setFlag(NL.item(i), FP_LOCNOTE_DATA, REF_PREFIX+rule.info, true);
 							break;
 						case INFOTYPE_REFPOINTER:
-							setFlag(NL.item(i), FP_LOCNOTE_DATA, "REF:"+resolvePointer(NL.item(i), rule.info), true);
+							setFlag(NL.item(i), FP_LOCNOTE_DATA, REF_PREFIX+resolvePointer(NL.item(i), rule.info), true);
 							break;
 						}
 					}
@@ -1697,7 +1701,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 					}
 					else if ( localName.equals("termInfoRef") || localName.equals("its-term-info-ref") ) {
 						setFlag(attr.getOwnerElement(), FP_TERMINOLOGY_DATA,
-							"REF:"+attr.getValue(), attr.getSpecified());
+							REF_PREFIX+attr.getValue(), attr.getSpecified());
 					}
 				}
 			}
@@ -1730,7 +1734,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 					}
 					else if ( localName.equals("locNoteRef") || localName.equals("its-loc-note-ref") ) {
 						setFlag(attr.getOwnerElement(), FP_LOCNOTE_DATA,
-							"REF:"+attr.getValue(), attr.getSpecified());
+							REF_PREFIX+attr.getValue(), attr.getSpecified());
 					}
 				}
 			}

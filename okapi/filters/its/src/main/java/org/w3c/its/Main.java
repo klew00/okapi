@@ -66,8 +66,6 @@ public class Main {
 	public static final String DC_STORAGESIZE = "storagesize";
 	public static final String DC_ALLOWEDCHARACTERS = "allowedcharacters";
 	
-	public static final String DC_REF_PREFIX = "REF:";
-
 	public static void main (String[] args) {
  
 		PrintWriter writer = null;
@@ -283,9 +281,10 @@ public class Main {
 				//--TODO: May need to be done more selectively--
 				out1 = unwrap(out1);
 				//--re-formatting the refs--
-				if ( out1.startsWith(DC_REF_PREFIX) ) {
-					writer.print(String.format("\tlocNoteRef=\"%s\"", escape(out1.substring(DC_REF_PREFIX.length())).replace("&quot;", "\"")));
-				}else{
+				if ( out1.startsWith(ITSEngine.REF_PREFIX) ) {
+					writer.print(String.format("\tlocNoteRef=\"%s\"", escape(out1.substring(ITSEngine.REF_PREFIX.length())).replace("&quot;", "\"")));
+				}
+				else {
 					writer.print(String.format("\tlocNote=\"%s\"", escape(out1).replace("&quot;", "\"")));					
 				}
 				out1 = trav.getLocNoteType(attr);
@@ -298,10 +297,11 @@ public class Main {
 			//writer.print("\t");
 			out1 = trav.getTermInfo(attr);
 			if ( out1 != null ){
-				if (out1.startsWith(DC_REF_PREFIX)){
-					writer.print(String.format("\ttermInfoRef=\"%s\"", escape(out1.substring(DC_REF_PREFIX.length()) )));
-				}else{
-					if( !Util.isEmpty(out1) ){
+				if ( out1.startsWith(ITSEngine.REF_PREFIX) ) {
+					writer.print(String.format("\ttermInfoRef=\"%s\"", escape(out1.substring(ITSEngine.REF_PREFIX.length()) )));
+				}
+				else {
+					if ( !Util.isEmpty(out1) ) {
 						writer.print(String.format("\ttermInfo=\"%s\"", escape(unwrap(out1))));
 					}
 				}
