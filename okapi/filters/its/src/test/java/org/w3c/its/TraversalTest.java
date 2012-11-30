@@ -79,10 +79,25 @@ public class TraversalTest {
 		elem = getElement(trav, "term", 1);
 		assertNotNull(elem);
 		assertTrue(trav.getTerm(null));
-		// This is empty because ref in id(@ref) is not defined as IDType
-		// So no text is detected
-//TODO: Need to look at this		
-		assertEquals("", trav.getTermInfo(null));
+		assertEquals("the relationship, expressed through discourse\n"
+			+ "structure, between the implied author or some other addresser,\n"
+			+ "and the fiction.", trav.getTermInfo(null));
+	}
+
+	@Test
+	public void testTermPointerwithID () throws SAXException, IOException, ParserConfigurationException {
+		InputSource is = new InputSource(new StringReader("<text>"
+			+ "<its:rules xmlns:its=\"http://www.w3.org/2005/11/its\" version=\"2.0\">"
+			+ "<its:termRule selector=\"//term\" term=\"yes\" termInfoPointer=\"id(@def)\"/>"
+			+ "</its:rules>"
+			+ "<p>We may define	<term def=\"TDPV\">discoursal point of view</term> as "
+			+ "<gloss xml:id=\"TDPV\">the relationship, etc.</gloss>.</p></text>"));
+		Document doc = fact.newDocumentBuilder().parse(is);
+		ITraversal trav = applyITSRules(doc, null, false, null);
+		Element elem = getElement(trav, "term", 1);
+		assertNotNull(elem);
+		assertTrue(trav.getTerm(null));
+		assertEquals("the relationship, etc.", trav.getTermInfo(null));
 	}
 
 	@Test
