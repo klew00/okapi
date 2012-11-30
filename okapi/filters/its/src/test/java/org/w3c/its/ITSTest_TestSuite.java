@@ -55,6 +55,7 @@ public class ITSTest_TestSuite {
 //		processBatches(root+"/preservespace", Main.DC_PRESERVESPACE);
 //		processBatches(root+"/locqualityissue", Main.DC_LOCQUALITYISSUE);
 //		processBatches(root+"/storagesize", Main.DC_STORAGESIZE);
+//		processBatches(root+"/mtconfidence", Main.DC_MTCONFIDENCE);
 //		processBatches(root+"/allowedcharacters", Main.DC_ALLOWEDCHARACTERS);
 	}
 	

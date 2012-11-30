@@ -62,7 +62,7 @@ public class Main {
 	public static final String DC_IDVALUE = "idvalue";
 	public static final String DC_PRESERVESPACE = "preservespace";
 	public static final String DC_LOCQUALITYISSUE = "locqualityissue";
-	// TODO: public static final String DC_MTCONFIDENCE = "mtconfidence";
+	public static final String DC_MTCONFIDENCE = "mtconfidence";
 	public static final String DC_STORAGESIZE = "storagesize";
 	public static final String DC_ALLOWEDCHARACTERS = "allowedcharacters";
 	
@@ -105,6 +105,7 @@ public class Main {
 						+ "\n" + DC_IDVALUE
 						+ "\n" + DC_PRESERVESPACE
 						+ "\n" + DC_LOCQUALITYISSUE
+						+ "\n" + DC_MTCONFIDENCE
 						+ "\n" + DC_STORAGESIZE
 						+ "\n" + DC_ALLOWEDCHARACTERS
 					);
@@ -389,6 +390,13 @@ public class Main {
 				out1 = trav.getLocQualityIssueType(attr, i);
 				writer.print(String.format("\tlocQualityIssueType[%d]=\"%s\"", i, escape(out1==null ? "" : out1)));
 			}
+		}
+		else if ( dc.equals(DC_MTCONFIDENCE) ) {
+			Float outFloat1 = trav.getMtConfidence(attr);
+			writer.print(String.format("\tmtConfidence=\"%f\"", outFloat1==null ? 0 : outFloat1));
+			writer.print("\t"); // display also toosRef because it's a required information for MT confidence
+			out1 = trav.getToolsRef();
+			writer.print(String.format("\ttoolsRef=\"%s\"", escape(out1==null ? "" : out1)));
 		}
 		else if ( dc.equals(DC_STORAGESIZE) ) {
 			out1 = trav.getStorageSize(attr);

@@ -453,6 +453,9 @@ public class ITSEngine implements IProcessor, ITraversal {
 					else if ( "allowedCharactersRule".equals(locName) ) {
 						compileAllowedCharactersRule(ruleElem, isInternal);
 					}
+					else if ( "mtConfidenceRule".equals(locName) ) {
+						compileMtConfidenceRule(ruleElem, isInternal);
+					}
 					else if ( "subFilterRule".equals(locName) ) {
 						compileSubFilterRule(ruleElem, isInternal);
 					}
@@ -720,6 +723,20 @@ public class ITSEngine implements IProcessor, ITraversal {
 		rules.add(rule);
 	}
 	
+	private void compileMtConfidenceRule (Element elem,
+		boolean isInternal)
+	{
+		ITSRule rule = new ITSRule(IProcessor.DC_MTCONFIDENCE);
+		rule.selector = elem.getAttribute("selector");
+		rule.isInternal = isInternal;
+			
+		rule.info = retrieveMtconfidence(elem, false, false);
+		if ( rule.info == null ) return;
+			
+		rule.infoType = INFOTYPE_TEXT;
+		rules.add(rule);
+	}
+		
 	private void compileLocQualityIssueRule (Element elem,
 		boolean isInternal)
 	{
@@ -1196,6 +1213,11 @@ public class ITSEngine implements IProcessor, ITraversal {
 			trace.peek().lineBreakType = values[2];
 		}
 		
+		if ( data.charAt(FP_MTCONFIDENCE) != '?' ) {
+			value = getFlagData(data, FP_MTCONFIDENCE_DATA);
+			trace.peek().mtConfidence = Float.parseFloat(value);
+		}
+		
 		if ( data.charAt(FP_ALLOWEDCHARS) != '?' ) {
 			trace.peek().allowedChars = getFlagData(data, FP_ALLOWEDCHARS_DATA);
 		}
@@ -1537,6 +1559,11 @@ public class ITSEngine implements IProcessor, ITraversal {
 						setFlag(NL.item(i), FP_SUBFILTER, 'y', true);
 						setFlag(NL.item(i), FP_SUBFILTER_DATA, rule.info, true);
 					}
+					
+					else if ( rule.ruleType == IProcessor.DC_MTCONFIDENCE ) {
+						setFlag(NL.item(i), FP_MTCONFIDENCE, 'y', true);
+						setFlag(NL.item(i), FP_MTCONFIDENCE_DATA, rule.info, true);
+					}
 
 				}
 		    }
@@ -1796,7 +1823,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 				expr = xpath.compile("//*/@its-tools-ref");
 			}
 			else {
-				expr = xpath.compile("//*/@"+ITS_NS_PREFIX+":toolsRef");
+				expr = xpath.compile("//*/@"+ITS_NS_PREFIX+":toolsRef|//"+ITS_NS_PREFIX+":span/@toolsRef");
 			}
 			NL = (NodeList)expr.evaluate(doc, XPathConstants.NODESET);
 			for ( int i=0; i<NL.getLength(); i++ ) {
@@ -1814,7 +1841,6 @@ public class ITSEngine implements IProcessor, ITraversal {
 				setFlag(attr.getOwnerElement(), FP_TOOLSREF_DATA,
 						value, attr.getSpecified()); 
 			}
-			
 			
 			// locale filter
 			if (( (dataCategories & IProcessor.DC_LOCFILTER) > 0 ) && isVersion2() ) {
@@ -1947,6 +1973,33 @@ public class ITSEngine implements IProcessor, ITraversal {
 				}
 			}
 
+			// MT Confidence
+			if (( (dataCategories & IProcessor.DC_MTCONFIDENCE) > 0 ) && isVersion2() ) {
+				if ( isHTML5 ) {
+					expr = xpath.compile("//*/@its-mt-confidence");
+				}
+				else {
+					expr = xpath.compile("//*/@"+ITS_NS_PREFIX+":mtConfidence|//"+ITS_NS_PREFIX+":span/@mtConfidence");
+				}
+				NL = (NodeList)expr.evaluate(doc, XPathConstants.NODESET);
+				for ( int i=0; i<NL.getLength(); i++ ) {
+					attr = (Attr)NL.item(i);
+					// Skip irrelevant nodes
+					if ( ITS_NS_URI.equals(attr.getOwnerElement().getNamespaceURI())
+						&& "mtConfidenceRule".equals(attr.getOwnerElement().getLocalName()) ) continue;
+					// Set the flag
+					boolean qualified = true;
+					String ns = attr.getOwnerElement().getNamespaceURI();
+					if ( !Util.isEmpty(ns) ) qualified = !ns.equals(ITS_NS_URI);
+					// Get, validate and set the value
+					String value = retrieveMtconfidence(attr.getOwnerElement(), qualified, isHTML5);
+					if ( value != null ) {
+						setFlag(attr.getOwnerElement(), FP_MTCONFIDENCE, 'y', attr.getSpecified());
+						setFlag(attr.getOwnerElement(), FP_MTCONFIDENCE_DATA, value, attr.getSpecified());
+					}
+				}
+			}
+			
 //			// sub filter
 //			if ( (dataCategories & IProcessor.DC_SUBFILTER) > 0 ) {
 //				if ( isHTML5 ) {
@@ -1980,6 +2033,24 @@ public class ITSEngine implements IProcessor, ITraversal {
 		}
 	}
 
+	private boolean validateFloat (String value,
+		float minimum,
+		float maximum,
+		String name)
+	{
+		try {
+			float f = Float.parseFloat(value);
+			if (( f < minimum ) || ( f > maximum )) {
+				logger.error("Invalid value for {}: {}. It should be between [{} and {}]", name, value, minimum, maximum);
+			}
+			return true;
+		}
+		catch ( NumberFormatException e ) {
+			logger.error("Invalid rational value for {}: {}", name, value);
+			return false;
+		}
+	}
+	
 	private String validateToolsRefValue (String data) {
 		if ( Util.isEmpty(data) || ( ("allowed-characters|directionality|disambiguation|domain|elements-within-text|"
 			+ "external-resource|id-value|language-information|locale-filter|localization-note|lq-issue|lq-precis|"
@@ -2074,7 +2145,31 @@ public class ITSEngine implements IProcessor, ITraversal {
 		return null;
 	}
 	
-	
+	private String retrieveMtconfidence (Element elem,
+		boolean qualified,
+		boolean useHTML5)
+	{
+		String value = null;
+		String name = "mtConfidence";
+		if ( useHTML5 ) {
+			name = "its-mt-confidence";
+			if ( elem.hasAttribute(name) )
+				value = elem.getAttribute(name);
+		}
+		else if ( qualified ) {
+			if ( elem.hasAttributeNS(ITS_NS_URI, name) )
+				value = elem.getAttributeNS(ITS_NS_URI, name);
+		}
+		else {
+			if ( elem.hasAttribute(name) )
+				return elem.getAttribute(name);
+		}
+		if ( validateFloat(value, 0.0F, 1.0F, name) ) {
+			return value;
+		}
+		return null; // No or bad value 
+	}
+		
 	private String[] retrieveStorageSizeData (Element elem,
 		boolean qualified,
 		boolean useHTML5)
@@ -2796,8 +2891,18 @@ public class ITSEngine implements IProcessor, ITraversal {
 		return getFlagData(tmp, FP_SUBFILTER_DATA);
 	}
 
+	@Override
 	public String getToolsRef () {
 		return trace.peek().toolsRef;
+	}
+	
+	@Override
+	public Float getMtConfidence (Attr attribute) {
+		if ( attribute == null ) return trace.peek().mtConfidence;
+		String tmp;
+		if ( (tmp = (String)attribute.getUserData(FLAGNAME)) == null ) return null;
+		if ( tmp.charAt(FP_MTCONFIDENCE) != 'y' ) return trace.peek().mtConfidence;
+		return Float.parseFloat(getFlagData(tmp, FP_MTCONFIDENCE_DATA));
 	}
 	
 	/**

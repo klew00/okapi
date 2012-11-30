@@ -47,6 +47,7 @@ class ITSTrace {
 	String lqIssuesRef;
 	GenericAnnotations lqIssues;
 	String toolsRef;
+	Float mtConfidence;
 
 	ITSTrace () {
 		// Default constructor
@@ -81,7 +82,10 @@ class ITSTrace {
 		
 		// external resource reference: No inheritance
 		
-		// locale filter:  Inheritance for child element including attributes
+		//MT Confidence: Inheritance for child element including attributes
+		mtConfidence = initialTrace.mtConfidence;
+		
+		// locale filter: Inheritance for child element including attributes
 		localeFilter = initialTrace.localeFilter;
 		
 		// domain: Inheritance for child elements including attributes

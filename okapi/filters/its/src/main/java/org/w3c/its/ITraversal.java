@@ -177,4 +177,13 @@ public interface ITraversal {
 	 * @return the tools references associated with the queried part.
 	 */
 	public String getToolsRef ();
+	
+	/**
+	 * Gets the MT Confidence value for the current element of the traversal or one
+	 * of its attributes.
+	 * @param attribute the attribute to query or null for the element.
+	 * @return the MT Confidence value or null if none is set.
+	 */
+	public Float getMtConfidence (Attr attribute);
+	
 }

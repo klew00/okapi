@@ -34,7 +34,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import net.sf.okapi.common.TestUtil;
-import net.sf.okapi.common.resource.TextFragment;
+import nu.validator.htmlparser.dom.HtmlDocumentBuilder;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -50,6 +50,7 @@ public class TraversalTest {
 	private String root = TestUtil.getParentDir(this.getClass(), "/input.xml");
 	//private LocaleId locEN = LocaleId.fromString("en");
 	private DocumentBuilderFactory fact = DocumentBuilderFactory.newInstance();
+	private HtmlDocumentBuilder htmlDocBuilder = new HtmlDocumentBuilder();
 
 	@Before
 	public void setUp() {
@@ -173,7 +174,74 @@ public class TraversalTest {
 		assertNotNull(elem);
 		assertEquals("finalDom1, dom3, final dom2, Dom4", trav.getDomains(null));
 	}
+	
+	@Test
+	public void testMtConfidenceLocal () throws SAXException, IOException, ParserConfigurationException {
+		InputSource is = new InputSource(new StringReader("	<text xmlns:its='http://www.w3.org/2005/11/its' its:version='2.0' "
+			+ " its:toolsRef='mt-confidence|file:///tools.xml#T1'><body><p>"
+			+ "<span its:mtConfidence='0.8982'>Dublin is the "
+			+ "<its:span mtConfidence='1' toolsRef='mt-confidence|uri2'>capital city</its:span> of Ireland.</span></p></body></text>"));
+		Document doc = fact.newDocumentBuilder().parse(is);
+		ITraversal trav = applyITSRules(doc, null, false, null);
+		Element elem = getElement(trav, "span", 1);
+		assertNotNull(elem);
+		assertEquals(0.8982F, trav.getMtConfidence(null), 0.0F);
+		assertEquals("mt-confidence|file:///tools.xml#T1", trav.getToolsRef());
+		elem = getElement(trav, "its:span", 1);
+		assertNotNull(elem);
+		assertEquals("capital city", elem.getTextContent());
+		assertEquals(1.0F, trav.getMtConfidence(null), 0.0F);
+		assertEquals("mt-confidence|uri2", trav.getToolsRef());
+	}
 
+	@Test
+	public void testMtConfidenceLocalHtml () throws SAXException, IOException, ParserConfigurationException {
+		InputSource is = new InputSource(new StringReader("<!DOCTYPE html><html lang=en><head>"
+			+ "<meta charset=utf-8><title>Title</title></head>"
+			+ "<body its-tools-ref='mt-confidence|file:///tools.xml#T1'><p>"
+			+ "<span its-mt-confidence=0.8982>Dublin is the capital of Ireland.</span> "
+			+ "<span its-mt-confidence=0.8536 >The capital of the Czech Republic is Prague.</span>"
+			+ "</p></body>/html>"));
+		Document doc = htmlDocBuilder.parse(is);
+		ITraversal trav = applyITSRules(doc, null, true, null);
+		Element elem = getElement(trav, "span", 1);
+		assertNotNull(elem);
+		assertEquals(0.8982F, trav.getMtConfidence(null), 0.0F);
+		assertEquals("mt-confidence|file:///tools.xml#T1", trav.getToolsRef());
+		elem = getElement(trav, "span", 2);
+		assertNotNull(elem);
+		assertEquals(0.8536F, trav.getMtConfidence(null), 0.0F);
+		assertEquals("mt-confidence|file:///tools.xml#T1", trav.getToolsRef());
+	}
+
+	@Test
+	public void testMtConfidenceGlobalHtml () throws SAXException, IOException, ParserConfigurationException {
+		InputSource is = new InputSource(new StringReader("<!DOCTYPE html><html lang=en><head><meta charset=utf-8>"
+			+ "<script type='application/its+xml'>"
+			+ "<its:rules xmlns:its='http://www.w3.org/2005/11/its' version='2.0' "
+			+ "xmlns:h='http://www.w3.org/1999/xhtml'>"
+			+ " <its:mtConfidenceRule mtConfidence='0.785' selector=\"//h:img[@src='src1']/@title\"/>"        
+			+ " <its:mtConfidenceRule mtConfidence='0.805' selector=\"//h:img[@src='src2']/@title\"/>"        
+			+ "</its:rules>"
+			+ "</script>"
+			+ "<title>TM confidence</title></head>"
+			+ "<body its-tools-ref='mt-confidence|file:///tools.xml#T1'><p>"
+			+ "<img src='src1' title='Front gate of Trinity College Dublin'/>"
+			+ "<img src='src2' title='A tart with a cart'/></p></body></html>"));
+		Document doc = htmlDocBuilder.parse(is);
+		ITraversal trav = applyITSRules(doc, null, true, null);
+		Element elem = getElement(trav, "img", 1);
+		assertNotNull(elem);
+		Attr attr = elem.getAttributeNode("title");
+		assertEquals(0.785F, trav.getMtConfidence(attr), 0.0F);
+		assertEquals("mt-confidence|file:///tools.xml#T1", trav.getToolsRef());
+		elem = getElement(trav, "img", 2);
+		assertNotNull(elem);
+		attr = elem.getAttributeNode("title");
+		assertEquals(0.805F, trav.getMtConfidence(attr), 0.0F);
+		assertEquals("mt-confidence|file:///tools.xml#T1", trav.getToolsRef());
+	}
+	
 	@Test
 	public void testTargetPointerGlobal () throws SAXException, IOException, ParserConfigurationException {
 		InputSource is = new InputSource(new StringReader("<doc>"
@@ -476,7 +544,8 @@ public class TraversalTest {
 			+ "</i:rules>"
 			+ "<par title='title text' test='test' alt='alt text'>Text</par></doc>"));
 		Document doc = fact.newDocumentBuilder().parse(is);
-		ITraversal trav = applyITSRules(doc, null, false, null);
+		// Just trigger the error
+		applyITSRules(doc, null, false, null);
 	}
 	
 	@Test
