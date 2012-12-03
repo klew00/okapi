@@ -903,9 +903,10 @@ public class ITSEngine implements IProcessor, ITraversal {
 		if ( identRefP != null ) {
 			ann.setString(GenericAnnotationType.DISAMB_IDENT, PTRFLAG+REFFLAG+identRefP);
 		}
+		// No confidence information in global rule
 
 		// Get the optional enabled
-		ann.setString(GenericAnnotationType.DISAMB_GRANULARITY, np[3]);
+		ann.setString(GenericAnnotationType.DISAMB_GRANULARITY, np[4]);
 
 		// Add the rule
 		rules.add(rule);
@@ -1625,6 +1626,9 @@ public class ITSEngine implements IProcessor, ITraversal {
 							}
 							ann.setString(GenericAnnotationType.DISAMB_IDENT, data1);
 						}
+						
+						// Confidence is not in global rules
+						
 						// Granularity has no pointer
 						// So it is already set, including its default if needed
 					
@@ -2060,7 +2064,8 @@ public class ITSEngine implements IProcessor, ITraversal {
 					if ( values[0] != null ) ann.setString(GenericAnnotationType.DISAMB_CLASS, values[0]);
 					if ( values[1] != null ) ann.setString(GenericAnnotationType.DISAMB_SOURCE, values[1]);
 					if ( values[2] != null ) ann.setString(GenericAnnotationType.DISAMB_IDENT, values[2]);
-					if ( values[3] != null ) ann.setString(GenericAnnotationType.DISAMB_GRANULARITY, values[3]);
+					if ( values[3] != null ) ann.setFloat(GenericAnnotationType.DISAMB_CONFIDENCE, Float.parseFloat(values[3]));
+					if ( values[4] != null ) ann.setString(GenericAnnotationType.DISAMB_GRANULARITY, values[4]);
 					// Set the updated flags
 					setFlag(attr.getOwnerElement(), FP_DISAMBIGUATION, 'y', attr.getSpecified());
 					setFlag(attr.getOwnerElement(), FP_DISAMBIGUATION_DATA, anns.toString(), attr.getSpecified()); 
@@ -2460,10 +2465,13 @@ public class ITSEngine implements IProcessor, ITraversal {
 			else if ( elem.hasAttribute("its-disambig-ident-ref") )
 				data[2] = REF_PREFIX+elem.getAttribute("its-disambig-ident-ref");
 			
+			if ( elem.hasAttribute("its-disambig-confidence") )
+				data[3] = elem.getAttribute("its-disambig-confidence");
+			
 			if ( elem.hasAttribute("its-disambig-granularity") )
-				data[3] = elem.getAttribute("its-disambig-granularity");
+				data[4] = elem.getAttribute("its-disambig-granularity");
 			else
-				data[3] = GenericAnnotationType.DISAMB_GRANULARITY_ENTITY; // Default
+				data[4] = GenericAnnotationType.DISAMB_GRANULARITY_ENTITY; // Default
 		}
 		else if ( qualified ) {
 			if ( elem.hasAttributeNS(ITS_NS_URI, "disambigClassRef") )
@@ -2478,10 +2486,13 @@ public class ITSEngine implements IProcessor, ITraversal {
 			else if ( elem.hasAttributeNS(ITS_NS_URI, "disambigIdentRef") )
 				data[2] = REF_PREFIX+elem.getAttributeNS(ITS_NS_URI, "disambigIdentRef");
 			
+			if ( elem.hasAttributeNS(ITS_NS_URI, "disambigConfidence") )
+				data[3] = elem.getAttributeNS(ITS_NS_URI, "disambigConfidence");
+			
 			if ( elem.hasAttributeNS(ITS_NS_URI, "disambigGranularity") )
-				data[3] = elem.getAttributeNS(ITS_NS_URI, "disambigGranularity");
+				data[4] = elem.getAttributeNS(ITS_NS_URI, "disambigGranularity");
 			else
-				data[3] = GenericAnnotationType.DISAMB_GRANULARITY_ENTITY; // Default
+				data[4] = GenericAnnotationType.DISAMB_GRANULARITY_ENTITY; // Default
 		}
 		else {
 			if ( elem.hasAttribute("disambigClassRef") )
@@ -2496,10 +2507,13 @@ public class ITSEngine implements IProcessor, ITraversal {
 			else if ( elem.hasAttribute("disambigIdentRef") )
 				data[2] = REF_PREFIX+elem.getAttribute("disambigIdentRef");
 			
+			if ( elem.hasAttribute("disambigConfidence") )
+				data[3] = elem.getAttribute("disambigConfidence");
+
 			if ( elem.hasAttribute("disambigGranularity") )
-				data[3] = elem.getAttribute("disambigGranularity");
+				data[4] = elem.getAttribute("disambigGranularity");
 			else
-				data[3] = GenericAnnotationType.DISAMB_GRANULARITY_ENTITY; // Default
+				data[4] = GenericAnnotationType.DISAMB_GRANULARITY_ENTITY; // Default
 		}
 		
 		//TODO: Validation
@@ -3085,6 +3099,19 @@ public class ITSEngine implements IProcessor, ITraversal {
 	@Override
 	public String getDisambigIdent (Attr attribute) {
 		return getDisambValue(GenericAnnotationType.DISAMB_IDENT, attribute);
+	}
+
+	@Override
+	public Float getDisambigConfidence (Attr attribute) {
+		if ( attribute == null ) {
+			if ( trace.peek().disambig == null ) return null;
+			return trace.peek().disambig.getAnnotations(GenericAnnotationType.DISAMB).get(0).getFloat(GenericAnnotationType.DISAMB_CONFIDENCE);
+		}
+		String tmp;
+		if ( (tmp = (String)attribute.getUserData(FLAGNAME)) == null ) return null;
+		if ( tmp.charAt(FP_DISAMBIGUATION) != 'y' ) return null;
+		GenericAnnotations anns = new GenericAnnotations(getFlagData(tmp, FP_DISAMBIGUATION_DATA));
+		return anns.getAnnotations(GenericAnnotationType.DISAMB).get(0).getFloat(GenericAnnotationType.DISAMB_CONFIDENCE);
 	}
 
 	private String getDisambValue (String fieldName,

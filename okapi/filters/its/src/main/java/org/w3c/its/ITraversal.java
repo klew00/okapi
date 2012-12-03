@@ -194,4 +194,6 @@ public interface ITraversal {
 	
 	public String getDisambigIdent (Attr attribute);
 	
+	public Float getDisambigConfidence (Attr attribute);
+	
 }
