@@ -136,11 +136,9 @@ public class DoxygenPatterns {
 	 * 		///  2. Paragraph 4
 	 * </pre>
 	 */
-	public static final String LIST_ITEM_PREFIX = "^(?:\\s*(?:[-+*]#?|\\d+\\.)\\s*|\\s*\\.\\s*$)";
+	public static final String LIST_ITEM_PREFIX = "^(?:\\s*(?:[-+*]#?|\\d+\\.)\\s+|\\s*\\.\\s*$)";
 	public static final Pattern LIST_ITEM_PREFIX_PATTERN = Pattern.compile(LIST_ITEM_PREFIX, Pattern.MULTILINE);
-
-	public static final String LIST_ITEM_SUFFIX = "^(?:\\s*(?:[-+*]#?|\\d+\\.)\\s*|\\s*\\.\\s*$)";
-	public static final Pattern LIST_ITEM_SUFFIX_PATTERN = Pattern.compile(LIST_ITEM_SUFFIX, Pattern.MULTILINE);
+	public static final Pattern LIST_ITEM_SUFFIX_PATTERN = Pattern.compile(LIST_ITEM_PREFIX, Pattern.MULTILINE);
 	
 	static
 	{
