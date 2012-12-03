@@ -134,10 +134,11 @@ public class ITSEngine implements IProcessor, ITraversal {
 	
 	private Document doc;
 	private URI docURI;
+	private XPath xpath;
+	private boolean defaultIdsDone;
 	private NSContextManager nsContext;
 	private VariableResolver varResolver;
 	private XPathFactory xpFact;
-	private XPath xpath;
 	private ArrayList<ITSRule> rules;
 	private Node node;
 	private boolean startTraversal;
@@ -191,6 +192,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 		xpath = xpFact.newXPath();
 		xpath.setNamespaceContext(nsContext);
 		xpath.setXPathVariableResolver(varResolver);
+		defaultIdsDone = false;
 	}
 	
 	public void setVariables (Map<String, String> map) {
@@ -2378,6 +2380,9 @@ public class ITSEngine implements IProcessor, ITraversal {
 		String pointer)
 	{
 		try {
+			if ( pointer.contains("id(") ) {
+				markDefaultIdentifiers();
+			}
 			XPathExpression expr = xpath.compile(pointer);
 			NodeList list = (NodeList)expr.evaluate(node, XPathConstants.NODESET);
 			if (( list == null ) || ( list.getLength() == 0 )) {
@@ -2396,10 +2401,34 @@ public class ITSEngine implements IProcessor, ITraversal {
 		return "pointer("+pointer+")";
 	}
 	
+	/**
+	 * mark all xml:id attribute in a document as of ID-type, so they can be used
+	 * with the id() XPath and similar functions.
+	 * This method is executed only once.
+	 * @throws XPathExpressionException
+	 */
+	private void markDefaultIdentifiers ()
+		throws XPathExpressionException
+	{
+//TODO: handle HTML id		
+		if ( defaultIdsDone ) return;
+		XPathExpression expr = xpath.compile("//*[@xml:id]");
+		NodeList list = (NodeList)expr.evaluate(doc, XPathConstants.NODESET);
+		if ( list == null ) return;
+		for ( int i=0; i<list.getLength(); i++ ) {
+			Element elem = (Element)list.item(i);
+			elem.setIdAttributeNS(XML_NS_URI, "id", true);
+		}
+		defaultIdsDone = true;
+	}
+	
 	private String resolveExpressionAsString (Node node,
 		String expression)
 	{
 		try {
+			if ( expression.contains("id(") ) {
+				markDefaultIdentifiers();
+			}
 			XPathExpression expr = xpath.compile(expression);
 			return (String)expr.evaluate(node, XPathConstants.STRING);
 		}
@@ -2413,6 +2442,9 @@ public class ITSEngine implements IProcessor, ITraversal {
 	{
 		ArrayList<String> list = new ArrayList<String>();
 		try {
+			if ( expression.contains("id(") ) {
+				markDefaultIdentifiers();
+			}
 			XPathExpression expr = xpath.compile(expression);
 			NodeList nl = (NodeList)expr.evaluate(node, XPathConstants.NODESET);
 			for ( int i=0; i<nl.getLength(); i++ ) {

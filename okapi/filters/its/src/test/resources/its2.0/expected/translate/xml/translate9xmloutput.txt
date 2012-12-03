@@ -1,5 +1,4 @@
 /doc	translate="no"
-/doc/@its:version	translate="no"
 /doc/its:rules[1]	translate="no"
 /doc/its:rules[1]/@version	translate="no"
 /doc/its:rules[1]/its:param[1]	translate="no"
