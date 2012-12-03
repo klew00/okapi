@@ -90,7 +90,8 @@ public class ITSEngine implements IProcessor, ITraversal {
 	private static final String SRC_TRGPTRFLAGNAME = "\u10ff"; // Name of the user-data property that holds the target pointer flag in the source
 	private static final String TRG_TRGPTRFLAGNAME = "\u20ff"; // Name of the user-data property that holds the target pointer flag in the target
 	
-	private static final String PTRPREFIX = "@@"; // If length of PTRPREFIX changes: code needs to be updated
+	private static final String PTRFLAG = "@@"; // Flag for pointer-type attributes
+	private static final String REFFLAG = "\u0011"; // Flag for Ref vs non-Ref attributes
 
 	// Indicator position
 	private static final int      FP_TRANSLATE             = 0;
@@ -796,7 +797,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 			// TODO: verify the value?
 		}
 		else if ( typeP != null ) {
-			ann.setString(GenericAnnotationType.LQI_TYPE, PTRPREFIX+typeP);
+			ann.setString(GenericAnnotationType.LQI_TYPE, PTRFLAG+typeP);
 		}
 		
 		// Get the comment
@@ -807,7 +808,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 			ann.setString(GenericAnnotationType.LQI_COMMENT, np[2]);
 		}
 		else if ( commentP != null ) {
-			ann.setString(GenericAnnotationType.LQI_COMMENT, PTRPREFIX+commentP);
+			ann.setString(GenericAnnotationType.LQI_COMMENT, PTRFLAG+commentP);
 		}
 		
 		// Get the optional severity
@@ -822,7 +823,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 			ann.setString(GenericAnnotationType.LQI_SEVERITY, np[3]);
 		}
 		else if ( severityP != null ) {
-			ann.setString(GenericAnnotationType.LQI_SEVERITY, PTRPREFIX+severityP);
+			ann.setString(GenericAnnotationType.LQI_SEVERITY, PTRFLAG+severityP);
 		}
 		
 		// Get the optional profile reference
@@ -836,14 +837,14 @@ public class ITSEngine implements IProcessor, ITraversal {
 			ann.setString(GenericAnnotationType.LQI_PROFILEREF, np[4]);
 		}
 		else if ( profileRefP != null ) {
-			ann.setString(GenericAnnotationType.LQI_PROFILEREF, PTRPREFIX+profileRefP);
+			ann.setString(GenericAnnotationType.LQI_PROFILEREF, PTRFLAG+profileRefP);
 		}
 
 		// Get the optional enabled
 		String enabledP = null;
 		if ( elem.hasAttribute("locQualityIssueEnabledPointer")) {
 			profileRefP = elem.getAttribute("locQualityIssueEnabledPointer");
-			ann.setString(GenericAnnotationType.LQI_ENABLED, PTRPREFIX+enabledP);
+			ann.setString(GenericAnnotationType.LQI_ENABLED, PTRFLAG+enabledP);
 		}
 		else { // either default or set value
 			ann.setString(GenericAnnotationType.LQI_ENABLED, np[5]);
@@ -888,22 +889,23 @@ public class ITSEngine implements IProcessor, ITraversal {
 		GenericAnnotation ann = rule.annotations.add(GenericAnnotationType.DISAMB);
 		
 		// For the annotation info, we add '@@' in front if it is a pointer
+		// also flag with REFFLAG if it is a ref version
 		
 		if ( classRefP != null ) {
-			ann.setString(GenericAnnotationType.DISAMB_CLASSREF, PTRPREFIX+classRefP);
+			ann.setString(GenericAnnotationType.DISAMB_CLASS, PTRFLAG+REFFLAG+classRefP);
 		}
 		if ( sourceP != null ) {
-			ann.setString(GenericAnnotationType.DISAMB_SOURCE, PTRPREFIX+sourceP);
+			ann.setString(GenericAnnotationType.DISAMB_SOURCE, PTRFLAG+sourceP);
 		}
 		if ( identP != null ) {
-			ann.setString(GenericAnnotationType.DISAMB_IDENT, PTRPREFIX+identP);
+			ann.setString(GenericAnnotationType.DISAMB_IDENT, PTRFLAG+identP);
 		}
 		if ( identRefP != null ) {
-			ann.setString(GenericAnnotationType.DISAMB_IDENTREF, PTRPREFIX+identRefP);
+			ann.setString(GenericAnnotationType.DISAMB_IDENT, PTRFLAG+REFFLAG+identRefP);
 		}
 
 		// Get the optional enabled
-		ann.setString(GenericAnnotationType.DISAMB_GRANULARITY, np[4]);
+		ann.setString(GenericAnnotationType.DISAMB_GRANULARITY, np[3]);
 
 		// Add the rule
 		rules.add(rule);
@@ -1546,24 +1548,24 @@ public class ITSEngine implements IProcessor, ITraversal {
 							// Get and resolve 'type'
 							data1 = ann.getString(GenericAnnotationType.LQI_TYPE);
 							if ( data1 != null ) {
-								if ( data1.startsWith(PTRPREFIX) ) {
-									data1 = resolvePointer(NL.item(i), data1.substring(2));
+								if ( data1.startsWith(PTRFLAG) ) {
+									data1 = resolvePointer(NL.item(i), data1.substring(PTRFLAG.length()));
 								}
 								upd.setString(GenericAnnotationType.LQI_TYPE, data1);
 							}
 							// Get and resolve 'comment'
 							data1 = ann.getString(GenericAnnotationType.LQI_COMMENT);
 							if ( data1 != null ) {
-								if ( data1.startsWith(PTRPREFIX) ) {
-									data1 = resolvePointer(NL.item(i), data1.substring(2));
+								if ( data1.startsWith(PTRFLAG) ) {
+									data1 = resolvePointer(NL.item(i), data1.substring(PTRFLAG.length()));
 								}
 								upd.setString(GenericAnnotationType.LQI_COMMENT, data1);
 							}
 							// Get and resolve 'severity'
 							data1  = ann.getString(GenericAnnotationType.LQI_SEVERITY);
 							if ( data1 != null ) {
-								if ( data1.startsWith(PTRPREFIX) ) {
-									data1 = resolvePointer(NL.item(i), data1.substring(2));
+								if ( data1.startsWith(PTRFLAG) ) {
+									data1 = resolvePointer(NL.item(i), data1.substring(PTRFLAG.length()));
 								}
 								// Convert the string to the float value
 								upd.setFloat(GenericAnnotationType.LQI_SEVERITY, Float.parseFloat(data1));
@@ -1571,16 +1573,16 @@ public class ITSEngine implements IProcessor, ITraversal {
 							// Get and resolve 'profile reference'
 							data1 = ann.getString(GenericAnnotationType.LQI_PROFILEREF);
 							if ( data1 != null ) {
-								if ( data1.startsWith(PTRPREFIX) ) {
-									data1 = resolvePointer(NL.item(i), data1.substring(2));
+								if ( data1.startsWith(PTRFLAG) ) {
+									data1 = resolvePointer(NL.item(i), data1.substring(PTRFLAG.length()));
 								}
 								upd.setString(GenericAnnotationType.LQI_PROFILEREF, data1);
 							}
 							// Get and resolve 'enabled'
 							data1 = ann.getString(GenericAnnotationType.LQI_ENABLED);
 							if ( data1 != null ) {
-								if ( data1.startsWith(PTRPREFIX) ) {
-									data1 = resolvePointer(NL.item(i), data1.substring(2));
+								if ( data1.startsWith(PTRFLAG) ) {
+									data1 = resolvePointer(NL.item(i), data1.substring(PTRFLAG.length()));
 								}
 								upd.setBoolean(GenericAnnotationType.LQI_ENABLED, data1.equals("yes"));
 							}
@@ -1594,40 +1596,38 @@ public class ITSEngine implements IProcessor, ITraversal {
 						GenericAnnotations anns = rule.annotations;
 						GenericAnnotation ann = anns.getAnnotations(GenericAnnotationType.DISAMB).get(0);
 						// Get and resolve 'classRef'
-						data1 = ann.getString(GenericAnnotationType.DISAMB_CLASSREF);
+						data1 = ann.getString(GenericAnnotationType.DISAMB_CLASS);
 						if ( data1 != null ) {
-							if ( data1.startsWith(PTRPREFIX) ) {
-								data1 = REF_PREFIX+resolvePointer(NL.item(i), data1.substring(2));
+							if ( data1.startsWith(PTRFLAG) ) {
+								data1 = data1.substring(PTRFLAG.length());
+								boolean ref = data1.startsWith(REFFLAG);
+								if ( ref ) data1 = data1.substring(REFFLAG.length());
+								data1 = (ref ? REF_PREFIX : "")+resolvePointer(NL.item(i), data1);
 							}
-							ann.setString(GenericAnnotationType.DISAMB_CLASSREF, data1);
+							ann.setString(GenericAnnotationType.DISAMB_CLASS, data1);
 						}
 						// Get and resolve 'source'
 						data1 = ann.getString(GenericAnnotationType.DISAMB_SOURCE);
 						if ( data1 != null ) {
-							if ( data1.startsWith(PTRPREFIX) ) {
-								data1 = resolvePointer(NL.item(i), data1.substring(2));
+							if ( data1.startsWith(PTRFLAG) ) {
+								data1 = resolvePointer(NL.item(i), data1.substring(PTRFLAG.length()));
 							}
 							ann.setString(GenericAnnotationType.DISAMB_SOURCE, data1);
 						}
 						// Get and resolve 'ident'
 						data1  = ann.getString(GenericAnnotationType.DISAMB_IDENT);
 						if ( data1 != null ) {
-							if ( data1.startsWith(PTRPREFIX) ) {
-								data1 = resolvePointer(NL.item(i), data1.substring(2));
+							if ( data1.startsWith(PTRFLAG) ) {
+								data1 = data1.substring(PTRFLAG.length());
+								boolean ref = data1.startsWith(REFFLAG);
+								if ( ref ) data1 = data1.substring(REFFLAG.length());
+								data1 = (ref ? REF_PREFIX : "")+resolvePointer(NL.item(i), data1);
 							}
 							ann.setString(GenericAnnotationType.DISAMB_IDENT, data1);
 						}
-						// Get and resolve 'ident ref'
-						data1 = ann.getString(GenericAnnotationType.DISAMB_IDENTREF);
-						if ( data1 != null ) {
-							if ( data1.startsWith(PTRPREFIX) ) {
-								data1 = REF_PREFIX+resolvePointer(NL.item(i), data1.substring(2));
-							}
-							ann.setString(GenericAnnotationType.DISAMB_IDENTREF, data1);
-						}
 						// Granularity has no pointer
 						// So it is already set, including its default if needed
-						
+					
 						// Decorate the node with the resolved annotation data
 						setFlag(NL.item(i), FP_DISAMBIGUATION, 'y', true);
 						setFlag(NL.item(i), FP_DISAMBIGUATION_DATA, anns.toString(), true);
@@ -2057,11 +2057,10 @@ public class ITSEngine implements IProcessor, ITraversal {
 					// Convert the values into an annotation
 					GenericAnnotations anns = new GenericAnnotations();
 					GenericAnnotation ann = addIssueItem(anns);
-					if ( values[0] != null ) ann.setString(GenericAnnotationType.DISAMB_CLASSREF, values[0]);
+					if ( values[0] != null ) ann.setString(GenericAnnotationType.DISAMB_CLASS, values[0]);
 					if ( values[1] != null ) ann.setString(GenericAnnotationType.DISAMB_SOURCE, values[1]);
 					if ( values[2] != null ) ann.setString(GenericAnnotationType.DISAMB_IDENT, values[2]);
-					if ( values[3] != null ) ann.setString(GenericAnnotationType.DISAMB_IDENTREF, values[3]);
-					if ( values[4] != null ) ann.setString(GenericAnnotationType.DISAMB_GRANULARITY, values[4]);
+					if ( values[3] != null ) ann.setString(GenericAnnotationType.DISAMB_GRANULARITY, values[3]);
 					// Set the updated flags
 					setFlag(attr.getOwnerElement(), FP_DISAMBIGUATION, 'y', attr.getSpecified());
 					setFlag(attr.getOwnerElement(), FP_DISAMBIGUATION_DATA, anns.toString(), attr.getSpecified()); 
@@ -2440,7 +2439,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 	 * Retrieves the non-pointer information of the Disambiguation data category.
 	 * @param elem the element where to get the data.
 	 * @param qualified true if the attributes are expected to be qualified.
-	 * @return an array of the value: classRef, source, ident, identRef, granularity
+	 * @return an array of the value: classRef, source, ident/identRef, granularity
 	 */
 	private String[] retrieveDisambiguationData (Element elem,
 		boolean qualified,
@@ -2451,16 +2450,20 @@ public class ITSEngine implements IProcessor, ITraversal {
 		if ( useHTML5 ) {
 			if ( elem.hasAttribute("its-disambig-class-ref") )
 				data[0] = REF_PREFIX+elem.getAttribute("its-disambig-class-ref");
+			
 			if ( elem.hasAttribute("its-disambig-source") )
 				data[1] = elem.getAttribute("its-disambig-source");
+			
 			if ( elem.hasAttribute("its-disambig-ident") )
 				data[2] = elem.getAttribute("its-disambig-ident");
-			if ( elem.hasAttribute("its-disambig-ident-ref") )
-				data[3] = REF_PREFIX+elem.getAttribute("its-disambig-ident-ref");
+			// OR the ref version
+			else if ( elem.hasAttribute("its-disambig-ident-ref") )
+				data[2] = REF_PREFIX+elem.getAttribute("its-disambig-ident-ref");
+			
 			if ( elem.hasAttribute("its-disambig-granularity") )
-				data[4] = elem.getAttribute("its-disambig-granularity");
+				data[3] = elem.getAttribute("its-disambig-granularity");
 			else
-				data[4] = GenericAnnotationType.DISAMB_GRANULARITY_ENTITY; // Default
+				data[3] = GenericAnnotationType.DISAMB_GRANULARITY_ENTITY; // Default
 		}
 		else if ( qualified ) {
 			if ( elem.hasAttributeNS(ITS_NS_URI, "disambigClassRef") )
@@ -2471,14 +2474,14 @@ public class ITSEngine implements IProcessor, ITraversal {
 			
 			if ( elem.hasAttributeNS(ITS_NS_URI, "disambigIdent") )
 				data[2] = elem.getAttributeNS(ITS_NS_URI, "disambigIdent");
-			
-			if ( elem.hasAttributeNS(ITS_NS_URI, "disambigIdentRef") )
-				data[3] = REF_PREFIX+elem.getAttributeNS(ITS_NS_URI, "disambigIdentRef");
+			// OR the ref version
+			else if ( elem.hasAttributeNS(ITS_NS_URI, "disambigIdentRef") )
+				data[2] = REF_PREFIX+elem.getAttributeNS(ITS_NS_URI, "disambigIdentRef");
 			
 			if ( elem.hasAttributeNS(ITS_NS_URI, "disambigGranularity") )
-				data[4] = elem.getAttributeNS(ITS_NS_URI, "disambigGranularity");
+				data[3] = elem.getAttributeNS(ITS_NS_URI, "disambigGranularity");
 			else
-				data[4] = GenericAnnotationType.DISAMB_GRANULARITY_ENTITY; // Default
+				data[3] = GenericAnnotationType.DISAMB_GRANULARITY_ENTITY; // Default
 		}
 		else {
 			if ( elem.hasAttribute("disambigClassRef") )
@@ -2489,14 +2492,14 @@ public class ITSEngine implements IProcessor, ITraversal {
 			
 			if ( elem.hasAttribute("disambigIdent") )
 				data[2] = elem.getAttribute("disambigIdent");
-			
-			if ( elem.hasAttribute("disambigIdentRef") )
-				data[3] = REF_PREFIX+elem.getAttribute("disambigIdentRef");
+			// OR the ref version
+			else if ( elem.hasAttribute("disambigIdentRef") )
+				data[2] = REF_PREFIX+elem.getAttribute("disambigIdentRef");
 			
 			if ( elem.hasAttribute("disambigGranularity") )
-				data[4] = elem.getAttribute("disambigGranularity");
+				data[3] = elem.getAttribute("disambigGranularity");
 			else
-				data[4] = GenericAnnotationType.DISAMB_GRANULARITY_ENTITY; // Default
+				data[3] = GenericAnnotationType.DISAMB_GRANULARITY_ENTITY; // Default
 		}
 		
 		//TODO: Validation
@@ -3063,7 +3066,41 @@ public class ITSEngine implements IProcessor, ITraversal {
 		if ( tmp.charAt(FP_DISAMBIGUATION) != 'y' ) return null;
 		return new GenericAnnotations(getFlagData(tmp, FP_DISAMBIGUATION_DATA));
 	}
+	
+	@Override
+	public String getDisambigGranularity (Attr attribute) {
+		return getDisambValue(GenericAnnotationType.DISAMB_GRANULARITY, attribute);
+	}
+	
+	@Override
+	public String getDisambigClass (Attr attribute) {
+		return getDisambValue(GenericAnnotationType.DISAMB_CLASS, attribute);
+	}
+	
+	@Override
+	public String getDisambigSource (Attr attribute) {
+		return getDisambValue(GenericAnnotationType.DISAMB_SOURCE, attribute);
+	}
+	
+	@Override
+	public String getDisambigIdent (Attr attribute) {
+		return getDisambValue(GenericAnnotationType.DISAMB_IDENT, attribute);
+	}
 
+	private String getDisambValue (String fieldName,
+		Attr attribute)
+	{
+		if ( attribute == null ) {
+			if ( trace.peek().disambig == null ) return null;
+			return trace.peek().disambig.getAnnotations(GenericAnnotationType.DISAMB).get(0).getString(fieldName);
+		}
+		String tmp;
+		if ( (tmp = (String)attribute.getUserData(FLAGNAME)) == null ) return null;
+		if ( tmp.charAt(FP_DISAMBIGUATION) != 'y' ) return null;
+		GenericAnnotations anns = new GenericAnnotations(getFlagData(tmp, FP_DISAMBIGUATION_DATA));
+		return anns.getAnnotations(GenericAnnotationType.DISAMB).get(0).getString(fieldName);
+	}
+	
 	@Override
 	public String getStorageSize (Attr attribute) {
 		if ( attribute == null ) return trace.peek().storageSize;

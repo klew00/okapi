@@ -267,8 +267,8 @@ public class TraversalTest {
 		assertNotNull(anns);
 		GenericAnnotation ann = anns.getAnnotations(GenericAnnotationType.DISAMB).get(0);
 		assertEquals(GenericAnnotationType.DISAMB_GRANULARITY_ENTITY, ann.getString(GenericAnnotationType.DISAMB_GRANULARITY));
-		assertEquals(ITSEngine.REF_PREFIX+"http:/nerd.eurecom.fr/ontology#Place", ann.getString(GenericAnnotationType.DISAMB_CLASSREF));
-		assertEquals(ITSEngine.REF_PREFIX+"http://dbpedia.org/resource/Dublin", ann.getString(GenericAnnotationType.DISAMB_IDENTREF));
+		assertEquals(ITSEngine.REF_PREFIX+"http:/nerd.eurecom.fr/ontology#Place", ann.getString(GenericAnnotationType.DISAMB_CLASS));
+		assertEquals(ITSEngine.REF_PREFIX+"http://dbpedia.org/resource/Dublin", ann.getString(GenericAnnotationType.DISAMB_IDENT));
 	}
 
 

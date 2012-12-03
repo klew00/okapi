@@ -36,10 +36,8 @@ public class GenericAnnotationType {
 	public static final String DISAMB = "its-disamb";
 	public static final String DISAMB_GRANULARITY = "disambGranularity";
 	public static final String DISAMB_CLASS = "disambClass";
-	public static final String DISAMB_CLASSREF = "disambClassRef";
 	public static final String DISAMB_SOURCE = "disambSource";
 	public static final String DISAMB_IDENT = "disambIdent";
-	public static final String DISAMB_IDENTREF = "disambIdentRef";
 	
 	public static final String DISAMB_GRANULARITY_LEXICAL = "lexicalConcept";
 	public static final String DISAMB_GRANULARITY_ONTOLOGY = "ontologyConcept";

@@ -185,5 +185,13 @@ public interface ITraversal {
 	 * @return the MT Confidence value or null if none is set.
 	 */
 	public Float getMtConfidence (Attr attribute);
+
+	public String getDisambigGranularity (Attr attribute);
+
+	public String getDisambigClass (Attr attribute);
+	
+	public String getDisambigSource (Attr attribute);
+	
+	public String getDisambigIdent (Attr attribute);
 	
 }
