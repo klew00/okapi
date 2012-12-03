@@ -193,7 +193,8 @@ public class XMLFilter extends ITSFilter {
 			| IProcessor.DC_LOCNOTE | IProcessor.DC_WITHINTEXT | IProcessor.DC_TERMINOLOGY
 			| IProcessor.DC_DOMAIN | IProcessor.DC_TARGETPOINTER | IProcessor.DC_EXTERNALRES
 			| IProcessor.DC_LOCFILTER | IProcessor.DC_PRESERVESPACE | IProcessor.DC_LOCQUALITYISSUE
-			| IProcessor.DC_STORAGESIZE | IProcessor.DC_ALLOWEDCHARS
+			| IProcessor.DC_STORAGESIZE | IProcessor.DC_ALLOWEDCHARS | IProcessor.DC_MTCONFIDENCE
+			| IProcessor.DC_DISAMBIGUATION
 			| IProcessor.DC_SUBFILTER);
 	}
 	

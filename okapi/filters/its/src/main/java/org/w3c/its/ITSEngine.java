@@ -83,9 +83,9 @@ public class ITSEngine implements IProcessor, ITraversal {
 	
 	// Must have '?' as many times as there are FP_XXX entries +1
 	// Must have +FLAGSEP as many times as there are FP_XXX_DATA entries +1
-	private static final String   FLAGDEFAULTDATA     = "?????????????????"
+	private static final String   FLAGDEFAULTDATA     = "??????????????????"
 		+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP
-		+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP;
+		+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP;
 
 	private static final String SRC_TRGPTRFLAGNAME = "\u10ff"; // Name of the user-data property that holds the target pointer flag in the source
 	private static final String TRG_TRGPTRFLAGNAME = "\u20ff"; // Name of the user-data property that holds the target pointer flag in the target
@@ -110,6 +110,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 	private static final int      FP_TARGETPOINTER         = 14;
 	private static final int      FP_TOOLSREF              = 15;
 	private static final int      FP_MTCONFIDENCE          = 16;
+	private static final int      FP_DISAMBIGUATION        = 17;
 	
 	// Data position 
 	private static final int      FP_TERMINOLOGY_DATA      = 0;
@@ -126,6 +127,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 	private static final int      FP_SUBFILTER_DATA        = 11;
 	private static final int      FP_TOOLSREF_DATA         = 12;
 	private static final int      FP_MTCONFIDENCE_DATA     = 13;
+	private static final int      FP_DISAMBIGUATION_DATA   = 14;
 	
 	private static final int      INFOTYPE_TEXT            = 0;
 	private static final int      INFOTYPE_REF             = 1;
@@ -455,6 +457,9 @@ public class ITSEngine implements IProcessor, ITraversal {
 					}
 					else if ( "mtConfidenceRule".equals(locName) ) {
 						compileMtConfidenceRule(ruleElem, isInternal);
+					}
+					else if ( "disambiguationRule".equals(locName) ) {
+						compileDisambiguationRule(ruleElem, isInternal);
 					}
 					else if ( "subFilterRule".equals(locName) ) {
 						compileSubFilterRule(ruleElem, isInternal);
@@ -848,6 +853,63 @@ public class ITSEngine implements IProcessor, ITraversal {
 		rules.add(rule);
 	}
 
+	private void compileDisambiguationRule (Element elem,
+		boolean isInternal)
+	{
+		ITSRule rule = new ITSRule(IProcessor.DC_DISAMBIGUATION);
+		rule.selector = elem.getAttribute("selector");
+		rule.isInternal = isInternal;
+
+		// Get the local attributes
+		String np[] = retrieveDisambiguationData(elem, false, false);
+		
+		String classRefP = null;
+		if ( elem.hasAttribute("disambigClassRefPointer") )
+			classRefP = elem.getAttribute("disambigClassRefPointer");
+		
+		String sourceP = null;
+		if (elem.hasAttribute("disambigSourcePointer"))
+			sourceP = elem.getAttribute("disambigSourcePointer");
+		
+		String identP = null;
+		if ( elem.hasAttribute("disambigIdentPointer"))
+			identP = elem.getAttribute("disambigIdentPointer");
+		
+		String identRefP = null;
+		if ( elem.hasAttribute("disambigIdentRefPointer"))
+			identRefP = elem.getAttribute("disambigIdentRefPointer");
+
+		// Granularity is only non-pointer
+		
+		// Check we have the mandatory attributes
+		//TODO later when the dta category is stable
+
+		rule.annotations = new GenericAnnotations();
+		GenericAnnotation ann = rule.annotations.add(GenericAnnotationType.DISAMB);
+		
+		// For the annotation info, we add '@@' in front if it is a pointer
+		
+		if ( classRefP != null ) {
+			ann.setString(GenericAnnotationType.DISAMB_CLASSREF, PTRPREFIX+classRefP);
+		}
+		if ( sourceP != null ) {
+			ann.setString(GenericAnnotationType.DISAMB_SOURCE, PTRPREFIX+sourceP);
+		}
+		if ( identP != null ) {
+			ann.setString(GenericAnnotationType.DISAMB_IDENT, PTRPREFIX+identP);
+		}
+		if ( identRefP != null ) {
+			ann.setString(GenericAnnotationType.DISAMB_IDENTREF, PTRPREFIX+identRefP);
+		}
+
+		// Get the optional enabled
+		ann.setString(GenericAnnotationType.DISAMB_GRANULARITY, np[4]);
+
+		// Add the rule
+		rules.add(rule);
+	}
+
+	
 	private void compileLocaleFilterRule (Element elem,
 		boolean isInternal)
 	{
@@ -1206,6 +1268,10 @@ public class ITSEngine implements IProcessor, ITraversal {
 			trace.peek().lqIssues = new GenericAnnotations(getFlagData(data, FP_LQISSUE_DATA));
 		}
 
+		if ( data.charAt(FP_DISAMBIGUATION) != '?' ) {
+			trace.peek().disambig = new GenericAnnotations(getFlagData(data, FP_DISAMBIGUATION_DATA));
+		}
+
 		if ( data.charAt(FP_STORAGESIZE) != '?' ) {
 			String[] values = fromSingleString(getFlagData(data, FP_STORAGESIZE_DATA));
 			trace.peek().storageSize = values[0];
@@ -1522,6 +1588,49 @@ public class ITSEngine implements IProcessor, ITraversal {
 						// Decorate the node with the resolved annotation data
 						setFlag(NL.item(i), FP_LQISSUE, 'y', true);
 						setFlag(NL.item(i), FP_LQISSUE_DATA, anns.toString(), true);
+					}
+
+					else if ( rule.ruleType == IProcessor.DC_DISAMBIGUATION ) {
+						GenericAnnotations anns = rule.annotations;
+						GenericAnnotation ann = anns.getAnnotations(GenericAnnotationType.DISAMB).get(0);
+						// Get and resolve 'classRef'
+						data1 = ann.getString(GenericAnnotationType.DISAMB_CLASSREF);
+						if ( data1 != null ) {
+							if ( data1.startsWith(PTRPREFIX) ) {
+								data1 = REF_PREFIX+resolvePointer(NL.item(i), data1.substring(2));
+							}
+							ann.setString(GenericAnnotationType.DISAMB_CLASSREF, data1);
+						}
+						// Get and resolve 'source'
+						data1 = ann.getString(GenericAnnotationType.DISAMB_SOURCE);
+						if ( data1 != null ) {
+							if ( data1.startsWith(PTRPREFIX) ) {
+								data1 = resolvePointer(NL.item(i), data1.substring(2));
+							}
+							ann.setString(GenericAnnotationType.DISAMB_SOURCE, data1);
+						}
+						// Get and resolve 'ident'
+						data1  = ann.getString(GenericAnnotationType.DISAMB_IDENT);
+						if ( data1 != null ) {
+							if ( data1.startsWith(PTRPREFIX) ) {
+								data1 = resolvePointer(NL.item(i), data1.substring(2));
+							}
+							ann.setString(GenericAnnotationType.DISAMB_IDENT, data1);
+						}
+						// Get and resolve 'ident ref'
+						data1 = ann.getString(GenericAnnotationType.DISAMB_IDENTREF);
+						if ( data1 != null ) {
+							if ( data1.startsWith(PTRPREFIX) ) {
+								data1 = REF_PREFIX+resolvePointer(NL.item(i), data1.substring(2));
+							}
+							ann.setString(GenericAnnotationType.DISAMB_IDENTREF, data1);
+						}
+						// Granularity has no pointer
+						// So it is already set, including its default if needed
+						
+						// Decorate the node with the resolved annotation data
+						setFlag(NL.item(i), FP_DISAMBIGUATION, 'y', true);
+						setFlag(NL.item(i), FP_DISAMBIGUATION_DATA, anns.toString(), true);
 					}
 
 					else if ( rule.ruleType == IProcessor.DC_ALLOWEDCHARS ) {
@@ -1922,6 +2031,43 @@ public class ITSEngine implements IProcessor, ITraversal {
 				}
 			}
 			
+			// Disambiguation
+			if (( (dataCategories & IProcessor.DC_DISAMBIGUATION) > 0 ) && isVersion2() ) {
+				if ( isHTML5 ) {
+					expr = xpath.compile("//*/@its-disambig-class-ref|//*/@its-disambig-source|//*/@its-disambig-indent|//*/@its-disambig-indent-ref");
+				}
+				else {
+					expr = xpath.compile("//*/@"+ITS_NS_PREFIX+":disambigClassRef|//"+ITS_NS_PREFIX+":span/@disambigClassRef"
+						+"|//*/@"+ITS_NS_PREFIX+":disambigSource|//"+ITS_NS_PREFIX+":span/@disambigSource"
+						+"|//*/@"+ITS_NS_PREFIX+":disambigIndent|//"+ITS_NS_PREFIX+":span/@disambigIndent"
+						+"|//*/@"+ITS_NS_PREFIX+":disambigIndentRef|//"+ITS_NS_PREFIX+":span/@disambigIndentRef");
+				}
+
+				NL = (NodeList)expr.evaluate(doc, XPathConstants.NODESET);
+				for ( int i=0; i<NL.getLength(); i++ ) {
+					attr = (Attr)NL.item(i);
+					// Skip irrelevant nodes
+					if ( ITS_NS_URI.equals(attr.getOwnerElement().getNamespaceURI())
+						&& "disambiguationRule".equals(attr.getOwnerElement().getLocalName()) ) continue;
+					// Set the flag
+					boolean qualified = true;
+					String ns = attr.getOwnerElement().getNamespaceURI();
+					if ( !Util.isEmpty(ns) ) qualified = !ns.equals(ITS_NS_URI);
+					String[] values = retrieveDisambiguationData(attr.getOwnerElement(), qualified, isHTML5);
+					// Convert the values into an annotation
+					GenericAnnotations anns = new GenericAnnotations();
+					GenericAnnotation ann = addIssueItem(anns);
+					if ( values[0] != null ) ann.setString(GenericAnnotationType.DISAMB_CLASSREF, values[0]);
+					if ( values[1] != null ) ann.setString(GenericAnnotationType.DISAMB_SOURCE, values[1]);
+					if ( values[2] != null ) ann.setString(GenericAnnotationType.DISAMB_IDENT, values[2]);
+					if ( values[3] != null ) ann.setString(GenericAnnotationType.DISAMB_IDENTREF, values[3]);
+					if ( values[4] != null ) ann.setString(GenericAnnotationType.DISAMB_GRANULARITY, values[4]);
+					// Set the updated flags
+					setFlag(attr.getOwnerElement(), FP_DISAMBIGUATION, 'y', attr.getSpecified());
+					setFlag(attr.getOwnerElement(), FP_DISAMBIGUATION_DATA, anns.toString(), attr.getSpecified()); 
+				}
+			}
+
 			// Allowed characters
 			if (( (dataCategories & IProcessor.DC_ALLOWEDCHARS) > 0 ) && isVersion2() ) {
 				if ( isHTML5 ) {
@@ -2286,6 +2432,74 @@ public class ITSEngine implements IProcessor, ITraversal {
 
 		// Do not check for complete set of required characters
 		// This because we could have a global pointer that defines a non-native way to get the data
+
+		return data;
+	}
+	
+	/**
+	 * Retrieves the non-pointer information of the Disambiguation data category.
+	 * @param elem the element where to get the data.
+	 * @param qualified true if the attributes are expected to be qualified.
+	 * @return an array of the value: classRef, source, ident, identRef, granularity
+	 */
+	private String[] retrieveDisambiguationData (Element elem,
+		boolean qualified,
+		boolean useHTML5)
+	{
+		String[] data = new String[6];
+		
+		if ( useHTML5 ) {
+			if ( elem.hasAttribute("its-disambig-class-ref") )
+				data[0] = REF_PREFIX+elem.getAttribute("its-disambig-class-ref");
+			if ( elem.hasAttribute("its-disambig-source") )
+				data[1] = elem.getAttribute("its-disambig-source");
+			if ( elem.hasAttribute("its-disambig-ident") )
+				data[2] = elem.getAttribute("its-disambig-ident");
+			if ( elem.hasAttribute("its-disambig-ident-ref") )
+				data[3] = REF_PREFIX+elem.getAttribute("its-disambig-ident-ref");
+			if ( elem.hasAttribute("its-disambig-granularity") )
+				data[4] = elem.getAttribute("its-disambig-granularity");
+			else
+				data[4] = GenericAnnotationType.DISAMB_GRANULARITY_ENTITY; // Default
+		}
+		else if ( qualified ) {
+			if ( elem.hasAttributeNS(ITS_NS_URI, "disambigClassRef") )
+				data[0] = REF_PREFIX+elem.getAttributeNS(ITS_NS_URI, "disambigClassRef");
+			
+			if ( elem.hasAttributeNS(ITS_NS_URI, "disambigSource") )
+				data[1] = elem.getAttributeNS(ITS_NS_URI, "disambigSource");
+			
+			if ( elem.hasAttributeNS(ITS_NS_URI, "disambigIdent") )
+				data[2] = elem.getAttributeNS(ITS_NS_URI, "disambigIdent");
+			
+			if ( elem.hasAttributeNS(ITS_NS_URI, "disambigIdentRef") )
+				data[3] = REF_PREFIX+elem.getAttributeNS(ITS_NS_URI, "disambigIdentRef");
+			
+			if ( elem.hasAttributeNS(ITS_NS_URI, "disambigGranularity") )
+				data[4] = elem.getAttributeNS(ITS_NS_URI, "disambigGranularity");
+			else
+				data[4] = GenericAnnotationType.DISAMB_GRANULARITY_ENTITY; // Default
+		}
+		else {
+			if ( elem.hasAttribute("disambigClassRef") )
+				data[0] = REF_PREFIX+elem.getAttribute("disambigClassRef");
+			
+			if ( elem.hasAttribute("disambigSource") )
+				data[1] = elem.getAttribute("disambigSource");
+			
+			if ( elem.hasAttribute("disambigIdent") )
+				data[2] = elem.getAttribute("disambigIdent");
+			
+			if ( elem.hasAttribute("disambigIdentRef") )
+				data[3] = REF_PREFIX+elem.getAttribute("disambigIdentRef");
+			
+			if ( elem.hasAttribute("disambigGranularity") )
+				data[4] = elem.getAttribute("disambigGranularity");
+			else
+				data[4] = GenericAnnotationType.DISAMB_GRANULARITY_ENTITY; // Default
+		}
+		
+		//TODO: Validation
 
 		return data;
 	}
@@ -2832,6 +3046,22 @@ public class ITSEngine implements IProcessor, ITraversal {
 		if ( tmp.charAt(FP_LQISSUE) != 'y' ) return null;
 		GenericAnnotations anns = new GenericAnnotations(getFlagData(tmp, FP_LQISSUE_DATA));
 		return anns.getAnnotations(GenericAnnotationType.LQI).get(index).getString(fieldName);
+	}
+
+	/**
+	 * Gets the disambiguation annotation set for the current element
+	 * or one of its attributes. 
+	 * @param attribute the attribute to look up, or null for the element.
+	 * @return the annotation set for the queried node (can be null).
+	 */
+	public GenericAnnotations getDisambiguation (Attr attribute) {
+		if ( attribute == null ) {
+			return trace.peek().disambig;
+		}
+		String tmp;
+		if ( (tmp = (String)attribute.getUserData(FLAGNAME)) == null ) return null;
+		if ( tmp.charAt(FP_DISAMBIGUATION) != 'y' ) return null;
+		return new GenericAnnotations(getFlagData(tmp, FP_DISAMBIGUATION_DATA));
 	}
 
 	@Override

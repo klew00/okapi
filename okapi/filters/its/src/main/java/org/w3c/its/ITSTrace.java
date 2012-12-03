@@ -48,6 +48,7 @@ class ITSTrace {
 	GenericAnnotations lqIssues;
 	String toolsRef;
 	Float mtConfidence;
+	GenericAnnotations disambig;
 
 	ITSTrace () {
 		// Default constructor
@@ -90,6 +91,8 @@ class ITSTrace {
 		
 		// domain: Inheritance for child elements including attributes
 		domains = initialTrace.domains;
+		
+		// disambiguation: no inheritance 
 		
 		// localization quality issue:
 		lqIssuesRef = initialTrace.lqIssuesRef;

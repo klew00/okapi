@@ -54,7 +54,7 @@ public class Main {
 	public static final String DC_LANGUAGEINFORMATION = "lang";
 	public static final String DC_WITHINTEXT = "withintext";
 	public static final String DC_DOMAIN = "domain";
-	// TODO: public static final String DC_DISAMBIGUATION = "disambiguation";
+	public static final String DC_DISAMBIGUATION = "disambiguation";
 	public static final String DC_LOCALEFILTER = "localefilter";
 	// TODO: public static final String DC_PROVENANCE = "provenance";
 	public static final String DC_EXTERNALRESOURCE = "externalresource";
@@ -99,6 +99,7 @@ public class Main {
 						+ "\n" + DC_LANGUAGEINFORMATION
 						+ "\n" + DC_WITHINTEXT
 						+ "\n" + DC_DOMAIN
+						+ "\n" + DC_DISAMBIGUATION
 						+ "\n" + DC_LOCALEFILTER
 						+ "\n" + DC_EXTERNALRESOURCE
 						+ "\n" + DC_TARGETPOINTER
@@ -336,6 +337,9 @@ public class Main {
 		else if ( dc.equals(DC_DOMAIN) ) {
 			out1 = trav.getDomains(attr);
 			if ( out1 != null ) writer.print(String.format("\tdomains=\"%s\"", escape(out1)));
+		}
+		else if ( dc.equals(DC_DISAMBIGUATION) ) {
+			//TODO: output
 		}
 		else if ( dc.equals(DC_LOCALEFILTER) ) {
 			out1 = trav.getLocaleFilter();

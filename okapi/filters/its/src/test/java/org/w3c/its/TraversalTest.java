@@ -34,6 +34,9 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import net.sf.okapi.common.TestUtil;
+import net.sf.okapi.common.annotation.GenericAnnotation;
+import net.sf.okapi.common.annotation.GenericAnnotationType;
+import net.sf.okapi.common.annotation.GenericAnnotations;
 import nu.validator.htmlparser.dom.HtmlDocumentBuilder;
 
 import org.junit.Before;
@@ -242,6 +245,33 @@ public class TraversalTest {
 		assertEquals("mt-confidence|file:///tools.xml#T1", trav.getToolsRef());
 	}
 	
+	@Test
+	public void testDisambiguationPointerHtml () throws SAXException, IOException, ParserConfigurationException {
+		InputSource is = new InputSource(new StringReader("<!DOCTYPE html><html lang=en><head><meta charset=utf-8>"
+			+ "<title>Title</title>"
+			+ "<script type='application/its+xml'>"
+			+ "<its:rules xmlns:its='http://www.w3.org/2005/11/its' version='2.0'>"
+			+ "<its:disambiguationRule selector='//*[@typeof and @about]' "
+			+ " disambigClassRefPointer='@typeof' disambigIdentRefPointer='@about' disambigGranularity='entity'/>"
+			+ "</its:rules>"
+			+ "</script>"
+			+ "</head><body>"
+			+ "<p><span property='http://xmlns.com/foaf/0.1/name' about='http://dbpedia.org/resource/Dublin' "
+			+ "typeof='http:/nerd.eurecom.fr/ontology#Place'>Dublin</span> is the capital of Ireland.</p>"
+			+ "</body>/html>"));
+		Document doc = htmlDocBuilder.parse(is);
+		ITSEngine trav = applyITSRules(doc, null, true, null);
+		Element elem = getElement(trav, "span", 1);
+		assertNotNull(elem);
+		GenericAnnotations anns = trav.getDisambiguation(null);
+		assertNotNull(anns);
+		GenericAnnotation ann = anns.getAnnotations(GenericAnnotationType.DISAMB).get(0);
+		assertEquals(GenericAnnotationType.DISAMB_GRANULARITY_ENTITY, ann.getString(GenericAnnotationType.DISAMB_GRANULARITY));
+		assertEquals(ITSEngine.REF_PREFIX+"http:/nerd.eurecom.fr/ontology#Place", ann.getString(GenericAnnotationType.DISAMB_CLASSREF));
+		assertEquals(ITSEngine.REF_PREFIX+"http://dbpedia.org/resource/Dublin", ann.getString(GenericAnnotationType.DISAMB_IDENTREF));
+	}
+
+
 	@Test
 	public void testTargetPointerGlobal () throws SAXException, IOException, ParserConfigurationException {
 		InputSource is = new InputSource(new StringReader("<doc>"
@@ -660,7 +690,7 @@ public class TraversalTest {
 		return null;
 	}
 	
-	private static ITraversal applyITSRules (Document doc,
+	private static ITSEngine applyITSRules (Document doc,
 		URI docURI,
 		boolean isHTML5,
 		File rulesFile)

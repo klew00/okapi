@@ -43,7 +43,7 @@ public interface IProcessor {
 	public static final long DC_STORAGESIZE       = 0x00004000; // ITS 2.0
 	public static final long DC_ALLOWEDCHARS      = 0x00008000; // ITS 2.0
 	public static final long DC_MTCONFIDENCE      = 0x00010000; // ITS 2.0
-//TODO	public static final long DC_DISAMBIGUATION    = 0x00020000; // ITS 2.0
+	public static final long DC_DISAMBIGUATION    = 0x00020000; // ITS 2.0
 //TODO	public static final long DC_PROVENANCE        = 0x00040000; // ITS 2.0
 	
 	public static final long DC_SUBFILTER         = 0x00080000; // Extension
