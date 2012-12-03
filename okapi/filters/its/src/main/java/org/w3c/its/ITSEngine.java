@@ -109,7 +109,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 	private static final int      FP_ALLOWEDCHARS          = 12;
 	private static final int      FP_SUBFILTER             = 13;
 	private static final int      FP_TARGETPOINTER         = 14;
-	private static final int      FP_TOOLSREF              = 15;
+	private static final int      FP_ANNOTATORSREF         = 15;
 	private static final int      FP_MTCONFIDENCE          = 16;
 	private static final int      FP_DISAMBIGUATION        = 17;
 	
@@ -126,7 +126,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 	private static final int      FP_STORAGESIZE_DATA      = 9;
 	private static final int      FP_ALLOWEDCHARS_DATA     = 10;
 	private static final int      FP_SUBFILTER_DATA        = 11;
-	private static final int      FP_TOOLSREF_DATA         = 12;
+	private static final int      FP_ANNOTATORSREF_DATA    = 12;
 	private static final int      FP_MTCONFIDENCE_DATA     = 13;
 	private static final int      FP_DISAMBIGUATION_DATA   = 14;
 	
@@ -1347,16 +1347,16 @@ public class ITSEngine implements IProcessor, ITraversal {
 			trace.peek().subFilter = getFlagData(data, FP_SUBFILTER_DATA);
 		}
 		
-		if ( data.charAt(FP_TOOLSREF) != '?' ) {
+		if ( data.charAt(FP_ANNOTATORSREF) != '?' ) {
 			// Update each data category
-			Map<String, String> oldMap = toolsRefToMap(trace.peek().toolsRef);
-			Map<String, String> newMap = toolsRefToMap(getFlagData(data, FP_TOOLSREF_DATA));
+			Map<String, String> oldMap = annotatorsRefToMap(trace.peek().annotatorsRef);
+			Map<String, String> newMap = annotatorsRefToMap(getFlagData(data, FP_ANNOTATORSREF_DATA));
 			oldMap.putAll(newMap); // Add or override if needed
-			trace.peek().toolsRef = mapToToolsRef(oldMap);
+			trace.peek().annotatorsRef = mapToAnnotatorsRef(oldMap);
 		}
 	}
 	
-	private Map<String, String> toolsRefToMap (String data) {
+	private Map<String, String> annotatorsRefToMap (String data) {
 		TreeMap<String, String> map = new TreeMap<String, String>();
 		if ( Util.isEmpty(data) ) return map; // Empty map
 		// Else: fill the map
@@ -1364,7 +1364,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 		for ( String tmp : list ) {
 			int n = tmp.indexOf('|');
 			if ( n == -1 ) {
-				logger.warn("Invalid toolsRef value '{}'", tmp);
+				logger.warn("Invalid annotatorsRef value '{}'", tmp);
 				continue;
 			}
 			map.put(tmp.substring(0, n), tmp.substring(n+1));
@@ -1372,7 +1372,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 		return map;
 	}
 	
-	private String mapToToolsRef (Map<String, String> map) {
+	private String mapToAnnotatorsRef (Map<String, String> map) {
 		StringBuilder sb = new StringBuilder();
 		
 		for ( String dc : map.keySet() ) {
@@ -1931,12 +1931,12 @@ public class ITSEngine implements IProcessor, ITraversal {
 					("preserve".equals(value) ? 'y' : '?'), attr.getSpecified());
 			}
 			
-			// its:toolsRef always applied
+			// its:annotatorsRef always applied
 			if ( isHTML5 ) {
-				expr = xpath.compile("//*/@its-tools-ref");
+				expr = xpath.compile("//*/@its-annotators-ref");
 			}
 			else {
-				expr = xpath.compile("//*/@"+ITS_NS_PREFIX+":toolsRef|//"+ITS_NS_PREFIX+":span/@toolsRef");
+				expr = xpath.compile("//*/@"+ITS_NS_PREFIX+":annotatorsRef|//"+ITS_NS_PREFIX+":span/@annotatorsRef");
 			}
 			NL = (NodeList)expr.evaluate(doc, XPathConstants.NODESET);
 			for ( int i=0; i<NL.getLength(); i++ ) {
@@ -1944,14 +1944,14 @@ public class ITSEngine implements IProcessor, ITraversal {
 				// Validate the value
 				String value = attr.getValue();
 				// Validate the values
-				Map<String, String> map = toolsRefToMap(value);
+				Map<String, String> map = annotatorsRefToMap(value);
 				for ( String dc : map.keySet() ) {
-					validateToolsRefValue(dc);
+					validateAnnotatorsRefValue(dc);
 				}
 				// Set the flag
-				setFlag(attr.getOwnerElement(), FP_TOOLSREF,
+				setFlag(attr.getOwnerElement(), FP_ANNOTATORSREF,
 					(value!=null ? 'y' : '?'), attr.getSpecified());
-				setFlag(attr.getOwnerElement(), FP_TOOLSREF_DATA,
+				setFlag(attr.getOwnerElement(), FP_ANNOTATORSREF_DATA,
 						value, attr.getSpecified()); 
 			}
 			
@@ -2201,13 +2201,13 @@ public class ITSEngine implements IProcessor, ITraversal {
 		}
 	}
 	
-	private String validateToolsRefValue (String data) {
+	private String validateAnnotatorsRefValue (String data) {
 		if ( Util.isEmpty(data) || ( ("allowed-characters|directionality|disambiguation|domain|elements-within-text|"
-			+ "external-resource|id-value|language-information|locale-filter|localization-note|lq-issue|lq-precis|"
+			+ "external-resource|id-value|language-information|locale-filter|localization-note|lq-issue|lq-rating|"
 			+ "mt-confidence|provenance|ruby|storage-size|target-pointer|terminology|translate").indexOf(data)==-1 ))
 		{
 			// Log an error, but don't stop the process
-			logger.error("Invalid value for toolsRef/its-tools-ref: '{}'", data);
+			logger.error("Invalid value for annotatorsRef/its-annotators-ref: '{}'", data);
 		}
 		return data;
 	}
@@ -3186,8 +3186,8 @@ public class ITSEngine implements IProcessor, ITraversal {
 	}
 
 	@Override
-	public String getToolsRef () {
-		return trace.peek().toolsRef;
+	public String getAnnotatorsRef () {
+		return trace.peek().annotatorsRef;
 	}
 	
 	@Override

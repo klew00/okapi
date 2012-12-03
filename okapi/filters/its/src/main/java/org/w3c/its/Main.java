@@ -399,8 +399,8 @@ public class Main {
 			Float outFloat1 = trav.getMtConfidence(attr);
 			writer.print(String.format("\tmtConfidence=\"%f\"", outFloat1==null ? 0 : outFloat1));
 			writer.print("\t"); // display also toosRef because it's a required information for MT confidence
-			out1 = trav.getToolsRef();
-			writer.print(String.format("\ttoolsRef=\"%s\"", escape(out1==null ? "" : out1)));
+			out1 = trav.getAnnotatorsRef();
+			writer.print(String.format("\tannotatorsRef=\"%s\"", escape(out1==null ? "" : out1)));
 		}
 		else if ( dc.equals(DC_STORAGESIZE) ) {
 			out1 = trav.getStorageSize(attr);

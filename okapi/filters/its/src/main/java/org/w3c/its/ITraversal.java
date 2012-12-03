@@ -176,7 +176,7 @@ public interface ITraversal {
 	 * (not just the ones set on the given node).
 	 * @return the tools references associated with the queried part.
 	 */
-	public String getToolsRef ();
+	public String getAnnotatorsRef ();
 	
 	/**
 	 * Gets the MT Confidence value for the current element of the traversal or one

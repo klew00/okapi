@@ -46,7 +46,7 @@ class ITSTrace {
 	String subFilter;
 	String lqIssuesRef;
 	GenericAnnotations lqIssues;
-	String toolsRef;
+	String annotatorsRef;
 	Float mtConfidence;
 	GenericAnnotations disambig;
 
@@ -107,7 +107,7 @@ class ITSTrace {
 		
 		this.isChildDone = isChildDone; // From parameter
 		
-		this.toolsRef = initialTrace.toolsRef;
+		this.annotatorsRef = initialTrace.annotatorsRef;
 	}
 
 }
