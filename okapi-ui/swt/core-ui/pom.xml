@@ -13,12 +13,12 @@
     <name>Okapi Core UI</name>
 
     <profiles>
-    
-		<profile>
+    	<profile>
 			<id>WIN_SWT</id>
 			<activation>
 				<os>
 					<family>Windows</family>
+					<arch>x86</arch>
 				</os>
 			</activation>
 			<dependencies>
@@ -29,13 +29,12 @@
 				</dependency>
 			</dependencies>
 		</profile>
-		
 		<profile>
 			<id>WIN_64_SWT</id>
 			<activation>
 				<os>
 					<family>Windows</family>
-					<arch>x64</arch>
+					<arch>amd64</arch>
 				</os>
 			</activation>
 			<dependencies>
@@ -46,7 +45,6 @@
 				</dependency>
 			</dependencies>
 		</profile>
-		
         <profile>
             <id>COCOA_64_SWT</id>
             <activation>
