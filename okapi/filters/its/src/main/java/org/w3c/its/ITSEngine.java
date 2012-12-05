@@ -2038,15 +2038,17 @@ public class ITSEngine implements IProcessor, ITraversal {
 			// Disambiguation
 			if (( (dataCategories & IProcessor.DC_DISAMBIGUATION) > 0 ) && isVersion2() ) {
 				if ( isHTML5 ) {
-					expr = xpath.compile("//*/@its-disambig-class-ref|//*/@its-disambig-source|//*/@its-disambig-indent|//*/@its-disambig-indent-ref");
+					expr = xpath.compile("//*/@its-disambig-class-ref|//*/@its-disambig-ident|//*/@its-disambig-ident-ref");
 				}
 				else {
 					expr = xpath.compile("//*/@"+ITS_NS_PREFIX+":disambigClassRef|//"+ITS_NS_PREFIX+":span/@disambigClassRef"
-						+"|//*/@"+ITS_NS_PREFIX+":disambigSource|//"+ITS_NS_PREFIX+":span/@disambigSource"
-						+"|//*/@"+ITS_NS_PREFIX+":disambigIndent|//"+ITS_NS_PREFIX+":span/@disambigIndent"
-						+"|//*/@"+ITS_NS_PREFIX+":disambigIndentRef|//"+ITS_NS_PREFIX+":span/@disambigIndentRef");
+						+"|//*/@"+ITS_NS_PREFIX+":disambigIdent|//"+ITS_NS_PREFIX+":span/@disambigIdent"
+						+"|//*/@"+ITS_NS_PREFIX+":disambigIdentRef|//"+ITS_NS_PREFIX+":span/@disambigIdentRef");
 				}
 
+				// This may catch elements twice (e.g. if the have class-ref and ident-ref)
+				// So the work may be duplicated
+//TODO: Remove duplicated items from the list before processing
 				NL = (NodeList)expr.evaluate(doc, XPathConstants.NODESET);
 				for ( int i=0; i<NL.getLength(); i++ ) {
 					attr = (Attr)NL.item(i);
@@ -2060,7 +2062,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 					String[] values = retrieveDisambiguationData(attr.getOwnerElement(), qualified, isHTML5);
 					// Convert the values into an annotation
 					GenericAnnotations anns = new GenericAnnotations();
-					GenericAnnotation ann = addIssueItem(anns);
+					GenericAnnotation ann = anns.add(GenericAnnotationType.DISAMB);
 					if ( values[0] != null ) ann.setString(GenericAnnotationType.DISAMB_CLASS, values[0]);
 					if ( values[1] != null ) ann.setString(GenericAnnotationType.DISAMB_SOURCE, values[1]);
 					if ( values[2] != null ) ann.setString(GenericAnnotationType.DISAMB_IDENT, values[2]);

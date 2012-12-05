@@ -271,6 +271,25 @@ public class TraversalTest {
 		assertEquals(ITSEngine.REF_PREFIX+"http://dbpedia.org/resource/Dublin", ann.getString(GenericAnnotationType.DISAMB_IDENT));
 	}
 
+	@Test
+	public void testDisambiguationSimpleHtml () throws SAXException, IOException, ParserConfigurationException {
+		InputSource is = new InputSource(new StringReader("<p>hello "
+			+ "<span its-disambig-ident-ref=\"http://purl.org/vocabularies/princeton/wn30/synset-sweet-adjective-1.rdf\" "
+			+ "its-disambig-granularity=\"lexical-concept\">sweet</span> "
+			+ "<span its-disambig-ident-ref=\"http://dbpedia.org/resource/Paris\" "
+			+ "its-disambig-class-ref=\"http://schema.org/Place\">Paris</span> summer</p>"));
+		Document doc = htmlDocBuilder.parse(is);
+		ITSEngine trav = applyITSRules(doc, null, true, null);
+		Element elem = getElement(trav, "span", 1);
+		assertEquals("sweet", elem.getTextContent());
+		assertEquals("REF:http://purl.org/vocabularies/princeton/wn30/synset-sweet-adjective-1.rdf", trav.getDisambigIdent(null));
+		assertEquals(GenericAnnotationType.DISAMB_GRANULARITY_LEXICAL, trav.getDisambigGranularity(null));
+		elem = getElement(trav, "span", 2);
+		assertEquals("Paris", elem.getTextContent());
+		assertEquals("REF:http://dbpedia.org/resource/Paris", trav.getDisambigIdent(null));
+		assertEquals("REF:http://schema.org/Place", trav.getDisambigClass(null));
+		assertEquals(GenericAnnotationType.DISAMB_GRANULARITY_ENTITY, trav.getDisambigGranularity(null));
+	}
 
 	@Test
 	public void testTargetPointerGlobal () throws SAXException, IOException, ParserConfigurationException {
