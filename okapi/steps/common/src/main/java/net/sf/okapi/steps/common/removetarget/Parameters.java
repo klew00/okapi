@@ -25,6 +25,7 @@ import net.sf.okapi.common.EditorFor;
 import net.sf.okapi.common.ParametersDescription;
 import net.sf.okapi.common.uidescription.EditorDescription;
 import net.sf.okapi.common.uidescription.IEditorDescriptionProvider;
+import net.sf.okapi.common.uidescription.TextInputPart;
 
 @EditorFor(Parameters.class)
 public class Parameters extends BaseParameters implements IEditorDescriptionProvider {
@@ -127,8 +128,10 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		EditorDescription desc = new EditorDescription("Remove Target Options", true, false);
 		desc.addCheckboxPart(paramsDesc.get(FILTER_BASED_ON_IDS));
 		desc.addCheckboxPart(paramsDesc.get(REMOVE_TU_IF_NO_TARGET));
-		desc.addTextInputPart(paramsDesc.get(TUS_FOR_TARGET_REMOVAL));
-		desc.addTextInputPart(paramsDesc.get(TARGET_LOCALES_TO_KEEP));
+		TextInputPart tip = desc.addTextInputPart(paramsDesc.get(TUS_FOR_TARGET_REMOVAL));
+		tip.setAllowEmpty(true);
+		tip = desc.addTextInputPart(paramsDesc.get(TARGET_LOCALES_TO_KEEP));
+		tip.setAllowEmpty(true);
 		return desc;
 	}
 
