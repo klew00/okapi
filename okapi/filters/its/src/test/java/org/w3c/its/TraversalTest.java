@@ -292,6 +292,24 @@ public class TraversalTest {
 	}
 
 	@Test
+	public void testDisambiguationOnAttribute () throws SAXException, IOException, ParserConfigurationException {
+		InputSource is = new InputSource(new StringReader("<doc>"
+			+ "<i:rules xmlns:i='"+ITSEngine.ITS_NS_URI+"' version='2.0'>"
+			+ "<i:disambiguationRule selector='//entry/@text' disambigSourcePointer='../@attSource' "
+			+ " disambigIdentPointer='../@attIdent' />"
+			+ "</i:rules>"
+			+ "<entry text='Some text' attIdent='ident1' attSource='src1'>Content</entry></doc>"));
+		Document doc = fact.newDocumentBuilder().parse(is);
+		ITraversal trav = applyITSRules(doc, null, false, null);
+		Element elem = getElement(trav, "entry", 1);
+		Attr attr = elem.getAttributeNode("text");
+		assertNotNull(attr);
+		assertEquals("src1", trav.getDisambigSource(attr));
+		assertEquals("ident1", trav.getDisambigIdent(attr));
+		assertEquals(GenericAnnotationType.DISAMB_GRANULARITY_ENTITY, trav.getDisambigGranularity(attr));
+	}
+	
+	@Test
 	public void testTargetPointerGlobal () throws SAXException, IOException, ParserConfigurationException {
 		InputSource is = new InputSource(new StringReader("<doc>"
 			+ "<i:rules xmlns:i='"+ITSEngine.ITS_NS_URI+"' version='2.0'>"
