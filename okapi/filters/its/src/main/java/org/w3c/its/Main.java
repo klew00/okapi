@@ -340,6 +340,31 @@ public class Main {
 		}
 		else if ( dc.equals(DC_DISAMBIGUATION) ) {
 			//TODO: output
+			
+			out1 = trav.getDisambigClass(attr);
+			if ( out1 != null ) {
+				if ( out1.startsWith(ITSEngine.REF_PREFIX) ) {
+					writer.print(String.format("\tdisambigClassRef=\"%s\"", escape(out1.substring(ITSEngine.REF_PREFIX.length()))));
+				}
+				else {
+					writer.print(String.format("\tdisambigClass=\"%s\"", escape(out1)));
+				}
+			}
+			out1 = trav.getDisambigGranularity(attr);
+			if ( out1 != null ) writer.print(String.format("\tdisambigGranularity=\"%s\"", escape(out1)));
+			out1 = trav.getDisambigIdent(attr);
+			if ( out1 != null ) {
+				if ( out1.startsWith(ITSEngine.REF_PREFIX) ) {
+					writer.print(String.format("\tdisambigIdentRef=\"%s\"", escape(out1.substring(ITSEngine.REF_PREFIX.length()))));
+				}
+				else {
+					writer.print(String.format("\tdisambigIdent=\"%s\"", escape(out1)));
+				}
+			}
+			out1 = trav.getDisambigSource(attr);
+			if ( out1 != null ) {
+				writer.print(String.format("\tdisambigsource=\"%s\"", escape(out1)));
+			}
 		}
 		else if ( dc.equals(DC_LOCALEFILTER) ) {
 			out1 = trav.getLocaleFilter();

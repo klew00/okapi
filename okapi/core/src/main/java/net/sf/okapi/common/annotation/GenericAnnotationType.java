@@ -25,6 +25,11 @@ package net.sf.okapi.common.annotation;
  */
 public class GenericAnnotationType {
 
+	/**
+	 * Annotation identifier for the
+	 * <a href='http://www.w3.org/TR/its20/#lqissue'>ITS Localization Quality Issue</a> data category.
+	 * 
+	 */
 	public static final String LQI = "its-lqi";
 	public static final String LQI_ISSUESREF = "lqiIssuesRef";
 	public static final String LQI_TYPE = "lqiType";
@@ -33,6 +38,10 @@ public class GenericAnnotationType {
 	public static final String LQI_PROFILEREF = "lqiProfileRef";
 	public static final String LQI_ENABLED = "lqiEnabled"; // Boolean
 
+	/**
+	 * Annotation identifier for the
+	 * <a href='http://www.w3.org/TR/its20/#Disambiguation'>ITS Disambiguation</a> data category.
+	 */
 	public static final String DISAMB = "its-disamb";
 	public static final String DISAMB_CLASS = "disambClass";
 	public static final String DISAMB_SOURCE = "disambSource";
