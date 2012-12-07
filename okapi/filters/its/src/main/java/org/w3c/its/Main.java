@@ -384,7 +384,7 @@ public class Main {
 		}
 		else if ( dc.equals(DC_PRESERVESPACE) ) {
 			out1 = (trav.preserveWS() ? "preserve" : "default");
-			if ( out1 != null ) writer.print(String.format("\tpreserveSpace=\"%s\"", escape(out1)));
+			if ( out1 != null ) writer.print(String.format("\tspace=\"%s\"", escape(out1)));
 		}
 		else if ( dc.equals(DC_LOCQUALITYISSUE) ) {
 			int count = trav.getLocQualityIssueCount(attr);
@@ -429,13 +429,14 @@ public class Main {
 		}
 		else if ( dc.equals(DC_STORAGESIZE) ) {
 			out1 = trav.getStorageSize(attr);
-			if ( out1 != null ) writer.print(String.format("\tstorageSize=\"%s\"", escape(out1)));
-			writer.print("\t");
-			out1 = trav.getStorageEncoding(attr);
-			if ( out1 != null ) writer.print(String.format("\tstorageEncoding=\"%s\"", escape(out1)));
-			writer.print("\t");
-			out1 = trav.getLineBreakType(attr);
-			if ( out1 != null ) writer.print(String.format("\tlineBreakType=\"%s\"", escape(out1)));
+			if ( out1 != null ) {
+				out1 = trav.getLineBreakType(attr);
+				if ( out1 != null ) writer.print(String.format("\tlineBreakType=\"%s\"", escape(out1)));
+				out1 = trav.getStorageEncoding(attr);
+				if ( out1 != null ) writer.print(String.format("\tstorageEncoding=\"%s\"", escape(out1)));
+				out1 = trav.getStorageSize(attr);
+				writer.print(String.format("\tstorageSize=\"%s\"", escape(out1)));
+			}
 		}
 		else if ( dc.equals(DC_ALLOWEDCHARACTERS) ) {
 			out1 = trav.getAllowedCharacters(attr);
