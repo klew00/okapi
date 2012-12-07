@@ -1291,7 +1291,9 @@ public class ITSEngine implements IProcessor, ITraversal {
 			trace.peek().allowedChars = getFlagData(data, FP_ALLOWEDCHARS_DATA);
 		}
 		
-		trace.peek().targetPointer = getFlagData(data, FP_TARGETPOINTER_DATA);
+		if ( data.charAt(FP_TARGETPOINTER) != '?' ) {
+			trace.peek().targetPointer = getFlagData(data, FP_TARGETPOINTER_DATA);
+		}
 		
 		if ( data.charAt(FP_DIRECTIONALITY) != '?' ) {
 			switch ( data.charAt(FP_DIRECTIONALITY) ) {
@@ -1528,6 +1530,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 						
 					else if ( rule.ruleType == IProcessor.DC_TARGETPOINTER ) {
 						targetPointerRuleTriggered = true;
+						setFlag(NL.item(i), FP_TARGETPOINTER, 'y', true);
 						setFlag(NL.item(i), FP_TARGETPOINTER_DATA, rule.info, true);							
 					}
 						
@@ -1897,7 +1900,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 					expr = xpath.compile("//*/@its-within-text");
 				}
 				else {
-					expr = xpath.compile("//*/@"+ITS_NS_PREFIX+":withinText");
+					expr = xpath.compile("//*/@"+ITS_NS_PREFIX+":withinText|//"+ITS_NS_PREFIX+":span/@withinText");
 				}
 				NL = (NodeList)expr.evaluate(doc, XPathConstants.NODESET);
 				for ( int i=0; i<NL.getLength(); i++ ) {
@@ -2864,6 +2867,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 		else return "";
 	}
 
+	@Override
 	public boolean getTranslate (Attr attribute) {
 		if ( attribute == null ) return trace.peek().translate;
 		// Else: check the attribute
@@ -2879,6 +2883,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 		// Else: check the attribute
 		String tmp;
 		if ( (tmp = (String)attribute.getUserData(FLAGNAME)) == null ) return null;
+		if ( tmp.charAt(FP_TARGETPOINTER) != 'y' ) return null;
 		return getFlagData(tmp, FP_TARGETPOINTER_DATA);
 	}
 	
@@ -2891,6 +2896,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 		return getFlagData(tmp, FP_IDVALUE_DATA);
 	}
 	
+	@Override
 	public int getDirectionality (Attr attribute) {
 		if ( attribute == null ) return trace.peek().dir;
 		String tmp;
@@ -2898,10 +2904,12 @@ public class ITSEngine implements IProcessor, ITraversal {
 		return Integer.valueOf(tmp.charAt(FP_DIRECTIONALITY));
 	}
 	
+	@Override
 	public int getWithinText () {
 		return trace.peek().withinText;
 	}
 	
+	@Override
 	public boolean getTerm (Attr attribute) {
 		if ( attribute == null ) return trace.peek().term;
 		String tmp;
@@ -2910,6 +2918,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 		return (tmp.charAt(FP_TERMINOLOGY) == 'y');
 	}
 
+	@Override
 	public String getTermInfo (Attr attribute) {
 		if ( attribute == null ) return trace.peek().termInfo;;
 		String tmp;
@@ -2918,6 +2927,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 		return getFlagData(tmp, FP_TERMINOLOGY_DATA);
 	}
 
+	@Override
 	public String getLocNote (Attr attribute) {
 		if ( attribute == null ) return trace.peek().locNote;
 		String tmp;
@@ -2926,6 +2936,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 		return getFlagData(tmp, FP_LOCNOTE_DATA);
 	}
 
+	@Override
 	public String getLocNoteType (Attr attribute) {
 		if ( attribute == null ) return trace.peek().locNoteType;
 		String tmp;
@@ -2935,6 +2946,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 		return "description";
 	}
 	
+	@Override
 	public String getDomains (Attr attribute) {
 		if ( attribute == null ) return trace.peek().domains;
 		String tmp;
@@ -2948,6 +2960,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 		return trace.peek().preserveWS;
 	}
 
+	@Override
 	public String getLanguage () {
 		return trace.peek().language;
 	}
