@@ -124,6 +124,26 @@ public class TraversalTest {
 	}
 	
 	@Test
+	public void testTermLocally () throws SAXException, IOException, ParserConfigurationException {
+		InputSource is = new InputSource(new StringReader("<doc xmlns:its=\"http://www.w3.org/2005/11/its\" its:version=\"2.0\">"
+			+ "<p><span its:term='yes' its:termInfoRef='ref1' its:termConfidence='0.5'>"
+			+ "<its:span term='yes' termInfoRef='ref2' termConfidence='1'>Capital</its:span> city</span></p>"
+			+ "</doc>"));
+		Document doc = fact.newDocumentBuilder().parse(is);
+		ITraversal trav = applyITSRules(doc, null, false, null);
+		Element elem = getElement(trav, "span", 1);
+		assertEquals("Capital city", elem.getTextContent());
+		assertTrue(trav.getTerm(null));
+		assertEquals("REF:ref1", trav.getTermInfo(null));
+		assertEquals(0.5, trav.getTermConfidence(null), 0.0);
+		elem = getElement(trav, "its:span", 1);
+		assertEquals("Capital", elem.getTextContent());
+		assertTrue(trav.getTerm(null));
+		assertEquals("REF:ref2", trav.getTermInfo(null));
+		assertEquals(1.0, trav.getTermConfidence(null), 0.0);
+	}
+	
+	@Test
 	public void testXmlId () throws SAXException, IOException, ParserConfigurationException {
 		Document doc = fact.newDocumentBuilder().parse(root + "/input.xml");
 		ITraversal trav = applyITSRules(doc, new File(root + "/input.xml").toURI(), false, null);
@@ -157,6 +177,18 @@ public class TraversalTest {
 		assertTrue(trav.getWithinText()==ITraversal.WITHINTEXT_YES);
 	}
 
+	@Test
+	public void testWithinTextLocalSpan () throws SAXException, IOException, ParserConfigurationException {
+		InputSource is = new InputSource(new StringReader("<doc xmlns:i='"+ITSEngine.ITS_NS_URI+"' i:version='2.0'>"
+			+ "<p>Text <i:span withinText='yes'>span</i:span> text</p></doc>"));
+		Document doc = fact.newDocumentBuilder().parse(is);
+		ITraversal trav = applyITSRules(doc, null, false, null);
+		getElement(trav, "p", 1);
+		assertTrue(trav.getWithinText()==ITraversal.WITHINTEXT_NO);
+		getElement(trav, "i:span", 1);
+		assertTrue(trav.getWithinText()==ITraversal.WITHINTEXT_YES);
+	}
+	
 	@Test
 	public void testDomainGlobal () throws SAXException, IOException, ParserConfigurationException {
 		InputSource is = new InputSource(new StringReader("<doc>"

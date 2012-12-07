@@ -53,4 +53,11 @@ public class GenericAnnotationType {
 	public static final String DISAMB_GRANULARITY_ONTOLOGY = "ontology-concept";
 	public static final String DISAMB_GRANULARITY_ENTITY = "entity";
 
+	/**
+	 * Annotation identifier for the 
+	 * <a href='http://www.w3.org/TR/its20/#terminology'>ITS Terminology</a> data category.
+	 */
+	public static final String TERM = "its-term";
+	public static final String TERM_INFO = "termInfo";
+	public static final String TERM_CONFIDENCE = "termConfidence";
 }

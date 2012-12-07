@@ -130,6 +130,14 @@ public interface ITraversal {
 	public String getTermInfo (Attr attribute);
 	
 	/**
+	 * Gets the confidence associated with a given term node or one of its
+	 * attributes.
+	 * @param attribute The attribute to query or null for the element.
+	 * @return the confidence associated with the queried part.
+	 */
+	public Float getTermConfidence (Attr attribute);
+	
+	/**
 	 * Gets the localization note of the current element of the traversal or
 	 * one of its attributes.
 	 * @param attribute the attribute to query or null for the element.

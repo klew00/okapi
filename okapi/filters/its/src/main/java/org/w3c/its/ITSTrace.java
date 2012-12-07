@@ -28,8 +28,7 @@ class ITSTrace {
 	boolean translate;
 	int dir;
 	int withinText;
-	boolean term;
-	String termInfo;
+	GenericAnnotations termino;
 	String locNote;
 	String locNoteType;
 	boolean preserveWS;
