@@ -29,8 +29,19 @@ public class GenericAnnotationType {
 	public static final String LQI_ISSUESREF = "lqiIssuesRef";
 	public static final String LQI_TYPE = "lqiType";
 	public static final String LQI_COMMENT = "lqiComment";
-	public static final String LQI_SEVERITY = "lqiSeverity";
+	public static final String LQI_SEVERITY = "lqiSeverity"; // Float
 	public static final String LQI_PROFILEREF = "lqiProfileRef";
-	public static final String LQI_ENABLED = "lqiEnabled";
+	public static final String LQI_ENABLED = "lqiEnabled"; // Boolean
+
+	public static final String DISAMB = "its-disamb";
+	public static final String DISAMB_CLASS = "disambClass";
+	public static final String DISAMB_SOURCE = "disambSource";
+	public static final String DISAMB_IDENT = "disambIdent";
+	public static final String DISAMB_CONFIDENCE = "disambConfidence"; // Float
+	public static final String DISAMB_GRANULARITY = "disambGranularity";
+	
+	public static final String DISAMB_GRANULARITY_LEXICAL = "lexical-concept";
+	public static final String DISAMB_GRANULARITY_ONTOLOGY = "ontology-concept";
+	public static final String DISAMB_GRANULARITY_ENTITY = "entity";
 
 }

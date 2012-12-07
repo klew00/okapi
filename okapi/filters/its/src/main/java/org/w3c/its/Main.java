@@ -54,7 +54,7 @@ public class Main {
 	public static final String DC_LANGUAGEINFORMATION = "lang";
 	public static final String DC_WITHINTEXT = "withintext";
 	public static final String DC_DOMAIN = "domain";
-	// TODO: public static final String DC_DISAMBIGUATION = "disambiguation";
+	public static final String DC_DISAMBIGUATION = "disambiguation";
 	public static final String DC_LOCALEFILTER = "localefilter";
 	// TODO: public static final String DC_PROVENANCE = "provenance";
 	public static final String DC_EXTERNALRESOURCE = "externalresource";
@@ -62,12 +62,10 @@ public class Main {
 	public static final String DC_IDVALUE = "idvalue";
 	public static final String DC_PRESERVESPACE = "preservespace";
 	public static final String DC_LOCQUALITYISSUE = "locqualityissue";
-	// TODO: public static final String DC_MTCONFIDENCE = "mtconfidence";
+	public static final String DC_MTCONFIDENCE = "mtconfidence";
 	public static final String DC_STORAGESIZE = "storagesize";
 	public static final String DC_ALLOWEDCHARACTERS = "allowedcharacters";
 	
-	public static final String DC_REF_PREFIX = "REF:";
-
 	public static void main (String[] args) {
  
 		PrintWriter writer = null;
@@ -101,12 +99,14 @@ public class Main {
 						+ "\n" + DC_LANGUAGEINFORMATION
 						+ "\n" + DC_WITHINTEXT
 						+ "\n" + DC_DOMAIN
+						+ "\n" + DC_DISAMBIGUATION
 						+ "\n" + DC_LOCALEFILTER
 						+ "\n" + DC_EXTERNALRESOURCE
 						+ "\n" + DC_TARGETPOINTER
 						+ "\n" + DC_IDVALUE
 						+ "\n" + DC_PRESERVESPACE
 						+ "\n" + DC_LOCQUALITYISSUE
+						+ "\n" + DC_MTCONFIDENCE
 						+ "\n" + DC_STORAGESIZE
 						+ "\n" + DC_ALLOWEDCHARACTERS
 					);
@@ -283,9 +283,10 @@ public class Main {
 				//--TODO: May need to be done more selectively--
 				out1 = unwrap(out1);
 				//--re-formatting the refs--
-				if ( out1.startsWith(DC_REF_PREFIX) ) {
-					writer.print(String.format("\tlocNoteRef=\"%s\"", escape(out1.substring(DC_REF_PREFIX.length())).replace("&quot;", "\"")));
-				}else{
+				if ( out1.startsWith(ITSEngine.REF_PREFIX) ) {
+					writer.print(String.format("\tlocNoteRef=\"%s\"", escape(out1.substring(ITSEngine.REF_PREFIX.length())).replace("&quot;", "\"")));
+				}
+				else {
 					writer.print(String.format("\tlocNote=\"%s\"", escape(out1).replace("&quot;", "\"")));					
 				}
 				out1 = trav.getLocNoteType(attr);
@@ -298,10 +299,11 @@ public class Main {
 			//writer.print("\t");
 			out1 = trav.getTermInfo(attr);
 			if ( out1 != null ){
-				if (out1.startsWith(DC_REF_PREFIX)){
-					writer.print(String.format("\ttermInfoRef=\"%s\"", escape(out1.substring(DC_REF_PREFIX.length()) )));
-				}else{
-					if( !Util.isEmpty(out1) ){
+				if ( out1.startsWith(ITSEngine.REF_PREFIX) ) {
+					writer.print(String.format("\ttermInfoRef=\"%s\"", escape(out1.substring(ITSEngine.REF_PREFIX.length()) )));
+				}
+				else {
+					if ( !Util.isEmpty(out1) ) {
 						writer.print(String.format("\ttermInfo=\"%s\"", escape(unwrap(out1))));
 					}
 				}
@@ -335,6 +337,9 @@ public class Main {
 		else if ( dc.equals(DC_DOMAIN) ) {
 			out1 = trav.getDomains(attr);
 			if ( out1 != null ) writer.print(String.format("\tdomains=\"%s\"", escape(out1)));
+		}
+		else if ( dc.equals(DC_DISAMBIGUATION) ) {
+			//TODO: output
 		}
 		else if ( dc.equals(DC_LOCALEFILTER) ) {
 			out1 = trav.getLocaleFilter();
@@ -389,6 +394,13 @@ public class Main {
 				out1 = trav.getLocQualityIssueType(attr, i);
 				writer.print(String.format("\tlocQualityIssueType[%d]=\"%s\"", i, escape(out1==null ? "" : out1)));
 			}
+		}
+		else if ( dc.equals(DC_MTCONFIDENCE) ) {
+			Float outFloat1 = trav.getMtConfidence(attr);
+			writer.print(String.format("\tmtConfidence=\"%f\"", outFloat1==null ? 0 : outFloat1));
+			writer.print("\t"); // display also toosRef because it's a required information for MT confidence
+			out1 = trav.getAnnotatorsRef();
+			writer.print(String.format("\tannotatorsRef=\"%s\"", escape(out1==null ? "" : out1)));
 		}
 		else if ( dc.equals(DC_STORAGESIZE) ) {
 			out1 = trav.getStorageSize(attr);

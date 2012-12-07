@@ -46,7 +46,9 @@ class ITSTrace {
 	String subFilter;
 	String lqIssuesRef;
 	GenericAnnotations lqIssues;
-	String toolsRef;
+	String annotatorsRef;
+	Float mtConfidence;
+	GenericAnnotations disambig;
 
 	ITSTrace () {
 		// Default constructor
@@ -81,11 +83,16 @@ class ITSTrace {
 		
 		// external resource reference: No inheritance
 		
-		// locale filter:  Inheritance for child element including attributes
+		//MT Confidence: Inheritance for child element including attributes
+		mtConfidence = initialTrace.mtConfidence;
+		
+		// locale filter: Inheritance for child element including attributes
 		localeFilter = initialTrace.localeFilter;
 		
 		// domain: Inheritance for child elements including attributes
 		domains = initialTrace.domains;
+		
+		// disambiguation: no inheritance 
 		
 		// localization quality issue:
 		lqIssuesRef = initialTrace.lqIssuesRef;
@@ -100,7 +107,7 @@ class ITSTrace {
 		
 		this.isChildDone = isChildDone; // From parameter
 		
-		this.toolsRef = initialTrace.toolsRef;
+		this.annotatorsRef = initialTrace.annotatorsRef;
 	}
 
 }

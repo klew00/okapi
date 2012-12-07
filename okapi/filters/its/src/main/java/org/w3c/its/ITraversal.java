@@ -176,5 +176,24 @@ public interface ITraversal {
 	 * (not just the ones set on the given node).
 	 * @return the tools references associated with the queried part.
 	 */
-	public String getToolsRef ();
+	public String getAnnotatorsRef ();
+	
+	/**
+	 * Gets the MT Confidence value for the current element of the traversal or one
+	 * of its attributes.
+	 * @param attribute the attribute to query or null for the element.
+	 * @return the MT Confidence value or null if none is set.
+	 */
+	public Float getMtConfidence (Attr attribute);
+
+	public String getDisambigGranularity (Attr attribute);
+
+	public String getDisambigClass (Attr attribute);
+	
+	public String getDisambigSource (Attr attribute);
+	
+	public String getDisambigIdent (Attr attribute);
+	
+	public Float getDisambigConfidence (Attr attribute);
+	
 }

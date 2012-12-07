@@ -34,7 +34,10 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import net.sf.okapi.common.TestUtil;
-import net.sf.okapi.common.resource.TextFragment;
+import net.sf.okapi.common.annotation.GenericAnnotation;
+import net.sf.okapi.common.annotation.GenericAnnotationType;
+import net.sf.okapi.common.annotation.GenericAnnotations;
+import nu.validator.htmlparser.dom.HtmlDocumentBuilder;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -50,6 +53,7 @@ public class TraversalTest {
 	private String root = TestUtil.getParentDir(this.getClass(), "/input.xml");
 	//private LocaleId locEN = LocaleId.fromString("en");
 	private DocumentBuilderFactory fact = DocumentBuilderFactory.newInstance();
+	private HtmlDocumentBuilder htmlDocBuilder = new HtmlDocumentBuilder();
 
 	@Before
 	public void setUp() {
@@ -173,6 +177,100 @@ public class TraversalTest {
 		assertNotNull(elem);
 		assertEquals("finalDom1, dom3, final dom2, Dom4", trav.getDomains(null));
 	}
+	
+	@Test
+	public void testMtConfidenceLocal () throws SAXException, IOException, ParserConfigurationException {
+		InputSource is = new InputSource(new StringReader("	<text xmlns:its='http://www.w3.org/2005/11/its' its:version='2.0' "
+			+ " its:annotatorsRef='mt-confidence|file:///tools.xml#T1'><body><p>"
+			+ "<span its:mtConfidence='0.8982'>Dublin is the "
+			+ "<its:span mtConfidence='1' annotatorsRef='mt-confidence|uri2'>capital city</its:span> of Ireland.</span></p></body></text>"));
+		Document doc = fact.newDocumentBuilder().parse(is);
+		ITraversal trav = applyITSRules(doc, null, false, null);
+		Element elem = getElement(trav, "span", 1);
+		assertNotNull(elem);
+		assertEquals(0.8982F, trav.getMtConfidence(null), 0.0F);
+		assertEquals("mt-confidence|file:///tools.xml#T1", trav.getAnnotatorsRef());
+		elem = getElement(trav, "its:span", 1);
+		assertNotNull(elem);
+		assertEquals("capital city", elem.getTextContent());
+		assertEquals(1.0F, trav.getMtConfidence(null), 0.0F);
+		assertEquals("mt-confidence|uri2", trav.getAnnotatorsRef());
+	}
+
+	@Test
+	public void testMtConfidenceLocalHtml () throws SAXException, IOException, ParserConfigurationException {
+		InputSource is = new InputSource(new StringReader("<!DOCTYPE html><html lang=en><head>"
+			+ "<meta charset=utf-8><title>Title</title></head>"
+			+ "<body its-annotators-ref='mt-confidence|file:///tools.xml#T1'><p>"
+			+ "<span its-mt-confidence=0.8982>Dublin is the capital of Ireland.</span> "
+			+ "<span its-mt-confidence=0.8536 >The capital of the Czech Republic is Prague.</span>"
+			+ "</p></body>/html>"));
+		Document doc = htmlDocBuilder.parse(is);
+		ITraversal trav = applyITSRules(doc, null, true, null);
+		Element elem = getElement(trav, "span", 1);
+		assertNotNull(elem);
+		assertEquals(0.8982F, trav.getMtConfidence(null), 0.0F);
+		assertEquals("mt-confidence|file:///tools.xml#T1", trav.getAnnotatorsRef());
+		elem = getElement(trav, "span", 2);
+		assertNotNull(elem);
+		assertEquals(0.8536F, trav.getMtConfidence(null), 0.0F);
+		assertEquals("mt-confidence|file:///tools.xml#T1", trav.getAnnotatorsRef());
+	}
+
+	@Test
+	public void testMtConfidenceGlobalHtml () throws SAXException, IOException, ParserConfigurationException {
+		InputSource is = new InputSource(new StringReader("<!DOCTYPE html><html lang=en><head><meta charset=utf-8>"
+			+ "<script type='application/its+xml'>"
+			+ "<its:rules xmlns:its='http://www.w3.org/2005/11/its' version='2.0' "
+			+ "xmlns:h='http://www.w3.org/1999/xhtml'>"
+			+ " <its:mtConfidenceRule mtConfidence='0.785' selector=\"//h:img[@src='src1']/@title\"/>"        
+			+ " <its:mtConfidenceRule mtConfidence='0.805' selector=\"//h:img[@src='src2']/@title\"/>"        
+			+ "</its:rules>"
+			+ "</script>"
+			+ "<title>TM confidence</title></head>"
+			+ "<body its-annotators-ref='mt-confidence|file:///tools.xml#T1'><p>"
+			+ "<img src='src1' title='Front gate of Trinity College Dublin'/>"
+			+ "<img src='src2' title='A tart with a cart'/></p></body></html>"));
+		Document doc = htmlDocBuilder.parse(is);
+		ITraversal trav = applyITSRules(doc, null, true, null);
+		Element elem = getElement(trav, "img", 1);
+		assertNotNull(elem);
+		Attr attr = elem.getAttributeNode("title");
+		assertEquals(0.785F, trav.getMtConfidence(attr), 0.0F);
+		assertEquals("mt-confidence|file:///tools.xml#T1", trav.getAnnotatorsRef());
+		elem = getElement(trav, "img", 2);
+		assertNotNull(elem);
+		attr = elem.getAttributeNode("title");
+		assertEquals(0.805F, trav.getMtConfidence(attr), 0.0F);
+		assertEquals("mt-confidence|file:///tools.xml#T1", trav.getAnnotatorsRef());
+	}
+	
+	@Test
+	public void testDisambiguationPointerHtml () throws SAXException, IOException, ParserConfigurationException {
+		InputSource is = new InputSource(new StringReader("<!DOCTYPE html><html lang=en><head><meta charset=utf-8>"
+			+ "<title>Title</title>"
+			+ "<script type='application/its+xml'>"
+			+ "<its:rules xmlns:its='http://www.w3.org/2005/11/its' version='2.0'>"
+			+ "<its:disambiguationRule selector='//*[@typeof and @about]' "
+			+ " disambigClassRefPointer='@typeof' disambigIdentRefPointer='@about' disambigGranularity='entity'/>"
+			+ "</its:rules>"
+			+ "</script>"
+			+ "</head><body>"
+			+ "<p><span property='http://xmlns.com/foaf/0.1/name' about='http://dbpedia.org/resource/Dublin' "
+			+ "typeof='http:/nerd.eurecom.fr/ontology#Place'>Dublin</span> is the capital of Ireland.</p>"
+			+ "</body>/html>"));
+		Document doc = htmlDocBuilder.parse(is);
+		ITSEngine trav = applyITSRules(doc, null, true, null);
+		Element elem = getElement(trav, "span", 1);
+		assertNotNull(elem);
+		GenericAnnotations anns = trav.getDisambiguation(null);
+		assertNotNull(anns);
+		GenericAnnotation ann = anns.getAnnotations(GenericAnnotationType.DISAMB).get(0);
+		assertEquals(GenericAnnotationType.DISAMB_GRANULARITY_ENTITY, ann.getString(GenericAnnotationType.DISAMB_GRANULARITY));
+		assertEquals(ITSEngine.REF_PREFIX+"http:/nerd.eurecom.fr/ontology#Place", ann.getString(GenericAnnotationType.DISAMB_CLASS));
+		assertEquals(ITSEngine.REF_PREFIX+"http://dbpedia.org/resource/Dublin", ann.getString(GenericAnnotationType.DISAMB_IDENT));
+	}
+
 
 	@Test
 	public void testTargetPointerGlobal () throws SAXException, IOException, ParserConfigurationException {
@@ -425,31 +523,31 @@ public class TraversalTest {
 	}
 
 	@Test
-	public void testToolsRef () throws SAXException, IOException, ParserConfigurationException {
+	public void testAnnotatorsRef () throws SAXException, IOException, ParserConfigurationException {
 		InputSource is = new InputSource(new StringReader("<doc xmlns:i='"+ITSEngine.ITS_NS_URI+"' i:version='2.0'>"
-			+ "<group i:toolsRef='terminology|uri2 mt-confidence|uri1'>"
-			+ "<p i:toolsRef='disambiguation|uriDisamb'>Text with <z i:toolsRef='terminology|uri3'"
+			+ "<group i:annotatorsRef='terminology|uri2 mt-confidence|uri1'>"
+			+ "<p i:annotatorsRef='disambiguation|uriDisamb'>Text with <z i:annotatorsRef='terminology|uri3'"
 			+ " i:term='yes'>a term</z></p></group></doc>"));
 		Document doc = fact.newDocumentBuilder().parse(is);
 		ITraversal trav = applyITSRules(doc, null, false, null);
 		getElement(trav, "group", 1);
-		assertEquals("mt-confidence|uri1 terminology|uri2", trav.getToolsRef());
+		assertEquals("mt-confidence|uri1 terminology|uri2", trav.getAnnotatorsRef());
 		getElement(trav, "p", 1);
-		assertEquals("disambiguation|uriDisamb mt-confidence|uri1 terminology|uri2", trav.getToolsRef());
+		assertEquals("disambiguation|uriDisamb mt-confidence|uri1 terminology|uri2", trav.getAnnotatorsRef());
 		getElement(trav, "z", 1);
-		assertEquals("disambiguation|uriDisamb mt-confidence|uri1 terminology|uri3", trav.getToolsRef());
+		assertEquals("disambiguation|uriDisamb mt-confidence|uri1 terminology|uri3", trav.getAnnotatorsRef());
 	}
 	
 	@Test
-	public void testToolsRefBadValue () throws SAXException, IOException, ParserConfigurationException {
+	public void testAnnotatorsRefBadValue () throws SAXException, IOException, ParserConfigurationException {
 		// Should pass without exception, but generate an error in the log.
 		InputSource is = new InputSource(new StringReader("<doc xmlns:i='"+ITSEngine.ITS_NS_URI+"' i:version='2.0'>"
-			+ "<group i:toolsRef='Invalid-value-for-test|uri1'>"
+			+ "<group i:annotatorsRef='Invalid-value-for-test|uri1'>"
 			+ "<p>Text with</p></group></doc>"));
 		Document doc = fact.newDocumentBuilder().parse(is);
 		ITraversal trav = applyITSRules(doc, null, false, null);
 		getElement(trav, "group", 1);
-		assertEquals("Invalid-value-for-test|uri1", trav.getToolsRef());
+		assertEquals("Invalid-value-for-test|uri1", trav.getAnnotatorsRef());
 	}
 	
 	@Test
@@ -476,7 +574,8 @@ public class TraversalTest {
 			+ "</i:rules>"
 			+ "<par title='title text' test='test' alt='alt text'>Text</par></doc>"));
 		Document doc = fact.newDocumentBuilder().parse(is);
-		ITraversal trav = applyITSRules(doc, null, false, null);
+		// Just trigger the error
+		applyITSRules(doc, null, false, null);
 	}
 	
 	@Test
@@ -591,7 +690,7 @@ public class TraversalTest {
 		return null;
 	}
 	
-	private static ITraversal applyITSRules (Document doc,
+	private static ITSEngine applyITSRules (Document doc,
 		URI docURI,
 		boolean isHTML5,
 		File rulesFile)

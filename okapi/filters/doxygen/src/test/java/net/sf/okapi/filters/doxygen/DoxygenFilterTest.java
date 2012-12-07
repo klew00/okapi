@@ -101,6 +101,15 @@ public class DoxygenFilterTest {
 	}
 	
 	@Test
+	public void testBlankOneLiner() {
+		String snippet = "int foo; ///< \n///< New paragraph.";
+		ArrayList<Event> events = getEvents(snippet);
+		ITextUnit tu1 = FilterTestDriver.getTextUnit(events, 1);
+		assertNotNull(tu1);
+		assertEquals("", tu1.getSource().toString());
+	}
+	
+	@Test
 	public void testJavadocLine() {
 		String snippet = "int foo; /** This is a test. */";
 		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
@@ -286,6 +295,14 @@ public class DoxygenFilterTest {
 		assertEquals(expected, tu.getSource().getCodedText());
 	}
 
+	@Test
+	public void testPositiveFloatListFalsePositive() {
+		String snippet = " /// 1.0 is the loneliest float.";
+		String expected = "1.0 is the loneliest float.";
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		assertNotNull(tu);
+		assertEquals(expected, tu.getSource().getCodedText());
+	}
 	
 	@Test
 	public void testDoubleExtractionSample() throws URISyntaxException {

@@ -122,7 +122,7 @@ public class DoxygenPatterns {
 	 * 		bool mybool; ///< Paragraph 4
 	 * </pre>
 	 */
-	public static final String MEMBER_COMMENT_PREFIX = "^<\\s+";
+	public static final String MEMBER_COMMENT_PREFIX = "^<[^\\S\\r\\n]+";
 	public static final Pattern MEMBER_COMMENT_PREFIX_PATTERN = Pattern.compile(MEMBER_COMMENT_PREFIX, Pattern.MULTILINE);
 	public static final Pattern MEMBER_COMMENT_SUFFIX_PATTERN = Pattern.compile(CPP_COMMENT_SUFFIX);
 	
@@ -136,11 +136,9 @@ public class DoxygenPatterns {
 	 * 		///  2. Paragraph 4
 	 * </pre>
 	 */
-	public static final String LIST_ITEM_PREFIX = "^(?:\\s*(?:[-+*]#?|\\d+\\.)\\s*|\\s*\\.\\s*$)";
+	public static final String LIST_ITEM_PREFIX = "^(?:\\s*(?:[-+*]#?|\\d+\\.)\\s+|\\s*\\.\\s*$)";
 	public static final Pattern LIST_ITEM_PREFIX_PATTERN = Pattern.compile(LIST_ITEM_PREFIX, Pattern.MULTILINE);
-
-	public static final String LIST_ITEM_SUFFIX = "^(?:\\s*(?:[-+*]#?|\\d+\\.)\\s*|\\s*\\.\\s*$)";
-	public static final Pattern LIST_ITEM_SUFFIX_PATTERN = Pattern.compile(LIST_ITEM_SUFFIX, Pattern.MULTILINE);
+	public static final Pattern LIST_ITEM_SUFFIX_PATTERN = Pattern.compile(LIST_ITEM_PREFIX, Pattern.MULTILINE);
 	
 	static
 	{
