@@ -48,6 +48,22 @@ public class GenericAnnotationTest {
 	}
 
 	@Test
+	public void testFloat () {
+		GenericAnnotation ann = new GenericAnnotation("type1");
+		assertEquals("type1", ann.getType());
+		ann.setFloat("f1", 1.234F);
+		assertEquals(1.234F, ann.getFloat("f1"), 0.0F);
+	}
+
+	@Test
+	public void testInteger () {
+		GenericAnnotation ann = new GenericAnnotation("type1");
+		assertEquals("type1", ann.getType());
+		ann.setInteger("f1", 123);
+		assertEquals(123, (int)ann.getInteger("f1"));
+	}
+
+	@Test
 	public void testStorage () {
 		GenericAnnotation ann1 = new GenericAnnotation("type1");
 		ann1.setBoolean("fb1", true);
@@ -55,6 +71,8 @@ public class GenericAnnotationTest {
 		ann1.setBoolean("fb2", false);
 		ann1.setString("fs2", "");
 		ann1.setString("fs3", " \t ");
+		ann1.setFloat("ff1", 1.234F);
+		ann1.setInteger("fi1", 123);
 		String buf = ann1.toString();
 		
 		GenericAnnotation ann2 = new GenericAnnotation("tmp");
@@ -65,6 +83,8 @@ public class GenericAnnotationTest {
 		assertEquals("string1", ann2.getString("fs1"));
 		assertEquals("", ann2.getString("fs2"));
 		assertEquals(" \t ", ann2.getString("fs3"));
+		assertEquals(1.234F, ann2.getFloat("ff1"), 0.0F);
+		assertEquals(123, (int)ann2.getInteger("fi1"));
 	}
 
 	@Test
@@ -72,6 +92,8 @@ public class GenericAnnotationTest {
 		GenericAnnotation ann1 = new GenericAnnotation("type1");
 		ann1.setString("f1", "v1");
 		ann1.setBoolean("f2", true);
+		ann1.setFloat("ff1", 1.234F);
+		ann1.setInteger("fi1", 543);
 		
 		GenericAnnotation ann2 = ann1.clone();
 		assertEquals(ann2.getType(), ann1.getType());
@@ -79,5 +101,7 @@ public class GenericAnnotationTest {
 		assertEquals(ann2.getString("f1"), ann1.getString("f1"));
 		assertFalse(ann2.getString("f1")==ann1.getString("f1"));
 		assertEquals(ann2.getBoolean("f2"), ann1.getBoolean("f2"));
+		assertEquals(ann2.getFloat("ff1"), ann1.getFloat("ff1"), 0.0F);
+		assertEquals(ann2.getInteger("fi1"), ann1.getInteger("fi1"));
 	}
 }
