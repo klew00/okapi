@@ -60,4 +60,15 @@ public class GenericAnnotationType {
 	public static final String TERM = "its-term";
 	public static final String TERM_INFO = "termInfo";
 	public static final String TERM_CONFIDENCE = "termConfidence";
+	
+	/**
+	 * Annotation identifier for the
+	 * <a href='http://www.w3.org/TR/its20/#lqrating'>Localization Quality Rating</a> data category.
+	 */
+	public static final String LQR = "its-lqr";
+	public static final String LQR_SCORE = "its-lqrScore";
+	public static final String LQR_VOTE = "its-lqrVote";
+	public static final String LQR_SCORETHRESHOLD = "its-lqrScoreThreshold";
+	public static final String LQR_VOTETHRESHOLD = "its-lqrVoteThreshold";
+	public static final String LQR_PROFILEREF = "its-lqrProfileRef";
 }

@@ -203,5 +203,15 @@ public interface ITraversal {
 	public String getDisambigIdent (Attr attribute);
 	
 	public Float getDisambigConfidence (Attr attribute);
+
+	public Float getLocQualityRatingScore ();
+	
+	public Integer getLocQualityRatingVote ();
+	
+	public Float getLocQualityRatingScoreThreshold ();
+	
+	public Integer getLocQualityRatingVoteThreshold ();
+	
+	public String getLocQualityRatingProfileRef ();
 	
 }

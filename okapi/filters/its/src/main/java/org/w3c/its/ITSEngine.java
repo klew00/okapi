@@ -83,9 +83,9 @@ public class ITSEngine implements IProcessor, ITraversal {
 	
 	// Must have '?' as many times as there are FP_XXX entries +1
 	// Must have +FLAGSEP as many times as there are FP_XXX_DATA entries +1
-	private static final String   FLAGDEFAULTDATA     = "??????????????????"
+	private static final String   FLAGDEFAULTDATA     = "???????????????????"
 		+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP
-		+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP;
+		+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP;
 
 	private static final String SRC_TRGPTRFLAGNAME = "\u10ff"; // Name of the user-data property that holds the target pointer flag in the source
 	private static final String TRG_TRGPTRFLAGNAME = "\u20ff"; // Name of the user-data property that holds the target pointer flag in the target
@@ -112,6 +112,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 	private static final int      FP_ANNOTATORSREF         = 15;
 	private static final int      FP_MTCONFIDENCE          = 16;
 	private static final int      FP_DISAMBIGUATION        = 17;
+	private static final int      FP_LQRATING              = 18;
 	
 	// Data position 
 	private static final int      FP_TERMINOLOGY_DATA      = 0;
@@ -129,6 +130,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 	private static final int      FP_ANNOTATORSREF_DATA    = 12;
 	private static final int      FP_MTCONFIDENCE_DATA     = 13;
 	private static final int      FP_DISAMBIGUATION_DATA   = 14;
+	private static final int      FP_LQRATING_DATA         = 15;
 	
 	private static final int      INFOTYPE_TEXT            = 0;
 	private static final int      INFOTYPE_REF             = 1;
@@ -1274,7 +1276,11 @@ public class ITSEngine implements IProcessor, ITraversal {
 		if ( data.charAt(FP_DISAMBIGUATION) == 'y' ) {
 			trace.peek().disambig = new GenericAnnotations(getFlagData(data, FP_DISAMBIGUATION_DATA));
 		}
-
+		
+		if ( data.charAt(FP_LQRATING) == 'y' ) {
+			trace.peek().lqRating = new GenericAnnotations(getFlagData(data, FP_LQRATING_DATA));
+		}
+		
 		if ( data.charAt(FP_TERMINOLOGY) == 'y' ) {
 			trace.peek().termino = new GenericAnnotations(getFlagData(data, FP_TERMINOLOGY_DATA));
 		}
@@ -2086,6 +2092,39 @@ public class ITSEngine implements IProcessor, ITraversal {
 				}
 			}
 
+			// Localization Quality Rating
+			if (( (dataCategories & IProcessor.DC_LOCQUALITYRATING) > 0 ) && isVersion2() ) {
+				if ( isHTML5 ) {
+					expr = xpath.compile("//*/@its-loc-quality-rating-score|//*/@its-loc-quality-rating-vote");
+				}
+				else {
+					expr = xpath.compile("//*/@"+ITS_NS_PREFIX+":locQualityRatingScore|//"+ITS_NS_PREFIX+":span/@locQualityRatingScore"
+						+"|//*/@"+ITS_NS_PREFIX+":locQualityRatingVote|//"+ITS_NS_PREFIX+":span/@locQualityRatingVote");
+				}
+
+				NL = (NodeList)expr.evaluate(doc, XPathConstants.NODESET);
+				for ( int i=0; i<NL.getLength(); i++ ) {
+					attr = (Attr)NL.item(i);
+					// No irrelevant nodes to skip as there is no global rules
+					// Next: Set the flag
+					boolean qualified = true;
+					String ns = attr.getOwnerElement().getNamespaceURI();
+					if ( !Util.isEmpty(ns) ) qualified = !ns.equals(ITS_NS_URI);
+					String[] values = retrieveLocQualityRatingData(attr.getOwnerElement(), qualified, isHTML5);
+					// Convert the values into an annotation
+					GenericAnnotations anns = new GenericAnnotations();
+					GenericAnnotation ann = anns.add(GenericAnnotationType.LQR);
+					if ( values[0] != null ) ann.setFloat(GenericAnnotationType.LQR_SCORE, Float.parseFloat(values[0]));
+					if ( values[1] != null ) ann.setInteger(GenericAnnotationType.LQR_VOTE, Integer.parseInt(values[1]));
+					if ( values[2] != null ) ann.setFloat(GenericAnnotationType.LQR_SCORETHRESHOLD, Float.parseFloat(values[2]));
+					if ( values[3] != null ) ann.setInteger(GenericAnnotationType.LQR_VOTETHRESHOLD, Integer.parseInt(values[3]));
+					if ( values[4] != null ) ann.setString(GenericAnnotationType.LQR_PROFILEREF, values[4]);
+					// Set the updated flags
+					setFlag(attr.getOwnerElement(), FP_LQRATING, 'y', attr.getSpecified());
+					setFlag(attr.getOwnerElement(), FP_LQRATING_DATA, anns.toString(), attr.getSpecified()); 
+				}
+			}
+
 			// Allowed characters
 			if (( (dataCategories & IProcessor.DC_ALLOWEDCHARS) > 0 ) && isVersion2() ) {
 				if ( isHTML5 ) {
@@ -2571,6 +2610,84 @@ public class ITSEngine implements IProcessor, ITraversal {
 		}
 		
 		//TODO: Validation
+
+		return data;
+	}
+	
+	/**
+	 * Retrieves the non-pointer information of the Localization Quality Rating data category.
+	 * @param elem the element where to get the data.
+	 * @param qualified true if the attributes are expected to be qualified.
+	 * @return an array of the value: score, vote, scoreThreshold, voteThreshold, profileRef
+	 */
+	private String[] retrieveLocQualityRatingData (Element elem,
+		boolean qualified,
+		boolean useHTML5)
+	{
+		String[] data = new String[5];
+		
+		if ( useHTML5 ) {
+			if ( elem.hasAttribute("its-loc-quality-rating-score") )
+				data[0] = elem.getAttribute("its-loc-quality-rating-score");
+			
+			if ( elem.hasAttribute("its-loc-quality-rating-vote") )
+				data[1] = elem.getAttribute("its-loc-quality-rating-vote");
+			
+			if ( elem.hasAttribute("its-loc-quality-rating-score-threshold") )
+				data[2] = elem.getAttribute("its-loc-quality-rating-score-threshold");
+			
+			if ( elem.hasAttribute("its-loc-quality-rating-vote-threshold") )
+				data[3] = elem.getAttribute("its-loc-quality-rating-vote-threshold");
+			
+			if ( elem.hasAttribute("its-loc-quality-rating-profile-ref") )
+				data[4] = REF_PREFIX+elem.getAttribute("its-loc-quality-rating-profile-ref");
+		}
+		else if ( qualified ) {
+			if ( elem.hasAttributeNS(ITS_NS_URI, "locQualityRatingScore") )
+				data[0] = elem.getAttributeNS(ITS_NS_URI, "locQualityRatingScore");
+			
+			if ( elem.hasAttributeNS(ITS_NS_URI, "locQualityRatingVote") )
+				data[1] = elem.getAttributeNS(ITS_NS_URI, "locQualityRatingVote");
+			
+			if ( elem.hasAttributeNS(ITS_NS_URI, "locQualityRatingScoreThreshold") )
+				data[2] = elem.getAttributeNS(ITS_NS_URI, "locQualityRatingScoreThreshold");
+			
+			if ( elem.hasAttributeNS(ITS_NS_URI, "locQualityRatingVoteThreshold") )
+				data[3] = elem.getAttributeNS(ITS_NS_URI, "locQualityRatingVoteThreshold");
+			
+			if ( elem.hasAttributeNS(ITS_NS_URI, "locQualityRatingProfileRef") )
+				data[4] = REF_PREFIX+elem.getAttributeNS(ITS_NS_URI, "locQualityRatingProfileRef");
+		}
+		else {
+			if ( elem.hasAttribute("locQualityRatingScore") )
+				data[0] = elem.getAttribute("locQualityRatingScore");
+			
+			if ( elem.hasAttribute("locQualityRatingVote") )
+				data[1] = elem.getAttribute("locQualityRatingVote");
+			
+			if ( elem.hasAttribute("locQualityRatingScoreThreshold") )
+				data[2] = elem.getAttribute("locQualityRatingScoreThreshold");
+			
+			if ( elem.hasAttribute("locQualityRatingVoteThreshold") )
+				data[3] = elem.getAttribute("locQualityRatingVoteThreshold");
+
+			if ( elem.hasAttribute("locQualityRatingProfileRef") )
+				data[4] = REF_PREFIX+elem.getAttribute("locQualityRatingProfileRef");
+		}
+		
+		// Basic validation
+		if (( data[0] != null ) && ( data[1] != null )) {
+			logger.error("Cannot have localization quality rating score and vote at the same time.");
+			data[1] = null;
+		}
+		if (( data[0] != null ) && ( data[3] != null )) {
+			logger.error("Cannot have localization quality rating score with a vote threshold.");
+			data[3] = null;
+		}
+		if (( data[1] != null ) && ( data[2] != null )) {
+			logger.error("Cannot have localization quality rating vote with a score threshold.");
+			data[2] = null;
+		}
 
 		return data;
 	}
@@ -3224,6 +3341,44 @@ public class ITSEngine implements IProcessor, ITraversal {
 		if ( tmp.charAt(FP_DISAMBIGUATION) != 'y' ) return null;
 		GenericAnnotations anns = new GenericAnnotations(getFlagData(tmp, FP_DISAMBIGUATION_DATA));
 		return anns.getAnnotations(GenericAnnotationType.DISAMB).get(0).getString(fieldName);
+	}
+
+	/**
+	 * Gets the localization quality rating annotation set for the current element.
+	 * @return the annotation set for the queried node (can be null).
+	 */
+	public GenericAnnotations getLocQualityRating () {
+		return trace.peek().lqRating;
+	}
+	
+	@Override
+	public Float getLocQualityRatingScore () {
+		if ( trace.peek().lqRating == null ) return null;
+		return trace.peek().lqRating.getAnnotations(GenericAnnotationType.LQR).get(0).getFloat(GenericAnnotationType.LQR_SCORE);
+	}
+	
+	@Override
+	public Integer getLocQualityRatingVote () {
+		if ( trace.peek().lqRating == null ) return null;
+		return trace.peek().lqRating.getAnnotations(GenericAnnotationType.LQR).get(0).getInteger(GenericAnnotationType.LQR_VOTE);
+	}
+	
+	@Override
+	public Float getLocQualityRatingScoreThreshold () {
+		if ( trace.peek().lqRating == null ) return null;
+		return trace.peek().lqRating.getAnnotations(GenericAnnotationType.LQR).get(0).getFloat(GenericAnnotationType.LQR_SCORETHRESHOLD);
+	}
+	
+	@Override
+	public Integer getLocQualityRatingVoteThreshold () {
+		if ( trace.peek().lqRating == null ) return null;
+		return trace.peek().lqRating.getAnnotations(GenericAnnotationType.LQR).get(0).getInteger(GenericAnnotationType.LQR_VOTETHRESHOLD);
+	}
+	
+	@Override
+	public String getLocQualityRatingProfileRef () {
+		if ( trace.peek().lqRating == null ) return null;
+		return trace.peek().lqRating.getAnnotations(GenericAnnotationType.LQR).get(0).getString(GenericAnnotationType.LQR_PROFILEREF);
 	}
 	
 	@Override

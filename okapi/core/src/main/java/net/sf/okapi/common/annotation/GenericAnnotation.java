@@ -118,6 +118,22 @@ public class GenericAnnotation {
 		setObject(name, value);
 	}
 	
+	public Integer getInteger (String name) {
+		if ( map == null ) return null;
+		Object obj = map.get(name);
+		if ( obj == null ) return null;
+		if ( !(obj instanceof Integer) ) {
+			throw new InvalidParameterException(String.format("The field '%s' is not an integer.", name));
+		}
+		return (Integer)obj;
+	}
+
+	public void setInteger (String name,
+		Integer value)
+	{
+		setObject(name, value);
+	}
+	
 	@Override
 	public String toString () {
 		StringBuilder sb = new StringBuilder(type); // Type saved first
@@ -129,6 +145,7 @@ public class GenericAnnotation {
 			sb.append(PART_SEPARATOR);
 			if ( value instanceof String ) sb.append('s');
 			else if ( value instanceof Boolean ) sb.append('b');
+			else if ( value instanceof Integer ) sb.append('i');
 			else if ( value instanceof Float ) sb.append('f');
 			sb.append(PART_SEPARATOR);
 			sb.append(value); // Value
@@ -146,6 +163,9 @@ public class GenericAnnotation {
 			}
 			else if ( parts[1].equals("b") ) {
 				setBoolean(parts[0], parts[2].equals("true"));
+			}
+			else if ( parts[1].equals("i") ) {
+				setInteger(parts[0], Integer.parseInt(parts[2]));
 			}
 			else if ( parts[1].equals("f") ) {
 				setFloat(parts[0], Float.parseFloat(parts[2]));

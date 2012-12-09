@@ -48,6 +48,7 @@ class ITSTrace {
 	String annotatorsRef;
 	Float mtConfidence;
 	GenericAnnotations disambig;
+	GenericAnnotations lqRating;
 
 	ITSTrace () {
 		// Default constructor
@@ -96,6 +97,9 @@ class ITSTrace {
 		// localization quality issue:
 		lqIssuesRef = initialTrace.lqIssuesRef;
 		lqIssues = initialTrace.lqIssues;
+		
+		// localization quality rating
+		lqRating = initialTrace.lqRating;
 		
 		// Allowed chars: Inheritance for child elements but not attributes
 		allowedChars = initialTrace.allowedChars;
