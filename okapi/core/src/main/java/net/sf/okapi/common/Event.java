@@ -112,6 +112,10 @@ public class Event {
 		this.resource = resource;
 	}
 
+	public void setEventType(EventType filterEventType) {
+		this.filterEventType = filterEventType;
+	}
+
 	/**
 	 * Convenience method to tell if this Event carries a {@link ITextUnit}
 	 * 

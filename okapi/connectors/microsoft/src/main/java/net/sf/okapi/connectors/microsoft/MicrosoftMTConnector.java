@@ -809,8 +809,8 @@ public class MicrosoftMTConnector extends BaseConnector implements ITMQuery {
 		super.setLanguages(sourceLocale, targetLocale);
 		queryListTemplate = null;
 		addListTemplate = null;
-		srcCode = sourceLocale.toString();
-		trgCode = targetLocale.toString();
+		// srcCode and trgCode are set properly in setLanguage()
+		// they must not be reset here
 	}
 	
 }
