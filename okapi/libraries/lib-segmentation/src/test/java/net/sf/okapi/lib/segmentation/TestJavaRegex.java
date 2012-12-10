@@ -263,16 +263,16 @@ public class TestJavaRegex {
 		testBreak("before\rAfter", "[\\W\\r]", "A", "before\r", "After");
 
 		//* \x{hhhh}
-		testPatternSyntaxException("before\u00AFAfter", "\\x{00AF}", "A", "before\u00AF", "After");
-		testPatternSyntaxException("before\u00AFAfter", "\\x{00af}", "A", "before\u00AF", "After");
-		testPatternSyntaxException("before\u00AFAfter", "\\x{af}", "A", "before\u00AF", "After");
-		testPatternSyntaxException("before\u00AFAfter", "[\\x{00AF}\\x{00AA}]", "A", "before\u00AF", "After");
-		testPatternSyntaxException("before\u00AAAfter", "[\\x{00AF}\\x{00AA}]", "A", "before\u00AA", "After");
-		testPatternSyntaxException("before" + buildString(0x00FFFF) + "After", 
+		testPerlPatternSyntaxException("before\u00AFAfter", "\\x{00AF}", "A", "before\u00AF", "After");
+		testPerlPatternSyntaxException("before\u00AFAfter", "\\x{00af}", "A", "before\u00AF", "After");
+		testPerlPatternSyntaxException("before\u00AFAfter", "\\x{af}", "A", "before\u00AF", "After");
+		testPerlPatternSyntaxException("before\u00AFAfter", "[\\x{00AF}\\x{00AA}]", "A", "before\u00AF", "After");
+		testPerlPatternSyntaxException("before\u00AAAfter", "[\\x{00AF}\\x{00AA}]", "A", "before\u00AA", "After");
+		testPerlPatternSyntaxException("before" + buildString(0x00FFFF) + "After", 
 				"\\x{00FFFF}", "A", "before" + buildString(0x00FFFF), "After");
-		testPatternSyntaxException("before" + buildString(0x10FFFF) + "After", 
+		testPerlPatternSyntaxException("before" + buildString(0x10FFFF) + "After", 
 				"[\\x{10FFFF}\\x{10A000}]", "A", "before" + buildString(0x10FFFF), "After");
-		testPatternSyntaxException("before" + buildString(0x10A000) + "After", 
+		testPerlPatternSyntaxException("before" + buildString(0x10A000) + "After", 
 				"[\\x{10FFFF}\\x{10A000}-\\x{10AA00}]", "A", "before" + buildString(0x10A000), "After");
 
 		//* \xhh
@@ -458,6 +458,56 @@ public class TestJavaRegex {
 		} catch (PatternSyntaxException e) {
 			// Expected
 		}		
+	}
+
+	static boolean isJdk7Tested = false;
+	static boolean isJdk7 = false;
+	static boolean isJdk7OrUp() {
+		if (isJdk7Tested)
+			return isJdk7;
+
+		isJdk7Tested = true;
+		// older Java version use 1.0, 1.1 etc, so this can only fail for new JDKs
+		// so if the splitting and parsing fails, it is probably a newer jdk
+		isJdk7 = true;
+
+		String version = System.getProperty("java.version");
+		String [] verParts = version.split("\\.");
+
+		if (verParts.length < 2)
+			return isJdk7;
+
+		int vmajor = -1;
+		int vminor = -1;
+		try {
+			vmajor = Integer.parseInt(verParts[0]);
+			vminor = Integer.parseInt(verParts[1]);
+		} catch (NumberFormatException e) {
+			// Same logic as above: old JDK versions don't fail this
+			return isJdk7;
+		}
+
+		if (vmajor > 2)
+			return isJdk7;
+		if ( vminor >= 7 )
+			return isJdk7;
+
+		isJdk7 = false;
+		return isJdk7;
+	}
+
+	private void testPerlPatternSyntaxException(String text, String bbr, String abr, String beforeBreak,
+			String afterBreak) {
+		boolean supported = isJdk7OrUp();
+		try {
+			testBreak(text, bbr, abr, beforeBreak, afterBreak);
+			if	(!supported)
+				fail();
+		} catch (PatternSyntaxException e) {
+			// Expected
+			if	(supported)
+				fail();
+		}
 	}
 	
 	private void testBreak(String text, String bbr, String abr, String beforeBreak,
