@@ -114,6 +114,7 @@ public class ITSTest_TestSuite {
 		
 		String gold = output.replace("/output/", "/expected/");
 		assertTrue(fc.compareFilesPerLines(output, gold, "UTF-8"));
+		//fc.compareFilesPerLines(output, gold, "UTF-8");
 	}
 	
 }

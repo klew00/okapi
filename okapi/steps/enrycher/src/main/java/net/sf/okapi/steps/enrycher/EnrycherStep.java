@@ -32,6 +32,7 @@ import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.UsingParameters;
 import net.sf.okapi.common.annotation.GenericAnnotation;
+import net.sf.okapi.common.annotation.GenericAnnotationType;
 import net.sf.okapi.common.annotation.GenericAnnotations;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
 import net.sf.okapi.common.resource.Code;
@@ -43,6 +44,7 @@ import net.sf.okapi.common.resource.TextFragment;
 public class EnrycherStep extends BasePipelineStep {
 
 	private final static int MAXEVENTS = 20;  //TODO:--move to Parameters
+	private final static String REF_PREFIX = "REF:"; // Should be the same as in the ITS engine
 	
 	private LinkedList<Event> events;
 	private int maxEvents = MAXEVENTS;
@@ -334,14 +336,33 @@ public class EnrycherStep extends BasePipelineStep {
 	 * @return
 	 */
 	GenericAnnotations createAnnotation (Element itsSpan) {
+		
 		GenericAnnotations gas = new GenericAnnotations();
-		GenericAnnotation ga = gas.add("disambiguation");
+		
+		GenericAnnotation ga = gas.add(GenericAnnotationType.DISAMB);
+		ga.setString(GenericAnnotationType.DISAMB_GRANULARITY, GenericAnnotationType.DISAMB_GRANULARITY_ENTITY); // Default
 
 		Attributes attributes = itsSpan.getAttributes();
-		for (Attribute attr : attributes) {
-			if(attr.getKey().startsWith("its-disambig-")){
-				ga.setString(attr.getKey(), attr.getValue());
-			}			
+		for ( Attribute attr : attributes ) {
+			if ( attr.getKey().equals("its-disambig-class-ref") ) {
+				ga.setString(GenericAnnotationType.DISAMB_CLASS, REF_PREFIX+attr.getValue());
+			}
+			else if ( attr.getKey().equals("its-disambig-source") ) {
+				ga.setString(GenericAnnotationType.DISAMB_SOURCE, attr.getValue());
+			}
+			
+			else if ( attr.getKey().equals("its-disambig-ident") ) {
+				ga.setString(GenericAnnotationType.DISAMB_IDENT, attr.getValue());
+			}
+			else if ( attr.getKey().equals("its-disambig-ident-ref") ) {
+				ga.setString(GenericAnnotationType.DISAMB_IDENT, REF_PREFIX+attr.getValue());
+			}
+			else if ( attr.getKey().equals("its-disambig-confidence") ) {
+				ga.setFloat(GenericAnnotationType.DISAMB_CONFIDENCE, Float.parseFloat(attr.getValue()));
+			}
+			else if ( attr.getKey().equals("its-disambig-granularity") ) {
+				ga.setString(GenericAnnotationType.DISAMB_GRANULARITY, attr.getValue());
+			}
 		}
 		return gas;
 	}
@@ -405,11 +426,10 @@ public class EnrycherStep extends BasePipelineStep {
 	 */
 	List<Element> getItsElements (Source doc) {
 		List<Element> itsSpans = new LinkedList<Element>();
-		for (Element span : doc.getAllElements("span")) {
-			
+		for ( Element span : doc.getAllElements("span") ) {
 			//--check if any of the attributes is its-disambig-
-			for (Attribute a : span.getAttributes()) {
-				if(a.getKey().startsWith("its-disambig-")){
+			for ( Attribute a : span.getAttributes() ) {
+				if ( a.getKey().startsWith("its-disambig-" ) ) {
 					itsSpans.add(span);
 					break;
 				}				
