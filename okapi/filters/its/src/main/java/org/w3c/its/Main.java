@@ -325,7 +325,10 @@ public class Main {
 			if ( out1 != null && !Util.isEmpty(out1)) writer.print(String.format("\tlang=\"%s\"", escape(out1)));			
 		}
 		else if ( dc.equals(DC_WITHINTEXT) ) {
-			if ( attr != null ) return;
+			if ( attr != null ){
+				writer.print("\n");
+				return;				
+			}
 			int wt = trav.getWithinText();
 			switch ( wt ) {
 			case ITraversal.WITHINTEXT_NESTED: out1 = "nested"; break;
@@ -352,6 +355,7 @@ public class Main {
 			}
 			out1 = trav.getDisambigGranularity(attr);
 			if ( out1 != null ) writer.print(String.format("\tdisambigGranularity=\"%s\"", escape(out1)));
+			
 			out1 = trav.getDisambigIdent(attr);
 			if ( out1 != null ) {
 				if ( out1.startsWith(ITSEngine.REF_PREFIX) ) {
@@ -372,7 +376,7 @@ public class Main {
 		}
 		else if ( dc.equals(DC_EXTERNALRESOURCE) ) {
 			out1 = trav.getExternalResourceRef(attr);
-			if ( out1 != null ) writer.print(String.format("\texternalResource=\"%s\"", escape(out1)));
+			if ( out1 != null ) writer.print(String.format("\texternalResourceRef=\"%s\"", escape(out1)));
 		}
 		else if ( dc.equals(DC_TARGETPOINTER) ) {
 			out1 = trav.getTargetPointer(attr);
