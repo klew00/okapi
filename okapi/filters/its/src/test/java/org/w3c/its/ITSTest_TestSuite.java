@@ -41,7 +41,7 @@ public class ITSTest_TestSuite {
 
 	@Test
 	public void process () throws URISyntaxException {
-	//	processBatches(root+"/translate", Main.DC_TRANSLATE);
+		processBatches(root+"/translate", Main.DC_TRANSLATE);
 //		processBatches(root+"/localizationnote", Main.DC_LOCALIZATIONNOTE);
 //		processBatches(root+"/terminology", Main.DC_TERMINOLOGY);
 //		processBatches(root+"/directionality", Main.DC_DIRECTIONALITY);
@@ -50,13 +50,13 @@ public class ITSTest_TestSuite {
 //		processBatches(root+"/domain", Main.DC_DOMAIN);
 //		processBatches(root+"/disambiguation", Main.DC_DISAMBIGUATION);
 //		processBatches(root+"/localefilter", Main.DC_LOCALEFILTER);
-//		processBatches(root+"/externalresource", Main.DC_EXTERNALRESOURCE);
+		processBatches(root+"/externalresource", Main.DC_EXTERNALRESOURCE);
 //		processBatches(root+"/targetpointer", Main.DC_TARGETPOINTER);
-	//	processBatches(root+"/idvalue", Main.DC_IDVALUE);
+		processBatches(root+"/idvalue", Main.DC_IDVALUE);
 		processBatches(root+"/preservespace", Main.DC_PRESERVESPACE);
 //		processBatches(root+"/locqualityissue", Main.DC_LOCQUALITYISSUE);
 //		processBatches(root+"/storagesize", Main.DC_STORAGESIZE);
-	//	processBatches(root+"/mtconfidence", Main.DC_MTCONFIDENCE);
+		processBatches(root+"/mtconfidence", Main.DC_MTCONFIDENCE);
 //		processBatches(root+"/allowedcharacters", Main.DC_ALLOWEDCHARACTERS);
 	}
 	
@@ -113,8 +113,8 @@ public class ITSTest_TestSuite {
 		assertTrue(new File(output).exists());
 		
 		String gold = output.replace("/output/", "/expected/");
-//		assertTrue(fc.compareFilesPerLines(output, gold, "UTF-8"));
-		fc.compareFilesPerLines(output, gold, "UTF-8");
+		assertTrue(fc.compareFilesPerLines(output, gold, "UTF-8"));
+//		fc.compareFilesPerLines(output, gold, "UTF-8");
 	}
 	
 }
