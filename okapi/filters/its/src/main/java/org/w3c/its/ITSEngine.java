@@ -2248,6 +2248,10 @@ public class ITSEngine implements IProcessor, ITraversal {
 			}
 			return true;
 		}
+		catch ( NullPointerException e ) {
+			logger.error("Not value defined for '{}'.", name);
+			return false;
+		}
 		catch ( NumberFormatException e ) {
 			logger.error("Invalid rational value for {}: {}", name, value);
 			return false;
@@ -2407,7 +2411,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 		}
 		else {
 			if ( elem.hasAttribute(name) )
-				return elem.getAttribute(name);
+				value = elem.getAttribute(name);
 		}
 		if ( validateFloat(value, 0.0F, 1.0F, name) ) {
 			return value;

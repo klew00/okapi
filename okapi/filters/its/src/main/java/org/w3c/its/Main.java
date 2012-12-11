@@ -425,11 +425,14 @@ public class Main {
 			}
 		}
 		else if ( dc.equals(DC_MTCONFIDENCE) ) {
-			Float outFloat1 = trav.getMtConfidence(attr);
-			writer.print(String.format("\tmtConfidence=\"%f\"", outFloat1==null ? 0 : outFloat1));
-			writer.print("\t"); // display also toosRef because it's a required information for MT confidence
 			out1 = trav.getAnnotatorsRef();
-			writer.print(String.format("\tannotatorsRef=\"%s\"", escape(out1==null ? "" : out1)));
+			if ( out1 != null ) {
+				writer.print(String.format("\tannotatorsRef=\"%s\"", escape(out1==null ? "" : out1)));
+			}
+			Float outFloat1 = trav.getMtConfidence(attr);
+			if ( outFloat1 != null ) {
+				writer.print(String.format("\tmtConfidence=\"%s\"", formatFloat(outFloat1)));
+			}
 		}
 		else if ( dc.equals(DC_STORAGESIZE) ) {
 			out1 = trav.getStorageSize(attr);
@@ -496,5 +499,13 @@ public class Main {
 		
 		return itsEng;
 	}
-	
+
+	static private String formatFloat (Float value) {
+		if ( value == null ) return "";
+		String tmp = String.format("%f", value);
+		while (( tmp.length() > 1 ) && ( tmp.charAt(tmp.length()-1) == '0' )) {
+			tmp = tmp.substring(0, tmp.length()-1);
+		}
+		return tmp;
+	}
 }
