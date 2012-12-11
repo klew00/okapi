@@ -413,7 +413,7 @@ public class EnrycherStep extends BasePipelineStep {
 		int offset = 0;
 		//System.out.println("Before Annotation: "+tf);
 		for (Insertion insertion : insertions) {
-			tf.annotate(insertion.begin + offset, insertion.end + offset, "disambig", insertion.genAnn);
+			tf.annotate(insertion.begin + offset, insertion.end + offset, GenericAnnotationType.GENERIC, insertion.genAnn);
 			offset += 4;
 		}
 		//System.out.println("After Annotation: "+tf);

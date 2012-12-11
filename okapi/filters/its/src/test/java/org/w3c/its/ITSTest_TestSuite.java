@@ -52,7 +52,7 @@ public class ITSTest_TestSuite {
 //		processBatches(root+"/localefilter", Main.DC_LOCALEFILTER);
 //		processBatches(root+"/externalresource", Main.DC_EXTERNALRESOURCE);
 //		processBatches(root+"/targetpointer", Main.DC_TARGETPOINTER);
-//		processBatches(root+"/idvalue", Main.DC_IDVALUE);
+		processBatches(root+"/idvalue", Main.DC_IDVALUE);
 //		processBatches(root+"/preservespace", Main.DC_PRESERVESPACE);
 //		processBatches(root+"/locqualityissue", Main.DC_LOCQUALITYISSUE);
 //		processBatches(root+"/storagesize", Main.DC_STORAGESIZE);
@@ -114,7 +114,7 @@ public class ITSTest_TestSuite {
 		
 		String gold = output.replace("/output/", "/expected/");
 		assertTrue(fc.compareFilesPerLines(output, gold, "UTF-8"));
-		//fc.compareFilesPerLines(output, gold, "UTF-8");
+//		fc.compareFilesPerLines(output, gold, "UTF-8");
 	}
 	
 }

@@ -96,9 +96,9 @@ public class XLIFFContentTest {
 		ga.setString(GenericAnnotationType.DISAMB_GRANULARITY, GenericAnnotationType.DISAMB_GRANULARITY_ENTITY);
 		TextFragment tf = new TextFragment();
 		tf.append("Before ");
-		tf.append(TagType.OPENING, "disambiguation", anns);
+		tf.append(TagType.OPENING, GenericAnnotationType.GENERIC, anns);
 		tf.append("the span");
-		tf.append(TagType.CLOSING, "disambiguation", anns);
+		tf.append(TagType.CLOSING, GenericAnnotationType.GENERIC, anns);
 		tf.append(" after.");
 		assertEquals("Before <mrk mtype=\"x-its-disambiguation\"><g id=\"1\">the span</g></mrk> after.",
 			fmt.setContent(tf).toString(true));

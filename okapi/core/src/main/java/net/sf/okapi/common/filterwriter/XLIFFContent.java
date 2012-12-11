@@ -128,8 +128,8 @@ public class XLIFFContent {
 					if ( code.hasAnnotation("protected") ) {
 						tmp.append("<mrk mtype=\"protected\">");
 					}
-					else if ( code.hasAnnotation("disambiguation") ) { // Temporary code
-						GenericAnnotations anns = (GenericAnnotations)code.getAnnotation("disambiguation");
+					else if ( code.hasAnnotation(GenericAnnotationType.GENERIC) ) { // Temporary code
+						GenericAnnotations anns = (GenericAnnotations)code.getAnnotation(GenericAnnotationType.GENERIC);
 						List<GenericAnnotation> lga = anns.getAnnotations(GenericAnnotationType.DISAMB);
 						tmp.append("<mrk mtype=\"x-its-disambiguation\">");
 					}
@@ -160,8 +160,8 @@ public class XLIFFContent {
 						tmp.append(Util.escapeToXML(code.toString(), quoteMode, escapeGT, chsEnc));
 						tmp.append("</ept>");
 					}
-					if ( code.hasAnnotation("disambiguation") ) { // Temporary code
-						GenericAnnotations anns = (GenericAnnotations)code.getAnnotation("disambiguation");
+					if ( code.hasAnnotation(GenericAnnotationType.GENERIC) ) { // Temporary code
+						GenericAnnotations anns = (GenericAnnotations)code.getAnnotation(GenericAnnotationType.GENERIC);
 						List<GenericAnnotation> lga = anns.getAnnotations(GenericAnnotationType.DISAMB);
 						tmp.append("</mrk>");
 					}

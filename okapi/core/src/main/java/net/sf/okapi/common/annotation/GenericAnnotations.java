@@ -83,6 +83,15 @@ public class GenericAnnotations extends InlineAnnotation {
 		}
 		return res;
 	}
+
+	/**
+	 * Gets the unmodifiable list of all the annotation in this annotation set.
+	 * @return the live list, or an empty one if there are no annotations.
+	 */
+	public List<GenericAnnotation> getAllAnnotations () {
+		if ( Util.isEmpty(list) ) return Collections.emptyList();
+		return Collections.unmodifiableList(list);
+	}
 	
 	/**
 	 * Indicates if there is at least one annotation of a given type.
@@ -122,6 +131,16 @@ public class GenericAnnotations extends InlineAnnotation {
 		if ( list == null ) list = new ArrayList<GenericAnnotation>();
 		list.add(ann);
 		return ann;
+	}
+	
+	
+	public void addAll (GenericAnnotations annotations) {
+		if ( annotations == null ) return;
+		if ( annotations.size() == 0 ) return;
+		// There is something to add: make sure we have a place where to copy
+		if ( list == null ) list = new ArrayList<GenericAnnotation>();
+		// Add all annotations of the given annotation set
+		list.addAll(annotations.getAllAnnotations());
 	}
 	
 	@Override

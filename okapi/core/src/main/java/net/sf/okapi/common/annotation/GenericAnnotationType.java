@@ -24,6 +24,11 @@ package net.sf.okapi.common.annotation;
  * Types of Generic annotation.
  */
 public class GenericAnnotationType {
+	
+	/**
+	 * Label to use for a generic annotation set (e.g. on an inline code).
+	 */
+	public static final String GENERIC = "generic";
 
 	/**
 	 * Annotation identifier for the
