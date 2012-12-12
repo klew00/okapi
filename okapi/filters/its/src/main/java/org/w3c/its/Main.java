@@ -398,30 +398,64 @@ public class Main {
 			}
 			// Else: print the entries
 			// IssuesRef
+			boolean standoff = false;
 			out1 = trav.getLocQualityIssuesRef(attr);
-			writer.print(String.format("\tlocQualityIssuesRef=\"%s\"", escape(out1==null ? "" : out1)));
-			writer.print("\t");
+			if ( out1 != null ) {
+				writer.print(String.format("\tlocQualityIssuesRef=\"%s\"", escape(out1)));
+				standoff = true;
+			}
 			for ( int i=0; i<count; i++ ) {
-				// Enabled
-				Boolean outBool1 = trav.getLocQualityIssueEnabled(attr, i);
-				writer.print(String.format("\tlocQualityIssueEnabled[%d]=\"%s\"", i,
-					outBool1==null ? "false" : (outBool1 ? "yes" : "no")));
-				writer.print("\t");
 				// Comment
 				out1 = trav.getLocQualityIssueComment(attr, i);
-				writer.print(String.format("\tlocQualityIssueComment[%d]=\"%s\"", i, escape(out1==null ? "" : out1)));
-				writer.print("\t");
+				if ( out1 != null ) {
+					if ( standoff ) {
+						writer.print(String.format("\tlocQualityIssueComment[%d]=\"%s\"", i+1, escape(out1)));
+					}
+					else {
+						writer.print(String.format("\tlocQualityIssueComment=\"%s\"", escape(out1)));
+					}
+				}
+				// Enabled
+				Boolean outBool1 = trav.getLocQualityIssueEnabled(attr, i);
+				if ( outBool1 == null ) throw new NullPointerException("lQI-enabled is null.");
+				if ( !outBool1 ) {
+					if ( standoff ) {
+						writer.print(String.format("\tlocQualityIssueEnabled[%d]=\"%s\"", i+1, "no"));
+					}
+					else {
+						writer.print(String.format("\tlocQualityIssueEnabled=\"%s\"", "no"));
+					}
+				}
 				// ProfileRef
 				out1 = trav.getLocQualityIssueProfileRef(attr, i);
-				writer.print(String.format("\tlocQualityIssueProfileRef[%d]=\"%s\"", i, escape(out1==null ? "" : out1)));
-				writer.print("\t");
+				if ( out1 != null ) {
+					if ( standoff ) { 
+						writer.print(String.format("\tlocQualityIssueProfileRef[%d]=\"%s\"", i+1, escape(out1)));
+					}
+					else {
+						writer.print(String.format("\tlocQualityIssueProfileRef=\"%s\"", escape(out1)));
+					}
+				}
 				// Severity
 				Float outFloat1 = trav.getLocQualityIssueSeverity(attr, i);
-				writer.print(String.format("\tlocQualityIssueSeverity[%d]=\"%f\"", i, outFloat1==null ? 0 : outFloat1));
-				writer.print("\t");
+				if ( outFloat1 != null ) {
+					if ( standoff ) {
+						writer.print(String.format("\tlocQualityIssueSeverity[%d]=\"%s\"", i+1, formatFloat(outFloat1)));
+					}
+					else {
+						writer.print(String.format("\tlocQualityIssueSeverity=\"%s\"", formatFloat(outFloat1)));
+					}
+				}
 				// Type
 				out1 = trav.getLocQualityIssueType(attr, i);
-				writer.print(String.format("\tlocQualityIssueType[%d]=\"%s\"", i, escape(out1==null ? "" : out1)));
+				if ( out1 != null ) {
+					if ( standoff ) {
+						writer.print(String.format("\tlocQualityIssueType[%d]=\"%s\"", i+1, escape(out1)));
+					}
+					else {
+						writer.print(String.format("\tlocQualityIssueType=\"%s\"", escape(out1)));
+					}
+				}
 			}
 		}
 		else if ( dc.equals(DC_MTCONFIDENCE) ) {
@@ -500,7 +534,12 @@ public class Main {
 	static private String formatFloat (Float value) {
 		if ( value == null ) return "";
 		String tmp = String.format("%f", value);
+		// Remove trailing zeros
 		while (( tmp.length() > 1 ) && ( tmp.charAt(tmp.length()-1) == '0' )) {
+			tmp = tmp.substring(0, tmp.length()-1);
+		}
+		// Remove ending period if it's the last character
+		if ( tmp.charAt(tmp.length()-1) == '.' ) {
 			tmp = tmp.substring(0, tmp.length()-1);
 		}
 		return tmp;

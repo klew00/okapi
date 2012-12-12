@@ -795,7 +795,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 			if ( !Util.isEmpty(typeP) ) {
 				throw new ITSException("Cannot have both locQualityIssueType and locQualityIssueTypePointer.");
 			}
-			ann.setString(GenericAnnotationType.LQI, np[1]);
+			ann.setString(GenericAnnotationType.LQI_TYPE, np[1]);
 			// TODO: verify the value?
 		}
 		else if ( typeP != null ) {
