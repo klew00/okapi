@@ -1,6 +1,4 @@
-<?xml version="1.0"?>
-<text>
-  <its:rules xmlns:its="http://www.w3.org/2005/11/its" version="2.0">
+<its:rules xmlns:its="http://www.w3.org/2005/11/its" version="2.0">
     <its:disambiguationRule selector="/text/body/p/*[@id='dublin']"
       disambigClassPointer="@class"
       disambigGranularity="entity"
@@ -10,7 +8,3 @@
       disambigSourcePointer="@source"
       disambigIdentPointer="@ident"/>
   </its:rules>
-  <body>
-    <p><span class="place" identref="http://dbpedia.org/resource/Dublin"  id="dublin">Dublin</span> is the <span source="Wordnet3.0" ident="301467919" id="capital">capital</span> of Ireland.</p>
-  </body>
-</text>

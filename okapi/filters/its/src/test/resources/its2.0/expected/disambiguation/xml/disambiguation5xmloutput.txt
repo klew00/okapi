@@ -1,23 +1,15 @@
-/text
-/text/its:rules[1]
-/text/its:rules[1]/@version
-/text/its:rules[1]/its:param[1]
-/text/its:rules[1]/its:param[1]/@name
-/text/its:rules[1]/its:disambiguationRule[1]
-/text/its:rules[1]/its:disambiguationRule[1]/@disambigClassRef
-/text/its:rules[1]/its:disambiguationRule[1]/@disambigGranularity
-/text/its:rules[1]/its:disambiguationRule[1]/@disambigIdentRef
-/text/its:rules[1]/its:disambiguationRule[1]/@selector
-/text/its:rules[1]/its:param[2]
-/text/its:rules[1]/its:param[2]/@name
-/text/its:rules[1]/its:disambiguationRule[2]
-/text/its:rules[1]/its:disambiguationRule[2]/@disambigGranularity
-/text/its:rules[1]/its:disambiguationRule[2]/@disambigIdent
-/text/its:rules[1]/its:disambiguationRule[2]/@disambigSource
-/text/its:rules[1]/its:disambiguationRule[2]/@selector
-/text/body[1]
-/text/body[1]/p[1]
-/text/body[1]/p[1]/span[1]	disambigClassRef="http:/nerd.eurecom.fr/ontology#Place"	disambigGranularity="entity"	disambigIdentRef="http://dbpedia.org/resource/Dublin"
-/text/body[1]/p[1]/span[1]/@id
-/text/body[1]/p[1]/span[2]	disambigGranularity="lexicalConcept"	disambigIdent="301467919"	disambigSource="Wordnet3.0"
-/text/body[1]/p[1]/span[2]/@id
+/text	annotatorsRef="disambiguation|http://enrycher.ijs.si"
+/text/@its:annotatorsRef	annotatorsRef="disambiguation|http://enrycher.ijs.si"
+/text/@its:version	annotatorsRef="disambiguation|http://enrycher.ijs.si"
+/text/body[1]	annotatorsRef="disambiguation|http://enrycher.ijs.si"
+/text/body[1]/p[1]	annotatorsRef="disambiguation|http://enrycher.ijs.si"
+/text/body[1]/p[1]/span[1]	annotatorsRef="disambiguation|http://enrycher.ijs.si"	disambigClassRef="http://nerd.eurecom.fr/ontology#Place"	disambigConfidence="0.7"	disambigGranularity="entity"	disambigIdentRef="http://dbpedia.org/resource/Dublin"
+/text/body[1]/p[1]/span[1]/@its:disambigClassRef	annotatorsRef="disambiguation|http://enrycher.ijs.si"
+/text/body[1]/p[1]/span[1]/@its:disambigConfidence	annotatorsRef="disambiguation|http://enrycher.ijs.si"
+/text/body[1]/p[1]/span[1]/@its:disambigGranularity	annotatorsRef="disambiguation|http://enrycher.ijs.si"
+/text/body[1]/p[1]/span[1]/@its:disambigIdentRef	annotatorsRef="disambiguation|http://enrycher.ijs.si"
+/text/body[1]/p[1]/span[2]	annotatorsRef="disambiguation|http://enrycher.ijs.si"	disambigConfidence="0.5"	disambigGranularity="lexical-concept"	disambigIdent="301467919"	disambigSource="Wordnet3.0"
+/text/body[1]/p[1]/span[2]/@its:disambigConfidence	annotatorsRef="disambiguation|http://enrycher.ijs.si"
+/text/body[1]/p[1]/span[2]/@its:disambigGranularity	annotatorsRef="disambiguation|http://enrycher.ijs.si"
+/text/body[1]/p[1]/span[2]/@its:disambigIdent	annotatorsRef="disambiguation|http://enrycher.ijs.si"
+/text/body[1]/p[1]/span[2]/@its:disambigSource	annotatorsRef="disambiguation|http://enrycher.ijs.si"

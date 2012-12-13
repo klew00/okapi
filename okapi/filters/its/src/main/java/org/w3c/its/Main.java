@@ -344,8 +344,10 @@ public class Main {
 			if ( out1 != null ) writer.print(String.format("\tdomains=\"%s\"", escape(out1)));
 		}
 		else if ( dc.equals(DC_DISAMBIGUATION) ) {
-			//TODO: output
-			
+			out1 = trav.getAnnotatorsRef();
+			if ( out1 != null ) {
+				writer.print(String.format("\tannotatorsRef=\"%s\"", escape(out1==null ? "" : out1)));
+			}
 			out1 = trav.getDisambigClass(attr);
 			if ( out1 != null ) {
 				if ( out1.startsWith(ITSEngine.REF_PREFIX) ) {
@@ -355,9 +357,12 @@ public class Main {
 					writer.print(String.format("\tdisambigClass=\"%s\"", escape(out1)));
 				}
 			}
+			Float outFloat = trav.getDisambigConfidence(attr);
+			if ( outFloat != null ) {
+				writer.print(String.format("\tdisambigConfidence=\"%s\"", formatFloat(outFloat)));
+			}
 			out1 = trav.getDisambigGranularity(attr);
 			if ( out1 != null ) writer.print(String.format("\tdisambigGranularity=\"%s\"", escape(out1)));
-			
 			out1 = trav.getDisambigIdent(attr);
 			if ( out1 != null ) {
 				if ( out1.startsWith(ITSEngine.REF_PREFIX) ) {
@@ -369,7 +374,7 @@ public class Main {
 			}
 			out1 = trav.getDisambigSource(attr);
 			if ( out1 != null ) {
-				writer.print(String.format("\tdisambigsource=\"%s\"", escape(out1)));
+				writer.print(String.format("\tdisambigSource=\"%s\"", escape(out1)));
 			}
 		}
 		else if ( dc.equals(DC_LOCALEFILTER) ) {

@@ -866,6 +866,10 @@ public class ITSEngine implements IProcessor, ITraversal {
 		// Get the local attributes
 		String np[] = retrieveDisambiguationData(elem, false, false);
 		
+		String classP = null;
+		if ( elem.hasAttribute("disambigClassPointer") )
+			classP = elem.getAttribute("disambigClassPointer");
+
 		String classRefP = null;
 		if ( elem.hasAttribute("disambigClassRefPointer") )
 			classRefP = elem.getAttribute("disambigClassRefPointer");
@@ -893,17 +897,35 @@ public class ITSEngine implements IProcessor, ITraversal {
 		// For the annotation info, we add '@@' in front if it is a pointer
 		// also flag with REFFLAG if it is a ref version
 		
-		if ( classRefP != null ) {
+		if ( classP != null ) {
+			ann.setString(GenericAnnotationType.DISAMB_CLASS, PTRFLAG+classP);
+		}
+		else if ( classRefP != null ) {
 			ann.setString(GenericAnnotationType.DISAMB_CLASS, PTRFLAG+REFFLAG+classRefP);
 		}
+		else if ( np[0] != null ) {
+			ann.setString(GenericAnnotationType.DISAMB_CLASS, np[0]);
+		}
+		
 		if ( sourceP != null ) {
 			ann.setString(GenericAnnotationType.DISAMB_SOURCE, PTRFLAG+sourceP);
 		}
+		else if ( np[1] != null ) {
+			ann.setString(GenericAnnotationType.DISAMB_SOURCE, np[1]);
+		}
+		
 		if ( identP != null ) {
 			ann.setString(GenericAnnotationType.DISAMB_IDENT, PTRFLAG+identP);
 		}
+		else if ( np[2] != null ) {
+			ann.setString(GenericAnnotationType.DISAMB_IDENT, np[2]);
+		}
+		
 		if ( identRefP != null ) {
 			ann.setString(GenericAnnotationType.DISAMB_IDENT, PTRFLAG+REFFLAG+identRefP);
+		}
+		else if ( np[3] != null ) {
+			ann.setString(GenericAnnotationType.DISAMB_IDENT, np[3]);
 		}
 		// No confidence information in global rule
 
