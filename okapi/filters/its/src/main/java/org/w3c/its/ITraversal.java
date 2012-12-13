@@ -204,14 +204,14 @@ public interface ITraversal {
 	
 	public Float getDisambigConfidence (Attr attribute);
 
-	public Float getLocQualityRatingScore ();
+	public Float getLocQualityRatingScore (Attr attribute);
 	
-	public Integer getLocQualityRatingVote ();
+	public Integer getLocQualityRatingVote (Attr attribute);
 	
-	public Float getLocQualityRatingScoreThreshold ();
+	public Float getLocQualityRatingScoreThreshold (Attr attribute);
 	
-	public Integer getLocQualityRatingVoteThreshold ();
+	public Integer getLocQualityRatingVoteThreshold (Attr attribute);
 	
-	public String getLocQualityRatingProfileRef ();
+	public String getLocQualityRatingProfileRef (Attr attribute);
 	
 }

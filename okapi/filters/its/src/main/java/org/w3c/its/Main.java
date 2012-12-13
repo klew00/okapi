@@ -62,6 +62,7 @@ public class Main {
 	public static final String DC_IDVALUE = "idvalue";
 	public static final String DC_PRESERVESPACE = "preservespace";
 	public static final String DC_LOCQUALITYISSUE = "locqualityissue";
+	public static final String DC_LOCQUALITYRATING = "locqualityrating";
 	public static final String DC_MTCONFIDENCE = "mtconfidence";
 	public static final String DC_STORAGESIZE = "storagesize";
 	public static final String DC_ALLOWEDCHARACTERS = "allowedcharacters";
@@ -106,6 +107,7 @@ public class Main {
 						+ "\n" + DC_IDVALUE
 						+ "\n" + DC_PRESERVESPACE
 						+ "\n" + DC_LOCQUALITYISSUE
+						+ "\n" + DC_LOCQUALITYRATING
 						+ "\n" + DC_MTCONFIDENCE
 						+ "\n" + DC_STORAGESIZE
 						+ "\n" + DC_ALLOWEDCHARACTERS
@@ -456,6 +458,28 @@ public class Main {
 						writer.print(String.format("\tlocQualityIssueType=\"%s\"", escape(out1)));
 					}
 				}
+			}
+		}
+		else if ( dc.equals(DC_LOCQUALITYRATING) ) {
+			out1 = trav.getLocQualityRatingProfileRef(attr);
+			if ( out1 != null ) {
+				writer.print(String.format("\tlocQualityRatingProfileRef=\"%s\"", escape(out1.substring(ITSEngine.REF_PREFIX.length()))));
+			}
+			Float outF1 = trav.getLocQualityRatingScore(attr);
+			if ( outF1 != null ) {
+				writer.print(String.format("\tlocQualityRatingScore=\"%s\"", formatFloat(outF1)));
+			}
+			outF1 = trav.getLocQualityRatingScoreThreshold(attr);
+			if ( outF1 != null ) {
+				writer.print(String.format("\tlocQualityRatingScoreThreshold=\"%s\"", formatFloat(outF1)));
+			}
+			Integer outInt = trav.getLocQualityRatingVote(attr);
+			if ( outInt != null ) {
+				writer.print(String.format("\tlocQualityRatingVote=\"%d\"", outInt));
+			}
+			outInt = trav.getLocQualityRatingVoteThreshold(attr);
+			if ( outInt != null ) {
+				writer.print(String.format("\tlocQualityRatingVoteThreshold=\"%d\"", outInt));
 			}
 		}
 		else if ( dc.equals(DC_MTCONFIDENCE) ) {

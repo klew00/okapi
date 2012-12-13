@@ -20,14 +20,13 @@
 
 package org.w3c.its;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.net.URISyntaxException;
 
 import net.sf.okapi.common.TestUtil;
 import net.sf.okapi.common.Util;
-import net.sf.okapi.common.resource.TextFragment;
 
 import org.junit.Test;
 
@@ -55,7 +54,8 @@ public class ITSTest_TestSuite {
 //		processBatches(root+"/targetpointer", Main.DC_TARGETPOINTER);
 	//	processBatches(root+"/idvalue", Main.DC_IDVALUE);
 	//	processBatches(root+"/preservespace", Main.DC_PRESERVESPACE);
-		processBatches(root+"/locqualityissue", Main.DC_LOCQUALITYISSUE);
+	//	processBatches(root+"/locqualityissue", Main.DC_LOCQUALITYISSUE);
+		processBatches(root+"/locqualityrating", Main.DC_LOCQUALITYRATING);
 //		processBatches(root+"/storagesize", Main.DC_STORAGESIZE);
 	//	processBatches(root+"/mtconfidence", Main.DC_MTCONFIDENCE);
 //		processBatches(root+"/allowedcharacters", Main.DC_ALLOWEDCHARACTERS);

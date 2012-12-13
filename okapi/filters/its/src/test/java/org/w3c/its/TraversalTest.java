@@ -352,18 +352,18 @@ public class TraversalTest {
 		ITSEngine trav = applyITSRules(doc, null, true, null);
 		Element elem = getElement(trav, "span", 1);
 		assertNotNull(elem);
-		assertEquals(5.4321F, trav.getLocQualityRatingScore(), 0.0);
-		assertEquals(5.0F, trav.getLocQualityRatingScoreThreshold(), 0.0);
-		assertEquals(null, trav.getLocQualityRatingVote());
-		assertEquals(null, trav.getLocQualityRatingVoteThreshold());
-		assertEquals(null, trav.getLocQualityRatingProfileRef());
+		assertEquals(5.4321F, trav.getLocQualityRatingScore(null), 0.0);
+		assertEquals(5.0F, trav.getLocQualityRatingScoreThreshold(null), 0.0);
+		assertEquals(null, trav.getLocQualityRatingVote(null));
+		assertEquals(null, trav.getLocQualityRatingVoteThreshold(null));
+		assertEquals(null, trav.getLocQualityRatingProfileRef(null));
 		elem = getElement(trav, "span", 2);
 		assertNotNull(elem);
-		assertEquals(null, trav.getLocQualityRatingScore());
-		assertEquals(null, trav.getLocQualityRatingScoreThreshold());
-		assertEquals(-12, (int)trav.getLocQualityRatingVote());
-		assertEquals(0, (int)trav.getLocQualityRatingVoteThreshold());
-		assertEquals("REF:uri1", trav.getLocQualityRatingProfileRef());
+		assertEquals(null, trav.getLocQualityRatingScore(null));
+		assertEquals(null, trav.getLocQualityRatingScoreThreshold(null));
+		assertEquals(-12, (int)trav.getLocQualityRatingVote(null));
+		assertEquals(0, (int)trav.getLocQualityRatingVoteThreshold(null));
+		assertEquals("REF:uri1", trav.getLocQualityRatingProfileRef(null));
 	}
 
 	@Test
@@ -376,18 +376,18 @@ public class TraversalTest {
 		ITraversal trav = applyITSRules(doc, null, false, null);
 		Element elem = getElement(trav, "mrk", 1);
 		assertNotNull(elem);
-		assertEquals(null, trav.getLocQualityRatingScore());
-		assertEquals(null, trav.getLocQualityRatingScoreThreshold());
-		assertEquals(7, (int)trav.getLocQualityRatingVote());
-		assertEquals(95, (int)trav.getLocQualityRatingVoteThreshold());
-		assertEquals("REF:u1", trav.getLocQualityRatingProfileRef());
+		assertEquals(null, trav.getLocQualityRatingScore(null));
+		assertEquals(null, trav.getLocQualityRatingScoreThreshold(null));
+		assertEquals(7, (int)trav.getLocQualityRatingVote(null));
+		assertEquals(95, (int)trav.getLocQualityRatingVoteThreshold(null));
+		assertEquals("REF:u1", trav.getLocQualityRatingProfileRef(null));
 		elem = getElement(trav, "i:span", 1);
 		assertNotNull(elem);
-		assertEquals(88.22F, trav.getLocQualityRatingScore(), 0.0F);
-		assertEquals(100.0F, trav.getLocQualityRatingScoreThreshold(), 0.0F);
-		assertEquals(null, trav.getLocQualityRatingVote());
-		assertEquals(null, trav.getLocQualityRatingVoteThreshold());
-		assertEquals("REF:u2", trav.getLocQualityRatingProfileRef());
+		assertEquals(88.22F, trav.getLocQualityRatingScore(null), 0.0F);
+		assertEquals(100.0F, trav.getLocQualityRatingScoreThreshold(null), 0.0F);
+		assertEquals(null, trav.getLocQualityRatingVote(null));
+		assertEquals(null, trav.getLocQualityRatingVoteThreshold(null));
+		assertEquals("REF:u2", trav.getLocQualityRatingProfileRef(null));
 	}
 
 	@Test

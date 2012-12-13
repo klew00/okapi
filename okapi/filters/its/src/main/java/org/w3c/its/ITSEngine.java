@@ -3356,31 +3356,36 @@ public class ITSEngine implements IProcessor, ITraversal {
 	}
 	
 	@Override
-	public Float getLocQualityRatingScore () {
+	public Float getLocQualityRatingScore (Attr attribute) {
+		if ( attribute != null ) return null;
 		if ( trace.peek().lqRating == null ) return null;
 		return trace.peek().lqRating.getAnnotations(GenericAnnotationType.LQR).get(0).getFloat(GenericAnnotationType.LQR_SCORE);
 	}
 	
 	@Override
-	public Integer getLocQualityRatingVote () {
+	public Integer getLocQualityRatingVote (Attr attribute) {
+		if ( attribute != null ) return null;
 		if ( trace.peek().lqRating == null ) return null;
 		return trace.peek().lqRating.getAnnotations(GenericAnnotationType.LQR).get(0).getInteger(GenericAnnotationType.LQR_VOTE);
 	}
 	
 	@Override
-	public Float getLocQualityRatingScoreThreshold () {
+	public Float getLocQualityRatingScoreThreshold (Attr attribute) {
+		if ( attribute != null ) return null;
 		if ( trace.peek().lqRating == null ) return null;
 		return trace.peek().lqRating.getAnnotations(GenericAnnotationType.LQR).get(0).getFloat(GenericAnnotationType.LQR_SCORETHRESHOLD);
 	}
 	
 	@Override
-	public Integer getLocQualityRatingVoteThreshold () {
+	public Integer getLocQualityRatingVoteThreshold (Attr attribute) {
+		if ( attribute != null ) return null;
 		if ( trace.peek().lqRating == null ) return null;
 		return trace.peek().lqRating.getAnnotations(GenericAnnotationType.LQR).get(0).getInteger(GenericAnnotationType.LQR_VOTETHRESHOLD);
 	}
 	
 	@Override
-	public String getLocQualityRatingProfileRef () {
+	public String getLocQualityRatingProfileRef (Attr attribute) {
+		if ( attribute != null ) return null;
 		if ( trace.peek().lqRating == null ) return null;
 		return trace.peek().lqRating.getAnnotations(GenericAnnotationType.LQR).get(0).getString(GenericAnnotationType.LQR_PROFILEREF);
 	}
