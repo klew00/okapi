@@ -13,6 +13,8 @@ import net.sf.okapi.filters.xini.jaxb.Xini;
 import net.sf.okapi.steps.segmentation.Parameters;
 import net.sf.okapi.steps.segmentation.SegmentationStep;
 
+import net.sf.okapi.common.TestUtil;
+
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -483,7 +485,7 @@ public class SegmentationAndDesegmentationTest {
 	 */
 	private void checkContent(Seg seg, String expectedContent){
 		String segContent = xiniHelper.serializeTextContent(seg);
-		xiniHelper.assertEquivalent(expectedContent, segContent);
+		TestUtil.assertEquivalentXml(expectedContent, segContent);
 	}
 
 	/**

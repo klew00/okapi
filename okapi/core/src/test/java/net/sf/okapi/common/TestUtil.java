@@ -7,12 +7,21 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 
+import static org.junit.Assert.assertEquals;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 /**
  * Class to hold test utility methods
  * @author Christian Hargraves
  *
  */
 public class TestUtil {
+	private final static Pattern STARTING_TAG = Pattern.compile("<(\\w+ [^>]+?)(/?)>");
+	private final static Pattern ATTRIBUTES = Pattern.compile("\\w+?=\".*?\"");
 
     /**
      * Takes a class and a file path and returns you the parent directory name of that file. This is used
@@ -45,4 +54,48 @@ public class TestUtil {
         bis.close();
         return new String(bytes);
     }
+
+	public static void assertEquivalentXml(String expected, String actual) {
+		expected = normalize(expected);
+		actual = normalize(actual);
+		assertEquals(expected, actual);
+	}
+
+	private static String normalize(String str) {
+		String result = str;
+		Matcher startTagMatcher = STARTING_TAG.matcher(str);
+
+		while (startTagMatcher.find()) {
+			String tagContent = startTagMatcher.group(1);
+			String suffix = startTagMatcher.group(2);
+			String newTagContent = orderAttributes(tagContent);
+			newTagContent += suffix;
+
+			String before = result.substring(0, startTagMatcher.start());
+			String after = result.substring(startTagMatcher.end(), result.length());
+			result = before + "<" + newTagContent + ">" + after;
+		}
+		return result;
+	}
+
+	private static String orderAttributes(String tagContent) {
+		String tagContentWithOrderedAttributes = "";
+		Matcher attributeMatcher = ATTRIBUTES.matcher(tagContent);
+		List<String> attributeDeclarations = new ArrayList<String>();
+		boolean firstMatch = true;
+		while (attributeMatcher.find()) {
+			if (firstMatch) {
+				tagContentWithOrderedAttributes += tagContent.substring(0, attributeMatcher.start());
+				tagContentWithOrderedAttributes = tagContentWithOrderedAttributes.trim();
+				firstMatch = false;
+			}
+			String attDeclaration = attributeMatcher.group();
+			attributeDeclarations.add(attDeclaration);
+		}
+		Collections.sort(attributeDeclarations);
+		for (String attributeDeclaration : attributeDeclarations) {
+			tagContentWithOrderedAttributes += " " + attributeDeclaration;
+		}
+		return tagContentWithOrderedAttributes;
+	}
 }
