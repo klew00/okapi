@@ -29,6 +29,7 @@ import org.slf4j.LoggerFactory;
 
 import net.htmlparser.jericho.Attribute;
 import net.htmlparser.jericho.EndTag;
+import net.htmlparser.jericho.EndTagType;
 import net.htmlparser.jericho.Segment;
 import net.htmlparser.jericho.StartTag;
 import net.htmlparser.jericho.StartTagType;
@@ -45,6 +46,8 @@ import net.sf.okapi.common.filters.PropertyTextUnitPlaceholder.PlaceholderAccess
 import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.RawDocument;
+import net.sf.okapi.common.resource.TextFragment;
+import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.filters.abstractmarkup.AbstractMarkupEventBuilder;
 import net.sf.okapi.filters.abstractmarkup.AbstractMarkupFilter;
 import net.sf.okapi.filters.abstractmarkup.ExtractionRuleState.RuleType;
@@ -405,5 +408,42 @@ public class HtmlFilter extends AbstractMarkupFilter {
 	 */
 	public AbstractMarkupEventBuilder getEventBuilder() {
 		return (AbstractMarkupEventBuilder) super.getEventBuilder();
+	}
+
+	@Override
+	protected TagType determineTagType(Tag tag) {
+		TextFragment.TagType codeType;
+		
+		// start tag or empty tag
+		if (tag.getTagType() == StartTagType.NORMAL
+				|| tag.getTagType() == StartTagType.UNREGISTERED) {
+			StartTag startTag = ((StartTag) tag);
+
+			// is this an empty tag?
+			if (startTag.isSyntacticalEmptyElementTag()) {
+				codeType = TextFragment.TagType.PLACEHOLDER;
+			} else if (startTag.isEndTagRequired()) {
+				if (getRuleState().isInlineExcludedState()) {
+					codeType = TextFragment.TagType.PLACEHOLDER;
+				} else {
+					codeType = TextFragment.TagType.OPENING;
+				}
+			} else {
+				if (getConfig().isWellformed()) {
+					codeType = TextFragment.TagType.OPENING;
+				} else {
+					codeType = TextFragment.TagType.PLACEHOLDER;
+				}
+			}
+		} else { // end or unknown tag
+			if (tag.getTagType() == EndTagType.NORMAL
+					|| tag.getTagType() == EndTagType.UNREGISTERED) {
+				codeType = TextFragment.TagType.CLOSING;
+			} else {
+				codeType = TextFragment.TagType.PLACEHOLDER;
+			}
+		}
+		
+		return codeType;
 	}
 }

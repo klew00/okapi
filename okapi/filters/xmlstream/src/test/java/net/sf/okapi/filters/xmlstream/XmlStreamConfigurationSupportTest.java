@@ -5,9 +5,11 @@ import java.util.ArrayList;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.filters.FilterTestDriver;
+import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.RawDocument;
+import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.filters.xmlstream.XmlStreamFilter;
 
 import org.junit.Test;
@@ -405,6 +407,22 @@ public class XmlStreamConfigurationSupportTest {
 		assertEquals("1: Translate me.", tu.getSource().toString());
 		tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 2);
 		assertEquals("4: Translate me.", tu.getSource().toString());
+	}
+	
+	@Test
+	public void testStartTagShouldbeOpenNotPlaceholder() {
+		String config = 
+			    "assumeWellformed: true\n" +
+			    "preserve_whitespace: false\n" +
+			    "elements:\n" +
+				"  link: \n" +
+			    "    ruleTypes: [INLINE]";
+		filter.setParameters(new Parameters(config));
+		String snippet = "<link>Hello world</link>";
+		ArrayList<Event> list = getEvents(snippet, locEN, locFR);
+		ITextUnit tu = FilterTestDriver.getTextUnit(list, 1);
+		Code c = tu.getSource().getFirstContent().getCode(0);
+		assertEquals(TagType.OPENING, c.getTagType());
 	}
 	
 	private ArrayList<Event> getEvents(String snippet,

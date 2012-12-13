@@ -1035,6 +1035,41 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 		addCodeToCurrentTextUnit(tag, true);
 	}
 	
+	/**
+	 * Filter specific method for determining {@link TextFragment.TagType}
+	 * @param tag Jericho {@link Tag} start or end tag
+	 * @return PLACEHOLDER, OPEN, CLOSED {@link TextFragment.TagType}
+	 */
+	protected TextFragment.TagType determineTagType(Tag tag) {
+		TextFragment.TagType codeType;
+		
+		// start tag or empty tag
+		if (tag.getTagType() == StartTagType.NORMAL
+				|| tag.getTagType() == StartTagType.UNREGISTERED) {
+			StartTag startTag = ((StartTag) tag);
+
+			// is this an empty tag?
+			if (startTag.isSyntacticalEmptyElementTag()) {
+				codeType = TextFragment.TagType.PLACEHOLDER;
+			} else {
+				if (ruleState.isInlineExcludedState()) {
+					codeType = TextFragment.TagType.PLACEHOLDER;
+				} else {
+					codeType = TextFragment.TagType.OPENING;
+				}
+			}
+		} else { // end or unknown tag
+			if (tag.getTagType() == EndTagType.NORMAL
+					|| tag.getTagType() == EndTagType.UNREGISTERED) {
+				codeType = TextFragment.TagType.CLOSING;
+			} else {
+				codeType = TextFragment.TagType.PLACEHOLDER;
+			}
+		}
+		
+		return codeType;
+	}
+	
 	
 	/**
 	 * Add an {@link Code} to the current {@link TextUnit}. Throws an exception if there is no current {@link TextUnit}.
@@ -1048,25 +1083,12 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 	protected void addCodeToCurrentTextUnit(Tag tag, boolean endCodeNow) {
 		List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders;
 		String literalTag = tag.toString();
-		TextFragment.TagType codeType;
+		TextFragment.TagType codeType = determineTagType(tag);
 
 		// start tag or empty tag
 		if (tag.getTagType() == StartTagType.NORMAL
 				|| tag.getTagType() == StartTagType.UNREGISTERED) {
 			StartTag startTag = ((StartTag) tag);
-
-			// is this an empty tag?
-			if (startTag.isSyntacticalEmptyElementTag()) {
-				codeType = TextFragment.TagType.PLACEHOLDER;
-			} else if (startTag.isEndTagRequired()) {
-				if (ruleState.isInlineExcludedState()) {
-					codeType = TextFragment.TagType.PLACEHOLDER;
-				} else {
-					codeType = TextFragment.TagType.OPENING;
-				}
-			} else {
-				codeType = TextFragment.TagType.PLACEHOLDER;
-			}
 
 			// create a list of Property or Text placeholders for this tag
 			// If this list is empty we know that there are no attributes that
@@ -1085,12 +1107,6 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 						endCodeNow);
 			}
 		} else { // end or unknown tag
-			if (tag.getTagType() == EndTagType.NORMAL
-					|| tag.getTagType() == EndTagType.UNREGISTERED) {
-				codeType = TextFragment.TagType.CLOSING;
-			} else {
-				codeType = TextFragment.TagType.PLACEHOLDER;
-			}
 			addToTextUnit(new Code(codeType, getConfig().getElementType(tag), literalTag));
 		}
 	}
