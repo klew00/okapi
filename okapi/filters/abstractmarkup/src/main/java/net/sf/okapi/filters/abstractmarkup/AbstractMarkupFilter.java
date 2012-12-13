@@ -687,7 +687,8 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 		currentId = null;
 		
 		// if exclude is true by default then push "not exclude" to enable this rule
-		if (getConfig().isGlobalExcludeByDefault()) {
+		if (getConfig().isGlobalExcludeByDefault() &&
+				!startTag.isSyntacticalEmptyElementTag()) {
 			switch (ruleType) {
 			case TEXT_UNIT_ELEMENT:
 				ruleState.pushIncludedRule(startTag.getName());
