@@ -407,6 +407,26 @@ public class XmlStreamConfigurationSupportTest {
 		assertEquals("4: Translate me.", tu.getSource().toString());
 	}
 	
+	@Test
+	public void test_ISSUE_282_empty_elements() {
+		// Second testcase to make sure that textunit rules we mash onto
+		// the stack are properly removed when they're attached to an
+		// empty element.
+		String config = 
+			    "assumeWellformed: true\n" +
+			    "preserve_whitespace: false\n" +
+			    "exclude_by_default: true\n\n" +
+			    "elements:\n" +
+				"  foo: \n" +
+			    "    conditions: [translate, EQUALS, y]\n" +
+			    "    ruleTypes: [TEXTUNIT]";
+		filter.setParameters(new Parameters(config));
+		String snippet = "<xml><foo translate=\"y\" /><foo translate=\"n\">2: Don't Translate me.</foo><foo>3: Don't Translate me.</foo><foo translate=\"y\">4: Translate me.</foo></xml>";
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 1);
+		assertNotNull(tu);
+		assertEquals("4: Translate me.", tu.getSource().toString());
+	}
+	
 	private ArrayList<Event> getEvents(String snippet,
 		LocaleId srcLang,
 		LocaleId trgLang)
