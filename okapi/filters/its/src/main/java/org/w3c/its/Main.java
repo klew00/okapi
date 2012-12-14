@@ -429,13 +429,11 @@ public class Main {
 				// Enabled
 				Boolean outBool1 = trav.getLocQualityIssueEnabled(attr, i);
 				if ( outBool1 == null ) throw new NullPointerException("lQI-enabled is null.");
-				if ( !outBool1 ) {
-					if ( standoff ) {
-						writer.print(String.format("\tlocQualityIssueEnabled[%d]=\"%s\"", i+1, "no"));
-					}
-					else {
-						writer.print(String.format("\tlocQualityIssueEnabled=\"%s\"", "no"));
-					}
+				if ( standoff ) {
+					writer.print(String.format("\tlocQualityIssueEnabled[%d]=\"%s\"", i+1, (outBool1 ? "yes" : "no")));
+				}
+				else {
+					writer.print(String.format("\tlocQualityIssueEnabled=\"%s\"", (outBool1 ? "yes" : "no")));
 				}
 				// ProfileRef
 				out1 = trav.getLocQualityIssueProfileRef(attr, i);

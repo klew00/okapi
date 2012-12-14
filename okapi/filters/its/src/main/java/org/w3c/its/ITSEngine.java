@@ -3177,8 +3177,8 @@ public class ITSEngine implements IProcessor, ITraversal {
 	public String getDomains (Attr attribute) {
 		if ( attribute == null ) return trace.peek().domains;
 		String tmp;
-		if ( (tmp = (String)attribute.getUserData(FLAGNAME)) == null ) return null;
-		if ( tmp.charAt(FP_DOMAIN) != 'y' ) return null;
+		if ( (tmp = (String)attribute.getUserData(FLAGNAME)) == null ) return trace.peek().domains;
+		if ( tmp.charAt(FP_DOMAIN) != 'y' ) return trace.peek().domains;
 		return getFlagData(tmp, FP_DOMAIN_DATA);
 	}
 
