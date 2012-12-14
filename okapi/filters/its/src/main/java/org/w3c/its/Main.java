@@ -296,6 +296,10 @@ public class Main {
 			}
 		}
 		else if ( dc.equals(DC_TERMINOLOGY) ) {
+			out1 = trav.getAnnotatorsRef();
+			if ( out1 != null ) {
+				writer.print(String.format("\tannotatorsRef=\"%s\"", escape(out1)));
+			}
 			out1 = (trav.getTerm(attr) ? "yes" : "no");
 			if ( out1 != null ) writer.print(String.format("\tterm=\"%s\"", escape(out1)));
 			//writer.print("\t");
@@ -346,7 +350,7 @@ public class Main {
 		else if ( dc.equals(DC_DISAMBIGUATION) ) {
 			out1 = trav.getAnnotatorsRef();
 			if ( out1 != null ) {
-				writer.print(String.format("\tannotatorsRef=\"%s\"", escape(out1==null ? "" : out1)));
+				writer.print(String.format("\tannotatorsRef=\"%s\"", escape(out1)));
 			}
 			out1 = trav.getDisambigClass(attr);
 			if ( out1 != null ) {
@@ -490,7 +494,7 @@ public class Main {
 		else if ( dc.equals(DC_MTCONFIDENCE) ) {
 			out1 = trav.getAnnotatorsRef();
 			if ( out1 != null ) {
-				writer.print(String.format("\tannotatorsRef=\"%s\"", escape(out1==null ? "" : out1)));
+				writer.print(String.format("\tannotatorsRef=\"%s\"", escape(out1)));
 			}
 			Float outFloat1 = trav.getMtConfidence(attr);
 			if ( outFloat1 != null ) {

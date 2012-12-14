@@ -1764,8 +1764,9 @@ public class ITSEngine implements IProcessor, ITraversal {
 		}
 		for ( String part : parts ) {
 			// If there is a map and the part is listed in it
-			if (( map != null ) && map.containsKey(part.toLowerCase()) ) {
-				part = map.get(part); // Use the mapped value
+			String lcPart = part.toLowerCase();
+			if (( map != null ) && map.containsKey(lcPart) ) {
+				part = map.get(lcPart); // Use the mapped value
 			}
 			if ( !list.contains(part) ) {
 				list.add(part);

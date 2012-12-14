@@ -459,6 +459,16 @@ public class XMLFilterTest {
 		assertEquals("t5<1/>t6", fmt.setContent(tu.getSource().getFirstContent()).toString());
 	}
 
+	@Test
+	public void testLocalWithinTextOnRoot () { // ITS 2.0
+		String snippet = "<?xml version=\"1.0\"?>\n"
+			+ "<doc><link xmlns:its='http://www.w3.org/2005/11/its' its:version='2.0' its:withinText='yes'>Hello world</link></doc>";
+		ArrayList<Event> list = getEvents(snippet);
+		ITextUnit tu = FilterTestDriver.getTextUnit(list, 1);
+		assertEquals("<1>Hello world</1>", fmt.setContent(tu.getSource().getFirstContent()).toString());
+		//TODO: If we remove the doc element we get a null on the TU. We need to fix that rare case.
+	}
+
 	//TODO: implement it properly @Test
 	public void testLocalWithinTextNested () { // ITS 2.0
 		String snippet = "<?xml version=\"1.0\"?>\n"
