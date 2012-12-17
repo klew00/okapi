@@ -71,9 +71,9 @@ public class GenericAnnotationType {
 	 * <a href='http://www.w3.org/TR/its20/#lqrating'>Localization Quality Rating</a> data category.
 	 */
 	public static final String LQR = "its-lqr";
-	public static final String LQR_SCORE = "its-lqrScore";
-	public static final String LQR_VOTE = "its-lqrVote";
-	public static final String LQR_SCORETHRESHOLD = "its-lqrScoreThreshold";
-	public static final String LQR_VOTETHRESHOLD = "its-lqrVoteThreshold";
-	public static final String LQR_PROFILEREF = "its-lqrProfileRef";
+	public static final String LQR_SCORE = "lqrScore";
+	public static final String LQR_VOTE = "lqrVote";
+	public static final String LQR_SCORETHRESHOLD = "lqrScoreThreshold";
+	public static final String LQR_VOTETHRESHOLD = "lqrVoteThreshold";
+	public static final String LQR_PROFILEREF = "lqrProfileRef";
 }

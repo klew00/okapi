@@ -21,6 +21,7 @@
 package net.sf.okapi.filters.its;
 
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
@@ -32,10 +33,13 @@ import net.sf.okapi.common.ListUtil;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.annotation.TermsAnnotation;
+import net.sf.okapi.common.encoder.EncoderContext;
 import net.sf.okapi.common.encoder.EncoderManager;
+import net.sf.okapi.common.encoder.IEncoder;
 import net.sf.okapi.common.exceptions.OkapiBadFilterInputException;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filters.IFilterConfigurationMapper;
+import net.sf.okapi.common.filters.InlineCodeFinder;
 import net.sf.okapi.common.filters.SubFilter;
 import net.sf.okapi.common.filterwriter.GenericFilterWriter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
@@ -90,7 +94,7 @@ public abstract class ITSFilter implements IFilter {
 	private TextFragment frag;
 	private Stack<ContextItem> context;
 	private boolean canceled;
-//	private IEncoder cfEncoder;
+	private IEncoder cfEncoder;
 	private TermsAnnotation terms;
 	private Map<String, String> variables;
 
@@ -486,6 +490,24 @@ public abstract class ITSFilter implements IFilter {
 		code.setReferenceFlag(id!=null); // Set reference flag if we created TU(s)
 	}
 
+	private void applyCodeFinder (TextFragment tf) {
+		// Find the inline codes
+		params.codeFinder.process(tf);
+		// Escape inline code content
+		List<Code> codes = tf.getCodes();
+		for ( Code code : codes ) {
+			// Escape the data of the new inline code (and only them)
+			if ( code.getType().equals(InlineCodeFinder.TAGTYPE) ) {
+				if ( cfEncoder == null ) {
+					cfEncoder = getEncoderManager().getEncoder();
+					//TODO: We should use the proper output encoding here, not force UTF-8, but we do not know it
+					cfEncoder.setOptions(params, "utf-8", lineBreak);
+				}
+				code.setData(cfEncoder.encode(code.getData(), EncoderContext.TEXT));
+			}
+		}
+	}
+	
 	private String addAttributeTextUnit (Attr attr,
 		boolean addToSkeleton)
 	{
@@ -494,21 +516,9 @@ public abstract class ITSFilter implements IFilter {
 		
 		// Deal with inline codes if needed
 		if ( params.useCodeFinder ) {
-			TextFragment tf = tu.getSource().getFirstContent();
-			params.codeFinder.process(tf);
-//			// Escape inline code content
-//			List<Code> codes = tf.getCodes();
-//			for ( Code code : codes ) {
-//				// Escape the data of the new inline code (and only them)
-//				if ( code.getType().equals(InlineCodeFinder.TAGTYPE) ) {
-//					if ( cfEncoder == null ) {
-//						cfEncoder = getEncoderManager().getEncoder();
-//						//TODO: We should use the proper output encoding here, not force UTF-8, but we do not know it
-//						cfEncoder.setOptions(params, "utf-8", lineBreak);
-//					}
-//					code.setData(cfEncoder.encode(code.getData(), EncoderContext.TEXT));
-//				}
-//			}
+			applyCodeFinder(tu.getSource().getFirstContent());
+			//TODO: we could have target entries too in some case (ITS targePointer) so we should test for that
+			// and process the target too if needed.
 		}
 
 		// Set the ITS context for this attribute and set the relevant properties
@@ -837,20 +847,7 @@ public abstract class ITSFilter implements IFilter {
 		if ( extract ) {
 			// Deal with inline codes if needed
 			if ( params.useCodeFinder ) {
-				params.codeFinder.process(frag);
-				// Escape inline code content
-//				List<Code> codes = frag.getCodes();
-//				for ( Code code : codes ) {
-//					// Escape the data of the new inline code (and only them)
-//					if ( code.getType().equals(InlineCodeFinder.TAGTYPE) ) {
-//						if ( cfEncoder == null ) {
-//							cfEncoder = getEncoderManager().getEncoder();
-//							//TODO: We should use the proper output encoding here, not force UTF-8, but we do not know it
-//							cfEncoder.setOptions(params, "utf-8", lineBreak);
-//						}
-//						code.setData(cfEncoder.encode(code.getData(), EncoderContext.TEXT));
-//					}
-//				}
+				applyCodeFinder(frag);
 			}
 		
 			// Update the flag after the new codes

@@ -349,7 +349,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 				if ( !version.equals(ITS_VERSION1) && !version.equals(ITS_VERSION2) ) {
 					throw new ITSException(String.format("Invalid or missing ITS version (\"%s\")", version));
 				}
-				
+
 				// Check queryLanguage
 				String qlang = rulesElem.getAttributeNS(null, "queryLanguage");
 				if ( !Util.isEmpty(qlang) ) {
