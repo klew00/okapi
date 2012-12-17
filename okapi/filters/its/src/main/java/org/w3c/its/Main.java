@@ -323,8 +323,7 @@ public class Main {
 			case ITraversal.DIR_RLO: out1 = "rlo"; break;
 			case ITraversal.DIR_RTL: out1 = "rtl"; break;
 			}
-			writer.print(String.format("\tdir=\"%s\"",
-				escape(out1)));
+			writer.print(String.format("\tdir=\"%s\"", out1));
 		}
 		else if ( dc.equals(DC_LANGUAGEINFORMATION) ) {
 			out1 = trav.getLanguage();

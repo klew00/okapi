@@ -25,10 +25,10 @@ import org.w3c.dom.Node;
 
 public interface ITraversal {
 	
-	public static final int DIR_RTL              = 0;
-	public static final int DIR_LTR              = 1;
-	public static final int DIR_RLO              = 2;
-	public static final int DIR_LRO              = 3;
+	public static final int DIR_LTR              = 0;
+	public static final int DIR_RTL              = 1;
+	public static final int DIR_LRO              = 2;
+	public static final int DIR_RLO              = 3;
 	
 	public static final int WITHINTEXT_NO        = 0;
 	public static final int WITHINTEXT_YES       = 1;

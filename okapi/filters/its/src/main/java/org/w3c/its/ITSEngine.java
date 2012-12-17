@@ -1844,10 +1844,10 @@ public class ITSEngine implements IProcessor, ITraversal {
 						&& "dirRule".equals(attr.getOwnerElement().getLocalName()) ) continue;
 					// Set the flag on the others
 					int n = DIR_LTR;
-					if ( "rtl".equals(attr.getValue()) ) n = DIR_LTR; 
-					else if ( "ltr".equals(attr.getValue()) ) n = DIR_RTL; 
-					else if ( "rlo".equals(attr.getValue()) ) n = DIR_RLO; 
-					else if ( "lro".equals(attr.getValue()) ) n = DIR_LRO;
+					if ( "ltr".equals(attr.getValue()) ) n = DIR_LTR; 
+					else if ( "rtl".equals(attr.getValue()) ) n = DIR_RTL; 
+					else if ( "lro".equals(attr.getValue()) ) n = DIR_RLO; 
+					else if ( "rlo".equals(attr.getValue()) ) n = DIR_LRO;
 					else throw new ITSException("Invalid value for 'dir'."); 
 					setFlag(attr.getOwnerElement(), FP_DIRECTIONALITY,
 						String.format("%d", n).charAt(0), attr.getSpecified());
@@ -3093,7 +3093,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 	public int getDirectionality (Attr attribute) {
 		if ( attribute == null ) return trace.peek().dir;
 		String tmp;
-		if ( (tmp = (String)attribute.getUserData(FLAGNAME)) == null ) return DIR_LTR;
+		if ( (tmp = (String)attribute.getUserData(FLAGNAME)) == null ) return trace.peek().dir;
 		return Integer.valueOf(tmp.charAt(FP_DIRECTIONALITY));
 	}
 	
