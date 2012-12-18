@@ -43,20 +43,240 @@ public class SpaceCheckerTest {
 	}
 
 	@Test
-	public void testSimpleCase () {
-		// t1 <b>t2</b> t3
+	public void testEmptyCase () {
+		
+		TextFragment srcTf = new TextFragment("t1 ");
+		srcTf.append(TagType.OPENING, "bold", "<b>");
+		srcTf.append("t2");
+		srcTf.append(TagType.CLOSING, "bold", "</b>");
+		srcTf.append(" t3.");
+		
+		TextFragment trgTf = new TextFragment();
+		
+		checker.checkSpaces(srcTf, trgTf);
+		
+		assertEquals("", fmt.setContent(trgTf).toString());
+		assertEquals("", fmt.setContent(trgTf).toString(true));
+	}
+	
+	@Test
+	public void testMatchingCase () {
+		TextFragment srcTf = new TextFragment("t1 ");
+		srcTf.append(TagType.OPENING, "bold", "<b>");
+		srcTf.append("t2");
+		srcTf.append(TagType.CLOSING, "bold", "</b>");
+		srcTf.append(" t3.");
+		
+		TextFragment trgTf = new TextFragment("t1 ");
+		trgTf.append(TagType.OPENING, "bold", "<b>");
+		trgTf.append("t2");
+		trgTf.append(TagType.CLOSING, "bold", "</b>");
+		trgTf.append(" t3.");
+		
+		checker.checkSpaces(srcTf, trgTf);
+		
+		assertEquals("t1 <1>t2</1> t3.", fmt.setContent(trgTf).toString());
+		assertEquals("t1 <b>t2</b> t3.", fmt.setContent(trgTf).toString(true));
+	}
+	
+	@Test
+	public void testStartCase () {
+		
+		// <b>t1</b> t2
+		TextFragment srcTf = new TextFragment();
+		srcTf.append(TagType.OPENING, "bold", "<b>");
+		srcTf.append("t1");
+		srcTf.append(TagType.CLOSING, "bold", "</b>");
+		srcTf.append(" t2.");
+		
+		// <b> t1 </b> t2
+		TextFragment trgTf = new TextFragment();
+		trgTf.append(TagType.OPENING, "bold", "<b>");
+		trgTf.append(" t1 ");
+		trgTf.append(TagType.CLOSING, "bold", "</b>");
+		trgTf.append(" t2.");
+		
+		checker.checkSpaces(srcTf, trgTf);
+
+		assertEquals("<1>t1</1> t2.", fmt.setContent(trgTf).toString());
+		assertEquals("<b>t1</b> t2.", fmt.setContent(trgTf).toString(true));
+	}
+	
+	@Test
+	public void testEndCase () {
+		
+		// t1 <b>t2</b>
+		TextFragment srcTf = new TextFragment("t1 ");
+		srcTf.append(TagType.OPENING, "bold", "<b>");
+		srcTf.append("t2");
+		srcTf.append(TagType.CLOSING, "bold", "</b>");
+		
+		// t1 <b> t2 </b>
+		TextFragment trgTf = new TextFragment("t1 ");
+		trgTf.append(TagType.OPENING, "bold", "<b>");
+		trgTf.append(" t2 ");
+		trgTf.append(TagType.CLOSING, "bold", "</b>");
+		
+		checker.checkSpaces(srcTf, trgTf);
+
+		assertEquals("t1 <1>t2</1>", fmt.setContent(trgTf).toString());
+		assertEquals("t1 <b>t2</b>", fmt.setContent(trgTf).toString(true));
+	}
+	
+	@Test
+	public void testSrcMultipleSpaceBefore() {
+		
+		// t1  <b>t2</b>
 		TextFragment srcTf = new TextFragment("t1  ");
 		srcTf.append(TagType.OPENING, "bold", "<b>");
 		srcTf.append("t2");
 		srcTf.append(TagType.CLOSING, "bold", "</b>");
-		srcTf.append(" t3");
-		TextFragment trgTf = srcTf.clone();
+
+		// t1 <b> t2 </b>
+		TextFragment trgTf = new TextFragment("t1 ");
+		trgTf.append(TagType.OPENING, "bold", "<b>");
+		trgTf.append(" t2 ");
+		trgTf.append(TagType.CLOSING, "bold", "</b>");
+
+		checker.checkSpaces(srcTf, trgTf);
+
+		assertEquals("t1  <1>t2</1>", fmt.setContent(trgTf).toString());
+		assertEquals("t1  <b>t2</b>", fmt.setContent(trgTf).toString(true));
+	}
+	
+	@Test
+	public void testTrgMultipleSpaceBefore() {
 		
+		// t1 <b>t2</b>
+		TextFragment srcTf = new TextFragment("t1 ");
+		srcTf.append(TagType.OPENING, "bold", "<b>");
+		srcTf.append("t2");
+		srcTf.append(TagType.CLOSING, "bold", "</b>");
+
+		// t1  <b> t2 </b>
+		TextFragment trgTf = new TextFragment("t1  ");
+		trgTf.append(TagType.OPENING, "bold", "<b>");
+		trgTf.append(" t2 ");
+		trgTf.append(TagType.CLOSING, "bold", "</b>");
+
+		checker.checkSpaces(srcTf, trgTf);
+
+		assertEquals("t1 <1>t2</1>", fmt.setContent(trgTf).toString());
+		assertEquals("t1 <b>t2</b>", fmt.setContent(trgTf).toString(true));
+	}
+	
+	@Test
+	public void testMultipleSpaceAfter() {
+		
+		// t1 <b>t2</b>
+		TextFragment srcTf = new TextFragment("t1 ");
+		srcTf.append(TagType.OPENING, "bold", "<b>");
+		srcTf.append("  t2");
+		srcTf.append(TagType.CLOSING, "bold", "</b>");
+
+		// t1 <b> t2 </b>
+		TextFragment trgTf = new TextFragment("t1 ");
+		trgTf.append(TagType.OPENING, "bold", "<b>");
+		trgTf.append(" t2 ");
+		trgTf.append(TagType.CLOSING, "bold", "</b>");
+
+		checker.checkSpaces(srcTf, trgTf);
+
+		assertEquals("t1 <1>  t2</1>", fmt.setContent(trgTf).toString());
+		assertEquals("t1 <b>  t2</b>", fmt.setContent(trgTf).toString(true));
+	}
+	
+	@Test
+	public void testNoSpaceSrc() {
+		
+		// t1<b>t2</b>t3
+		TextFragment srcTf = new TextFragment("t1");
+		srcTf.append(TagType.OPENING, "bold", "<b>");
+		srcTf.append("t2");
+		srcTf.append(TagType.CLOSING, "bold", "</b>");
+		srcTf.append("t3");
+
+		// t1  <b>t2 </b>   t3
+		TextFragment trgTf = new TextFragment("t1  ");
+		trgTf.append(TagType.OPENING, "bold", "<b>");
+		trgTf.append("t2 ");
+		trgTf.append(TagType.CLOSING, "bold", "</b>");
+		trgTf.append("   t3");
+
+		checker.checkSpaces(srcTf, trgTf);
+
+		assertEquals("t1<1>t2</1>t3", fmt.setContent(trgTf).toString());
+		assertEquals("t1<b>t2</b>t3", fmt.setContent(trgTf).toString(true));		
+	}
+	
+	@Test
+	public void testNoSpaceTrg() {
+		
+		// t1 <b>t2</b> t3
+		TextFragment srcTf = new TextFragment("t1 ");
+		srcTf.append(TagType.OPENING, "bold", "<b>");
+		srcTf.append("t2");
+		srcTf.append(TagType.CLOSING, "bold", "</b>");
+		srcTf.append(" t3");
+
+		// t1<b>t2</b>t3
+		TextFragment trgTf = new TextFragment("t1");
+		trgTf.append(TagType.OPENING, "bold", "<b>");
+		trgTf.append("t2");
+		trgTf.append(TagType.CLOSING, "bold", "</b>");
+		trgTf.append("t3");
+
 		checker.checkSpaces(srcTf, trgTf);
 
 		assertEquals("t1 <1>t2</1> t3", fmt.setContent(trgTf).toString());
-		assertEquals("t1 <b>t2</b> t3", fmt.setContent(trgTf).toString(true));
+		assertEquals("t1 <b>t2</b> t3", fmt.setContent(trgTf).toString(true));		
+	}
+	
+	@Test
+	public void testTrgMultiInsert() {
 		
+		// t1  <b>  t2</b> t3
+		TextFragment srcTf = new TextFragment("t1  ");
+		srcTf.append(TagType.OPENING, "bold", "<b>");
+		srcTf.append("  t2");
+		srcTf.append(TagType.CLOSING, "bold", "</b>");
+		srcTf.append(" t3");
+
+		// t1<b>t2</b>t3
+		TextFragment trgTf = new TextFragment("t1");
+		trgTf.append(TagType.OPENING, "bold", "<b>");
+		trgTf.append("t2");
+		trgTf.append(TagType.CLOSING, "bold", "</b>");
+		trgTf.append("t3");
+
+		checker.checkSpaces(srcTf, trgTf);
+
+		assertEquals("t1  <1>  t2</1> t3", fmt.setContent(trgTf).toString());
+		assertEquals("t1  <b>  t2</b> t3", fmt.setContent(trgTf).toString(true));		
+	}
+	
+	@Test
+	public void testSimpleRemoval () {
+		
+		// t1 <b>t2</b> t3
+		TextFragment srcTf = new TextFragment("t1 ");
+		srcTf.append(TagType.OPENING, "bold", "<b>");
+		srcTf.append("t2");
+		srcTf.append(TagType.CLOSING, "bold", "</b>");
+		srcTf.append(" t3.");
+		
+		// t1 <b> t2 </b> t3
+		TextFragment trgTf = new TextFragment("t1 ");
+		trgTf.append(TagType.OPENING, "bold", "<b>");
+		trgTf.append(" t2 ");
+		trgTf.append(TagType.CLOSING, "bold", "</b>");
+		trgTf.append(" t3.");
+		//TextFragment trgTf = srcTf.clone();
+		
+		checker.checkSpaces(srcTf, trgTf);
+
+		assertEquals("t1 <1>t2</1> t3.", fmt.setContent(trgTf).toString());
+		assertEquals("t1 <b>t2</b> t3.", fmt.setContent(trgTf).toString(true));
 	}
 
 }
