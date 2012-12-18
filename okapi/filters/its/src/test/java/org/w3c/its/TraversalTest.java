@@ -235,7 +235,7 @@ public class TraversalTest {
 	public void testMtConfidenceLocalHtml () throws SAXException, IOException, ParserConfigurationException {
 		InputSource is = new InputSource(new StringReader("<!DOCTYPE html><html lang=en><head>"
 			+ "<meta charset=utf-8><title>Title</title></head>"
-			+ "<body its-annotators-ref='mt-confidence|file:///tools.xml#T1'><p>"
+			+ "<body its-annotators-ref='MT-ConFiDeNce|file:///tools.xml#T1'><p>"
 			+ "<span its-mt-confidence=0.8982>Dublin is the capital of Ireland.</span> "
 			+ "<span its-mt-confidence=0.8536 >The capital of the Czech Republic is Prague.</span>"
 			+ "</p></body>/html>"));
@@ -262,7 +262,7 @@ public class TraversalTest {
 			+ "</its:rules>"
 			+ "</script>"
 			+ "<title>TM confidence</title></head>"
-			+ "<body its-annotators-ref='mt-confidence|file:///tools.xml#T1'><p>"
+			+ "<body its-annotators-ref='mt-conFIDENCE|file:///tools.xml#T1'><p>"
 			+ "<img src='src1' title='Front gate of Trinity College Dublin'/>"
 			+ "<img src='src2' title='A tart with a cart'/></p></body></html>"));
 		Document doc = htmlDocBuilder.parse(is);
@@ -309,7 +309,7 @@ public class TraversalTest {
 	public void testDisambiguationSimpleHtml () throws SAXException, IOException, ParserConfigurationException {
 		InputSource is = new InputSource(new StringReader("<p>hello "
 			+ "<span its-disambig-ident-ref=\"http://purl.org/vocabularies/princeton/wn30/synset-sweet-adjective-1.rdf\" "
-			+ "its-disambig-granularity=\"lexical-concept\">sweet</span> "
+			+ "its-disambig-granularity=\"Lexical-CONCEPT\">sweet</span> "
 			+ "<span its-disambig-ident-ref=\"http://dbpedia.org/resource/Paris\" "
 			+ "its-disambig-class-ref=\"http://schema.org/Place\">Paris</span> summer</p>"));
 		Document doc = htmlDocBuilder.parse(is);
@@ -667,7 +667,7 @@ public class TraversalTest {
 		Document doc = fact.newDocumentBuilder().parse(is);
 		ITraversal trav = applyITSRules(doc, null, false, null);
 		getElement(trav, "group", 1);
-		assertEquals("Invalid-value-for-test|uri1", trav.getAnnotatorsRef());
+		assertEquals("invalid-value-for-test|uri1", trav.getAnnotatorsRef());
 	}
 	
 	@Test

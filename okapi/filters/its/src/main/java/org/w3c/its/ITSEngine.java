@@ -353,6 +353,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 				// Check queryLanguage
 				String qlang = rulesElem.getAttributeNS(null, "queryLanguage");
 				if ( !Util.isEmpty(qlang) ) {
+					if ( isHTML5 ) qlang = qlang.toLowerCase(); 
 					if ( !qlang.startsWith("xpath") ) {
 						throw new ITSException(String.format("ITS queryLanguage is '%s', but this implementation supports only XPath.", qlang));
 					}
@@ -1396,7 +1397,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 				logger.warn("Invalid annotatorsRef value '{}'", tmp);
 				continue;
 			}
-			map.put(tmp.substring(0, n), tmp.substring(n+1));
+			map.put(tmp.substring(0, n).toLowerCase(), tmp.substring(n+1));
 		}
 		return map;
 	}
@@ -1818,6 +1819,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 						&& "translateRule".equals(attr.getOwnerElement().getLocalName()) ) continue;
 					// Validate the value
 					String value = attr.getValue();
+					if ( isHTML5 ) value = value.toLowerCase();
 					if (( !"yes".equals(value) ) && ( !"no".equals(value) )) {
 						throw new ITSException("Invalid value for 'translate'.");
 					}
@@ -1948,6 +1950,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 						&& "withinTextRule".equals(attr.getOwnerElement().getLocalName()) ) continue;
 					// Set the flag
 					String value = attr.getValue();
+					if ( isHTML5 ) value = value.toLowerCase();
 					char ch;
 					if ( "no".equals(value) ) ch='0'; // WITHINTEXT_NO;
 					else if ( "yes".equals(value) ) ch='1'; // WITHINTEXT_YES;
@@ -2327,7 +2330,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 		String[] data = new String[3];
 		if ( useHTML5 ) {
 			if ( elem.hasAttribute("its-term") )
-				data[0] = elem.getAttribute("its-term");
+				data[0] = elem.getAttribute("its-term").toLowerCase();
 			if ( elem.hasAttribute("its-term-info-ref") )
 				data[1] = REF_PREFIX+elem.getAttribute("its-term-info-ref");
 			if ( elem.hasAttribute("its-term-confidence") )
@@ -2453,7 +2456,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 			if ( elem.hasAttribute("its-storage-encoding") )
 				data[1] = elem.getAttribute("its-storage-encoding");
 			if ( elem.hasAttribute("its-line-break-type") )
-				data[2] = elem.getAttribute("its-line-break-type");
+				data[2] = elem.getAttribute("its-line-break-type").toLowerCase();
 		}
 		else if ( qualified ) {
 			if ( elem.hasAttributeNS(ITS_NS_URI, "storageSize") )
@@ -2507,7 +2510,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 			if ( elem.hasAttribute("its-loc-quality-issue-profile-ref") )
 				data[4] = elem.getAttribute("its-loc-quality-issue-profile-ref");
 			if ( elem.hasAttribute("its-loc-quality-issue-enabled") )
-				data[5] = elem.getAttribute("its-loc-quality-issue-enabled");
+				data[5] = elem.getAttribute("its-loc-quality-issue-enabled").toLowerCase();
 			else
 				data[5] = "yes"; // Default
 		}
@@ -2588,8 +2591,8 @@ public class ITSEngine implements IProcessor, ITraversal {
 			if ( elem.hasAttribute("its-disambig-confidence") )
 				data[3] = elem.getAttribute("its-disambig-confidence");
 			
-			if ( elem.hasAttribute("its-disambig-granularity") )
-				data[4] = elem.getAttribute("its-disambig-granularity");
+			if ( elem.hasAttribute("its-disambig-granularity") ) // Case in-sensitive in HTML
+				data[4] = elem.getAttribute("its-disambig-granularity").toLowerCase();
 			else
 				data[4] = GenericAnnotationType.DISAMB_GRANULARITY_ENTITY; // Default
 		}
