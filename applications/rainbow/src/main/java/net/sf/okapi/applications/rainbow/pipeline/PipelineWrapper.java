@@ -618,6 +618,13 @@ public class PipelineWrapper {
 			availableSteps.put(step.stepClass, step);
 
 			ps = (IPipelineStep)Class.forName(
+				"net.sf.okapi.steps.spacecheck.SpaceCheckStep").newInstance();
+			params = ps.getParameters();
+			step = new StepInfo(ps.getName(), ps.getDescription(), ps.getClass().getName(), null,
+				null);
+			availableSteps.put(step.stepClass, step);
+
+			ps = (IPipelineStep)Class.forName(
 				"net.sf.okapi.steps.termextraction.TermExtractionStep").newInstance();
 			params = ps.getParameters();
 			step = new StepInfo(ps.getName(), ps.getDescription(), ps.getClass().getName(), null,
