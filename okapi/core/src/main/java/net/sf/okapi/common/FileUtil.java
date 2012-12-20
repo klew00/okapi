@@ -106,6 +106,10 @@ public final class FileUtil {
 		return files;
 	}
 
+	// Out of guessLanguages for better performance
+	private static final Pattern pattern = Pattern.compile(
+		"\\s(srclang|source-?language|xml:lang|lang|(target)?locale|(target-?)?language)\\s*?=\\s*?['\"](.*?)['\"]",
+		Pattern.CASE_INSENSITIVE);
 	/**
 	 * Tries to guess the language(s) declared in the given input file. The method should work with XLIFF, TMX, TTX and TS files.
 	 * <p>The methods looks in the file line by line, in the 10 first KB, or until a source and at least
@@ -116,73 +120,68 @@ public final class FileUtil {
 	 */
 	public static List<String> guessLanguages (String path) {
 		ArrayList<String> list = new ArrayList<String>();
-		BufferedReader reader = null;
+		InputStreamReader reader = null;
+		FileInputStream fis = null;
 		
 		try {
 			// Deal with the potential BOM
+			fis = new FileInputStream(path);
 			String encoding = Charset.defaultCharset().name();
-			BOMAwareInputStream bis = new BOMAwareInputStream(new FileInputStream(path), encoding);
+			BOMAwareInputStream bis = new BOMAwareInputStream(fis, encoding);
 			encoding = bis.detectEncoding();
+			bis.close();
+
+			reader = new InputStreamReader(fis, encoding);
 			
-			// Open the input document with BOM-aware reader
-			reader = new BufferedReader(new InputStreamReader(bis, encoding));
-			
+			final int BYTES_TO_SCAN = 10240;
+			char [] buffer = new char[BYTES_TO_SCAN];
+
 			// Read the top of the file
 			String trgValue = null;
-			Pattern pattern = Pattern.compile(
-				"\\s(srclang|source-?language|xml:lang|lang|(target)?locale|(target-?)?language)\\s*?=\\s*?['\"](.*?)['\"]",
-				Pattern.CASE_INSENSITIVE);
 
-			int scanned = 0;
-			while ( true ) {
-				
-				String line = reader.readLine();
-				if ( line == null ) return list;
-				scanned += line.length();
+			int readCount = reader.read(buffer, 0, BYTES_TO_SCAN);
+			if ( readCount <= 0 ) return list;
+			String line = new String(buffer, 0, readCount);
 			
-				// Else: Try the detect the language codes
-				// For XLIFF: source-language, xml:lang, lang, target-language
-				// For TMX: srcLang, xml:lang, lang
-				// For TTX: SourceLanguage, TargetLanguage, Lang
-				// For TS: sourcelanguage, language
-				// For TXML: locale, targetlocale
-				// Note: the order matter: target cases should be last
-				Matcher m = pattern.matcher(line);
-				int pos = 0;
-				while ( m.find(pos) ) {
-					String lang = m.group(4).toLowerCase();
-					if ( lang.isEmpty() ) {
-						pos = m.end();
-						continue;
-					}
-					String name = m.group(1).toLowerCase();
-				
-					// If we have a header-type target declaration
-					if ( name.equals("language") || name.startsWith("target") ) {
-						if ( list.isEmpty() ) {
-							// Note that we don't do anything to handle a second match, but that should be OK
-							trgValue = lang;
-							pos = m.end();
-							continue; // Move to the next
-						}
-						// Else: we can add to the normal list as the source is defined already
-					}
-					
-					// Else: add the language
-					if ( !list.contains(lang) ) {
-						list.add(lang);
-					}
-					// Then check if we have a target to add. This will be done only once.
-					if ( trgValue != null ) {
-						// Add the target
-						list.add(trgValue);
-						trgValue = null;
-					}
-					pos = m.end();
+			// Else: Try the detect the language codes
+			// For XLIFF: source-language, xml:lang, lang, target-language
+			// For TMX: srcLang, xml:lang, lang
+			// For TTX: SourceLanguage, TargetLanguage, Lang
+			// For TS: sourcelanguage, language
+			// For TXML: locale, targetlocale
+			// Note: the order matter: target cases should be last
+			Matcher m = pattern.matcher(line);
+
+			while ( m.find() ) {
+
+				String lang = m.group(4).toLowerCase();
+				if ( lang.isEmpty() ) {
+					continue;
 				}
-			
-				// Don't scan the  whole file
-				if (( scanned > 10240 ) || ( list.size() > 1 )) break;
+				String name = m.group(1).toLowerCase();
+
+				// If we have a header-type target declaration
+				if ( name.equals("language") || name.startsWith("target") ) {
+					if ( list.isEmpty() ) {
+						// Note that we don't do anything to handle a second match, but that should be OK
+						trgValue = lang;
+						continue; // Move to the next
+					}
+					// Else: we can add to the normal list as the source is defined already
+				}
+
+				// Else: add the language
+				if ( !list.contains(lang) ) {
+					list.add(lang);
+				}
+				// Then check if we have a target to add. This will be done only once.
+				if ( trgValue != null ) {
+					// Add the target
+					list.add(trgValue);
+					trgValue = null;
+				}
+
+				if ( list.size() > 1 ) break;
 			}
 			
 		}
@@ -193,6 +192,14 @@ public final class FileUtil {
 			if ( reader != null ) {
 				try {
 					reader.close();
+				}
+				catch ( IOException e ) {
+					// Swallow this error
+				}
+			}
+			if ( fis != null ) {
+				try {
+					fis.close();
 				}
 				catch ( IOException e ) {
 					// Swallow this error
