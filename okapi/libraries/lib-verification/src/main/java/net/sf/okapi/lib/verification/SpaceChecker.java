@@ -84,7 +84,7 @@ class SpaceChecker {
 									// fix spaces before tag
 									while (sIndexBefore >= 0) {
 										if (Character.isWhitespace(srcText.charAt(sIndexBefore))) {
-											if ((tIndexBefore >= 0)
+											if ((tIndexBefore > 0)
 													&& (!Character.isWhitespace(trgText.charAt(tIndexBefore)))) {
 												trgText.insert(tIndexBefore + 1, srcText.charAt(sIndexBefore));
 												tCur += 1;
@@ -154,7 +154,16 @@ class SpaceChecker {
 					// iterate
 					tCur += 1;
 				}
-
+				
+				// check for leading and trailing whitespace
+				if ((Character.isWhitespace(srcText.charAt(0))) && (!Character.isWhitespace(trgText.charAt(0)))) {
+					trgText.insert(0, srcText.charAt(0));
+				}
+				if ((Character.isWhitespace(srcText.charAt(srcText.length() - 1)))
+						&& (!Character.isWhitespace(trgText.charAt(trgText.length() - 1)))) {
+					trgText.insert(trgText.length(), srcText.charAt(srcText.length() - 1));
+				}
+				
 				// write fixed string into target
 				trgFrag.setCodedText(trgText.toString(), false);
 
