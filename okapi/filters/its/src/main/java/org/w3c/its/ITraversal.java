@@ -25,10 +25,10 @@ import org.w3c.dom.Node;
 
 public interface ITraversal {
 	
-	public static final int DIR_RTL              = 0;
-	public static final int DIR_LTR              = 1;
-	public static final int DIR_RLO              = 2;
-	public static final int DIR_LRO              = 3;
+	public static final int DIR_LTR              = 0;
+	public static final int DIR_RTL              = 1;
+	public static final int DIR_LRO              = 2;
+	public static final int DIR_RLO              = 3;
 	
 	public static final int WITHINTEXT_NO        = 0;
 	public static final int WITHINTEXT_YES       = 1;
@@ -130,6 +130,14 @@ public interface ITraversal {
 	public String getTermInfo (Attr attribute);
 	
 	/**
+	 * Gets the confidence associated with a given term node or one of its
+	 * attributes.
+	 * @param attribute The attribute to query or null for the element.
+	 * @return the confidence associated with the queried part.
+	 */
+	public Float getTermConfidence (Attr attribute);
+	
+	/**
 	 * Gets the localization note of the current element of the traversal or
 	 * one of its attributes.
 	 * @param attribute the attribute to query or null for the element.
@@ -195,5 +203,15 @@ public interface ITraversal {
 	public String getDisambigIdent (Attr attribute);
 	
 	public Float getDisambigConfidence (Attr attribute);
+
+	public Float getLocQualityRatingScore (Attr attribute);
+	
+	public Integer getLocQualityRatingVote (Attr attribute);
+	
+	public Float getLocQualityRatingScoreThreshold (Attr attribute);
+	
+	public Integer getLocQualityRatingVoteThreshold (Attr attribute);
+	
+	public String getLocQualityRatingProfileRef (Attr attribute);
 	
 }

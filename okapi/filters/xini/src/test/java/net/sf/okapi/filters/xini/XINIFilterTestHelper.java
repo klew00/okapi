@@ -6,10 +6,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -36,8 +33,6 @@ public class XINIFilterTestHelper implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	
-	private static Pattern STARTING_TAG = Pattern.compile("<(\\w+ [^>]+?)(/?)>");
-	private static Pattern ATTRIBUTES = Pattern.compile("\\w+?=\".*?\"");
 	private XINIFilter filter;
 	private LocaleId locEN;
 	private LocaleId locDE;
@@ -55,50 +50,6 @@ public class XINIFilterTestHelper implements Serializable {
 		catch (JAXBException e) {
 			e.printStackTrace();
 		}
-	}
-
-	public void assertEquivalent(String expected, String actual) {
-		expected = normalize(expected);
-		actual = normalize(actual);
-		assertEquals(expected, actual);
-	}
-
-	private String normalize(String str) {
-		String result = str;
-		Matcher startTagMatcher = STARTING_TAG.matcher(str);
-
-		while (startTagMatcher.find()) {
-			String tagContent = startTagMatcher.group(1);
-			String suffix = startTagMatcher.group(2);
-			String newTagContent = orderAttributes(tagContent);
-			newTagContent += suffix;
-
-			String before = result.substring(0, startTagMatcher.start());
-			String after = result.substring(startTagMatcher.end(), result.length());
-			result = before + "<" + newTagContent + ">" + after;
-		}
-		return result;
-	}
-
-	private String orderAttributes(String tagContent) {
-		String tagContentWithOrderedAttributes = "";
-		Matcher attributeMatcher = ATTRIBUTES.matcher(tagContent);
-		List<String> attributeDeclarations = new ArrayList<String>();
-		boolean firstMatch = true;
-		while (attributeMatcher.find()) {
-			if (firstMatch) {
-				tagContentWithOrderedAttributes += tagContent.substring(0, attributeMatcher.start());
-				tagContentWithOrderedAttributes = tagContentWithOrderedAttributes.trim();
-				firstMatch = false;
-			}
-			String attDeclaration = attributeMatcher.group();
-			attributeDeclarations.add(attDeclaration);
-		}
-		Collections.sort(attributeDeclarations);
-		for (String attributeDeclaration : attributeDeclarations) {
-			tagContentWithOrderedAttributes += " " + attributeDeclaration;
-		}
-		return tagContentWithOrderedAttributes;
 	}
 
 	/**

@@ -62,6 +62,7 @@ public class Main {
 	public static final String DC_IDVALUE = "idvalue";
 	public static final String DC_PRESERVESPACE = "preservespace";
 	public static final String DC_LOCQUALITYISSUE = "locqualityissue";
+	public static final String DC_LOCQUALITYRATING = "locqualityrating";
 	public static final String DC_MTCONFIDENCE = "mtconfidence";
 	public static final String DC_STORAGESIZE = "storagesize";
 	public static final String DC_ALLOWEDCHARACTERS = "allowedcharacters";
@@ -106,6 +107,7 @@ public class Main {
 						+ "\n" + DC_IDVALUE
 						+ "\n" + DC_PRESERVESPACE
 						+ "\n" + DC_LOCQUALITYISSUE
+						+ "\n" + DC_LOCQUALITYRATING
 						+ "\n" + DC_MTCONFIDENCE
 						+ "\n" + DC_STORAGESIZE
 						+ "\n" + DC_ALLOWEDCHARACTERS
@@ -294,9 +296,16 @@ public class Main {
 			}
 		}
 		else if ( dc.equals(DC_TERMINOLOGY) ) {
+			out1 = trav.getAnnotatorsRef();
+			if ( out1 != null ) {
+				writer.print(String.format("\tannotatorsRef=\"%s\"", escape(out1)));
+			}
 			out1 = (trav.getTerm(attr) ? "yes" : "no");
 			if ( out1 != null ) writer.print(String.format("\tterm=\"%s\"", escape(out1)));
-			//writer.print("\t");
+			Float outF1 = trav.getTermConfidence(attr);
+			if ( outF1 != null ) {
+				writer.print(String.format("\ttermConfidence=\"%s\"", formatFloat(outF1)));
+			}
 			out1 = trav.getTermInfo(attr);
 			if ( out1 != null ){
 				if ( out1.startsWith(ITSEngine.REF_PREFIX) ) {
@@ -317,15 +326,17 @@ public class Main {
 			case ITraversal.DIR_RLO: out1 = "rlo"; break;
 			case ITraversal.DIR_RTL: out1 = "rtl"; break;
 			}
-			writer.print(String.format("\tdir=\"%s\"",
-				escape(out1)));
+			writer.print(String.format("\tdir=\"%s\"", out1));
 		}
 		else if ( dc.equals(DC_LANGUAGEINFORMATION) ) {
 			out1 = trav.getLanguage();
 			if ( out1 != null && !Util.isEmpty(out1)) writer.print(String.format("\tlang=\"%s\"", escape(out1)));			
 		}
 		else if ( dc.equals(DC_WITHINTEXT) ) {
-			if ( attr != null ) return;
+			if ( attr != null ){
+				writer.print("\n");
+				return;				
+			}
 			int wt = trav.getWithinText();
 			switch ( wt ) {
 			case ITraversal.WITHINTEXT_NESTED: out1 = "nested"; break;
@@ -339,7 +350,38 @@ public class Main {
 			if ( out1 != null ) writer.print(String.format("\tdomains=\"%s\"", escape(out1)));
 		}
 		else if ( dc.equals(DC_DISAMBIGUATION) ) {
-			//TODO: output
+			out1 = trav.getAnnotatorsRef();
+			if ( out1 != null ) {
+				writer.print(String.format("\tannotatorsRef=\"%s\"", escape(out1)));
+			}
+			out1 = trav.getDisambigClass(attr);
+			if ( out1 != null ) {
+				if ( out1.startsWith(ITSEngine.REF_PREFIX) ) {
+					writer.print(String.format("\tdisambigClassRef=\"%s\"", escape(out1.substring(ITSEngine.REF_PREFIX.length()))));
+				}
+				else {
+					writer.print(String.format("\tdisambigClass=\"%s\"", escape(out1)));
+				}
+			}
+			Float outFloat = trav.getDisambigConfidence(attr);
+			if ( outFloat != null ) {
+				writer.print(String.format("\tdisambigConfidence=\"%s\"", formatFloat(outFloat)));
+			}
+			out1 = trav.getDisambigGranularity(attr);
+			if ( out1 != null ) writer.print(String.format("\tdisambigGranularity=\"%s\"", escape(out1)));
+			out1 = trav.getDisambigIdent(attr);
+			if ( out1 != null ) {
+				if ( out1.startsWith(ITSEngine.REF_PREFIX) ) {
+					writer.print(String.format("\tdisambigIdentRef=\"%s\"", escape(out1.substring(ITSEngine.REF_PREFIX.length()))));
+				}
+				else {
+					writer.print(String.format("\tdisambigIdent=\"%s\"", escape(out1)));
+				}
+			}
+			out1 = trav.getDisambigSource(attr);
+			if ( out1 != null ) {
+				writer.print(String.format("\tdisambigSource=\"%s\"", escape(out1)));
+			}
 		}
 		else if ( dc.equals(DC_LOCALEFILTER) ) {
 			out1 = trav.getLocaleFilter();
@@ -347,7 +389,7 @@ public class Main {
 		}
 		else if ( dc.equals(DC_EXTERNALRESOURCE) ) {
 			out1 = trav.getExternalResourceRef(attr);
-			if ( out1 != null ) writer.print(String.format("\texternalResource=\"%s\"", escape(out1)));
+			if ( out1 != null ) writer.print(String.format("\texternalResourceRef=\"%s\"", escape(out1)));
 		}
 		else if ( dc.equals(DC_TARGETPOINTER) ) {
 			out1 = trav.getTargetPointer(attr);
@@ -359,7 +401,7 @@ public class Main {
 		}
 		else if ( dc.equals(DC_PRESERVESPACE) ) {
 			out1 = (trav.preserveWS() ? "preserve" : "default");
-			if ( out1 != null ) writer.print(String.format("\tpreserveSpace=\"%s\"", escape(out1)));
+			if ( out1 != null ) writer.print(String.format("\tspace=\"%s\"", escape(out1)));
 		}
 		else if ( dc.equals(DC_LOCQUALITYISSUE) ) {
 			int count = trav.getLocQualityIssueCount(attr);
@@ -369,48 +411,103 @@ public class Main {
 			}
 			// Else: print the entries
 			// IssuesRef
+			boolean standoff = false;
 			out1 = trav.getLocQualityIssuesRef(attr);
-			writer.print(String.format("\tlocQualityIssuesRef=\"%s\"", escape(out1==null ? "" : out1)));
-			writer.print("\t");
+			if ( out1 != null ) {
+				writer.print(String.format("\tlocQualityIssuesRef=\"%s\"", escape(out1)));
+				standoff = true;
+			}
 			for ( int i=0; i<count; i++ ) {
-				// Enabled
-				Boolean outBool1 = trav.getLocQualityIssueEnabled(attr, i);
-				writer.print(String.format("\tlocQualityIssueEnabled[%d]=\"%s\"", i,
-					outBool1==null ? "false" : (outBool1 ? "yes" : "no")));
-				writer.print("\t");
 				// Comment
 				out1 = trav.getLocQualityIssueComment(attr, i);
-				writer.print(String.format("\tlocQualityIssueComment[%d]=\"%s\"", i, escape(out1==null ? "" : out1)));
-				writer.print("\t");
+				if ( out1 != null ) {
+					if ( standoff ) {
+						writer.print(String.format("\tlocQualityIssueComment[%d]=\"%s\"", i+1, escape(out1)));
+					}
+					else {
+						writer.print(String.format("\tlocQualityIssueComment=\"%s\"", escape(out1)));
+					}
+				}
+				// Enabled
+				Boolean outBool1 = trav.getLocQualityIssueEnabled(attr, i);
+				if ( outBool1 == null ) throw new NullPointerException("lQI-enabled is null.");
+				if ( standoff ) {
+					writer.print(String.format("\tlocQualityIssueEnabled[%d]=\"%s\"", i+1, (outBool1 ? "yes" : "no")));
+				}
+				else {
+					writer.print(String.format("\tlocQualityIssueEnabled=\"%s\"", (outBool1 ? "yes" : "no")));
+				}
 				// ProfileRef
 				out1 = trav.getLocQualityIssueProfileRef(attr, i);
-				writer.print(String.format("\tlocQualityIssueProfileRef[%d]=\"%s\"", i, escape(out1==null ? "" : out1)));
-				writer.print("\t");
+				if ( out1 != null ) {
+					if ( standoff ) { 
+						writer.print(String.format("\tlocQualityIssueProfileRef[%d]=\"%s\"", i+1, escape(out1)));
+					}
+					else {
+						writer.print(String.format("\tlocQualityIssueProfileRef=\"%s\"", escape(out1)));
+					}
+				}
 				// Severity
 				Float outFloat1 = trav.getLocQualityIssueSeverity(attr, i);
-				writer.print(String.format("\tlocQualityIssueSeverity[%d]=\"%f\"", i, outFloat1==null ? 0 : outFloat1));
-				writer.print("\t");
+				if ( outFloat1 != null ) {
+					if ( standoff ) {
+						writer.print(String.format("\tlocQualityIssueSeverity[%d]=\"%s\"", i+1, formatFloat(outFloat1)));
+					}
+					else {
+						writer.print(String.format("\tlocQualityIssueSeverity=\"%s\"", formatFloat(outFloat1)));
+					}
+				}
 				// Type
 				out1 = trav.getLocQualityIssueType(attr, i);
-				writer.print(String.format("\tlocQualityIssueType[%d]=\"%s\"", i, escape(out1==null ? "" : out1)));
+				if ( out1 != null ) {
+					if ( standoff ) {
+						writer.print(String.format("\tlocQualityIssueType[%d]=\"%s\"", i+1, escape(out1)));
+					}
+					else {
+						writer.print(String.format("\tlocQualityIssueType=\"%s\"", escape(out1)));
+					}
+				}
+			}
+		}
+		else if ( dc.equals(DC_LOCQUALITYRATING) ) {
+			out1 = trav.getLocQualityRatingProfileRef(attr);
+			if ( out1 != null ) {
+				writer.print(String.format("\tlocQualityRatingProfileRef=\"%s\"", escape(out1.substring(ITSEngine.REF_PREFIX.length()))));
+			}
+			Float outF1 = trav.getLocQualityRatingScore(attr);
+			if ( outF1 != null ) {
+				writer.print(String.format("\tlocQualityRatingScore=\"%s\"", formatFloat(outF1)));
+			}
+			outF1 = trav.getLocQualityRatingScoreThreshold(attr);
+			if ( outF1 != null ) {
+				writer.print(String.format("\tlocQualityRatingScoreThreshold=\"%s\"", formatFloat(outF1)));
+			}
+			Integer outInt = trav.getLocQualityRatingVote(attr);
+			if ( outInt != null ) {
+				writer.print(String.format("\tlocQualityRatingVote=\"%d\"", outInt));
+			}
+			outInt = trav.getLocQualityRatingVoteThreshold(attr);
+			if ( outInt != null ) {
+				writer.print(String.format("\tlocQualityRatingVoteThreshold=\"%d\"", outInt));
 			}
 		}
 		else if ( dc.equals(DC_MTCONFIDENCE) ) {
-			Float outFloat1 = trav.getMtConfidence(attr);
-			writer.print(String.format("\tmtConfidence=\"%f\"", outFloat1==null ? 0 : outFloat1));
-			writer.print("\t"); // display also toosRef because it's a required information for MT confidence
 			out1 = trav.getAnnotatorsRef();
-			writer.print(String.format("\tannotatorsRef=\"%s\"", escape(out1==null ? "" : out1)));
+			if ( out1 != null ) {
+				writer.print(String.format("\tannotatorsRef=\"%s\"", escape(out1)));
+			}
+			Float outFloat1 = trav.getMtConfidence(attr);
+			if ( outFloat1 != null ) {
+				writer.print(String.format("\tmtConfidence=\"%s\"", formatFloat(outFloat1)));
+			}
 		}
 		else if ( dc.equals(DC_STORAGESIZE) ) {
-			out1 = trav.getStorageSize(attr);
-			if ( out1 != null ) writer.print(String.format("\tstorageSize=\"%s\"", escape(out1)));
-			writer.print("\t");
-			out1 = trav.getStorageEncoding(attr);
-			if ( out1 != null ) writer.print(String.format("\tstorageEncoding=\"%s\"", escape(out1)));
-			writer.print("\t");
 			out1 = trav.getLineBreakType(attr);
 			if ( out1 != null ) writer.print(String.format("\tlineBreakType=\"%s\"", escape(out1)));
+			out1 = trav.getStorageEncoding(attr);
+			if ( out1 != null ) writer.print(String.format("\tstorageEncoding=\"%s\"", escape(out1).replace("UTF-8", "utf-8")));
+			out1 = trav.getStorageSize(attr);
+			if ( out1 != null ) writer.print(String.format("\tstorageSize=\"%s\"", escape(out1)));
 		}
 		else if ( dc.equals(DC_ALLOWEDCHARACTERS) ) {
 			out1 = trav.getAllowedCharacters(attr);
@@ -442,12 +539,12 @@ public class Main {
 		
 		// For HTML5: load the default rules
 		if ( isHTML5 ) {
-			URL url = HTML5Filter.class.getResource("default.fprm");
+			URL url = HTML5Filter.class.getResource("strict.fprm");
 			try {
 				itsEng.addExternalRules(url.toURI());
 			}
 			catch ( URISyntaxException e ) {
-				throw new OkapiBadFilterParametersException("Cannot load default parameters.");
+				throw new OkapiBadFilterParametersException("Cannot load strict default parameters.");
 			}
 		}
 
@@ -466,5 +563,18 @@ public class Main {
 		
 		return itsEng;
 	}
-	
+
+	static private String formatFloat (Float value) {
+		if ( value == null ) return "";
+		String tmp = String.format("%f", value);
+		// Remove trailing zeros
+		while (( tmp.length() > 1 ) && ( tmp.charAt(tmp.length()-1) == '0' )) {
+			tmp = tmp.substring(0, tmp.length()-1);
+		}
+		// Remove ending period if it's the last character
+		if ( tmp.charAt(tmp.length()-1) == '.' ) {
+			tmp = tmp.substring(0, tmp.length()-1);
+		}
+		return tmp;
+	}
 }

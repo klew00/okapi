@@ -22,4 +22,9 @@ public class TestUtilTest {
         assertTrue("Incorrect path returned",
                 TestUtil.getParentDir(this.getClass(), "/TestUtilTestTestFile.txt").endsWith("test-classes/"));
     }
+
+    @Test
+    public void checkXmlIgnoreAttributeOrder() {
+		TestUtil.assertEquivalentXml("<ph type=\"deleted\" ID=\"1\">test content</ph>", "<ph ID=\"1\" type=\"deleted\">test content</ph>");
+	}
 }

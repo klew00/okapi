@@ -107,9 +107,8 @@ class PreferencesForm {
 		
 		cbLogLevel = new Combo(grpTmp, SWT.DROP_DOWN | SWT.READ_ONLY);
 		cbLogLevel.add(Res.getString("PreferencesForm.logNormal")); //$NON-NLS-1$
-		cbLogLevel.add(Res.getString("PreferencesForm.logFine")); //$NON-NLS-1$
-		cbLogLevel.add(Res.getString("PreferencesForm.logFiner")); //$NON-NLS-1$
-		cbLogLevel.add(Res.getString("PreferencesForm.logFinest")); //$NON-NLS-1$
+		cbLogLevel.add(Res.getString("PreferencesForm.logDebug")); //$NON-NLS-1$
+		cbLogLevel.add(Res.getString("PreferencesForm.logTrace")); //$NON-NLS-1$
 		
 		grpTmp = new Group(shell, SWT.NONE);
 		grpTmp.setText("Plugins Location");
@@ -180,7 +179,7 @@ class PreferencesForm {
 		else if ( n == 2 ) rdStartPrjLoad.setSelection(true);
 		else rdStartPrjDoNotLoad.setSelection(true);
 		n = config.getInteger(MainForm.OPT_LOGLEVEL);
-		if (( n < 0 ) || ( n > 3)) n = 0;
+		if (( n < 0 ) || ( n > 2)) n = 0;
 		cbLogLevel.select(n);
 		
 		String tmp = config.getProperty(MainForm.OPT_DROPINSDIR, "");

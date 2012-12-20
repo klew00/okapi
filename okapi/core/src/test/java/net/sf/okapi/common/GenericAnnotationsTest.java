@@ -65,6 +65,25 @@ public class GenericAnnotationsTest {
 		assertEquals(1, list.size());
 		assertEquals("test", list.get(0).span.toString());
 	}
+	
+	@Test
+	public void testAddAll () {
+		// First set
+		GenericAnnotations anns1 = new GenericAnnotations();
+		GenericAnnotation ann1 = anns1.add("A1-type1");
+		ann1.setString("f1", "v1");
+		ann1 = anns1.add("A1-type2");
+		ann1.setString("f1", "v1");
+		// second set
+		GenericAnnotations anns2 = new GenericAnnotations();
+		GenericAnnotation ann2 = anns2.add("A1-type1");
+		ann2.setString("f1", "v1");
+		ann2 = anns2.add("A1-type2");
+		ann2.setString("f1", "v1");
+		
+		anns2.addAll(anns1);
+		assertEquals(4, anns2.size());
+	}
 
 	@Test
 	public void testStorage () {

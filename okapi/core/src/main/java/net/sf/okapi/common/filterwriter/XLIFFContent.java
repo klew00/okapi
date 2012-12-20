@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2010 by the Okapi Framework contributors
+  Copyright (C) 2008-2012 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -24,6 +24,9 @@ import java.nio.charset.CharsetEncoder;
 import java.util.List;
 
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.annotation.GenericAnnotation;
+import net.sf.okapi.common.annotation.GenericAnnotationType;
+import net.sf.okapi.common.annotation.GenericAnnotations;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextContainer;
@@ -125,6 +128,11 @@ public class XLIFFContent {
 					if ( code.hasAnnotation("protected") ) {
 						tmp.append("<mrk mtype=\"protected\">");
 					}
+					else if ( code.hasAnnotation(GenericAnnotationType.GENERIC) ) { // Temporary code
+						GenericAnnotations anns = (GenericAnnotations)code.getAnnotation(GenericAnnotationType.GENERIC);
+						List<GenericAnnotation> lga = anns.getAnnotations(GenericAnnotationType.DISAMB);
+						tmp.append("<mrk mtype=\"x-its-disambiguation\">");
+					}
 					//if ( code.hasData() ) {
 						if ( gMode ) {
 							tmp.append(String.format("<g id=\"%d\">", code.getId()));
@@ -152,7 +160,12 @@ public class XLIFFContent {
 						tmp.append(Util.escapeToXML(code.toString(), quoteMode, escapeGT, chsEnc));
 						tmp.append("</ept>");
 					}
-					if ( code.hasAnnotation("protected") ) {
+					if ( code.hasAnnotation(GenericAnnotationType.GENERIC) ) { // Temporary code
+						GenericAnnotations anns = (GenericAnnotations)code.getAnnotation(GenericAnnotationType.GENERIC);
+						List<GenericAnnotation> lga = anns.getAnnotations(GenericAnnotationType.DISAMB);
+						tmp.append("</mrk>");
+					}
+					else if ( code.hasAnnotation("protected") ) {
 						tmp.append("</mrk>");
 					}
 				}

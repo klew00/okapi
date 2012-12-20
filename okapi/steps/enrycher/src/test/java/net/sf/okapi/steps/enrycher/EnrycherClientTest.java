@@ -5,6 +5,7 @@ import java.util.List;
 import net.htmlparser.jericho.Element;
 import net.htmlparser.jericho.Source;
 import net.sf.okapi.common.annotation.GenericAnnotation;
+import net.sf.okapi.common.annotation.GenericAnnotationType;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.steps.enrycher.EnrycherStep.Insertion;
 
@@ -75,21 +76,21 @@ public class EnrycherClientTest {
 		assertEquals(2, insertions.size());
 		
 		Insertion ins = insertions.get(0);
-		List<GenericAnnotation> gas = ins.genAnn.getAnnotations("disambiguation");
+		List<GenericAnnotation> gas = ins.genAnn.getAnnotations(GenericAnnotationType.DISAMB);
 		GenericAnnotation ga = gas.get(0);
 		
 		//--check first GenericAnnotation
-		assertEquals("http://purl.org/vocabularies/princeton/wn30/synset-sweet-adjective-1.rdf", ga.getString("its-disambig-ident-ref"));
-		assertEquals("lexicalConcept", ga.getString("its-disambig-granularity"));
+		assertEquals("REF:http://purl.org/vocabularies/princeton/wn30/synset-sweet-adjective-1.rdf", ga.getString(GenericAnnotationType.DISAMB_IDENT));
+		assertEquals("lexicalConcept", ga.getString(GenericAnnotationType.DISAMB_GRANULARITY));
 		
 		ins = insertions.get(1);
-		gas = ins.genAnn.getAnnotations("disambiguation");
+		gas = ins.genAnn.getAnnotations(GenericAnnotationType.DISAMB);
 		ga = gas.get(0);
 		
 		//--check second GenericAnnotation
-		assertEquals("http://dbpedia.org/resource/Paris", ga.getString("its-disambig-ident-ref"));
-		assertEquals("entity", ga.getString("its-disambig-granularity"));
-		assertEquals("http://schema.org/Place", ga.getString("its-disambig-class-ref"));
+		assertEquals("REF:http://dbpedia.org/resource/Paris", ga.getString(GenericAnnotationType.DISAMB_IDENT));
+		assertEquals("entity", ga.getString(GenericAnnotationType.DISAMB_GRANULARITY));
+		assertEquals("REF:http://schema.org/Place", ga.getString(GenericAnnotationType.DISAMB_CLASS));
 
 		//--TextFragment before
 		assertEquals("hello sweet Paris summer", tf.toString());
@@ -97,7 +98,9 @@ public class EnrycherClientTest {
 		dummy.annotateFragment(tf, insertions);
 		
 		//--TextFragment after
-		assertEquals("hello "+(char)TextFragment.MARKER_OPENING + TextFragment.toChar(0)+"sweet"+(char)TextFragment.MARKER_CLOSING+TextFragment.toChar(1)+" "+(char)TextFragment.MARKER_OPENING+TextFragment.toChar(2)+"Paris"+(char)TextFragment.MARKER_CLOSING+""+TextFragment.toChar(3)+" summer", tf.toString());
+		assertEquals("hello "+(char)TextFragment.MARKER_OPENING + TextFragment.toChar(0) + "sweet" 
+			+ (char)TextFragment.MARKER_CLOSING+TextFragment.toChar(1) +" " + (char)TextFragment.MARKER_OPENING + TextFragment.toChar(2) 
+			+ "Paris" + (char)TextFragment.MARKER_CLOSING + "" + TextFragment.toChar(3) + " summer", tf.toString());
 	}
 
 	//TODO: In progress

@@ -1189,13 +1189,10 @@ public class MainForm { //implements IParametersProvider {
 	private void setLogLevel () {
 		int n = config.getInteger(MainForm.OPT_LOGLEVEL);
 		switch ( n ) {
-		case 1:
+		case 1: // Debug
 			logHandler.setLogLevel(ILogHandler.LogLevel.DEBUG);
 			break;
-		case 2:
-			logHandler.setLogLevel(ILogHandler.LogLevel.DEBUG);
-			break;
-		case 3:
+		case 2: // Trace
 			logHandler.setLogLevel(ILogHandler.LogLevel.TRACE);
 			break;
 		default:

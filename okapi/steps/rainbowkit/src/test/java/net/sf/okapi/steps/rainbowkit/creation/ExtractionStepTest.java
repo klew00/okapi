@@ -42,6 +42,8 @@ import net.sf.okapi.steps.common.RawDocumentToFilterEventsStep;
 import net.sf.okapi.steps.common.createtarget.CreateTargetStep;
 import net.sf.okapi.steps.rainbowkit.ontram.OntramPackageWriter;
 
+import net.sf.okapi.common.TestUtil;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -134,7 +136,7 @@ public class ExtractionStepTest {
 		assertTrue(file.exists());
 		
 		// Compare with the gold file
-		assertEquals(
+		TestUtil.assertEquivalentXml(
 				TestUtil.getFileAsString(new File(root+"xiniPack/xini/contents.xini")), 
 				TestUtil.getFileAsString(new File(root+"pack2/xini/contents.xini"))
 					.replaceFirst("xiniPack/original", ""));

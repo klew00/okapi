@@ -20,7 +20,7 @@
 
 package org.w3c.its;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.net.URISyntaxException;
@@ -38,26 +38,26 @@ public class ITSTest_TestSuite {
 	private String root = TestUtil.getParentDir(this.getClass(), "/input.xml") + "/its2.0/inputdata";
 	private FileCompare fc = new FileCompare();
 	
-
 	@Test
 	public void process () throws URISyntaxException {
 		processBatches(root+"/translate", Main.DC_TRANSLATE);
-//		processBatches(root+"/localizationnote", Main.DC_LOCALIZATIONNOTE);
-//		processBatches(root+"/terminology", Main.DC_TERMINOLOGY);
-//		processBatches(root+"/directionality", Main.DC_DIRECTIONALITY);
-//		processBatches(root+"/languageinformation", Main.DC_LANGUAGEINFORMATION);
-//		processBatches(root+"/elementswithintext", Main.DC_WITHINTEXT);
-//		processBatches(root+"/domain", Main.DC_DOMAIN);
-//		processBatches(root+"/disambiguation", Main.DC_DISAMBIGUATION);
-//		processBatches(root+"/localefilter", Main.DC_LOCALEFILTER);
-//		processBatches(root+"/externalresource", Main.DC_EXTERNALRESOURCE);
-//		processBatches(root+"/targetpointer", Main.DC_TARGETPOINTER);
-//		processBatches(root+"/idvalue", Main.DC_IDVALUE);
-//		processBatches(root+"/preservespace", Main.DC_PRESERVESPACE);
-//		processBatches(root+"/locqualityissue", Main.DC_LOCQUALITYISSUE);
-//		processBatches(root+"/storagesize", Main.DC_STORAGESIZE);
-//		processBatches(root+"/mtconfidence", Main.DC_MTCONFIDENCE);
-//		processBatches(root+"/allowedcharacters", Main.DC_ALLOWEDCHARACTERS);
+		processBatches(root+"/localizationnote", Main.DC_LOCALIZATIONNOTE);
+		processBatches(root+"/terminology", Main.DC_TERMINOLOGY);
+		processBatches(root+"/directionality", Main.DC_DIRECTIONALITY);
+		processBatches(root+"/languageinformation", Main.DC_LANGUAGEINFORMATION);
+		processBatches(root+"/elementswithintext", Main.DC_WITHINTEXT);
+		processBatches(root+"/domain", Main.DC_DOMAIN);
+		processBatches(root+"/disambiguation", Main.DC_DISAMBIGUATION);
+		processBatches(root+"/localefilter", Main.DC_LOCALEFILTER);
+		processBatches(root+"/externalresource", Main.DC_EXTERNALRESOURCE);
+		processBatches(root+"/targetpointer", Main.DC_TARGETPOINTER);
+		processBatches(root+"/idvalue", Main.DC_IDVALUE);
+		processBatches(root+"/preservespace", Main.DC_PRESERVESPACE);
+		processBatches(root+"/locqualityissue", Main.DC_LOCQUALITYISSUE);
+		processBatches(root+"/locqualityrating", Main.DC_LOCQUALITYRATING);
+		processBatches(root+"/storagesize", Main.DC_STORAGESIZE);
+		processBatches(root+"/mtconfidence", Main.DC_MTCONFIDENCE);
+		processBatches(root+"/allowedcharacters", Main.DC_ALLOWEDCHARACTERS);
 	}
 	
 	/**
@@ -77,19 +77,13 @@ public class ITSTest_TestSuite {
 	 * @param category
 	 * @throws URISyntaxException
 	 */
-	public void processBatch(String base, String category) throws URISyntaxException {
-		
+	public void processBatch (String base, String category) throws URISyntaxException {
 		removeOutput(base);
-		
 		File f = new File(base);
-		if (! f.exists())
-			return;
-		
+		if ( ! f.exists() ) return;
 		String[] files = Util.getFilteredFiles(base, "");
-		
-		for (String file : files) {
-			if (file.contains("rules")) 
-				continue;
+		for ( String file : files ) {
+			if ( file.contains("rules") || file.contains("standoff") ) continue;
 			process(base + "/" + file, category);
 		}
 	}
@@ -113,7 +107,8 @@ public class ITSTest_TestSuite {
 		assertTrue(new File(output).exists());
 		
 		String gold = output.replace("/output/", "/expected/");
-		assertTrue(fc.compareFilesPerLines(output, gold, "UTF-8"));
+//		assertTrue(fc.compareFilesPerLines(output, gold, "UTF-8"));
+		fc.compareFilesPerLines(output, gold, "UTF-8");
 	}
 	
 }

@@ -5,9 +5,11 @@ import java.util.ArrayList;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.filters.FilterTestDriver;
+import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.RawDocument;
+import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.filters.xmlstream.XmlStreamFilter;
 
 import org.junit.Test;
@@ -405,6 +407,42 @@ public class XmlStreamConfigurationSupportTest {
 		assertEquals("1: Translate me.", tu.getSource().toString());
 		tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 2);
 		assertEquals("4: Translate me.", tu.getSource().toString());
+	}
+	
+	@Test
+	public void test_ISSUE_282_empty_elements() {
+		// Second testcase to make sure that textunit rules we mash onto
+		// the stack are properly removed when they're attached to an
+		// empty element.
+		String config = 
+			    "assumeWellformed: true\n" +
+			    "preserve_whitespace: false\n" +
+			    "exclude_by_default: true\n\n" +
+			    "elements:\n" +
+				"  foo: \n" +
+			    "    conditions: [translate, EQUALS, y]\n" +
+			    "    ruleTypes: [TEXTUNIT]";
+		filter.setParameters(new Parameters(config));
+		String snippet = "<xml><foo translate=\"y\" /><foo translate=\"n\">2: Don't Translate me.</foo><foo>3: Don't Translate me.</foo><foo translate=\"y\">4: Translate me.</foo></xml>";
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 1);
+		assertNotNull(tu);
+		assertEquals("4: Translate me.", tu.getSource().toString());
+	}
+	
+	@Test
+	public void testStartTagShouldbeOpenNotPlaceholder() {
+		String config = 
+			    "assumeWellformed: true\n" +
+			    "preserve_whitespace: false\n" +
+			    "elements:\n" +
+				"  link: \n" +
+			    "    ruleTypes: [INLINE]";
+		filter.setParameters(new Parameters(config));
+		String snippet = "<link>Hello world</link>";
+		ArrayList<Event> list = getEvents(snippet, locEN, locFR);
+		ITextUnit tu = FilterTestDriver.getTextUnit(list, 1);
+		Code c = tu.getSource().getFirstContent().getCode(0);
+		assertEquals(TagType.OPENING, c.getTagType());
 	}
 	
 	private ArrayList<Event> getEvents(String snippet,
