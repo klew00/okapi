@@ -211,7 +211,7 @@ public class TagPeekTranslator extends AbstractTranslator {
 		}
 		catch(Throwable e)
 		{
-			LOGGER.warn("Tag Translator failed on "+s);
+			LOGGER.warn("Tag Translator failed on {}", s);
 		}
 		return rslt;
 	}

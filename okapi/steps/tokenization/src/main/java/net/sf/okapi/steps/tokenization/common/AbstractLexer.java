@@ -51,11 +51,11 @@ public abstract class AbstractLexer extends Component implements ILexer {
 			
 		} catch (InstantiationException e) {
 
-			logger.debug("Lexer rules instantialion falied: " + e.getMessage());
+			logger.debug("Lexer rules instantialion falied: {}", e.getMessage());
 			
 		} catch (IllegalAccessException e) {
 			
-			logger.debug("Lexer rules instantialion falied: " + e.getMessage());
+			logger.debug("Lexer rules instantialion falied: {}", e.getMessage());
 		}
 		
 		
@@ -68,15 +68,15 @@ public abstract class AbstractLexer extends Component implements ILexer {
 //			
 //		} catch (InstantiationException e) {
 //			
-//			logger.debug("Lexer rules instantialion falied: " + e.getMessage());
+//			logger.debug("Lexer rules instantialion falied: {}", e.getMessage());
 //			
 //		} catch (IllegalAccessException e) {
 //			
-//			logger.debug("Lexer rules instantialion falied: " + e.getMessage());
+//			logger.debug("Lexer rules instantialion falied: {}", e.getMessage());
 //			
 //		} catch (ClassNotFoundException e) {
 //			
-//			logger.debug("Lexer rules instantialion falied: " + e.getMessage());
+//			logger.debug("Lexer rules instantialion falied: {}", e.getMessage());
 //		}
 		
 //		System.out.println(rulesClassName);

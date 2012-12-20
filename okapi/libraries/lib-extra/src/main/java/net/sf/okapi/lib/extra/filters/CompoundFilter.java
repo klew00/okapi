@@ -85,37 +85,37 @@ public class CompoundFilter extends AbstractBaseFilter {
 		} catch (InstantiationException e) {
 			
 			//e.printStackTrace();
-			logger.debug("Subfilter instantiation failed: " + e.getMessage());
+			logger.debug("Subfilter instantiation failed: {}", e.getMessage());
 			return false;
 			
 		} catch (IllegalAccessException e) {
 			
 			//e.printStackTrace();
-			logger.debug("Subfilter instantiation failed: " + e.getMessage());
+			logger.debug("Subfilter instantiation failed: {}", e.getMessage());
 			return false;
 			
 		} catch (SecurityException e) {
 			
 			//e.printStackTrace();
-			logger.debug("Subfilter instantiation failed: " + e.getMessage());
+			logger.debug("Subfilter instantiation failed: {}", e.getMessage());
 			return false;
 			
 		} catch (NoSuchMethodException e) {
 			
 			//e.printStackTrace();
-			logger.debug("Subfilter instantiation failed: " + e.getMessage());
+			logger.debug("Subfilter instantiation failed: {}", e.getMessage());
 			return false;
 			
 		} catch (IllegalArgumentException e) {
 			
 			//e.printStackTrace();
-			logger.debug("Subfilter instantiation failed: " + e.getMessage());
+			logger.debug("Subfilter instantiation failed: {}", e.getMessage());
 			return false;
 			
 		} catch (InvocationTargetException e) {
 			
 			//e.printStackTrace();
-			logger.debug("Subfilter instantiation failed: " + e.getMessage());
+			logger.debug("Subfilter instantiation failed: {}", e.getMessage());
 			return false;
 		}
 		

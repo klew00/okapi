@@ -383,8 +383,8 @@ public class IDMLFilter implements IFilter {
 	{
 		// Skip large spreads if needed
 		if ( entry.getSize() > params.getSkipThreshold()*1024 ) {
-			logger.warn(String.format("The spread '%s' is larger than the defined threshold (%d Kb). It will be skipped.",
-				entry.getName(), params.getSkipThreshold()));
+			logger.warn("The spread '{}' is larger than the defined threshold ({} Kb). It will be skipped.",
+				entry.getName(), params.getSkipThreshold());
 			return 0;
 		}
 		

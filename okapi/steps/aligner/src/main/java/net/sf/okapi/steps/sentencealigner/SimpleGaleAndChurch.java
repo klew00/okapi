@@ -49,7 +49,7 @@ public class SimpleGaleAndChurch implements AlignmentScorer<Segment> {
 	 */
 	public void setLocales(LocaleId p_sourceLocale, LocaleId p_targetLocale) {
 		m_charDist = getCharacterDistribution(p_sourceLocale, p_targetLocale);
-		LOGGER.trace("Character Distribution = " + m_charDist);
+		LOGGER.trace("Character Distribution = {}", m_charDist);
 	}
 
 	/**

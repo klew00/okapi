@@ -213,7 +213,7 @@ public class EncodingConversionStep extends BasePipelineStep {
 			// Open the input document 
 			//TODO: Where did we reset the reader - can't call this twice unless we reset it
 			reader = new BufferedReader(rawDoc.getReader());
-			logger.info("Input encoding: " + inputEncoding);
+			logger.info("Input encoding: {}", inputEncoding);
 			
 			// Open the output document
 			File outFile;
@@ -232,7 +232,7 @@ public class EncodingConversionStep extends BasePipelineStep {
 			writer = new OutputStreamWriter(new BufferedOutputStream(
 				new FileOutputStream(outFile)), outputEncoding);
 			outputEncoder = Charset.forName(outputEncoding).newEncoder();
-			logger.info("Output encoding: " + outputEncoding);
+			logger.info("Output encoding: {}", outputEncoding);
 			Util.writeBOMIfNeeded(writer, params.BOMonUTF8, outputEncoding);
 			
 			int n;

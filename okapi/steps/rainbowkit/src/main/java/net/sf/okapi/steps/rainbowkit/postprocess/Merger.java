@@ -177,7 +177,7 @@ public class Merger {
 		Event event)
 	{
 		useSubDoc = false;
-		LOGGER.info("Merging: "+info.getRelativeInputPath());
+		LOGGER.info("Merging: {}", info.getRelativeInputPath());
 		// Create the filter for this original file
 		filter = fcMapper.createFilter(info.getFilterId(), filter);
 		if ( filter == null ) {
@@ -266,8 +266,7 @@ public class Merger {
 		// search for the corresponding event in the original
 		Event oriEvent = processUntilTextUnit();
 		if ( oriEvent == null ) {
-			LOGGER.error(String.format("No corresponding text unit for id='%s' in the original file.",
-				traTu.getId()));
+			LOGGER.error("No corresponding text unit for id='{}' in the original file.", traTu.getId());
 			return;
 		}
 		// Get the actual text unit object of the original
@@ -275,8 +274,8 @@ public class Merger {
 
 		// Check the IDs
 		if ( !traTu.getId().equals(oriTu.getId()) ) {
-			LOGGER.error(String.format("De-synchronized files: translated TU id='%s', Original TU id='%s'.",
-				traTu.getId(), oriTu.getId()));
+			LOGGER.error("De-synchronized files: translated TU id='{}', Original TU id='{}'.",
+				traTu.getId(), oriTu.getId());
 			return;
 		}
 		
@@ -288,7 +287,7 @@ public class Merger {
 		if ( trgTraCont == null ) {
 			if ( oriTu.getSource().hasText() ) {
 				// Warn only if there source is not empty
-				LOGGER.warn(String.format("No translation found for TU id='%s'. Using source instead.", traTu.getId()));
+				LOGGER.warn("No translation found for TU id='{}'. Using source instead.", traTu.getId());
 			}
 			writer.handleEvent(oriEvent); // Use the source
 			return;
@@ -305,7 +304,7 @@ public class Merger {
 		}
 		if ( !isTransApproved && manifest.getUseApprovedOnly() ) {
 			// Not approved: use the source
-			LOGGER.warn(String.format("Item id='%s': Target is not approved. Using source instead.", traTu.getId()));
+			LOGGER.warn("Item id='{}': Target is not approved. Using source instead.", traTu.getId());
 			writer.handleEvent(oriEvent); // Use the source
 			return;
 		}
@@ -327,9 +326,9 @@ public class Merger {
 			// Use the source of the target to get the proper segmentations
 			if ( !srcOriCont.getUnSegmentedContentCopy().getCodedText().equals(
 				srcTraCont.getUnSegmentedContentCopy().getCodedText()) ) {
-				LOGGER.warn(String.format("Item id='%s': Original source and source in the translated file are different.\n"
+				LOGGER.warn("Item id='{}': Original source and source in the translated file are different.\n"
 					+ "Cannot use the source of the translation as the new segmented source.",
-					traTu.getId()));
+					traTu.getId());
 			}
 		}
 
@@ -384,9 +383,9 @@ public class Merger {
 
 		// Check if the target has more segments
 		if ( srcOriCont.getSegments().count() < trgTraCont.getSegments().count() ) {
-			LOGGER.warn(String.format("Item id='%s': There is at least one extra segment in the translation file.\n"
+			LOGGER.warn("Item id='{}': There is at least one extra segment in the translation file.\n"
 				+ "Extra segments are not merged into the translated output.",
-				traTu.getId()));
+				traTu.getId());
 		}
 		
 		// Assign the translated target to the target text unit

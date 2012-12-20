@@ -210,9 +210,9 @@ public class OpenXMLContentFilter extends AbstractMarkupFilter {
 			}
 			if (etyp.equals("START"))
 				LOGGER.trace("\n");
-			LOGGER.trace(etyp + ": ");
+			LOGGER.trace("{}: ", etyp);
 			if (event.getResource() != null) {
-				LOGGER.trace("(" + event.getResource().getId()+")");
+				LOGGER.trace("({})", event.getResource().getId());
 				if (event.getResource() instanceof DocumentPart) {
 					setter = ((DocumentPart) event.getResource()).getSourcePropertyNames();
 					for(String seti : setter)
@@ -221,7 +221,7 @@ public class OpenXMLContentFilter extends AbstractMarkupFilter {
 					LOGGER.trace(event.getResource().toString());
 				}
 				if (event.getResource().getSkeleton() != null) {
-					LOGGER.trace("*Skeleton: \n" + event.getResource().getSkeleton().toString());
+					LOGGER.trace("*Skeleton: \n{}", event.getResource().getSkeleton().toString());
 				}
 			}
 		}		

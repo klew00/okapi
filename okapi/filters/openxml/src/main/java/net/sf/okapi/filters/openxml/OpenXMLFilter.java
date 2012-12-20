@@ -311,7 +311,7 @@ public class OpenXMLFilter implements IFilter {
 		}
 		else if ( input.getInputURI() != null ) {
 			open(input.getInputURI());
-			LOGGER.debug("\nOpening "+input.getInputURI().toString());
+			LOGGER.debug("\nOpening {}", input.getInputURI().toString());
 		}
 		else if ( input.getStream() != null ) {
 			open(input.getStream());
@@ -340,7 +340,7 @@ public class OpenXMLFilter implements IFilter {
 		}
 		else if ( input.getInputURI() != null ) {
 			open(input.getInputURI(),bSquishable);
-			LOGGER.debug("\nOpening "+input.getInputURI().toString());
+			LOGGER.debug("\nOpening {}", input.getInputURI().toString());
 		}
 		else if ( input.getStream() != null ) {
 			open(input.getStream());
@@ -399,7 +399,7 @@ public class OpenXMLFilter implements IFilter {
 		this.bSquishable = bSquishable;
 		if (cparams!=null)
 			readParams(); // rainbow loads into cparams before this but after it is open
-		LOGGER.debug("\nOpening "+inputURI.toString());
+		LOGGER.debug("\nOpening {}", inputURI.toString());
 	}
 
 	/**
@@ -610,7 +610,7 @@ public class OpenXMLFilter implements IFilter {
 			openXMLContentFilter.setBInSettingsFile(bInSettingsFile); // DWH 4-12-10 for <v:textbox in settings file
 			if (bInMainFile && bSquishable)
 			{
-				LOGGER.debug("\n\n<<<<<<< "+sEntryName+" : "+sDocType+" >>>>>>>");
+				LOGGER.debug("\n\n<<<<<<< {} : {} >>>>>>>", sEntryName, sDocType);
 				nFileType = nZipType;
 				openXMLContentFilter.setUpConfig(nFileType);
 				yparams = (YamlParameters)openXMLContentFilter.getParameters();
@@ -660,7 +660,7 @@ public class OpenXMLFilter implements IFilter {
 				openXMLContentFilter.setUpConfig(nFileType);
 				yparams = (YamlParameters)openXMLContentFilter.getParameters();
 				  // DWH 6-15-09 fully specified Parameters
-				LOGGER.debug("<<<<<<< "+sEntryName+" : "+sDocType+" >>>>>>>");
+				LOGGER.debug("<<<<<<< {} : {} >>>>>>>", sEntryName, sDocType);
 				Event ually = openSubDocument(false); // DWH 6-25-09 save the event
 				resetExcel(); // DWH 6-25-09 if Excel and excluding colors or columns, start through zips again if done with worksheets
 				return ually; // DWH 6-25-09 now return the event

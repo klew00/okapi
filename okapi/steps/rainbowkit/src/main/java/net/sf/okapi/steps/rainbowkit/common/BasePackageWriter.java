@@ -567,7 +567,7 @@ public abstract class BasePackageWriter implements IPackageWriter {
 			File dir = new File(Util.getDirectoryName(origin));
 			File[] files = dir.listFiles(new DefaultFilenameFilter(pattern, false));
 			if ( files == null ) {
-				logger.warn(String.format("Invalid list of files for '%s'", origin));
+				logger.warn("Invalid list of files for '{}'", origin);
 				continue;
 			}
 			

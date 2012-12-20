@@ -111,9 +111,9 @@ public class LeveragingStep extends BasePipelineStep {
 	@Override
 	protected Event handleEndBatch (Event event) {
 		if ( !params.getLeverage() ) return event;
-		logger.info(String.format("\nTotals:\nProcesseed segments = %d", totalCount));
-		logger.info(String.format("Best matches that are exact = %d", exactCount));
-		logger.info(String.format("Best matches that are fuzzy = %d", fuzzyCount));
+		logger.info("\nTotals:\nProcesseed segments = {}", totalCount);
+		logger.info("Best matches that are exact = {}", exactCount);
+		logger.info("Best matches that are fuzzy = {}", fuzzyCount);
 		destroy();
 		return event;
 	}
@@ -135,9 +135,9 @@ public class LeveragingStep extends BasePipelineStep {
 		totalCount += qm.getTotalSegments();
 		exactCount += qm.getExactBestMatches();
 		fuzzyCount += qm.getFuzzyBestMatches();
-		logger.info(String.format("Processeed segments = %d", qm.getTotalSegments()));
-		logger.info(String.format("Best matches that are exact = %d", qm.getExactBestMatches()));
-		logger.info(String.format("Best matches that are fuzzy = %d", qm.getFuzzyBestMatches()));
+		logger.info("Processeed segments = {}", qm.getTotalSegments());
+		logger.info("Best matches that are exact = {}", qm.getExactBestMatches());
+		logger.info("Best matches that are fuzzy = {}", qm.getFuzzyBestMatches());
 		return event;
 	}
 
@@ -203,7 +203,7 @@ public class LeveragingStep extends BasePipelineStep {
 		}
 		
 		ResourceItem res = qm.getResource(iQueryId);
-		logger.info("Leveraging settings: "+res.name);
+		logger.info("Leveraging settings: {}", res.name);
 		logger.info(res.query.getSettingsDisplay());
 
 		// Options

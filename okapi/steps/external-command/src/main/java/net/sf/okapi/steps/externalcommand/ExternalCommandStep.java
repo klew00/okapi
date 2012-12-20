@@ -150,7 +150,7 @@ public class ExternalCommandStep extends BasePipelineStep {
 		try {
 			psh.start();
 			CommandLine cl = CommandLine.parse(parameters.getCommand(), subtitutions);
-			LOGGER.info("External Command: " + cl.toString());
+			LOGGER.info("External Command: {}", cl.toString());
 			exitValue = executor.execute(cl);
 		}
 		catch (ExecuteException e) {

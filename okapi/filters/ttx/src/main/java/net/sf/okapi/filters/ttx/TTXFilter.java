@@ -519,7 +519,7 @@ public class TTXFilter implements IFilter {
 									value = Integer.valueOf(tmp);
 								}
 								catch ( Throwable e ) {
-									logger.warn(String.format("Unexpected value in %s attribute (%s)", MATCHPERCENT, tmp));
+									logger.warn("Unexpected value in {} attribute ({})", MATCHPERCENT, tmp);
 								}
 							}
 							if ( value > 0 ) {
@@ -544,7 +544,7 @@ public class TTXFilter implements IFilter {
 							inTarget = trgLoc.equals(tmp);
 						}
 						else { // Just in case we don't have Lang
-							logger.warn(String.format("Attribute Lang is missing in Tuv (after text unit '%d'", tuId));
+							logger.warn("Attribute Lang is missing in Tuv (after text unit '{}')", tuId);
 							inTarget = !inTarget;
 						}
 						if ( inTarget ) {
@@ -984,8 +984,8 @@ public class TTXFilter implements IFilter {
 		String tmp = reader.getAttributeValue(null, "SourceLanguage");
 		if ( !Util.isEmpty(tmp) ) {
 			 if ( !srcLoc.equals(tmp) ) {
-				 logger.warn(String.format("Specified source was '%s' but source language in the file is '%s'.\nUsing '%s'.",
-					srcLoc.toString(), tmp, tmp));
+				 logger.warn("Specified source was '{}' but source language in the file is '{}'.\nUsing '{}'.",
+					srcLoc.toString(), tmp, tmp);
 				 srcLoc = LocaleId.fromString(tmp);
 				 srcLangCode = tmp;
 				 skelWriter.setSourceLanguageCode(srcLangCode);
@@ -996,8 +996,8 @@ public class TTXFilter implements IFilter {
 		tmp = reader.getAttributeValue(null, TARGETLANGUAGE_ATTR);
 		if ( !Util.isEmpty(tmp) ) {
 			 if ( !trgLoc.equals(tmp) ) {
-				 logger.warn(String.format("Specified target was '%s' but target language in the file is '%s'.\nUsing '%s'.",
-					trgLoc.toString(), tmp, tmp));
+				 logger.warn("Specified target was '{}' but target language in the file is '{}'.\nUsing '{}'.",
+					trgLoc.toString(), tmp, tmp);
 				 trgLoc = LocaleId.fromString(tmp);
 				 trgLangCode = tmp;
 				 skelWriter.setTargetLanguageCode(trgLangCode);

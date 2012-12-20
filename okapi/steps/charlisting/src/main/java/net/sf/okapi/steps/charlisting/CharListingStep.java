@@ -110,12 +110,10 @@ public class CharListingStep extends BasePipelineStep {
 			}
 		}
 		catch ( FileNotFoundException e ) {
-			logger.error(
-				String.format("Error with '%s'.", params.getOutputPath()), e);
+			logger.error("Error with '{}'.", params.getOutputPath(), e);
 		}
 		catch ( UnsupportedEncodingException e ) {
-			logger.error(
-				String.format("Encoding error with '%s'.", params.getOutputPath()), e);
+			logger.error("Encoding error with '{}'.", params.getOutputPath(), e);
 		}
 		finally {
 			if ( writer != null ) {

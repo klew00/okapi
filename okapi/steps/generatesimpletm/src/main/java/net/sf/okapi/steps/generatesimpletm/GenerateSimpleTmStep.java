@@ -106,21 +106,21 @@ public class GenerateSimpleTmStep extends BasePipelineStep {
 	
 	@Override
 	protected Event handleEndBatchItem (Event event) {
-		logger.info(String.format("\nSimpleTM output: %s", fileName ));
-		logger.info(String.format("Untranslatable text units = %d",countIsNotTranslatable));
-		logger.info(String.format("Translatable text units but failed to add = %d", countTuNotAdded));
-		logger.info(String.format("Text units added = %d", countTusAdded));
-		logger.info(String.format("Segments added = %d",countSegsAdded));
+		logger.info("\nSimpleTM output: {}", fileName );
+		logger.info("Untranslatable text units = {}",countIsNotTranslatable);
+		logger.info("Translatable text units but failed to add = {}", countTuNotAdded);
+		logger.info("Text units added = {}", countTusAdded);
+		logger.info("Segments added = {}",countSegsAdded);
 		return event;
 	}
 
 	@Override
 	protected Event handleEndBatch (Event event) {
-		logger.info(String.format("Total untranslatable text units = %d",countIsNotTranslatable));
-		logger.info(String.format("Total text units (Translatable) that failed to add = %d", countTuNotAdded));
-		logger.info(String.format("Total text units added = %d", countTusAdded));
-		logger.info(String.format("Total segments added = %d",countSegsAdded));
-		logger.info(String.format("Total entries in generated simpleTm = %d", simpleTm.getEntryCount()));
+		logger.info("Total untranslatable text units = {}",countIsNotTranslatable);
+		logger.info("Total text units (Translatable) that failed to add = {}", countTuNotAdded);
+		logger.info("Total text units added = {}", countTusAdded);
+		logger.info("Total segments added = {}",countSegsAdded);
+		logger.info("Total entries in generated simpleTm = {}", simpleTm.getEntryCount());
 		simpleTm.close();
 		return event;		
 	}
@@ -131,7 +131,7 @@ public class GenerateSimpleTmStep extends BasePipelineStep {
 		fileName = Util.getFilename(sd.getName(), true);
 		isMultilingual = sd.isMultilingual();
 		if(!isMultilingual){
-			logger.warn("File "+fileName+ " is not processed as a multiLingual file and cannot be used to populate the SimpleTm.");
+			logger.warn("File {} is not processed as a multiLingual file and cannot be used to populate the SimpleTm.", fileName);
 		} 
 		
 		return event;
@@ -160,7 +160,7 @@ public class GenerateSimpleTmStep extends BasePipelineStep {
 		}
 		
 		if( !tu.hasTarget(targetLocale) || ( tu.getTarget(targetLocale)==null )){
-			logger.warn(String.format("TextUnit is missing '%s' target.", targetLocale));
+			logger.warn("TextUnit is missing '{}' target.", targetLocale);
 			countTuNotAdded++;
 			return event;
 		}

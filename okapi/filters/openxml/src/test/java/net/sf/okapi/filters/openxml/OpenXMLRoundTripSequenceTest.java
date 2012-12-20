@@ -139,7 +139,7 @@ public class OpenXMLRoundTripSequenceTest {
 			}
 			writer.close();
 			rtrued2 = zc.zipsExactlyTheSame(sOutputPath+"Tran"+filename, sGoldPath+"Tran"+filename);
-			LOGGER.info("Tran"+filename+(rtrued2 ? " SUCCEEDED" : " FAILED"));
+			LOGGER.info("Tran{}{}", filename, rtrued2 ? " SUCCEEDED" : " FAILED");
 			if (!rtrued2)
 				allGood = false;
 		}

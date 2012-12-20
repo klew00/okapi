@@ -104,7 +104,7 @@ public class UriConversionStep extends BasePipelineStep {
 			}
 		}
 		catch ( Exception e ) {
-			logger.error(String.format("Error when updating content: '%s'", cont.toString()), e);
+			logger.error("Error when updating content: '{}'", cont.toString(), e);
 		}
 		
 		return event;
@@ -140,7 +140,7 @@ public class UriConversionStep extends BasePipelineStep {
 			sb.append(URLDecoder.decode(sbTemp.toString(),"UTF-8"));
 		}
 		catch (UnsupportedEncodingException e) {
-			logger.error(String.format("Error when unescaping: '%s'", text), e);
+			logger.error("Error when unescaping: '{}'", text, e);
 		}
 		return sb.toString();
 	}
@@ -180,7 +180,7 @@ public class UriConversionStep extends BasePipelineStep {
 			}
 		}
 		catch (UnsupportedEncodingException e) {
-			logger.error(String.format("Error when escaping: '%s'", text), e);
+			logger.error("Error when escaping: '{}'", text, e);
 		}
 		return sb.toString();
 	}

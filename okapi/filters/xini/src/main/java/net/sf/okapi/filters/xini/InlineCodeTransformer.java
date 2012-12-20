@@ -532,11 +532,11 @@ public class InlineCodeTransformer {
 			fragment.append(code);
 		}
 		else if (jaxbEl.getValue() instanceof Empty) {
-			LOGGER.warn("Inline element " + jaxbEl.getName() + " will be ignored");
+			LOGGER.warn("Inline element {} will be ignored", jaxbEl.getName());
 
 		}
 		else if (jaxbEl.getValue() instanceof TextContent) {
-			LOGGER.warn("Inline element " + jaxbEl.getName() + " will be ignored");
+			LOGGER.warn("Inline element {} will be ignored", jaxbEl.getName());
 			JAXBElement<TextContent> txtC = (JAXBElement<TextContent>) part;
 			TextFragment innerText = serializeTextParts(txtC.getValue().getContent(), TARGET_IS_TKIT);
 			fragment.append(innerText);

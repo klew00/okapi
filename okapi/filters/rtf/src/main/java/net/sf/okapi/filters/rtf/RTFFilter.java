@@ -660,8 +660,8 @@ public class RTFFilter implements IFilter {
 									endHidden = trgFrag.length();
 								}
 								if ( endHidden-startHidden > 0 ) {
-									logger.warn(String.format("Hidden text detected in target content of text unit '%s'\nTarget=\"%s\"",
-										tu.getId(), trgFrag.toText()));
+									logger.warn("Hidden text detected in target content of text unit '{}'\nTarget=\"{}\"",
+										tu.getId(), trgFrag.toText());
 									tu.setTargetProperty(trgLang, new Property(PROP_HASHIDDENTEXT,
 										String.format("%d;%d", startHidden, endHidden)));
 								}
@@ -1029,8 +1029,8 @@ public class RTFFilter implements IFilter {
 							chCurrent = charBuf.get(0);
 						}
 						catch (CharacterCodingException e) {
-							logger.warn(String.format("Encoding issue: %s%s", e.getLocalizedMessage(),
-								ctxStack.peek().inText ? " Character replaced by '?' in text." : ""));
+							logger.warn("Encoding issue: {}{}", e.getLocalizedMessage(),
+								ctxStack.peek().inText ? " Character replaced by '?' in text." : "");
 							chCurrent = '?';
 						}
 					}
@@ -1052,8 +1052,8 @@ public class RTFFilter implements IFilter {
 									chCurrent = charBuf.get(0);
 								}
 								catch (CharacterCodingException e) {
-									logger.warn(String.format("Issue decoding bytes into character: %s%s", e.getLocalizedMessage(),
-										ctxStack.peek().inText ? " Character replaced by '?' in text." : ""));
+									logger.warn("Issue decoding bytes into character: {}{}", e.getLocalizedMessage(),
+										ctxStack.peek().inText ? " Character replaced by '?' in text." : "");
 									chCurrent = '?';
 								}
 							}
@@ -1094,11 +1094,11 @@ public class RTFFilter implements IFilter {
 			case TOKEN_ENDINPUT:
 				if ( group > 0 ) {
 					// Missing '{'
-					logger.warn(String.format("Missing '{' = %d.", group));
+					logger.warn("Missing '{' = {}.", group);
 				}
 				else if ( group < 0 ) {
 					// Extra '}'
-					logger.warn(String.format("Extra '}' = %d.", group));
+					logger.warn("Extra '}' = {}.", group);
 				}
 				return nRes;
 
@@ -1339,8 +1339,8 @@ public class RTFFilter implements IFilter {
 				}
 				else {
 					// Font undefined: Switch to the default encoding
-					logger.warn(String.format("The font '%d' is undefined. The encoding '%s' is used by default instead.", 
-						value, defaultEncoding));
+					logger.warn("The font '{}' is undefined. The encoding '{}' is used by default instead.", 
+						value, defaultEncoding);
 					loadEncoding(defaultEncoding);
 				}
 			}
@@ -1414,8 +1414,8 @@ public class RTFFilter implements IFilter {
 		case CW_ANSICPG:
 			String name = winCodepages.get(value);
 			if ( name == null ) {
-				logger.warn(String.format("The codepage '%d' is undefined. The encoding '%s' is used by default instead.",
-					value, defaultEncoding));
+				logger.warn("The codepage '{}' is undefined. The encoding '{}' is used by default instead.",
+					value, defaultEncoding);
 				ctxStack.peek().encoding = defaultEncoding;
 			}
 			else {
@@ -1510,8 +1510,8 @@ public class RTFFilter implements IFilter {
 			|| ( "arabic-user".compareTo(encodingName) == 0 )
 			|| ( "hebrew-user".compareTo(encodingName) == 0 ))
 		{
-			logger.warn(String.format("The encoding '%s' is unsupported. The encoding '%s' is used by default instead.", 
-				encodingName, defaultEncoding));
+			logger.warn("The encoding '{}' is unsupported. The encoding '{}' is used by default instead.", 
+				encodingName, defaultEncoding);
 			encodingName = defaultEncoding;
 		}
 		// Load the new encoding

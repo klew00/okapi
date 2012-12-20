@@ -242,7 +242,7 @@ public class RainbowKitFilter implements IFilter {
 				}
 			}
 			catch ( Throwable e ) {
-				LOGGER.error(String.format("Cannot create the editor (%s)\n"+e.getMessage(), className));
+				LOGGER.error("Cannot create the editor ({})\n{}", className, e.getMessage());
 				// And move on to the merge
 			}
 		}
@@ -480,7 +480,7 @@ public class RainbowKitFilter implements IFilter {
 		catch ( Exception e ) {
 			// Log and move on to the next file
 			Throwable e2 = e.getCause();
-			LOGGER.error("RTF Conversion error.\n" + ((e2!=null) ? e2.getMessage() : e.getMessage()));
+			LOGGER.error("RTF Conversion error.\n{}", ((e2!=null) ? e2.getMessage() : e.getMessage()));
 		}
 		finally {
 			if ( rtfFilter != null ) {
@@ -491,7 +491,7 @@ public class RainbowKitFilter implements IFilter {
 					writer.close();
 				}
 				catch ( IOException e ) {
-					LOGGER.error("RTF Conversion error when closing file.\n" + e.getMessage());
+					LOGGER.error("RTF Conversion error when closing file.\n{}", e.getMessage());
 				}
 			}
 		}
@@ -502,8 +502,8 @@ public class RainbowKitFilter implements IFilter {
 		// Check if we have a resource id
 		if ( Util.isEmpty(info.getResourceId()) ) {
 			// No resource id in the info: cannot post-process
-			LOGGER.error(String.format("The file '%s' does not have an associated Transifex resource id.",
-				info.getRelativeInputPath()));
+			LOGGER.error("The file '{}' does not have an associated Transifex resource id.",
+				info.getRelativeInputPath());
 			return null;
 		}
 		
@@ -525,7 +525,7 @@ public class RainbowKitFilter implements IFilter {
 		String[] res = cli.getResource(info.getResourceId(), manifest.getTargetLocale(), outputPath);
 		if ( res[0] == null ) {
 			// Could not download the file
-			LOGGER.error("Cannot pull the resource from Transifex.\n"+res[1]);
+			LOGGER.error("Cannot pull the resource from Transifex.\n{}", res[1]);
 			return null;
 		}
 		File file = new File(outputPath);

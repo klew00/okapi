@@ -117,13 +117,13 @@ public class SentenceAligner {
 			if (cell.getState() == DpMatrixCell.DELETED) {
 				Segment sourceSegment = matrix.getAlignmentElementX(cell.getXindex());
 				alignedPairs.add(new AlignedPair(sourceSegment, null, trgLocale));
-				LOGGER.warn(sourceSegment.toString() +
-						"\nTarget segment deleted (TU ID: " + srcTuid + "): Non 1-1 match. Please confirm alignment.");
+				LOGGER.warn("{}\nTarget segment deleted (TU ID: {}): Non 1-1 match. Please confirm alignment.",
+						sourceSegment.toString(), srcTuid);
 			} else if (cell.getState() == DpMatrixCell.INSERTED) {
 				Segment targetSegment = matrix.getAlignmentElementY(cell.getYindex());
 				alignedPairs.add(new AlignedPair(null, targetSegment, trgLocale));
-				LOGGER.warn(targetSegment.toString() +
-						"\nSource segment deleted (TU ID: " + srcTuid + "): Non 1-1 match. Please confirm alignment.");
+				LOGGER.warn("{}\nSource segment deleted (TU ID: {}): Non 1-1 match. Please confirm alignment.",
+						targetSegment.toString(), srcTuid);
 			} else if (cell.getState() == DpMatrixCell.MATCH) {
 				Segment sourceSegment = matrix.getAlignmentElementX(cell.getXindex());
 				Segment targetSegment = matrix.getAlignmentElementY(cell.getYindex());
@@ -141,8 +141,7 @@ public class SentenceAligner {
 				} catch (IndexOutOfBoundsException e) {
 					s = targetSegments.get(0);
 				}
-				LOGGER.warn(s.toString()
-						+ "\nMulti-Segment Match (TU ID: " + srcTuid + "): Non 1-1 match. Please confirm alignment.");
+				LOGGER.warn("{}\nMulti-Segment Match (TU ID: {}): Non 1-1 match. Please confirm alignment.", s.toString(), srcTuid);
 			}
 		}
 		
@@ -187,13 +186,13 @@ public class SentenceAligner {
 			if (cell.getState() == DpMatrixCell.DELETED) {
 				Segment sourceSegment = matrix.getAlignmentElementX(cell.getXindex());
 				alignedPairs.add(new AlignedPair(sourceSegment, null, trgLocale));
-				LOGGER.warn(sourceSegment.toString() +
-						"\nTarget segment deleted (TU ID: " + srcTuid + "): Non 1-1 match. Please confirm alignment.");
+				LOGGER.warn("{}\nTarget segment deleted (TU ID: {}): Non 1-1 match. Please confirm alignment.",
+						sourceSegment.toString(), srcTuid);
 			} else if (cell.getState() == DpMatrixCell.INSERTED) {
 				Segment targetSegment = matrix.getAlignmentElementY(cell.getYindex());
 				alignedPairs.add(new AlignedPair(null, targetSegment, trgLocale));
-				LOGGER.warn(targetSegment.toString() +
-						"\nSource segment deleted (TU ID: " + srcTuid + "): Non 1-1 match. Please confirm alignment.");
+				LOGGER.warn("{}\nSource segment deleted (TU ID: {}): Non 1-1 match. Please confirm alignment.",
+						targetSegment.toString(), srcTuid);
 			} else if (cell.getState() == DpMatrixCell.MATCH) {
 				Segment sourceSegment = matrix.getAlignmentElementX(cell.getXindex());
 				Segment targetSegment = matrix.getAlignmentElementY(cell.getYindex());
@@ -211,8 +210,8 @@ public class SentenceAligner {
 				} catch (IndexOutOfBoundsException e) {
 					s = targetSegments.get(0);
 				}
-				LOGGER.warn(s.toString()
-						+ "\nMulti-Segment Match (TU ID: " + srcTuid + "): Non 1-1 match. Please confirm alignment.");
+				LOGGER.warn("{}\nMulti-Segment Match (TU ID: {}): Non 1-1 match. Please confirm alignment.",
+						s.toString(), srcTuid);
 			}
 		}
 

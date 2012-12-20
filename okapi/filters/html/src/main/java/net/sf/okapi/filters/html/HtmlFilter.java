@@ -232,9 +232,8 @@ public class HtmlFilter extends AbstractMarkupFilter {
 			// assume the default (non-conditional) rule
 			if (!currentState.ruleName.equalsIgnoreCase(endTag.getName())) {
 				String character = Integer.toString(endTag.getBegin());
-				LOGGER.debug("End tag " + endTag.getName()
-						+ " and start tag " + currentState.ruleName
-						+ " do not match at character number " + character);
+				LOGGER.debug("End tag {} and start tag {} do not match at character number {}",
+						endTag.getName(), currentState.ruleName, character);
 			}
 		}
 

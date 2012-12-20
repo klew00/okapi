@@ -199,8 +199,8 @@ public abstract class BaseConnector implements IQuery {
 					if ( ts == null ) {
 						ts = new Segment(srcSeg.id, new TextFragment(""));
 						trgSegs.append(ts);
-						LOGGER.warn(String.format("Cannot find matching target segment for source id: %s."
-							+ "Creating a new target segment at the end of the target.", srcSeg.getId()));
+						LOGGER.warn("Cannot find matching target segment for source id: {}."
+							+ "Creating a new target segment at the end of the target.", srcSeg.getId());
 					}
 					at = TextUnitUtil.addAltTranslation(ts,
 						qr.toAltTranslation(srcSeg.text, getSourceLanguage(), getTargetLanguage()));
@@ -396,8 +396,8 @@ public abstract class BaseConnector implements IQuery {
 //						if ( ts == null ) {
 //							ts = new Segment(seg.id, new TextFragment(""));
 //							tc.append(ts);
-//							LOGGER.warn(String.format("Cannot find matching target segment for source id: %s."
-//								+ "Creating a new target segment at the end of the target.", seg.id));
+//							LOGGER.warn("Cannot find matching target segment for source id: {}."
+//								+ "Creating a new target segment at the end of the target.", seg.id);
 //						}
 //
 //						at = TextUnitUtil.addAltTranslation(ts,

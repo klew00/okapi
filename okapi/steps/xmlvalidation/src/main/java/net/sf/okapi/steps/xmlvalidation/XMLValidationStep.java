@@ -101,7 +101,7 @@ public class XMLValidationStep extends BasePipelineStep {
 		//xmlInputFact.setProperty(XMLInputFactory.SUPPORT_DTD, false);
 		
 		if(params.isValidate()){
-			logger.info("Validating using XML Schema: "+params.getSchemaPath());
+			logger.info("Validating using XML Schema: {}", params.getSchemaPath());
 		}
 		
 		return event;
@@ -139,11 +139,9 @@ public class XMLValidationStep extends BasePipelineStep {
 
 		}
 		catch ( XMLStreamException e ) {
-			logger.error("Well-Formedness Error " +
-				"Line: "+ e.getLocation().getLineNumber() +
-				", Column: "+ e.getLocation().getColumnNumber() +
-				", Offset: "+ e.getLocation().getCharacterOffset() +
-				"\n"+ e.getMessage());
+			logger.error("Well-Formedness Error Line: {}, Column: {}, Offset: {}\n{}\n",
+				e.getLocation().getLineNumber(), e.getLocation().getColumnNumber(),
+				e.getLocation().getCharacterOffset(), e.getMessage());
 			return event;
 		}
 		
@@ -226,28 +224,22 @@ class ValidatingErrorHandler implements ErrorHandler {
 	
 	 @Override
 	public void error(SAXParseException e) throws SAXException {
-		logger.error("Validation Error " +
-				"Line: "+ e.getLineNumber() +
-				", Column: "+ e.getColumnNumber() +
-				"\n"+ e.getMessage()+"\n");
+		logger.error("Validation Error Line: {}, Column: {}\n{}\n",
+				e.getLineNumber(), e.getColumnNumber(), e.getMessage());
 		throw new SAXException("Error encountered");
 	}
 
 	@Override
 	public void fatalError(SAXParseException e) throws SAXException {
-		logger.error("Validation Fatal Error " +
-				"Line: "+ e.getLineNumber() +
-				", Column: "+ e.getColumnNumber() +
-				"\n"+ e.getMessage()+"\n");
+		logger.error("Validation Fatal Error {}Line: {}, Column: {}\n{}\n",
+				e.getLineNumber(), e.getColumnNumber(), e.getMessage());
 		throw new SAXException("Fatal Error encountered");
 	}
 
 	@Override
 	public void warning(SAXParseException e) throws SAXException {
-		logger.error("Validation Warning " +
-				"Line: "+ e.getLineNumber() +
-				", Column: "+ e.getColumnNumber() +
-				"\n"+ e.getMessage()+"\n");
+		logger.error("Validation Warning {}Line: {}, Column: {}\n{}\n",
+				e.getLineNumber(), e.getColumnNumber(), e.getMessage());
 		throw new SAXException("Warning encountered");
 	}
 }

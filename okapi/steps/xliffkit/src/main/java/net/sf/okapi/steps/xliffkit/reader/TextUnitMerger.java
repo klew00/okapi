@@ -52,16 +52,15 @@ public class TextUnitMerger {
 
 		if ( !tu.getId().equals(tuFromTrans.getId()) ) {
 			// Problem: different IDs
-			logger.warn(String.format("ID mismatch: Original item id=\"%s\" package item id=\"%s\".",
-				tu.getId(), tuFromTrans.getId()));
+			logger.warn("ID mismatch: Original item id=\"{}\" package item id=\"{}\".",
+				tu.getId(), tuFromTrans.getId());
 			return; // Use the source
 		}
 
 		if ( !tuFromTrans.hasTarget(trgLoc) ) {
 			// No translation in package
 			if ( !tu.getSource().isEmpty() ) {
-				logger.warn(
-					String.format("Item id=\"%s\": No translation provided; using source instead.", tu.getId()));
+				logger.warn("Item id=\"{}\": No translation provided; using source instead.", tu.getId());
 				return; // Use the source
 			}
 		}
@@ -74,8 +73,7 @@ public class TextUnitMerger {
 		}
 		if (useApprovedOnly && !isTransApproved ) {
 			// Not approved: use the source
-			logger.warn(
-				String.format("Item id='%s': Target is not approved; using source instead.", tu.getId()));
+			logger.warn("Item id='{}': Target is not approved; using source instead.", tu.getId());
 			return; // Use the source
 		}
 
@@ -84,8 +82,7 @@ public class TextUnitMerger {
 		if ( fromTrans == null ) {
 			if ( tuFromTrans.getSource().isEmpty() ) return;
 			// Else: Missing target in the XLIFF
-			logger.warn(
-				String.format("Item id='%s': No target in XLIFF; using source instead.", tu.getId()));
+			logger.warn("Item id='{}': No target in XLIFF; using source instead.", tu.getId());
 			return; // Use the source
 		}
 
@@ -159,8 +156,7 @@ public class TextUnitMerger {
 			}
 		}
 		catch ( RuntimeException e ) {
-			logger.error(
-				String.format("Inline code error with item id=\"%s\".\n" + e.getLocalizedMessage(), tu.getId()));
+			logger.error("Inline code error with item id=\"{}\".\n{}", tu.getId(), e.getLocalizedMessage());
 			// Use the source instead, continue the merge
 			tu.setTarget(trgLoc, tu.getSource());
 		}
@@ -218,8 +214,8 @@ public class TextUnitMerger {
 			if ( oriCode == null ) { // Not found in original (extra in target)
 				if ( !transCode.hasData() ) {
 					// Leave it like that
-					logger.warn(String.format("The extra target code id='%d' does not have corresponding data (item id='%s', name='%s')",
-						transCode.getId(), tu.getId(), (tu.getName()==null ? "" : tu.getName())));
+					logger.warn("The extra target code id='{}' does not have corresponding data (item id='{}', name='{}')",
+						transCode.getId(), tu.getId(), (tu.getName()==null ? "" : tu.getName()));
 				}
 			}
 			else { // Get the data from the original
@@ -241,9 +237,9 @@ public class TextUnitMerger {
 				if ( oriIndices[i] != -1 ) {
 					Code code = oriCodes.get(oriIndices[i]);
 					if ( !code.isDeleteable() ) {
-						logger.warn(String.format("The code id='%d' (%s) is missing in target (item id='%s', name='%s')",
-							code.getId(), code.getData(), tu.getId(), (tu.getName()==null ? "" : tu.getName())));
-						logger.info("Source='"+tu.getSource().toString()+"'");
+						logger.warn("The code id='{}' ({}) is missing in target (item id='{}', name='{}')",
+							code.getId(), code.getData(), tu.getId(), (tu.getName()==null ? "" : tu.getName()));
+						logger.info("Source='{}'", tu.getSource().toString());
 					}
 				}
 			}

@@ -356,7 +356,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 					}
 					if ( !qlang.equals("xpath") ) {
 						// Some version other than 1.0 of XPath: proceed, but warn of the potential issues
-						logger.warn(String.format("ITS queryLanguage is '%s', but this implementation supports only XPath 1.0: You may or may not run into problems.'", qlang));
+						logger.warn("ITS queryLanguage is '{}', but this implementation supports only XPath 1.0: You may or may not run into problems.'", qlang);
 					}
 				}
 

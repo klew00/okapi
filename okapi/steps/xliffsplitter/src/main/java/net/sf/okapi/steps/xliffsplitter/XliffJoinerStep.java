@@ -298,7 +298,7 @@ public class XliffJoinerStep extends BasePipelineStep {
     			eventReader = inputFactory.createXMLEventReader(inputStream, encoding);
     		}
     		else {
-    			logger.info("Encoding could not be auto-detected. Using default encoding: "+encoding);
+    			logger.info("Encoding could not be auto-detected. Using default encoding: {}", encoding);
     			eventReader = inputFactory.createXMLEventReader(inputStream);
     		}
     	} catch (XMLStreamException e) {

@@ -154,8 +154,8 @@ public class XSLTransformStep extends BasePipelineStep {
 				= javax.xml.transform.TransformerFactory.newInstance();
 
 			trans = fact.newTransformer(xsltInput);
-			logger.info("Factory used: " + fact.getClass().getCanonicalName());
-			logger.info("Transformer used: " + trans.getClass().getCanonicalName());
+			logger.info("Factory used: {}", fact.getClass().getCanonicalName());
+			logger.info("Transformer used: {}", trans.getClass().getCanonicalName());
 			isDone = true;
 		}
 		catch ( Throwable e ) {
@@ -312,7 +312,7 @@ public class XSLTransformStep extends BasePipelineStep {
 			}
 		}
 		catch ( Throwable e ) {
-			logger.error(String.format("Error when trying to substitute variables in the parameter value '%s'", value));
+			logger.error("Error when trying to substitute variables in the parameter value '{}'", value);
 		}
 	}
 

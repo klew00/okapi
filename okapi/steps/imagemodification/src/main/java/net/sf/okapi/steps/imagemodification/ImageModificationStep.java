@@ -117,7 +117,7 @@ public class ImageModificationStep extends BasePipelineStep {
 							newFormat = currentSuffix;
 						}
 						else { // No such writer, fall back to "png"
-							LOGGER.warn(String.format("No image writer available for '%s'. Using 'png' instead.", newFormat));
+							LOGGER.warn("No image writer available for '{}'. Using 'png' instead.", newFormat);
 							currentSuffix = "png";
 							newFormat = "png";
 						}

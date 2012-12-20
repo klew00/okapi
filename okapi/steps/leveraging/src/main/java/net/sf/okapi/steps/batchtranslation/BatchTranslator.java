@@ -141,10 +141,10 @@ public class BatchTranslator {
 	public Event endBatch () {
 		LOGGER.info("");
 		if ( currentTm != null ) {
-			LOGGER.info(String.format("Total matches from TM being built = %d", totalInternalMatches));
-			LOGGER.info(String.format("Total matches from existing TM = %d", totalExternalMatches));
+			LOGGER.info("Total matches from TM being built = {}", totalInternalMatches);
+			LOGGER.info("Total matches from existing TM = {}", totalExternalMatches);
 		}
-		LOGGER.info(String.format("Total entries sent to translation = %d", totalEntries));
+		LOGGER.info("Total entries sent to translation = {}", totalEntries);
 		
 		// Then close all files/TMs
 		closeAll();
@@ -398,10 +398,10 @@ public class BatchTranslator {
 			}
 
 			if ( currentTm != null ) {
-				LOGGER.info(String.format("Existing matches from TM being built = %d", docInternalMatches));
-				LOGGER.info(String.format("Existing matches from existing TM = %d", docExternalMatches));
+				LOGGER.info("Existing matches from TM being built = {}", docInternalMatches);
+				LOGGER.info("Existing matches from existing TM = {}", docExternalMatches);
 			}
-			LOGGER.info(String.format("Entries sent to translation = %d", docEntries));
+			LOGGER.info("Entries sent to translation = {}", docEntries);
 
 			totalInternalMatches += docInternalMatches;
 			totalExternalMatches += docExternalMatches;
@@ -468,7 +468,7 @@ public class BatchTranslator {
 			
 			cmd = LocaleId.replaceVariables(cmd, srcLoc, trgLoc);
 			
-			LOGGER.info("Command line: "+cmd);
+			LOGGER.info("Command line: {}", cmd);
 			Process p = Runtime.getRuntime().exec(cmd);
 			
 			// Make sure we empty the output buffers 
@@ -528,8 +528,7 @@ public class BatchTranslator {
 				}
 				catch ( Throwable e ) {
 					// Catch issues with inline codes
-					LOGGER.warn(String.format("Skipping entry '%d:%s:%s'.\n", htmlSubDocId, htmlTuId, htmlSegId)
-						+ e.getMessage());
+					LOGGER.warn("Skipping entry '{}:{}:{}'.\n{}", htmlSubDocId, htmlTuId, htmlSegId, e.getMessage());
 					continue; // Skip this entry
 				}
 

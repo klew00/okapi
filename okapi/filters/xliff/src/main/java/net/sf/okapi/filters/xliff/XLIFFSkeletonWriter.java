@@ -146,7 +146,7 @@ public class XLIFFSkeletonWriter extends GenericSkeletonWriter {
 		// Else this is a true reference to a referent
 		IReferenceable ref = getReference((String)marker[0]);
 		if ( ref == null ) {
-			logger.warn(String.format("Reference '%s' not found.", (String)marker[0]));
+			logger.warn("Reference '{}' not found.", (String)marker[0]);
 			return "-ERR:REF-NOT-FOUND-";
 		}
 		if ( ref instanceof ITextUnit ) {
@@ -361,8 +361,8 @@ public class XLIFFSkeletonWriter extends GenericSkeletonWriter {
 				Segment srcSeg = srcSegs.get(trgSeg.id);
 				if ( srcSeg == null ) {
 					// A target segment without a corresponding source: give warning
-					logger.warn(String.format("No source segment found for target segment id='%s':\n\"%s\".",
-						trgSeg.id, trgSeg.text.toText()));
+					logger.warn("No source segment found for target segment id='{}':\n\"{}\".",
+						trgSeg.id, trgSeg.text.toText());
 				}
 
 				// Opening marker
@@ -471,7 +471,7 @@ public class XLIFFSkeletonWriter extends GenericSkeletonWriter {
 		// Check the property we got
 		if ( value == null ) {
 			if ( prop == null ) {
-				logger.warn(String.format("Property '%s' not found.", name));
+				logger.warn("Property '{}' not found.", name);
 				return "-ERR:PROP-NOT-FOUND-";
 			}
 			// Else process the value
@@ -480,7 +480,7 @@ public class XLIFFSkeletonWriter extends GenericSkeletonWriter {
 		
 		// Now look at the value
 		if ( value == null ) {
-			logger.warn(String.format("Property value for '%s' is null.", name));
+			logger.warn("Property value for '{}' is null.", name);
 			return "-ERR:PROP-VALUE-NULL-";
 		}
 		// Else: We got the property value

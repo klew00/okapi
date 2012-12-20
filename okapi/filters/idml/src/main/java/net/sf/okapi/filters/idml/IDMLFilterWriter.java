@@ -382,7 +382,7 @@ public class IDMLFilterWriter implements IFilterWriter {
 					String key = marker.getAttribute("id");
 					Node original = map.get(key);
 					if ( original == null ) {
-						logger.error(String.format("Missing original node for a reference in text unit id='%s'.", tu.getId()));
+						logger.error("Missing original node for a reference in text unit id='{}'.", tu.getId());
 						break; // Break now or we'll be in an infinite loop
 					}
 					Element parent = (Element)marker.getParentNode();
@@ -391,7 +391,7 @@ public class IDMLFilterWriter implements IFilterWriter {
 			}
 		}
 		catch ( Throwable e ) {
-			logger.error(String.format("Error when parsing XML of text unit id='%s'.\n"+e.getMessage(), tu.getId()));
+			logger.error("Error when parsing XML of text unit id='{}'.\n{}", tu.getId(), e.getMessage());
 		}
 	}
 	

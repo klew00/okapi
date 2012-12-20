@@ -354,8 +354,8 @@ public class TXMLFilter implements IFilter {
 		String tmp = reader.getAttributeValue(null, "locale");
 		if ( !Util.isEmpty(tmp) ) {
 			 if ( !srcLoc.equals(tmp) ) {
-				 logger.warn(String.format("Specified source was '%s' but source language in the file is '%s'.\nUsing '%s'.",
-					srcLoc.toString(), tmp, tmp));
+				 logger.warn("Specified source was '{}' but source language in the file is '{}'.\nUsing '{}'.",
+					srcLoc.toString(), tmp, tmp);
 				 srcLoc = LocaleId.fromString(tmp);
 			 }
 		}
@@ -364,8 +364,8 @@ public class TXMLFilter implements IFilter {
 		tmp = reader.getAttributeValue(null, TARGETLOCALE);
 		if ( !Util.isEmpty(tmp) ) {
 			 if ( !trgLoc.equals(tmp) ) {
-				 logger.warn(String.format("Specified target was '%s' but target language in the file is '%s'.\nUsing '%s'.",
-					trgLoc.toString(), tmp, tmp));
+				 logger.warn("Specified target was '{}' but target language in the file is '{}'.\nUsing '{}'.",
+					trgLoc.toString(), tmp, tmp);
 				 trgLoc = LocaleId.fromString(tmp);
 			 }
 		}

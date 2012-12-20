@@ -344,7 +344,7 @@ public class SearchAndReplaceStep extends BasePipelineStep {
 			}
 		} 
 		catch ( Exception e ) {
-			logger.warn(String.format("Error when updating content: '%s'.\n"+ e.getMessage(), tmp), e);
+			logger.warn("Error when updating content: '{}'.\n{}", tmp, e.getMessage(), e);
 		}
 
 		return event;

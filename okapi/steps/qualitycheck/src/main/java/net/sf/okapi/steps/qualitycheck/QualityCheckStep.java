@@ -181,13 +181,13 @@ public class QualityCheckStep extends BasePipelineStep {
 			}
 				
 			// Log the info
-			LOGGER.info("\nOutput: " + finalPath);
+			LOGGER.info("\nOutput: {}", finalPath);
 			int count = session.getIssues().size();
 			if ( count == 0 ) {
 				LOGGER.info("No issue found.");
 			}
 			else {
-				LOGGER.warn(String.format("Number of issues found = %d", count));
+				LOGGER.warn("Number of issues found = {}", count);
 			}
 			
 			// Open the report if requested

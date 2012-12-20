@@ -302,8 +302,8 @@ public class XLIFF2PackageWriter extends BasePackageWriter {
 			trgTc = tu.getTarget(manifest.getTargetLocale());
 			if ( trgTc.getSegments().count() != srcTc.getSegments().count() ) {
 				// Use un-segmented entry if we have different number of segments
-				LOGGER.warn(String.format("Text unit id='%s' has different number of segments in source and target.\n"
-					+"This entry will be output un-segmented.", tu.getId()));
+				LOGGER.warn("Text unit id='{}' has different number of segments in source and target.\n"
+					+"This entry will be output un-segmented.", tu.getId());
 				srcTc = tu.getSource().clone(); srcTc.joinAll();
 				trgTc = tu.getTarget(manifest.getTargetLocale()).clone(); trgTc.joinAll();
 			}

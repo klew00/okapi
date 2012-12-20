@@ -189,7 +189,7 @@ public class RTFConversionStep extends BasePipelineStep {
 				}
 
 				if ( !encoder.canEncode(buf.toString()) ) {
-					logger.warn(String.format("At least one character cannot be encoded in '%s' in '%s'.", outputEncoding, buf.toString()));
+					logger.warn("At least one character cannot be encoded in '{}' in '{}'.", outputEncoding, buf.toString());
 				}
 				
 				writer.write(buf.toString());

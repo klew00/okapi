@@ -180,14 +180,12 @@ public class VersifiedTextFilter extends AbstractFilter {
 		// may need to override encoding based on what we detect
 		if (detector.isDefinitive()) {
 			detectedEncoding = detector.getEncoding();
-			LOGGER.debug(String.format(
-					"Overridding user set encoding (if any). Setting auto-detected encoding (%s).",
-					detectedEncoding));
+			LOGGER.debug("Overridding user set encoding (if any). Setting auto-detected encoding ({}).",
+					detectedEncoding);
 		} else if (!detector.isDefinitive() && getEncoding().equals(RawDocument.UNKOWN_ENCODING)) {
 			detectedEncoding = detector.getEncoding();
-			LOGGER.debug(String.format(
-							"Default encoding and detected encoding not found. Using best guess encoding (%s)",
-							detectedEncoding));
+			LOGGER.debug("Default encoding and detected encoding not found. Using best guess encoding ({})",
+							detectedEncoding);
 		}
 
 		input.setEncoding(detectedEncoding);
@@ -563,7 +561,7 @@ public class VersifiedTextFilter extends AbstractFilter {
 			// treat as monolingual paragraph and log a warning
 			buildTextUnitForNonTrados(text, true);
 			LOGGER.warn("In a Trados bilingual document but found no segment markers. " +
-					"Treating as monlingual text: " + text);
+					"Treating as monlingual text: {}", text);
 		}
 		
 		return tu;

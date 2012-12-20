@@ -229,7 +229,7 @@ public class ExtractionVerificationUtil {
 				Set<LocaleId> targetLocales = tu2.getTargetLocales();
 				if(targetLocales.size()==1 && !targetLocales.contains(targetLocale)){
 					LocaleId overridenLocaleId = targetLocales.iterator().next();
-					LOGGER.warn("compareTextUnits warning: Specified targetLocale not found. Assuming it was overriden by the filter. [Overriden from: "+targetLocale+"\tto:"+overridenLocaleId+"]");
+					LOGGER.warn("compareTextUnits warning: Specified targetLocale not found. Assuming it was overriden by the filter. [Overriden from: {}\tto: {}]", targetLocale, overridenLocaleId);
 					targetLocale = targetLocales.iterator().next();
 					targetLocaleOverriden = true;
 				}
@@ -309,7 +309,8 @@ public class ExtractionVerificationUtil {
 
 		//--PROPERTY CHECK--
 		if( !tc1.getPropertyNames().equals(tc2.getPropertyNames()) ){
-			LOGGER.warn("compareTextContainer warning: TextContainer properties difference. [tc1:"+tc1.getPropertyNames()+"\ttc2:"+tc2.getPropertyNames()+" ]");
+			LOGGER.warn("compareTextContainer warning: TextContainer properties difference. [tc1:{}\ttc2:{}]",
+					tc1.getPropertyNames(), tc2.getPropertyNames());
 			if(!allowPropValChanges){
 				return false;				
 			}
@@ -326,7 +327,7 @@ public class ExtractionVerificationUtil {
 		//--TextPart count--
 		if (tc1.count() != tc2.count()) {
 			LOGGER.warn("compareTextContainer warning: TextPart count difference.\n" +
-					"tc1=" + tc1.count() + "\ntc2="+ tc2.count() );
+					"tc1={}\ntc2={}", tc1.count(), tc2.count() );
 			return false;
 		}
 		
@@ -446,7 +447,7 @@ public class ExtractionVerificationUtil {
 		//--code count--
 		if (codes1.size() != codes2.size()) {
 			LOGGER.warn("compareTextFragment warning: TextFragment code count difference.\n" +
-					"tf1=" + codes1.size() + "\ntf2="+ codes2.size());
+					"tf1={}\ntf2={}", codes1.size(), codes2.size());
 			return false;
 		}
 
@@ -454,7 +455,7 @@ public class ExtractionVerificationUtil {
 		if (!tf1.getCodedText().equals(tf2.getCodedText())) {
 			//if(tf1.compareTo(tf2) != 0){
 			LOGGER.warn("compareTextFragment warning: TextFragment coded text difference.\n" +
-					"text1=\"" + tf1.getCodedText() + "\"\ntext2=\""+ tf2.getCodedText() + "\"");
+					"text1=\"{}\"\ntext2=\"{}\"", tf1.getCodedText(), tf2.getCodedText());
 			return false;
 		}
 		
@@ -466,27 +467,27 @@ public class ExtractionVerificationUtil {
 			// Id
 			if (code1.getId() != code2.getId()) {
 				LOGGER.warn("compareTextFragment warning: TextFragment Code id difference.\n" +
-						"code1 id=\"" + code1.getId() + "\"\ncode2 id=\""+ code2.getId() + "\"");
+						"code1 id=\"{}\"\ncode2 id=\"{}\"", code1.getId(), code2.getId());
 				return false;
 			}
 
 			// Data
 			if ( !code1.getData().equals(code2.getData()) ) {
 				LOGGER.warn("compareTextFragment warning: TextFragment Code data difference.\n" +
-						"code1 data=\"" + code1.getData() + "\"\ncode2 data=\""+ code2.getData() + "\"");
+						"code1 data=\"{}\"\ncode2 data=\"{}\"", code1.getData(), code2.getData());
 				return false;
 			}
 
 			// Outer data
 			if ( !code1.getOuterData().equals(code2.getOuterData()) ) {
 				LOGGER.warn("compareTextFragment warning: TextFragment Code outer data difference.\n" +
-						"code1 outerdata=\"" + code1.getOuterData() + "\"\ncode2 outerdata=\""+ code2.getOuterData() + "\"");
+						"code1 outerdata=\"{}\"\ncode2 outerdata=\"{}\"", code1.getOuterData(), code2.getOuterData());
 				return false;
 			}
 			
 			if ( !code1.getType().equals(code2.getType()) ) {
 				LOGGER.warn("compareTextFragment warning: TextFragment Code type difference.\n" +
-						"code1 type=\"" + code1.getType() + "\"\ncode2 type=\""+ code2.getType() + "\"");
+						"code1 type=\"{}\"\ncode2 type=\"{}\"", code1.getType(), code2.getType());
 				return false;
 			}
 			if (code1.getTagType() != code2.getTagType()) {
@@ -521,7 +522,7 @@ public class ExtractionVerificationUtil {
 		String codeStr2 = Code.codesToString(codes2);
 		if ( !codeStr1.equals(codeStr2) ) {
 			LOGGER.warn("compareTextFragment warning: TextFragment Code string difference.\n" +
-					"code1=\"" + codeStr1 + "\"\ncode2=\""+ codeStr2 + "\"");
+					"code1=\"{}\"\ncode2=\"{}\"", codeStr1, codeStr2);
 			return false;
 		}
 		
@@ -685,7 +686,7 @@ public class ExtractionVerificationUtil {
 
 		if (!r1.getSkeleton().toString().equals(r2.getSkeleton().toString())) {
 			LOGGER.warn("compareIResource warning: Skeleton content difference (If skeleton difference is acceptable turn it off in the settings).\n" +
-					"skel1=\"" + r1.getSkeleton().toString() + "\"\nskel2=\""+ r2.getSkeleton().toString() + "\"");
+					"skel1=\"{}\"\nskel2=\"{}\"", r1.getSkeleton().toString(), r2.getSkeleton().toString());
 			return false;
 		}
 
@@ -754,7 +755,7 @@ public class ExtractionVerificationUtil {
 		}
 		if( !bothAreNull(p1.getValue(),p2.getValue()) ){
 			if (!p1.getValue().equals(p2.getValue())) {
-				LOGGER.warn("compareProperty warning: Property value difference. [prop name:"+p1.getName()+"\tval p1:"+p1.getValue()+"\tval p2:"+p2.getValue()+"]");
+				LOGGER.warn("compareProperty warning: Property value difference. [prop name:{}\tval p1:{}\tval p2:{}]", p1.getName(), p1.getValue(), p2.getValue());
 				return false;
 			}
 		}
@@ -791,11 +792,11 @@ public class ExtractionVerificationUtil {
 	public boolean oneIsNulll(Object o1, Object o2, String function, String type){
 		
 		if (o1 == null && o2 != null){
-			LOGGER.warn(function+ " warning: "+type+" 1 is null and "+type+" 2 is not null.");
+			LOGGER.warn("{} warning: {} 1 is null and {} 2 is not null.", function, type, type);
 			return true;
 		} 
 		if (o1 != null && o2 == null){				
-			LOGGER.warn(function+ " warning: "+type+" 1 is not null and "+type+" 2 is null.");
+			LOGGER.warn("{} warning: {} 1 is not null and {} 2 is null.", function, type, type);
 			return true;
 		}
 		return false;

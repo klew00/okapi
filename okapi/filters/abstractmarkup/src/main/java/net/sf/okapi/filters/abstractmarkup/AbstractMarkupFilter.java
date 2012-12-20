@@ -176,7 +176,7 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 		}
 		this.document = null; // help Java GC
 		
-		LOGGER.debug(getDocumentName() + " has been closed");
+		LOGGER.debug("{} has been closed", getDocumentName());
 	}
 
 	/*
@@ -229,14 +229,11 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 
 		if (detectedEncoding == null && getEncoding() != null) {
 			detectedEncoding = getEncoding();
-			LOGGER.debug(String.format(
-					"Cannot auto-detect encoding. Using the default encoding (%s)", getEncoding()));
+			LOGGER.debug("Cannot auto-detect encoding. Using the default encoding ({})", getEncoding());
 		} else if (getEncoding() == null) {
 			detectedEncoding = parsedHeader.getEncoding(); // get best guess
-			LOGGER.debug(
-					String.format(
-							"Default encoding and detected encoding not found. Using best guess encoding (%s)",
-							detectedEncoding));
+			LOGGER.debug("Default encoding and detected encoding not found. Using best guess encoding ({})",
+							detectedEncoding);
 		}
 
 		return detectedEncoding;
@@ -250,7 +247,7 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 	 */
 	public void open(RawDocument input) {
 		open(input, true);
-		LOGGER.debug(getName() + " has opened an input document");
+		LOGGER.debug("{} has opened an input document", getName());
 	}
 
 	/**

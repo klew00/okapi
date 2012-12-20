@@ -576,7 +576,7 @@ public class TsFilter implements IFilter {
 
 						StartElement se = getStartElement("message");
 						if( ts.noSource() ){
-							logger.warn("Message (Line "+se.getLocation().getLineNumber()+" contains no <source>. Message will be ignored.");
+							logger.warn("Message (Line {} contains no <source>. Message will be ignored.", se.getLocation().getLineNumber());
 						}
 
 						DocumentPart dp = generateObsoleteTu();
@@ -907,7 +907,7 @@ public class TsFilter implements IFilter {
 						if(approvedProp.getValue().equals("yes")){
 							approvedProp.setValue("no");
 							tu.setTargetProperty(trgLang, approvedProp);
-							logger.warn("Translation (Line "+endElem.getLocation().getLineNumber()+") is empty. type attribute was updated to unfinished.");
+							logger.warn("Translation (Line {}) is empty. type attribute was updated to unfinished.", endElem.getLocation().getLineNumber());
 						}
 					}
 					procEndElem(endElem);
@@ -1245,8 +1245,8 @@ public class TsFilter implements IFilter {
 
 		String xmlEnc = startDoc.getCharacterEncodingScheme();
 		if (xmlEnc != null && !xmlEnc.equalsIgnoreCase(encoding)){
-			logger.warn("The xml encoding attribute value "+xmlEnc+" is different from " +
-					"what was detected or specified in the settings. Encoding "+encoding+ " will be used.");	
+			logger.warn("The xml encoding attribute value {} is different from " +
+					"what was detected or specified in the settings. Encoding {} will be used.", xmlEnc, encoding);
 		}
 	}
 

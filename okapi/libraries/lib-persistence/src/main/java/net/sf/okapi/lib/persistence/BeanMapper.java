@@ -35,7 +35,7 @@ public class BeanMapper {
 	private static final String MAPPER_NOT_INIT = "BeanMapper: bean mapping is not initialized";
 	private static final String MAPPER_UNK_CLASS = "BeanMapper: unknown class: %s";		
 	private static final String MAPPER_EMPTY_REF = "BeanMapper: class reference cannot be empty";
-	private static final String MAPPER_NOT_REG = "No bean class registered for %s, using %s for %s instead.";
+	private static final String MAPPER_NOT_REG = "No bean class registered for {}, using {} for {} instead.";
 	
 	private static final String OBJ_MAPPER_NOT_INIT = "BeanMapper: object mapping is not initialized";
 	private static final String OBJ_MAPPER_EMPTY_REF = "BeanMapper: bean class reference cannot be empty";
@@ -128,16 +128,16 @@ public class BeanMapper {
 					beanClass = (Class<IPersistenceBean<T>>) beanClassMapping.get(cls);
 					if (session.getState() == SessionState.WRITING && !loggedClasses.contains(classRef)) {
 						loggedClasses.add(classRef);
-						LOGGER.warn(String.format(MAPPER_NOT_REG,
+						LOGGER.warn(MAPPER_NOT_REG,
 								ClassUtil.getQualifiedClassName(classRef),
 								ClassUtil.getQualifiedClassName(beanClass),
-								ClassUtil.getQualifiedClassName(cls)));
+								ClassUtil.getQualifiedClassName(cls));
 					}					
 					break;
 				}	
 			if (beanClass == null && !loggedClasses.contains(classRef)) {
 				loggedClasses.add(classRef);
-				LOGGER.warn(String.format("No bean class registered for %s", ClassUtil.getQualifiedClassName(classRef)));
+				LOGGER.warn("No bean class registered for {}", ClassUtil.getQualifiedClassName(classRef));
 			}				
 		}
 		return beanClass;		
@@ -163,7 +163,7 @@ public class BeanMapper {
 		IPersistenceBean<?> proxy = proxies.get(NamespaceMapper.getMapping(objClassName)); 
 		if (proxy == null && !loggedClassNames.contains(objClassName)) {
 			loggedClassNames.add(objClassName);
-			LOGGER.warn(String.format("No proxy found for %s", objClassName));
+			LOGGER.warn("No proxy found for {}", objClassName);
 		}
 		
 		return proxy;

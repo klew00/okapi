@@ -91,11 +91,11 @@ abstract public class BaseCounter {
 			
 		} catch (InstantiationException e) {
 			
-			localLogger.debug("Counter instantiation failed: " + e.getMessage());
+			localLogger.debug("Counter instantiation failed: {}", e.getMessage());
 			
 		} catch (IllegalAccessException e) {
 			
-			localLogger.debug("Counter instantiation failed: " + e.getMessage());
+			localLogger.debug("Counter instantiation failed: {}", e.getMessage());
 		}
 	}
 
