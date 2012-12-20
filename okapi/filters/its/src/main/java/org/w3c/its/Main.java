@@ -302,7 +302,10 @@ public class Main {
 			}
 			out1 = (trav.getTerm(attr) ? "yes" : "no");
 			if ( out1 != null ) writer.print(String.format("\tterm=\"%s\"", escape(out1)));
-			//writer.print("\t");
+			Float outF1 = trav.getTermConfidence(attr);
+			if ( outF1 != null ) {
+				writer.print(String.format("\ttermConfidence=\"%s\"", formatFloat(outF1)));
+			}
 			out1 = trav.getTermInfo(attr);
 			if ( out1 != null ){
 				if ( out1.startsWith(ITSEngine.REF_PREFIX) ) {
@@ -536,12 +539,12 @@ public class Main {
 		
 		// For HTML5: load the default rules
 		if ( isHTML5 ) {
-			URL url = HTML5Filter.class.getResource("default.fprm");
+			URL url = HTML5Filter.class.getResource("strict.fprm");
 			try {
 				itsEng.addExternalRules(url.toURI());
 			}
 			catch ( URISyntaxException e ) {
-				throw new OkapiBadFilterParametersException("Cannot load default parameters.");
+				throw new OkapiBadFilterParametersException("Cannot load strict default parameters.");
 			}
 		}
 
