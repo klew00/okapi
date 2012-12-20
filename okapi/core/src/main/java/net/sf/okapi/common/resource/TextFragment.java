@@ -1342,7 +1342,7 @@ public class TextFragment implements Appendable, CharSequence, Comparable<Object
 	{
 		checkPositionForMarker(start);
 		checkPositionForMarker(end);
-		balanceMarkers();
+		if ( !isBalanced ) balanceMarkers();
 		//TODO: Handle all the cases (overlapping, interrupted range, etc.
 		// cases:
 		// a<1>|bc|</1>d = a<1n>bc</1>d
