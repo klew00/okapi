@@ -1574,13 +1574,13 @@ public class ITSEngine implements IProcessor, ITraversal {
 						
 					else if ( rule.ruleType == IProcessor.DC_LOCQUALITYISSUE ) {
 						GenericAnnotations anns = null;
-						data1 = rule.info;
+						String oriRef = data1 = rule.info;
 						if ( data1 != null ) {
 							if ( rule.infoType == INFOTYPE_REFPOINTER) {
 								data1 = resolvePointer(NL.item(i), data1);
 							}
 							// Fetch the stand-off data
-							anns = fetchLocQualityStandoffData(data1);
+							anns = fetchLocQualityStandoffData(data1, oriRef);
 						}
 						else {
 							// Not a stand-off annotation
@@ -2062,7 +2062,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 					GenericAnnotations anns = null;
 					if ( values[0] != null ) { // stand-off reference
 						// Fetch the stand-off data 
-						anns = fetchLocQualityStandoffData(values[0]);
+						anns = fetchLocQualityStandoffData(values[0], values[0]);
 					}
 					else { // Not an stand-off reference
 						anns = new GenericAnnotations();
@@ -2722,7 +2722,9 @@ public class ITSEngine implements IProcessor, ITraversal {
 		return data;
 	}
 	
-	private GenericAnnotations fetchLocQualityStandoffData (String ref) {
+	private GenericAnnotations fetchLocQualityStandoffData (String ref,
+		String originalRef)
+	{
 		if ( Util.isEmpty(ref) ) {
 			throw new InvalidParameterException("The reference URI cannot be null or empty.");
 		}
@@ -2836,9 +2838,9 @@ public class ITSEngine implements IProcessor, ITraversal {
 		}
 		if ( elem1 == null ) {
 			// Entry not found
-			logger.warn("Cannot find standoff markup for '{}'", ref);
+			logger.warn("Cannot find standoff markup for '{}'", originalRef);
 			GenericAnnotation ann = addIssueItem(anns);
-			ann.setString(GenericAnnotationType.LQI_ISSUESREF, ref); // For information only
+			ann.setString(GenericAnnotationType.LQI_ISSUESREF, originalRef); // For information only
 			return anns;
 		}
 		
@@ -2849,7 +2851,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 			Element elem2 = (Element)items.item(i);
 			// Add the annotation to the set
 			GenericAnnotation ann = addIssueItem(anns);
-			ann.setString(GenericAnnotationType.LQI_ISSUESREF, ref); // For information only
+			ann.setString(GenericAnnotationType.LQI_ISSUESREF, originalRef); // For information only
 			// Gather the local information (never in HTML since if it's HTML it's inside a script)
 			String[] values = retrieveLocQualityIssueData(elem2, false, false);
 			if ( values[0] != null ) {
