@@ -32,6 +32,9 @@ import net.sf.okapi.common.IdGenerator;
 import net.sf.okapi.common.ListUtil;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.annotation.GenericAnnotation;
+import net.sf.okapi.common.annotation.GenericAnnotationType;
+import net.sf.okapi.common.annotation.GenericAnnotations;
 import net.sf.okapi.common.annotation.TermsAnnotation;
 import net.sf.okapi.common.encoder.EncoderContext;
 import net.sf.okapi.common.encoder.EncoderManager;
@@ -652,7 +655,6 @@ public abstract class ITSFilter implements IFilter {
 					}
 				}
 				else { // Already in extraction
-					//frag.append(TagType.OPENING, node.getLocalName(), buildStartTag(node));
 					addStartTagToFragment(node);
 				}
 				break;
@@ -904,6 +906,17 @@ public abstract class ITSFilter implements IFilter {
 		// Set term info
 		if ( terms != null ) {
 			tu.getSource().setAnnotation(terms);
+			
+//			// Term as a generic annotation
+//			GenericAnnotations anns = tu.getSource().getAnnotation(GenericAnnotations.class);
+//			if ( anns == null ) {
+//				// If there is no annotation yet, creates one
+//				anns = new GenericAnnotations();
+//				tu.getSource().setAnnotation(anns);
+//			}
+//			GenericAnnotation ann = anns.add(GenericAnnotationType.TERM);
+//			ann.setString(GenericAnnotationType.TERM_INFO, value)
+
 			terms = null; // Reset for next time
 		}
 

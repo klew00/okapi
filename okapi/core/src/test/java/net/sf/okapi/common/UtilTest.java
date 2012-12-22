@@ -391,6 +391,14 @@ public class UtilTest {
 		assertEquals((Long) 0L, Util.getValue(map, "three", 0L));
 		assertEquals((Long) 5L, Util.getValue(map, "three", 5L));
 	}
+
+	@Test
+	public void testFormatFloat () {
+		assertEquals("1.2", Util.formatFloat(1.2f));
+		assertEquals("1.01", Util.formatFloat(1.01f));
+		assertEquals("100", Util.formatFloat(100.0f));
+		assertEquals("0.1", Util.formatFloat(0.1f));
+	}
 	
 	@Test
 	public void testNormalizRange() {

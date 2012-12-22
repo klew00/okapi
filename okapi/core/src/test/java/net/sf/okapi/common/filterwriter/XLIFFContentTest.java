@@ -86,23 +86,17 @@ public class XLIFFContentTest {
 		assertEquals("<it id=\"1\" pos=\"open\">&lt;b1&gt;</it><it id=\"2\" pos=\"open\">&lt;b2&gt;</it><bpt id=\"3\">&lt;b2&gt;</bpt><ept id=\"3\">&lt;/b2&gt;</ept><it id=\"1\" pos=\"close\">&lt;/b1&gt;</it><it id=\"4\" pos=\"open\">&lt;b3&gt;</it><it id=\"2\" pos=\"close\">&lt;/b2&gt;</it><it id=\"4\" pos=\"close\">&lt;/b3&gt;</it>",
 			fmt.setContent(tf).toString(false));
 	}
-	
-//TEMPORARY test	
+
 	@Test
 	public void testDisambiguityAnnotation () {
 		GenericAnnotations anns = new GenericAnnotations();
 		GenericAnnotation ga = anns.add(GenericAnnotationType.DISAMB);
 		ga.setString(GenericAnnotationType.DISAMB_SOURCE, "src");
 		ga.setString(GenericAnnotationType.DISAMB_GRANULARITY, GenericAnnotationType.DISAMB_GRANULARITY_ENTITY);
-		TextFragment tf = new TextFragment();
-		tf.append("Before ");
-		tf.append(TagType.OPENING, GenericAnnotationType.GENERIC, anns);
-		tf.append("the span");
-		tf.append(TagType.CLOSING, GenericAnnotationType.GENERIC, anns);
-		tf.append(" after.");
-		assertEquals("Before <mrk mtype=\"x-its-disambiguation\"><g id=\"1\">the span</g></mrk> after.",
+		TextFragment tf = new TextFragment("Before the span after.");
+		tf.annotate(7, 15, GenericAnnotationType.GENERIC, anns);
+		assertEquals("Before <mrk mtype=\"x-its\" its:disambigSource=\"src\">the span</mrk> after.",
 			fmt.setContent(tf).toString(true));
-		
 	}
 	
 	private TextFragment createTextFragment () {

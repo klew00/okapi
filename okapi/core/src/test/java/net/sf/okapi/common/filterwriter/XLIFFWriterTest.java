@@ -26,11 +26,16 @@ import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 
+import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.TestUtil;
+import net.sf.okapi.common.annotation.GenericAnnotation;
+import net.sf.okapi.common.annotation.GenericAnnotationType;
+import net.sf.okapi.common.annotation.GenericAnnotations;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.TextContainer;
-import net.sf.okapi.common.resource.ITextUnit;
+import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.resource.TextUnit;
 
@@ -61,7 +66,7 @@ public class XLIFFWriterTest {
 		
 		String result = readFile(root+"out.xlf");
 		assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-			+ "<xliff version=\"1.2\" xmlns=\"urn:oasis:names:tc:xliff:document:1.2\" xmlns:okp=\"okapi-framework:xliff-extensions\">\n"
+			+ "<xliff version=\"1.2\" xmlns=\"urn:oasis:names:tc:xliff:document:1.2\" xmlns:okp=\"okapi-framework:xliff-extensions\" xmlns:its=\"http://www.w3.org/2005/11/its\">\n"
 			+ "<file original=\"unknown\" source-language=\"en\" datatype=\"x-undefined\">\n"
 			+ "<body>\n</body>\n</file>\n</xliff>\n", result);
 	}
@@ -75,7 +80,7 @@ public class XLIFFWriterTest {
 		
 		String result = readFile(root+"out.xlf");
 		assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-			+ "<xliff version=\"1.2\" xmlns=\"urn:oasis:names:tc:xliff:document:1.2\" xmlns:okp=\"okapi-framework:xliff-extensions\">\n"
+			+ "<xliff version=\"1.2\" xmlns=\"urn:oasis:names:tc:xliff:document:1.2\" xmlns:okp=\"okapi-framework:xliff-extensions\" xmlns:its=\"http://www.w3.org/2005/11/its\">\n"
 			+ "<file original=\"original.ext\" source-language=\"en\" datatype=\"x-undefined\">\n"
 			+ "<body>\n</body>\n</file>\n</xliff>\n", result);
 	}
@@ -91,7 +96,7 @@ public class XLIFFWriterTest {
 		
 		String result = readFile(root+"out.xlf");
 		assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-			+ "<xliff version=\"1.2\" xmlns=\"urn:oasis:names:tc:xliff:document:1.2\" xmlns:okp=\"okapi-framework:xliff-extensions\">\n"
+			+ "<xliff version=\"1.2\" xmlns=\"urn:oasis:names:tc:xliff:document:1.2\" xmlns:okp=\"okapi-framework:xliff-extensions\" xmlns:its=\"http://www.w3.org/2005/11/its\">\n"
 			+ "<file original=\"unknown\" source-language=\"en\" datatype=\"x-undefined\">\n"
 			+ "<header><phase-group phase-name=\"a\" process-name=\"b\"/></header>\n"
 			+ "<body>\n</body>\n</file>\n</xliff>\n", result);
@@ -108,11 +113,62 @@ public class XLIFFWriterTest {
 
 		String result = readFile(root+"out.xlf");
 		assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-			+ "<xliff version=\"1.2\" xmlns=\"urn:oasis:names:tc:xliff:document:1.2\" xmlns:okp=\"okapi-framework:xliff-extensions\">\n"
+			+ "<xliff version=\"1.2\" xmlns=\"urn:oasis:names:tc:xliff:document:1.2\" xmlns:okp=\"okapi-framework:xliff-extensions\" xmlns:its=\"http://www.w3.org/2005/11/its\">\n"
 			+ "<file original=\"original.ext\" source-language=\"en\" datatype=\"x-undefined\">\n"
 			+ "<body>\n"
 			+ "<trans-unit id=\"tu1\">\n"
 			+ "<source xml:lang=\"en\">src1 with &lt;></source>\n"
+			+ "</trans-unit>\n"
+			+ "</body>\n</file>\n</xliff>\n", result);
+	}
+
+	@Test
+	public void testAnnotations ()
+		throws IOException
+	{
+		writer.create(root+"out.xlf", null, locEN, locFR, null, "original.ext", null);
+		writer.writeStartFile(null, null, null);
+		ITextUnit tu = new TextUnit("tu1");
+		TextFragment tf = tu.getSource().getFirstSegment().getContent();
+		tf.append("t1 t2");
+		GenericAnnotations anns = new GenericAnnotations();
+		GenericAnnotation ann = anns.add(GenericAnnotationType.LQI);
+		ann.setString(GenericAnnotationType.LQI_COMMENT, "rem1");
+		ann.setBoolean(GenericAnnotationType.LQI_ENABLED, false);
+		ann.setString(GenericAnnotationType.LQI_PROFILEREF, "uri");
+		ann = anns.add(GenericAnnotationType.LQI);
+		ann.setString(GenericAnnotationType.LQI_COMMENT, "rem2");
+		ann.setBoolean(GenericAnnotationType.LQI_ENABLED, true);
+		ann.setFloat(GenericAnnotationType.LQI_SEVERITY, 12.34f);
+		ann.setString(GenericAnnotationType.LQI_TYPE, "grammar");
+		tf.annotate(0, 2, GenericAnnotationType.GENERIC, anns);
+		tf = tu.createTarget(locFR, false, IResource.COPY_ALL).getFirstContent();
+		ann = ann.clone();
+		ann.setString(GenericAnnotationType.LQI_COMMENT, "rem3");
+		ann.setFloat(GenericAnnotationType.LQI_SEVERITY, 99f);
+		anns = new GenericAnnotations();
+		anns.add(ann);
+		tf.annotate(3+4, 5+4, GenericAnnotationType.GENERIC, anns); // +4 is for the markers of the previous annotation
+		writer.writeTextUnit(tu);
+		writer.writeEndFile();
+		writer.close();
+		
+		String result = readFile(root+"out.xlf");
+		assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+			+ "<xliff version=\"1.2\" xmlns=\"urn:oasis:names:tc:xliff:document:1.2\" xmlns:okp=\"okapi-framework:xliff-extensions\" xmlns:its=\"http://www.w3.org/2005/11/its\">\n"
+			+ "<file original=\"unknown\" source-language=\"en\" target-language=\"fr\" datatype=\"x-undefined\">\n"
+			+ "<body>\n<trans-unit id=\"tu1\">\n"
+			+ "<source xml:lang=\"en\"><mrk mtype=\"x-its\" its:locQualityIssuesRef=\"#lqi1\">t1</mrk> t2</source>\n"
+			+ "<target xml:lang=\"fr\"><mrk mtype=\"x-its\" its:locQualityIssuesRef=\"#lqi2\">t1</mrk> "
+			+ "<mrk mtype=\"x-its\" its:locQualityIssueComment=\"rem3\" its:locQualityIssueSeverity=\"99\" its:locQualityIssueType=\"grammar\">t2</mrk></target>\n"
+			+ "<its:locQualityIssues xml:id=\"lqi1\">\n"
+			+ "<its:locQualityIssue locQualityIssueComment=\"rem1\" locQualityIssueEnabled=\"no\" locQualityIssueProfileRef=\"uri\"></its:locQualityIssue>\n"
+			+ "<its:locQualityIssue locQualityIssueComment=\"rem2\" locQualityIssueSeverity=\"12.34\" locQualityIssueType=\"grammar\"></its:locQualityIssue>\n"
+			+ "</its:locQualityIssues>\n"
+			+ "<its:locQualityIssues xml:id=\"lqi2\">\n"
+			+ "<its:locQualityIssue locQualityIssueComment=\"rem1\" locQualityIssueEnabled=\"no\" locQualityIssueProfileRef=\"uri\"></its:locQualityIssue>\n"
+			+ "<its:locQualityIssue locQualityIssueComment=\"rem2\" locQualityIssueSeverity=\"12.34\" locQualityIssueType=\"grammar\"></its:locQualityIssue>\n"
+			+ "</its:locQualityIssues>\n"
 			+ "</trans-unit>\n"
 			+ "</body>\n</file>\n</xliff>\n", result);
 	}
@@ -132,7 +188,7 @@ public class XLIFFWriterTest {
 
 		String result = readFile(root+"out.xlf");
 		assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-			+ "<xliff version=\"1.2\" xmlns=\"urn:oasis:names:tc:xliff:document:1.2\" xmlns:okp=\"okapi-framework:xliff-extensions\">\n"
+			+ "<xliff version=\"1.2\" xmlns=\"urn:oasis:names:tc:xliff:document:1.2\" xmlns:okp=\"okapi-framework:xliff-extensions\" xmlns:its=\"http://www.w3.org/2005/11/its\">\n"
 			+ "<file original=\"original.ext\" source-language=\"en\" datatype=\"x-undefined\">\n"
 			+ "<body>\n"
 			+ "<trans-unit id=\"tu1\">\n"
@@ -157,7 +213,7 @@ public class XLIFFWriterTest {
 
 		String result = readFile(root+"out.xlf");
 		assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-			+ "<xliff version=\"1.2\" xmlns=\"urn:oasis:names:tc:xliff:document:1.2\" xmlns:okp=\"okapi-framework:xliff-extensions\">\n"
+			+ "<xliff version=\"1.2\" xmlns=\"urn:oasis:names:tc:xliff:document:1.2\" xmlns:okp=\"okapi-framework:xliff-extensions\" xmlns:its=\"http://www.w3.org/2005/11/its\">\n"
 			+ "<file original=\"original.ext\" source-language=\"en\" datatype=\"x-undefined\">\n"
 			+ "<body>\n"
 			+ "<trans-unit id=\"tu1\">\n"
@@ -178,7 +234,7 @@ public class XLIFFWriterTest {
 
 		String result = readFile(root+"out.xlf");
 		assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-			+ "<xliff version=\"1.2\" xmlns=\"urn:oasis:names:tc:xliff:document:1.2\" xmlns:okp=\"okapi-framework:xliff-extensions\">\n"
+			+ "<xliff version=\"1.2\" xmlns=\"urn:oasis:names:tc:xliff:document:1.2\" xmlns:okp=\"okapi-framework:xliff-extensions\" xmlns:its=\"http://www.w3.org/2005/11/its\">\n"
 			+ "<file original=\"original.ext\" source-language=\"en\" datatype=\"x-undefined\">\n"
 			+ "<body>\n"
 			+ "<trans-unit id=\"tu1\">\n"
@@ -199,7 +255,7 @@ public class XLIFFWriterTest {
 
 		String result = readFile(root+"out.xlf");
 		assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-			+ "<xliff version=\"1.2\" xmlns=\"urn:oasis:names:tc:xliff:document:1.2\" xmlns:okp=\"okapi-framework:xliff-extensions\">\n"
+			+ "<xliff version=\"1.2\" xmlns=\"urn:oasis:names:tc:xliff:document:1.2\" xmlns:okp=\"okapi-framework:xliff-extensions\" xmlns:its=\"http://www.w3.org/2005/11/its\">\n"
 			+ "<file original=\"original.ext\" source-language=\"en\" target-language=\"fr\" datatype=\"x-undefined\">\n"
 			+ "<body>\n"
 			+ "<trans-unit id=\"tu1\">\n"
@@ -221,7 +277,7 @@ public class XLIFFWriterTest {
 
 		String result = readFile(root+"out.xlf");
 		assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-			+ "<xliff version=\"1.2\" xmlns=\"urn:oasis:names:tc:xliff:document:1.2\" xmlns:okp=\"okapi-framework:xliff-extensions\">\n"
+			+ "<xliff version=\"1.2\" xmlns=\"urn:oasis:names:tc:xliff:document:1.2\" xmlns:okp=\"okapi-framework:xliff-extensions\" xmlns:its=\"http://www.w3.org/2005/11/its\">\n"
 			+ "<!--messageValue-->\n"
 			+ "<file original=\"original.ext\" source-language=\"en\" target-language=\"fr\" datatype=\"x-dtValue\">\n"
 			+ "<header><skl><external-file href=\"skel.skl\"></external-file></skl></header>\n"
@@ -246,7 +302,7 @@ public class XLIFFWriterTest {
 
 		String result = readFile(root+"out.xlf");
 		assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-			+ "<xliff version=\"1.2\" xmlns=\"urn:oasis:names:tc:xliff:document:1.2\" xmlns:okp=\"okapi-framework:xliff-extensions\">\n"
+			+ "<xliff version=\"1.2\" xmlns=\"urn:oasis:names:tc:xliff:document:1.2\" xmlns:okp=\"okapi-framework:xliff-extensions\" xmlns:its=\"http://www.w3.org/2005/11/its\">\n"
 			+ "<file original=\"original.ext\" source-language=\"en\" datatype=\"x-undefined\">\n"
 			+ "<body>\n"
 			+ "<trans-unit id=\"tu1\" xmlns:okp=\"okapi-framework:xliff-extensions\" okp:itsExternalResourceRef=\"http://example.com/res\" okp:itsDomain=\"dom1, dom2\">\n"

@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2010 by the Okapi Framework contributors
+  Copyright (C) 2010-2012 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -24,11 +24,13 @@ import java.util.List;
 
 /**
  * Provides a common way to generate sequential ID that are unique for a given root.
+ * The root can be null or empty.
  * <p>Each value generated is made of two main parts separated by a '-':
- * <ol><li>The hexadecimal representation of the hash code of the root.
+ * <ol><li>The hexadecimal representation of the hash code of the root (if a root exists)
  * <li>The sequential identifier starting at 1, with a fixed prefix if one was provided.  
  */
 public class IdGenerator {
+	
 	public static final String START_DOCUMENT = "sd";
 	public static final String END_DOCUMENT = "ed";
 	public static final String START_GROUP = "sg";
@@ -49,7 +51,7 @@ public class IdGenerator {
 	/**
 	 * Creates a generator with a given root and no prefix.
 	 * @param root
-	 * 	the root to use (case-sensitive, can be null)
+	 * 	the root to use (case-sensitive, can be null or empty)
 	 */
 	public IdGenerator (String root) {
 		create(root, "");

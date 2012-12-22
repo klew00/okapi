@@ -29,6 +29,11 @@ public class GenericAnnotationType {
 	 * Label to use for a generic annotation set (e.g. on an inline code).
 	 */
 	public static final String GENERIC = "generic";
+	
+	/**
+	 * Code type to use for annotation-only markers.
+	 */
+	public static final String ANNOTATION_ONLY_MARKER = "_annotation_";
 
 	/**
 	 * Annotation identifier for the

@@ -133,6 +133,16 @@ public class GenericAnnotations extends InlineAnnotation {
 		return ann;
 	}
 	
+	/**
+	 * Adds an existing annotation to this list.
+	 * @param annotation the annotation to add.
+	 * @return the annotation that was added.
+	 */
+	public GenericAnnotation add (GenericAnnotation annotation) {
+		if ( list == null ) list = new ArrayList<GenericAnnotation>();
+		list.add(annotation);
+		return annotation;
+	}
 	
 	public void addAll (GenericAnnotations annotations) {
 		if ( annotations == null ) return;
@@ -141,6 +151,14 @@ public class GenericAnnotations extends InlineAnnotation {
 		if ( list == null ) list = new ArrayList<GenericAnnotation>();
 		// Add all annotations of the given annotation set
 		list.addAll(annotations.getAllAnnotations());
+	}
+	
+	public void addAll (List<GenericAnnotation> newItems) {
+		if ( Util.isEmpty(newItems) ) return;
+		// There is something to add: make sure we have a place where to copy
+		if ( list == null ) list = new ArrayList<GenericAnnotation>();
+		// Add all annotations of the given list
+		list.addAll(newItems);
 	}
 	
 	@Override

@@ -304,7 +304,7 @@ public class Main {
 			if ( out1 != null ) writer.print(String.format("\tterm=\"%s\"", escape(out1)));
 			Float outF1 = trav.getTermConfidence(attr);
 			if ( outF1 != null ) {
-				writer.print(String.format("\ttermConfidence=\"%s\"", formatFloat(outF1)));
+				writer.print(String.format("\ttermConfidence=\"%s\"", Util.formatFloat(outF1)));
 			}
 			out1 = trav.getTermInfo(attr);
 			if ( out1 != null ){
@@ -365,7 +365,7 @@ public class Main {
 			}
 			Float outFloat = trav.getDisambigConfidence(attr);
 			if ( outFloat != null ) {
-				writer.print(String.format("\tdisambigConfidence=\"%s\"", formatFloat(outFloat)));
+				writer.print(String.format("\tdisambigConfidence=\"%s\"", Util.formatFloat(outFloat)));
 			}
 			out1 = trav.getDisambigGranularity(attr);
 			if ( out1 != null ) writer.print(String.format("\tdisambigGranularity=\"%s\"", escape(out1)));
@@ -451,10 +451,10 @@ public class Main {
 				Float outFloat1 = trav.getLocQualityIssueSeverity(attr, i);
 				if ( outFloat1 != null ) {
 					if ( standoff ) {
-						writer.print(String.format("\tlocQualityIssueSeverity[%d]=\"%s\"", i+1, formatFloat(outFloat1)));
+						writer.print(String.format("\tlocQualityIssueSeverity[%d]=\"%s\"", i+1, Util.formatFloat(outFloat1)));
 					}
 					else {
-						writer.print(String.format("\tlocQualityIssueSeverity=\"%s\"", formatFloat(outFloat1)));
+						writer.print(String.format("\tlocQualityIssueSeverity=\"%s\"", Util.formatFloat(outFloat1)));
 					}
 				}
 				// Type
@@ -476,11 +476,11 @@ public class Main {
 			}
 			Float outF1 = trav.getLocQualityRatingScore(attr);
 			if ( outF1 != null ) {
-				writer.print(String.format("\tlocQualityRatingScore=\"%s\"", formatFloat(outF1)));
+				writer.print(String.format("\tlocQualityRatingScore=\"%s\"", Util.formatFloat(outF1)));
 			}
 			outF1 = trav.getLocQualityRatingScoreThreshold(attr);
 			if ( outF1 != null ) {
-				writer.print(String.format("\tlocQualityRatingScoreThreshold=\"%s\"", formatFloat(outF1)));
+				writer.print(String.format("\tlocQualityRatingScoreThreshold=\"%s\"", Util.formatFloat(outF1)));
 			}
 			Integer outInt = trav.getLocQualityRatingVote(attr);
 			if ( outInt != null ) {
@@ -498,7 +498,7 @@ public class Main {
 			}
 			Float outFloat1 = trav.getMtConfidence(attr);
 			if ( outFloat1 != null ) {
-				writer.print(String.format("\tmtConfidence=\"%s\"", formatFloat(outFloat1)));
+				writer.print(String.format("\tmtConfidence=\"%s\"", Util.formatFloat(outFloat1)));
 			}
 		}
 		else if ( dc.equals(DC_STORAGESIZE) ) {
@@ -564,17 +564,4 @@ public class Main {
 		return itsEng;
 	}
 
-	static private String formatFloat (Float value) {
-		if ( value == null ) return "";
-		String tmp = String.format("%f", value);
-		// Remove trailing zeros
-		while (( tmp.length() > 1 ) && ( tmp.charAt(tmp.length()-1) == '0' )) {
-			tmp = tmp.substring(0, tmp.length()-1);
-		}
-		// Remove ending period if it's the last character
-		if ( tmp.charAt(tmp.length()-1) == '.' ) {
-			tmp = tmp.substring(0, tmp.length()-1);
-		}
-		return tmp;
-	}
 }

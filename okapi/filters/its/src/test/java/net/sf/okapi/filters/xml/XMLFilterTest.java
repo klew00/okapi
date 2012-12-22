@@ -977,7 +977,18 @@ public class XMLFilterTest {
 		ArrayList<Event> list = getEvents(snippet);
 		ITextUnit tu = FilterTestDriver.getTextUnit(list, 1);
 		assertNotNull(tu);
-//TODO: test annottaion when it's implemented		
+//TODO: test annotation when it's implemented		
+	}
+
+	@Test
+	public void testTerms () {
+		String snippet = "<?xml version=\"1.0\"?>\n"
+			+ "<doc its:version=\"1.0\" xmlns:its=\"http://www.w3.org/2005/11/its\">"
+			+ "<p>One <its:span term='yes' termInfo='info1'>term</its:span>, and more.</p></doc>";
+		ArrayList<Event> list = getEvents(snippet);
+		ITextUnit tu = FilterTestDriver.getTextUnit(list, 1);
+		assertNotNull(tu);
+//TODO: test annotation when it's implemented
 	}
 	
 	@Test

@@ -28,6 +28,9 @@ import net.sf.okapi.common.Util;
 import net.sf.okapi.common.XMLWriter;
 import net.sf.okapi.common.annotation.AltTranslation;
 import net.sf.okapi.common.annotation.AltTranslationsAnnotation;
+import net.sf.okapi.common.annotation.GenericAnnotation;
+import net.sf.okapi.common.annotation.GenericAnnotationType;
+import net.sf.okapi.common.annotation.GenericAnnotations;
 import net.sf.okapi.common.annotation.TermsAnnotation;
 import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.exceptions.OkapiUnsupportedEncodingException;
@@ -202,6 +205,7 @@ public class XLIFFWriter implements IFilterWriter {
 		writer.writeAttributeString("version", "1.2");
 		writer.writeAttributeString("xmlns", NS_XLIFF12);
 		writer.writeAttributeString("xmlns:okp", NS_XLIFFOKAPI); 
+		writer.writeAttributeString("xmlns:its", NS_ITS20); 
 
 		if ( !Util.isEmpty(message) ) {
 			writer.writeLineBreak();
@@ -455,13 +459,11 @@ public class XLIFFWriter implements IFilterWriter {
 		if ( tu.hasProperty(Property.ITS_STORAGESIZE) ) {
 			String[] values = tu.getProperty(Property.ITS_STORAGESIZE).getValue().split("\t", -1);
 			writer.writeAttributeString("maxbytes", values[0]);
-			writer.writeAttributeString("xmlns:its", NS_ITS20);
 			writer.writeAttributeString("its:storageSizeEncoding", values[1]);
 			writer.writeAttributeString("its:lineBreakType", values[2]);
 		}
 		if ( tu.hasProperty(Property.ITS_ALLOWEDCHARACTERS) ) {
 			writer.writeAttributeString("its:allowedCharacters", tu.getProperty(Property.ITS_ALLOWEDCHARACTERS).getValue());
-			writer.writeAttributeString("xmlns:its", NS_ITS20);
 		}
 		if ( tu.hasProperty(Property.ITS_DOMAIN) ) {
 			writer.writeAttributeString("okp:itsDomain", tu.getProperty(Property.ITS_DOMAIN).getValue());
@@ -479,16 +481,19 @@ public class XLIFFWriter implements IFilterWriter {
 		writer.writeAttributeString("xml:lang", srcLoc.toBCP47());
 		// Write full source content (always without segments markers
 		writer.writeRawXML(xliffCont.toSegmentedString(tc, 0, escapeGt, false, placeholderMode));
+		GenericAnnotations srcStandoff = xliffCont.getStandoff();
 		writer.writeEndElementLineBreak(); // source
 		// Write segmented source (with markers) if needed
 		if ( tc.hasBeenSegmented() ) {
 			writer.writeStartElement("seg-source");
 			writer.writeRawXML(xliffCont.toSegmentedString(tc, 0, escapeGt, true, placeholderMode));
+			// No repeat of the standoff
 			writer.writeEndElementLineBreak(); // seg-source
 		}
 
 		//--- Write the target
 		
+		GenericAnnotations trgStandoff = null;
 		if ( trgLoc != null ) {
 			// At this point tc contains the source
 			// Do we have an available target to use instead?
@@ -506,6 +511,7 @@ public class XLIFFWriter implements IFilterWriter {
 				writer.writeAttributeString("xml:lang", trgLoc.toBCP47());
 				// Now tc hold the content to write. Write it with or without marks
 				writer.writeRawXML(xliffCont.toSegmentedString(tc, 0, escapeGt, tc.hasBeenSegmented(), placeholderMode));
+				trgStandoff = xliffCont.getStandoff();
 				writer.writeEndElementLineBreak(); // target
 			}
 
@@ -535,6 +541,13 @@ public class XLIFFWriter implements IFilterWriter {
 			writer.writeAttributeString("from", "translator");
 			writer.writeString(tu.getProperty(Property.TRANSNOTE).getValue());
 			writer.writeEndElementLineBreak(); // note
+		}
+		
+		if ( srcStandoff != null ) {
+			writeStandoffLQI(srcStandoff);
+		}
+		if ( trgStandoff != null ) {
+			writeStandoffLQI(trgStandoff);
 		}
 		
 		// Temporary output for terms annotation
@@ -719,4 +732,36 @@ public class XLIFFWriter implements IFilterWriter {
 	private void processTextUnit (ITextUnit tu) {
 		writeTextUnit(tu, null);
 	}
+
+	private void writeStandoffLQI (GenericAnnotations anns) {
+		writer.writeStartElement("its:locQualityIssues");
+		writer.writeAttributeString("xml:id", anns.getData());
+		writer.writeLineBreak();
+		for ( GenericAnnotation ann : anns.getAnnotations(GenericAnnotationType.LQI) ) {
+			writer.writeStartElement("its:locQualityIssue");
+			String strVal = ann.getString(GenericAnnotationType.LQI_COMMENT);
+			if ( strVal != null ) {
+				writer.writeAttributeString("locQualityIssueComment", strVal);
+			}
+			Boolean booVal = ann.getBoolean(GenericAnnotationType.LQI_ENABLED);
+			if (( booVal != null ) && !booVal ) {
+				writer.writeAttributeString("locQualityIssueEnabled", "no");
+			}
+			strVal = ann.getString(GenericAnnotationType.LQI_PROFILEREF);
+			if ( strVal != null ) {
+				writer.writeAttributeString("locQualityIssueProfileRef", strVal);
+			}
+			Float floVal = ann.getFloat(GenericAnnotationType.LQI_SEVERITY);
+			if ( floVal != null ) {
+				writer.writeAttributeString("locQualityIssueSeverity", Util.formatFloat(floVal));
+			}
+			strVal = ann.getString(GenericAnnotationType.LQI_TYPE);
+			if ( strVal != null ) {
+				writer.writeAttributeString("locQualityIssueType", strVal);
+			}
+			writer.writeEndElementLineBreak();
+		}
+		writer.writeEndElementLineBreak(); // 
+	}
+		
 }

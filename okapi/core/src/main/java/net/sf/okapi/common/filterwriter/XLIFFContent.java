@@ -23,6 +23,7 @@ package net.sf.okapi.common.filterwriter;
 import java.nio.charset.CharsetEncoder;
 import java.util.List;
 
+import net.sf.okapi.common.IdGenerator;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.annotation.GenericAnnotation;
 import net.sf.okapi.common.annotation.GenericAnnotationType;
@@ -31,18 +32,25 @@ import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
-import net.sf.okapi.common.resource.TextPart;
 import net.sf.okapi.common.resource.TextFragment.TagType;
+import net.sf.okapi.common.resource.TextPart;
 
 /**
  * Handles the conversion between a coded text object and XLIFF.
+ * In some case this class may output ITS attributes.
+ * It assumes the namespace for ITS is declared and the corresponding prefix is 'its'.
  */
 public class XLIFFContent {
 
+	public static final String ITS_PREFIX = "its:";
+	public static final String REF_PREFIX = "REF:";
+	
 	private String codedText;
 	private List<Code> codes;
 	private XLIFFContent innerContent;
 	private CharsetEncoder chsEnc;
+	private GenericAnnotations standoff;
+	private IdGenerator idGen;
 	
 	/**
 	 * Creates a new XLIFFContent object without any content.
@@ -100,6 +108,10 @@ public class XLIFFContent {
 
 	/**
 	 * Generates an XLIFF string from the content.
+	 * <p>In some cases, a reference to an ITS standoff element may be generated.
+	 * Use {@link #getStandoff()} to get the standoff information that needs to be output
+	 * along with the inline reference. Each call to {@link #toString(int, boolean, boolean, boolean)} resets 
+	 * the standoff information returned by {@link #getStandoff()}.
 	 * @param quoteMode 0=no quote escaped, 1=apos and quot, 2=#39 and quot,
 	 * and 3=quot only.
 	 * @param escapeGT True to always escape '>' to gt
@@ -116,6 +128,7 @@ public class XLIFFContent {
 		StringBuilder tmp = new StringBuilder();
 		int index;
 		Code code;
+		standoff = null;
 		for ( int i=0; i<codedText.length(); i++ ) {
 			switch ( codedText.codePointAt(i) ) {
 			case TextFragment.MARKER_OPENING:
@@ -129,11 +142,11 @@ public class XLIFFContent {
 						tmp.append("<mrk mtype=\"protected\">");
 					}
 					else if ( code.hasAnnotation(GenericAnnotationType.GENERIC) ) { // Temporary code
-						GenericAnnotations anns = (GenericAnnotations)code.getAnnotation(GenericAnnotationType.GENERIC);
-						List<GenericAnnotation> lga = anns.getAnnotations(GenericAnnotationType.DISAMB);
-						tmp.append("<mrk mtype=\"x-its-disambiguation\">");
+						tmp.append("<mrk mtype=\"x-its\"");
+						outputITSAttributes((GenericAnnotations)code.getAnnotation(GenericAnnotationType.GENERIC), quoteMode, escapeGT, tmp);
+						tmp.append(">");
 					}
-					//if ( code.hasData() ) {
+					if ( !code.getType().equals(GenericAnnotationType.ANNOTATION_ONLY_MARKER) ) {
 						if ( gMode ) {
 							tmp.append(String.format("<g id=\"%d\">", code.getId()));
 						}
@@ -142,7 +155,7 @@ public class XLIFFContent {
 							tmp.append(Util.escapeToXML(code.toString(), quoteMode, escapeGT, chsEnc));
 							tmp.append("</bpt>");
 						}
-					//}
+					}
 				}
 				break;
 			case TextFragment.MARKER_CLOSING:
@@ -152,17 +165,17 @@ public class XLIFFContent {
 					tmp.append(code.toString());
 				}
 				else {
-					if ( gMode ) {
-						tmp.append("</g>");
-					}
-					else {
-						tmp.append(String.format("<ept id=\"%d\">", code.getId())); //TODO: escape unsupported chars
-						tmp.append(Util.escapeToXML(code.toString(), quoteMode, escapeGT, chsEnc));
-						tmp.append("</ept>");
+					if ( !code.getType().equals(GenericAnnotationType.ANNOTATION_ONLY_MARKER) ) {
+						if ( gMode ) {
+							tmp.append("</g>");
+						}
+						else {
+							tmp.append(String.format("<ept id=\"%d\">", code.getId())); //TODO: escape unsupported chars
+							tmp.append(Util.escapeToXML(code.toString(), quoteMode, escapeGT, chsEnc));
+							tmp.append("</ept>");
+						}
 					}
 					if ( code.hasAnnotation(GenericAnnotationType.GENERIC) ) { // Temporary code
-						GenericAnnotations anns = (GenericAnnotations)code.getAnnotation(GenericAnnotationType.GENERIC);
-						List<GenericAnnotation> lga = anns.getAnnotations(GenericAnnotationType.DISAMB);
 						tmp.append("</mrk>");
 					}
 					else if ( code.hasAnnotation("protected") ) {
@@ -302,11 +315,116 @@ public class XLIFFContent {
 			// Fragment
 			innerContent.setContent(part.text);
 			tmp.append(innerContent.toString(quoteMode, escapeGT, false, gMode));
+			standoff = innerContent.getStandoff(); // Trickle up the standoff information too.
 			if ( withMarkers && part.isSegment() && container.hasBeenSegmented() ) {
 				if ( withMarkers ) tmp.append("</mrk>");
 			}
 		}
 		return tmp.toString();
+	}
+
+	/**
+	 * Gets the standoff information for a possible list of annotations.
+	 * @return null if there are no standoff markup to generate, or a {@link GenericAnnotations} object with the
+	 * list of the annotation to put in the standoff element. The data of the object is the id that is used
+	 * in the local markup to point to this standoff markup.
+	 */
+	public GenericAnnotations getStandoff () {
+		return standoff;
+	}
+	
+	private void outputITSAttributes (GenericAnnotations anns,
+		int quoteMode,
+		boolean escapeGT,
+		StringBuilder output)
+	{
+		for ( GenericAnnotation ann : anns.getAllAnnotations() ) {
+			// AnnotatorsRef
+			//TODO
+			// Disambiguation
+			if ( ann.getType().equals(GenericAnnotationType.DISAMB) ) {
+				printITSStringAttribute(ann.getString(GenericAnnotationType.DISAMB_CLASS), "disambigClass", quoteMode, escapeGT, output);
+				printITSFloatAttribute(ann.getFloat(GenericAnnotationType.DISAMB_CONFIDENCE), "disambigConfidence", output);
+				//TODO: needs annotatorsRef if confidence is there
+				String value = ann.getString(GenericAnnotationType.DISAMB_GRANULARITY);
+				if ( !value.equals(GenericAnnotationType.DISAMB_GRANULARITY_ENTITY) ) { // Output only the non-default value
+					printITSStringAttribute(value, "disambigGranularity", quoteMode, escapeGT, output);
+				}
+				printITSStringAttribute(ann.getString(GenericAnnotationType.DISAMB_IDENT), "disambigIdent", quoteMode, escapeGT, output);
+				printITSStringAttribute(ann.getString(GenericAnnotationType.DISAMB_SOURCE), "disambigSource", quoteMode, escapeGT, output);
+			}
+			
+			// Terminology
+			else if ( ann.getType().equals(GenericAnnotationType.TERM) ) {
+				printITSFloatAttribute(ann.getFloat(GenericAnnotationType.TERM_CONFIDENCE), "termConfidence", output);
+				printITSFloatAttribute(ann.getFloat(GenericAnnotationType.TERM_INFO), "termInfo", output);
+			}
+			
+			// Localization Quality issue
+			else if ( ann.getType().equals(GenericAnnotationType.LQI) ) {
+				continue; // LQI are dealt with separately
+			}
+		}
+		
+		// Deal with LQI information
+		List<GenericAnnotation> list = anns.getAnnotations(GenericAnnotationType.LQI);
+		if ( list.size() == 1 ) {
+			// If there is only one QI entry: we output it locally
+			GenericAnnotation ann = list.get(0);
+			printITSStringAttribute(ann.getString(GenericAnnotationType.LQI_COMMENT), "locQualityIssueComment", quoteMode, escapeGT, output);
+			Boolean booVal = ann.getBoolean(GenericAnnotationType.LQI_ENABLED);
+			if (( booVal != null ) && !booVal ) { // Output only non-default value (if one is set)
+				printITSBooleanAttribute(booVal, "locQualityIssueEnabled", output);
+			}
+			printITSStringAttribute(ann.getString(GenericAnnotationType.LQI_PROFILEREF), "locQualityIssueProfile", quoteMode, escapeGT, output);
+			printITSFloatAttribute(ann.getFloat(GenericAnnotationType.LQI_SEVERITY), "locQualityIssueSeverity", output);
+			printITSStringAttribute(ann.getString(GenericAnnotationType.LQI_TYPE), "locQualityIssueType", quoteMode, escapeGT, output);
+		}
+		else if ( list.size() > 1 ) {
+			// If there are 2 or more: the items need to be output as standoff markup.
+			// This generates the reference and creates initializes the standoff data.
+			// Call getStandoff() to get the items to output in the standoff element.
+			if ( idGen == null ) idGen =new IdGenerator(null);
+			String refId = idGen.createId("lqi");
+			output.append(" "+ITS_PREFIX+"locQualityIssuesRef=\"#"+refId+"\"");
+			standoff = new GenericAnnotations();
+			standoff.setData(refId);
+			standoff.addAll(list);
+		}
+	}
+	
+	private void printITSStringAttribute (String value,
+		String attrName,
+		int quoteMode,
+		boolean escapeGT,
+		StringBuilder output)
+	{
+		if ( value != null ) {
+			String ref = "";
+			if ( value.startsWith(REF_PREFIX) ) {
+				ref = "Ref";
+				value = value.substring(REF_PREFIX.length());
+			}
+			output.append(" "+ITS_PREFIX+attrName+ref+"=\""+Util.escapeToXML(value, quoteMode, escapeGT, chsEnc)+"\"");
+		}
+	}
+
+	private void printITSFloatAttribute (Float value,
+		String attrName,
+		StringBuilder output)
+	{
+		if ( value != null ) {
+			output.append(" "+ITS_PREFIX+attrName+"=\""+Util.formatFloat(value)+"\"");
+		}
+	}
+
+	private void printITSBooleanAttribute (Boolean value,
+		String attrName,
+		StringBuilder output)
+	{
+		if ( value != null ) {
+			output.append(" "+ITS_PREFIX+attrName+"=\""+(value ? "yes" : "no")+"\"");
+		}
 	}
 
 }
