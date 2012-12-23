@@ -316,7 +316,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 						seg = tc.getSegments().get(segId);
 					}
 					if (seg == null) {
-						logger.warn(String.format("Segment reference '%s' not found.", (String)marker[0]));
+						logger.warn("Segment reference '{}' not found.", (String)marker[0]);
 						return "-ERR:INVALID-SEGMENT-REF-";
 					}
 					
@@ -358,7 +358,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 			int end = (Integer) marker[2];
 			
 			if ( ref == null ) {
-				logger.warn(String.format("Reference '%s' not found.", (String)marker[0]));
+				logger.warn("Reference '{}' not found.", (String)marker[0]);
 				refData = "-ERR:REF-NOT-FOUND-";
 			}
 			else if ( ref instanceof ITextUnit ) {
@@ -384,7 +384,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 		EncoderContext context)
 	{
 		if ( ref == null ) {
-			logger.warn(String.format("Null reference for '%s'.", propName));
+			logger.warn("Null reference for '{}'.", propName);
 			return "-ERR:NULL-REF-";
 		}
 		if ( propName != null ) {
@@ -399,7 +399,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 		if ( ref instanceof StorageList ) {
 			return getString((StorageList)ref, locToUse, context);
 		}
-		logger.warn(String.format("Invalid reference type for '%s'.", propName));
+		logger.warn("Invalid reference type for '{}'.", propName);
 		return "-ERR:INVALID-REFTYPE-";
 	}
 
@@ -540,8 +540,8 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 				Segment srcSeg = srcCont.getSegments().get(trgSeg.id);
 				if ( srcSeg == null ) {
 					// A target segment without a corresponding source: give warning
-					logger.warn(String.format("No source segment found for target segment id='%s':\n\"%s\".",
-						trgSeg.id, trgFrag.toText()));
+					logger.warn("No source segment found for target segment id='{}':\n\"{}\".",
+						trgSeg.id, trgFrag.toText());
 				}
 				else {
 					if ( trgFrag.isEmpty() && !srcSeg.text.isEmpty() ) {
@@ -1001,7 +1001,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 			String propName = (String)marker[3];
 			IReferenceable ref = getReference((String)marker[0]);
 			if ( ref == null ) {
-				logger.warn(String.format("Reference '%s' not found.", (String)marker[0]));
+				logger.warn("Reference '{}' not found.", (String)marker[0]);
 				tmp.replace(start, end, "-ERR:REF-NOT-FOUND-");
 			}
 			else if ( propName != null ) {
@@ -1096,13 +1096,13 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 		}
 		// Check the property we got
 		if ( prop == null ) {
-			logger.warn(String.format("Property '%s' not found.", name));
+			logger.warn("Property '{}' not found.", name);
 			return "-ERR:PROP-NOT-FOUND-";
 		}
 		// Else process the value
 		String value = prop.getValue();
 		if ( value == null ) {
-			logger.warn(String.format("Property value for '%s' is null.", name));
+			logger.warn("Property value for '{}' is null.", name);
 			return "-ERR:PROP-VALUE-NULL-";
 		}
 		
