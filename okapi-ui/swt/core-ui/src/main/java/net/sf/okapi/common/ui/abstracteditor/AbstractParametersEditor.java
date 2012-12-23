@@ -559,42 +559,42 @@ public abstract class AbstractParametersEditor implements IParametersEditor, Lis
 
 			result = false;
 			//e.printStackTrace();
-			logger.debug("Page instantiation failed: " + e.getMessage());
+			logger.debug("Page instantiation failed: {}", e.getMessage());
 			return null;
 
 		} catch (IllegalAccessException e) {
 
 			result = false;
 			//e.printStackTrace();
-			logger.debug("Page instantiation failed: " + e.getMessage());
+			logger.debug("Page instantiation failed: {}", e.getMessage());
 			return null;
 
 		} catch (SecurityException e) {
 
 			result = false;
 			//e.printStackTrace();
-			logger.debug("Page instantiation failed: " + e.getMessage());
+			logger.debug("Page instantiation failed: {}", e.getMessage());
 			return null;
 
 		} catch (NoSuchMethodException e) {
 
 			result = false;
 			//e.printStackTrace();
-			logger.debug("Page instantiation failed: " + e.getMessage());
+			logger.debug("Page instantiation failed: {}", e.getMessage());
 			return null;
 
 		} catch (IllegalArgumentException e) {
 
 			result = false;
 			//e.printStackTrace();
-			logger.debug("Page instantiation failed: " + e.getMessage());
+			logger.debug("Page instantiation failed: {}", e.getMessage());
 			return null;
 
 		} catch (InvocationTargetException e) {
 
 			result = false;
 			//e.printStackTrace();
-			logger.debug("Page instantiation failed: " + e.getMessage());
+			logger.debug("Page instantiation failed: {}", e.getMessage());
 			return null;
 		}
 	}

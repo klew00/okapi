@@ -92,7 +92,7 @@ public class Utility extends BaseUtility implements ISimpleUtility {
 		merger.initialize(manifest);
 		
 		// One target language only, and take it from the manifest
-		logger.info("Target: " + manifest.getTargetLanguage());
+		logger.info("Target: {}", manifest.getTargetLanguage());
 		
 		// Process each selected document in the manifest
 		Iterator<Integer> iter = manifest.getItems().keySet().iterator();

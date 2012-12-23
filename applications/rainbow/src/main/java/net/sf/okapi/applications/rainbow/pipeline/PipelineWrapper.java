@@ -123,8 +123,8 @@ public class PipelineWrapper {
 					availableSteps.put(stepInfo.stepClass, stepInfo);
 				}
 				catch ( Throwable e ) {
-					logger.warn("Could not instantiate step '{}' because of error.\n"+e.getMessage(),
-						item.getClassName());
+					logger.warn("Could not instantiate step '{}' because of error.\n{}",
+						item.getClassName(), e.getMessage());
 				}
 			}
 			if (fcMapper instanceof FilterConfigurationMapper) {
@@ -778,16 +778,16 @@ public class PipelineWrapper {
 
 		}
 		catch ( InstantiationException e ) {
-			logger.warn("Could not instantiate a step.\n" + e.getMessage());
+			logger.warn("Could not instantiate a step.\n{}", e.getMessage());
 		}
 		catch ( IllegalAccessException e ) {
-			logger.warn("Illegal access for a step.\n" + e.getMessage());
+			logger.warn("Illegal access for a step.\n{}", e.getMessage());
 		}
 		catch ( ClassNotFoundException e ) {
-			logger.warn("Step class not found.\n" + e.getMessage());
+			logger.warn("Step class not found.\n{}", e.getMessage());
 		}
 		catch ( Throwable e ) {
-			logger.warn("Error creating one of the step.\n" + e.getMessage());
+			logger.warn("Error creating one of the step.\n{}", e.getMessage());
 		}
 	}
 	

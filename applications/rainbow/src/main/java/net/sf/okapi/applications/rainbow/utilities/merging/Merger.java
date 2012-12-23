@@ -109,7 +109,7 @@ public class Merger {
 				rtfFilter = new RTFFilter();
 			}
 
-			logger.info("\nConverting: " + fileToConvert);
+			logger.info("\nConverting: {}", fileToConvert);
 			
 			//TODO: get LB info from original
 			String lineBreak = Util.LINEBREAK_DOS;
@@ -139,7 +139,7 @@ public class Merger {
 		catch ( Exception e ) {
 			// Log and move on to the next file
 			Throwable e2 = e.getCause();
-			logger.error("Conversion error. " + ((e2!=null) ? e2.getMessage() : e.getMessage()), e);
+			logger.error("Conversion error. {}", ((e2!=null) ? e2.getMessage() : e.getMessage()), e);
 		}
 		finally {
 			if ( rtfFilter != null ) {
@@ -150,7 +150,7 @@ public class Merger {
 					writer.close();
 				}
 				catch ( IOException e ) {
-					logger.error("Conversion error when closing file. " + e.getMessage(), e);
+					logger.error("Conversion error when closing file. {}", e.getMessage(), e);
 				}
 			}
 		}
@@ -167,7 +167,7 @@ public class Merger {
 			if ( reader == null ) {
 				reader = (IReader)Class.forName(manifest.getReaderClass()).newInstance();
 			}
-			logger.info("\nMerging: " + fileToMerge);
+			logger.info("\nMerging: {}", fileToMerge);
 
 			// Original and parameters files
 			String originalFile = manifest.getRoot() + File.separator + manifest.getOriginalLocation()
@@ -209,7 +209,7 @@ public class Merger {
 		catch ( Exception e ) {
 			// Log and move on to the next file
 			Throwable e2 = e.getCause();
-			logger.error("Merging error. " + ((e2!=null) ? e2.getMessage() : e.getMessage()), e);
+			logger.error("Merging error. {}", ((e2!=null) ? e2.getMessage() : e.getMessage()), e);
 		}
 		finally {
 			if ( reader != null ) {
@@ -365,7 +365,7 @@ public class Merger {
 			}
 		}
 		catch ( RuntimeException e ) {
-			logger.error("Inline code error with item id=\"{}\".\n" + e.getLocalizedMessage(), tu.getId());
+			logger.error("Inline code error with item id=\"{}\".\n{}", tu.getId(), e.getLocalizedMessage());
 			// Use the source instead, continue the merge
 			tu.setTarget(trgLoc, tu.getSource());
 		}
@@ -529,7 +529,7 @@ public class Merger {
 					if ( !code.isDeleteable() ) {
 						logger.warn("The code id='{}' ({}) is missing in target (item id='{}', name='{}')",
 							code.getId(), code.getData(), tu.getId(), (tu.getName()==null ? "" : tu.getName()));
-						logger.info("Source='"+tu.getSource().toString()+"'");
+						logger.info("Source='{}'", tu.getSource().toString());
 					}
 				}
 			}

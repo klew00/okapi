@@ -376,7 +376,7 @@ public class Utility extends BaseFilterDrivenUtility {
 		
 		// Else: track the item not aligned
 		if ( !stopProcess ) {
-			logger.info("Not aligned: "+tu.getName());
+			logger.info("Not aligned: {}", tu.getName());
 			if ( tmxWriterForUnknown != null ) {
 				tu.removeTarget(trgLang); // Write empty target
 				tmxWriterForUnknown.writeItem(tu, assignedAttributes);
