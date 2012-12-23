@@ -531,6 +531,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 		rule.isInternal = isInternal;
 		
 		String value = elem.getAttribute("translate");
+		if ( isHTML5 ) value = value.toLowerCase();
 		if ( "yes".equals(value) ) rule.flag = true;
 		else if ( "no".equals(value) ) rule.flag = false;
 		else throw new ITSException("Invalid value for 'translate'.");
@@ -1577,7 +1578,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 						String oriRef = data1 = rule.info;
 						if ( data1 != null ) {
 							if ( rule.infoType == INFOTYPE_REFPOINTER) {
-								data1 = resolvePointer(NL.item(i), data1);
+								oriRef = data1 = resolvePointer(NL.item(i), data1);
 							}
 							// Fetch the stand-off data
 							anns = fetchLocQualityStandoffData(data1, oriRef);
@@ -2380,7 +2381,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 	{
 		String type;
 		if ( useHTML5 ) {
-			type = elem.getAttribute("its-loc-note-type");
+			type = elem.getAttribute("its-loc-note-type").toLowerCase();
 		}
 		else if ( qualified ) {
 			type = elem.getAttributeNS(ITS_NS_URI, "locNoteType");
@@ -2502,7 +2503,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 			if ( elem.hasAttribute("its-loc-quality-issues-ref") )
 				data[0] = elem.getAttribute("its-loc-quality-issues-ref");
 			if ( elem.hasAttribute("its-loc-quality-issue-type") )
-				data[1] = elem.getAttribute("its-loc-quality-issue-type");
+				data[1] = elem.getAttribute("its-loc-quality-issue-type").toLowerCase();
 			if ( elem.hasAttribute("its-loc-quality-issue-comment") )
 				data[2] = elem.getAttribute("its-loc-quality-issue-comment");
 			if ( elem.hasAttribute("its-loc-quality-issue-severity") )
