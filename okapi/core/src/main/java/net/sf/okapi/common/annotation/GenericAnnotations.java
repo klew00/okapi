@@ -53,6 +53,14 @@ public class GenericAnnotations extends InlineAnnotation {
 		fromString(storage);
 	}
 	
+	/**
+	 * Creates an annotation set and add a given one.
+	 * @param annotation the annotation to add.
+	 */
+	public GenericAnnotations (GenericAnnotation annotation) {
+		this.add(annotation);
+	}
+	
 	@Override
 	public GenericAnnotations clone () {
 		return new GenericAnnotations(this.toString());
@@ -84,6 +92,21 @@ public class GenericAnnotations extends InlineAnnotation {
 		return res;
 	}
 
+	/**
+	 * Gets the first occurence of an annotation for a given type.
+	 * @param type the type of annotation to retrieve.
+	 * @return the first annotation of the given type, or null if none exists.
+	 */
+	public GenericAnnotation getFirstAnnotation (String type) {
+		if ( Util.isEmpty(list) ) return null;
+		for ( GenericAnnotation ann : list ) {
+			if ( ann.getType().equals(type) ) {
+				return ann;
+			}
+		}
+		return null;
+	}
+	
 	/**
 	 * Gets the unmodifiable list of all the annotation in this annotation set.
 	 * @return the live list, or an empty one if there are no annotations.

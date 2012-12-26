@@ -450,23 +450,35 @@ public class XLIFFWriter implements IFilterWriter {
 			writer.writeAttributeString("xml:space", "preserve");
 		}
 		
-		// TU-level ITS properties (as attribute)
-		if ( tu.hasProperty(Property.ITS_EXTERNALRESREF) ) {
-			writer.writeAttributeString("xmlns:okp", NS_XLIFFOKAPI);
-			writer.writeAttributeString("okp:itsExternalResourceRef",
-				tu.getProperty(Property.ITS_EXTERNALRESREF).getValue());
-		}
 		if ( tu.hasProperty(Property.ITS_STORAGESIZE) ) {
 			String[] values = tu.getProperty(Property.ITS_STORAGESIZE).getValue().split("\t", -1);
 			writer.writeAttributeString("maxbytes", values[0]);
 			writer.writeAttributeString("its:storageSizeEncoding", values[1]);
 			writer.writeAttributeString("its:lineBreakType", values[2]);
 		}
-		if ( tu.hasProperty(Property.ITS_ALLOWEDCHARACTERS) ) {
-			writer.writeAttributeString("its:allowedCharacters", tu.getProperty(Property.ITS_ALLOWEDCHARACTERS).getValue());
-		}
-		if ( tu.hasProperty(Property.ITS_DOMAIN) ) {
-			writer.writeAttributeString("okp:itsDomain", tu.getProperty(Property.ITS_DOMAIN).getValue());
+		
+		GenericAnnotations anns = tu.getAnnotation(GenericAnnotations.class);
+		if ( anns != null ) {
+			// Domain
+			GenericAnnotation ann = anns.getFirstAnnotation(GenericAnnotationType.DOMAIN);
+			if ( ann != null ) {
+				writer.writeAttributeString("okp:itsDomain",
+					ann.getString(GenericAnnotationType.DOMAIN_LIST));
+			}
+
+			// Allowed Characters
+			ann = anns.getFirstAnnotation(GenericAnnotationType.ALLOWEDCHARS);
+			if ( ann != null ) {
+				writer.writeAttributeString("its:allowedCharacters",
+					ann.getString(GenericAnnotationType.ALLOWEDCHARS_PATTERN));
+			}
+			
+			// External Resoure Reference
+			ann = anns.getFirstAnnotation(GenericAnnotationType.EXTRESREF);
+			if ( ann != null ) {
+				writer.writeAttributeString("okp:itsExternalResourceRef",
+					ann.getString(GenericAnnotationType.EXTRESREF_IRI));
+			}
 		}
 
 		writer.writeLineBreak();

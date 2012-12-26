@@ -20,8 +20,22 @@
 
 package net.sf.okapi.filters.xml;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+import java.io.File;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.List;
+
 import net.sf.okapi.common.Event;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.TestUtil;
+import net.sf.okapi.common.annotation.GenericAnnotation;
+import net.sf.okapi.common.annotation.GenericAnnotationType;
+import net.sf.okapi.common.annotation.GenericAnnotations;
 import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.FilterConfigurationMapper;
 import net.sf.okapi.common.filters.FilterTestDriver;
@@ -29,25 +43,17 @@ import net.sf.okapi.common.filters.IFilterConfigurationMapper;
 import net.sf.okapi.common.filters.InputDocument;
 import net.sf.okapi.common.filters.RoundTripComparison;
 import net.sf.okapi.common.filterwriter.GenericContent;
-import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextFragment.TagType;
-import net.sf.okapi.filters.xml.XMLFilter;
-import static org.junit.Assert.*;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.w3c.its.ITSEngine;
 import org.w3c.its.ITSException;
-
-import java.io.File;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.List;
 
 public class XMLFilterTest {
 
@@ -350,9 +356,8 @@ public class XMLFilterTest {
 			+ "</doc>";
 		ArrayList<Event> list = getEvents(snippet);
 		ITextUnit tu = FilterTestDriver.getTextUnit(list, 1);
-		Property prop = tu.getProperty(Property.ITS_DOMAIN);
-		assertNotNull(prop);
-		assertEquals("domZ, domC, domD", prop.getValue());
+		GenericAnnotation ga = tu.getAnnotation(GenericAnnotations.class).getFirstAnnotation(GenericAnnotationType.DOMAIN);
+		assertEquals("domZ, domC, domD", ga.getString(GenericAnnotationType.DOMAIN_LIST));		
 	}
 	
 	@Test
@@ -371,9 +376,8 @@ public class XMLFilterTest {
 			+ "</doc>";
 		ArrayList<Event> list = getEvents(snippet);
 		ITextUnit tu = FilterTestDriver.getTextUnit(list, 1);
-		Property prop = tu.getProperty(Property.ITS_DOMAIN);
-		assertNotNull(prop);
-		assertEquals("domA, domB, domY", prop.getValue());
+		GenericAnnotation ga = tu.getAnnotation(GenericAnnotations.class).getFirstAnnotation(GenericAnnotationType.DOMAIN);
+		assertEquals("domA, domB, domY", ga.getString(GenericAnnotationType.DOMAIN_LIST));		
 	}
 	
 	@Test
@@ -385,16 +389,18 @@ public class XMLFilterTest {
 			+ "<its:allowedCharactersRule selector=\"//p\" allowedCharacters='[a-z]'/>"
 			+ "<its:allowedCharactersRule selector=\"//p/@title\" allowedCharacters='[A-Z]'/>"
 			+ "</its:rules>"
-			+ "<p title='ABC'>text</p>"
-			+ "<q>text</q>"
+			+ "<p title='ABC'>text1</p>"
+			+ "<q>text2</q>"
 			+ "</doc>";
 		ArrayList<Event> list = getEvents(snippet);
 		ITextUnit tu = FilterTestDriver.getTextUnit(list, 1);
-		assertEquals("[A-Z]", tu.getProperty(Property.ITS_ALLOWEDCHARACTERS).getValue());
+		GenericAnnotation ga = tu.getAnnotation(GenericAnnotations.class).getFirstAnnotation(GenericAnnotationType.ALLOWEDCHARS);
+		assertEquals("[A-Z]", ga.getString(GenericAnnotationType.ALLOWEDCHARS_PATTERN));
 		tu = FilterTestDriver.getTextUnit(list, 2);
-		assertEquals("[a-z]", tu.getProperty(Property.ITS_ALLOWEDCHARACTERS).getValue());
+		ga = tu.getAnnotation(GenericAnnotations.class).getFirstAnnotation(GenericAnnotationType.ALLOWEDCHARS);
+		assertEquals("[a-z]", ga.getString(GenericAnnotationType.ALLOWEDCHARS_PATTERN));
 		tu = FilterTestDriver.getTextUnit(list, 3);
-		assertFalse(tu.hasProperty(Property.ITS_ALLOWEDCHARACTERS));
+		assertEquals(null, tu.getAnnotation(GenericAnnotations.class));
 	}
 
 	@Test

@@ -24,6 +24,7 @@ import java.security.InvalidParameterException;
 import java.util.HashMap;
 
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.resource.ITextUnit;
 
 /**
  * Generic annotation allowing access with field names and multiple instance on the same object.
@@ -37,6 +38,23 @@ public class GenericAnnotation {
 	private HashMap<String, Object> map;
 	
 	/**
+	 * Adds an annotation to a set attached to a gievn text unit. If the text unit has
+	 * no annotation set attached, one is created and attached. 
+	 * @param tu the text unit where to attach the annotation.
+	 * @param ann the annotation to attach.
+	 */
+	static public void addAnnotation (ITextUnit tu,
+		GenericAnnotation ann)
+	{
+		GenericAnnotations anns = tu.getAnnotation(GenericAnnotations.class);
+		if ( anns == null ) {
+			anns = new GenericAnnotations();
+			tu.setAnnotation(anns);
+		}
+		anns.add(ann);
+	}
+
+	/**
 	 * Creates a new annotation for a given type.
 	 * <p>Note that it is technically to have two annotations with the same type but different fields.
 	 * This is a side effect of the capability to access the annotation in a generic way.
@@ -48,6 +66,47 @@ public class GenericAnnotation {
 			throw new InvalidParameterException("The type of an annotation must not be null or empty.");
 		}
 		this.type = type;
+	}
+
+	/**
+	 * Creates a new annotation for a given type.
+	 * With a list of fields. This method simply call the {@link #setFields(Object...)} method after
+	 * creating the annotation.
+	 * @param type the identifier of the type (cannot be null or empty).
+	 * @param list the list of key+value pairs to set.
+	 */
+	public GenericAnnotation (String type, Object ... list) {
+		this(type);
+		setFields(list);
+	}
+	
+	/**
+	 * Sets a list of key+values pairs for this annotation.
+	 * Each pair must be made of a string that is the name of the field, and an object that is the value to set.
+	 * Only supported types must be used.
+	 * @param list the list of key+value pairs to set.
+	 */
+	public void setFields (Object ... list) {
+		for ( int i=0; i<list.length; i += 2 ) {
+			if ( !(list[i] instanceof String) ) {
+				throw new InvalidParameterException("Invalid field name in key+value pair.");
+			}
+			if ( list[i+1] instanceof String ) {
+				setString((String)list[i], (String)list[i+1]);
+			}
+			else if ( list[i+1] instanceof Boolean ) {
+				setBoolean((String)list[i], (Boolean)list[i+1]);
+			}
+			else if ( list[i+1] instanceof Integer ) {
+				setInteger((String)list[i], (Integer)list[i+1]);
+			}
+			else if ( list[i+1] instanceof Float ) {
+				setFloat((String)list[i], (Float)list[i+1]);
+			}
+			else {
+				throw new InvalidParameterException("Invalid field value in key+value pair.");
+			}
+		}
 	}
 	
 	@Override

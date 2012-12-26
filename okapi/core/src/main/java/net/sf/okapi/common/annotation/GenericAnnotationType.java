@@ -81,4 +81,19 @@ public class GenericAnnotationType {
 	public static final String LQR_SCORETHRESHOLD = "lqrScoreThreshold";
 	public static final String LQR_VOTETHRESHOLD = "lqrVoteThreshold";
 	public static final String LQR_PROFILEREF = "lqrProfileRef";
+	
+	public static final String ALLOWEDCHARS = "its-allowedchars";
+	public static final String ALLOWEDCHARS_PATTERN = "allowedcharsPattern";
+
+	public static final String EXTRESREF = "its-extresref";
+	public static final String EXTRESREF_IRI = "its-extresrefIri";
+	
+	public static final String DOMAIN = "its-domain";
+	public static final String DOMAIN_LIST = "domainList";
+	
+//	public static final String STORAGESIZE = "its-storagesize";
+//	public static final String STORAGESIZE_SIZE = "storagesizeSize";
+//	public static final String STORAGESIZE_ENCODIBG = "storagesizeEncoding";
+//	public static final String STORAGESIZE_LINEBREAK = "storagesizeLinebreak";
+
 }

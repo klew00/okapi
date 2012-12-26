@@ -35,6 +35,9 @@ import java.util.regex.Pattern;
 
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.annotation.GenericAnnotation;
+import net.sf.okapi.common.annotation.GenericAnnotationType;
+import net.sf.okapi.common.annotation.GenericAnnotations;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.ISegments;
 import net.sf.okapi.common.resource.Property;
@@ -826,9 +829,12 @@ class QualityChecker {
 		boolean isSource)
 	{
 		if ( tc == null ) return;
-		if ( !tu.hasProperty(Property.ITS_ALLOWEDCHARACTERS) ) return;
+		GenericAnnotations anns = tu.getAnnotation(GenericAnnotations.class);
+		if ( anns == null ) return;
+		GenericAnnotation ga = anns.getFirstAnnotation(GenericAnnotationType.ALLOWEDCHARS);
+		if ( ga == null ) return;
 		try {
-			String pattern = tu.getProperty(Property.ITS_ALLOWEDCHARACTERS).getValue();
+			String pattern = ga.getString(GenericAnnotationType.ALLOWEDCHARS_PATTERN);
 			// Re-set the compiled pattern if needed
 			if (( itsAllowedChars == null ) || !itsAllowedCharsPattern.equals(pattern) ) {
 				itsAllowedCharsPattern = pattern; // Remember for next time

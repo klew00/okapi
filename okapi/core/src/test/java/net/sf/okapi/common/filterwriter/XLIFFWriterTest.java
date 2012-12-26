@@ -295,8 +295,10 @@ public class XLIFFWriterTest {
 	{
 		writer.create(root+"out.xlf", null, locEN, null, null, "original.ext", null);
 		ITextUnit tu = new TextUnit("tu1", "text");
-		tu.setProperty(new Property(Property.ITS_DOMAIN, "dom1, dom2"));
-		tu.setProperty(new Property(Property.ITS_EXTERNALRESREF, "http://example.com/res"));
+		GenericAnnotation.addAnnotation(tu, new GenericAnnotation(GenericAnnotationType.DOMAIN,
+			GenericAnnotationType.DOMAIN_LIST, "dom1, dom2"));
+		GenericAnnotation.addAnnotation(tu, new GenericAnnotation(GenericAnnotationType.EXTRESREF,
+			GenericAnnotationType.EXTRESREF_IRI, "http://example.com/res"));
 		writer.writeTextUnit(tu);
 		writer.close();
 
@@ -305,7 +307,7 @@ public class XLIFFWriterTest {
 			+ "<xliff version=\"1.2\" xmlns=\"urn:oasis:names:tc:xliff:document:1.2\" xmlns:okp=\"okapi-framework:xliff-extensions\" xmlns:its=\"http://www.w3.org/2005/11/its\">\n"
 			+ "<file original=\"original.ext\" source-language=\"en\" datatype=\"x-undefined\">\n"
 			+ "<body>\n"
-			+ "<trans-unit id=\"tu1\" xmlns:okp=\"okapi-framework:xliff-extensions\" okp:itsExternalResourceRef=\"http://example.com/res\" okp:itsDomain=\"dom1, dom2\">\n"
+			+ "<trans-unit id=\"tu1\" okp:itsDomain=\"dom1, dom2\" okp:itsExternalResourceRef=\"http://example.com/res\">\n"
 			+ "<source xml:lang=\"en\">text</source>\n"
 			+ "</trans-unit>\n"
 			+ "</body>\n</file>\n</xliff>\n", result);

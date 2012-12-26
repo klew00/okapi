@@ -39,25 +39,10 @@ public class Property {
 	public static final String COORDINATES = "coordinates"; 
 
 	/**
-	 * ITS Domain value (comma-delimited list of domains)
-	 */
-	public static final String ITS_DOMAIN = "its-domains";
-	
-	/**
-	 * ITS External Resources Reference value
-	 */
-	public static final String ITS_EXTERNALRESREF = "its-externalResourcesRef";
-	
-	/**
 	 * ITS Storage Size. A tab-separated values of 1=maximum size in byte
 	 * and 2=the encoding to use.
 	 */
 	public static final String ITS_STORAGESIZE = "its-storageSize"; 
-	
-	/**
-	 * ITS Allowed characters. A character class regular expression matching allowed characters.
-	 */
-	public static final String ITS_ALLOWEDCHARACTERS = "its-allowedCharacters"; 
 	
 	private final String name;
 	private String value;

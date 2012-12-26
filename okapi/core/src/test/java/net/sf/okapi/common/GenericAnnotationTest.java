@@ -104,4 +104,19 @@ public class GenericAnnotationTest {
 		assertEquals(ann2.getFloat("ff1"), ann1.getFloat("ff1"), 0.0F);
 		assertEquals(ann2.getInteger("fi1"), ann1.getInteger("fi1"));
 	}
+
+	@Test
+	public void testSetFields () {
+		GenericAnnotation ann1 = new GenericAnnotation("type1", 
+			"fs1", "v1",
+			"fb2", true,
+			"ff3", 1.234F,
+			"fi4", 543);
+		
+		assertEquals("type1", ann1.getType());
+		assertEquals("v1", ann1.getString("fs1"));
+		assertEquals(true, ann1.getBoolean("fb2"));
+		assertEquals(1.234F, ann1.getFloat("ff3"), 0.0F);
+		assertEquals(543, (int)ann1.getInteger("fi4"));
+	}
 }

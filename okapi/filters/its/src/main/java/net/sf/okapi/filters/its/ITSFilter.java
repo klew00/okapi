@@ -34,7 +34,6 @@ import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.annotation.GenericAnnotation;
 import net.sf.okapi.common.annotation.GenericAnnotationType;
-import net.sf.okapi.common.annotation.GenericAnnotations;
 import net.sf.okapi.common.annotation.TermsAnnotation;
 import net.sf.okapi.common.encoder.EncoderContext;
 import net.sf.okapi.common.encoder.EncoderManager;
@@ -534,11 +533,15 @@ public abstract class ITSFilter implements IFilter {
 		}
 		// ITS Domain
 		if ( !Util.isEmpty(ci.domains) ) {
-			tu.setProperty(new Property(Property.ITS_DOMAIN, ci.domains));
+			GenericAnnotation.addAnnotation(tu, new GenericAnnotation(GenericAnnotationType.DOMAIN,
+				GenericAnnotationType.DOMAIN_LIST, ci.domains)
+			);
 		}
 		// ITS External resources Reference
 		if ( !Util.isEmpty(ci.externalRes) ) {
-			tu.setProperty(new Property(Property.ITS_EXTERNALRESREF, ci.externalRes));
+			GenericAnnotation.addAnnotation(tu, new GenericAnnotation(GenericAnnotationType.EXTRESREF,
+				GenericAnnotationType.EXTRESREF_IRI, ci.externalRes)
+			);
 		}
 		// ITS Storage Size
 		if ( ci.storageSize != null ) {
@@ -546,7 +549,9 @@ public abstract class ITSFilter implements IFilter {
 		}
 		// ITS Allowed characters
 		if ( ci.allowedChars != null ) {
-			tu.setProperty(new Property(Property.ITS_ALLOWEDCHARACTERS, ci.allowedChars));
+			GenericAnnotation.addAnnotation(tu, new GenericAnnotation(GenericAnnotationType.ALLOWEDCHARS,
+				GenericAnnotationType.ALLOWEDCHARS_PATTERN, ci.allowedChars)
+			);
 		}
 		// ITS Localization Quality Issue
 		if ( ci.lqIssues != null ) {
@@ -884,11 +889,15 @@ public abstract class ITSFilter implements IFilter {
 		}
 		// ITS Domain
 		if ( !Util.isEmpty(context.peek().domains) ) {
-			tu.setProperty(new Property(Property.ITS_DOMAIN, context.peek().domains));
+			GenericAnnotation.addAnnotation(tu, new GenericAnnotation(GenericAnnotationType.DOMAIN,
+				GenericAnnotationType.DOMAIN_LIST, context.peek().domains)
+			);
 		}
 		// ITS External resources Reference
 		if ( !Util.isEmpty(context.peek().externalRes) ) {
-			tu.setProperty(new Property(Property.ITS_EXTERNALRESREF, context.peek().externalRes));
+			GenericAnnotation.addAnnotation(tu, new GenericAnnotation(GenericAnnotationType.EXTRESREF,
+				GenericAnnotationType.EXTRESREF_IRI, context.peek().externalRes)
+			);
 		}
 		// ITS Storage Size
 		if ( context.peek().storageSize != null ) {
@@ -896,7 +905,9 @@ public abstract class ITSFilter implements IFilter {
 		}
 		// ITS Allowed characters
 		if ( context.peek().allowedChars != null ) {
-			tu.setProperty(new Property(Property.ITS_ALLOWEDCHARACTERS, context.peek().allowedChars));
+			GenericAnnotation.addAnnotation(tu, new GenericAnnotation(GenericAnnotationType.ALLOWEDCHARS,
+				GenericAnnotationType.ALLOWEDCHARS_PATTERN, context.peek().allowedChars)
+			);
 		}
 		// ITS Localization Quality Issue
 		if ( context.peek().lqIssues != null ) {

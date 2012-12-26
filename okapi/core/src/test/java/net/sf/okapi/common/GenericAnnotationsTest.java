@@ -44,6 +44,19 @@ public class GenericAnnotationsTest {
 	}
 
 	@Test
+	public void testConstructors () {
+		GenericAnnotations anns = new GenericAnnotations();
+		assertFalse(anns.hasAnnotation("type1"));
+		
+		anns = new GenericAnnotations(new GenericAnnotation("type1"));
+		assertTrue(anns.hasAnnotation("type1"));
+		String storage = anns.toString();
+		
+		anns = new GenericAnnotations(storage);
+		assertTrue(anns.hasAnnotation("type1"));
+	}
+
+	@Test
 	public void testSeveral () {
 		GenericAnnotations anns = new GenericAnnotations();
 		GenericAnnotation ann1 = anns.add("type1");
