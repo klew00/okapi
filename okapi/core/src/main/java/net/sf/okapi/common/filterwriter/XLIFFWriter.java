@@ -465,14 +465,12 @@ public class XLIFFWriter implements IFilterWriter {
 				writer.writeAttributeString("okp:itsDomain",
 					ann.getString(GenericAnnotationType.DOMAIN_LIST));
 			}
-
 			// Allowed Characters
 			ann = anns.getFirstAnnotation(GenericAnnotationType.ALLOWEDCHARS);
 			if ( ann != null ) {
 				writer.writeAttributeString("its:allowedCharacters",
 					ann.getString(GenericAnnotationType.ALLOWEDCHARS_PATTERN));
 			}
-			
 			// External Resoure Reference
 			ann = anns.getFirstAnnotation(GenericAnnotationType.EXTRESREF);
 			if ( ann != null ) {

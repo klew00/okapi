@@ -25,7 +25,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -669,33 +668,29 @@ public class ITSEngine implements IProcessor, ITraversal {
 			throw new ITSException("You must have at least an attribute storageSize or storageSizePointer.");
 		}
 		
-		rule.map = new HashMap<String, String>();
-
+		rule.annotations = new GenericAnnotations();
+		GenericAnnotation ann = rule.annotations.add(GenericAnnotationType.STORAGESIZE);
+		
 		// Check pointer vs non-pointers
 		if ( !Util.isEmpty(np[0]) ) {
 			if ( !Util.isEmpty(storageSizeP) ) {
 				throw new ITSException("Cannot have both storageSize and storageSizePointer.");
 			}
-			rule.map.put("size", np[0]);
+			ann.setString(GenericAnnotationType.STORAGESIZE_SIZE, np[0]);
 		}
 		else {
-			rule.map.put("sizePointer", storageSizeP);
+			ann.setString(GenericAnnotationType.STORAGESIZE_SIZE, PTRFLAG+storageSizeP);
 		}
 		
-		if ( !Util.isEmpty(np[1]) ) {
-			if ( !Util.isEmpty(storageEncodingP) ) {
-				throw new ITSException("Cannot have both storageEncoding and storageEncodingPointer.");
-			}
-			rule.map.put("encoding", np[1]);
+		if ( !Util.isEmpty(storageEncodingP) ) {
+			ann.setString(GenericAnnotationType.STORAGESIZE_ENCODING, PTRFLAG+storageEncodingP);
 		}
-		else {
-			rule.map.put("encodingPointer", storageEncodingP);
+		else { // Always has a default
+			ann.setString(GenericAnnotationType.STORAGESIZE_ENCODING, np[1]);
 		}
 
-		// No pointer for line break type
-		if ( !Util.isEmpty(np[2]) ) {
-			rule.map.put("linebreak", np[2]);
-		}
+		// No pointer for line break type (and always has a default)
+		ann.setString(GenericAnnotationType.STORAGESIZE_LINEBREAK, np[2]);
 		
 		// Add the rule
 		rules.add(rule);
@@ -890,9 +885,6 @@ public class ITSEngine implements IProcessor, ITraversal {
 
 		// Granularity is only non-pointer
 		
-		// Check we have the mandatory attributes
-		//TODO later when the dta category is stable
-
 		rule.annotations = new GenericAnnotations();
 		GenericAnnotation ann = rule.annotations.add(GenericAnnotationType.DISAMB);
 		
@@ -1310,10 +1302,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 		}
 		
 		if ( data.charAt(FP_STORAGESIZE) != '?' ) {
-			String[] values = fromSingleString(getFlagData(data, FP_STORAGESIZE_DATA));
-			trace.peek().storageSize = values[0];
-			trace.peek().storageEncoding = values[1];
-			trace.peek().lineBreakType = values[2];
+			trace.peek().storageSize = new GenericAnnotations(getFlagData(data, FP_STORAGESIZE_DATA));
 		}
 		
 		if ( data.charAt(FP_MTCONFIDENCE) != '?' ) {
@@ -1636,6 +1625,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 					}
 
 					else if ( rule.ruleType == IProcessor.DC_DISAMBIGUATION ) {
+//TODO: handle case where rule is applied to several nodes (pointers must be reset)						
 						GenericAnnotations anns = rule.annotations;
 						GenericAnnotation ann = anns.getAnnotations(GenericAnnotationType.DISAMB).get(0);
 						// Get and resolve 'classRef'
@@ -1691,23 +1681,28 @@ public class ITSEngine implements IProcessor, ITraversal {
 					}
 						
 					else if ( rule.ruleType == IProcessor.DC_STORAGESIZE ) {
-						data1 = rule.map.get("size");
-						if ( data1 == null ) {
-							data1 = rule.map.get("sizePointer");
-							if ( !Util.isEmpty(data1) ) data1 = resolvePointer(NL.item(i), data1);
+						GenericAnnotation ann = rule.annotations.getFirstAnnotation(GenericAnnotationType.STORAGESIZE);
+						// Create the clone (pointers need to be re-computed, etc.)
+						GenericAnnotations anns = new GenericAnnotations();
+						GenericAnnotation upd = anns.add(GenericAnnotationType.STORAGESIZE);
+						// Get and resolve 'size'
+						data1 = ann.getString(GenericAnnotationType.STORAGESIZE_SIZE);
+						if ( data1.startsWith(PTRFLAG) ) {
+							data1 = resolvePointer(NL.item(i), data1.substring(PTRFLAG.length()));
 						}
-						String data2 = rule.map.get("encoding");
-						if ( data2 == null ) {
-							data2 = rule.map.get("encodingPointer");
-							if ( !Util.isEmpty(data2) ) data2 = resolvePointer(NL.item(i), data2);
+						upd.setInteger(GenericAnnotationType.STORAGESIZE_SIZE, Integer.parseInt(data1));
+						// Get and resolve 'encoding'
+						data1 = ann.getString(GenericAnnotationType.STORAGESIZE_ENCODING);
+						if ( data1.startsWith(PTRFLAG) ) {
+							data1 = data1.substring(PTRFLAG.length());
+							data1 = resolvePointer(NL.item(i), data1);
 						}
-						String data3 = rule.map.get("linebreak");
-						if ( data3 == null ) {
-							data3 = rule.map.get("linebreakPointer");
-							if ( !Util.isEmpty(data3) ) data3 = resolvePointer(NL.item(i), data3);
-						}
+						upd.setString(GenericAnnotationType.STORAGESIZE_ENCODING, data1);
+						// Copy the line-break info (it's never a pointer)
+						upd.setString(GenericAnnotationType.STORAGESIZE_LINEBREAK, ann.getString(GenericAnnotationType.STORAGESIZE_LINEBREAK));
+						// set the flag and data
 						setFlag(NL.item(i), FP_STORAGESIZE, 'y', true);
-						setFlag(NL.item(i), FP_STORAGESIZE_DATA, toSingleString(data1, data2, data3), true);
+						setFlag(NL.item(i), FP_STORAGESIZE_DATA, anns.toString(), true);
 					}
 
 					else if ( rule.ruleType == IProcessor.DC_SUBFILTER ) {
@@ -1777,28 +1772,28 @@ public class ITSEngine implements IProcessor, ITraversal {
 		return list;
 	}
 	
-	/**
-	 * Converts a list of strings arguments to a single string that is delimited with end-of-group characters. 
-	 * @param values the values to store. Null values are ok and mean no value.
-	 * @return a single string with all values.
-	 */
-	private String toSingleString (String ... values) {
-		StringBuilder data = new StringBuilder();
-		for ( String value : values ) {
-			if ( value == null ) data.append("\u001A");
-			if ( value != null ) data.append(value);
-			data.append("\u001D");
-		}
-		return data.toString();
-	}
+//	/**
+//	 * Converts a list of strings arguments to a single string that is delimited with end-of-group characters. 
+//	 * @param values the values to store. Null values are ok and mean no value.
+//	 * @return a single string with all values.
+//	 */
+//	private String toSingleString (String ... values) {
+//		StringBuilder data = new StringBuilder();
+//		for ( String value : values ) {
+//			if ( value == null ) data.append("\u001A");
+//			if ( value != null ) data.append(value);
+//			data.append("\u001D");
+//		}
+//		return data.toString();
+//	}
 	
-	private String[] fromSingleString (String data) {
-		String[] values = data.split("\u001D", -1);
-		for ( int i=0; i<values.length; i++ ) {
-			if ( values[i].equals("\u001A") ) values[i] = null;
-		}
-		return values;
-	}
+//	private String[] fromSingleString (String data) {
+//		String[] values = data.split("\u001D", -1);
+//		for ( int i=0; i<values.length; i++ ) {
+//			if ( values[i].equals("\u001A") ) values[i] = null;
+//		}
+//		return values;
+//	}
 	
 	private void processLocalRules (long dataCategories) {
 		XPathExpression expr;
@@ -2197,9 +2192,15 @@ public class ITSEngine implements IProcessor, ITraversal {
 					if ( !Util.isEmpty(ns) ) qualified = !ns.equals(ITS_NS_URI);
 					String[] values = retrieveStorageSizeData(attr.getOwnerElement(), qualified, isHTML5);
 					// Set the updated flags
+					GenericAnnotations anns = new GenericAnnotations(
+						new GenericAnnotation(GenericAnnotationType.STORAGESIZE,
+							GenericAnnotationType.STORAGESIZE_SIZE, Integer.parseInt(values[0]),
+							GenericAnnotationType.STORAGESIZE_ENCODING, values[1],
+							GenericAnnotationType.STORAGESIZE_LINEBREAK, values[2]
+						)
+					);
 					setFlag(attr.getOwnerElement(), FP_STORAGESIZE, 'y', attr.getSpecified());
-					setFlag(attr.getOwnerElement(), FP_STORAGESIZE_DATA,
-						toSingleString(values[0], values[1], values[2]), attr.getSpecified()); 
+					setFlag(attr.getOwnerElement(), FP_STORAGESIZE_DATA, anns.toString(), attr.getSpecified()); 
 				}
 			}
 
@@ -2475,6 +2476,9 @@ public class ITSEngine implements IProcessor, ITraversal {
 			if ( elem.hasAttribute("lineBreakType") )
 				data[2] = elem.getAttribute("lineBreakType");
 		}
+		// Defaults
+		if ( data[1] == null ) data[1] = "UTF-8";
+		if ( data[2] == null ) data[2] = "lf";
 		return data;
 	}
 
@@ -3420,43 +3424,42 @@ public class ITSEngine implements IProcessor, ITraversal {
 	}
 	
 	@Override
-	public String getStorageSize (Attr attribute) {
-		if ( attribute == null ) return trace.peek().storageSize;
+	public Integer getStorageSize (Attr attribute) {
+		if ( attribute == null ) {
+			if ( trace.peek().storageSize == null ) return null;
+			return trace.peek().storageSize.getFirstAnnotation(GenericAnnotationType.STORAGESIZE).getInteger(GenericAnnotationType.STORAGESIZE_SIZE);
+		}
 		String tmp;
 		if ( (tmp = (String)attribute.getUserData(FLAGNAME)) == null ) return null;
 		if ( tmp.charAt(FP_STORAGESIZE) != 'y' ) return null;
-		String[] values = fromSingleString(getFlagData(tmp, FP_STORAGESIZE_DATA));
-		return values[0];
+		GenericAnnotations anns = new GenericAnnotations(getFlagData(tmp, FP_STORAGESIZE_DATA));
+		return anns.getFirstAnnotation(GenericAnnotationType.STORAGESIZE).getInteger(GenericAnnotationType.STORAGESIZE_SIZE);
 	}
 
 	@Override
 	public String getStorageEncoding (Attr attribute) {
-		String tmp;
 		if ( attribute == null ) {
-			tmp = trace.peek().storageEncoding;
-			if ( tmp == null ) return "UTF-8";
-			else return tmp;
+			if ( trace.peek().storageSize == null ) return "UTF-8";
+			return trace.peek().storageSize.getFirstAnnotation(GenericAnnotationType.STORAGESIZE).getString(GenericAnnotationType.STORAGESIZE_ENCODING);
 		}
-		if ( (tmp = (String)attribute.getUserData(FLAGNAME)) == null ) return null;
-		if ( tmp.charAt(FP_STORAGESIZE) != 'y' ) return null;
-		String[] values = fromSingleString(getFlagData(tmp, FP_STORAGESIZE_DATA));
-		if ( values[1] == null ) return "UTF-8";
-		else return values[1];
+		String tmp;
+		if ( (tmp = (String)attribute.getUserData(FLAGNAME)) == null ) return "UTF-8";
+		if ( tmp.charAt(FP_STORAGESIZE) != 'y' ) return "UTF-8";
+		GenericAnnotations anns = new GenericAnnotations(getFlagData(tmp, FP_STORAGESIZE_DATA));
+		return anns.getFirstAnnotation(GenericAnnotationType.STORAGESIZE).getString(GenericAnnotationType.STORAGESIZE_ENCODING);
 	}
 
 	@Override
 	public String getLineBreakType (Attr attribute) {
-		String tmp;
 		if ( attribute == null ) {
-			tmp = trace.peek().lineBreakType;
-			if ( tmp == null ) return "lf";
-			else return tmp;
+			if ( trace.peek().storageSize == null ) return "lf";
+			return trace.peek().storageSize.getFirstAnnotation(GenericAnnotationType.STORAGESIZE).getString(GenericAnnotationType.STORAGESIZE_LINEBREAK);
 		}
-		if ( (tmp = (String)attribute.getUserData(FLAGNAME)) == null ) return null;
-		if ( tmp.charAt(FP_STORAGESIZE) != 'y' ) return null;
-		String[] values = fromSingleString(getFlagData(tmp, FP_STORAGESIZE_DATA));
-		if ( values[2] == null ) return "lf";
-		else return values[2];
+		String tmp;
+		if ( (tmp = (String)attribute.getUserData(FLAGNAME)) == null ) return "lf";
+		if ( tmp.charAt(FP_STORAGESIZE) != 'y' ) return "lf";
+		GenericAnnotations anns = new GenericAnnotations(getFlagData(tmp, FP_STORAGESIZE_DATA));
+		return anns.getFirstAnnotation(GenericAnnotationType.STORAGESIZE).getString(GenericAnnotationType.STORAGESIZE_LINEBREAK);
 	}
 
 	@Override

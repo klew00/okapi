@@ -91,9 +91,9 @@ public class GenericAnnotationType {
 	public static final String DOMAIN = "its-domain";
 	public static final String DOMAIN_LIST = "domainList";
 	
-//	public static final String STORAGESIZE = "its-storagesize";
-//	public static final String STORAGESIZE_SIZE = "storagesizeSize";
-//	public static final String STORAGESIZE_ENCODIBG = "storagesizeEncoding";
-//	public static final String STORAGESIZE_LINEBREAK = "storagesizeLinebreak";
+	public static final String STORAGESIZE = "its-storagesize";
+	public static final String STORAGESIZE_SIZE = "storagesizeSize";
+	public static final String STORAGESIZE_ENCODING = "storagesizeEncoding";
+	public static final String STORAGESIZE_LINEBREAK = "storagesizeLinebreak";
 
 }

@@ -170,7 +170,7 @@ public interface ITraversal {
 	 */
 	public String getLanguage ();
 	
-	public String getStorageSize(Attr attribute);
+	public Integer getStorageSize(Attr attribute);
 	
 	public String getStorageEncoding (Attr attribute);
 	

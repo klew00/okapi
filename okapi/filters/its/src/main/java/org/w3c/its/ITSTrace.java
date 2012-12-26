@@ -38,15 +38,13 @@ class ITSTrace {
 	String localeFilter = "*";
 	String idValue;
 	String domains;
-	String storageSize;
-	String storageEncoding;
-	String lineBreakType;
 	String allowedChars;
 	String subFilter;
 	String lqIssuesRef;
 	GenericAnnotations lqIssues;
 	String annotatorsRef;
 	Float mtConfidence;
+	GenericAnnotations storageSize;
 	GenericAnnotations disambig;
 	GenericAnnotations lqRating;
 

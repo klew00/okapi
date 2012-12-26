@@ -503,7 +503,7 @@ public class TraversalTest {
 		Document doc = fact.newDocumentBuilder().parse(is);
 		ITraversal trav = applyITSRules(doc, null, false, null);
 		getElement(trav, "p", 1);
-		assertEquals("255", trav.getStorageSize(null));
+		assertEquals(255, (int)trav.getStorageSize(null));
 		assertEquals("UTF-8", trav.getStorageEncoding(null));
 		assertEquals("crlf", trav.getLineBreakType(null));
 		getElement(trav, "q", 1); // Not inherited
@@ -522,7 +522,7 @@ public class TraversalTest {
 		Document doc = fact.newDocumentBuilder().parse(is);
 		ITraversal trav = applyITSRules(doc, null, false, null);
 		getElement(trav, "p", 1);
-		assertEquals("222", trav.getStorageSize(null));
+		assertEquals(222, (int)trav.getStorageSize(null));
 		assertEquals("UTF-16", trav.getStorageEncoding(null));
 		assertEquals("cr", trav.getLineBreakType(null));
 		getElement(trav, "b", 1);
@@ -538,7 +538,7 @@ public class TraversalTest {
 		Document doc = fact.newDocumentBuilder().parse(is);
 		ITraversal trav = applyITSRules(doc, null, false, null);
 		getElement(trav, "p", 1);
-		assertEquals("111", trav.getStorageSize(null));
+		assertEquals(111, (int)trav.getStorageSize(null));
 		assertEquals("Shift-JIS", trav.getStorageEncoding(null));
 		assertEquals("lf", trav.getLineBreakType(null));
 	}
