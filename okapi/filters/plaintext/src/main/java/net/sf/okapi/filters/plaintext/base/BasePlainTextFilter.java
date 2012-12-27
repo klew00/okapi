@@ -426,7 +426,7 @@ public class BasePlainTextFilter extends AbstractLineFilter {
 	private void _unescape (TextFragment textFrag) {
 		// Cannot be static because of the logger
 		
-		final String INVALID_UESCAPE = "Invalid Unicode escape sequence '%s'";
+		final String INVALID_UESCAPE = "Invalid Unicode escape sequence '{}'";
 		
 		if (textFrag == null) return;
 		
@@ -448,15 +448,13 @@ public class BasePlainTextFilter extends AbstractLineFilter {
 							tmpText.append((char)nTmp);
 						}
 						catch ( Exception e ) {
-							logger.warn(
-								String.format(INVALID_UESCAPE, text.substring(i+2, i+6)));
+							logger.warn(INVALID_UESCAPE, text.substring(i+2, i+6));
 						}
 						i += 5;
 						continue;
 					}
 					else {
-						logger.warn(
-							String.format(INVALID_UESCAPE, text.substring(i+2)));
+						logger.warn(INVALID_UESCAPE, text.substring(i+2));
 					}
 					break;
 				case '\\':

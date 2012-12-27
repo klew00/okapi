@@ -5,7 +5,7 @@
     <parent>
         <artifactId>build-okapi-ui</artifactId>
         <groupId>net.sf.okapi</groupId>
-        <version>0.19-SNAPSHOT</version>
+        <version>0.20-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>okapi-core-ui</artifactId>
@@ -13,12 +13,12 @@
     <name>Okapi Core UI</name>
 
     <profiles>
-    
-		<profile>
+    	<profile>
 			<id>WIN_SWT</id>
 			<activation>
 				<os>
 					<family>Windows</family>
+					<arch>x86</arch>
 				</os>
 			</activation>
 			<dependencies>
@@ -29,13 +29,12 @@
 				</dependency>
 			</dependencies>
 		</profile>
-		
 		<profile>
 			<id>WIN_64_SWT</id>
 			<activation>
 				<os>
 					<family>Windows</family>
-					<arch>x64</arch>
+					<arch>amd64</arch>
 				</os>
 			</activation>
 			<dependencies>
@@ -46,7 +45,6 @@
 				</dependency>
 			</dependencies>
 		</profile>
-		
         <profile>
             <id>COCOA_64_SWT</id>
             <activation>
@@ -123,7 +121,7 @@
         <dependency>
         	<groupId>net.sf.okapi.lib</groupId>
         	<artifactId>okapi-lib-extra</artifactId>
-        	<version>0.19-SNAPSHOT</version>
+        	<version>0.20-SNAPSHOT</version>
         </dependency>
     </dependencies>
 

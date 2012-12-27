@@ -91,12 +91,12 @@ public class ParagraphAligner {
 			
 			if (cell.getState() == DpMatrixCell.DELETED) {
 				ITextUnit sourceSegment = matrix.getAlignmentElementX(cell.getXindex());				
-				LOGGER.warn(sourceSegment.toString() +
-						"\nTarget segment deleted (TU ID: " + sourceSegment.getName() + "): Non 1-1 match. Please confirm alignment.");
+				LOGGER.warn("{}\nTarget segment deleted (TU ID: {}): Non 1-1 match. Please confirm alignment.",
+						sourceSegment.toString(), sourceSegment.getName());
 			} else if (cell.getState() == DpMatrixCell.INSERTED) {
 				ITextUnit targetSegment = matrix.getAlignmentElementY(cell.getYindex());
-				LOGGER.warn(targetSegment.toString() +
-						"\nSource segment deleted (TU ID: " + targetSegment.getName() + "): Non 1-1 match. Please confirm alignment.");
+				LOGGER.warn("{}\nSource segment deleted (TU ID: {}): Non 1-1 match. Please confirm alignment.",
+						targetSegment.toString(), targetSegment.getName());
 			} else if (cell.getState() == DpMatrixCell.MATCH) {
 				ITextUnit sourceSegment = matrix.getAlignmentElementX(cell.getXindex());
 				ITextUnit targetSegment = matrix.getAlignmentElementY(cell.getYindex());
@@ -105,8 +105,8 @@ public class ParagraphAligner {
 						cell.getMultiMatchXIndexBegin(), cell.getMultiMatchXIndexEnd());
 				List<ITextUnit> targetSegments = matrix.getAlignmentElementsY(
 						cell.getMultiMatchYIndexBegin(), cell.getMultiMatchYIndexEnd());
-				LOGGER.warn(sourceSegments.get(0).getSource().toString()
-						+ "\nMulti-ITextUnit Match (TU ID: " + sourceSegments.get(0).getName() + "): Non 1-1 match. Please confirm alignment.");
+				LOGGER.warn("{}\nMulti-ITextUnit Match (TU ID: {}): Non 1-1 match. Please confirm alignment.",
+						sourceSegments.get(0).getSource().toString(), sourceSegments.get(0).getName());
 			}
 		}
 		

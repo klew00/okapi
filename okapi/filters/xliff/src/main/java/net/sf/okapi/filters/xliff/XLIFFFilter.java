@@ -251,7 +251,7 @@ public class XLIFFFilter implements IFilter {
 				inStreamReader = new InputStreamReader(input.getStream(), inStreamCharset);
 			}
 			catch ( java.io.UnsupportedEncodingException e ) {
-				logger.warn(String.format("Invalid encoding '%s', using default.", inStreamCharset));
+				logger.warn("Invalid encoding '{}', using default.", inStreamCharset);
 				inStreamReader = new InputStreamReader(input.getStream());
 			}
 			// When possible, make sure we have a filename associated with the stream
@@ -433,7 +433,7 @@ public class XLIFFFilter implements IFilter {
 		if ( tmp == null ) throw new OkapiIllegalFilterOperationException("Missing attribute 'source-language'.");
 		LocaleId tmpLang = LocaleId.fromString(tmp); 
 		if ( !tmpLang.equals(srcLang) ) { // Warn about source language
-			logger.warn(String.format("The source language declared in <file> is '%s' not '%s'.", tmp, srcLang));
+			logger.warn("The source language declared in <file> is '{}' not '{}'.", tmp, srcLang);
 		}
 		
 		// Check the target language
@@ -445,8 +445,8 @@ public class XLIFFFilter implements IFilter {
 			}
 			else { // If we do not override the target
 				if ( !tmpLang.sameLanguageAs(trgLang) ) { // Warn about target language
-					logger.warn(String.format("The target language declared in <file> is '%s' not '%s'. '%s' will be used.",
-						prop.getValue(), trgLang, prop.getValue()));
+					logger.warn("The target language declared in <file> is '{}' not '{}'. '{}' will be used.",
+						prop.getValue(), trgLang, prop.getValue());
 					trgLang = tmpLang;
 				}
 			}
@@ -497,9 +497,15 @@ public class XLIFFFilter implements IFilter {
 		int count = reader.getNamespaceCount();
 		for ( int i=0; i<count; i++ ) {
 			prefix = reader.getNamespacePrefix(i);
-			skel.append(String.format(" xmlns%s=\"%s\"",
-				(!Util.isEmpty(prefix) ? ":"+prefix : ""),
-				reader.getNamespaceURI(i)));
+//			skel.append(String.format(" xmlns%s=\"%s\"",
+//				(!Util.isEmpty(prefix) ? ":"+prefix : ""),
+//				reader.getNamespaceURI(i)));
+			skel.append(" xmlns");
+			if (!Util.isEmpty(prefix))
+				skel.append(":"+prefix);
+			skel.append("=\"");
+			skel.append(reader.getNamespaceURI(i));
+			skel.append("\"");
 		}
 		String attrName;
 		String attrValue;
@@ -509,9 +515,11 @@ public class XLIFFFilter implements IFilter {
 		for ( int i=0; i<count; i++ ) {
 			if ( !reader.isAttributeSpecified(i) ) continue; // Skip defaults
 			prefix = reader.getAttributePrefix(i);
-			attrName = String.format("%s%s",
-				(((prefix==null)||(prefix.length()==0)) ? "" : prefix+":"),
-				reader.getAttributeLocalName(i));
+//			attrName = String.format("%s%s",
+//				(((prefix==null)||(prefix.length()==0)) ? "" : prefix+":"),
+//				reader.getAttributeLocalName(i));
+			attrName = (((prefix==null)||(prefix.length()==0)) ? "" : prefix+":")
+				+ reader.getAttributeLocalName(i);
 			attrValue = reader.getAttributeValue(i);
 			
 			if ( updateLangWithTarget && attrName.equals("xml:lang") ) {
@@ -523,8 +531,13 @@ public class XLIFFFilter implements IFilter {
 				addApprovedIfNeeded = false;
 			}
 			else {
-				skel.append(String.format(" %s=\"%s\"", attrName,
-					Util.escapeToXML(attrValue.replace("\n", lineBreak), 3, params.getEscapeGT(), null)));
+//				skel.append(String.format(" %s=\"%s\"", attrName,
+//					Util.escapeToXML(attrValue.replace("\n", lineBreak), 3, params.getEscapeGT(), null)));
+				skel.append(" ");
+				skel.append(attrName);
+				skel.append("=\"");
+				skel.append(Util.escapeToXML(attrValue.replace("\n", lineBreak), 3, params.getEscapeGT(), null));
+				skel.append("\"");
 			}
 			
 			if ( attrName.equals("xml:space") ) {
@@ -553,9 +566,15 @@ public class XLIFFFilter implements IFilter {
 		int count = reader.getNamespaceCount();
 		for ( int i=0; i<count; i++ ) {
 			prefix = reader.getNamespacePrefix(i);
-			skel.append(String.format(" xmlns%s=\"%s\"",
-				(!Util.isEmpty(prefix) ? ":"+prefix : ""),
-				reader.getNamespaceURI(i)));
+//			skel.append(String.format(" xmlns%s=\"%s\"",
+//				(!Util.isEmpty(prefix) ? ":"+prefix : ""),
+//				reader.getNamespaceURI(i)));
+			skel.append(" xmlns");
+			if (!Util.isEmpty(prefix))
+				skel.append(":" + prefix);
+			skel.append("=\"");
+			skel.append(reader.getNamespaceURI(i));
+			skel.append("\"");
 		}
 		String attrName;
 		boolean ps = preserveSpaces.peek();
@@ -565,21 +584,31 @@ public class XLIFFFilter implements IFilter {
 		for ( int i=0; i<count; i++ ) {
 			if ( !reader.isAttributeSpecified(i) ) continue; // Skip defaults
 			prefix = reader.getAttributePrefix(i);
-			attrName = String.format("%s%s",
-				(((prefix==null)||(prefix.length()==0)) ? "" : prefix+":"),
-				reader.getAttributeLocalName(i));
+//			attrName = String.format("%s%s",
+//				(((prefix==null)||(prefix.length()==0)) ? "" : prefix+":"),
+//				reader.getAttributeLocalName(i));
+			attrName = (((prefix==null)||(prefix.length()==0)) ? "" : prefix+":")
+				+ reader.getAttributeLocalName(i);
 			
 			if ( reader.getAttributeLocalName(i).equals("target-language") ) {
 				// Create a property
 				hasTargetlanguage = true;
 				startSubDoc.setProperty(new Property("targetLanguage", reader.getAttributeValue(i), false));
-				skel.append(String.format(" %s=\"", attrName));
+//				skel.append(String.format(" %s=\"", attrName));
+				skel.append(" ");
+				skel.append(attrName);
+				skel.append("=\"");
 				skel.addValuePlaceholder(startSubDoc, "targetLanguage", LocaleId.EMPTY);
 				skel.append("\"");
 			}
 			else {
-				skel.append(String.format(" %s=\"%s\"", attrName,
-					Util.escapeToXML(reader.getAttributeValue(i).replace("\n", lineBreak), 3, params.getEscapeGT(), null)));
+//				skel.append(String.format(" %s=\"%s\"", attrName,
+//					Util.escapeToXML(reader.getAttributeValue(i).replace("\n", lineBreak), 3, params.getEscapeGT(), null)));
+				skel.append(" ");
+				skel.append(attrName);
+				skel.append("=\"");
+				skel.append(Util.escapeToXML(reader.getAttributeValue(i).replace("\n", lineBreak), 3, params.getEscapeGT(), null));
+				skel.append("\"");
 				if ( attrName.equals("xml:space") ) {
 					ps = reader.getAttributeValue(i).equals("preserve");
 				}
@@ -830,7 +859,7 @@ public class XLIFFFilter implements IFilter {
 				TextContainer cont = tc.clone();
 				cont.getSegments().joinAll();
 				if ( cont.compareTo(tu.getSource(), true) != 0 ) {
-					logger.warn(String.format("The <seg-source> content for the entry id='%s' is different from its <source>. The un-segmented content of <source> will be used.", tu.getId()));
+					logger.warn("The <seg-source> content for the entry id='{}' is different from its <source>. The un-segmented content of <source> will be used.", tu.getId());
 				}
 				else { // Same content: use the segmented one
 					tc.setHasBeenSegmentedFlag(true); // Force entries without mrk to single segment entries
@@ -1007,7 +1036,7 @@ public class XLIFFFilter implements IFilter {
 			Segment seg = tc.getSegments().get(mid);
 			if ( seg == null ) {
 				// No corresponding segment found. We drop that entry
-				logger.warn(String.format("An <alt-trans> element for an unknown segment '%s' was detected. It will be ignored.", mid));
+				logger.warn("An <alt-trans> element for an unknown segment '{}' was detected. It will be ignored.", mid);
 				processAltTrans = false;
 				return;
 			}
@@ -1059,7 +1088,10 @@ public class XLIFFFilter implements IFilter {
 		if ( srcLang.equals(trgLang) ) return;
 		//Else: this trans-unit has no target, we add it here in the skeleton
 		// so we can merge target data in it when writing out the skeleton
-		skel.append(String.format("<target xml:lang=\"%s\">", trgLang));
+//		skel.append(String.format("<target xml:lang=\"%s\">", trgLang));
+		skel.append("<target xml:lang=\"");
+		skel.append(trgLang.toString());
+		skel.append("\">");
 		skel.addContentPlaceholder(tu, trgLang);
 		skel.append("</target>");
 		skel.append(lineBreak);
@@ -1193,18 +1225,31 @@ public class XLIFFFilter implements IFilter {
 						int count = reader.getNamespaceCount();
 						for ( int i=0; i<count; i++ ) {
 							prefix = reader.getNamespacePrefix(i);
-							tmpg.append(String.format(" xmlns%s=\"%s\"",
-								(!Util.isEmpty(prefix) ? ":"+prefix : ""),
-								reader.getNamespaceURI(i)));
+//							tmpg.append(String.format(" xmlns%s=\"%s\"",
+//								(!Util.isEmpty(prefix) ? ":"+prefix : ""),
+//								reader.getNamespaceURI(i)));
+							tmpg.append(" xmlns");
+							if (!Util.isEmpty(prefix))
+								tmpg.append(":" + prefix);
+							tmpg.append("=\"");
+							tmpg.append(reader.getNamespaceURI(i));
+							tmpg.append("\"");
 						}
 						count = reader.getAttributeCount();
 						for ( int i=0; i<count; i++ ) {
 							if ( !reader.isAttributeSpecified(i) ) continue; // Skip defaults
 							prefix = reader.getAttributePrefix(i); 
-							tmpg.append(String.format(" %s%s=\"%s\"",
-								(((prefix==null)||(prefix.length()==0)) ? "" : prefix+":"),
-								reader.getAttributeLocalName(i),
-								Util.escapeToXML(reader.getAttributeValue(i), 3, params.getEscapeGT(), null)));
+//							tmpg.append(String.format(" %s%s=\"%s\"",
+//								(((prefix==null)||(prefix.length()==0)) ? "" : prefix+":"),
+//								reader.getAttributeLocalName(i),
+//								Util.escapeToXML(reader.getAttributeValue(i), 3, params.getEscapeGT(), null)));
+							tmpg.append(" ");
+							if ((prefix!=null) && (prefix.length()!=0))
+								tmpg.append(prefix + ":");
+							tmpg.append(reader.getAttributeLocalName(i));
+							tmpg.append("=\"");
+							tmpg.append(Util.escapeToXML(reader.getAttributeValue(i), 3, params.getEscapeGT(), null));
+							tmpg.append("\"");
 						}
 						tmpg.append(">");
 						code.setOuterData(tmpg.toString());
@@ -1249,7 +1294,7 @@ public class XLIFFFilter implements IFilter {
 							tt = TagType.OPENING;
 						}
 						else {
-							logger.error(String.format("Invalid value '%s' for pos attribute.", tmp));
+							logger.error("Invalid value '{}' for pos attribute.", tmp);
 						}
 						appendCode(tt, id, name, name, store, current);
 					}
@@ -1309,10 +1354,17 @@ public class XLIFFFilter implements IFilter {
 			for ( int i=0; i<count; i++ ) {
 				if ( !reader.isAttributeSpecified(i) ) continue; // Skip defaults
 				prefix = reader.getAttributePrefix(i); 
-				outerCode.append(String.format(" %s%s=\"%s\"",
-					(((prefix==null)||(prefix.length()==0)) ? "" : prefix+":"),
-					reader.getAttributeLocalName(i),
-					Util.escapeToXML(reader.getAttributeValue(i), 3, params.getEscapeGT(), null)));
+//				outerCode.append(String.format(" %s%s=\"%s\"",
+//					(((prefix==null)||(prefix.length()==0)) ? "" : prefix+":"),
+//					reader.getAttributeLocalName(i),
+//					Util.escapeToXML(reader.getAttributeValue(i), 3, params.getEscapeGT(), null)));
+				outerCode.append(" ");
+				if ((prefix!=null) && (prefix.length()!=0))
+					outerCode.append(prefix + ":");
+				outerCode.append(reader.getAttributeLocalName(i));
+				outerCode.append("=\"");
+				outerCode.append(Util.escapeToXML(reader.getAttributeValue(i), 3, params.getEscapeGT(), null));
+				outerCode.append("\"");
 			}
 			outerCode.append(">");
 			
@@ -1339,18 +1391,31 @@ public class XLIFFFilter implements IFilter {
 					count = reader.getNamespaceCount();
 					for ( int i=0; i<count; i++ ) {
 						prefix = reader.getNamespacePrefix(i);
-						tmpg.append(String.format(" xmlns%s=\"%s\"",
-							(!Util.isEmpty(prefix) ? ":"+prefix : ""),
-							reader.getNamespaceURI(i)));
+//						tmpg.append(String.format(" xmlns%s=\"%s\"",
+//							(!Util.isEmpty(prefix) ? ":"+prefix : ""),
+//							reader.getNamespaceURI(i)));
+						tmpg.append(" xmlns");
+						if (!Util.isEmpty(prefix))
+							tmpg.append(":" + prefix);
+						tmpg.append("=\"");
+						tmpg.append(reader.getNamespaceURI(i));
+						tmpg.append("\"");
 					}
 					count = reader.getAttributeCount();
 					for ( int i=0; i<count; i++ ) {
 						if ( !reader.isAttributeSpecified(i) ) continue; // Skip defaults
 						prefix = reader.getAttributePrefix(i); 
-						tmpg.append(String.format(" %s%s=\"%s\"",
-							(((prefix==null)||(prefix.length()==0)) ? "" : prefix+":"),
-							reader.getAttributeLocalName(i),
-							Util.escapeToXML(reader.getAttributeValue(i), 3, params.getEscapeGT(), null)));
+//						tmpg.append(String.format(" %s%s=\"%s\"",
+//							(((prefix==null)||(prefix.length()==0)) ? "" : prefix+":"),
+//							reader.getAttributeLocalName(i),
+//							Util.escapeToXML(reader.getAttributeValue(i), 3, params.getEscapeGT(), null)));
+						tmpg.append(" ");
+						if ((prefix!=null) && (prefix.length()!=0))
+							tmpg.append(prefix + ":");
+						tmpg.append(reader.getAttributeLocalName(i));
+						tmpg.append("=\"");
+						tmpg.append(Util.escapeToXML(reader.getAttributeValue(i), 3, params.getEscapeGT(), null));
+						tmpg.append("\"");
 					}
 					tmpg.append(">");
 					innerCode.append(tmpg.toString());

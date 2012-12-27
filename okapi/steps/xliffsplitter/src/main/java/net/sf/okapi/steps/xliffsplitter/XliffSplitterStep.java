@@ -241,7 +241,7 @@ public class XliffSplitterStep extends BasePipelineStep {
 					eventReader = inputFactory.createXMLEventReader(rawDoc.getStream(), encoding);
 				}
 				else {
-					logger.info("Encoding could not be auto-detected. Using default encoding: "+encoding);
+					logger.info("Encoding could not be auto-detected. Using default encoding: {}", encoding);
 					eventReader = inputFactory.createXMLEventReader(rawDoc.getStream());
 				}
 			} catch (XMLStreamException e) {

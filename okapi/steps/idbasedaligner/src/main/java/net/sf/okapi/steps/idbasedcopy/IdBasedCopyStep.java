@@ -121,7 +121,7 @@ public class IdBasedCopyStep extends BasePipelineStep {
 		if ( toCopy != null ) {
 			if ( toCopy.size() > 0 ) {
 				for ( String id : toCopy.keySet() ) {
-					logger.warn(String.format("Id '%s' is in the second file, but not in the main input.", id));
+					logger.warn("Id '{}' is in the second file, but not in the main input.", id);
 				}
 			}
 		}
@@ -181,7 +181,7 @@ public class IdBasedCopyStep extends BasePipelineStep {
 					}
 					// Else: put in the hash table
 					if ( toCopy.get(id) != null ) {
-						logger.warn("Duplicate id detected: "+id);
+						logger.warn("Duplicate id detected: {}", id);
 						continue;
 					}
 					toCopy.put(id, tu);

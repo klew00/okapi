@@ -158,6 +158,17 @@ public class FileCompare {
 					if (( oLine == null ) && ( gLine == null )) {
 						return true; // Done
 					}
+					
+					/*if ( oLine.contains("/its:")){
+						oLine = oLine.replace("/its:", "/");
+						System.err.println("Ignoring extra \"its:\" in okapi output when comparing");
+					}*/
+					
+					/*if ( oLine.contains("/@its:")){
+						oLine = oLine.replace("/@its:", "/@");
+						System.err.println("Ignoring extra \"@its:\" in okapi output when comparing");
+					}*/
+					
 					if ( !oLine.equals(gLine) )  {
 						if((oLine.length()+ 1 == gLine.length()) && (gLine.charAt(gLine.length()-1) == '\t')){
 							//Ignore Tab Difference--

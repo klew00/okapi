@@ -165,7 +165,7 @@ public class BOMConversionStep extends BasePipelineStep {
 							logger.info("Added UTF-8 BOM");
 						}
 						else { // Cannot add to un-supported encodings
-							logger.warn(String.format("Cannot add a BOM to a document in %s.", enc));
+							logger.warn("Cannot add a BOM to a document in {}.", enc);
 						}
 					}
 					// Then write the buffer we checked

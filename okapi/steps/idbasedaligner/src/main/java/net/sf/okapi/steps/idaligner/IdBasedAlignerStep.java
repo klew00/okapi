@@ -237,17 +237,17 @@ public class IdBasedAlignerStep extends BasePipelineStep {
 		else { // No match in the reference file
 			if ( missingReferenceMatch ) {
 				if ( sourceTu.getName() == null ) {
-					LOGGER.info(String.format("Entry without original identifier (id='%s').", sourceTu.getId()));
+					LOGGER.info("Entry without original identifier (id='{}').", sourceTu.getId());
 					hasNoMatch = true;
 				}
 				else {
-					LOGGER.info("No match found for " + sourceTu.getName());
+					LOGGER.info("No match found for {}", sourceTu.getName());
 					hasNoMatch = true;
 				}
 
 			}
 			else {
-				LOGGER.info("Source texts differ for " + sourceTu.getName());
+				LOGGER.info("Source texts differ for {}", sourceTu.getName());
 				hasNoMatch = true;
 			}
 			if ( params.getReplaceWithSource()) {
@@ -289,14 +289,14 @@ public class IdBasedAlignerStep extends BasePipelineStep {
 
 					// check if we have a name value
 					if (tu.getName() == null) {
-						LOGGER.info(String.format("Missing original identifier in target (id='%s').", tu.getId()));
+						LOGGER.info("Missing original identifier in target (id='{}').", tu.getId());
 						hasNoMatch = true;
 						continue;
 					}
 
 					// check if we have a duplicate name
 					if (targetTextUnitMap.get(tu.getName()) != null) {
-						LOGGER.info("Duplicate entry for " + tu.getName());
+						LOGGER.info("Duplicate entry for {}", tu.getName());
 						hasNoMatch = true;
 						continue;
 					}

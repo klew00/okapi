@@ -222,8 +222,8 @@ public class SegmentationStep extends BasePipelineStep {
 				if ( params.checkSegments && ( trgCont != null)) {
 					if ( trgCont.getSegments().count() != tu.getSource().getSegments().count() ) {
 						// Not the same number of segments
-						logger.warn(String.format("Text unit id='%s': Source (%s) and target (%s) do not have the same number of segments.",
-							tu.getId(), sourceLocale, targetLocale));
+						logger.warn("Text unit id='{}': Source ({}) and target ({}) do not have the same number of segments.",
+							tu.getId(), sourceLocale, targetLocale);
 					}
 					// Otherwise make sure we have matches
 					else {
@@ -231,8 +231,8 @@ public class SegmentationStep extends BasePipelineStep {
 						for ( Segment seg : tu.getSource().getSegments() ) {
 							if ( trgSegs.get(seg.id) == null ) {
 								// No target segment matching source segment seg.id
-								logger.warn(String.format("Text unit id='%s': No match found for source segment id='%s' in target language '%s'",
-									tu.getId(), seg.id, targetLocale));
+								logger.warn("Text unit id='{}': No match found for source segment id='{}' in target language '{}'",
+									tu.getId(), seg.id, targetLocale);
 							}
 						}
 					}

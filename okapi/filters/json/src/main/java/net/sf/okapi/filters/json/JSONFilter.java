@@ -398,8 +398,8 @@ public class JSONFilter implements IFilter {
 					buffer.append(inputText.charAt(current));
 					break;
 				default: // Unexpected escape sequence
-					logger.warn(String.format("Unexpected escape sequence '\\%c'.",
-						inputText.charAt(current)));
+					logger.warn("Unexpected escape sequence '\\{}'.",
+						inputText.charAt(current));
 					buffer.append('\\');
 					buffer.append(inputText.charAt(current));
 					break;

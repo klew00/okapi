@@ -65,22 +65,22 @@ public class JavaCcLexer extends AbstractLexer {
 			
 		} catch (TokenMgrError e) {
 			
-			logger.debug("JavaCC error: " + e.getMessage());
+			logger.debug("JavaCC error: {}", e.getMessage());
 			return null;
 			
 		} catch (Error e) {
 		
-			logger.debug("JavaCC error: " + e.getMessage());
+			logger.debug("JavaCC error: {}", e.getMessage());
 			return null;
 		
 		} catch (ParseException e) {
 
-			logger.debug("JavaCC parsing exception: " + e.getMessage());
+			logger.debug("JavaCC parsing exception: {}", e.getMessage());
 			return null;
 			
 		} catch (IOException e) {
 
-			logger.debug("JavaCC IO exception: " + e.getMessage());
+			logger.debug("JavaCC IO exception: {}", e.getMessage());
 			return null;
 		}
 

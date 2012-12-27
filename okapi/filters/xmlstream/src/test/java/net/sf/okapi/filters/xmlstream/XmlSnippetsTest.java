@@ -8,7 +8,6 @@ import net.sf.okapi.common.filters.IFilterConfigurationMapper;
 import net.sf.okapi.common.filterwriter.GenericContent;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.*;
-import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.filters.xmlstream.integration.XmlStreamTestUtils;
 
 import org.junit.After;
@@ -118,18 +117,6 @@ public class XmlSnippetsTest {
 		tu = FilterTestDriver.getTextUnit(events, 3);
 		assertNotNull(tu);
 		assertEquals(".", tu.toString());
-	}
-
-	@Test
-	public void testHtmlNonWellFormedEmptyTag() {
-		String snippet = "<br>text<br/>";
-		ArrayList<Event> events = XmlStreamTestUtils
-				.getEvents(snippet, xmlStreamFilter, parameters);
-		ITextUnit tu = events.get(1).getTextUnit();
-		List<Code> codes = tu.getSource().getFirstContent().getCodes();
-		for (Code code : codes) {
-			assertEquals(TagType.PLACEHOLDER, code.getTagType());
-		}
 	}
 
 	@Test

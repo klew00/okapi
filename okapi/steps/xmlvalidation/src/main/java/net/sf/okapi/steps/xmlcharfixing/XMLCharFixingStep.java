@@ -91,7 +91,7 @@ public class XMLCharFixingStep extends BasePipelineStep {
 	
 	@Override
 	protected Event handleEndBatch (Event event) {
-		LOGGER.info(String.format("Number of invalid characters replaced = %d", count));
+		LOGGER.info("Number of invalid characters replaced = {}", count);
 		return event;
 	}
 	
@@ -186,7 +186,7 @@ public class XMLCharFixingStep extends BasePipelineStep {
 						else start = m.end();
 					}
 					catch ( NumberFormatException e ) {
-						LOGGER.error(String.format("Invalid NCR: '%s'", m.group()));
+						LOGGER.error("Invalid NCR: '{}'", m.group());
 					}
 					
 				}
@@ -206,7 +206,7 @@ public class XMLCharFixingStep extends BasePipelineStep {
 				rd.getSourceLocale(), rd.getTargetLocale()));
 		}
 		catch ( IllegalFormatException e ) {
-			LOGGER.error(String.format("Invalid replacement format: '%s'", params.getReplacement()));
+			LOGGER.error("Invalid replacement format: '{}'", params.getReplacement());
 		}
 		catch ( Exception e ) {
 			LOGGER.error("Error while processing XML for invalid characters.");

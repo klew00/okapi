@@ -96,8 +96,8 @@ public class TermExtractionStep extends BasePipelineStep {
 		extractor.completeExtraction();
 
 		String finalPath = Util.fillRootDirectoryVariable(params.getOutputPath(), rootDir);
-		LOGGER.info("Output: " + finalPath);
-		LOGGER.info(String.format("Candidate terms found = %d", extractor.getTerms().size()));
+		LOGGER.info("Output: {}", finalPath);
+		LOGGER.info("Candidate terms found = {}", extractor.getTerms().size());
 
 		if ( params.getAutoOpen() ) {
 			Util.openURL((new File(finalPath)).getAbsolutePath());

@@ -72,19 +72,23 @@ public class DoxygenCommand implements Iterable<DoxygenParameter> {
 	
 	public String getCanonicalName()
 	{
-		
-		String cName = name;
-		
 		if (getTagType() == TagType.CLOSING) {
 			String pair = getPair();
-			if (pair != null) cName = pair;
+			if (pair != null) return pair;
 		}
 		
-		return cName;
+		return name;
+	}
+	
+	public boolean hasPair()
+	{
+		return getPair() != null;
 	}
 	
 	public String getPair()
 	{
+		if (isHtmlTag()) return name;
+		
 		return (String) data.get("pair");
 	}
 
@@ -100,6 +104,11 @@ public class DoxygenCommand implements Iterable<DoxygenParameter> {
 		Boolean preserve = (Boolean) data.get("preserve_whitespace");
 		
 		return preserve != null ? preserve.booleanValue() : filterParams.isPreserveWhitespace();
+	}
+	
+	private boolean isHtmlTag()
+	{
+		return rawCommand.startsWith("<");
 	}
 	
 	private boolean isFinalHtmlTag()

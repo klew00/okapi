@@ -244,7 +244,7 @@ public class ResourceSimplifier {
 		if (tuIndex == 1)
 			id = resId;
 		else {
-			logger.warn("Duplicate TU: " + resId);
+			logger.warn("Duplicate TU: {}", resId);
 			id = String.format("%s_%d", resId, tuIndex);
 		}
 		
@@ -362,7 +362,7 @@ public class ResourceSimplifier {
 			if (part.parent instanceof ITextUnit)
 				newSkel.add(writer.getContent((ITextUnit)part.parent, null, EncoderContext.TEXT)); // Source goes to skeleton
 			else {
-				logger.warn("The self-reference must be a text-unit: " + resId);
+				logger.warn("The self-reference must be a text-unit: {}", resId);
 				newSkel.add(part.parent.toString());
 			}
 		}
@@ -389,13 +389,13 @@ public class ResourceSimplifier {
 		if (parent instanceof IReferenceable) {
 			IReferenceable r = (IReferenceable) parent;
 			if (!r.isReferent()) {
-				logger.warn("Referent flag is not set in parent: " + resId);
+				logger.warn("Referent flag is not set in parent: {}", resId);
 				return false;
 			}
 			return true;
 		}
 		else {
-			logger.warn("Invalid parent type: " + resId);
+			logger.warn("Invalid parent type: {}", resId);
 			return false;
 		}
 	}

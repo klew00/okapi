@@ -29,6 +29,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.ProgressBar;
@@ -43,6 +44,7 @@ public class LogForm implements ILog {
 
 	private Shell shell;
 	private Text edLog;
+	private StringBuffer strLog = new StringBuffer();
 	private Button btStop;
 	private int errorCount;
 	private int warningCount;
@@ -143,16 +145,26 @@ public class LogForm implements ILog {
 	}
 
 	private void updateDisplay () {
+		final Display disp = Display.getDefault();
+		// Don't do anything if the current thread is not the display thread
+		if (Thread.currentThread().getId() != disp.getThread().getId())
+			return;
+
+		edLog.append(strLog.toString());
+		strLog = new StringBuffer();
+
 		btStop.setEnabled(inProgress);
 		pbPrimary.setEnabled(inProgress);
 		pbSecondary.setEnabled(inProgress);
+
+		while (disp.readAndDispatch()) {}
 	}
-	
+
 	public boolean beginProcess (String p_sText) {
 		if ( inProgress() ) return false;
 		clear();
 		startTime = System.currentTimeMillis();
-		edLog.append(Res.getString("LogForm.startProcess")); //$NON-NLS-1$
+		strLog.append(Res.getString("LogForm.startProcess")); //$NON-NLS-1$
 		if (( p_sText != null ) && ( p_sText.length() > 0 ))
 			setLog(LogType.MESSAGE, 0, p_sText);
 		errorCount = warningCount = 0;
@@ -190,6 +202,7 @@ public class LogForm implements ILog {
 
 	public void clear () {
 		edLog.setText(""); //$NON-NLS-1$
+		strLog = new StringBuffer();
 	}
 
 	private String toHMSMS (long millis) {
@@ -206,11 +219,11 @@ public class LogForm implements ILog {
 		if ( inProgress ) {
 			if (( p_sText != null ) && ( p_sText.length() > 0 ))
 				setLog(LogType.MESSAGE, 0, p_sText);
-			edLog.append(String.format(Res.getString("LogForm.errorCount"), errorCount)); //$NON-NLS-1$
-			edLog.append(String.format(Res.getString("LogForm.warningCount"), warningCount)); //$NON-NLS-1$
-			edLog.append(String.format(Res.getString("LogForm.duration"), //$NON-NLS-1$
+			strLog.append(String.format(Res.getString("LogForm.errorCount"), errorCount)); //$NON-NLS-1$
+			strLog.append(String.format(Res.getString("LogForm.warningCount"), warningCount)); //$NON-NLS-1$
+			strLog.append(String.format(Res.getString("LogForm.duration"), //$NON-NLS-1$
 				toHMSMS(System.currentTimeMillis()-startTime)));
-			edLog.append(Res.getString("LogForm.endProcess")); //$NON-NLS-1$
+			strLog.append(Res.getString("LogForm.endProcess")); //$NON-NLS-1$
 		}
 		inProgress = false;
 		updateDisplay();
@@ -276,15 +289,18 @@ public class LogForm implements ILog {
 	{
 		switch ( p_nType ) {
 		case LogType.ERROR:
-			edLog.append(Res.getString("LogForm.error") + p_sValue + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
+			strLog.append(Res.getString("LogForm.error") + p_sValue + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
+			updateDisplay();
 			errorCount++;
 			break;
 		case LogType.WARNING:
-			edLog.append(Res.getString("LogForm.warning") + p_sValue + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
+			strLog.append(Res.getString("LogForm.warning") + p_sValue + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
+			updateDisplay();
 			warningCount++;
 			break;
 		case LogType.MESSAGE:
-			edLog.append(p_sValue + "\n"); //$NON-NLS-1$
+			strLog.append(p_sValue + "\n"); //$NON-NLS-1$
+			updateDisplay();
 			break;
 		case LogType.SUBPROGRESS:
 		case LogType.MAINPROGRESS:

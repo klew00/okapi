@@ -177,7 +177,7 @@ public class UtilityDriver implements CancelListener {
 			int f = -1;
 			for ( Input item : prj.getList(0) ) {
 				f++;
-				logger.warn(Res.getString("UtilityDriver.input")+item.relativePath); //$NON-NLS-1$
+				logger.warn(Res.getString("UtilityDriver.input"), item.relativePath); //$NON-NLS-1$
 
 				// Initialize the main input
 				utility.resetLists();

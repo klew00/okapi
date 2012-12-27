@@ -216,13 +216,11 @@ public class Main {
 			// Create an encoding-aware output for the console
 			// System.out uses the default system encoding that
 			// may not be the right one (e.g. windows-1252 vs cp850)
-			if (!useLogger) {
+			if ( !useLogger ) {
 				PrintStream ps = new PrintStream(System.out, true, getConsoleEncodingName());
-
 				logHandler = LogHandlerFactory.getLogHandler();
 				logHandler.initialize(ps);
-				if (showTrace)
-					logHandler.setLogLevel(ILogHandler.LogLevel.TRACE);
+				if ( showTrace ) logHandler.setLogLevel(ILogHandler.LogLevel.TRACE);
 			}
 			
 			prog.printBanner();
@@ -727,7 +725,7 @@ public class Main {
 		FilterConfiguration config;
 		while ( iter.hasNext() ) {
 			config = iter.next();
-			logger.info(String.format(" - {} = {}", config.configId, config.description));
+			logger.info(" - {} = {}", config.configId, config.description);
 		}
 	}
 	
@@ -1057,10 +1055,8 @@ public class Main {
 		logger.info("Shows version and other information: -i or --info");
 		logger.info("Opens the user guide page: -h or --help");
 		logger.info("Lists all available filter configurations: -lfc or --listconf");
-		logger.info("Global option - output all messages to the current logger instead of the console:");
-		logger.info("   -logger");
-		logger.info("Global option - output debug messages when in console mode (no effect on logger):");
-		logger.info("   -trace");
+		logger.info("Outputs all messages to the current logger instead of the console: -logger");
+		logger.info("Outputs debug messages when in console mode (no effect on logger): -trace");
 		logger.info("Edits or view filter configurations (UI-dependent command):");
 		logger.info("   -e [[-fc] configId]");
 		logger.info("Extracts a file to XLIFF (and optionally segment and pre-translate):");

@@ -1533,4 +1533,25 @@ public final class Util {
 		float n = 100.0f; // high value of map to range
 		return (int) (m +((value-low)/(high-low) * (n-m)));
 	}
+
+	/**
+	 * Formats a float value so only the significant trailing zeros are displayed.
+	 * Removes the decimal period if there are no significant decimal digits.
+	 * @param value the float value to format (can be null).
+	 * @return the formatted value or an empty string.
+	 */
+	public static String formatFloat (Float value) {
+		if ( value == null ) return "";
+		String tmp = String.format("%f", value);
+		// Remove trailing zeros
+		while (( tmp.length() > 1 ) && ( tmp.charAt(tmp.length()-1) == '0' )) {
+			tmp = tmp.substring(0, tmp.length()-1);
+		}
+		// Remove ending period if it's the last character
+		if ( tmp.charAt(tmp.length()-1) == '.' ) {
+			tmp = tmp.substring(0, tmp.length()-1);
+		}
+		return tmp;
+	}
+
 }

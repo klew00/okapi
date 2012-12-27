@@ -34,6 +34,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.UsingParameters;
@@ -49,6 +52,8 @@ import net.sf.okapi.lib.translation.QueryUtil;
 
 @UsingParameters(Parameters.class)
 public class MicrosoftMTConnector extends BaseConnector implements ITMQuery {
+
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 
 	private final String OPTIONS1 = "<TranslateOptions xmlns=\"http://schemas.datacontract.org/2004/07/Microsoft.MT.Web.Service.V2\">" +
 		"<Category>";
@@ -141,22 +146,27 @@ public class MicrosoftMTConnector extends BaseConnector implements ITMQuery {
 				trgCode,
 				maximumHits);
 			
-			for (int zzyxx = 0; zzyxx < RETRIES; zzyxx++) {
+			for (int tries = 0; tries < RETRIES; tries++) {
 				if (!getNewTokenIfNeeded())
 				{
 					throw new RuntimeException("Error getting Microsoft Azure access token for translation");
-				} else {
-					if (zzyxx == RETRIES - 1) { // no use sleeping to just fall out of for loop
-						throw new RuntimeException("Failed to get Microsoft Translator access token after " + TOKENRETRIES);
+				} 
+				else {
+					if ( tries == RETRIES-1 ) { // no use sleeping to just fall out of for loop
+						throw new RuntimeException(String.format(
+							"Failed to get Microsoft Translator access token after %d tries.\nStopped at fragment: %s",
+							TOKENRETRIES, frag.toString()));
 					}
-					sBlock = poost(sAddress,OPTIONS1+params.getCategory()+OPTIONS2);
-					if (sBlock==null) {
+					sBlock = postQuery(sAddress,OPTIONS1+params.getCategory()+OPTIONS2);
+					if ( sBlock==null ) {
 						try {
 							Thread.sleep(SLEEPPAUSE);
-						} catch (InterruptedException e) { // this should never happen unless the app is closed
+						}
+						catch ( InterruptedException e ) { // This should never happen unless the application is closed
 							throw new RuntimeException("Interrupted while waiting for Microsoft Translator access token");
 						}  // wait then try again
-					} else {
+					}
+					else {
 						results = parseBlock(sBlock, frag);
 						break;
 					}
@@ -170,7 +180,9 @@ public class MicrosoftMTConnector extends BaseConnector implements ITMQuery {
 		return results.size();
 	}
 	
-	private String poost(String sAddress, String query) throws MalformedURLException, IOException
+	private String postQuery (String sAddress,
+		String query)
+		throws MalformedURLException, IOException
 	{
 		URL url = new URL(sAddress);
 		HttpURLConnection conn = (HttpURLConnection)url.openConnection();
@@ -193,7 +205,13 @@ public class MicrosoftMTConnector extends BaseConnector implements ITMQuery {
 			osw.close();
 		}
 		int code = conn.getResponseCode();
-		return(code==200 ? fromInputStreamToString(conn.getInputStream(), "UTF-8") : null);
+		if ( code == 200 ) {
+			return fromInputStreamToString(conn.getInputStream(), "UTF-8");
+		}
+		else {
+//			logger.debug("Query response code: {}: {}", code, conn.getResponseMessage());
+			return null;
+		}
 	}
 	
 	private String unescapeXML (String text) {
@@ -476,7 +494,7 @@ public class MicrosoftMTConnector extends BaseConnector implements ITMQuery {
 	
 	@Override
 	public List<List<QueryResult>> batchQuery (List<TextFragment> fragments) {
-		String sBlock;
+
 		List<List<QueryResult>> list = new ArrayList<List<QueryResult>>();
 		List<List<QueryResult>> subList;
 		List<TextFragment> subFragments;
@@ -487,6 +505,7 @@ public class MicrosoftMTConnector extends BaseConnector implements ITMQuery {
 		StringBuilder sb;
 		// Create the query template if needed
 		StringWriter strWriter = null;
+		
 		try {
 			if ( queryListTemplate == null ) {
 				strWriter = new StringWriter();
@@ -528,12 +547,14 @@ public class MicrosoftMTConnector extends BaseConnector implements ITMQuery {
 				String stext = util.toCodedHTML(tf);
 				sEscapee = Util.escapeToXML(stext, 0, false, null);
 				nEwLen = 21 + sEscapee.length();
-				if (nEwLen+queryListTemplate.length() + 200 > QUERYLENGTHLIMIT)
+				if ( nEwLen+queryListTemplate.length() + 200 > QUERYLENGTHLIMIT ) {
+					logger.warn("Segment starting with '{}' is too long to query.", sEscapee.substring(0, 20));
 					continue; // this segment by itself is too long for a query, so skip it
-				if (nCharCount+nEwLen > QUERYLENGTHLIMIT) { // do query now so don't exceed length limit
-					subList = subBatchQuery(queryListTemplate,sb,subFragments);
+				}
+				if ( nCharCount+nEwLen > QUERYLENGTHLIMIT ) { // do query now so don't exceed length limit
+					subList = subBatchQuery(queryListTemplate, sb, subFragments);
 					Iterator<List<QueryResult>> it = subList.iterator();
-					while(it.hasNext()) {
+					while ( it.hasNext() ) {
 						list.add(it.next());
 						bGotSome = true;
 					}
@@ -558,9 +579,9 @@ public class MicrosoftMTConnector extends BaseConnector implements ITMQuery {
 				return list;
 			}
 
-			subList = subBatchQuery(queryListTemplate,sb,subFragments);
+			subList = subBatchQuery(queryListTemplate, sb, subFragments);
 			Iterator<List<QueryResult>> it = subList.iterator();
-			while(it.hasNext()) {
+			while( it.hasNext() ) {
 				list.add(it.next());
 			}
 		}
@@ -571,7 +592,10 @@ public class MicrosoftMTConnector extends BaseConnector implements ITMQuery {
 		return list;
 	}
 	
-	private List<List<QueryResult>> subBatchQuery(String subQueryListTemplate, StringBuilder sb, List<TextFragment> fragments) {
+	private List<List<QueryResult>> subBatchQuery (String subQueryListTemplate,
+		StringBuilder sb,
+		List<TextFragment> fragments)
+	{
 		String sBlock;
 		List<List<QueryResult>> list = new ArrayList<List<QueryResult>>();
 		try {
@@ -579,22 +603,27 @@ public class MicrosoftMTConnector extends BaseConnector implements ITMQuery {
 //			URL url = new URL(String.format("http://api.microsofttranslator.com/v2/Http.svc/GetTranslationsArray"
 //			+ "?appId=%s", params.getAppId()));
 			String sAddress = String.format("http://api.microsofttranslator.com/v2/Http.svc/GetTranslationsArray");
-			for (int zzyxx = 0; zzyxx < RETRIES; zzyxx++) {
-				if (!getNewTokenIfNeeded())
+			for (int tries = 0; tries < RETRIES; tries++) {
+				if ( !getNewTokenIfNeeded() )
 				{
 					throw new RuntimeException("Error getting Microsoft Azure access token for translation");
-				} else {
-					if (zzyxx == RETRIES - 1) { // no use sleeping to just fall out of for loop
-						throw new RuntimeException("Failed to get Microsoft Translator access token after " + TOKENRETRIES);
+				}
+				else {
+					if (tries == RETRIES - 1) { // no use sleeping to just fall out of for loop
+						throw new RuntimeException(String.format(
+							"Failed to get Microsoft Translator access token after %d tries.",
+							TOKENRETRIES));
 					}
-					sBlock = poost(sAddress,query);
-					if (sBlock==null) {
+					sBlock = postQuery(sAddress,query);
+					if ( sBlock==null ) {
 						try {
 							Thread.sleep(SLEEPPAUSE);
-						} catch (InterruptedException e) { // this should never happen unless the app is closed
+						}
+						catch (InterruptedException e) { // this should never happen unless the app is closed
 							throw new RuntimeException("Interrupted while waiting for Microsoft Translator access token");
 						}  // wait then try again
-					} else {
+					}
+					else {
 						list = parseAllBlocks(sBlock, fragments);
 						break;
 					}
@@ -608,7 +637,7 @@ public class MicrosoftMTConnector extends BaseConnector implements ITMQuery {
 		return list;
 	}
 	
-	private boolean getNewTokenIfNeeded() { 
+	private boolean getNewTokenIfNeeded () { 
 		// returns false if Token could not be obtained
 		boolean bResult = true;
 		long lNow = getCurrentTime();
@@ -624,16 +653,18 @@ public class MicrosoftMTConnector extends BaseConnector implements ITMQuery {
 				}
 			}
 
-			for (int zzyxx = 0; zzyxx < TOKENRETRIES; zzyxx++) {
-				if (gitAccessToken()) {
+			for (int tries = 0; tries < TOKENRETRIES; tries++) {
+				if ( getAccessToken() ) {
 					bResult = true;
 					break;
 				}
 				else {
-					if (zzyxx == TOKENRETRIES - 1) { // no use sleeping to
+					if ( tries == TOKENRETRIES-1 ) { // no use sleeping to
 						// just fall out of
 						// for loop
-						throw new RuntimeException("Failed to get Microsoft Translator access token after " + TOKENRETRIES);
+						throw new RuntimeException(String.format(
+							"Failed to get Microsoft Translator access token after %d tries.",
+							TOKENRETRIES));
 					}
 					try {
 						Thread.sleep(SLEEPPAUSE);
@@ -647,22 +678,21 @@ public class MicrosoftMTConnector extends BaseConnector implements ITMQuery {
 		return bResult;
 	}
 
-	private boolean gitAccessToken () {
+	private boolean getAccessToken () {
 		boolean bResult = false;
 		try {
-			String sally = ApacheHttpClientForMT.getAzureAccessToken(
+			String tokenRes = ApacheHttpClientForMT.getAzureAccessToken(
 				"https://datamarket.accesscontrol.windows.net/v2/OAuth2-13",
 				params.getClientId(), params.getSecret());
-			if ( sally != null ) {
-				sToken = parseTokenForm(sally); // parseTokenForm should set nExpirationSecond
+			if ( tokenRes != null ) {
+				sToken = parseTokenForm(tokenRes); // parseTokenForm should set nExpirationSecond
 				if ( !sToken.equals("") ) {
 					bResult = true;
 				}
 			}
 		}
-		catch (Throwable e) {
-			int i = 1;
-			i = i + 1;
+		catch ( Throwable e ) {
+			logger.debug("Error in getAccessToken: {}", e.getMessage());
 		}
 		return bResult;
 	}
@@ -683,7 +713,8 @@ public class MicrosoftMTConnector extends BaseConnector implements ITMQuery {
 				sExpiresAt = sBlock.substring(n1 + 10, n2);
 				try {
 					lExpiresAt = Long.valueOf(sExpiresAt);
-				} catch (Exception e) {
+				}
+				catch (Exception e) {
 					lExpiresAt = 0L;
 				}
 			}
@@ -693,8 +724,7 @@ public class MicrosoftMTConnector extends BaseConnector implements ITMQuery {
 				lDies = 0;
 			}
 		}
-		if (lDies <= 0)
-			sAccessToken = "";
+		if ( lDies <= 0 ) sAccessToken = "";
 		lExpirationTime = lDies;
 		return sAccessToken;
 	}
@@ -779,8 +809,8 @@ public class MicrosoftMTConnector extends BaseConnector implements ITMQuery {
 		super.setLanguages(sourceLocale, targetLocale);
 		queryListTemplate = null;
 		addListTemplate = null;
-		srcCode = sourceLocale.toString();
-		trgCode = targetLocale.toString();
+		// srcCode and trgCode are set properly in setLanguage()
+		// they must not be reset here
 	}
 	
 }

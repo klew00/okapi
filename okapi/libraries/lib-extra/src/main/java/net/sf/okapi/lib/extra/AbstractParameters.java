@@ -141,13 +141,13 @@ public abstract class AbstractParameters extends BaseParameters implements INoti
 			} catch (InstantiationException e) {
 				
 				//e.printStackTrace();
-				logger.debug("Group element instantiation failed: " + e.getMessage());
+				logger.debug("Group element instantiation failed: {}", e.getMessage());
 				return;
 				
 			} catch (IllegalAccessException e) {
 				
 				//e.printStackTrace();
-				logger.debug("Group element instantiation failed: " + e.getMessage());
+				logger.debug("Group element instantiation failed: {}", e.getMessage());
 				return;
 			}
 			

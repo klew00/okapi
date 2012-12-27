@@ -38,7 +38,7 @@ import net.sf.okapi.common.Util;
 public class ReportGenerator {
 
 	private static final String FIELD_REGEX = "\\[([A-Za-z0-9_]+)\\]";
-	private static final String TABLE_REGEX = "\\[(\\[.+\\][\\r\\n \\t,]*)\\]";
+	private static final String TABLE_REGEX = "\\[(.*\\[.+\\][\\r\\n \\t,;]*)\\]";
 	private String template;
 	private String lineBreak = "\n";
 	
@@ -191,11 +191,12 @@ public class ReportGenerator {
 		        String fieldName = st.substring(start2, end2);
 		        //System.out.println("---" + fieldName + "---");
 		        String value = getData(fieldName);
-		        if (!Util.isEmpty(value))
+		        if (! Util.isEmpty(value))
 		        	st = RegexUtil.replaceAll(st, RegexUtil.escape(field), 0, value);
-		        else
-		        	//break;
+		        else {		        	
 		        	st = RegexUtil.replaceAll(st, RegexUtil.escape(field), 0, "[?" + fieldName + "]");
+		        	break;
+		        }		        	
 		    }
 		    else 
 		    	break;
@@ -287,12 +288,20 @@ public class ReportGenerator {
 		//String[] columnValues = new String[columnNames.length];		
 		List<List<String>> columns = new LinkedList<List<String>>();
 		
-		int numRows = Integer.MAX_VALUE;
+		int numRows = 0; //Integer.MAX_VALUE;
 		
 		for (String columnName : columnNames) {
 			List<String> column = multiFields.get(columnName);
 			columns.add(column);
-			numRows = Math.min(numRows, column.size());
+			numRows = Math.max(numRows, column.size());
+		}
+		
+		// Make all columns equally sized
+		for (String columnName : columnNames) {
+			List<String> column = multiFields.get(columnName);
+			for (int i = column.size() - 1; i < numRows; i++) {
+				column.add("[?" + columnName + "]");
+			} 
 		}
 		
 		String st = "";

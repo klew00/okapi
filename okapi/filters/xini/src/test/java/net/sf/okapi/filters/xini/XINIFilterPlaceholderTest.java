@@ -16,6 +16,8 @@ import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.filters.xini.jaxb.Field;
 import net.sf.okapi.filters.xini.jaxb.Xini;
 
+import net.sf.okapi.common.TestUtil;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -112,16 +114,16 @@ public class XINIFilterPlaceholderTest {
 		List<Field> field = helper.getFieldsByPageIdAndElementId(xini, 1, 10);
 
 		String segContent = helper.getSegContentBySegId(field.get(0), 0);
-		helper.assertEquivalent("Sentence <sph ID=\"1\" type=\"style\"/> one. <sph type=\"ph\" ID=\"2\"/>Two.", segContent);
+		TestUtil.assertEquivalentXml("Sentence <sph ID=\"1\" type=\"style\"/> one. <sph type=\"ph\" ID=\"2\"/>Two.", segContent);
 
 		segContent = helper.getSegContentBySegId(field.get(0), 1);
-		helper.assertEquivalent("Three <eph ID=\"2\"/>", segContent);
+		TestUtil.assertEquivalentXml("Three <eph ID=\"2\"/>", segContent);
 
 		segContent = helper.getSegContentBySegId(field.get(0), 2);
-		helper.assertEquivalent("Four <eph ID=\"1\" type=\"link\"/>", segContent);
+		TestUtil.assertEquivalentXml("Four <eph ID=\"1\" type=\"link\"/>", segContent);
 
 		segContent = helper.getSegContentBySegId(field.get(0), 3);
-		helper.assertEquivalent("A line <br/> break", segContent);
+		TestUtil.assertEquivalentXml("A line <br/> break", segContent);
 
 		segContent = helper.getSegContentBySegId(field.get(0), 4);
 		assertEquals("<ph ID=\"3\"><ph ID=\"4\">a</ph>b</ph>cc", segContent);
@@ -131,28 +133,28 @@ public class XINIFilterPlaceholderTest {
 	public void phTypeMemory100Preserved(){
 		String snippet = preparePhTypeTest("memory100");
 		String segContent = doStringToEventsAndEventsToXiniForPhTypeTest(snippet);
-		Assert.assertEquals("<ph type=\"memory100\" ID=\"1\">test content</ph>", segContent);
+		TestUtil.assertEquivalentXml("<ph type=\"memory100\" ID=\"1\">test content</ph>", segContent);
 	}
 
 	@Test
 	public void phTypeUpdatedPreserved(){
 		String snippet = preparePhTypeTest("updated");
 		String segContent = doStringToEventsAndEventsToXiniForPhTypeTest(snippet);
-		Assert.assertEquals("<ph type=\"updated\" ID=\"1\">test content</ph>", segContent);
+		TestUtil.assertEquivalentXml("<ph type=\"updated\" ID=\"1\">test content</ph>", segContent);
 	}
 
 	@Test
 	public void phTypeInsertedPreserved(){
 		String snippet = preparePhTypeTest("inserted");
 		String segContent = doStringToEventsAndEventsToXiniForPhTypeTest(snippet);
-		Assert.assertEquals("<ph type=\"inserted\" ID=\"1\">test content</ph>", segContent);
+		TestUtil.assertEquivalentXml("<ph type=\"inserted\" ID=\"1\">test content</ph>", segContent);
 	}
 
 	@Test
 	public void phTypeDeletedPreserved(){
 		String snippet = preparePhTypeTest("deleted");
 		String segContent = doStringToEventsAndEventsToXiniForPhTypeTest(snippet);
-		Assert.assertEquals("<ph type=\"deleted\" ID=\"1\">test content</ph>", segContent);
+		TestUtil.assertEquivalentXml("<ph type=\"deleted\" ID=\"1\">test content</ph>", segContent);
 	}
 
 	private String doStringToEventsAndEventsToXiniForPhTypeTest(String snippet){

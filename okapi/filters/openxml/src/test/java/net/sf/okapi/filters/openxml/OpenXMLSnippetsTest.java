@@ -226,8 +226,8 @@ public class OpenXMLSnippetsTest {
 			}
 		}		
 
-		LOGGER.debug("nOriginal: "+original);
-		LOGGER.debug("Output:    "+tmp.toString());
+		LOGGER.debug("nOriginal: {}", original);
+		LOGGER.debug("Output:    {}", tmp.toString());
 		writer.close();
 		return tmp.toString();
 	}

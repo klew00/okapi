@@ -67,7 +67,7 @@ public class ZipCompare {
 		}
 		catch(Exception e)
 		{
-			LOGGER.info("ZipCompare:  Output file "+out+" not found.");
+			LOGGER.info("ZipCompare:  Output file {} not found.", out);
 //			throw new OkapiFileNotFoundException("Output file "+out+" not found.");
 			return false;
 		}
@@ -79,7 +79,7 @@ public class ZipCompare {
 		}
 		catch(Exception e)
 		{
-			LOGGER.info("ZipCompare:  Gold file "+gold+" not found.");
+			LOGGER.info("ZipCompare:  Gold file {} not found.", gold);
 //			throw new OkapiFileNotFoundException("Gold file "+gold+" not found.");
 			return false;
 		}
@@ -107,7 +107,7 @@ public class ZipCompare {
 					bRslt = fc.filesExactlyTheSame(ois,gis);
 					if (!bRslt)
 					{
-						LOGGER.info("Output and Gold Entry "+sOEntryName+" differ"); // DWH 7-16-09
+						LOGGER.info("Output and Gold Entry {} differ", sOEntryName); // DWH 7-16-09
 						return false;
 					}
 					break;
@@ -115,7 +115,7 @@ public class ZipCompare {
 			}
 			if (!bFoundit)
 			{
-				LOGGER.info("Output entry "+sOEntryName+" not found in gold."); // DWH 7-16-09
+				LOGGER.info("Output entry {} not found in gold.", sOEntryName); // DWH 7-16-09
 				return false;
 			}
 		}
@@ -136,7 +136,7 @@ public class ZipCompare {
 			}
 			if (!bFoundit)
 			{
-				LOGGER.info("Gold entry "+sGEntryName+" not found in output."); // DWH 7-16-09
+				LOGGER.info("Gold entry {} not found in output.", sGEntryName); // DWH 7-16-09
 				return false;
 			}
 		}

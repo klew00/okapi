@@ -25,10 +25,10 @@ import org.w3c.dom.Node;
 
 public interface ITraversal {
 	
-	public static final int DIR_RTL              = 0;
-	public static final int DIR_LTR              = 1;
-	public static final int DIR_RLO              = 2;
-	public static final int DIR_LRO              = 3;
+	public static final int DIR_LTR              = 0;
+	public static final int DIR_RTL              = 1;
+	public static final int DIR_LRO              = 2;
+	public static final int DIR_RLO              = 3;
 	
 	public static final int WITHINTEXT_NO        = 0;
 	public static final int WITHINTEXT_YES       = 1;
@@ -87,15 +87,24 @@ public interface ITraversal {
 	
 	public String getExternalResourceRef (Attr attribute);
 	
-	public String getLocQualityIssuesRef ();
+	public String getLocQualityIssuesRef (Attr attribute);
 	
-	public String getLocQualityIssueType ();
+	public int getLocQualityIssueCount (Attr attribute);
 	
-	public String getLocQualityIssueComment ();
+	public String getLocQualityIssueType (Attr attribute,
+		int index);
 	
-	public String getLocQualityIssueSeverity ();
+	public String getLocQualityIssueComment (Attr attribute,
+		int index);
 	
-	public String getLocQualityIssueProfileRef ();
+	public Float getLocQualityIssueSeverity (Attr attribute,
+		int index);
+	
+	public String getLocQualityIssueProfileRef (Attr attribute,
+		int index);
+	
+	public Boolean getLocQualityIssueEnabled (Attr attribute,
+		int index);
 	
 	/**
 	 * Gets the element-withinText-related information for the current element.
@@ -121,8 +130,17 @@ public interface ITraversal {
 	public String getTermInfo (Attr attribute);
 	
 	/**
-	 * Gets the localization note of the given attribute of the current element or one of its attributes.
-	 * @param attribute the attribute to query. The attribute must be in the current
+	 * Gets the confidence associated with a given term node or one of its
+	 * attributes.
+	 * @param attribute The attribute to query or null for the element.
+	 * @return the confidence associated with the queried part.
+	 */
+	public Float getTermConfidence (Attr attribute);
+	
+	/**
+	 * Gets the localization note of the current element of the traversal or
+	 * one of its attributes.
+	 * @param attribute the attribute to query or null for the element.
 	 * @return The localization note of the queried part.
 	 */
 	public String getLocNote (Attr attribute);
@@ -159,5 +177,41 @@ public interface ITraversal {
 	public String getLineBreakType (Attr attribute);
 	
 	public String getAllowedCharacters (Attr attribute);
+
+	/**
+	 * Gets the tools references associated with the current element of the traversal (and its attributes).
+	 * <p>The returned value is sorted by data category and hold all data categories within scope
+	 * (not just the ones set on the given node).
+	 * @return the tools references associated with the queried part.
+	 */
+	public String getAnnotatorsRef ();
+	
+	/**
+	 * Gets the MT Confidence value for the current element of the traversal or one
+	 * of its attributes.
+	 * @param attribute the attribute to query or null for the element.
+	 * @return the MT Confidence value or null if none is set.
+	 */
+	public Float getMtConfidence (Attr attribute);
+
+	public String getDisambigGranularity (Attr attribute);
+
+	public String getDisambigClass (Attr attribute);
+	
+	public String getDisambigSource (Attr attribute);
+	
+	public String getDisambigIdent (Attr attribute);
+	
+	public Float getDisambigConfidence (Attr attribute);
+
+	public Float getLocQualityRatingScore (Attr attribute);
+	
+	public Integer getLocQualityRatingVote (Attr attribute);
+	
+	public Float getLocQualityRatingScoreThreshold (Attr attribute);
+	
+	public Integer getLocQualityRatingVoteThreshold (Attr attribute);
+	
+	public String getLocQualityRatingProfileRef (Attr attribute);
 	
 }

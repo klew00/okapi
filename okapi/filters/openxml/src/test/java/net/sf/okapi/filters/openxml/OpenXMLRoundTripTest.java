@@ -193,8 +193,9 @@ public class OpenXMLRoundTripTest {
 			rtrued2 = zc.zipsExactlyTheSame(sOutputPath+(bPeeking ? (bTranslating ? "Peek" : "Tag") : (bTranslating ? "Tran" : "Out"))+filename,
 					   					      sGoldPath+(bPeeking ? (bTranslating ? "Peek" : "Tag") : (bTranslating ? "Tran" : "Out"))+filename);
 			if (!rtrued2) // DWH 12-18-09 log only if it failed
-				LOGGER.info((bPeeking ? (bTranslating ? "Peek" : "Tag") : (bTranslating ? "Tran" : "Out"))+filename+
-						   (rtrued2 ? " SUCCEEDED" : " FAILED"));
+				LOGGER.info("{}{}{}",
+							(bPeeking ? (bTranslating ? "Peek" : "Tag") : (bTranslating ? "Tran" : "Out")),
+							filename, (rtrued2 ? " SUCCEEDED" : " FAILED"));
 			if (!rtrued2)
 				allGood = false;
 		}

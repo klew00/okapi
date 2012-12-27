@@ -356,7 +356,7 @@ public class GTTBatchTranslationStep extends BasePipelineStep {
 				}
 				catch ( Throwable e ) {
 					// Catch issues with inline codes
-					logger.warn(String.format("Skipping entry '%d'.\n", id) + e.getMessage());
+					logger.warn("Skipping entry '{}'.\n{}", id, e.getMessage());
 					continue; // Skip this entry
 				}
 

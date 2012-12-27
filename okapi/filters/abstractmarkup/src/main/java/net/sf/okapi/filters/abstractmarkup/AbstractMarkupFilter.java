@@ -176,7 +176,7 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 		}
 		this.document = null; // help Java GC
 		
-		LOGGER.debug(getDocumentName() + " has been closed");
+		LOGGER.debug("{} has been closed", getDocumentName());
 	}
 
 	/*
@@ -229,14 +229,11 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 
 		if (detectedEncoding == null && getEncoding() != null) {
 			detectedEncoding = getEncoding();
-			LOGGER.debug(String.format(
-					"Cannot auto-detect encoding. Using the default encoding (%s)", getEncoding()));
+			LOGGER.debug("Cannot auto-detect encoding. Using the default encoding ({})", getEncoding());
 		} else if (getEncoding() == null) {
 			detectedEncoding = parsedHeader.getEncoding(); // get best guess
-			LOGGER.debug(
-					String.format(
-							"Default encoding and detected encoding not found. Using best guess encoding (%s)",
-							detectedEncoding));
+			LOGGER.debug("Default encoding and detected encoding not found. Using best guess encoding ({})",
+							detectedEncoding);
 		}
 
 		return detectedEncoding;
@@ -250,7 +247,7 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 	 */
 	public void open(RawDocument input) {
 		open(input, true);
-		LOGGER.debug(getName() + " has opened an input document");
+		LOGGER.debug("{} has opened an input document", getName());
 	}
 
 	/**
@@ -686,6 +683,18 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 		// set a TextUnit name that id from a far out tag
 		currentId = null;
 		
+		// if exclude is true by default then push "not exclude" to enable this rule
+		if (getConfig().isGlobalExcludeByDefault() &&
+				!startTag.isSyntacticalEmptyElementTag()) {
+			switch (ruleType) {
+			case TEXT_UNIT_ELEMENT:
+				ruleState.pushIncludedRule(startTag.getName());
+				break;
+			default:
+				break;
+			}			
+		}
+		
 		try {
 			// if in excluded state everything is skeleton including text
 			if (ruleState.isExludedState()) {
@@ -906,6 +915,17 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 		}
 		
 		ruleType = updateEndTagRuleState(endTag);
+		
+		// if exclude is true by default then pop "not exclude" added in handleStartTag
+		if (getConfig().isGlobalExcludeByDefault()) {
+			switch (ruleType) {
+			case TEXT_UNIT_ELEMENT:
+				ruleState.popExcludedIncludedRule();
+				break;
+			default:
+				break;
+			}			
+		}
 
 		switch (ruleType) {
 		case INLINE_EXCLUDED_ELEMENT:
@@ -1013,6 +1033,41 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 		addCodeToCurrentTextUnit(tag, true);
 	}
 	
+	/**
+	 * Filter specific method for determining {@link TextFragment.TagType}
+	 * @param tag Jericho {@link Tag} start or end tag
+	 * @return PLACEHOLDER, OPEN, CLOSED {@link TextFragment.TagType}
+	 */
+	protected TextFragment.TagType determineTagType(Tag tag) {
+		TextFragment.TagType codeType;
+		
+		// start tag or empty tag
+		if (tag.getTagType() == StartTagType.NORMAL
+				|| tag.getTagType() == StartTagType.UNREGISTERED) {
+			StartTag startTag = ((StartTag) tag);
+
+			// is this an empty tag?
+			if (startTag.isSyntacticalEmptyElementTag()) {
+				codeType = TextFragment.TagType.PLACEHOLDER;
+			} else {
+				if (ruleState.isInlineExcludedState()) {
+					codeType = TextFragment.TagType.PLACEHOLDER;
+				} else {
+					codeType = TextFragment.TagType.OPENING;
+				}
+			}
+		} else { // end or unknown tag
+			if (tag.getTagType() == EndTagType.NORMAL
+					|| tag.getTagType() == EndTagType.UNREGISTERED) {
+				codeType = TextFragment.TagType.CLOSING;
+			} else {
+				codeType = TextFragment.TagType.PLACEHOLDER;
+			}
+		}
+		
+		return codeType;
+	}
+	
 	
 	/**
 	 * Add an {@link Code} to the current {@link TextUnit}. Throws an exception if there is no current {@link TextUnit}.
@@ -1026,25 +1081,12 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 	protected void addCodeToCurrentTextUnit(Tag tag, boolean endCodeNow) {
 		List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders;
 		String literalTag = tag.toString();
-		TextFragment.TagType codeType;
+		TextFragment.TagType codeType = determineTagType(tag);
 
 		// start tag or empty tag
 		if (tag.getTagType() == StartTagType.NORMAL
 				|| tag.getTagType() == StartTagType.UNREGISTERED) {
 			StartTag startTag = ((StartTag) tag);
-
-			// is this an empty tag?
-			if (startTag.isSyntacticalEmptyElementTag()) {
-				codeType = TextFragment.TagType.PLACEHOLDER;
-			} else if (startTag.isEndTagRequired()) {
-				if (ruleState.isInlineExcludedState()) {
-					codeType = TextFragment.TagType.PLACEHOLDER;
-				} else {
-					codeType = TextFragment.TagType.OPENING;
-				}
-			} else {
-				codeType = TextFragment.TagType.PLACEHOLDER;
-			}
 
 			// create a list of Property or Text placeholders for this tag
 			// If this list is empty we know that there are no attributes that
@@ -1063,12 +1105,6 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 						endCodeNow);
 			}
 		} else { // end or unknown tag
-			if (tag.getTagType() == EndTagType.NORMAL
-					|| tag.getTagType() == EndTagType.UNREGISTERED) {
-				codeType = TextFragment.TagType.CLOSING;
-			} else {
-				codeType = TextFragment.TagType.PLACEHOLDER;
-			}
 			addToTextUnit(new Code(codeType, getConfig().getElementType(tag), literalTag));
 		}
 	}

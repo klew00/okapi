@@ -441,6 +441,7 @@ doxygen_commands:
       #  translatable: true
   if: 
     type: OPENING
+    pair: endif
     parameters: 
       - name: section-label 
         length: WORD
@@ -448,6 +449,7 @@ doxygen_commands:
         translatable: false
   ifnot: 
     type: OPENING
+    pair: endif
     parameters: 
       - name: section-label 
         length: WORD

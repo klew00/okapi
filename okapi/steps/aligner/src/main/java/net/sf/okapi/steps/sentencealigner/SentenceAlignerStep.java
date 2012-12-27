@@ -134,9 +134,8 @@ public class SentenceAlignerStep extends BasePipelineStep implements IObserver {
 					srxDocument.loadRules(params.getCustomSourceRulesPath());
 					loadDefault = false;
 				} catch (Exception e) {
-					LOGGER.warn(String
-							.format("Custom source segmentation rules file '%s' cannot be read.\nUsing the default rules instead.",
-									params.getCustomSourceRulesPath()));
+					LOGGER.warn("Custom source segmentation rules file '{}' cannot be read.\nUsing the default rules instead.",
+									params.getCustomSourceRulesPath());
 				}
 			}
 			if (loadDefault) {
@@ -157,9 +156,8 @@ public class SentenceAlignerStep extends BasePipelineStep implements IObserver {
 					srxDocument.loadRules(params.getCustomTargetRulesPath());
 					loadDefault = false;
 				} catch (Exception e) {
-					LOGGER.warn(String
-							.format("Custom target segmentation rules file '%s' cannot be read.\nUsing the default rules instead.",
-									params.getCustomTargetRulesPath()));
+					LOGGER.warn("Custom target segmentation rules file '{}' cannot be read.\nUsing the default rules instead.",
+									params.getCustomTargetRulesPath());
 				}
 			}
 			if (loadDefault) {

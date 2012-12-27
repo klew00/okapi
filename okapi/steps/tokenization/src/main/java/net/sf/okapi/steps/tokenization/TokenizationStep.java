@@ -150,17 +150,17 @@ public class TokenizationStep extends AbstractPipelineStep {
 				
 			} catch (ClassNotFoundException e) {
 				
-				logger.debug("Lexer instantiation falied: " + e.getMessage());
+				logger.debug("Lexer instantiation falied: {}", e.getMessage());
 				continue;
 				
 			} catch (InstantiationException e) {
 				
-				logger.debug("Lexer instantiation falied: " + e.getMessage());
+				logger.debug("Lexer instantiation falied: {}", e.getMessage());
 				continue;
 				
 			} catch (IllegalAccessException e) {
 				
-				logger.debug("Lexer instantiation falied: " + e.getMessage());
+				logger.debug("Lexer instantiation falied: {}", e.getMessage());
 				continue;
 			}				
 		}

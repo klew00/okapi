@@ -681,7 +681,7 @@ public class MIFFilter implements IFilter {
 							else {
 								// Else: unexpected type of page: extract it just in case
 								trToExtract.add(textRectId);
-								logger.warn(String.format("Unknown page type '%s' (It will be extracted)", pageType));
+								logger.warn("Unknown page type '{}' (It will be extracted)", pageType);
 							}
 						}
 
@@ -1179,7 +1179,7 @@ public class MIFFilter implements IFilter {
 		if ( token.getType() == MIFToken.TYPE_STRING ) {
 			String str = charTable.get(token.getString());
 			if ( str == null ) {
-				logger.warn(String.format("Unknow character name '%s'. This character will be ignored.", token));
+				logger.warn("Unknow character name '{}'. This character will be ignored.", token);
 			}
 			else {
 				chToken.setString(str); 
@@ -1597,7 +1597,7 @@ public class MIFFilter implements IFilter {
 		String mappedEncoding = encodingTable.get(encoding);
 		if ( mappedEncoding == null ) {
 			// Warn if the name is not found (and just move on)
-			logger.warn(String.format("Unknown encoding name: '%s'.", encoding));
+			logger.warn("Unknown encoding name: '{}'.", encoding);
 			return res;
 		}
 		else {
@@ -2157,8 +2157,8 @@ public class MIFFilter implements IFilter {
 						catch ( CharacterCodingException e ) {
 							if ( ++decodingErrors < 25 ) {
 								// Warning message, but only up to a point
-								logger.warn(String.format("Error with decoding character with encoding '%s'.",
-									currentDecoder.charset().name()));
+								logger.warn("Error with decoding character with encoding '{}'.",
+									currentDecoder.charset().name());
 							}
 						}
 					}
@@ -2288,7 +2288,7 @@ public class MIFFilter implements IFilter {
 		}
 		catch ( NumberFormatException e ) {
 			// Log warning
-			logger.warn(String.format("Invalid escape sequence found: '%s'", tagBuffer.toString()));
+			logger.warn("Invalid escape sequence found: '{}'", tagBuffer.toString());
 		}
 		
 		// Error

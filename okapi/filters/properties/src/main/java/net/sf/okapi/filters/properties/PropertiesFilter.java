@@ -560,16 +560,14 @@ public class PropertiesFilter implements IFilter {
 									text.substring(i + 2, i + 6), 16);
 							tmpText.append((char) nTmp);
 						} catch (Exception e) {
-							logger.warn(
-									String.format(Res.getString("INVALID_UESCAPE"),
-											text.substring(i + 2, i + 6)));
+							logger.warn(Res.getString("INVALID_UESCAPE"),
+											text.substring(i + 2, i + 6));
 						}
 						i += 5;
 						continue;
 					} else {
-						logger.warn(
-								String.format(Res.getString("INVALID_UESCAPE"),
-										text.substring(i + 2)));
+						logger.warn(Res.getString("INVALID_UESCAPE"),
+										text.substring(i + 2));
 					}
 					break;
 				case 'n':

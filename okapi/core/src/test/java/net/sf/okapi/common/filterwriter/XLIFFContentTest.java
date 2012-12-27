@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2009-2012 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -20,6 +20,9 @@
 
 package net.sf.okapi.common.filterwriter;
 
+import net.sf.okapi.common.annotation.GenericAnnotation;
+import net.sf.okapi.common.annotation.GenericAnnotationType;
+import net.sf.okapi.common.annotation.GenericAnnotations;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 
@@ -38,7 +41,7 @@ public class XLIFFContentTest {
 	
 	@Test
 	public void testSimpleDefault () {
-		TextFragment tf = createTextUnit();
+		TextFragment tf = createTextFragment();
 		assertEquals(tf.getCodes().size(), 5);
 		assertEquals("t1<bpt id=\"1\">&lt;b1&gt;</bpt><bpt id=\"2\">&lt;b2&gt;</bpt><ph id=\"3\">{\\x1\\}</ph>t2<ept id=\"2\">&lt;/b2&gt;</ept><ept id=\"1\">&lt;/b1&gt;</ept>t3",
 			fmt.setContent(tf).toString());
@@ -46,7 +49,7 @@ public class XLIFFContentTest {
 	
 	@Test
 	public void testSimpleGX () {
-		TextFragment tf = createTextUnit();
+		TextFragment tf = createTextFragment();
 		assertEquals(tf.getCodes().size(), 5);
 		assertEquals("t1<g id=\"1\"><g id=\"2\"><x id=\"3\"/>t2</g></g>t3",
 			fmt.setContent(tf).toString(true));
@@ -54,7 +57,7 @@ public class XLIFFContentTest {
 
 	@Test
 	public void testMisOrderedGX1 () {
-		TextFragment tf = createMisOrderedTextUnit1();
+		TextFragment tf = createMisOrderedTextFragment1();
 		assertEquals(tf.getCodes().size(), 4);
 		assertEquals("t1<bx id=\"1\"/>t2<bx id=\"2\"/>t3<ex id=\"1\"/>t4<ex id=\"2\"/>t5",
 			fmt.setContent(tf).toString(true));
@@ -62,7 +65,7 @@ public class XLIFFContentTest {
 	
 	@Test
 	public void testMisOrderedGX2 () {
-		TextFragment tf = createMisOrderedTextUnit2();
+		TextFragment tf = createMisOrderedTextFragment2();
 		assertEquals(tf.getCodes().size(), 4);
 		assertEquals("<ex id=\"3\"/><g id=\"1\"></g><bx id=\"2\"/>",
 			fmt.setContent(tf).toString(true));
@@ -70,7 +73,7 @@ public class XLIFFContentTest {
 	
 	@Test
 	public void testMisOrderedComplexGX () {
-		TextFragment tf = createMisOrderedComplexTextUnit();
+		TextFragment tf = createMisOrderedComplexFragmentUnit();
 		assertEquals(tf.getCodes().size(), 8);
 		assertEquals("<bx id=\"1\"/><bx id=\"2\"/><g id=\"3\"></g><ex id=\"1\"/><bx id=\"4\"/><ex id=\"2\"/><ex id=\"4\"/>",
 			fmt.setContent(tf).toString(true));
@@ -78,13 +81,25 @@ public class XLIFFContentTest {
 	
 	@Test
 	public void testMisOrderedComplexBPT () {
-		TextFragment tf = createMisOrderedComplexTextUnit();
+		TextFragment tf = createMisOrderedComplexFragmentUnit();
 		assertEquals(tf.getCodes().size(), 8);
 		assertEquals("<it id=\"1\" pos=\"open\">&lt;b1&gt;</it><it id=\"2\" pos=\"open\">&lt;b2&gt;</it><bpt id=\"3\">&lt;b2&gt;</bpt><ept id=\"3\">&lt;/b2&gt;</ept><it id=\"1\" pos=\"close\">&lt;/b1&gt;</it><it id=\"4\" pos=\"open\">&lt;b3&gt;</it><it id=\"2\" pos=\"close\">&lt;/b2&gt;</it><it id=\"4\" pos=\"close\">&lt;/b3&gt;</it>",
 			fmt.setContent(tf).toString(false));
 	}
+
+	@Test
+	public void testDisambiguityAnnotation () {
+		GenericAnnotations anns = new GenericAnnotations();
+		GenericAnnotation ga = anns.add(GenericAnnotationType.DISAMB);
+		ga.setString(GenericAnnotationType.DISAMB_SOURCE, "src");
+		ga.setString(GenericAnnotationType.DISAMB_GRANULARITY, GenericAnnotationType.DISAMB_GRANULARITY_ENTITY);
+		TextFragment tf = new TextFragment("Before the span after.");
+		tf.annotate(7, 15, GenericAnnotationType.GENERIC, anns);
+		assertEquals("Before <mrk mtype=\"x-its\" its:disambigSource=\"src\">the span</mrk> after.",
+			fmt.setContent(tf).toString(true));
+	}
 	
-	private TextFragment createTextUnit () {
+	private TextFragment createTextFragment () {
 		TextFragment tf = new TextFragment();
 		tf.append("t1");
 		tf.append(TagType.OPENING, "b1", "<b1>");
@@ -97,7 +112,7 @@ public class XLIFFContentTest {
 		return tf;
 	}
 	
-	private TextFragment createMisOrderedTextUnit1 () {
+	private TextFragment createMisOrderedTextFragment1 () {
 		TextFragment tf = new TextFragment();
 		tf.append("t1");
 		tf.append(TagType.OPENING, "b1", "<b1>");
@@ -111,7 +126,7 @@ public class XLIFFContentTest {
 		return tf;
 	}
 
-	private TextFragment createMisOrderedTextUnit2 () {
+	private TextFragment createMisOrderedTextFragment2 () {
 		TextFragment tf = new TextFragment();
 		tf.append(TagType.CLOSING, "b1", "</b1>");
 		tf.append(TagType.OPENING, "b2", "<b2>");
@@ -120,7 +135,7 @@ public class XLIFFContentTest {
 		return tf;
 	}
 
-	private TextFragment createMisOrderedComplexTextUnit () {
+	private TextFragment createMisOrderedComplexFragmentUnit () {
 		TextFragment tf = new TextFragment();
 		tf.append(TagType.OPENING, "b1", "<b1>");
 		tf.append(TagType.OPENING, "b2", "<b2>");

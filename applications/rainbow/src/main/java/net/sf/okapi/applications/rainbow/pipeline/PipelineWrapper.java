@@ -123,8 +123,8 @@ public class PipelineWrapper {
 					availableSteps.put(stepInfo.stepClass, stepInfo);
 				}
 				catch ( Throwable e ) {
-					logger.warn("Could not instantiate step '{}' because of error.\n"+e.getMessage(),
-						item.getClassName());
+					logger.warn("Could not instantiate step '{}' because of error.\n{}",
+						item.getClassName(), e.getMessage());
 				}
 			}
 			if (fcMapper instanceof FilterConfigurationMapper) {
@@ -305,6 +305,17 @@ public class PipelineWrapper {
 			}
 			availableSteps.put(step.stepClass, step);
 
+			ps = (IPipelineStep)Class.forName(
+				"net.sf.okapi.steps.enrycher.EnrycherStep").newInstance();
+			params = ps.getParameters();
+			step = new StepInfo(ps.getName(), ps.getDescription(), ps.getClass().getName(), null,
+				params.getClass().getName());
+			if ( params != null ) {
+				step.paramsData = params.toString();
+				peMapper.addDescriptionProvider("net.sf.okapi.steps.enrycher.Parameters", step.paramsClass);
+			}
+			availableSteps.put(step.stepClass, step);
+			
 			ps = (IPipelineStep)Class.forName(
 				"net.sf.okapi.steps.externalcommand.ExternalCommandStep").newInstance();
 			params = ps.getParameters();
@@ -607,6 +618,13 @@ public class PipelineWrapper {
 			availableSteps.put(step.stepClass, step);
 
 			ps = (IPipelineStep)Class.forName(
+				"net.sf.okapi.steps.spacecheck.SpaceCheckStep").newInstance();
+			params = ps.getParameters();
+			step = new StepInfo(ps.getName(), ps.getDescription(), ps.getClass().getName(), null,
+				null);
+			availableSteps.put(step.stepClass, step);
+
+			ps = (IPipelineStep)Class.forName(
 				"net.sf.okapi.steps.termextraction.TermExtractionStep").newInstance();
 			params = ps.getParameters();
 			step = new StepInfo(ps.getName(), ps.getDescription(), ps.getClass().getName(), null,
@@ -760,16 +778,16 @@ public class PipelineWrapper {
 
 		}
 		catch ( InstantiationException e ) {
-			logger.warn("Could not instantiate a step.\n" + e.getMessage());
+			logger.warn("Could not instantiate a step.\n{}", e.getMessage());
 		}
 		catch ( IllegalAccessException e ) {
-			logger.warn("Illegal access for a step.\n" + e.getMessage());
+			logger.warn("Illegal access for a step.\n{}", e.getMessage());
 		}
 		catch ( ClassNotFoundException e ) {
-			logger.warn("Step class not found.\n" + e.getMessage());
+			logger.warn("Step class not found.\n{}", e.getMessage());
 		}
 		catch ( Throwable e ) {
-			logger.warn("Error creating one of the step.\n" + e.getMessage());
+			logger.warn("Error creating one of the step.\n{}", e.getMessage());
 		}
 	}
 	

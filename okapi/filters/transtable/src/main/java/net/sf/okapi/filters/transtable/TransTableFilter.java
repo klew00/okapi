@@ -333,17 +333,15 @@ public class TransTableFilter implements IFilter {
 		// Source locale
 		LocaleId srcLoc = LocaleId.fromString(parts[1]);
 		if ( !srcLoc.equals(input.getSourceLocale()) ) {
-			logger.warn(String.format("The source locale declared in the file ('%s') is not the expected one ('%s')\n"
-				+ "%s will be used.",
-				srcLoc.toString(), input.getSourceLocale().toString(), input.getSourceLocale().toString()));
+			logger.warn("The source locale declared in the file ('{}') is not the expected one ('{}')\n{} will be used.",
+				srcLoc.toString(), input.getSourceLocale().toString(), input.getSourceLocale().toString());
 		}
 		// Target locale
 		trgLoc = LocaleId.fromString(parts[2]);
 		if ( input.getTargetLocale() != null ) {
 			if ( !trgLoc.equals(input.getTargetLocale()) ) {
-				logger.warn(String.format("The target locale declared in the file ('%s') is not the expected one ('%s')\n"
-					+ "%s will be used.",
-					trgLoc.toString(), input.getTargetLocale().toString(), input.getTargetLocale().toString()));
+				logger.warn("The target locale declared in the file ('{}') is not the expected one ('{}')\n{} will be used.",
+					trgLoc.toString(), input.getTargetLocale().toString(), input.getTargetLocale().toString());
 				trgLoc = input.getTargetLocale();
 			}
 		}

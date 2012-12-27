@@ -20,15 +20,10 @@
 
 package net.sf.okapi.filters.its;
 
-import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Stack;
-
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathExpression;
-import javax.xml.xpath.XPathExpressionException;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
@@ -37,13 +32,17 @@ import net.sf.okapi.common.IdGenerator;
 import net.sf.okapi.common.ListUtil;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.annotation.GenericAnnotation;
+import net.sf.okapi.common.annotation.GenericAnnotationType;
+import net.sf.okapi.common.annotation.GenericAnnotations;
 import net.sf.okapi.common.annotation.TermsAnnotation;
+import net.sf.okapi.common.encoder.EncoderContext;
 import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.encoder.IEncoder;
 import net.sf.okapi.common.exceptions.OkapiBadFilterInputException;
-import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filters.IFilterConfigurationMapper;
+import net.sf.okapi.common.filters.InlineCodeFinder;
 import net.sf.okapi.common.filters.SubFilter;
 import net.sf.okapi.common.filterwriter.GenericFilterWriter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
@@ -69,11 +68,9 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.its.ITSEngine;
 import org.w3c.its.ITraversal;
+import org.w3c.its.TargetPointerEntry;
 
 public abstract class ITSFilter implements IFilter {
-
-	private static final String SRC_TRGPTRFLAGNAME = "\u10ff"; // Name of the user-data property that holds the target pointer flag in the source
-	private static final String TRG_TRGPTRFLAGNAME = "\u20ff"; // Name of the user-data property that holds the target pointer flag in the target
 
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -93,7 +90,7 @@ public abstract class ITSFilter implements IFilter {
 	private final boolean isHTML5;
 	
 	private String trgLangCode; // can be null
-	private ITraversal trav;
+	private ITSEngine trav;
 	private LinkedList<Event> queue;
 	private int tuId;
 	private IdGenerator otherId;
@@ -102,28 +99,8 @@ public abstract class ITSFilter implements IFilter {
 	private boolean canceled;
 	private IEncoder cfEncoder;
 	private TermsAnnotation terms;
-	private HashMap<Node, TargetPointerEntry> targetTable;
-	private boolean hasTargetPointer;
 	private Map<String, String> variables;
 
-	private class TargetPointerEntry {
-
-		static final int BEFORE = 0;
-		static final int AFTER = 1;
-		
-		int type;
-		Node srcNode;
-		Node trgNode;
-		ITextUnit tu;
-		
-		TargetPointerEntry (Node srcNode,
-			Node trgNode)
-		{
-			this.srcNode = srcNode;
-			this.trgNode = trgNode;
-		}
-	}
-	
 	public ITSFilter (boolean isHTML5,
 		String mimeType)
 	{
@@ -239,20 +216,16 @@ public abstract class ITSFilter implements IFilter {
 		}
 
 		// Create the ITS engine
-		ITSEngine itsEng;
-		itsEng = new ITSEngine(doc, input.getInputURI(), isHTML5, variables);
+		trav = new ITSEngine(doc, input.getInputURI(), isHTML5, variables);
 		// Load the parameters file if there is one
 		if ( params != null ) {
 			if ( params.getDocument() != null ) {
-				itsEng.addExternalRules(params.getDocument(), params.getURI());
+				trav.addExternalRules(params.getDocument(), params.getURI());
 			}
 		}
 		
-		applyRules(itsEng);
+		applyRules(trav);
 
-		// If we have rules with target pointers we must prepare the nodes first
-		prepareTargetPointers(itsEng);
-		trav = itsEng;
 		trav.startTraversal();
 		context = new Stack<ContextItem>();
 		
@@ -272,7 +245,7 @@ public abstract class ITSFilter implements IFilter {
 		params.quoteMode = 3; // quote is escaped, apos is not
 		// Change the escapeQuotes option depending on whether translatable attributes rule
 		// was triggered or not
-		if ( !itsEng.getTranslatableAttributeRuleTriggered() ) {
+		if ( !trav.getTranslatableAttributeRuleTriggered() ) {
 			// Allow to not escape quotes only if there is no translatable attributes
 			if ( !params.escapeQuotes ) {
 				params.quoteModeDefined = true;
@@ -290,92 +263,6 @@ public abstract class ITSFilter implements IFilter {
 		
 		// Put the start document in the queue
 		queue.add(new Event(EventType.START_DOCUMENT, startDoc));
-	}
-	
-	/**
-	 * Prepares the document for using target pointers.
-	 * <p>Because of the way the skeleton is constructed and because target pointer can result in the target
-	 * location being anywhere in the document, we need to perform a first pass to create the targetTable
-	 * table. That table lists all the source nodes that have a target pointer and the corresponding target
-	 * node with its status.
-	 * 
-	 * - check if node has target pointer for target
-	 * - if yes, it's either before or after the corresponding source
-	 * -- if it's before;
-	 * --- create a skel placeholder and a TU
-	 * --- move to next node
-	 * -- if it's after
-	 * --- get the text unit created when the source node was found
-	 * --- and create the skel placeholder
-	 * 
-	 * @param itsEng the engine to use (just because it's not a global variable)
-	 */
-	private void prepareTargetPointers (ITSEngine itsEng) {
-		hasTargetPointer = false;
-		// If there is no target pointers, just reset the table
-		if ( !itsEng.getTargetPointerRuleTriggered() ) {
-			targetTable = null;
-			return;
-		}
-		// Else: gather the target locations
-		targetTable = new HashMap<Node, ITSFilter.TargetPointerEntry>();
-		ITraversal tmpTrav = itsEng;
-		tmpTrav.startTraversal();
-
-		// Go through the document
-		Node srcNode;
-		while ( (srcNode = tmpTrav.nextNode()) != null ) {
-			switch ( srcNode.getNodeType() ) {
-			case Node.ELEMENT_NODE:
-				// Use !backTracking() to get to the elements only once
-				// and to include the empty elements (for attributes).
-				if ( !tmpTrav.backTracking() ) {
-					if ( tmpTrav.getTranslate(null) ) {
-						String pointer = tmpTrav.getTargetPointer(null);
-						if ( pointer != null ) {
-							resolveTargetPointer(itsEng.getXPath(), srcNode, pointer);
-							hasTargetPointer = true;
-						}
-					}
-					//TODO: attributes
-				}
-				break; // End switch
-			}
-		}
-	}
-
-	/**
-	 * Resolves the target pointer for a given source node and creates its
-	 * entry in targetTable.
-	 * @param xpath the XPath object to use for the resolution.
-	 * @param srcNode the source node.
-	 * @param pointer the XPath expression pointing to the target node
-	 */
-	private void resolveTargetPointer (XPath xpath,
-		Node srcNode,
-		String pointer)
-	{
-		try {
-			XPathExpression expr = xpath.compile(pointer);
-			Node trgNode = (Node)expr.evaluate(srcNode, XPathConstants.NODE);
-			if ( trgNode == null ) {
-				// No entry available
-				//TODO: try to create the needed node
-				return;
-			}
-			// Check the type
-			if ( srcNode.getNodeType() != trgNode.getNodeType() ) {
-				throw new OkapiIOException(String.format("a source node and its target node must be of the same type ('%s').", pointer));
-			}
-			// Create the entry
-			TargetPointerEntry tpe = new TargetPointerEntry(srcNode, trgNode);
-			// Set the flags on each nod
-			srcNode.setUserData(SRC_TRGPTRFLAGNAME, tpe, null);
-			trgNode.setUserData(TRG_TRGPTRFLAGNAME, tpe, null);
-		}
-		catch ( XPathExpressionException e ) {
-			throw new OkapiIOException(String.format("Bab XPath expression in target pointer ('%s').", pointer));
-		}
 	}
 	
 	private void process () {
@@ -606,6 +493,24 @@ public abstract class ITSFilter implements IFilter {
 		code.setReferenceFlag(id!=null); // Set reference flag if we created TU(s)
 	}
 
+	private void applyCodeFinder (TextFragment tf) {
+		// Find the inline codes
+		params.codeFinder.process(tf);
+		// Escape inline code content
+		List<Code> codes = tf.getCodes();
+		for ( Code code : codes ) {
+			// Escape the data of the new inline code (and only them)
+			if ( code.getType().equals(InlineCodeFinder.TAGTYPE) ) {
+				if ( cfEncoder == null ) {
+					cfEncoder = getEncoderManager().getEncoder();
+					//TODO: We should use the proper output encoding here, not force UTF-8, but we do not know it
+					cfEncoder.setOptions(params, "utf-8", lineBreak);
+				}
+				code.setData(cfEncoder.encode(code.getData(), EncoderContext.TEXT));
+			}
+		}
+	}
+	
 	private String addAttributeTextUnit (Attr attr,
 		boolean addToSkeleton)
 	{
@@ -614,25 +519,15 @@ public abstract class ITSFilter implements IFilter {
 		
 		// Deal with inline codes if needed
 		if ( params.useCodeFinder ) {
-			TextFragment tf = tu.getSource().getFirstContent();
-			params.codeFinder.process(tf);
-//			// Escape inline code content
-//			List<Code> codes = tf.getCodes();
-//			for ( Code code : codes ) {
-//				// Escape the data of the new inline code (and only them)
-//				if ( code.getType().equals(InlineCodeFinder.TAGTYPE) ) {
-//					if ( cfEncoder == null ) {
-//						cfEncoder = getEncoderManager().getEncoder();
-//						//TODO: We should use the proper output encoding here, not force UTF-8, but we do not know it
-//						cfEncoder.setOptions(params, "utf-8", lineBreak);
-//					}
-//					code.setData(cfEncoder.encode(code.getData(), EncoderContext.TEXT));
-//				}
-//			}
+			applyCodeFinder(tu.getSource().getFirstContent());
+			//TODO: we could have target entries too in some case (ITS targePointer) so we should test for that
+			// and process the target too if needed.
 		}
 
 		// Set the ITS context for this attribute and set the relevant properties
-		ContextItem ci = new ContextItem(context.peek().node, trav, attr);
+		ContextItem ci = new ContextItem(
+			(context.isEmpty() ? attr.getParentNode() : context.peek().node), trav, attr);
+		
 		// ITS Localization Note
 		if ( !Util.isEmpty(ci.locNote) ) {
 			tu.setProperty(new Property(Property.NOTE, ci.locNote));
@@ -652,6 +547,10 @@ public abstract class ITSFilter implements IFilter {
 		// ITS Allowed characters
 		if ( ci.allowedChars != null ) {
 			tu.setProperty(new Property(Property.ITS_ALLOWEDCHARACTERS, ci.allowedChars));
+		}
+		// ITS Localization Quality Issue
+		if ( ci.lqIssues != null ) {
+			tu.getSource().setAnnotation(ci.lqIssues);
 		}
 
 		queue.add(new Event(EventType.TEXT_UNIT, tu));
@@ -717,23 +616,30 @@ public abstract class ITSFilter implements IFilter {
 			}
 		}
 		else { // Else: Start tag
-			// Test if this is a target pointer node
-			if ( hasTargetPointer ) {
-				TargetPointerEntry tpe = (TargetPointerEntry)node.getUserData(TRG_TRGPTRFLAGNAME);
+			// Test if this node is involved in a source/target pair
+			if ( trav.getHasTargetPointer() ) {
+				TargetPointerEntry tpe = trav.getTargetPointerEntry(node);
 				if ( tpe != null ) {
-					//TODO
+					if ( tpe.getTargetNode() == node ) {
+						// This node is a target location
+						tpe.toString();
+						//TODO
+					}
+					else {
+						// This node is a source with a target location
+						// TODO
+						tpe.toString();
+					}
 				}
 			}
 			
-			if ( trav instanceof ITSEngine ) {
-				if ( ((ITSEngine)trav).getSubFilter(null) != null ) {
-					processSubFilterContent(node, ((ITSEngine)trav).getSubFilter(null));
-					moveToEnd(node); // Move to the end of this node
-					return true; // Send the events
-				}
+			if ( trav.getSubFilter(null) != null ) {
+				processSubFilterContent(node, ((ITSEngine)trav).getSubFilter(null));
+				moveToEnd(node); // Move to the end of this node
+				return true; // Send the events
 			}
 			
-			// otherwise, treat the tag
+			// Otherwise, treat the tag
 			switch ( trav.getWithinText() ) {
 			case ITraversal.WITHINTEXT_NESTED: //TODO: deal with nested elements
 				// For now treat them as inline
@@ -749,7 +655,6 @@ public abstract class ITSFilter implements IFilter {
 					}
 				}
 				else { // Already in extraction
-					//frag.append(TagType.OPENING, node.getLocalName(), buildStartTag(node));
 					addStartTagToFragment(node);
 				}
 				break;
@@ -944,20 +849,7 @@ public abstract class ITSFilter implements IFilter {
 		if ( extract ) {
 			// Deal with inline codes if needed
 			if ( params.useCodeFinder ) {
-				params.codeFinder.process(frag);
-				// Escape inline code content
-//				List<Code> codes = frag.getCodes();
-//				for ( Code code : codes ) {
-//					// Escape the data of the new inline code (and only them)
-//					if ( code.getType().equals(InlineCodeFinder.TAGTYPE) ) {
-//						if ( cfEncoder == null ) {
-//							cfEncoder = getEncoderManager().getEncoder();
-//							//TODO: We should use the proper output encoding here, not force UTF-8, but we do not know it
-//							cfEncoder.setOptions(params, "utf-8", lineBreak);
-//						}
-//						code.setData(cfEncoder.encode(code.getData(), EncoderContext.TEXT));
-//					}
-//				}
+				applyCodeFinder(frag);
 			}
 		
 			// Update the flag after the new codes
@@ -1006,10 +898,25 @@ public abstract class ITSFilter implements IFilter {
 		if ( context.peek().allowedChars != null ) {
 			tu.setProperty(new Property(Property.ITS_ALLOWEDCHARACTERS, context.peek().allowedChars));
 		}
+		// ITS Localization Quality Issue
+		if ( context.peek().lqIssues != null ) {
+			tu.getSource().setAnnotation(context.peek().lqIssues);
+		}
 		
 		// Set term info
 		if ( terms != null ) {
 			tu.getSource().setAnnotation(terms);
+			
+//			// Term as a generic annotation
+//			GenericAnnotations anns = tu.getSource().getAnnotation(GenericAnnotations.class);
+//			if ( anns == null ) {
+//				// If there is no annotation yet, creates one
+//				anns = new GenericAnnotations();
+//				tu.getSource().setAnnotation(anns);
+//			}
+//			GenericAnnotation ann = anns.add(GenericAnnotationType.TERM);
+//			ann.setString(GenericAnnotationType.TERM_INFO, value)
+
 			terms = null; // Reset for next time
 		}
 

@@ -34,6 +34,10 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import net.sf.okapi.common.TestUtil;
+import net.sf.okapi.common.annotation.GenericAnnotation;
+import net.sf.okapi.common.annotation.GenericAnnotationType;
+import net.sf.okapi.common.annotation.GenericAnnotations;
+import nu.validator.htmlparser.dom.HtmlDocumentBuilder;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -49,6 +53,7 @@ public class TraversalTest {
 	private String root = TestUtil.getParentDir(this.getClass(), "/input.xml");
 	//private LocaleId locEN = LocaleId.fromString("en");
 	private DocumentBuilderFactory fact = DocumentBuilderFactory.newInstance();
+	private HtmlDocumentBuilder htmlDocBuilder = new HtmlDocumentBuilder();
 
 	@Before
 	public void setUp() {
@@ -78,11 +83,66 @@ public class TraversalTest {
 		elem = getElement(trav, "term", 1);
 		assertNotNull(elem);
 		assertTrue(trav.getTerm(null));
-		// This is empty because ref in id(@ref) is not defined as IDType
-		// So no text is detected
-		assertEquals("", trav.getTermInfo(null));
+		assertEquals("the relationship, expressed through discourse\n"
+			+ "structure, between the implied author or some other addresser,\n"
+			+ "and the fiction.", trav.getTermInfo(null));
 	}
 
+	@Test
+	public void testTermPointerwithID () throws SAXException, IOException, ParserConfigurationException {
+		InputSource is = new InputSource(new StringReader("<text>"
+			+ "<its:rules xmlns:its=\"http://www.w3.org/2005/11/its\" version=\"2.0\">"
+			+ "<its:termRule selector=\"//term\" term=\"yes\" termInfoPointer=\"id(@def)\"/>"
+			+ "</its:rules>"
+			+ "<p>We may define	<term def=\"TDPV\">discoursal point of view</term> as "
+			+ "<gloss xml:id=\"TDPV\">the relationship, etc.</gloss>.</p></text>"));
+		Document doc = fact.newDocumentBuilder().parse(is);
+		ITraversal trav = applyITSRules(doc, null, false, null);
+		Element elem = getElement(trav, "term", 1);
+		assertNotNull(elem);
+		assertTrue(trav.getTerm(null));
+		assertEquals("the relationship, etc.", trav.getTermInfo(null));
+	}
+
+	@Test
+	public void testTermPointer () throws SAXException, IOException, ParserConfigurationException {
+		InputSource is = new InputSource(new StringReader("<doc>"
+			+ "<its:rules xmlns:its=\"http://www.w3.org/2005/11/its\" version=\"2.0\">"
+			+ "<its:param name=\"termInfoRefPointer\">target</its:param>"
+			+ "<its:termRule selector=\"//term\" term=\"yes\" "
+			+ " termInfoRefPointer=\"@*[local-name() = $termInfoRefPointer]\"/>"
+			+ "</its:rules>"
+			+ "<p>We may define<term target=\"#TDPV\">discoursal point of view</term> as <gloss xml:id=\"TDPV\">the "
+			+ "relationship, etc.</gloss></p>"
+			+ "</doc>"));
+		Document doc = fact.newDocumentBuilder().parse(is);
+		ITraversal trav = applyITSRules(doc, null, false, null);
+		Element elem = getElement(trav, "term", 1);
+		assertNotNull(elem);
+		assertTrue(trav.getTerm(null));
+		assertEquals("REF:#TDPV", trav.getTermInfo(null));
+	}
+	
+	@Test
+	public void testTermLocally () throws SAXException, IOException, ParserConfigurationException {
+		InputSource is = new InputSource(new StringReader("<doc xmlns:its=\"http://www.w3.org/2005/11/its\" its:version=\"2.0\">"
+			+ "<p><span its:term='yes' its:termInfoRef='ref1' its:termConfidence='0.5'>"
+			+ "<its:span term='yes' termInfoRef='ref2' termConfidence='1'>Capital</its:span> city</span></p>"
+			+ "</doc>"));
+		Document doc = fact.newDocumentBuilder().parse(is);
+		ITraversal trav = applyITSRules(doc, null, false, null);
+		Element elem = getElement(trav, "span", 1);
+		assertEquals("Capital city", elem.getTextContent());
+		assertTrue(trav.getTerm(null));
+		assertEquals("REF:ref1", trav.getTermInfo(null));
+		assertEquals(0.5, trav.getTermConfidence(null), 0.0);
+		elem = getElement(trav, "its:span", 1);
+		assertEquals("Capital", elem.getTextContent());
+		assertTrue(trav.getTerm(null));
+		assertEquals("REF:ref2", trav.getTermInfo(null));
+		assertEquals(1.0, trav.getTermConfidence(null), 0.0);
+	}
+	
 	@Test
 	public void testXmlId () throws SAXException, IOException, ParserConfigurationException {
 		Document doc = fact.newDocumentBuilder().parse(root + "/input.xml");
@@ -118,24 +178,218 @@ public class TraversalTest {
 	}
 
 	@Test
+	public void testWithinTextLocalSpan () throws SAXException, IOException, ParserConfigurationException {
+		InputSource is = new InputSource(new StringReader("<doc xmlns:i='"+ITSEngine.ITS_NS_URI+"' i:version='2.0'>"
+			+ "<p>Text <i:span withinText='yes'>span</i:span> text</p></doc>"));
+		Document doc = fact.newDocumentBuilder().parse(is);
+		ITraversal trav = applyITSRules(doc, null, false, null);
+		getElement(trav, "p", 1);
+		assertTrue(trav.getWithinText()==ITraversal.WITHINTEXT_NO);
+		getElement(trav, "i:span", 1);
+		assertTrue(trav.getWithinText()==ITraversal.WITHINTEXT_YES);
+	}
+	
+	@Test
 	public void testDomainGlobal () throws SAXException, IOException, ParserConfigurationException {
 		InputSource is = new InputSource(new StringReader("<doc>"
 			+ "<i:rules xmlns:i='"+ITSEngine.ITS_NS_URI+"' version='2.0'>"
 			+ "<i:domainRule selector='//doc' domainPointer='head/subject' "
-			+ " domainMapping=\"dom1 finalDom1, 'dom2 val' 'final dom2'\"/>"
+			+ " domainMapping=\"dom1 finalDom1, 'dom2 VAL' 'final dom2'\"/>"
 			+ "</i:rules>"
-			+ "<head><subject>dom1, dom3</subject><subject>dom2 val, dom4</subject></head><p>text</p></doc>"));
+			+ "<head><subject>dom1, dom3</subject><subject>'dom2 val', \"Dom4\"</subject></head><p id='abc'>text</p></doc>"));
 		Document doc = fact.newDocumentBuilder().parse(is);
 		ITraversal trav = applyITSRules(doc, null, false, null);
 		Element elem = getElement(trav, "doc", 1);
 		assertNotNull(elem);
-		assertEquals("finalDom1, dom3, final dom2, dom4", trav.getDomains(null));
+		assertEquals("finalDom1, dom3, final dom2, Dom4", trav.getDomains(null));
 		elem = getElement(trav, "head", 1);
 		assertNotNull(elem);
-		assertEquals("finalDom1, dom3, final dom2, dom4", trav.getDomains(null));
+		assertEquals("finalDom1, dom3, final dom2, Dom4", trav.getDomains(null));
 		elem = getElement(trav, "p", 1);
 		assertNotNull(elem);
-		assertEquals("finalDom1, dom3, final dom2, dom4", trav.getDomains(null));
+		assertEquals("finalDom1, dom3, final dom2, Dom4", trav.getDomains(null));
+		Attr attr = elem.getAttributeNode("id");
+		assertEquals("finalDom1, dom3, final dom2, Dom4", trav.getDomains(attr));
+	}
+	
+	@Test
+	public void testMtConfidenceLocal () throws SAXException, IOException, ParserConfigurationException {
+		InputSource is = new InputSource(new StringReader("	<text xmlns:its='http://www.w3.org/2005/11/its' its:version='2.0' "
+			+ " its:annotatorsRef='mt-confidence|file:///tools.xml#T1'><body><p>"
+			+ "<span its:mtConfidence='0.8982'>Dublin is the "
+			+ "<its:span mtConfidence='1' annotatorsRef='mt-confidence|uri2'>capital city</its:span> of Ireland.</span></p></body></text>"));
+		Document doc = fact.newDocumentBuilder().parse(is);
+		ITraversal trav = applyITSRules(doc, null, false, null);
+		Element elem = getElement(trav, "span", 1);
+		assertNotNull(elem);
+		assertEquals(0.8982F, trav.getMtConfidence(null), 0.0F);
+		assertEquals("mt-confidence|file:///tools.xml#T1", trav.getAnnotatorsRef());
+		elem = getElement(trav, "its:span", 1);
+		assertNotNull(elem);
+		assertEquals("capital city", elem.getTextContent());
+		assertEquals(1.0F, trav.getMtConfidence(null), 0.0F);
+		assertEquals("mt-confidence|uri2", trav.getAnnotatorsRef());
+	}
+
+	@Test
+	public void testMtConfidenceLocalHtml () throws SAXException, IOException, ParserConfigurationException {
+		InputSource is = new InputSource(new StringReader("<!DOCTYPE html><html lang=en><head>"
+			+ "<meta charset=utf-8><title>Title</title></head>"
+			+ "<body its-annotators-ref='MT-ConFiDeNce|file:///tools.xml#T1'><p>"
+			+ "<span its-mt-confidence=0.8982>Dublin is the capital of Ireland.</span> "
+			+ "<span its-mt-confidence=0.8536 >The capital of the Czech Republic is Prague.</span>"
+			+ "</p></body>/html>"));
+		Document doc = htmlDocBuilder.parse(is);
+		ITraversal trav = applyITSRules(doc, null, true, null);
+		Element elem = getElement(trav, "span", 1);
+		assertNotNull(elem);
+		assertEquals(0.8982F, trav.getMtConfidence(null), 0.0F);
+		assertEquals("mt-confidence|file:///tools.xml#T1", trav.getAnnotatorsRef());
+		elem = getElement(trav, "span", 2);
+		assertNotNull(elem);
+		assertEquals(0.8536F, trav.getMtConfidence(null), 0.0F);
+		assertEquals("mt-confidence|file:///tools.xml#T1", trav.getAnnotatorsRef());
+	}
+
+	@Test
+	public void testMtConfidenceGlobalHtml () throws SAXException, IOException, ParserConfigurationException {
+		InputSource is = new InputSource(new StringReader("<!DOCTYPE html><html lang=en><head><meta charset=utf-8>"
+			+ "<script type='application/its+xml'>"
+			+ "<its:rules xmlns:its='http://www.w3.org/2005/11/its' version='2.0' "
+			+ "xmlns:h='http://www.w3.org/1999/xhtml'>"
+			+ " <its:mtConfidenceRule mtConfidence='0.785' selector=\"//h:img[@src='src1']/@title\"/>"        
+			+ " <its:mtConfidenceRule mtConfidence='0.805' selector=\"//h:img[@src='src2']/@title\"/>"        
+			+ "</its:rules>"
+			+ "</script>"
+			+ "<title>TM confidence</title></head>"
+			+ "<body its-annotators-ref='mt-conFIDENCE|file:///tools.xml#T1'><p>"
+			+ "<img src='src1' title='Front gate of Trinity College Dublin'/>"
+			+ "<img src='src2' title='A tart with a cart'/></p></body></html>"));
+		Document doc = htmlDocBuilder.parse(is);
+		ITraversal trav = applyITSRules(doc, null, true, null);
+		Element elem = getElement(trav, "img", 1);
+		assertNotNull(elem);
+		Attr attr = elem.getAttributeNode("title");
+		assertEquals(0.785F, trav.getMtConfidence(attr), 0.0F);
+		assertEquals("mt-confidence|file:///tools.xml#T1", trav.getAnnotatorsRef());
+		elem = getElement(trav, "img", 2);
+		assertNotNull(elem);
+		attr = elem.getAttributeNode("title");
+		assertEquals(0.805F, trav.getMtConfidence(attr), 0.0F);
+		assertEquals("mt-confidence|file:///tools.xml#T1", trav.getAnnotatorsRef());
+	}
+	
+	@Test
+	public void testDisambiguationPointerHtml () throws SAXException, IOException, ParserConfigurationException {
+		InputSource is = new InputSource(new StringReader("<!DOCTYPE html><html lang=en><head><meta charset=utf-8>"
+			+ "<title>Title</title>"
+			+ "<script type='application/its+xml'>"
+			+ "<its:rules xmlns:its='http://www.w3.org/2005/11/its' version='2.0'>"
+			+ "<its:disambiguationRule selector='//*[@typeof and @about]' "
+			+ " disambigClassRefPointer='@typeof' disambigIdentRefPointer='@about' disambigGranularity='entity'/>"
+			+ "</its:rules>"
+			+ "</script>"
+			+ "</head><body>"
+			+ "<p><span property='http://xmlns.com/foaf/0.1/name' about='http://dbpedia.org/resource/Dublin' "
+			+ "typeof='http:/nerd.eurecom.fr/ontology#Place'>Dublin</span> is the capital of Ireland.</p>"
+			+ "</body>/html>"));
+		Document doc = htmlDocBuilder.parse(is);
+		ITSEngine trav = applyITSRules(doc, null, true, null);
+		Element elem = getElement(trav, "span", 1);
+		assertNotNull(elem);
+		GenericAnnotations anns = trav.getDisambiguation(null);
+		assertNotNull(anns);
+		GenericAnnotation ann = anns.getAnnotations(GenericAnnotationType.DISAMB).get(0);
+		assertEquals(GenericAnnotationType.DISAMB_GRANULARITY_ENTITY, ann.getString(GenericAnnotationType.DISAMB_GRANULARITY));
+		assertEquals(ITSEngine.REF_PREFIX+"http:/nerd.eurecom.fr/ontology#Place", ann.getString(GenericAnnotationType.DISAMB_CLASS));
+		assertEquals(ITSEngine.REF_PREFIX+"http://dbpedia.org/resource/Dublin", ann.getString(GenericAnnotationType.DISAMB_IDENT));
+	}
+
+	@Test
+	public void testDisambiguationSimpleHtml () throws SAXException, IOException, ParserConfigurationException {
+		InputSource is = new InputSource(new StringReader("<p>hello "
+			+ "<span its-disambig-ident-ref=\"http://purl.org/vocabularies/princeton/wn30/synset-sweet-adjective-1.rdf\" "
+			+ "its-disambig-granularity=\"Lexical-CONCEPT\">sweet</span> "
+			+ "<span its-disambig-ident-ref=\"http://dbpedia.org/resource/Paris\" "
+			+ "its-disambig-class-ref=\"http://schema.org/Place\">Paris</span> summer</p>"));
+		Document doc = htmlDocBuilder.parse(is);
+		ITSEngine trav = applyITSRules(doc, null, true, null);
+		Element elem = getElement(trav, "span", 1);
+		assertEquals("sweet", elem.getTextContent());
+		assertEquals("REF:http://purl.org/vocabularies/princeton/wn30/synset-sweet-adjective-1.rdf", trav.getDisambigIdent(null));
+		assertEquals(GenericAnnotationType.DISAMB_GRANULARITY_LEXICAL, trav.getDisambigGranularity(null));
+		elem = getElement(trav, "span", 2);
+		assertEquals("Paris", elem.getTextContent());
+		assertEquals("REF:http://dbpedia.org/resource/Paris", trav.getDisambigIdent(null));
+		assertEquals("REF:http://schema.org/Place", trav.getDisambigClass(null));
+		assertEquals(GenericAnnotationType.DISAMB_GRANULARITY_ENTITY, trav.getDisambigGranularity(null));
+	}
+
+	@Test
+	public void testDisambiguationOnAttribute () throws SAXException, IOException, ParserConfigurationException {
+		InputSource is = new InputSource(new StringReader("<doc>"
+			+ "<i:rules xmlns:i='"+ITSEngine.ITS_NS_URI+"' version='2.0'>"
+			+ "<i:disambiguationRule selector='//entry/@text' disambigSourcePointer='../@attSource' "
+			+ " disambigIdentPointer='../@attIdent' />"
+			+ "</i:rules>"
+			+ "<entry text='Some text' attIdent='ident1' attSource='src1'>Content</entry></doc>"));
+		Document doc = fact.newDocumentBuilder().parse(is);
+		ITraversal trav = applyITSRules(doc, null, false, null);
+		Element elem = getElement(trav, "entry", 1);
+		Attr attr = elem.getAttributeNode("text");
+		assertNotNull(attr);
+		assertEquals("src1", trav.getDisambigSource(attr));
+		assertEquals("ident1", trav.getDisambigIdent(attr));
+		assertEquals(GenericAnnotationType.DISAMB_GRANULARITY_ENTITY, trav.getDisambigGranularity(attr));
+	}
+	
+	@Test
+	public void testLocQualityRatingHtml () throws SAXException, IOException, ParserConfigurationException {
+		InputSource is = new InputSource(new StringReader("<!DOCTYPE html><html lang=en><head><meta charset=utf-8>"
+			+ "<title>Title</title></head><body>"
+			+ "<p><span its-loc-quality-rating-score='5.4321' its-loc-quality-rating-score-threshold='5.0'>text1 "
+			+ "<span its-loc-quality-rating-vote='-12' its-loc-quality-rating-vote-threshold='0'"
+			+ "its-loc-quality-rating-profile-ref='uri1'>text2</span></span>"));
+		Document doc = htmlDocBuilder.parse(is);
+		ITSEngine trav = applyITSRules(doc, null, true, null);
+		Element elem = getElement(trav, "span", 1);
+		assertNotNull(elem);
+		assertEquals(5.4321F, trav.getLocQualityRatingScore(null), 0.0);
+		assertEquals(5.0F, trav.getLocQualityRatingScoreThreshold(null), 0.0);
+		assertEquals(null, trav.getLocQualityRatingVote(null));
+		assertEquals(null, trav.getLocQualityRatingVoteThreshold(null));
+		assertEquals(null, trav.getLocQualityRatingProfileRef(null));
+		elem = getElement(trav, "span", 2);
+		assertNotNull(elem);
+		assertEquals(null, trav.getLocQualityRatingScore(null));
+		assertEquals(null, trav.getLocQualityRatingScoreThreshold(null));
+		assertEquals(-12, (int)trav.getLocQualityRatingVote(null));
+		assertEquals(0, (int)trav.getLocQualityRatingVoteThreshold(null));
+		assertEquals("REF:uri1", trav.getLocQualityRatingProfileRef(null));
+	}
+
+	@Test
+	public void testLocQualityRatingXml () throws SAXException, IOException, ParserConfigurationException {
+		InputSource is = new InputSource(new StringReader("<doc xmlns:i='"+ITSEngine.ITS_NS_URI+"' i:version='2.0'>"
+			+ "<p><mrk i:locQualityRatingVote='7' i:locQualityRatingVoteThreshold='95' i:locQualityRatingProfileRef='u1'>text1 "
+			+ "<i:span locQualityRatingScore='88.22' locQualityRatingScoreThreshold='100.0' locQualityRatingProfileRef='u2'>text2</i:span></mrk>"
+			+ "</p></doc>"));
+		Document doc = fact.newDocumentBuilder().parse(is);
+		ITraversal trav = applyITSRules(doc, null, false, null);
+		Element elem = getElement(trav, "mrk", 1);
+		assertNotNull(elem);
+		assertEquals(null, trav.getLocQualityRatingScore(null));
+		assertEquals(null, trav.getLocQualityRatingScoreThreshold(null));
+		assertEquals(7, (int)trav.getLocQualityRatingVote(null));
+		assertEquals(95, (int)trav.getLocQualityRatingVoteThreshold(null));
+		assertEquals("REF:u1", trav.getLocQualityRatingProfileRef(null));
+		elem = getElement(trav, "i:span", 1);
+		assertNotNull(elem);
+		assertEquals(88.22F, trav.getLocQualityRatingScore(null), 0.0F);
+		assertEquals(100.0F, trav.getLocQualityRatingScoreThreshold(null), 0.0F);
+		assertEquals(null, trav.getLocQualityRatingVote(null));
+		assertEquals(null, trav.getLocQualityRatingVoteThreshold(null));
+		assertEquals("REF:u2", trav.getLocQualityRatingProfileRef(null));
 	}
 
 	@Test
@@ -192,22 +446,6 @@ public class TraversalTest {
 		elem = getElement(trav, "para", 2);
 		assertNotNull(elem);
 		assertEquals("*", trav.getLocaleFilter());
-	}
-
-	@Test
-	public void testTargetPointerLocal () throws SAXException, IOException, ParserConfigurationException {
-		InputSource is = new InputSource(new StringReader("<doc xmlns:i='"+ITSEngine.ITS_NS_URI+"' i:version='2.0'>"
-			+ "<entry><src i:targetPointer='../trg'>source</src><trg></trg></entry></doc>"));
-		Document doc = fact.newDocumentBuilder().parse(is);
-		ITraversal trav = applyITSRules(doc, null, false, null);
-		Element elem = getElement(trav, "entry", 1);
-		assertNotNull(elem);
-		assertTrue(trav.getTranslate(null));
-		assertEquals(null, trav.getTargetPointer(null));
-		elem = getElement(trav, "src", 1);
-		assertNotNull(elem);
-		assertTrue(trav.getTranslate(null));
-		assertEquals("../trg", trav.getTargetPointer(null));
 	}
 
 	@Test
@@ -316,36 +554,41 @@ public class TraversalTest {
 		Document doc = fact.newDocumentBuilder().parse(is);
 		ITraversal trav = applyITSRules(doc, null, false, null);
 		getElement(trav, "z", 1);
-		assertEquals("other", trav.getLocQualityIssueType());
-		assertEquals("comment", trav.getLocQualityIssueComment());
-		assertEquals("1", trav.getLocQualityIssueSeverity());
-		assertEquals("uri", trav.getLocQualityIssueProfileRef());
+		assertEquals("other", trav.getLocQualityIssueType(null, 0));
+		assertEquals("comment", trav.getLocQualityIssueComment(null, 0));
+		assertEquals(1.0, trav.getLocQualityIssueSeverity(null, 0), 0);
+		assertEquals("uri", trav.getLocQualityIssueProfileRef(null, 0));
+		assertEquals(true, trav.getLocQualityIssueEnabled(null, 0));
 	}
 
 	@Test
 	public void testLQIssueGlobal2 () throws SAXException, IOException, ParserConfigurationException {
 		InputSource is = new InputSource(new StringReader("<doc xmlns:i='"+ITSEngine.ITS_NS_URI+"' i:version='2.0'>"
-			+ "<i:rules xmlns:i='"+ITSEngine.ITS_NS_URI+"' version='2.0'>"
+			+ "<i:rules version='2.0'>"
 			+ "<i:locQualityIssueRule selector='//z' locQualityIssuesRefPointer='@ref' />"
 			+ "</i:rules>"
 			+ "<p>Text with <z ref='#id1'>error</z></p>"
-			+ "<info id='id1' i:locQualityIssueComment='comment'/></doc>"));
+			+ "<i:locQualityIssues xml:id='id1'>"
+			+ "<i:locQualityIssue locQualityIssueEnabled='no' locQualityIssueComment='comment1'/>"
+			+ "<i:locQualityIssue locQualityIssueProfileRef='pref2' locQualityIssueSeverity='50' locQualityIssueComment='comment2'/>"
+			+ "</i:locQualityIssues>"
+			+ "</doc>"));
 		Document doc = fact.newDocumentBuilder().parse(is);
 		ITraversal trav = applyITSRules(doc, null, false, null);
 		getElement(trav, "z", 1);
-		assertEquals("#id1", trav.getLocQualityIssuesRef());
-		assertEquals(null, trav.getLocQualityIssueType());
-		assertEquals(null, trav.getLocQualityIssueComment());
-		assertEquals(null, trav.getLocQualityIssueSeverity());
-		assertEquals(null, trav.getLocQualityIssueProfileRef());
-		Element elem = getElement(trav, "info", 1);
-		assertNotNull(elem);
-		assertEquals(null, trav.getLocQualityIssuesRef());
-		assertEquals(null, trav.getLocQualityIssueType());
-		assertEquals("comment", trav.getLocQualityIssueComment());
-		assertEquals(null, trav.getLocQualityIssueSeverity());
-		assertEquals(null, trav.getLocQualityIssueProfileRef());
-		
+		assertEquals("#id1", trav.getLocQualityIssuesRef(null));
+		assertEquals(2, trav.getLocQualityIssueCount(null));
+		// Values
+		assertEquals(null, trav.getLocQualityIssueType(null, 0));
+		assertEquals(null, trav.getLocQualityIssueType(null, 1));
+		assertEquals("comment1", trav.getLocQualityIssueComment(null, 0));
+		assertEquals("comment2", trav.getLocQualityIssueComment(null, 1));
+		assertEquals(null, trav.getLocQualityIssueSeverity(null, 0));
+		assertEquals(50.0, trav.getLocQualityIssueSeverity(null, 1), 0);
+		assertEquals(null, trav.getLocQualityIssueProfileRef(null, 0));
+		assertEquals("pref2", trav.getLocQualityIssueProfileRef(null, 1));
+		assertEquals(false, trav.getLocQualityIssueEnabled(null, 0));
+		assertEquals(true, trav.getLocQualityIssueEnabled(null, 1));
 	}
 
 	@Test
@@ -360,14 +603,101 @@ public class TraversalTest {
 		Document doc = fact.newDocumentBuilder().parse(is);
 		ITraversal trav = applyITSRules(doc, null, false, null);
 		getElement(trav, "z", 1);
-		// Local markup overrides everything, even undefined data (complete overring rule in ITS)
-		assertEquals(null, trav.getLocQualityIssuesRef());
-		assertEquals(null, trav.getLocQualityIssueComment());
-		assertEquals(null, trav.getLocQualityIssueSeverity());
-		assertEquals("terminology", trav.getLocQualityIssueType());
-		assertEquals("thisUri", trav.getLocQualityIssueProfileRef());
+		// Local markup overrides everything, even undefined data (complete overriding rule in ITS)
+		assertEquals(null, trav.getLocQualityIssuesRef(null));
+		assertEquals(null, trav.getLocQualityIssueComment(null, 0));
+		assertEquals(null, trav.getLocQualityIssueSeverity(null, 0));
+		assertEquals("terminology", trav.getLocQualityIssueType(null, 0));
+		assertEquals("thisUri", trav.getLocQualityIssueProfileRef(null, 0));
+		assertEquals(true, trav.getLocQualityIssueEnabled(null, 0));
 	}
 
+	@Test
+	public void testLQIssueOnAttributes () throws SAXException, IOException, ParserConfigurationException {
+		InputSource is = new InputSource(new StringReader("<doc xmlns:i='"+ITSEngine.ITS_NS_URI+"' i:version='2.0'>"
+			+ "<i:rules xmlns:i='"+ITSEngine.ITS_NS_URI+"' version='2.0'>"
+			+ "<i:locQualityIssueRule selector='//p/@abc' locQualityIssuesRef='#id1'/>"
+			+ "</i:rules>"
+			+ "<p abc='some text'>Text</p>"
+			+ "<i:locQualityIssues xml:id='id1'>"
+			+ "<i:locQualityIssue locQualityIssueEnabled='no' locQualityIssueComment='comment1'/>"
+			+ "<i:locQualityIssue locQualityIssueProfileRef='pref2' locQualityIssueSeverity='50' locQualityIssueComment='comment2'/>"
+			+ "</i:locQualityIssues>"
+			+ "</doc>"));
+		Document doc = fact.newDocumentBuilder().parse(is);
+		ITraversal trav = applyITSRules(doc, null, false, null);
+		Element elem = getElement(trav, "p", 1);
+		Attr attr = elem.getAttributeNode("abc");
+		assertEquals("#id1", trav.getLocQualityIssuesRef(attr));
+		assertEquals(2, trav.getLocQualityIssueCount(attr));
+		assertEquals(null, trav.getLocQualityIssueType(attr, 0));
+		assertEquals(null, trav.getLocQualityIssueType(attr, 1));
+		assertEquals("comment1", trav.getLocQualityIssueComment(attr, 0));
+		assertEquals("comment2", trav.getLocQualityIssueComment(attr, 1));
+		assertEquals(null, trav.getLocQualityIssueSeverity(attr, 0));
+		assertEquals(50.0, trav.getLocQualityIssueSeverity(attr, 1), 0);
+		assertEquals(null, trav.getLocQualityIssueProfileRef(attr, 0));
+		assertEquals("pref2", trav.getLocQualityIssueProfileRef(attr, 1));
+		assertEquals(false, trav.getLocQualityIssueEnabled(attr, 0));
+		assertEquals(true, trav.getLocQualityIssueEnabled(attr, 1));
+	}
+
+	@Test
+	public void testAnnotatorsRef () throws SAXException, IOException, ParserConfigurationException {
+		InputSource is = new InputSource(new StringReader("<doc xmlns:i='"+ITSEngine.ITS_NS_URI+"' i:version='2.0'>"
+			+ "<group i:annotatorsRef='terminology|uri2 mt-confidence|uri1'>"
+			+ "<p i:annotatorsRef='disambiguation|uriDisamb'>Text with <z i:annotatorsRef='terminology|uri3'"
+			+ " i:term='yes'>a term</z></p></group></doc>"));
+		Document doc = fact.newDocumentBuilder().parse(is);
+		ITraversal trav = applyITSRules(doc, null, false, null);
+		getElement(trav, "group", 1);
+		assertEquals("mt-confidence|uri1 terminology|uri2", trav.getAnnotatorsRef());
+		getElement(trav, "p", 1);
+		assertEquals("disambiguation|uriDisamb mt-confidence|uri1 terminology|uri2", trav.getAnnotatorsRef());
+		getElement(trav, "z", 1);
+		assertEquals("disambiguation|uriDisamb mt-confidence|uri1 terminology|uri3", trav.getAnnotatorsRef());
+	}
+	
+	@Test
+	public void testAnnotatorsRefBadValue () throws SAXException, IOException, ParserConfigurationException {
+		// Should pass without exception, but generate an error in the log.
+		InputSource is = new InputSource(new StringReader("<doc xmlns:i='"+ITSEngine.ITS_NS_URI+"' i:version='2.0'>"
+			+ "<group i:annotatorsRef='Invalid-value-for-test|uri1'>"
+			+ "<p>Text with</p></group></doc>"));
+		Document doc = fact.newDocumentBuilder().parse(is);
+		ITraversal trav = applyITSRules(doc, null, false, null);
+		getElement(trav, "group", 1);
+		assertEquals("invalid-value-for-test|uri1", trav.getAnnotatorsRef());
+	}
+	
+	@Test
+	public void testQueryLanguage () throws SAXException, IOException, ParserConfigurationException {
+		InputSource is = new InputSource(new StringReader("<doc>"
+			+ "<i:rules xmlns:i='"+ITSEngine.ITS_NS_URI+"' queryLanguage='xpath2' version='2.0'>"
+			+ "<i:translateRule selector='//par/@title' translate='yes' />"
+			+ "<i:translateRule selector='//par/@alt' translate='yes' />"
+			+ "</i:rules>"
+			+ "<par title='title text' test='test' alt='alt text'>Text</par></doc>"));
+		// Passes but should generate a warning in the log
+		Document doc = fact.newDocumentBuilder().parse(is);
+		ITraversal trav = applyITSRules(doc, null, false, null);
+		Element elem = getElement(trav, "par", 1);
+		assertTrue(trav.getTranslate(elem.getAttributeNode("title")));
+	}
+
+	@Test (expected=ITSException.class)
+	public void testBadQueryLanguage () throws SAXException, IOException, ParserConfigurationException {
+		InputSource is = new InputSource(new StringReader("<doc>"
+			+ "<i:rules xmlns:i='"+ITSEngine.ITS_NS_URI+"' queryLanguage='invalid-value' version='2.0'>"
+			+ "<i:translateRule selector='//par/@title' translate='yes' />"
+			+ "<i:translateRule selector='//par/@alt' translate='yes' />"
+			+ "</i:rules>"
+			+ "<par title='title text' test='test' alt='alt text'>Text</par></doc>"));
+		Document doc = fact.newDocumentBuilder().parse(is);
+		// Just trigger the error
+		applyITSRules(doc, null, false, null);
+	}
+	
 	@Test
 	public void testIdValueOnAttribute () throws SAXException, IOException, ParserConfigurationException {
 		InputSource is = new InputSource(new StringReader("<doc xmlns:i='"+ITSEngine.ITS_NS_URI+"' i:version='2.0'>"
@@ -404,14 +734,14 @@ public class TraversalTest {
 	public void testLQIssueLocal1 () throws SAXException, IOException, ParserConfigurationException {
 		InputSource is = new InputSource(new StringReader("<doc xmlns:i='"+ITSEngine.ITS_NS_URI+"' i:version='2.0'>"
 			+ "<p>Text with <z i:locQualityIssueType='other' i:locQualityIssueComment='comment'"
-			+ " i:locQualityIssueProfileRef='uri' i:locQualityIssueSeverity='1'>error</z></p></doc>"));
+			+ " i:locQualityIssueProfileRef='uri' i:locQualityIssueSeverity='1.0'>error</z></p></doc>"));
 		Document doc = fact.newDocumentBuilder().parse(is);
 		ITraversal trav = applyITSRules(doc, null, false, null);
 		getElement(trav, "z", 1);
-		assertEquals("other", trav.getLocQualityIssueType());
-		assertEquals("comment", trav.getLocQualityIssueComment());
-		assertEquals("1", trav.getLocQualityIssueSeverity());
-		assertEquals("uri", trav.getLocQualityIssueProfileRef());
+		assertEquals("other", trav.getLocQualityIssueType(null, 0));
+		assertEquals("comment", trav.getLocQualityIssueComment(null, 0));
+		assertEquals(1.0, trav.getLocQualityIssueSeverity(null, 0), 0);
+		assertEquals("uri", trav.getLocQualityIssueProfileRef(null, 0));
 	}
 	
 	@Test
@@ -422,10 +752,10 @@ public class TraversalTest {
 		Document doc = fact.newDocumentBuilder().parse(is);
 		ITraversal trav = applyITSRules(doc, null, false, null);
 		getElement(trav, "i:span", 1);
-		assertEquals("other", trav.getLocQualityIssueType());
-		assertEquals("comment", trav.getLocQualityIssueComment());
-		assertEquals("1", trav.getLocQualityIssueSeverity());
-		assertEquals("uri", trav.getLocQualityIssueProfileRef());
+		assertEquals("other", trav.getLocQualityIssueType(null, 0));
+		assertEquals("comment", trav.getLocQualityIssueComment(null, 0));
+		assertEquals(1.0, trav.getLocQualityIssueSeverity(null, 0), 0);
+		assertEquals("uri", trav.getLocQualityIssueProfileRef(null, 0));
 	}
 	
 	@Test
@@ -480,7 +810,7 @@ public class TraversalTest {
 		return null;
 	}
 	
-	private static ITraversal applyITSRules (Document doc,
+	private static ITSEngine applyITSRules (Document doc,
 		URI docURI,
 		boolean isHTML5,
 		File rulesFile)

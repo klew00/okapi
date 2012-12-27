@@ -22,7 +22,6 @@ package net.sf.okapi.filters.doxygen;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.util.EmptyStackException;
 import java.util.IdentityHashMap;
 import java.util.Map.Entry;
 import java.util.Stack;
@@ -387,14 +386,14 @@ public class DoxygenFilter extends AbstractFilter {
 		String text = commentBuffer.toString();
 		commentBuffer.setLength(0);
 		
-		DelimiterTokenizer tokenizer = new DelimiterTokenizer(DOXYGEN_CHUNK_PATTERN, text);
+		PrefixSuffixTokenizer tokenizer = new PrefixSuffixTokenizer(chunkDelimiters, text);
 		// Delimiter: "block"-indicating Doxygen markup, e.g. "///< "
 		// Token: block content
 		
-		for (DelimiterTokenizer.Token t : tokenizer) {
+		for (PrefixSuffixTokenizer.Token t : tokenizer) {
 			
 			GenericSkeleton skel = null;
-			if (t.delimiter() != null) skel = new GenericSkeleton(t.delimiter());
+			if (t.prefix() != null) skel = new GenericSkeleton(t.prefix());
 			
 			String chunk = t.toString();
 			
@@ -448,8 +447,10 @@ public class DoxygenFilter extends AbstractFilter {
 			if (!eventBuilder.peekMostRecentTextUnit().isTranslatable()
 				&& !commandStack.isEmpty()) {
 				
-				String pair = commandStack.peek().getPair();
-				if (pair != null && !pair.equals(cmdInfo.getName())) {
+				DoxygenCommand prevCmd = commandStack.peek();
+				// If this command does not end the current untranslatable command,
+				// then we add this command and associated token as plain text.
+				if (prevCmd.hasPair() && !prevCmd.getPair().equals(cmdInfo.getName())) {
 					eventBuilder.addToTextUnit(cmd);
 					eventBuilder.addToTextUnit(t.toString());
 					continue;
@@ -465,10 +466,16 @@ public class DoxygenFilter extends AbstractFilter {
 				eventBuilder.endTextUnit();
 				eventBuilder.startTextUnit();
 				
-				try {
-					commandStack.pop();
-				} catch (EmptyStackException e) {
-					LOGGER.warn("Orphaned end command: " + cmd);
+				if (commandStack.empty()) LOGGER.warn("Orphaned end command: " + cmd);
+				
+				// Pop the stack until we find the corresponding opening tag.
+				while (!commandStack.empty()) {
+					DoxygenCommand prevCmd = commandStack.pop();
+					if (prevCmd.hasPair() && prevCmd.getPair().equals(cmdInfo.getName())) {
+						break;
+					} else {
+						LOGGER.warn("Command not closed: " + prevCmd.getName());
+					}
 				}
 				
 			} else if (cmdInfo.isInline()) {
@@ -506,7 +513,8 @@ public class DoxygenFilter extends AbstractFilter {
 			}
 		}
 		
-		assert(commandStack.isEmpty());
+		while (!commandStack.isEmpty())
+			LOGGER.warn(commandStack.pop().getName() + " was not closed.");
 	}
 
 	/**

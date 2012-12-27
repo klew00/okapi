@@ -20,11 +20,18 @@
 
 package net.sf.okapi.common.resource;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
 import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.filterwriter.GenericContent;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
-import static org.junit.Assert.*;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -45,9 +52,6 @@ public class TextUnitTest {
         tu1 = new TextUnit(TU1);
         tc1 = new TextContainer("fr text");
     }
-
-
-
 
     ////TODO verify that these tests adequately cover the ITextUnit interface
 
@@ -434,6 +438,75 @@ public class TextUnitTest {
     	GenericSkeleton newSkel = (GenericSkeleton) tu2.getSkeleton();    	
     	assertEquals(3, newSkel.getParts().size());
     	assertEquals(tu2, newSkel.getParts().get(1).getParent());
+    }
+    
+    @Test
+    public void testExample () {
+    	// Create a text unit
+    	TextUnit tu = new TextUnit("id");
+    	// Get the source
+    	TextContainer srcTc = tu.getSource();
+    	// the source always exists
+    	assertNotNull(srcTc);
+    	// But is initially empty
+    	assertEquals("", srcTc.toString());
+    	// And we always have at least one segment
+    	assertEquals(1, srcTc.getSegments().count());
+    	
+    	// One can add segments
+    	srcTc.append(new Segment("seg1", new TextFragment("Text of segment 1.")));
+    	// (if previous is empty, it is collapsed by default) 
+    	assertEquals(1, srcTc.getSegments().count());
+    	// One can have inter-segment parts, like this space
+    	srcTc.append(new TextPart(" "));
+    	// and add another segment
+    	srcTc.append(new Segment("seg2", new TextFragment("Text of segment 2.")));
+    	// Noww we have two segments
+    	assertEquals(2, srcTc.getSegments().count());
+    	// and 3 parts (segments and non-segments)
+    	assertEquals(3, srcTc.count());
+    	// And here is the complete text
+    	assertEquals("Text of segment 1. Text of segment 2.", srcTc.toString());
+    	// We can look at it by parts too: (segments are between brackets)
+    	GenericContent fmt = new GenericContent();
+    	assertEquals("[Text of segment 1.] [Text of segment 2.]", fmt.printSegmentedContent(srcTc, true));
+    	
+    	// By default there are no targets
+    	assertTrue(tu.getTargetLocales().isEmpty());
+    	// One can add one with its own content
+    	tu.setTarget(LocaleId.JAPANESE, new TextContainer("One segment"));
+    	// Or one by cloning the source
+    	tu.createTarget(LocaleId.FRENCH, true, IResource.COPY_ALL);
+
+    	// We access the target by there locale-id
+    	TextContainer jaTc = tu.getTarget(LocaleId.JAPANESE);
+    	assertEquals("[One segment]", fmt.printSegmentedContent(jaTc, true));
+    	TextContainer frTc = tu.getTarget(LocaleId.FRENCH);
+    	assertEquals("[Text of segment 1.] [Text of segment 2.]", fmt.printSegmentedContent(frTc, true));
+    	// Note that the source container was cloned: the target object is not the same as the source 
+    	assertFalse(frTc==srcTc);
+    	
+    	// We can remove the targets too
+    	tu.removeTarget(LocaleId.JAPANESE);
+    	assertEquals(1, tu.getTargetLocales().size());
+    	
+    	// One can access the segmentsof both the source and target
+    	ISegments srcSegs = tu.getSourceSegments();
+    	for ( Segment srcSeg : srcSegs ) {
+    		Segment trgSeg = tu.getTargetSegment(LocaleId.FRENCH, srcSeg.getId(), false);
+    		// In this example, they have the same content
+    		assertEquals(srcSeg.toString(), trgSeg.toString());
+    		// But, obviously, they are not the same object
+    		assertFalse(srcSeg==trgSeg);
+    		// We can access and modify the segments' content as needed
+    		String text = trgSeg.getContent().getCodedText();
+    		text = text.toUpperCase();
+    		trgSeg.getContent().setCodedText(text);
+    	}
+    	// The source
+    	assertEquals("[Text of segment 1.] [Text of segment 2.]", fmt.printSegmentedContent(srcTc, true));
+    	// The modified target
+    	assertEquals("[TEXT OF SEGMENT 1.] [TEXT OF SEGMENT 2.]", fmt.printSegmentedContent(frTc, true));
     }
 
     //utility methods

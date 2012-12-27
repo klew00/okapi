@@ -317,17 +317,15 @@ public class VignetteFilter implements IFilter {
 				// No source
 				if ( !Util.isEmpty(data[1]) ) {
 					// No source but target exists
-					logger.warn(String.format(
-						"Entry '%s': No corresponding source entry exists for the target '%s'",
-						data[1], trgLoc.toPOSIXLocaleId()));
+					logger.warn("Entry '{}': No corresponding source entry exists for the target '{}'",
+						data[1], trgLoc.toPOSIXLocaleId());
 				}
 			}
 			else { // Source exists
 				if ( Util.isEmpty(data[1]) ) {
 					// Source exists but not the target
-					logger.warn(String.format(
-						"Entry '%s': No entry exists for the target '%s'",
-						data[0], trgLoc.toPOSIXLocaleId()));
+					logger.warn("Entry '{}': No entry exists for the target '{}'",
+						data[0], trgLoc.toPOSIXLocaleId());
 				}
 				else {
 					// Both source and target exists
@@ -510,7 +508,7 @@ public class VignetteFilter implements IFilter {
 			}
 			else {
 				if ( !preprocessing ) {
-					logger.info("contentInstance vcmLogicalPath="+currentVFullPath);
+					logger.info("contentInstance vcmLogicalPath={}", currentVFullPath);
 				}
 				if ( processList(elem, content) ) eventFound = true;
 			}
@@ -612,9 +610,8 @@ public class VignetteFilter implements IFilter {
 		if ( Util.isEmpty(localeId) || Util.isEmpty(sourceId) ) {
 			// Warn during pre-processing, then treat as document part
 			if ( preprocessing ) {
-				logger.warn(String.format(
-					"Entry with incomplete data at %s number %d\nlocale='%s' sourceId='%s'",
-					STARTBLOCK, counter, localeId, sourceId));
+				logger.warn("Entry with incomplete data at {} number {}\nlocale='{}' sourceId='{}'",
+					STARTBLOCK, counter, localeId, sourceId);
 				return false;
 			}
 			else {
@@ -662,8 +659,8 @@ public class VignetteFilter implements IFilter {
 				extract = false;
 			}
 			
-			logger.info(String.format("   LocaleId='%s', extract=%s, sourceId='%s'",
-				localeId, (extract ? "Yes" : "No"), sourceId));
+			logger.info("   LocaleId='{}', extract={}, sourceId='{}'",
+				localeId, (extract ? "Yes" : "No"), sourceId);
 
 			// If we don't extract
 			if ( !extract ) {
@@ -914,7 +911,7 @@ public class VignetteFilter implements IFilter {
 	}
 
 	private void generateListOfPaths () {
-		logger.info(String.format("\nNumber of parts to localize = %d", listOfPaths.size()));
+		logger.info("\nNumber of parts to localize = {}", listOfPaths.size());
 		for ( String tmp : listOfPaths ) {
 			logger.info(tmp);
 		}

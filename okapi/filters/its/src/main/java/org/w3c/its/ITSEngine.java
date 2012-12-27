@@ -21,21 +21,19 @@
 package org.w3c.its;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.TreeMap;
 
 import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
@@ -43,15 +41,24 @@ import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.annotation.GenericAnnotation;
+import net.sf.okapi.common.annotation.GenericAnnotationType;
+import net.sf.okapi.common.annotation.GenericAnnotations;
+import net.sf.okapi.common.exceptions.OkapiIOException;
+import nu.validator.htmlparser.dom.HtmlDocumentBuilder;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 
+/**
+ * Holds the information on a given entry that has a target pointer.
+ */
 public class ITSEngine implements IProcessor, ITraversal {
 
 	public static final String    ITS_VERSION1 = "1.0";
@@ -69,14 +76,22 @@ public class ITSEngine implements IProcessor, ITraversal {
 	public static final String    HTML_NS_PREFIX  = "h";
 	public static final String    ITS_MIMETYPE    = "application/its+xml";
 	
+	public static final String    REF_PREFIX = "REF:"; // Prefix added at the front of the information that are references
+
 	private static final String   FLAGNAME = "\u00ff"; // Name of the user-data property that holds the flags
 	private static final String   FLAGSEP  = "\u001c"; // Separator between data categories
 	
 	// Must have '?' as many times as there are FP_XXX entries +1
 	// Must have +FLAGSEP as many times as there are FP_XXX_DATA entries +1
-	private static final String   FLAGDEFAULTDATA     = "??????????????"
+	private static final String   FLAGDEFAULTDATA     = "???????????????????"
 		+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP
-		+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP;
+		+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP;
+
+	private static final String SRC_TRGPTRFLAGNAME = "\u10ff"; // Name of the user-data property that holds the target pointer flag in the source
+	private static final String TRG_TRGPTRFLAGNAME = "\u20ff"; // Name of the user-data property that holds the target pointer flag in the target
+	
+	private static final String PTRFLAG = "@@"; // Flag for pointer-type attributes
+	private static final String REFFLAG = "\u0011"; // Flag for Ref vs non-Ref attributes
 
 	// Indicator position
 	private static final int      FP_TRANSLATE             = 0;
@@ -93,6 +108,11 @@ public class ITSEngine implements IProcessor, ITraversal {
 	private static final int      FP_STORAGESIZE           = 11;
 	private static final int      FP_ALLOWEDCHARS          = 12;
 	private static final int      FP_SUBFILTER             = 13;
+	private static final int      FP_TARGETPOINTER         = 14;
+	private static final int      FP_ANNOTATORSREF         = 15;
+	private static final int      FP_MTCONFIDENCE          = 16;
+	private static final int      FP_DISAMBIGUATION        = 17;
+	private static final int      FP_LQRATING              = 18;
 	
 	// Data position 
 	private static final int      FP_TERMINOLOGY_DATA      = 0;
@@ -107,27 +127,27 @@ public class ITSEngine implements IProcessor, ITraversal {
 	private static final int      FP_STORAGESIZE_DATA      = 9;
 	private static final int      FP_ALLOWEDCHARS_DATA     = 10;
 	private static final int      FP_SUBFILTER_DATA        = 11;
+	private static final int      FP_ANNOTATORSREF_DATA    = 12;
+	private static final int      FP_MTCONFIDENCE_DATA     = 13;
+	private static final int      FP_DISAMBIGUATION_DATA   = 14;
+	private static final int      FP_LQRATING_DATA         = 15;
 	
-	private static final int      TERMINFOTYPE_POINTER     = 1;
-	private static final int      TERMINFOTYPE_REF         = 2;
-	private static final int      TERMINFOTYPE_REFPOINTER  = 3;
-	
-	private static final int      LOCNOTETYPE_TEXT         = 1;
-	private static final int      LOCNOTETYPE_POINTER      = 2;
-	private static final int      LOCNOTETYPE_REF          = 3;
-	private static final int      LOCNOTETYPE_REFPOINTER   = 4;
-
-	private static final int      ALLOWEDCHARSTYPE_POINTER = 1;
+	private static final int      INFOTYPE_TEXT            = 0;
+	private static final int      INFOTYPE_REF             = 1;
+	private static final int      INFOTYPE_POINTER         = 2;
+	private static final int      INFOTYPE_REFPOINTER      = 3;
 
 	private final boolean isHTML5;
 	
-	private DocumentBuilderFactory fact; 
+	private DocumentBuilderFactory xmlFactory;
+	
 	private Document doc;
 	private URI docURI;
+	private XPath xpath;
+	private boolean defaultIdsDone;
 	private NSContextManager nsContext;
 	private VariableResolver varResolver;
 	private XPathFactory xpFact;
-	private XPath xpath;
 	private ArrayList<ITSRule> rules;
 	private Node node;
 	private boolean startTraversal;
@@ -135,6 +155,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 	private boolean backTracking;
 	private boolean translatableAttributeRuleTriggered;
 	private boolean targetPointerRuleTriggered;
+	private boolean hasTargetPointer;
 	private String version;
 
 	private final Logger logger = LoggerFactory.getLogger(getClass());
@@ -180,6 +201,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 		xpath = xpFact.newXPath();
 		xpath.setNamespaceContext(nsContext);
 		xpath.setXPathVariableResolver(varResolver);
+		defaultIdsDone = false;
 	}
 	
 	public void setVariables (Map<String, String> map) {
@@ -194,7 +216,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 	public boolean getTranslatableAttributeRuleTriggered () {
 		return translatableAttributeRuleTriggered;
 	}
-	
+
 	/**
 	 * Indicates if the processed document has triggered a target pointer rule.
 	 * This must be called only after {@link #applyRules(long)}. 
@@ -212,27 +234,50 @@ public class ITSEngine implements IProcessor, ITraversal {
 		return xpath;
 	}
 	
-	private void ensureDocumentBuilderExist () {
-		if ( fact == null ) { 
-			fact = DocumentBuilderFactory.newInstance();
-			fact.setNamespaceAware(true);
-			fact.setValidating(false);
+	private void ensureDocumentBuilderFactoryExists () {
+		if ( xmlFactory == null ) { 
+			xmlFactory = DocumentBuilderFactory.newInstance();
+			xmlFactory.setNamespaceAware(true);
+			xmlFactory.setValidating(false);
+		}
+	}
+	
+	private Document parseXMLDocument (String uriString) {
+		ensureDocumentBuilderFactoryExists();
+		try {
+			return xmlFactory.newDocumentBuilder().parse(uriString);
+		}
+		catch ( Throwable e ) {
+			throw new RuntimeException("Error parsing an XML document.\n"+e.getMessage(), e);
+		}
+	}
+	
+	private Document parseXMLDocument (InputSource is) {
+		ensureDocumentBuilderFactoryExists();
+		try {
+			return xmlFactory.newDocumentBuilder().parse(is);
+		}
+		catch ( Throwable e ) {
+			throw new RuntimeException("Error parsing an XML document.\n"+e.getMessage(), e);
+		}
+	}
+	
+	private Document parseHTMLDocument (String uriString) {
+		HtmlDocumentBuilder docBuilder = new HtmlDocumentBuilder();
+		try {
+			return docBuilder.parse(uriString);
+		}
+		catch ( Throwable e ) {
+			throw new RuntimeException("Error parsing an HTML document.\n"+e.getMessage(), e);
 		}
 	}
 
 	public void addExternalRules (URI docURI) {
 		try {
-			ensureDocumentBuilderExist(); 
-			Document rulesDoc = fact.newDocumentBuilder().parse(docURI.toString());
+			Document rulesDoc = parseXMLDocument(docURI.toString());
 			addExternalRules(rulesDoc, docURI);
 		}
-		catch ( SAXException e ) {
-			throw new RuntimeException(e);
-		}
-		catch ( ParserConfigurationException e ) {
-			throw new RuntimeException(e);
-		}
-		catch ( IOException e ) {
+		catch ( Throwable e ) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -262,9 +307,8 @@ public class ITSEngine implements IProcessor, ITraversal {
 				if ( content.endsWith("-->")) content = content.substring(0, content.length()-3);
 				content = content.trim();
 				// Parse the content
-				ensureDocumentBuilderExist();
 				InputSource is = new InputSource(new ByteArrayInputStream(content.getBytes()));
-				Document scriptDoc = fact.newDocumentBuilder().parse(is);
+				Document scriptDoc = parseXMLDocument(is);
 				// And compile the rules
 				compileRules(scriptDoc, docURI, isInternal);
 			}
@@ -304,6 +348,19 @@ public class ITSEngine implements IProcessor, ITraversal {
 				version = rulesElem.getAttributeNS(null, "version");
 				if ( !version.equals(ITS_VERSION1) && !version.equals(ITS_VERSION2) ) {
 					throw new ITSException(String.format("Invalid or missing ITS version (\"%s\")", version));
+				}
+
+				// Check queryLanguage
+				String qlang = rulesElem.getAttributeNS(null, "queryLanguage");
+				if ( !Util.isEmpty(qlang) ) {
+					if ( isHTML5 ) qlang = qlang.toLowerCase(); 
+					if ( !qlang.startsWith("xpath") ) {
+						throw new ITSException(String.format("ITS queryLanguage is '%s', but this implementation supports only XPath.", qlang));
+					}
+					if ( !qlang.equals("xpath") ) {
+						// Some version other than 1.0 of XPath: proceed, but warn of the potential issues
+						logger.warn("ITS queryLanguage is '{}', but this implementation supports only XPath 1.0: You may or may not run into problems.'", qlang);
+					}
 				}
 
 				// Check for link
@@ -402,6 +459,12 @@ public class ITSEngine implements IProcessor, ITraversal {
 					else if ( "allowedCharactersRule".equals(locName) ) {
 						compileAllowedCharactersRule(ruleElem, isInternal);
 					}
+					else if ( "mtConfidenceRule".equals(locName) ) {
+						compileMtConfidenceRule(ruleElem, isInternal);
+					}
+					else if ( "disambiguationRule".equals(locName) ) {
+						compileDisambiguationRule(ruleElem, isInternal);
+					}
 					else if ( "subFilterRule".equals(locName) ) {
 						compileSubFilterRule(ruleElem, isInternal);
 					}
@@ -413,7 +476,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 						&& !"locQualityIssues".equals(locName)
 						&& !"locQualityIssue".equals(locName)
 						&& !"locNote".equals(locName) ) {
-						logger.warn(String.format("Unknown element '%s'.", ruleElem.getNodeName()));
+						logger.warn("Unknown element '{}'.", ruleElem.getNodeName());
 					}
 				}
 			}
@@ -452,17 +515,10 @@ public class ITSEngine implements IProcessor, ITraversal {
 		boolean isInternal)
 	{
 		try {
-			ensureDocumentBuilderExist();
-			Document rulesDoc = fact.newDocumentBuilder().parse(docURI.toString());
+			Document rulesDoc = parseXMLDocument(docURI.toString());
 			compileRules(rulesDoc, docURI, isInternal);
 		}
-		catch ( SAXException e ) {
-			throw new RuntimeException(e);
-		}
-		catch ( ParserConfigurationException e ) {
-			throw new RuntimeException(e);
-		}
-		catch ( IOException e ) {
+		catch ( Throwable e ) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -475,6 +531,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 		rule.isInternal = isInternal;
 		
 		String value = elem.getAttribute("translate");
+		if ( isHTML5 ) value = value.toLowerCase();
 		if ( "yes".equals(value) ) rule.flag = true;
 		else if ( "no".equals(value) ) rule.flag = false;
 		else throw new ITSException("Invalid value for 'translate'.");
@@ -484,8 +541,8 @@ public class ITSEngine implements IProcessor, ITraversal {
 		if ( !value.isEmpty() ) {
 			if ( version.equals(ITS_VERSION2) ) {
 				// Warn if the extension is used in ITS 2.0
-				logger.warn(String.format("This document uses the %s:idValue extension instead of the ITS 2.0 Id Value data category.",
-					ITSX_NS_URI));
+				logger.warn("This document uses the {}:idValue extension instead of the ITS 2.0 Id Value data category.",
+					ITSX_NS_URI);
 			}
 			rule.idValue = value;
 		}
@@ -495,8 +552,8 @@ public class ITSEngine implements IProcessor, ITraversal {
 		if ( !value.isEmpty() ) {
 			if ( version.equals(ITS_VERSION2) ) {
 				// Warn if the extension is used in ITS 2.0
-				logger.warn(String.format("This document uses the %s:whiteSpaces extension instead of the ITS 2.0 Preserve Space data category.",
-					ITSX_NS_URI));
+				logger.warn("This document uses the {}:whiteSpaces extension instead of the ITS 2.0 Preserve Space data category.",
+					ITSX_NS_URI);
 			}
 			if ( "preserve".equals(value) ) rule.preserveWS = true;
 			else if ( "default".equals(value) ) rule.preserveWS = false;
@@ -669,13 +726,27 @@ public class ITSEngine implements IProcessor, ITraversal {
 		}
 		else {
 			rule.info = allowedCharsP;
-			rule.infoType = ALLOWEDCHARSTYPE_POINTER;
+			rule.infoType = INFOTYPE_POINTER;
 		}
 		
 		// Add the rule
 		rules.add(rule);
 	}
 	
+	private void compileMtConfidenceRule (Element elem,
+		boolean isInternal)
+	{
+		ITSRule rule = new ITSRule(IProcessor.DC_MTCONFIDENCE);
+		rule.selector = elem.getAttribute("selector");
+		rule.isInternal = isInternal;
+			
+		rule.info = retrieveMtconfidence(elem, false, false);
+		if ( rule.info == null ) return;
+			
+		rule.infoType = INFOTYPE_TEXT;
+		rules.add(rule);
+	}
+		
 	private void compileLocQualityIssueRule (Element elem,
 		boolean isInternal)
 	{
@@ -684,7 +755,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 		rule.isInternal = isInternal;
 
 		// Get the local attributes
-		String np[] = retrieveLocQualityIssueData(elem, false);
+		String np[] = retrieveLocQualityIssueData(elem, false, false);
 		
 		String issuesRefP = null;
 		if ( elem.hasAttribute("locQualityIssuesRefPointer") )
@@ -705,27 +776,32 @@ public class ITSEngine implements IProcessor, ITraversal {
 		{
 			throw new ITSException("You must have at least a type or a comment or isses reference ainformation defined.");
 		}
-		rule.map = new HashMap<String, String>();
-
+		rule.annotations = new GenericAnnotations();
+		GenericAnnotation ann = addIssueItem(rule.annotations);
+		
 		if ( !Util.isEmpty(np[0]) ) {
 			if ( !Util.isEmpty(issuesRefP) ) {
 				throw new ITSException("Cannot have both locQualityIssuesRef and locQualityIssuesRefPointer.");
 			}
-			rule.map.put("issuesRef", np[0]);
+			rule.info = np[0];
+			rule.infoType = INFOTYPE_REF;
 		}
-		else {
-			rule.map.put("issuesRefPointer", issuesRefP);
+		else if ( issuesRefP != null ) {
+			rule.info = issuesRefP;
+			rule.infoType = INFOTYPE_REFPOINTER;
 		}
+
+		// For the annotation info, we add '@@' in front if it is a pointer
 		
 		if ( !Util.isEmpty(np[1]) ) {
 			if ( !Util.isEmpty(typeP) ) {
 				throw new ITSException("Cannot have both locQualityIssueType and locQualityIssueTypePointer.");
 			}
-			rule.map.put("type", np[1]);
+			ann.setString(GenericAnnotationType.LQI_TYPE, np[1]);
 			// TODO: verify the value?
 		}
-		else {
-			rule.map.put("typePointer", typeP);
+		else if ( typeP != null ) {
+			ann.setString(GenericAnnotationType.LQI_TYPE, PTRFLAG+typeP);
 		}
 		
 		// Get the comment
@@ -733,10 +809,10 @@ public class ITSEngine implements IProcessor, ITraversal {
 			if ( !Util.isEmpty(commentP) ) {
 				throw new ITSException("Cannot have both locQualityIssueComment and locQualityIssueCommentPointer.");
 			}
-			rule.map.put("comment", np[2]);
+			ann.setString(GenericAnnotationType.LQI_COMMENT, np[2]);
 		}
-		else {
-			rule.map.put("commentPointer", commentP);
+		else if ( commentP != null ) {
+			ann.setString(GenericAnnotationType.LQI_COMMENT, PTRFLAG+commentP);
 		}
 		
 		// Get the optional severity
@@ -747,11 +823,11 @@ public class ITSEngine implements IProcessor, ITraversal {
 			if ( !Util.isEmpty(severityP) ) {
 				throw new ITSException("Cannot have both locQualityIssueSeverity and locQualityIssueSeverityPointer.");
 			}
-			// TODO: verify the value? // 0. to 100.00
-			rule.map.put("severity", np[3]);
+			// Do not convert the float yet, this is done when triggering the rule
+			ann.setString(GenericAnnotationType.LQI_SEVERITY, np[3]);
 		}
-		else {
-			rule.map.put("severityPointer", severityP);
+		else if ( severityP != null ) {
+			ann.setString(GenericAnnotationType.LQI_SEVERITY, PTRFLAG+severityP);
 		}
 		
 		// Get the optional profile reference
@@ -762,17 +838,107 @@ public class ITSEngine implements IProcessor, ITraversal {
 			if ( !Util.isEmpty(profileRefP) ) {
 				throw new ITSException("Cannot have both locQualityIssueProfileRef and locQualityIssueProfileRefPointer.");
 			}
-			// TODO: verify the value? URI
-			rule.map.put("profileRef", np[4]);
+			ann.setString(GenericAnnotationType.LQI_PROFILEREF, np[4]);
 		}
-		else {
-			rule.map.put("profileRefPointer", profileRefP);
+		else if ( profileRefP != null ) {
+			ann.setString(GenericAnnotationType.LQI_PROFILEREF, PTRFLAG+profileRefP);
+		}
+
+		// Get the optional enabled
+		String enabledP = null;
+		if ( elem.hasAttribute("locQualityIssueEnabledPointer")) {
+			profileRefP = elem.getAttribute("locQualityIssueEnabledPointer");
+			ann.setString(GenericAnnotationType.LQI_ENABLED, PTRFLAG+enabledP);
+		}
+		else { // either default or set value
+			ann.setString(GenericAnnotationType.LQI_ENABLED, np[5]);
 		}
 
 		// Add the rule
 		rules.add(rule);
 	}
 
+	private void compileDisambiguationRule (Element elem,
+		boolean isInternal)
+	{
+		ITSRule rule = new ITSRule(IProcessor.DC_DISAMBIGUATION);
+		rule.selector = elem.getAttribute("selector");
+		rule.isInternal = isInternal;
+
+		// Get the local attributes
+		String np[] = retrieveDisambiguationData(elem, false, false);
+		
+		String classP = null;
+		if ( elem.hasAttribute("disambigClassPointer") )
+			classP = elem.getAttribute("disambigClassPointer");
+
+		String classRefP = null;
+		if ( elem.hasAttribute("disambigClassRefPointer") )
+			classRefP = elem.getAttribute("disambigClassRefPointer");
+		
+		String sourceP = null;
+		if (elem.hasAttribute("disambigSourcePointer"))
+			sourceP = elem.getAttribute("disambigSourcePointer");
+		
+		String identP = null;
+		if ( elem.hasAttribute("disambigIdentPointer"))
+			identP = elem.getAttribute("disambigIdentPointer");
+		
+		String identRefP = null;
+		if ( elem.hasAttribute("disambigIdentRefPointer"))
+			identRefP = elem.getAttribute("disambigIdentRefPointer");
+
+		// Granularity is only non-pointer
+		
+		// Check we have the mandatory attributes
+		//TODO later when the dta category is stable
+
+		rule.annotations = new GenericAnnotations();
+		GenericAnnotation ann = rule.annotations.add(GenericAnnotationType.DISAMB);
+		
+		// For the annotation info, we add '@@' in front if it is a pointer
+		// also flag with REFFLAG if it is a ref version
+		
+		if ( classP != null ) {
+			ann.setString(GenericAnnotationType.DISAMB_CLASS, PTRFLAG+classP);
+		}
+		else if ( classRefP != null ) {
+			ann.setString(GenericAnnotationType.DISAMB_CLASS, PTRFLAG+REFFLAG+classRefP);
+		}
+		else if ( np[0] != null ) {
+			ann.setString(GenericAnnotationType.DISAMB_CLASS, np[0]);
+		}
+		
+		if ( sourceP != null ) {
+			ann.setString(GenericAnnotationType.DISAMB_SOURCE, PTRFLAG+sourceP);
+		}
+		else if ( np[1] != null ) {
+			ann.setString(GenericAnnotationType.DISAMB_SOURCE, np[1]);
+		}
+		
+		if ( identP != null ) {
+			ann.setString(GenericAnnotationType.DISAMB_IDENT, PTRFLAG+identP);
+		}
+		else if ( np[2] != null ) {
+			ann.setString(GenericAnnotationType.DISAMB_IDENT, np[2]);
+		}
+		
+		if ( identRefP != null ) {
+			ann.setString(GenericAnnotationType.DISAMB_IDENT, PTRFLAG+REFFLAG+identRefP);
+		}
+		else if ( np[3] != null ) {
+			ann.setString(GenericAnnotationType.DISAMB_IDENT, np[3]);
+		}
+		// No confidence information in global rule
+
+		// Get the optional enabled
+		ann.setString(GenericAnnotationType.DISAMB_GRANULARITY, np[4]);
+
+		// Add the rule
+		rules.add(rule);
+	}
+
+	
 	private void compileLocaleFilterRule (Element elem,
 		boolean isInternal)
 	{
@@ -894,7 +1060,8 @@ public class ITSEngine implements IProcessor, ITraversal {
 				if ( map == null ) {
 					map = new LinkedHashMap<String, String>();
 				}
-				map.put(left.toString(), right.toString());
+				// Left value must be lowercase
+				map.put(left.toString().toLowerCase(), right.toString());
 			}
 		}
 		
@@ -907,41 +1074,41 @@ public class ITSEngine implements IProcessor, ITraversal {
 		ITSRule rule = new ITSRule(IProcessor.DC_TERMINOLOGY);
 		rule.selector = elem.getAttribute("selector");
 		rule.isInternal = isInternal;
-		
-		// term
-		String value = elem.getAttribute("term");
-		if ( "yes".equals(value) ) rule.flag = true;
-		else if ( "no".equals(value) ) rule.flag = false;
-		else throw new ITSException("Invalid value for 'term'.");
-		
-		value = elem.getAttribute("termInfoPointer");
-		String value2 = elem.getAttribute("termInfoRef");
-		String value3 = elem.getAttribute("termInfoRefPointer");
-		
-		if ( value.length() > 0 ) {
-			rule.infoType = TERMINFOTYPE_POINTER;
-			rule.info = value;
-			if (( value2.length() > 0 ) || ( value3.length() > 0 )) {
-				throw new ITSException("Too many termInfo attributes specified");
-			}
-		}
-		else {
-			if ( value2.length() > 0 ) {
-				rule.infoType = TERMINFOTYPE_REF;
-				rule.info = value2;
-				if ( value3.length() > 0 ) {
-					throw new ITSException("Too many termInfo attributes specified");
-				}
-			}
-			else {
-				if ( value3.length() > 0 ) {
-					rule.infoType = TERMINFOTYPE_REFPOINTER;
-					rule.info = value3;
-				}
-				// Else: No associate information, rule.termInfo is null
-			}
-		}
 
+		// Get the local attributes
+		String np[] = retrieveTerminologyData(elem, false, false);
+		
+		rule.flag = (np[0] != null );
+		rules.add(rule);
+
+		// Return now if its not a term
+		if ( !rule.flag ) return;
+		
+		String infoRefP = null;
+		if ( elem.hasAttribute("termInfoRefPointer") )
+			infoRefP = elem.getAttribute("termInfoRefPointer");
+		
+		String infoP = null;
+		if (elem.hasAttribute("termInfoPointer"))
+			infoP = elem.getAttribute("termInfoPointer");
+
+		rule.annotations = new GenericAnnotations();
+		GenericAnnotation ann = rule.annotations.add(GenericAnnotationType.TERM);
+		
+		// For the annotation info, we add '@@' in front if it is a pointer
+		// also flag with REFFLAG if it is a ref version
+		if ( infoRefP != null ) {
+			ann.setString(GenericAnnotationType.TERM_INFO, PTRFLAG+REFFLAG+infoRefP);
+		}
+		if ( infoP != null ) {
+			ann.setString(GenericAnnotationType.TERM_INFO, PTRFLAG+infoP);
+		}
+		if ( np[1] != null ) { // The REF prefix is already on this
+			ann.setString(GenericAnnotationType.TERM_INFO, np[1]);
+		}
+		// No confidence information in global rule
+
+		// Add the rule
 		rules.add(rule);
 	}
 
@@ -966,7 +1133,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 		String value4 = elem.getAttribute("locNoteRefPointer");
 		
 		if ( value1.length() > 0 ) {
-			rule.infoType = LOCNOTETYPE_TEXT;
+			rule.infoType = INFOTYPE_TEXT;
 			rule.info = value1;
 			if (( value2.length() > 0 ) || ( value3.length() > 0 ) || ( value4.length() > 0 )) {
 				throw new ITSException("Too many locNote attributes specified");
@@ -974,7 +1141,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 		}
 		else {
 			if ( value2.length() > 0 ) {
-				rule.infoType = LOCNOTETYPE_POINTER;
+				rule.infoType = INFOTYPE_POINTER;
 				rule.info = value2;
 				if (( value3.length() > 0 ) || ( value4.length() > 0 )) {
 					throw new ITSException("Too many locNote attributes specified");
@@ -982,7 +1149,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 			}
 			else {
 				if ( value3.length() > 0 ) {
-					rule.infoType = LOCNOTETYPE_REF;
+					rule.infoType = INFOTYPE_REF;
 					rule.info = value3;
 					if ( value4.length() > 0 ) {
 						throw new ITSException("Too many locNote attributes specified");
@@ -990,7 +1157,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 				}
 				else {
 					if ( value4.length() > 0 ) {
-						rule.infoType = LOCNOTETYPE_REFPOINTER;
+						rule.infoType = INFOTYPE_REFPOINTER;
 						rule.info = value4;
 					}
 				}
@@ -1020,6 +1187,9 @@ public class ITSEngine implements IProcessor, ITraversal {
 		version = "0"; // Needs to be not null (in case there is no ITS at all in file)
 		processGlobalRules(dataCategories);
 		processLocalRules(dataCategories);
+		
+		// Prepare for target pointers if needed
+		prepareTargetPointers();
 	}
 	
 	private void removeFlag (Node node) {
@@ -1123,16 +1293,22 @@ public class ITSEngine implements IProcessor, ITraversal {
 			trace.peek().localeFilter = getFlagData(data, FP_LOCFILTER_DATA);
 		}
 		
-		if ( data.charAt(FP_LQISSUE) != '?' ) {
-			String[] values = fromSingleString(getFlagData(data, FP_LQISSUE_DATA));
-			// Do not override if the value is no defined
-			if ( values[0] != null ) trace.peek().lqIssuesRef = values[0];
-			if ( values[1] != null ) trace.peek().lqIssueType = values[1];
-			if ( values[2] != null ) trace.peek().lqIssueComment = values[2];
-			if ( values[3] != null ) trace.peek().lqIssueSeverity = values[3];
-			if ( values[4] != null ) trace.peek().lqIssueProfileRef = values[4];
+		if ( data.charAt(FP_LQISSUE) == 'y' ) {
+			trace.peek().lqIssues = new GenericAnnotations(getFlagData(data, FP_LQISSUE_DATA));
 		}
 
+		if ( data.charAt(FP_DISAMBIGUATION) == 'y' ) {
+			trace.peek().disambig = new GenericAnnotations(getFlagData(data, FP_DISAMBIGUATION_DATA));
+		}
+		
+		if ( data.charAt(FP_LQRATING) == 'y' ) {
+			trace.peek().lqRating = new GenericAnnotations(getFlagData(data, FP_LQRATING_DATA));
+		}
+		
+		if ( data.charAt(FP_TERMINOLOGY) == 'y' ) {
+			trace.peek().termino = new GenericAnnotations(getFlagData(data, FP_TERMINOLOGY_DATA));
+		}
+		
 		if ( data.charAt(FP_STORAGESIZE) != '?' ) {
 			String[] values = fromSingleString(getFlagData(data, FP_STORAGESIZE_DATA));
 			trace.peek().storageSize = values[0];
@@ -1140,11 +1316,18 @@ public class ITSEngine implements IProcessor, ITraversal {
 			trace.peek().lineBreakType = values[2];
 		}
 		
+		if ( data.charAt(FP_MTCONFIDENCE) != '?' ) {
+			value = getFlagData(data, FP_MTCONFIDENCE_DATA);
+			trace.peek().mtConfidence = Float.parseFloat(value);
+		}
+		
 		if ( data.charAt(FP_ALLOWEDCHARS) != '?' ) {
 			trace.peek().allowedChars = getFlagData(data, FP_ALLOWEDCHARS_DATA);
 		}
 		
-		trace.peek().targetPointer = getFlagData(data, FP_TARGETPOINTER_DATA);
+		if ( data.charAt(FP_TARGETPOINTER) != '?' ) {
+			trace.peek().targetPointer = getFlagData(data, FP_TARGETPOINTER_DATA);
+		}
 		
 		if ( data.charAt(FP_DIRECTIONALITY) != '?' ) {
 			switch ( data.charAt(FP_DIRECTIONALITY) ) {
@@ -1177,11 +1360,6 @@ public class ITSEngine implements IProcessor, ITraversal {
 			}
 		}
 		
-		if ( data.charAt(FP_TERMINOLOGY) != '?' ) {
-			trace.peek().term = (data.charAt(FP_TERMINOLOGY) == 'y');
-			trace.peek().termInfo = getFlagData(data, FP_TERMINOLOGY_DATA);
-		}
-		
 		if ( data.charAt(FP_LOCNOTE) != '?' ) {
 			trace.peek().locNote = getFlagData(data, FP_LOCNOTE_DATA);
 			trace.peek().locNoteType = (data.charAt(FP_LOCNOTE)=='a' ? "alert" : "description");
@@ -1200,6 +1378,39 @@ public class ITSEngine implements IProcessor, ITraversal {
 			trace.peek().subFilter = getFlagData(data, FP_SUBFILTER_DATA);
 		}
 		
+		if ( data.charAt(FP_ANNOTATORSREF) != '?' ) {
+			// Update each data category
+			Map<String, String> oldMap = annotatorsRefToMap(trace.peek().annotatorsRef);
+			Map<String, String> newMap = annotatorsRefToMap(getFlagData(data, FP_ANNOTATORSREF_DATA));
+			oldMap.putAll(newMap); // Add or override if needed
+			trace.peek().annotatorsRef = mapToAnnotatorsRef(oldMap);
+		}
+	}
+	
+	private Map<String, String> annotatorsRefToMap (String data) {
+		TreeMap<String, String> map = new TreeMap<String, String>();
+		if ( Util.isEmpty(data) ) return map; // Empty map
+		// Else: fill the map
+		String[] list = data.split(" ", 0);
+		for ( String tmp : list ) {
+			int n = tmp.indexOf('|');
+			if ( n == -1 ) {
+				logger.warn("Invalid annotatorsRef value '{}'", tmp);
+				continue;
+			}
+			map.put(tmp.substring(0, n).toLowerCase(), tmp.substring(n+1));
+		}
+		return map;
+	}
+	
+	private String mapToAnnotatorsRef (Map<String, String> map) {
+		StringBuilder sb = new StringBuilder();
+		
+		for ( String dc : map.keySet() ) {
+			if ( sb.length() > 0 ) sb.append(' ');
+			sb.append(dc+"|"+map.get(dc));
+		}
+		return sb.toString();
 	}
 
 	public void startTraversal () {
@@ -1270,34 +1481,44 @@ public class ITSEngine implements IProcessor, ITraversal {
 					}
 						
 					else if ( rule.ruleType == IProcessor.DC_TERMINOLOGY ) {
-						setFlag(NL.item(i), FP_TERMINOLOGY, (rule.flag ? 'y' : 'n'), true);
-						switch ( rule.infoType ) {
-						case TERMINFOTYPE_POINTER:
-							setFlag(NL.item(i), FP_TERMINOLOGY_DATA, resolvePointer(NL.item(i), rule.info), true);
-							break;
-						case TERMINFOTYPE_REF:
-							setFlag(NL.item(i), FP_TERMINOLOGY_DATA, "REF:"+rule.info, true);
-							break;
-						case TERMINFOTYPE_REFPOINTER:
-							setFlag(NL.item(i), FP_TERMINOLOGY_DATA, "REF:"+resolvePointer(NL.item(i), rule.info), true);
-							break;
+						if ( !rule.flag ) {
+							setFlag(NL.item(i), FP_TERMINOLOGY, 'n', true);
+							continue;
 						}
+						// Else it is term='yes'
+						GenericAnnotations anns = rule.annotations;
+						GenericAnnotation ann = anns.getAnnotations(GenericAnnotationType.TERM).get(0);
+						// Get and resolve 'info/infoRef'
+						data1 = ann.getString(GenericAnnotationType.TERM_INFO);
+						if ( data1 != null ) {
+							if ( data1.startsWith(PTRFLAG) ) {
+								data1 = data1.substring(PTRFLAG.length());
+								boolean ref = data1.startsWith(REFFLAG);
+								if ( ref ) data1 = data1.substring(REFFLAG.length());
+								data1 = (ref ? REF_PREFIX : "")+resolvePointer(NL.item(i), data1);
+							}
+							ann.setString(GenericAnnotationType.TERM_INFO, data1);
+						}
+						// There is no confidence in the global rule
+						// Decorate the node with the resolved annotation data
+						setFlag(NL.item(i), FP_TERMINOLOGY, 'y', true);
+						setFlag(NL.item(i), FP_TERMINOLOGY_DATA, anns.toString(), true);
 					}
 						
 					else if ( rule.ruleType == IProcessor.DC_LOCNOTE ) {
 						setFlag(NL.item(i), FP_LOCNOTE, (rule.flag ? 'a' : 'd'), true); // Type alert or description
 						switch ( rule.infoType ) {
-						case LOCNOTETYPE_TEXT:
+						case INFOTYPE_TEXT:
 							setFlag(NL.item(i), FP_LOCNOTE_DATA, rule.info, true);
 							break;
-						case LOCNOTETYPE_POINTER:
+						case INFOTYPE_POINTER:
 							setFlag(NL.item(i), FP_LOCNOTE_DATA, resolvePointer(NL.item(i), rule.info), true);
 							break;
-						case LOCNOTETYPE_REF:
-							setFlag(NL.item(i), FP_LOCNOTE_DATA, "REF:"+rule.info, true);
+						case INFOTYPE_REF:
+							setFlag(NL.item(i), FP_LOCNOTE_DATA, REF_PREFIX+rule.info, true);
 							break;
-						case LOCNOTETYPE_REFPOINTER:
-							setFlag(NL.item(i), FP_LOCNOTE_DATA, "REF:"+resolvePointer(NL.item(i), rule.info), true);
+						case INFOTYPE_REFPOINTER:
+							setFlag(NL.item(i), FP_LOCNOTE_DATA, REF_PREFIX+resolvePointer(NL.item(i), rule.info), true);
 							break;
 						}
 					}
@@ -1331,6 +1552,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 						
 					else if ( rule.ruleType == IProcessor.DC_DOMAIN ) {
 						List<String> list = resolveExpressionAsList(NL.item(i), rule.info);
+						if ( list.isEmpty() ) continue;
 						// Map the values and build the final string
 						StringBuilder tmp = new StringBuilder();
 						List<String> values = null;
@@ -1347,46 +1569,118 @@ public class ITSEngine implements IProcessor, ITraversal {
 						
 					else if ( rule.ruleType == IProcessor.DC_TARGETPOINTER ) {
 						targetPointerRuleTriggered = true;
+						setFlag(NL.item(i), FP_TARGETPOINTER, 'y', true);
 						setFlag(NL.item(i), FP_TARGETPOINTER_DATA, rule.info, true);							
 					}
 						
 					else if ( rule.ruleType == IProcessor.DC_LOCQUALITYISSUE ) {
-						// Get and resolve type
-						// Get and resolve issues reference
-						data1 = rule.map.get("issuesRef");
-						if ( data1 == null ) {
-							data1 = rule.map.get("issuesRefPointer");
-							if ( !Util.isEmpty(data1) ) data1 = resolvePointer(NL.item(i), data1);
+						GenericAnnotations anns = null;
+						String oriRef = data1 = rule.info;
+						if ( data1 != null ) {
+							if ( rule.infoType == INFOTYPE_REFPOINTER) {
+								oriRef = data1 = resolvePointer(NL.item(i), data1);
+							}
+							// Fetch the stand-off data
+							anns = fetchLocQualityStandoffData(data1, oriRef);
 						}
-						String data2 = rule.map.get("type");
-						if ( data2 == null ) {
-							data2 = rule.map.get("typePointer");
-							if ( !Util.isEmpty(data2) ) data2 = resolvePointer(NL.item(i), data2);
+						else {
+							// Not a stand-off annotation
+							GenericAnnotation ann = rule.annotations.getAnnotations(GenericAnnotationType.LQI).get(0);
+							anns = new GenericAnnotations();
+							GenericAnnotation upd = addIssueItem(anns);
+							// Get and resolve 'type'
+							data1 = ann.getString(GenericAnnotationType.LQI_TYPE);
+							if ( data1 != null ) {
+								if ( data1.startsWith(PTRFLAG) ) {
+									data1 = resolvePointer(NL.item(i), data1.substring(PTRFLAG.length()));
+								}
+								upd.setString(GenericAnnotationType.LQI_TYPE, data1);
+							}
+							// Get and resolve 'comment'
+							data1 = ann.getString(GenericAnnotationType.LQI_COMMENT);
+							if ( data1 != null ) {
+								if ( data1.startsWith(PTRFLAG) ) {
+									data1 = resolvePointer(NL.item(i), data1.substring(PTRFLAG.length()));
+								}
+								upd.setString(GenericAnnotationType.LQI_COMMENT, data1);
+							}
+							// Get and resolve 'severity'
+							data1  = ann.getString(GenericAnnotationType.LQI_SEVERITY);
+							if ( data1 != null ) {
+								if ( data1.startsWith(PTRFLAG) ) {
+									data1 = resolvePointer(NL.item(i), data1.substring(PTRFLAG.length()));
+								}
+								// Convert the string to the float value
+								upd.setFloat(GenericAnnotationType.LQI_SEVERITY, Float.parseFloat(data1));
+							}
+							// Get and resolve 'profile reference'
+							data1 = ann.getString(GenericAnnotationType.LQI_PROFILEREF);
+							if ( data1 != null ) {
+								if ( data1.startsWith(PTRFLAG) ) {
+									data1 = resolvePointer(NL.item(i), data1.substring(PTRFLAG.length()));
+								}
+								upd.setString(GenericAnnotationType.LQI_PROFILEREF, data1);
+							}
+							// Get and resolve 'enabled'
+							data1 = ann.getString(GenericAnnotationType.LQI_ENABLED);
+							if ( data1 != null ) {
+								if ( data1.startsWith(PTRFLAG) ) {
+									data1 = resolvePointer(NL.item(i), data1.substring(PTRFLAG.length()));
+								}
+								upd.setBoolean(GenericAnnotationType.LQI_ENABLED, data1.equals("yes"));
+							}
 						}
-						// Get and resolve comment
-						String data3 = rule.map.get("comment");
-						if ( data3 == null ) {
-							data3 = rule.map.get("commentPointer");
-							if ( !Util.isEmpty(data3) ) data3 = resolvePointer(NL.item(i), data3);
-						}
-						// Get and resolve severity
-						String data4 = rule.map.get("severity");
-						if ( data4 == null ) {
-							data4 = rule.map.get("severityPointer");
-							if ( !Util.isEmpty(data4) ) data4 = resolvePointer(NL.item(i), data4);
-						}
-						// Get and resolve profile reference
-						String data5 = rule.map.get("profileRef");
-						if ( data5 == null ) {
-							data5 = rule.map.get("profileRefPointer");
-							if ( !Util.isEmpty(data5) ) data5 = resolvePointer(NL.item(i), data5);
-						}
+						// Decorate the node with the resolved annotation data
 						setFlag(NL.item(i), FP_LQISSUE, 'y', true);
-						setFlag(NL.item(i), FP_LQISSUE_DATA, toSingleString(data1, data2, data3, data4, data5), true);
+						setFlag(NL.item(i), FP_LQISSUE_DATA, anns.toString(), true);
+					}
+
+					else if ( rule.ruleType == IProcessor.DC_DISAMBIGUATION ) {
+						GenericAnnotations anns = rule.annotations;
+						GenericAnnotation ann = anns.getAnnotations(GenericAnnotationType.DISAMB).get(0);
+						// Get and resolve 'classRef'
+						data1 = ann.getString(GenericAnnotationType.DISAMB_CLASS);
+						if ( data1 != null ) {
+							if ( data1.startsWith(PTRFLAG) ) {
+								data1 = data1.substring(PTRFLAG.length());
+								boolean ref = data1.startsWith(REFFLAG);
+								if ( ref ) data1 = data1.substring(REFFLAG.length());
+								data1 = (ref ? REF_PREFIX : "")+resolvePointer(NL.item(i), data1);
+							}
+							ann.setString(GenericAnnotationType.DISAMB_CLASS, data1);
+						}
+						// Get and resolve 'source'
+						data1 = ann.getString(GenericAnnotationType.DISAMB_SOURCE);
+						if ( data1 != null ) {
+							if ( data1.startsWith(PTRFLAG) ) {
+								data1 = resolvePointer(NL.item(i), data1.substring(PTRFLAG.length()));
+							}
+							ann.setString(GenericAnnotationType.DISAMB_SOURCE, data1);
+						}
+						// Get and resolve 'ident'
+						data1  = ann.getString(GenericAnnotationType.DISAMB_IDENT);
+						if ( data1 != null ) {
+							if ( data1.startsWith(PTRFLAG) ) {
+								data1 = data1.substring(PTRFLAG.length());
+								boolean ref = data1.startsWith(REFFLAG);
+								if ( ref ) data1 = data1.substring(REFFLAG.length());
+								data1 = (ref ? REF_PREFIX : "")+resolvePointer(NL.item(i), data1);
+							}
+							ann.setString(GenericAnnotationType.DISAMB_IDENT, data1);
+						}
+						
+						// Confidence is not in global rules
+						
+						// Granularity has no pointer
+						// So it is already set, including its default if needed
+					
+						// Decorate the node with the resolved annotation data
+						setFlag(NL.item(i), FP_DISAMBIGUATION, 'y', true);
+						setFlag(NL.item(i), FP_DISAMBIGUATION_DATA, anns.toString(), true);
 					}
 
 					else if ( rule.ruleType == IProcessor.DC_ALLOWEDCHARS ) {
-						if ( rule.infoType == ALLOWEDCHARSTYPE_POINTER ) {
+						if ( rule.infoType == INFOTYPE_POINTER ) {
 							data1 = resolvePointer(NL.item(i), rule.info);
 						}
 						else { // Direct expression
@@ -1420,6 +1714,11 @@ public class ITSEngine implements IProcessor, ITraversal {
 						setFlag(NL.item(i), FP_SUBFILTER, 'y', true);
 						setFlag(NL.item(i), FP_SUBFILTER_DATA, rule.info, true);
 					}
+					
+					else if ( rule.ruleType == IProcessor.DC_MTCONFIDENCE ) {
+						setFlag(NL.item(i), FP_MTCONFIDENCE, 'y', true);
+						setFlag(NL.item(i), FP_MTCONFIDENCE_DATA, rule.info, true);
+					}
 
 				}
 		    }
@@ -1429,6 +1728,26 @@ public class ITSEngine implements IProcessor, ITraversal {
 		}
 	}
 	
+	/**
+	 * Adds an issue annotation to a given set and sets its default values.
+	 * @param anns the set where to add the annotation.
+	 * @return the annotation that has been added.
+	 */
+	private GenericAnnotation addIssueItem (GenericAnnotations anns) {
+		GenericAnnotation ann = anns.add(GenericAnnotationType.LQI);
+		ann.setBoolean(GenericAnnotationType.LQI_ENABLED, true); // default
+		return ann;
+	}
+	
+	/**
+	 * Adds the values found in a domain original string to a common result list.
+	 * following the ITS 2.0 algorithm.
+	 * @param text the content of the original string.
+	 * @param map the map where the domain Mapping values are listed (can be null)
+	 * The left values of the list must be in lowercase.
+	 * @param list the list of previously existing resulting values (can be null)
+	 * @return the list of the resulting values.
+	 */
 	private List<String> fromDomainItemToValues (String text,
 		Map<String, String> map,
 		List<String> list)
@@ -1438,11 +1757,18 @@ public class ITSEngine implements IProcessor, ITraversal {
 		String[] parts = text.split(",", 0);
 		for ( int i=0; i<parts.length; i++ ) {
 			parts[i] = parts[i].trim();
+			if ( parts[i].startsWith("'") || parts[i].startsWith("\"") ) {
+				parts[i] = parts[i].substring(1);
+			}
+			if ( parts[i].endsWith("'") || parts[i].endsWith("\"") ) {
+				parts[i] = parts[i].substring(0, parts[i].length()-1);
+			}
 		}
 		for ( String part : parts ) {
 			// If there is a map and the part is listed in it
-			if (( map != null ) && map.containsKey(part) ) {
-				part = map.get(part); // Use the mapped value
+			String lcPart = part.toLowerCase();
+			if (( map != null ) && map.containsKey(lcPart) ) {
+				part = map.get(lcPart); // Use the mapped value
 			}
 			if ( !list.contains(part) ) {
 				list.add(part);
@@ -1494,6 +1820,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 						&& "translateRule".equals(attr.getOwnerElement().getLocalName()) ) continue;
 					// Validate the value
 					String value = attr.getValue();
+					if ( isHTML5 ) value = value.toLowerCase();
 					if (( !"yes".equals(value) ) && ( !"no".equals(value) )) {
 						throw new ITSException("Invalid value for 'translate'.");
 					}
@@ -1520,10 +1847,10 @@ public class ITSEngine implements IProcessor, ITraversal {
 						&& "dirRule".equals(attr.getOwnerElement().getLocalName()) ) continue;
 					// Set the flag on the others
 					int n = DIR_LTR;
-					if ( "rtl".equals(attr.getValue()) ) n = DIR_LTR; 
-					else if ( "ltr".equals(attr.getValue()) ) n = DIR_RTL; 
-					else if ( "rlo".equals(attr.getValue()) ) n = DIR_RLO; 
-					else if ( "lro".equals(attr.getValue()) ) n = DIR_LRO;
+					if ( "ltr".equals(attr.getValue()) ) n = DIR_LTR; 
+					else if ( "rtl".equals(attr.getValue()) ) n = DIR_RTL; 
+					else if ( "lro".equals(attr.getValue()) ) n = DIR_RLO; 
+					else if ( "rlo".equals(attr.getValue()) ) n = DIR_LRO;
 					else throw new ITSException("Invalid value for 'dir'."); 
 					setFlag(attr.getOwnerElement(), FP_DIRECTIONALITY,
 						String.format("%d", n).charAt(0), attr.getSpecified());
@@ -1532,34 +1859,34 @@ public class ITSEngine implements IProcessor, ITraversal {
 			
 			if ( (dataCategories & IProcessor.DC_TERMINOLOGY) > 0 ) {
 				if ( isHTML5 ) {
-					expr = xpath.compile("//*/@its-term|//*/@its-term-info-ref");
+					expr = xpath.compile("//*/@its-term");
 				}
 				else {
-					expr = xpath.compile("//*/@"+ITS_NS_PREFIX+":term|//"+ITS_NS_PREFIX+":span/@term"
-						+"|//*/@"+ITS_NS_PREFIX+":termInfoRef|//"+ITS_NS_PREFIX+":span/@termInfoRef");
+					expr = xpath.compile("//*/@"+ITS_NS_PREFIX+":term|//"+ITS_NS_PREFIX+":span/@term");
 				}
 				NL = (NodeList)expr.evaluate(doc, XPathConstants.NODESET);
-				String localName;
 				for ( int i=0; i<NL.getLength(); i++ ) {
 					attr = (Attr)NL.item(i);
-					localName = attr.getLocalName();
 					// Skip irrelevant nodes
 					if ( ITS_NS_URI.equals(attr.getOwnerElement().getNamespaceURI())
 						&& "termRule".equals(attr.getOwnerElement().getLocalName()) ) continue;
-					// term
-					if ( localName.equals("term") || localName.equals("its-term")) {
-						// Validate the value
-						String value = attr.getValue();
-						if (( !"yes".equals(value) ) && ( !"no".equals(value) )) {
-							throw new ITSException("Invalid value for 'term'.");
-						}
-						// Set the flag
-						setFlag(attr.getOwnerElement(), FP_TERMINOLOGY, value.charAt(0), attr.getSpecified());
+					// Set the flag
+					boolean qualified = true;
+					String ns = attr.getOwnerElement().getNamespaceURI();
+					if ( !Util.isEmpty(ns) ) qualified = !ns.equals(ITS_NS_URI);
+					String[] values = retrieveTerminologyData(attr.getOwnerElement(), qualified, isHTML5);
+					if ( values[0] == null ) {
+						setFlag(attr.getOwnerElement(), FP_TERMINOLOGY, 'n', attr.getSpecified());
+						continue; 
 					}
-					else if ( localName.equals("termInfoRef") || localName.equals("its-term-info-ref") ) {
-						setFlag(attr.getOwnerElement(), FP_TERMINOLOGY_DATA,
-							"REF:"+attr.getValue(), attr.getSpecified());
-					}
+					// Else: term is set. Convert the values into an annotation
+					GenericAnnotations anns = new GenericAnnotations();
+					GenericAnnotation ann = anns.add(GenericAnnotationType.TERM);
+					if ( values[1] != null ) ann.setString(GenericAnnotationType.TERM_INFO, values[1]);
+					if ( values[2] != null ) ann.setFloat(GenericAnnotationType.TERM_CONFIDENCE, Float.parseFloat(values[2]));
+					// Set the updated flags
+					setFlag(attr.getOwnerElement(), FP_TERMINOLOGY, 'y', attr.getSpecified());
+					setFlag(attr.getOwnerElement(), FP_TERMINOLOGY_DATA, anns.toString(), attr.getSpecified()); 
 				}
 			}
 
@@ -1591,7 +1918,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 					}
 					else if ( localName.equals("locNoteRef") || localName.equals("its-loc-note-ref") ) {
 						setFlag(attr.getOwnerElement(), FP_LOCNOTE_DATA,
-							"REF:"+attr.getValue(), attr.getSpecified());
+							REF_PREFIX+attr.getValue(), attr.getSpecified());
 					}
 				}
 			}
@@ -1614,7 +1941,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 					expr = xpath.compile("//*/@its-within-text");
 				}
 				else {
-					expr = xpath.compile("//*/@"+ITS_NS_PREFIX+":withinText");
+					expr = xpath.compile("//*/@"+ITS_NS_PREFIX+":withinText|//"+ITS_NS_PREFIX+":span/@withinText");
 				}
 				NL = (NodeList)expr.evaluate(doc, XPathConstants.NODESET);
 				for ( int i=0; i<NL.getLength(); i++ ) {
@@ -1624,6 +1951,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 						&& "withinTextRule".equals(attr.getOwnerElement().getLocalName()) ) continue;
 					// Set the flag
 					String value = attr.getValue();
+					if ( isHTML5 ) value = value.toLowerCase();
 					char ch;
 					if ( "no".equals(value) ) ch='0'; // WITHINTEXT_NO;
 					else if ( "yes".equals(value) ) ch='1'; // WITHINTEXT_YES;
@@ -1646,6 +1974,30 @@ public class ITSEngine implements IProcessor, ITraversal {
 				// Set the flag
 				setFlag(attr.getOwnerElement(), FP_PRESERVEWS,
 					("preserve".equals(value) ? 'y' : '?'), attr.getSpecified());
+			}
+			
+			// its:annotatorsRef always applied
+			if ( isHTML5 ) {
+				expr = xpath.compile("//*/@its-annotators-ref");
+			}
+			else {
+				expr = xpath.compile("//*/@"+ITS_NS_PREFIX+":annotatorsRef|//"+ITS_NS_PREFIX+":span/@annotatorsRef");
+			}
+			NL = (NodeList)expr.evaluate(doc, XPathConstants.NODESET);
+			for ( int i=0; i<NL.getLength(); i++ ) {
+				attr = (Attr)NL.item(i);
+				// Validate the value
+				String value = attr.getValue();
+				// Validate the values
+				Map<String, String> map = annotatorsRefToMap(value);
+				for ( String dc : map.keySet() ) {
+					validateAnnotatorsRefValue(dc);
+				}
+				// Set the flag
+				setFlag(attr.getOwnerElement(), FP_ANNOTATORSREF,
+					(value!=null ? 'y' : '?'), attr.getSpecified());
+				setFlag(attr.getOwnerElement(), FP_ANNOTATORSREF_DATA,
+						value, attr.getSpecified()); 
 			}
 			
 			// locale filter
@@ -1687,9 +2039,15 @@ public class ITSEngine implements IProcessor, ITraversal {
 			
 			// Localization quality issue
 			if (( (dataCategories & IProcessor.DC_LOCQUALITYISSUE) > 0 ) && isVersion2() ) {
-				expr = xpath.compile("//*/@"+ITS_NS_PREFIX+":locQualityIssueType|//"+ITS_NS_PREFIX+":span/@locQualityIssueType"
-					+"|//*/@"+ITS_NS_PREFIX+":locQualityIssueComment|//"+ITS_NS_PREFIX+":span/@locQualityIssueComment"
-					+"|//*/@"+ITS_NS_PREFIX+":locQualityIssuesRef|//"+ITS_NS_PREFIX+":span/@locQualityIssuesRef");
+				if ( isHTML5 ) {
+					expr = xpath.compile("//*/@its-loc-quality-issue-type|//*/@its-loc-quality-issue-comment|//*/@its-loc-quality-issues-ref");
+				}
+				else {
+					expr = xpath.compile("//*/@"+ITS_NS_PREFIX+":locQualityIssueType|//"+ITS_NS_PREFIX+":span/@locQualityIssueType"
+						+"|//*/@"+ITS_NS_PREFIX+":locQualityIssueComment|//"+ITS_NS_PREFIX+":span/@locQualityIssueComment"
+						+"|//*/@"+ITS_NS_PREFIX+":locQualityIssuesRef|//"+ITS_NS_PREFIX+":span/@locQualityIssuesRef");
+				}
+
 				NL = (NodeList)expr.evaluate(doc, XPathConstants.NODESET);
 				for ( int i=0; i<NL.getLength(); i++ ) {
 					attr = (Attr)NL.item(i);
@@ -1700,28 +2058,100 @@ public class ITSEngine implements IProcessor, ITraversal {
 					boolean qualified = true;
 					String ns = attr.getOwnerElement().getNamespaceURI();
 					if ( !Util.isEmpty(ns) ) qualified = !ns.equals(ITS_NS_URI);
-					String[] values = retrieveLocQualityIssueData(attr.getOwnerElement(), qualified);
-//TODO: resolve this issue: if override is complete or not					
-//					// Get the previous data (if any)
-//					String oriData = (String)attr.getOwnerElement().getUserData(FLAGNAME);
-//					if ( oriData != null ) {
-//						String[] ori = fromSingleString(getFlagData(oriData, FP_LQISSUE_DATA));
-//						if ( ori.length > 1 ) {
-//							// Use original values if local one is not defined
-//							if ( values[0] == null ) values[0] = ori[0];
-//							if ( values[1] == null ) values[1] = ori[1];
-//							if ( values[2] == null ) values[2] = ori[2];
-//							if ( values[3] == null ) values[3] = ori[3];
-//							if ( values[4] == null ) values[4] = ori[4];
-//						}
-//					}
+					String[] values = retrieveLocQualityIssueData(attr.getOwnerElement(), qualified, isHTML5);
+					// Convert the values into an annotation
+					GenericAnnotations anns = null;
+					if ( values[0] != null ) { // stand-off reference
+						// Fetch the stand-off data 
+						anns = fetchLocQualityStandoffData(values[0], values[0]);
+					}
+					else { // Not an stand-off reference
+						anns = new GenericAnnotations();
+						GenericAnnotation ann = addIssueItem(anns);
+						if ( values[1] != null ) ann.setString(GenericAnnotationType.LQI_TYPE, values[1]);
+						if ( values[2] != null ) ann.setString(GenericAnnotationType.LQI_COMMENT, values[2]);
+						if ( values[3] != null ) ann.setFloat(GenericAnnotationType.LQI_SEVERITY, Float.parseFloat(values[3]));
+						if ( values[4] != null ) ann.setString(GenericAnnotationType.LQI_PROFILEREF, values[4]);
+						if ( values[5] != null ) ann.setBoolean(GenericAnnotationType.LQI_ENABLED, values[5].equals("yes"));
+					}
 					// Set the updated flags
 					setFlag(attr.getOwnerElement(), FP_LQISSUE, 'y', attr.getSpecified());
-					setFlag(attr.getOwnerElement(), FP_LQISSUE_DATA,
-						toSingleString(values[0], values[1], values[2], values[3], values[4]), attr.getSpecified()); 
+					setFlag(attr.getOwnerElement(), FP_LQISSUE_DATA, anns.toString(), attr.getSpecified()); 
 				}
 			}
 			
+			// Disambiguation
+			if (( (dataCategories & IProcessor.DC_DISAMBIGUATION) > 0 ) && isVersion2() ) {
+				if ( isHTML5 ) {
+					expr = xpath.compile("//*/@its-disambig-class-ref|//*/@its-disambig-ident|//*/@its-disambig-ident-ref");
+				}
+				else {
+					expr = xpath.compile("//*/@"+ITS_NS_PREFIX+":disambigClassRef|//"+ITS_NS_PREFIX+":span/@disambigClassRef"
+						+"|//*/@"+ITS_NS_PREFIX+":disambigIdent|//"+ITS_NS_PREFIX+":span/@disambigIdent"
+						+"|//*/@"+ITS_NS_PREFIX+":disambigIdentRef|//"+ITS_NS_PREFIX+":span/@disambigIdentRef");
+				}
+
+				// This may catch elements twice (e.g. if the have class-ref and ident-ref)
+				// So the work may be duplicated
+//TODO: Remove duplicated items from the list before processing
+				NL = (NodeList)expr.evaluate(doc, XPathConstants.NODESET);
+				for ( int i=0; i<NL.getLength(); i++ ) {
+					attr = (Attr)NL.item(i);
+					// Skip irrelevant nodes
+					if ( ITS_NS_URI.equals(attr.getOwnerElement().getNamespaceURI())
+						&& "disambiguationRule".equals(attr.getOwnerElement().getLocalName()) ) continue;
+					// Set the flag
+					boolean qualified = true;
+					String ns = attr.getOwnerElement().getNamespaceURI();
+					if ( !Util.isEmpty(ns) ) qualified = !ns.equals(ITS_NS_URI);
+					String[] values = retrieveDisambiguationData(attr.getOwnerElement(), qualified, isHTML5);
+					// Convert the values into an annotation
+					GenericAnnotations anns = new GenericAnnotations();
+					GenericAnnotation ann = anns.add(GenericAnnotationType.DISAMB);
+					if ( values[0] != null ) ann.setString(GenericAnnotationType.DISAMB_CLASS, values[0]);
+					if ( values[1] != null ) ann.setString(GenericAnnotationType.DISAMB_SOURCE, values[1]);
+					if ( values[2] != null ) ann.setString(GenericAnnotationType.DISAMB_IDENT, values[2]);
+					if ( values[3] != null ) ann.setFloat(GenericAnnotationType.DISAMB_CONFIDENCE, Float.parseFloat(values[3]));
+					if ( values[4] != null ) ann.setString(GenericAnnotationType.DISAMB_GRANULARITY, values[4]);
+					// Set the updated flags
+					setFlag(attr.getOwnerElement(), FP_DISAMBIGUATION, 'y', attr.getSpecified());
+					setFlag(attr.getOwnerElement(), FP_DISAMBIGUATION_DATA, anns.toString(), attr.getSpecified()); 
+				}
+			}
+
+			// Localization Quality Rating
+			if (( (dataCategories & IProcessor.DC_LOCQUALITYRATING) > 0 ) && isVersion2() ) {
+				if ( isHTML5 ) {
+					expr = xpath.compile("//*/@its-loc-quality-rating-score|//*/@its-loc-quality-rating-vote");
+				}
+				else {
+					expr = xpath.compile("//*/@"+ITS_NS_PREFIX+":locQualityRatingScore|//"+ITS_NS_PREFIX+":span/@locQualityRatingScore"
+						+"|//*/@"+ITS_NS_PREFIX+":locQualityRatingVote|//"+ITS_NS_PREFIX+":span/@locQualityRatingVote");
+				}
+
+				NL = (NodeList)expr.evaluate(doc, XPathConstants.NODESET);
+				for ( int i=0; i<NL.getLength(); i++ ) {
+					attr = (Attr)NL.item(i);
+					// No irrelevant nodes to skip as there is no global rules
+					// Next: Set the flag
+					boolean qualified = true;
+					String ns = attr.getOwnerElement().getNamespaceURI();
+					if ( !Util.isEmpty(ns) ) qualified = !ns.equals(ITS_NS_URI);
+					String[] values = retrieveLocQualityRatingData(attr.getOwnerElement(), qualified, isHTML5);
+					// Convert the values into an annotation
+					GenericAnnotations anns = new GenericAnnotations();
+					GenericAnnotation ann = anns.add(GenericAnnotationType.LQR);
+					if ( values[0] != null ) ann.setFloat(GenericAnnotationType.LQR_SCORE, Float.parseFloat(values[0]));
+					if ( values[1] != null ) ann.setInteger(GenericAnnotationType.LQR_VOTE, Integer.parseInt(values[1]));
+					if ( values[2] != null ) ann.setFloat(GenericAnnotationType.LQR_SCORETHRESHOLD, Float.parseFloat(values[2]));
+					if ( values[3] != null ) ann.setInteger(GenericAnnotationType.LQR_VOTETHRESHOLD, Integer.parseInt(values[3]));
+					if ( values[4] != null ) ann.setString(GenericAnnotationType.LQR_PROFILEREF, values[4]);
+					// Set the updated flags
+					setFlag(attr.getOwnerElement(), FP_LQRATING, 'y', attr.getSpecified());
+					setFlag(attr.getOwnerElement(), FP_LQRATING_DATA, anns.toString(), attr.getSpecified()); 
+				}
+			}
+
 			// Allowed characters
 			if (( (dataCategories & IProcessor.DC_ALLOWEDCHARS) > 0 ) && isVersion2() ) {
 				if ( isHTML5 ) {
@@ -1766,17 +2196,6 @@ public class ITSEngine implements IProcessor, ITraversal {
 					String ns = attr.getOwnerElement().getNamespaceURI();
 					if ( !Util.isEmpty(ns) ) qualified = !ns.equals(ITS_NS_URI);
 					String[] values = retrieveStorageSizeData(attr.getOwnerElement(), qualified, isHTML5);
-//TODO: resolve override complete or not					
-//					// Get the previous data (if any)
-//					String oriData = (String)attr.getOwnerElement().getUserData(FLAGNAME);
-//					if ( oriData != null ) {
-//						String[] ori = fromSingleString(getFlagData(oriData, FP_STORAGESIZE_DATA));
-//						if ( ori.length > 1 ) {
-//							// Use original values if local one is not defined
-//							if ( values[0] == null ) values[0] = ori[0];
-//							if ( values[1] == null ) values[1] = ori[1];
-//						}
-//					}
 					// Set the updated flags
 					setFlag(attr.getOwnerElement(), FP_STORAGESIZE, 'y', attr.getSpecified());
 					setFlag(attr.getOwnerElement(), FP_STORAGESIZE_DATA,
@@ -1784,24 +2203,33 @@ public class ITSEngine implements IProcessor, ITraversal {
 				}
 			}
 
-			// Local targetPointer attribute (ITS 2.0 only)
-			if (( (dataCategories & IProcessor.DC_TARGETPOINTER) > 0 ) && isVersion2() ) {
-				expr = xpath.compile("//*/@"+ITS_NS_PREFIX+":targetPointer");
+			// MT Confidence
+			if (( (dataCategories & IProcessor.DC_MTCONFIDENCE) > 0 ) && isVersion2() ) {
+				if ( isHTML5 ) {
+					expr = xpath.compile("//*/@its-mt-confidence");
+				}
+				else {
+					expr = xpath.compile("//*/@"+ITS_NS_PREFIX+":mtConfidence|//"+ITS_NS_PREFIX+":span/@mtConfidence");
+				}
 				NL = (NodeList)expr.evaluate(doc, XPathConstants.NODESET);
 				for ( int i=0; i<NL.getLength(); i++ ) {
 					attr = (Attr)NL.item(i);
 					// Skip irrelevant nodes
 					if ( ITS_NS_URI.equals(attr.getOwnerElement().getNamespaceURI())
-						&& "targetPointerRule".equals(attr.getOwnerElement().getLocalName()) ) continue;
+						&& "mtConfidenceRule".equals(attr.getOwnerElement().getLocalName()) ) continue;
 					// Set the flag
-					String value = attr.getValue();
+					boolean qualified = true;
+					String ns = attr.getOwnerElement().getNamespaceURI();
+					if ( !Util.isEmpty(ns) ) qualified = !ns.equals(ITS_NS_URI);
+					// Get, validate and set the value
+					String value = retrieveMtconfidence(attr.getOwnerElement(), qualified, isHTML5);
 					if ( value != null ) {
-						setFlag(attr.getOwnerElement(), FP_TARGETPOINTER_DATA,
-							value, attr.getSpecified());
+						setFlag(attr.getOwnerElement(), FP_MTCONFIDENCE, 'y', attr.getSpecified());
+						setFlag(attr.getOwnerElement(), FP_MTCONFIDENCE_DATA, value, attr.getSpecified());
 					}
 				}
 			}
-
+			
 //			// sub filter
 //			if ( (dataCategories & IProcessor.DC_SUBFILTER) > 0 ) {
 //				if ( isHTML5 ) {
@@ -1835,6 +2263,39 @@ public class ITSEngine implements IProcessor, ITraversal {
 		}
 	}
 
+	private boolean validateFloat (String value,
+		float minimum,
+		float maximum,
+		String name)
+	{
+		try {
+			float f = Float.parseFloat(value);
+			if (( f < minimum ) || ( f > maximum )) {
+				logger.error("Invalid value for {}: {}. It should be between [{} and {}]", name, value, minimum, maximum);
+			}
+			return true;
+		}
+		catch ( NullPointerException e ) {
+			logger.error("Not value defined for '{}'.", name);
+			return false;
+		}
+		catch ( NumberFormatException e ) {
+			logger.error("Invalid rational value for {}: {}", name, value);
+			return false;
+		}
+	}
+	
+	private String validateAnnotatorsRefValue (String data) {
+		if ( Util.isEmpty(data) || ( ("allowed-characters|directionality|disambiguation|domain|elements-within-text|"
+			+ "external-resource|id-value|language-information|locale-filter|localization-note|lq-issue|lq-rating|"
+			+ "mt-confidence|provenance|ruby|storage-size|target-pointer|terminology|translate").indexOf(data)==-1 ))
+		{
+			// Log an error, but don't stop the process
+			logger.error("Invalid value for annotatorsRef/its-annotators-ref: '{}'", data);
+		}
+		return data;
+	}
+	
 	/**
 	 * Retrieve the final list to use for a locale filter data category
 	 * @param elem the element where the attributes are defined.
@@ -1854,6 +2315,48 @@ public class ITSEngine implements IProcessor, ITraversal {
 		else { // Inside a global rule
 			return elem.getAttribute("localeFilterList").trim();
 		}
+	}
+
+	/**
+	 * Retrieves the local values for Terminology.
+	 * @param elem the element where to get the data.
+	 * @param qualified true if the attributes are expected to be qualified.
+	 * @param useHTML5 true if this is in HTML.
+	 * @return an array of the value: term (null means no), info, confidence.
+	 */
+	private String[] retrieveTerminologyData (Element elem,
+		boolean qualified,
+		boolean useHTML5)
+	{
+		String[] data = new String[3];
+		if ( useHTML5 ) {
+			if ( elem.hasAttribute("its-term") )
+				data[0] = elem.getAttribute("its-term").toLowerCase();
+			if ( elem.hasAttribute("its-term-info-ref") )
+				data[1] = REF_PREFIX+elem.getAttribute("its-term-info-ref");
+			if ( elem.hasAttribute("its-term-confidence") )
+				data[2] = elem.getAttribute("its-term-confidence");
+		}
+		else if ( qualified ) {
+			if ( elem.hasAttributeNS(ITS_NS_URI, "term") )
+				data[0] = elem.getAttributeNS(ITS_NS_URI, "term");
+			if ( elem.hasAttributeNS(ITS_NS_URI, "termInfoRef") )
+				data[1] = REF_PREFIX+elem.getAttributeNS(ITS_NS_URI, "termInfoRef");
+			if ( elem.hasAttributeNS(ITS_NS_URI, "termConfidence") )
+				data[2] = elem.getAttributeNS(ITS_NS_URI, "termConfidence");
+		}
+		else {
+			if ( elem.hasAttribute("term") )
+				data[0] = elem.getAttribute("term");
+			if ( elem.hasAttribute("termInfoRef") )
+				data[1] = REF_PREFIX+elem.getAttribute("termInfoRef");
+			if ( elem.hasAttribute("termConfidence") )
+				data[2] = elem.getAttribute("termConfidence");
+		}
+		if (( data[0] != null ) && !data[0].equals("yes") ) {
+			data[0] = null;
+		}
+		return data;
 	}
 	
 	private String retrieveSubFilter (Element elem,
@@ -1877,8 +2380,8 @@ public class ITSEngine implements IProcessor, ITraversal {
 		boolean useHTML5)
 	{
 		String type;
-		if ( isHTML5 ) {
-			type = elem.getAttribute("its-loc-note-type");
+		if ( useHTML5 ) {
+			type = elem.getAttribute("its-loc-note-type").toLowerCase();
 		}
 		else if ( qualified ) {
 			type = elem.getAttributeNS(ITS_NS_URI, "locNoteType");
@@ -1918,20 +2421,43 @@ public class ITSEngine implements IProcessor, ITraversal {
 		return null;
 	}
 	
-	
+	private String retrieveMtconfidence (Element elem,
+		boolean qualified,
+		boolean useHTML5)
+	{
+		String value = null;
+		String name = "mtConfidence";
+		if ( useHTML5 ) {
+			name = "its-mt-confidence";
+			if ( elem.hasAttribute(name) )
+				value = elem.getAttribute(name);
+		}
+		else if ( qualified ) {
+			if ( elem.hasAttributeNS(ITS_NS_URI, name) )
+				value = elem.getAttributeNS(ITS_NS_URI, name);
+		}
+		else {
+			if ( elem.hasAttribute(name) )
+				value = elem.getAttribute(name);
+		}
+		if ( validateFloat(value, 0.0F, 1.0F, name) ) {
+			return value;
+		}
+		return null; // No or bad value 
+	}
+		
 	private String[] retrieveStorageSizeData (Element elem,
 		boolean qualified,
 		boolean useHTML5)
 	{
 		String[] data = new String[3];
-		
 		if ( useHTML5 ) {
 			if ( elem.hasAttribute("its-storage-size") )
 				data[0] = elem.getAttribute("its-storage-size");
 			if ( elem.hasAttribute("its-storage-encoding") )
 				data[1] = elem.getAttribute("its-storage-encoding");
 			if ( elem.hasAttribute("its-line-break-type") )
-				data[2] = elem.getAttribute("its-line-break-type");
+				data[2] = elem.getAttribute("its-line-break-type").toLowerCase();
 		}
 		else if ( qualified ) {
 			if ( elem.hasAttributeNS(ITS_NS_URI, "storageSize") )
@@ -1949,22 +2475,47 @@ public class ITSEngine implements IProcessor, ITraversal {
 			if ( elem.hasAttribute("lineBreakType") )
 				data[2] = elem.getAttribute("lineBreakType");
 		}
-		
 		return data;
+	}
+
+	private XPath createXPath () {
+		XPath xpath = xpFact.newXPath();
+		NSContextManager nsc = new NSContextManager();
+		nsc.addNamespace(ITS_NS_PREFIX, ITS_NS_URI);
+		nsc.addNamespace(HTML_NS_PREFIX, HTML_NS_URI);
+		xpath.setNamespaceContext(nsc);
+		return xpath;
 	}
 	
 	/**
 	 * Retrieves the non-pointer information of the Localization Quality issue data category.
 	 * @param elem the element where to get the data.
 	 * @param qualified true if the attributes are expected to be qualified.
-	 * @return an array of the value: issues reference, type, comment, severity, profile reference.
+	 * @return an array of the value: issues reference, type, comment, severity, profile reference, enabled.
 	 */
 	private String[] retrieveLocQualityIssueData (Element elem,
-		boolean qualified)
+		boolean qualified,
+		boolean useHTML5)
 	{
-		String[] data = new String[5];
+		String[] data = new String[6];
 		
-		if ( qualified ) {
+		if ( useHTML5 ) {
+			if ( elem.hasAttribute("its-loc-quality-issues-ref") )
+				data[0] = elem.getAttribute("its-loc-quality-issues-ref");
+			if ( elem.hasAttribute("its-loc-quality-issue-type") )
+				data[1] = elem.getAttribute("its-loc-quality-issue-type").toLowerCase();
+			if ( elem.hasAttribute("its-loc-quality-issue-comment") )
+				data[2] = elem.getAttribute("its-loc-quality-issue-comment");
+			if ( elem.hasAttribute("its-loc-quality-issue-severity") )
+				data[3] = elem.getAttribute("its-loc-quality-issue-severity");
+			if ( elem.hasAttribute("its-loc-quality-issue-profile-ref") )
+				data[4] = elem.getAttribute("its-loc-quality-issue-profile-ref");
+			if ( elem.hasAttribute("its-loc-quality-issue-enabled") )
+				data[5] = elem.getAttribute("its-loc-quality-issue-enabled").toLowerCase();
+			else
+				data[5] = "yes"; // Default
+		}
+		else if ( qualified ) {
 			if ( elem.hasAttributeNS(ITS_NS_URI, "locQualityIssuesRef") )
 				data[0] = elem.getAttributeNS(ITS_NS_URI, "locQualityIssuesRef");
 			
@@ -1979,6 +2530,11 @@ public class ITSEngine implements IProcessor, ITraversal {
 			
 			if ( elem.hasAttributeNS(ITS_NS_URI, "locQualityIssueProfileRef") )
 				data[4] = elem.getAttributeNS(ITS_NS_URI, "locQualityIssueProfileRef");
+
+			if ( elem.hasAttributeNS(ITS_NS_URI, "locQualityIssueEnabled") )
+				data[5] = elem.getAttributeNS(ITS_NS_URI, "locQualityIssueEnabled");
+			else
+				data[5] = "yes"; // Default
 		}
 		else {
 			if ( elem.hasAttribute("locQualityIssuesRef") )
@@ -1995,12 +2551,321 @@ public class ITSEngine implements IProcessor, ITraversal {
 			
 			if ( elem.hasAttribute("locQualityIssueProfileRef") )
 				data[4] = elem.getAttribute("locQualityIssueProfileRef");
+
+			if ( elem.hasAttribute("locQualityIssueEnabled") )
+				data[5] = elem.getAttribute("locQualityIssueEnabled");
+			else
+				data[5] = "yes"; // Default
 		}
 
 		// Do not check for complete set of required characters
 		// This because we could have a global pointer that defines a non-native way to get the data
 
 		return data;
+	}
+	
+	/**
+	 * Retrieves the non-pointer information of the Disambiguation data category.
+	 * @param elem the element where to get the data.
+	 * @param qualified true if the attributes are expected to be qualified.
+	 * @return an array of the value: classRef, source, ident/identRef, granularity
+	 */
+	private String[] retrieveDisambiguationData (Element elem,
+		boolean qualified,
+		boolean useHTML5)
+	{
+		String[] data = new String[6];
+		
+		if ( useHTML5 ) {
+			if ( elem.hasAttribute("its-disambig-class-ref") )
+				data[0] = REF_PREFIX+elem.getAttribute("its-disambig-class-ref");
+			
+			if ( elem.hasAttribute("its-disambig-source") )
+				data[1] = elem.getAttribute("its-disambig-source");
+			
+			if ( elem.hasAttribute("its-disambig-ident") )
+				data[2] = elem.getAttribute("its-disambig-ident");
+			// OR the ref version
+			else if ( elem.hasAttribute("its-disambig-ident-ref") )
+				data[2] = REF_PREFIX+elem.getAttribute("its-disambig-ident-ref");
+			
+			if ( elem.hasAttribute("its-disambig-confidence") )
+				data[3] = elem.getAttribute("its-disambig-confidence");
+			
+			if ( elem.hasAttribute("its-disambig-granularity") ) // Case in-sensitive in HTML
+				data[4] = elem.getAttribute("its-disambig-granularity").toLowerCase();
+			else
+				data[4] = GenericAnnotationType.DISAMB_GRANULARITY_ENTITY; // Default
+		}
+		else if ( qualified ) {
+			if ( elem.hasAttributeNS(ITS_NS_URI, "disambigClassRef") )
+				data[0] = REF_PREFIX+elem.getAttributeNS(ITS_NS_URI, "disambigClassRef");
+			
+			if ( elem.hasAttributeNS(ITS_NS_URI, "disambigSource") )
+				data[1] = elem.getAttributeNS(ITS_NS_URI, "disambigSource");
+			
+			if ( elem.hasAttributeNS(ITS_NS_URI, "disambigIdent") )
+				data[2] = elem.getAttributeNS(ITS_NS_URI, "disambigIdent");
+			// OR the ref version
+			else if ( elem.hasAttributeNS(ITS_NS_URI, "disambigIdentRef") )
+				data[2] = REF_PREFIX+elem.getAttributeNS(ITS_NS_URI, "disambigIdentRef");
+			
+			if ( elem.hasAttributeNS(ITS_NS_URI, "disambigConfidence") )
+				data[3] = elem.getAttributeNS(ITS_NS_URI, "disambigConfidence");
+			
+			if ( elem.hasAttributeNS(ITS_NS_URI, "disambigGranularity") )
+				data[4] = elem.getAttributeNS(ITS_NS_URI, "disambigGranularity");
+			else
+				data[4] = GenericAnnotationType.DISAMB_GRANULARITY_ENTITY; // Default
+		}
+		else {
+			if ( elem.hasAttribute("disambigClassRef") )
+				data[0] = REF_PREFIX+elem.getAttribute("disambigClassRef");
+			
+			if ( elem.hasAttribute("disambigSource") )
+				data[1] = elem.getAttribute("disambigSource");
+			
+			if ( elem.hasAttribute("disambigIdent") )
+				data[2] = elem.getAttribute("disambigIdent");
+			// OR the ref version
+			else if ( elem.hasAttribute("disambigIdentRef") )
+				data[2] = REF_PREFIX+elem.getAttribute("disambigIdentRef");
+			
+			if ( elem.hasAttribute("disambigConfidence") )
+				data[3] = elem.getAttribute("disambigConfidence");
+
+			if ( elem.hasAttribute("disambigGranularity") )
+				data[4] = elem.getAttribute("disambigGranularity");
+			else
+				data[4] = GenericAnnotationType.DISAMB_GRANULARITY_ENTITY; // Default
+		}
+		
+		//TODO: Validation
+
+		return data;
+	}
+	
+	/**
+	 * Retrieves the non-pointer information of the Localization Quality Rating data category.
+	 * @param elem the element where to get the data.
+	 * @param qualified true if the attributes are expected to be qualified.
+	 * @return an array of the value: score, vote, scoreThreshold, voteThreshold, profileRef
+	 */
+	private String[] retrieveLocQualityRatingData (Element elem,
+		boolean qualified,
+		boolean useHTML5)
+	{
+		String[] data = new String[5];
+		
+		if ( useHTML5 ) {
+			if ( elem.hasAttribute("its-loc-quality-rating-score") )
+				data[0] = elem.getAttribute("its-loc-quality-rating-score");
+			
+			if ( elem.hasAttribute("its-loc-quality-rating-vote") )
+				data[1] = elem.getAttribute("its-loc-quality-rating-vote");
+			
+			if ( elem.hasAttribute("its-loc-quality-rating-score-threshold") )
+				data[2] = elem.getAttribute("its-loc-quality-rating-score-threshold");
+			
+			if ( elem.hasAttribute("its-loc-quality-rating-vote-threshold") )
+				data[3] = elem.getAttribute("its-loc-quality-rating-vote-threshold");
+			
+			if ( elem.hasAttribute("its-loc-quality-rating-profile-ref") )
+				data[4] = REF_PREFIX+elem.getAttribute("its-loc-quality-rating-profile-ref");
+		}
+		else if ( qualified ) {
+			if ( elem.hasAttributeNS(ITS_NS_URI, "locQualityRatingScore") )
+				data[0] = elem.getAttributeNS(ITS_NS_URI, "locQualityRatingScore");
+			
+			if ( elem.hasAttributeNS(ITS_NS_URI, "locQualityRatingVote") )
+				data[1] = elem.getAttributeNS(ITS_NS_URI, "locQualityRatingVote");
+			
+			if ( elem.hasAttributeNS(ITS_NS_URI, "locQualityRatingScoreThreshold") )
+				data[2] = elem.getAttributeNS(ITS_NS_URI, "locQualityRatingScoreThreshold");
+			
+			if ( elem.hasAttributeNS(ITS_NS_URI, "locQualityRatingVoteThreshold") )
+				data[3] = elem.getAttributeNS(ITS_NS_URI, "locQualityRatingVoteThreshold");
+			
+			if ( elem.hasAttributeNS(ITS_NS_URI, "locQualityRatingProfileRef") )
+				data[4] = REF_PREFIX+elem.getAttributeNS(ITS_NS_URI, "locQualityRatingProfileRef");
+		}
+		else {
+			if ( elem.hasAttribute("locQualityRatingScore") )
+				data[0] = elem.getAttribute("locQualityRatingScore");
+			
+			if ( elem.hasAttribute("locQualityRatingVote") )
+				data[1] = elem.getAttribute("locQualityRatingVote");
+			
+			if ( elem.hasAttribute("locQualityRatingScoreThreshold") )
+				data[2] = elem.getAttribute("locQualityRatingScoreThreshold");
+			
+			if ( elem.hasAttribute("locQualityRatingVoteThreshold") )
+				data[3] = elem.getAttribute("locQualityRatingVoteThreshold");
+
+			if ( elem.hasAttribute("locQualityRatingProfileRef") )
+				data[4] = REF_PREFIX+elem.getAttribute("locQualityRatingProfileRef");
+		}
+		
+		// Basic validation
+		if (( data[0] != null ) && ( data[1] != null )) {
+			logger.error("Cannot have localization quality rating score and vote at the same time.");
+			data[1] = null;
+		}
+		if (( data[0] != null ) && ( data[3] != null )) {
+			logger.error("Cannot have localization quality rating score with a vote threshold.");
+			data[3] = null;
+		}
+		if (( data[1] != null ) && ( data[2] != null )) {
+			logger.error("Cannot have localization quality rating vote with a score threshold.");
+			data[2] = null;
+		}
+
+		return data;
+	}
+	
+	private GenericAnnotations fetchLocQualityStandoffData (String ref,
+		String originalRef)
+	{
+		if ( Util.isEmpty(ref) ) {
+			throw new InvalidParameterException("The reference URI cannot be null or empty.");
+		}
+		// Identify the type of reference (internal/external)
+		// and get the element
+		int n = ref.lastIndexOf('#');
+		String id = null;
+		String firstPart = null;
+		if ( n > -1 ) {
+			id = ref.substring(n+1);
+			firstPart = ref.substring(0, n);
+		}
+		else {
+			// No ID in the URI
+			throw new RuntimeException(String.format("URI to standoff markup does not have an id: '%s'.", ref));
+		}
+
+		boolean useHTML5 = isHTML5;
+		Document containerDoc = null;
+		XPath containerXPath = null;
+		
+		if ( !Util.isEmpty(firstPart) ) {
+			// Load the document and the rules
+			try {
+				String baseFolder = "";
+				if ( docURI != null) baseFolder = getPartBeforeFile(docURI);
+				if ( baseFolder.length() > 0 ) {
+					if ( baseFolder.endsWith("/") )
+						baseFolder = baseFolder.substring(0, baseFolder.length()-1);
+					if ( !ref.startsWith("/") ) ref = baseFolder + "/" + ref;
+					else ref = baseFolder + ref;
+				}
+
+				// Remove the ID if any
+				int p = ref.lastIndexOf('#');
+				if ( p > -1 ) {
+					ref = ref.substring(0, p);
+				}
+				// Detect format based on extension: .html and .html as HTML, everything else as XML.
+				useHTML5 = ( ref.endsWith(".html") || ref.endsWith(".htm") );
+				if ( useHTML5 ) {
+					containerDoc = parseHTMLDocument(ref);
+				}
+				else {
+					containerDoc = parseXMLDocument(ref);
+				}
+				containerXPath = createXPath();
+			}
+			catch ( Throwable e) {
+				throw new RuntimeException(String.format("Error with URI '%s'.\n"+e.getMessage(), ref));
+			}
+		}
+		else {
+			// Else, the standoff markup is in the same document as the annotated content
+			containerDoc = doc;
+			containerXPath = xpath;
+		}
+		
+		// Create the new annotation set
+		GenericAnnotations anns = new GenericAnnotations();
+		Document issuesDoc = null;
+		XPath issuesXPath = null;
+
+		if ( useHTML5 ) {
+			// If the standoff markup is inside an HTML file:
+			// Get the script that holds the its:locQualityIssues element
+			try {
+				String tmp = String.format("//%s:script[@id='%s']", HTML_NS_PREFIX, id);
+				//String tmp = String.format("//script[@id='%s']", id);
+				XPathExpression expr = containerXPath.compile(tmp);
+				Element scriptElem = (Element)expr.evaluate(containerDoc, XPathConstants.NODE);
+				if ( scriptElem == null ) {
+					logger.warn("Cannot find standoff script element for '{}'", id);
+					GenericAnnotation ann = addIssueItem(anns);
+					ann.setString(GenericAnnotationType.LQI_ISSUESREF, ref); // For information only
+					return anns;
+				}
+				// Else: parse the locQualityIssues element inside the script
+				String content = scriptElem.getTextContent();
+				// Strip white spaces
+				content = content.trim();
+				// Create the context and XPath engine 
+				issuesXPath = createXPath();
+				// Parse the content
+				try {
+					InputSource is = new InputSource(new ByteArrayInputStream(content.getBytes()));
+					issuesDoc = parseXMLDocument(is);
+				}
+				catch ( Throwable e ) {
+					throw new RuntimeException("Error parsing a script element.", e);
+				}
+			}
+			catch ( XPathExpressionException e ) {
+				throw new RuntimeException("XPath error.", e);
+			}
+		}
+		else {
+			issuesDoc = containerDoc;
+			issuesXPath = containerXPath;
+		}
+		
+		// Now get the element holding the list of issues
+		Element elem1;
+		try {
+			String tmp = String.format("//%s:locQualityIssues[@xml:id='%s']", ITS_NS_PREFIX, id);
+			XPathExpression expr = issuesXPath.compile(tmp);
+			elem1 = (Element)expr.evaluate(issuesDoc, XPathConstants.NODE);
+		}
+		catch ( XPathExpressionException e ) {
+			throw new RuntimeException("XPath error.", e);
+		}
+		if ( elem1 == null ) {
+			// Entry not found
+			logger.warn("Cannot find standoff markup for '{}'", originalRef);
+			GenericAnnotation ann = addIssueItem(anns);
+			ann.setString(GenericAnnotationType.LQI_ISSUESREF, originalRef); // For information only
+			return anns;
+		}
+		
+		// Then get the list of items in the element
+		NodeList items = elem1.getElementsByTagNameNS(ITS_NS_URI, "locQualityIssue");
+		for ( int i=0; i<items.getLength(); i++ ) {
+			// For each entry 
+			Element elem2 = (Element)items.item(i);
+			// Add the annotation to the set
+			GenericAnnotation ann = addIssueItem(anns);
+			ann.setString(GenericAnnotationType.LQI_ISSUESREF, originalRef); // For information only
+			// Gather the local information (never in HTML since if it's HTML it's inside a script)
+			String[] values = retrieveLocQualityIssueData(elem2, false, false);
+			if ( values[0] != null ) {
+				logger.warn("Cannot have a standoff reference in a standoff element (reference='{}').", ref);
+			}
+			if ( values[1] != null ) ann.setString(GenericAnnotationType.LQI_TYPE, values[1]);
+			if ( values[2] != null ) ann.setString(GenericAnnotationType.LQI_COMMENT, values[2]);
+			if ( values[3] != null ) ann.setFloat(GenericAnnotationType.LQI_SEVERITY, Float.parseFloat(values[3]));
+			if ( values[4] != null ) ann.setString(GenericAnnotationType.LQI_PROFILEREF, values[4]);
+			if ( values[5] != null ) ann.setBoolean(GenericAnnotationType.LQI_ENABLED, values[5].equals("yes"));
+		}
+
+		return anns;
 	}
 	
 	private boolean isVersion2 () throws XPathExpressionException {
@@ -2049,6 +2914,9 @@ public class ITSEngine implements IProcessor, ITraversal {
 		String pointer)
 	{
 		try {
+			if ( pointer.contains("id(") ) {
+				markDefaultIdentifiers();
+			}
 			XPathExpression expr = xpath.compile(pointer);
 			NodeList list = (NodeList)expr.evaluate(node, XPathConstants.NODESET);
 			if (( list == null ) || ( list.getLength() == 0 )) {
@@ -2067,10 +2935,34 @@ public class ITSEngine implements IProcessor, ITraversal {
 		return "pointer("+pointer+")";
 	}
 	
+	/**
+	 * mark all xml:id attribute in a document as of ID-type, so they can be used
+	 * with the id() XPath and similar functions.
+	 * This method is executed only once.
+	 * @throws XPathExpressionException
+	 */
+	private void markDefaultIdentifiers ()
+		throws XPathExpressionException
+	{
+//TODO: handle HTML id		
+		if ( defaultIdsDone ) return;
+		XPathExpression expr = xpath.compile("//*[@xml:id]");
+		NodeList list = (NodeList)expr.evaluate(doc, XPathConstants.NODESET);
+		if ( list == null ) return;
+		for ( int i=0; i<list.getLength(); i++ ) {
+			Element elem = (Element)list.item(i);
+			elem.setIdAttributeNS(XML_NS_URI, "id", true);
+		}
+		defaultIdsDone = true;
+	}
+	
 	private String resolveExpressionAsString (Node node,
 		String expression)
 	{
 		try {
+			if ( expression.contains("id(") ) {
+				markDefaultIdentifiers();
+			}
 			XPathExpression expr = xpath.compile(expression);
 			return (String)expr.evaluate(node, XPathConstants.STRING);
 		}
@@ -2084,6 +2976,9 @@ public class ITSEngine implements IProcessor, ITraversal {
 	{
 		ArrayList<String> list = new ArrayList<String>();
 		try {
+			if ( expression.contains("id(") ) {
+				markDefaultIdentifiers();
+			}
 			XPathExpression expr = xpath.compile(expression);
 			NodeList nl = (NodeList)expr.evaluate(node, XPathConstants.NODESET);
 			for ( int i=0; i<nl.getLength(); i++ ) {
@@ -2171,6 +3066,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 		else return "";
 	}
 
+	@Override
 	public boolean getTranslate (Attr attribute) {
 		if ( attribute == null ) return trace.peek().translate;
 		// Else: check the attribute
@@ -2186,6 +3082,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 		// Else: check the attribute
 		String tmp;
 		if ( (tmp = (String)attribute.getUserData(FLAGNAME)) == null ) return null;
+		if ( tmp.charAt(FP_TARGETPOINTER) != 'y' ) return null;
 		return getFlagData(tmp, FP_TARGETPOINTER_DATA);
 	}
 	
@@ -2198,33 +3095,72 @@ public class ITSEngine implements IProcessor, ITraversal {
 		return getFlagData(tmp, FP_IDVALUE_DATA);
 	}
 	
+	@Override
 	public int getDirectionality (Attr attribute) {
 		if ( attribute == null ) return trace.peek().dir;
 		String tmp;
-		if ( (tmp = (String)attribute.getUserData(FLAGNAME)) == null ) return DIR_LTR;
+		if ( (tmp = (String)attribute.getUserData(FLAGNAME)) == null ) return trace.peek().dir;
 		return Integer.valueOf(tmp.charAt(FP_DIRECTIONALITY));
 	}
 	
+	@Override
 	public int getWithinText () {
 		return trace.peek().withinText;
 	}
 	
+	@Override
 	public boolean getTerm (Attr attribute) {
-		if ( attribute == null ) return trace.peek().term;
+		if ( attribute == null ) {
+			return (trace.peek().termino != null);
+		}
 		String tmp;
 		if ( (tmp = (String)attribute.getUserData(FLAGNAME)) == null ) return false;
-		// '?' and 'n' will return (correctly) false
 		return (tmp.charAt(FP_TERMINOLOGY) == 'y');
 	}
 
+	@Override
 	public String getTermInfo (Attr attribute) {
-		if ( attribute == null ) return trace.peek().termInfo;;
+		if ( attribute == null ) {
+			if ( trace.peek().termino == null ) return null;
+			return trace.peek().termino.getAnnotations(GenericAnnotationType.TERM).get(0).getString(GenericAnnotationType.TERM_INFO);
+		}
 		String tmp;
 		if ( (tmp = (String)attribute.getUserData(FLAGNAME)) == null ) return null;
 		if ( tmp.charAt(FP_TERMINOLOGY) != 'y' ) return null;
-		return getFlagData(tmp, FP_TERMINOLOGY_DATA);
+		GenericAnnotations anns = new GenericAnnotations(getFlagData(tmp, FP_TERMINOLOGY_DATA));
+		return anns.getAnnotations(GenericAnnotationType.TERM).get(0).getString(GenericAnnotationType.TERM_INFO);
 	}
 
+	@Override
+	public Float getTermConfidence (Attr attribute) {
+		if ( attribute == null ) {
+			if ( trace.peek().termino == null ) return null;
+			return trace.peek().termino.getAnnotations(GenericAnnotationType.TERM).get(0).getFloat(GenericAnnotationType.TERM_CONFIDENCE);
+		}
+		String tmp;
+		if ( (tmp = (String)attribute.getUserData(FLAGNAME)) == null ) return null;
+		if ( tmp.charAt(FP_TERMINOLOGY) != 'y' ) return null;
+		GenericAnnotations anns = new GenericAnnotations(getFlagData(tmp, FP_TERMINOLOGY_DATA));
+		return anns.getAnnotations(GenericAnnotationType.TERM).get(0).getFloat(GenericAnnotationType.TERM_CONFIDENCE);
+	}
+
+	/**
+	 * Gets the terminology annotation set for the current element
+	 * or one of its attributes. 
+	 * @param attribute the attribute to look up, or null for the element.
+	 * @return the annotation set for the queried node (can be null).
+	 */
+	public GenericAnnotations getTerminology (Attr attribute) {
+		if ( attribute == null ) {
+			return trace.peek().termino;
+		}
+		String tmp;
+		if ( (tmp = (String)attribute.getUserData(FLAGNAME)) == null ) return null;
+		if ( tmp.charAt(FP_TERMINOLOGY) != 'y' ) return null;
+		return new GenericAnnotations(getFlagData(tmp, FP_TERMINOLOGY_DATA));
+	}
+	
+	@Override
 	public String getLocNote (Attr attribute) {
 		if ( attribute == null ) return trace.peek().locNote;
 		String tmp;
@@ -2233,6 +3169,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 		return getFlagData(tmp, FP_LOCNOTE_DATA);
 	}
 
+	@Override
 	public String getLocNoteType (Attr attribute) {
 		if ( attribute == null ) return trace.peek().locNoteType;
 		String tmp;
@@ -2242,11 +3179,12 @@ public class ITSEngine implements IProcessor, ITraversal {
 		return "description";
 	}
 	
+	@Override
 	public String getDomains (Attr attribute) {
 		if ( attribute == null ) return trace.peek().domains;
 		String tmp;
-		if ( (tmp = (String)attribute.getUserData(FLAGNAME)) == null ) return null;
-		if ( tmp.charAt(FP_DOMAIN) != 'y' ) return null;
+		if ( (tmp = (String)attribute.getUserData(FLAGNAME)) == null ) return trace.peek().domains;
+		if ( tmp.charAt(FP_DOMAIN) != 'y' ) return trace.peek().domains;
 		return getFlagData(tmp, FP_DOMAIN_DATA);
 	}
 
@@ -2255,6 +3193,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 		return trace.peek().preserveWS;
 	}
 
+	@Override
 	public String getLanguage () {
 		return trace.peek().language;
 	}
@@ -2274,30 +3213,212 @@ public class ITSEngine implements IProcessor, ITraversal {
 	}
 
 	@Override
-	public String getLocQualityIssuesRef () {
-		return trace.peek().lqIssuesRef;
+	public String getLocQualityIssuesRef (Attr attribute) {
+		return getLQIValue(GenericAnnotationType.LQI_ISSUESREF, attribute, 0);
+	}
+	
+	@Override
+	public int getLocQualityIssueCount (Attr attribute) {
+		if ( attribute == null ) {
+			GenericAnnotations lqi = trace.peek().lqIssues;
+			if ( lqi == null ) return 0;
+			return lqi.size();
+		}
+		String tmp;
+		if ( (tmp = (String)attribute.getUserData(FLAGNAME)) == null ) return 0;
+		if ( tmp.charAt(FP_LQISSUE) != 'y' ) return 0;
+		GenericAnnotations anns = new GenericAnnotations(getFlagData(tmp, FP_LQISSUE_DATA));
+		return anns.getAnnotations(GenericAnnotationType.LQI).size();
+	}
+	
+	/**
+	 * Gets the localization quality issue annotation set for the current element
+	 * or one of its attributes. 
+	 * @param attribute the attribute to look up, or null for the element.
+	 * @return the annotation set for the queried node (can be null).
+	 */
+	public GenericAnnotations getLocQualityIssues (Attr attribute) {
+		if ( attribute == null ) {
+			return trace.peek().lqIssues;
+		}
+		String tmp;
+		if ( (tmp = (String)attribute.getUserData(FLAGNAME)) == null ) return null;
+		if ( tmp.charAt(FP_LQISSUE) != 'y' ) return null;
+		return new GenericAnnotations(getFlagData(tmp, FP_LQISSUE_DATA));
 	}
 
 	@Override
-	public String getLocQualityIssueType () {
-		return trace.peek().lqIssueType;
+	public String getLocQualityIssueType (Attr attribute,
+		int index)
+	{
+		return getLQIValue(GenericAnnotationType.LQI_TYPE, attribute, index);
 	}
 
 	@Override
-	public String getLocQualityIssueComment () {
-		return trace.peek().lqIssueComment;
+	public String getLocQualityIssueComment (Attr attribute,
+		int index)
+	{
+		return getLQIValue(GenericAnnotationType.LQI_COMMENT, attribute, index);
 	}
 
 	@Override
-	public String getLocQualityIssueSeverity () {
-		return trace.peek().lqIssueSeverity;
+	public Float getLocQualityIssueSeverity (Attr attribute,
+		int index)
+	{
+		if ( attribute == null ) {
+			if ( trace.peek().lqIssues == null ) return null;
+			return trace.peek().lqIssues.getAnnotations(GenericAnnotationType.LQI).get(index).getFloat(GenericAnnotationType.LQI_SEVERITY);
+		}
+		String tmp;
+		if ( (tmp = (String)attribute.getUserData(FLAGNAME)) == null ) return null;
+		if ( tmp.charAt(FP_LQISSUE) != 'y' ) return null;
+		GenericAnnotations anns = new GenericAnnotations(getFlagData(tmp, FP_LQISSUE_DATA));
+		return anns.getAnnotations(GenericAnnotationType.LQI).get(index).getFloat(GenericAnnotationType.LQI_SEVERITY);
 	}
 
 	@Override
-	public String getLocQualityIssueProfileRef () {
-		return trace.peek().lqIssueProfileRef;
+	public String getLocQualityIssueProfileRef (Attr attribute,
+		int index)
+	{
+		return getLQIValue(GenericAnnotationType.LQI_PROFILEREF, attribute, index);
 	}
 
+	@Override
+	public Boolean getLocQualityIssueEnabled (Attr attribute,
+		int index)
+	{
+		if ( attribute == null ) {
+			if ( trace.peek().lqIssues == null ) return null;
+			return trace.peek().lqIssues.getAnnotations(GenericAnnotationType.LQI).get(index).getBoolean(GenericAnnotationType.LQI_ENABLED);
+		}
+		String tmp;
+		if ( (tmp = (String)attribute.getUserData(FLAGNAME)) == null ) return null;
+		if ( tmp.charAt(FP_LQISSUE) != 'y' ) return null;
+		GenericAnnotations anns = new GenericAnnotations(getFlagData(tmp, FP_LQISSUE_DATA));
+		return anns.getAnnotations(GenericAnnotationType.LQI).get(index).getBoolean(GenericAnnotationType.LQI_ENABLED);
+	}
+	
+	private String getLQIValue (String fieldName,
+		Attr attribute,
+		int index)
+	{
+		if ( attribute == null ) {
+			if ( trace.peek().lqIssues == null ) return null;
+			return trace.peek().lqIssues.getAnnotations(GenericAnnotationType.LQI).get(index).getString(fieldName);
+		}
+		String tmp;
+		if ( (tmp = (String)attribute.getUserData(FLAGNAME)) == null ) return null;
+		if ( tmp.charAt(FP_LQISSUE) != 'y' ) return null;
+		GenericAnnotations anns = new GenericAnnotations(getFlagData(tmp, FP_LQISSUE_DATA));
+		return anns.getAnnotations(GenericAnnotationType.LQI).get(index).getString(fieldName);
+	}
+
+	/**
+	 * Gets the disambiguation annotation set for the current element
+	 * or one of its attributes. 
+	 * @param attribute the attribute to look up, or null for the element.
+	 * @return the annotation set for the queried node (can be null).
+	 */
+	public GenericAnnotations getDisambiguation (Attr attribute) {
+		if ( attribute == null ) {
+			return trace.peek().disambig;
+		}
+		String tmp;
+		if ( (tmp = (String)attribute.getUserData(FLAGNAME)) == null ) return null;
+		if ( tmp.charAt(FP_DISAMBIGUATION) != 'y' ) return null;
+		return new GenericAnnotations(getFlagData(tmp, FP_DISAMBIGUATION_DATA));
+	}
+	
+	@Override
+	public String getDisambigGranularity (Attr attribute) {
+		return getDisambValue(GenericAnnotationType.DISAMB_GRANULARITY, attribute);
+	}
+	
+	@Override
+	public String getDisambigClass (Attr attribute) {
+		return getDisambValue(GenericAnnotationType.DISAMB_CLASS, attribute);
+	}
+	
+	@Override
+	public String getDisambigSource (Attr attribute) {
+		return getDisambValue(GenericAnnotationType.DISAMB_SOURCE, attribute);
+	}
+	
+	@Override
+	public String getDisambigIdent (Attr attribute) {
+		return getDisambValue(GenericAnnotationType.DISAMB_IDENT, attribute);
+	}
+
+	@Override
+	public Float getDisambigConfidence (Attr attribute) {
+		if ( attribute == null ) {
+			if ( trace.peek().disambig == null ) return null;
+			return trace.peek().disambig.getAnnotations(GenericAnnotationType.DISAMB).get(0).getFloat(GenericAnnotationType.DISAMB_CONFIDENCE);
+		}
+		String tmp;
+		if ( (tmp = (String)attribute.getUserData(FLAGNAME)) == null ) return null;
+		if ( tmp.charAt(FP_DISAMBIGUATION) != 'y' ) return null;
+		GenericAnnotations anns = new GenericAnnotations(getFlagData(tmp, FP_DISAMBIGUATION_DATA));
+		return anns.getAnnotations(GenericAnnotationType.DISAMB).get(0).getFloat(GenericAnnotationType.DISAMB_CONFIDENCE);
+	}
+
+	private String getDisambValue (String fieldName,
+		Attr attribute)
+	{
+		if ( attribute == null ) {
+			if ( trace.peek().disambig == null ) return null;
+			return trace.peek().disambig.getAnnotations(GenericAnnotationType.DISAMB).get(0).getString(fieldName);
+		}
+		String tmp;
+		if ( (tmp = (String)attribute.getUserData(FLAGNAME)) == null ) return null;
+		if ( tmp.charAt(FP_DISAMBIGUATION) != 'y' ) return null;
+		GenericAnnotations anns = new GenericAnnotations(getFlagData(tmp, FP_DISAMBIGUATION_DATA));
+		return anns.getAnnotations(GenericAnnotationType.DISAMB).get(0).getString(fieldName);
+	}
+
+	/**
+	 * Gets the localization quality rating annotation set for the current element.
+	 * @return the annotation set for the queried node (can be null).
+	 */
+	public GenericAnnotations getLocQualityRating () {
+		return trace.peek().lqRating;
+	}
+	
+	@Override
+	public Float getLocQualityRatingScore (Attr attribute) {
+		if ( attribute != null ) return null;
+		if ( trace.peek().lqRating == null ) return null;
+		return trace.peek().lqRating.getAnnotations(GenericAnnotationType.LQR).get(0).getFloat(GenericAnnotationType.LQR_SCORE);
+	}
+	
+	@Override
+	public Integer getLocQualityRatingVote (Attr attribute) {
+		if ( attribute != null ) return null;
+		if ( trace.peek().lqRating == null ) return null;
+		return trace.peek().lqRating.getAnnotations(GenericAnnotationType.LQR).get(0).getInteger(GenericAnnotationType.LQR_VOTE);
+	}
+	
+	@Override
+	public Float getLocQualityRatingScoreThreshold (Attr attribute) {
+		if ( attribute != null ) return null;
+		if ( trace.peek().lqRating == null ) return null;
+		return trace.peek().lqRating.getAnnotations(GenericAnnotationType.LQR).get(0).getFloat(GenericAnnotationType.LQR_SCORETHRESHOLD);
+	}
+	
+	@Override
+	public Integer getLocQualityRatingVoteThreshold (Attr attribute) {
+		if ( attribute != null ) return null;
+		if ( trace.peek().lqRating == null ) return null;
+		return trace.peek().lqRating.getAnnotations(GenericAnnotationType.LQR).get(0).getInteger(GenericAnnotationType.LQR_VOTETHRESHOLD);
+	}
+	
+	@Override
+	public String getLocQualityRatingProfileRef (Attr attribute) {
+		if ( attribute != null ) return null;
+		if ( trace.peek().lqRating == null ) return null;
+		return trace.peek().lqRating.getAnnotations(GenericAnnotationType.LQR).get(0).getString(GenericAnnotationType.LQR_PROFILEREF);
+	}
+	
 	@Override
 	public String getStorageSize (Attr attribute) {
 		if ( attribute == null ) return trace.peek().storageSize;
@@ -2353,6 +3474,127 @@ public class ITSEngine implements IProcessor, ITraversal {
 		if ( (tmp = (String)attribute.getUserData(FLAGNAME)) == null ) return null;
 		if ( tmp.charAt(FP_SUBFILTER) != 'y' ) return null;
 		return getFlagData(tmp, FP_SUBFILTER_DATA);
+	}
+
+	@Override
+	public String getAnnotatorsRef () {
+		return trace.peek().annotatorsRef;
+	}
+	
+	@Override
+	public Float getMtConfidence (Attr attribute) {
+		if ( attribute == null ) return trace.peek().mtConfidence;
+		String tmp;
+		if ( (tmp = (String)attribute.getUserData(FLAGNAME)) == null ) return null;
+		if ( tmp.charAt(FP_MTCONFIDENCE) != 'y' ) return trace.peek().mtConfidence;
+		return Float.parseFloat(getFlagData(tmp, FP_MTCONFIDENCE_DATA));
+	}
+	
+	/**
+	 * Prepares the document for using target pointers.
+	 * <p>Because of the way the skeleton is constructed and because target pointer can result in the target
+	 * location being anywhere in the document, we need to perform a first pass to create the targetTable
+	 * table. That table lists all the source nodes that have a target pointer and the corresponding target
+	 * node with its status.
+	 */
+	private void prepareTargetPointers () {
+		hasTargetPointer = false;
+		try {
+			// If there is no target pointers, just reset the table
+			if ( !getTargetPointerRuleTriggered() ) {
+				return;
+			}
+			// Else: gather the target locations
+			startTraversal();
+	
+			// Go through the document
+			Node srcNode;
+			while ( (srcNode = nextNode()) != null ) {
+				if ( srcNode.getNodeType() == Node.ELEMENT_NODE ) {
+					// Use !backTracking() to get to the elements only once
+					// and to include the empty elements (for attributes).
+					if ( !backTracking() ) {
+						if ( getTranslate(null) ) {
+							String pointer = getTargetPointer(null);
+							if ( pointer != null ) {
+								resolveTargetPointer(getXPath(), srcNode, pointer);
+							}
+						}
+						//TODO: attributes
+					}
+				}
+			}
+		}
+		finally {
+			// Reset the traversal
+			startTraversal();
+		}
+	}
+
+	/**
+	 * Resolves the target pointer for a given source node and creates its
+	 * entry in targetTable, and set flag on the node
+	 * @param xpath the XPath object to use for the resolution.
+	 * @param srcNode the source node.
+	 * @param pointer the XPath expression pointing to the target node
+	 */
+	private void resolveTargetPointer (XPath xpath,
+		Node srcNode,
+		String pointer)
+	{
+		try {
+			XPathExpression expr = xpath.compile(pointer);
+			Node trgNode = (Node)expr.evaluate(srcNode, XPathConstants.NODE);
+			if ( trgNode == null ) {
+				// No entry available
+				//TODO: try to create the needed node
+				return;
+			}
+			// Check the type
+			if ( srcNode.getNodeType() != trgNode.getNodeType() ) {
+				logger.warn("Potential issue with target pointer '{}'.\nThe source and target node are of different types. "
+					+ "Depending on the content of the source, this may or may not be an issue.", pointer);
+			}
+			// Create the entry
+			TargetPointerEntry tpe = new TargetPointerEntry(srcNode, trgNode);
+			// Set the flags on each nod
+			srcNode.setUserData(SRC_TRGPTRFLAGNAME, tpe, null);
+			trgNode.setUserData(TRG_TRGPTRFLAGNAME, tpe, null);
+			hasTargetPointer = true;
+		}
+		catch ( XPathExpressionException e ) {
+			throw new OkapiIOException(String.format("Bab XPath expression in target pointer '%s'.", pointer));
+		}
+	}
+
+	/**
+	 * Indicates if the decorated document has at least one node with a target pointer.
+	 * @return true if the decorated document has at least one node with a target pointer,
+	 * false otherwise.
+	 */
+	public boolean getHasTargetPointer () {
+		return hasTargetPointer;
+	}
+
+	/**
+	 * Gets the target pointer entry for a given node.
+	 * @param node the node to examine.
+	 * @return the target pointer entry for that node, or null if there is none.
+	 */
+	public TargetPointerEntry getTargetPointerEntry (Node node) {
+		TargetPointerEntry tpe = (TargetPointerEntry)node.getUserData(TRG_TRGPTRFLAGNAME);
+		if ( tpe != null ) {
+			// This node is a target location
+			//TODO
+		}
+		else {
+			tpe = (TargetPointerEntry)node.getUserData(SRC_TRGPTRFLAGNAME);
+			if ( tpe != null ) {
+				// This node is a source with a target location
+				// TODO
+			}
+		}
+		return tpe;
 	}
 
 }

@@ -252,7 +252,7 @@ public class Utility extends BaseFilterDrivenUtility {
 				}
 			}
 			catch ( Throwable e ) {
-				logger.error("Error segmenting text unit id={}: "+e.getMessage(), tu.getId());
+				logger.error("Error segmenting text unit id={}: {}", tu.getId(), e.getMessage());
 			}
 		}
 		

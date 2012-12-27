@@ -20,14 +20,15 @@
 
 package org.w3c.its;
 
+import net.sf.okapi.common.annotation.GenericAnnotations;
+
 class ITSTrace {
 	
 	boolean isChildDone;
 	boolean translate;
 	int dir;
 	int withinText;
-	boolean term;
-	String termInfo;
+	GenericAnnotations termino;
 	String locNote;
 	String locNoteType;
 	boolean preserveWS;
@@ -37,16 +38,17 @@ class ITSTrace {
 	String localeFilter = "*";
 	String idValue;
 	String domains;
-	String lqIssueType;
-	String lqIssueComment;
-	String lqIssueSeverity;
-	String lqIssueProfileRef;
-	String lqIssuesRef;
 	String storageSize;
 	String storageEncoding;
 	String lineBreakType;
 	String allowedChars;
 	String subFilter;
+	String lqIssuesRef;
+	GenericAnnotations lqIssues;
+	String annotatorsRef;
+	Float mtConfidence;
+	GenericAnnotations disambig;
+	GenericAnnotations lqRating;
 
 	ITSTrace () {
 		// Default constructor
@@ -81,18 +83,23 @@ class ITSTrace {
 		
 		// external resource reference: No inheritance
 		
-		// locale filter:  Inheritance for child element including attributes
+		//MT Confidence: Inheritance for child element including attributes
+		mtConfidence = initialTrace.mtConfidence;
+		
+		// locale filter: Inheritance for child element including attributes
 		localeFilter = initialTrace.localeFilter;
 		
 		// domain: Inheritance for child elements including attributes
 		domains = initialTrace.domains;
 		
+		// disambiguation: no inheritance 
+		
 		// localization quality issue:
 		lqIssuesRef = initialTrace.lqIssuesRef;
-		lqIssueType = initialTrace.lqIssueType;
-		lqIssueComment = initialTrace.lqIssueComment;
-		lqIssueSeverity = initialTrace.lqIssueSeverity;
-		lqIssueProfileRef = initialTrace.lqIssueProfileRef;
+		lqIssues = initialTrace.lqIssues;
+		
+		// localization quality rating
+		lqRating = initialTrace.lqRating;
 		
 		// Allowed chars: Inheritance for child elements but not attributes
 		allowedChars = initialTrace.allowedChars;
@@ -101,7 +108,9 @@ class ITSTrace {
 		
 		// sub-filter: No inheritance
 		
-		this.isChildDone = isChildDone;
+		this.isChildDone = isChildDone; // From parameter
+		
+		this.annotatorsRef = initialTrace.annotatorsRef;
 	}
 
 }

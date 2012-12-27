@@ -20,6 +20,7 @@
 
 package net.sf.okapi.steps.msbatchtranslation;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.LinkedList;
@@ -44,6 +45,8 @@ import net.sf.okapi.common.query.QueryResult;
 import net.sf.okapi.common.resource.ISegments;
 import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.MultiEvent;
+import net.sf.okapi.common.resource.PipelineParameters;
+import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
@@ -68,6 +71,10 @@ public class MSBatchTranslationStep extends BasePipelineStep {
 	private String inputRootDir;
 	private Map<String, String> attributes;
 	private boolean needReset;
+	private boolean sendTmx;
+	private String tmxOutputPath;
+	private int batchInputCount;
+	private int count;
 
 	public MSBatchTranslationStep () {
 		params = new Parameters();
@@ -115,6 +122,11 @@ public class MSBatchTranslationStep extends BasePipelineStep {
 	public void setInputRootDirectory (String inputRootDir) {
 		this.inputRootDir = inputRootDir;
 	}
+	
+	@StepParameterMapping(parameterType = StepParameterType.BATCH_INPUT_COUNT)
+	public void setBatchInputCount (int batchInputCount) {
+		this.batchInputCount = batchInputCount;
+	}
 
 	@Override
 	public IParameters getParameters () {
@@ -128,6 +140,7 @@ public class MSBatchTranslationStep extends BasePipelineStep {
 	
 	@Override
 	protected Event handleStartBatch (Event event) {
+		count = 0;
 		events = new LinkedList<Event>();
 		maxEvents = params.getMaxEvents();
 		if (( maxEvents < 1 ) || ( maxEvents > 1000 )) maxEvents = MAXEVENTS;
@@ -142,9 +155,12 @@ public class MSBatchTranslationStep extends BasePipelineStep {
 		conn.setMaximumHits(params.getMaxMatches());
 		conn.setThreshold(params.getThreshold());
 		
+		// Set sendTmxFlag
+		sendTmx = params.getSendTmx() && params.getMakeTmx();
+		
 		// Create the TMX output if requested
 		if ( params.getMakeTmx() ) {
-			String tmxOutputPath = Util.fillRootDirectoryVariable(params.getTmxPath(), rootDir);
+			tmxOutputPath = Util.fillRootDirectoryVariable(params.getTmxPath(), rootDir);
 			tmxOutputPath = Util.fillInputRootDirectoryVariable(tmxOutputPath, inputRootDir);
 			tmxOutputPath = LocaleId.replaceVariables(tmxOutputPath, sourceLocale, targetLocale);
 			tmxWriter = new TMXWriter(tmxOutputPath);
@@ -164,6 +180,7 @@ public class MSBatchTranslationStep extends BasePipelineStep {
 
 	@Override
 	public Event handleEvent (Event event) {
+		Event tempEvent;
 		switch ( event.getEventType() ) {
 		case START_BATCH:
 			return handleStartBatch(event);
@@ -174,27 +191,56 @@ public class MSBatchTranslationStep extends BasePipelineStep {
 		case END_GROUP:
 		case START_SUBFILTER:
 		case END_SUBFILTER:
-			// Store and possibly trigger
-			return storeAndPossiblyProcess(event, false);
+			tempEvent = storeAndPossiblyProcess(event, false);
+			// Send NOOPs if passing tmx
+			if ( !sendTmx ) {
+				// Store and possibly trigger
+				return tempEvent;
+			}
+			break;
 		// Events that force the trigger if needed
 		case CUSTOM:
 		case MULTI_EVENT:
 		case START_SUBDOCUMENT: // Could have text units between start document and sub-document
-		case END_DOCUMENT:
 		case END_SUBDOCUMENT:
-			return storeAndPossiblyProcess(event, true);
+			tempEvent = storeAndPossiblyProcess(event, true);
+			// Send NOOPs if passing tmx
+			if ( !sendTmx ) {
+				return tempEvent;
+			}
+			break;
 		// Events that should clean up
 		case CANCELED:
 		case END_BATCH:
 			closeAndClean();
-			break;
-			// Events before any storing or after triggers	
+			break;			
 		case START_BATCH_ITEM:
-		case END_BATCH_ITEM:
+			// Keep track of files processed
+			count ++;
+			break;
+		case END_DOCUMENT:
+			tempEvent = storeAndPossiblyProcess(event, true);
+			if ( !sendTmx ) {
+				return tempEvent;
+			}else{
+				if ( count >= batchInputCount ) {
+					closeAndClean();
+					return generateAltOutput(tmxOutputPath, "UTF-8", sourceLocale, targetLocale, "okf_tmx");
+				}				
+			}
+			break;
+			// Events before any storing or after triggers
+		case END_BATCH_ITEM:			
 		case RAW_DOCUMENT:
 		case START_DOCUMENT:
 			break; // Do nothing special
 		}
+		
+		// Send NOOPs if passing tmx
+		if ( sendTmx ) {
+			return Event.NOOP_EVENT;
+		}
+		
 		return event;
 	}
 	
@@ -504,4 +550,40 @@ public class MSBatchTranslationStep extends BasePipelineStep {
 		return (ann.getFirst() != null);
 	}
 	
+	   /**
+     * Generates the alternative output used by several Trados Steps
+     * @param outFilePath path of the new input file. 
+     * @param defaultEncoding default encoding of the new file.
+     * @param sourceLocale source locale.
+     * @param targetLocale target locale.
+     * @param filterConfigId filter configuration id of the new file.
+     * @return the event created.
+     */
+	static public Event generateAltOutput (String outFilePath,
+    	String defaultEncoding,
+    	LocaleId sourceLocale,
+    	LocaleId targetLocale,
+    	String filterConfigId )
+    {
+		List<Event> list = new ArrayList<Event>();
+		// Change the pipeline parameters for the raw-document-related data
+		PipelineParameters pp = new PipelineParameters();
+		RawDocument rawDoc = new RawDocument(new File(outFilePath).toURI(), defaultEncoding, sourceLocale, targetLocale, filterConfigId);
+		pp.setInputURI(rawDoc.getInputURI());
+		pp.setOutputURI(rawDoc.getInputURI()); // Use same name as this output for now
+		pp.setSourceLocale(rawDoc.getSourceLocale());
+		pp.setTargetLocale(rawDoc.getTargetLocale());
+		pp.setOutputEncoding(rawDoc.getEncoding()); // Use same as the output document
+		pp.setInputRawDocument(rawDoc);
+		pp.setFilterConfigurationId(rawDoc.getFilterConfigId());
+		pp.setBatchInputCount(1);
+		// Add the event to the list
+		list.add(new Event(EventType.PIPELINE_PARAMETERS, pp));
+		// Add raw-document related events
+		list.add(new Event(EventType.START_BATCH_ITEM));
+		list.add(new Event(EventType.RAW_DOCUMENT, rawDoc));
+		list.add(new Event(EventType.END_BATCH_ITEM));
+		// Return the list as a multiple-event event
+		return new Event(EventType.MULTI_EVENT, new MultiEvent(list));
+    }
 }

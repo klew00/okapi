@@ -735,7 +735,7 @@ public class TmxFilter implements IFilter {
 						elemStack.clear();
 						Property p = tmxTu.getProp("tuid");
 						if (p != null){
-							logger.warn("Skipping invalid <tu> element with tuid: "+p.getValue()+".");
+							logger.warn("Skipping invalid <tu> element with tuid: {}.", p.getValue());
 						}else{
 							logger.warn("Skipping invalid <tu> element.");
 						}
@@ -1006,7 +1006,7 @@ public class TmxFilter implements IFilter {
 			if(throwException){
 				throw new OkapiBadFilterInputException("<"+newElem+"> not allowed in <"+curElem+">. Only "+rules+" allowed.");
 			}else{
-				logger.warn("<"+newElem+"> not allowed in <"+curElem+">. Only "+rules+" allowed.");
+				logger.warn("<{}> not allowed in <{}>. Only {} allowed.", newElem, curElem, rules);
 				return false;		
 			}
 		}

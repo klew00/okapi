@@ -48,6 +48,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	private static final String FILLTARGET = "fillTarget";
 	private static final String FILLTARGETTHRESHOLD = "fillTargetThreshold";
 	private static final String ONLYWHENWITHOUTCANDIDATE = "onlyWhenWithoutCandidate";
+	private static final String SENDTMX = "sendTmx";
 	
 	private String clientId;
 	private String secret;
@@ -62,6 +63,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	private boolean fillTarget;
 	private int fillTargetThreshold;
 	private boolean onlyWhenWithoutCandidate;
+	private boolean sendTmx;
 	
 	public Parameters () {
 		reset();
@@ -85,6 +87,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		maxMatches = buffer.getInteger(MAXMATCHES, maxMatches);
 		threshold = buffer.getInteger(THRESHOLD, threshold);
 		makeTmx = buffer.getBoolean(MAKETMX, makeTmx);
+		sendTmx = buffer.getBoolean(SENDTMX, sendTmx);		
 		annotate = buffer.getBoolean(ANNOTATE, annotate);
 		fillTarget = buffer.getBoolean(FILLTARGET, fillTarget);
 		fillTargetThreshold = buffer.getInteger(FILLTARGETTHRESHOLD, fillTargetThreshold);
@@ -107,6 +110,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		fillTarget = true;
 		fillTargetThreshold = 95;
 		onlyWhenWithoutCandidate = true;
+		sendTmx = false;
 	}
 
 	@Override
@@ -121,6 +125,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		buffer.setInteger(MAXMATCHES, maxMatches);
 		buffer.setInteger(THRESHOLD, threshold);
 		buffer.setBoolean(MAKETMX, makeTmx);
+		buffer.setBoolean(SENDTMX, sendTmx);		
 		buffer.setBoolean(ANNOTATE, annotate);
 		buffer.setBoolean(FILLTARGET, fillTarget);
 		buffer.setInteger(FILLTARGETTHRESHOLD, fillTargetThreshold);
@@ -231,6 +236,14 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	public void setOnlyWhenWithoutCandidate (boolean onlyWhenWithoutCandidate) {
 		this.onlyWhenWithoutCandidate = onlyWhenWithoutCandidate;
 	}
+	
+	public boolean getSendTmx () {
+		return sendTmx;
+	}
+	
+	public void setSendTmx (boolean sendTmx) {
+		this.sendTmx = sendTmx;
+	}
 
 	@Override
 	public ParametersDescription getParametersDescription () {
@@ -245,6 +258,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		desc.add(TMXPATH, null, "Full path of the new TMX document to create");
 		desc.add(MARKASMT, "Mark the generated translation as machine translation results", null);
 		desc.add(MAKETMX, "Generate a TMX document", null);
+		desc.add(SENDTMX, "Send the TMX document to the next step", null);
 		desc.add(ANNOTATE, "Annotate the text units with the translations", null);
 		desc.add(FILLTARGET, "Fill the target with the best translation candidate", null);
 		desc.add(FILLTARGETTHRESHOLD, "Fill threshold", "Fill the target when the best candidate is equal or above this score");
@@ -299,6 +313,10 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		pip.setVertical(true);
 		pip.setWithLabel(false);
 		pip.setMasterPart(master, true);
+		
+		cbp = desc.addCheckboxPart(paramsDesc.get(SENDTMX));
+		cbp.setVertical(true);
+		cbp.setMasterPart(master, true);
 		
 		cbp = desc.addCheckboxPart(paramsDesc.get(MARKASMT));
 		cbp.setVertical(true);

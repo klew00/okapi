@@ -90,7 +90,7 @@ public class DoxygenFilterTest {
 	
 	@Test
 	public void testOneLiner() {
-		String snippet = "int foo; ///< This is a test. \nint bar; ///< New paragraph.";
+		String snippet = "int foo; ///< This is a test. \n/// New paragraph.";
 		ArrayList<Event> events = getEvents(snippet);
 		ITextUnit tu1 = FilterTestDriver.getTextUnit(events, 1);
 		assertNotNull(tu1);
@@ -98,6 +98,15 @@ public class DoxygenFilterTest {
 		ITextUnit tu2 = FilterTestDriver.getTextUnit(events, 2);
 		assertNotNull(tu2);
 		assertEquals("New paragraph.", tu2.getSource().toString());
+	}
+	
+	@Test
+	public void testBlankOneLiner() {
+		String snippet = "int foo; ///< \n///< New paragraph.";
+		ArrayList<Event> events = getEvents(snippet);
+		ITextUnit tu1 = FilterTestDriver.getTextUnit(events, 1);
+		assertNotNull(tu1);
+		assertEquals("", tu1.getSource().toString());
 	}
 	
 	@Test
@@ -286,6 +295,14 @@ public class DoxygenFilterTest {
 		assertEquals(expected, tu.getSource().getCodedText());
 	}
 
+	@Test
+	public void testPositiveFloatListFalsePositive() {
+		String snippet = " /// 1.0 is the loneliest float.";
+		String expected = "1.0 is the loneliest float.";
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		assertNotNull(tu);
+		assertEquals(expected, tu.getSource().getCodedText());
+	}
 	
 	@Test
 	public void testDoubleExtractionSample() throws URISyntaxException {
@@ -315,6 +332,14 @@ public class DoxygenFilterTest {
 	public void testDoubleExtractionSpecialCommands() throws URISyntaxException {
 		ArrayList<InputDocument> list = new ArrayList<InputDocument>();
 		list.add(new InputDocument(root+"special_commands.h", null));		
+		RoundTripComparison rtc = new RoundTripComparison(false);
+		assertTrue(rtc.executeCompare(filter, list, "utf-8", LocaleId.ENGLISH, LocaleId.ENGLISH));
+	}
+	
+	@Test
+	public void testDoubleExtractionLists() throws URISyntaxException {
+		ArrayList<InputDocument> list = new ArrayList<InputDocument>();
+		list.add(new InputDocument(root+"lists.h", null));		
 		RoundTripComparison rtc = new RoundTripComparison(false);
 		assertTrue(rtc.executeCompare(filter, list, "utf-8", LocaleId.ENGLISH, LocaleId.ENGLISH));
 	}

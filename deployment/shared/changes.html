@@ -21,7 +21,56 @@ distribution.</p>
 	<li>Google Code Project site: <a href="http://code.google.com/p/okapi/">
 	http://code.google.com/p/okapi/</a></li>
 </ul>
-<h2>Changes from M18 to M19-SNAPSHOT</h2>
+<h2>Changes from M19 to M20-SNAPSHOT</h2>
+<ul>
+	<li>Rainbow:<ul>
+	<li>Improved the logging output and UI responsivness during lengthy 
+	processes.</li>
+	<li>Updated the user&#39;s preference dialog to allow the selection of the log 
+	levels as defined by SLF4J (Normal, Debug, Trace)</li>
+</ul>
+	</li>
+	<li>Tikal:<ul>
+	<li>Fixed -lfc command output.</li>
+</ul>
+	</li>
+	<li>Filters:<ul>
+	<li>ITS Filters (XML Filter and HTML5+ITS Filter):<ul>
+	<li>Continued the implementation of ITS 2.0</li>
+	<li>Fixed issue where the HTML-type special characters were not escaped when 
+	converted to inline codes by the code finder.</li>
+</ul>
+	</li>
+</ul>
+	</li>
+	<li>Connectors:<ul>
+	<li>Microsoft Translator Connector:<ul>
+	<li>Fixed the internal conversion of the language code.</li>
+</ul>
+	</li>
+</ul>
+	</li>
+	<li>Libraries:<ul>
+	<li>Fixed issue #282 for the Abstract Markup Filter.</li>
+	<li>Fixed issues in reporting libraries.</li>
+	<li>Added support for including ITS annotations in the XLIFF 1.2 writer.</li>
+</ul>
+	</li>
+	<li>Steps:<ul>
+	<li>Remove Target:<ul>
+	<li>Fixed issue #270 where the step could not be run without some of the 
+	optional parameters set.</li>
+</ul>
+	</li>
+	<li>Microsoft Batch Translation:<ul>
+	<li>Added an option to send the generated TMX document as a raw document for 
+	the input of the next step.</li>
+</ul>
+	</li>
+</ul>
+	</li>
+</ul>
+<h2>Changes from M18 to M19</h2>
 <ul>
 	<li>Rainbow:<ul>
 	<li>Changed the logging system.</li>
@@ -50,7 +99,12 @@ distribution.</p>
 </ul>
 	</li>
 	<li>Steps:<ul>
-	<li>Added the segments to text Units Converter Step.</li>
+	<li>Added the
+	<a href="http://www.opentag.com/okapi/wiki/index.php?title=Segments_to_Text_Units_Converter_Step">Segments to 
+	Text Units Converter Step</a>.</li>
+	<li>Added the
+	<a href="http://www.opentag.com/okapi/wiki/index.php?title=Enrycher_Step">
+	Enrycher Step</a> (Alpha).</li>
 	<li>Id-Based Aligner:<ul>
 	<li>Fixed issue where the multilingual files where detected on the source 
 	input rather than the target.</li>

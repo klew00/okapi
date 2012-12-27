@@ -28,6 +28,8 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import net.sf.okapi.common.annotation.GenericAnnotationType;
+
 /**
  * Implements the methods for creating and manipulating a pre-parsed
  * flat representation of a content with in-line codes.
@@ -1342,7 +1344,7 @@ public class TextFragment implements Appendable, CharSequence, Comparable<Object
 	{
 		checkPositionForMarker(start);
 		checkPositionForMarker(end);
-		balanceMarkers();
+		if ( !isBalanced ) balanceMarkers();
 		//TODO: Handle all the cases (overlapping, interrupted range, etc.
 		// cases:
 		// a<1>|bc|</1>d = a<1n>bc</1>d
@@ -1381,7 +1383,7 @@ public class TextFragment implements Appendable, CharSequence, Comparable<Object
 		String startBuf = ""; // Empty by default
 		if ( startCode == null ) {
 			// Create the new start code
-			startCode = new Code(TagType.OPENING, "$");
+			startCode = new Code(TagType.OPENING, GenericAnnotationType.ANNOTATION_ONLY_MARKER);
 			startBuf = ""+((char)MARKER_OPENING)+toChar(codes.size());
 			startCode.id = ++lastCodeID;
 			// Insert the start marker
@@ -1392,7 +1394,7 @@ public class TextFragment implements Appendable, CharSequence, Comparable<Object
 
 		if ( endCode == null ) {
 			// Create the new end code
-			endCode = new Code(TagType.CLOSING, "$");
+			endCode = new Code(TagType.CLOSING, GenericAnnotationType.ANNOTATION_ONLY_MARKER);
 			String endBuf = ""+((char)MARKER_CLOSING)+toChar(codes.size());
 			endCode.id = startCode.id;
 			// Insert the end code, startBuf length is 0 or 2

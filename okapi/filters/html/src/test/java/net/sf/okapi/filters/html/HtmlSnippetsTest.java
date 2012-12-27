@@ -140,12 +140,15 @@ public class HtmlSnippetsTest {
 	@Test
 	public void testHtmlNonWellFormedEmptyTag() {
 		String snippet = "<br>text<br/>";
+		URL originalParameters = parameters;
+		parameters = HtmlSnippetsTest.class.getResource("nonwellformedConfiguration.yml");
 		ArrayList<Event> events = getEvents(snippet);
 		ITextUnit tu = (ITextUnit)events.get(1).getResource();
 		List<Code> codes = tu.getSource().getFirstContent().getCodes();
 		for (Code code : codes) {			
 			assertEquals(TagType.PLACEHOLDER, code.getTagType());
 		}
+		parameters = originalParameters;
 	}
 
 	@Test

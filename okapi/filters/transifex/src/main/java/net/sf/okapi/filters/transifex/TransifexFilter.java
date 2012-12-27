@@ -226,7 +226,7 @@ public class TransifexFilter implements IFilter {
 			}
 		}
 		catch ( Throwable e ) {
-			logger.error(String.format("Cannot create the editor (%s)\n"+e.getMessage(), className));
+			logger.error("Cannot create the editor ({})\n{}", className, e.getMessage());
 			// And move on
 			return false;
 		}
@@ -278,17 +278,17 @@ public class TransifexFilter implements IFilter {
 //		// Check the information on this file
 //		Object[] res = cli.getInformation(resId, trgLoc);
 //		if ( res[0] == null ) {
-//			logger.warn(String.format("Cannot get information for resource '%s' (%s).", resId, trgLoc.toPOSIXLocaleId()));
+//			logger.warn("Cannot get information for resource '{}' ({}).", resId, trgLoc.toPOSIXLocaleId());
 //			return false;
 //		}
 //		//TODO: avoid re-downloading if we re-write here and the existing file is newer
 
-		logger.info("Resource: " + info.getId());
+		logger.info("Resource: {}", info.getId());
 		// Download the PO for this resource and the given target language
 		String outputPath = tempDir + File.separator + info.getName();
 		String[] res = cli.getResource(info.getId(), proj.getTargetLocale(), outputPath);
 		if ( res[0] == null ) {
-			logger.error(String.format("Could not download the resource '%s'.\n%s", info.getId(), res[1]));
+			logger.error("Could not download the resource '{}'.\n{}", info.getId(), res[1]);
 			return false;
 		}
 

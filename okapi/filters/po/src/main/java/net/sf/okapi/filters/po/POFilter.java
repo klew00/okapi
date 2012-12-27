@@ -838,12 +838,12 @@ public class POFilter implements IFilter {
 					}
 					if ( nPlurals < 0 ) {
 						nPlurals = DEFAULT_NPLURALS; // Make sure to reset to default
-						logger.warn(String.format(Res.getString("npluralsInvalid"), data, nPlurals));
+						logger.warn(Res.getString("npluralsInvalid"), data, nPlurals);
 					}
 				}
 				else { // Missing nplurals field
 					nPlurals = DEFAULT_NPLURALS; // Make sure to reset to default
-					logger.warn(String.format(Res.getString("npluralsNotDetected"), data, nPlurals));
+					logger.warn(Res.getString("npluralsNotDetected"), data, nPlurals);
 				}
 			}
 			// Else: no plural definition found, use default

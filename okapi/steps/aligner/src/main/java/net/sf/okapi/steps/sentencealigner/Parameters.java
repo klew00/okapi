@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009-2010 by the Okapi Framework contributors
+  Copyright (C) 2009-2012 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -202,10 +202,10 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 				"Use custom target segmentation rules (instead of the default ones)", null);
 		desc.add("customTargetRulesPath", "SRX path for the target",
 				"Full path of the SRX document to use for the target");
-		desc.add(COLLAPSEWHITESPACE, "Collapse Whitspace?", 
-				"Collapse whitespace (space, newline etc.) to a single space?");
-		desc.add(OUTPUT_ONE_TO_ONE_MATCHES_ONLY, "Output 1-1 Matches Only?", 
-			"Ouput only 1-1 sentence aligned matches?");
+		desc.add(COLLAPSEWHITESPACE, "Collapse whitspace", 
+				"Collapse whitespace (space, newline etc.) to a single space before segmentation and alignment");
+		desc.add(OUTPUT_ONE_TO_ONE_MATCHES_ONLY, "Output 1-1 matches only", 
+			"Ouput only 1-1 sentence aligned matches");
 		return desc;
 	}
 

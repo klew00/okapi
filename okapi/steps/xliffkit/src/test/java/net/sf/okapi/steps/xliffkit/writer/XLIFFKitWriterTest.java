@@ -1243,12 +1243,12 @@ public class XLIFFKitWriterTest {
 		XMLInputFactory fact = null;
 		XMLStreamReader reader = null;
 		 
-		logger.info("Factory class: " + System.getProperty("javax.xml.stream.XMLInputFactory"));
+		logger.info("Factory class: {}", System.getProperty("javax.xml.stream.XMLInputFactory"));
 		
 		fact = XMLInputFactory.newInstance();
 		reader = fact.createXMLStreamReader(this.getClass().getResourceAsStream("."));
-		logger.info("Factory class: " + ClassUtil.getQualifiedClassName(fact));
-		logger.info("Reader class: " + ClassUtil.getQualifiedClassName(reader));
+		logger.info("Factory class: {}", ClassUtil.getQualifiedClassName(fact));
+		logger.info("Reader class: {}", ClassUtil.getQualifiedClassName(reader));
 	}
 	
 	@Test
@@ -1256,25 +1256,25 @@ public class XLIFFKitWriterTest {
 		XMLInputFactory fact = null;
 		XMLStreamReader reader = null;
 		 
-		logger.info("Factory class: " + System.getProperty("javax.xml.stream.XMLInputFactory"));
+		logger.info("Factory class: {}", System.getProperty("javax.xml.stream.XMLInputFactory"));
 		
 		fact = XMLInputFactory.newInstance();
 		reader = fact.createXMLStreamReader(this.getClass().getResourceAsStream("."));
-		logger.info("Factory class: " + ClassUtil.getQualifiedClassName(fact));
-		logger.info("Reader class: " + ClassUtil.getQualifiedClassName(reader));
+		logger.info("Factory class: {}", ClassUtil.getQualifiedClassName(fact));
+		logger.info("Reader class: {}", ClassUtil.getQualifiedClassName(reader));
 		
 //		System.setProperty("javax.xml.stream.XMLInputFactory","com.sun.xml.internal.stream.XMLInputFactoryImpl");
 //		fact = XMLInputFactory.newInstance();
 //		reader = fact.createXMLStreamReader(this.getClass().getResourceAsStream("/BinUnitTest01.xlf"));
-//		logger.info("Factory class: " + ClassUtil.getQualifiedClassName(fact));
-//		logger.info("Reader class: " + ClassUtil.getQualifiedClassName(reader));
+//		logger.info("Factory class: {}", ClassUtil.getQualifiedClassName(fact));
+//		logger.info("Reader class: {}", ClassUtil.getQualifiedClassName(reader));
 //		
 //		System.getProperties().remove("javax.xml.stream.XMLInputFactory");
 //		//testSystemProperties();
 //		
 //		fact = XMLInputFactory.newInstance();
 //		reader = fact.createXMLStreamReader(this.getClass().getResourceAsStream("/BinUnitTest01.xlf"));
-//		logger.info("Factory class: " + ClassUtil.getQualifiedClassName(fact));
-//		logger.info("Reader class: " + ClassUtil.getQualifiedClassName(reader));
+//		logger.info("Factory class: {}", ClassUtil.getQualifiedClassName(fact));
+//		logger.info("Reader class: {}", ClassUtil.getQualifiedClassName(reader));
 	}
 }

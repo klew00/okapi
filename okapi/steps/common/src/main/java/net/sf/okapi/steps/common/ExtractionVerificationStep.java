@@ -206,7 +206,7 @@ public class ExtractionVerificationStep extends BasePipelineStep {
 			
 			// Compare total number of events
 			if(errorCount > 0){
-				LOGGER.warn("ExtractionVerification: "+errorCount+ " or more events fail.");
+				LOGGER.warn("ExtractionVerification: {} or more events fail.", errorCount);
 			}else{
 				LOGGER.info("ExtractionVerification: All events pass.");
 			}
