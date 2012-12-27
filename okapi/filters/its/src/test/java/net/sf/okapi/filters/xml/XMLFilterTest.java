@@ -45,7 +45,6 @@ import net.sf.okapi.common.filters.RoundTripComparison;
 import net.sf.okapi.common.filterwriter.GenericContent;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.ITextUnit;
-import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextFragment.TagType;
@@ -416,9 +415,15 @@ public class XMLFilterTest {
 			+ "</doc>";
 		ArrayList<Event> list = getEvents(snippet);
 		ITextUnit tu = FilterTestDriver.getTextUnit(list, 1);
-		assertEquals("5\tShift-JIS\tlf", tu.getProperty(Property.ITS_STORAGESIZE).getValue());
+		GenericAnnotation ga = tu.getAnnotation(GenericAnnotations.class).getFirstAnnotation(GenericAnnotationType.STORAGESIZE);
+		assertEquals(5, (int)ga.getInteger(GenericAnnotationType.STORAGESIZE_SIZE));
+		assertEquals("Shift-JIS", ga.getString(GenericAnnotationType.STORAGESIZE_ENCODING));
+		assertEquals("lf", ga.getString(GenericAnnotationType.STORAGESIZE_LINEBREAK));
 		tu = FilterTestDriver.getTextUnit(list, 2);
-		assertEquals("10\tUTF-16\tlf", tu.getProperty(Property.ITS_STORAGESIZE).getValue());
+		ga = tu.getAnnotation(GenericAnnotations.class).getFirstAnnotation(GenericAnnotationType.STORAGESIZE);
+		assertEquals(10, (int)ga.getInteger(GenericAnnotationType.STORAGESIZE_SIZE));
+		assertEquals("UTF-16", ga.getString(GenericAnnotationType.STORAGESIZE_ENCODING));
+		assertEquals("lf", ga.getString(GenericAnnotationType.STORAGESIZE_LINEBREAK));
 	}
 	
 	@Test

@@ -325,17 +325,25 @@ public class XLIFF2PackageWriter extends BasePackageWriter {
 			unit.addNote(new Note(tu.getTargetProperty(manifest.getTargetLocale(), Property.NOTE).getValue(), INote.AppliesTo.TARGET));
 		}
 		
-		// Storage size
-		if ( tu.hasProperty(Property.ITS_STORAGESIZE) ) {
-			String[] values = tu.getProperty(Property.ITS_STORAGESIZE).getValue().split("\t", -1);
-			unit.getExtendedAttributes().setAttribute(Names.NS_ITS, "storageSize", values[0]);
-			unit.getExtendedAttributes().setAttribute(Names.NS_ITS, "storageSizeEncoding", values[1]);
-			unit.getExtendedAttributes().setAttribute(Names.NS_ITS, "lineBreakType", values[2]);
-		}
 		GenericAnnotations anns = tu.getAnnotation(GenericAnnotations.class);
 		if ( anns != null ) {
+			// Storage Size
+			GenericAnnotation ga = anns.getFirstAnnotation(GenericAnnotationType.STORAGESIZE);
+			if ( ga != null ) {
+				unit.getExtendedAttributes().setAttribute(Names.NS_ITS, "storageSize",
+					ga.getString(GenericAnnotationType.STORAGESIZE_SIZE));
+				String tmp = ga.getString(GenericAnnotationType.STORAGESIZE_ENCODING);
+				if ( !tmp.equals("UTF-8") ) {
+					unit.getExtendedAttributes().setAttribute(Names.NS_ITS, "storageEncoding", tmp);
+				}
+				tmp = ga.getString(GenericAnnotationType.STORAGESIZE_LINEBREAK);
+				if ( !tmp.equals("lf") ) {
+					unit.getExtendedAttributes().setAttribute(Names.NS_ITS, "lineBreakType", tmp);
+				}
+			}
+			
 			// Domain
-			GenericAnnotation ga = anns.getFirstAnnotation(GenericAnnotationType.DOMAIN);
+			ga = anns.getFirstAnnotation(GenericAnnotationType.DOMAIN);
 			if ( ga != null ) {
 				unit.getExtendedAttributes().setAttribute(Names.NS_XLIFFOKAPI, "itsDomain",
 					ga.getString(GenericAnnotationType.DOMAIN_LIST));

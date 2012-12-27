@@ -786,41 +786,43 @@ class QualityChecker {
 		boolean isSource)
 	{
 		if ( tc == null ) return;
-		if ( tu.hasProperty(Property.ITS_STORAGESIZE) ) {
-			try {
-				String[] values = tu.getProperty(Property.ITS_STORAGESIZE).getValue().split("\t", -1);
-				if ( values[0].isEmpty() ) return; // No limits
-				int max = Integer.parseInt(values[0]);
-				if (( encoder2 == null ) || !encoder2.charset().name().equals(values[1]) ) {
-					encoder2 = Charset.forName(values[1]).newEncoder();
-				}
-				
-				// Get the plain text
-				TextFragment tf;
-				if ( tc.contentIsOneSegment() ) tf = tc.getFirstContent();
-				else tf = tc.getUnSegmentedContentCopy();
-				String  tmp = TextUnitUtil.getText(tf);
-				// Convert the line breaks if needed
-				if ( values[2].equals("crlf") ) tmp = tmp.replaceAll("\n", "\r\n");
-				// Else: all other values are a single byte, like the default lf, no need to replace
-				
-				// Compute the byte length
-				ByteBuffer buf = encoder2.encode(CharBuffer.wrap(tmp));
-				int len = buf.limit();
-				if ( len > max ) {
-					reportIssue(isSource ? IssueType.SOURCE_LENGTH : IssueType.TARGET_LENGTH, tu, null,
-						String.format("Number of bytes in the %s (using %s) is: %d. Number allowed: %d.",
-							(isSource ? "source" : "target"), values[1], len, max),
-						0, -1, 0, -1, Issue.SEVERITY_HIGH,
-						(isSource ? tc.toString() : "N/A"), (isSource ? "N/A" : tc.toString()), null);
-				}
+		GenericAnnotations anns = tu.getAnnotation(GenericAnnotations.class);
+		if ( anns == null ) return;
+		GenericAnnotation ga = anns.getFirstAnnotation(GenericAnnotationType.STORAGESIZE);
+		if ( ga == null ) return;
+		try {
+			int max = ga.getInteger(GenericAnnotationType.STORAGESIZE_SIZE);
+			String enc = ga.getString(GenericAnnotationType.STORAGESIZE_ENCODING);
+			if (( encoder2 == null ) || !encoder2.charset().name().equals(enc) ) {
+				encoder2 = Charset.forName(enc).newEncoder();
 			}
-			catch ( Throwable e ) {
+			String lb = ga.getString(GenericAnnotationType.STORAGESIZE_LINEBREAK);
+			
+			// Get the plain text
+			TextFragment tf;
+			if ( tc.contentIsOneSegment() ) tf = tc.getFirstContent();
+			else tf = tc.getUnSegmentedContentCopy();
+			String  tmp = TextUnitUtil.getText(tf);
+			// Convert the line breaks if needed
+			if ( lb.equals("crlf") ) tmp = tmp.replaceAll("\n", "\r\n");
+			// Else: all other values are a single byte, like the default lf, no need to replace
+			
+			// Compute the byte length
+			ByteBuffer buf = encoder2.encode(CharBuffer.wrap(tmp));
+			int len = buf.limit();
+			if ( len > max ) {
 				reportIssue(isSource ? IssueType.SOURCE_LENGTH : IssueType.TARGET_LENGTH, tu, null,
-					"Problem when trying use use ITS storage size property: "+e.getMessage(),
+					String.format("Number of bytes in the %s (using %s) is: %d. Number allowed: %d.",
+						(isSource ? "source" : "target"), enc, len, max),
 					0, -1, 0, -1, Issue.SEVERITY_HIGH,
 					(isSource ? tc.toString() : "N/A"), (isSource ? "N/A" : tc.toString()), null);
 			}
+		}
+		catch ( Throwable e ) {
+			reportIssue(isSource ? IssueType.SOURCE_LENGTH : IssueType.TARGET_LENGTH, tu, null,
+				"Problem when trying use use ITS storage size property: "+e.getMessage(),
+				0, -1, 0, -1, Issue.SEVERITY_HIGH,
+				(isSource ? tc.toString() : "N/A"), (isSource ? "N/A" : tc.toString()), null);
 		}
 	}
 	

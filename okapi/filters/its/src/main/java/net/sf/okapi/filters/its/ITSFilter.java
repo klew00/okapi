@@ -34,6 +34,7 @@ import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.annotation.GenericAnnotation;
 import net.sf.okapi.common.annotation.GenericAnnotationType;
+import net.sf.okapi.common.annotation.GenericAnnotations;
 import net.sf.okapi.common.annotation.TermsAnnotation;
 import net.sf.okapi.common.encoder.EncoderContext;
 import net.sf.okapi.common.encoder.EncoderManager;
@@ -545,7 +546,7 @@ public abstract class ITSFilter implements IFilter {
 		}
 		// ITS Storage Size
 		if ( ci.storageSize != null ) {
-			tu.setProperty(new Property(Property.ITS_STORAGESIZE, ci.storageSize));
+			addAnnotations(tu, ci.storageSize);
 		}
 		// ITS Allowed characters
 		if ( ci.allowedChars != null ) {
@@ -555,12 +556,25 @@ public abstract class ITSFilter implements IFilter {
 		}
 		// ITS Localization Quality Issue
 		if ( ci.lqIssues != null ) {
-			tu.getSource().setAnnotation(ci.lqIssues);
+			addAnnotations(tu, ci.lqIssues);
 		}
 
 		queue.add(new Event(EventType.TEXT_UNIT, tu));
 		if ( addToSkeleton ) skel.addReference(tu);
 		return id;
+	}
+
+	/**
+	 * Accumulate annotation sets for a given text unit.
+	 * @param tu the text unit where to attached the new set.
+	 * @param newSet the new set to attach.
+	 */
+	private void addAnnotations (ITextUnit tu,
+		GenericAnnotations newSet)
+	{
+		GenericAnnotations current = tu.getAnnotation(GenericAnnotations.class);
+		if ( current == null ) tu.setAnnotation(newSet); 
+		else current.addAll(newSet);
 	}
 	
 	private String buildEndTag (Node node) {
@@ -901,7 +915,7 @@ public abstract class ITSFilter implements IFilter {
 		}
 		// ITS Storage Size
 		if ( context.peek().storageSize != null ) {
-			tu.setProperty(new Property(Property.ITS_STORAGESIZE, context.peek().storageSize));
+			addAnnotations(tu, context.peek().storageSize);
 		}
 		// ITS Allowed characters
 		if ( context.peek().allowedChars != null ) {
@@ -911,7 +925,7 @@ public abstract class ITSFilter implements IFilter {
 		}
 		// ITS Localization Quality Issue
 		if ( context.peek().lqIssues != null ) {
-			tu.getSource().setAnnotation(context.peek().lqIssues);
+			addAnnotations(tu, context.peek().lqIssues);
 		}
 		
 		// Set term info

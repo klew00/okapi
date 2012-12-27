@@ -24,6 +24,7 @@ import java.io.OutputStream;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.XMLWriter;
 import net.sf.okapi.common.annotation.AltTranslation;
@@ -34,17 +35,15 @@ import net.sf.okapi.common.annotation.GenericAnnotations;
 import net.sf.okapi.common.annotation.TermsAnnotation;
 import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.exceptions.OkapiUnsupportedEncodingException;
-import net.sf.okapi.common.filterwriter.XLIFFContent;
-import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.query.MatchType;
 import net.sf.okapi.common.resource.Ending;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.StartGroup;
 import net.sf.okapi.common.resource.StartSubDocument;
 import net.sf.okapi.common.resource.TextContainer;
-import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.skeleton.ISkeletonWriter;
 
 /**
@@ -450,15 +449,22 @@ public class XLIFFWriter implements IFilterWriter {
 			writer.writeAttributeString("xml:space", "preserve");
 		}
 		
-		if ( tu.hasProperty(Property.ITS_STORAGESIZE) ) {
-			String[] values = tu.getProperty(Property.ITS_STORAGESIZE).getValue().split("\t", -1);
-			writer.writeAttributeString("maxbytes", values[0]);
-			writer.writeAttributeString("its:storageSizeEncoding", values[1]);
-			writer.writeAttributeString("its:lineBreakType", values[2]);
-		}
-		
 		GenericAnnotations anns = tu.getAnnotation(GenericAnnotations.class);
 		if ( anns != null ) {
+			// Storage Size
+			GenericAnnotation ga = anns.getFirstAnnotation(GenericAnnotationType.STORAGESIZE);
+			if ( ga != null ) {
+				writer.writeAttributeString("its:storageSize",
+					ga.getString(GenericAnnotationType.STORAGESIZE_SIZE));
+				tmp = ga.getString(GenericAnnotationType.STORAGESIZE_ENCODING);
+				if ( !tmp.equals("UTF-8") ) {
+					writer.writeAttributeString("its:storageEncoding", tmp);
+				}
+				tmp = ga.getString(GenericAnnotationType.STORAGESIZE_LINEBREAK);
+				if ( !tmp.equals("lf") ) {
+					writer.writeAttributeString("its:lineBreakType", tmp);
+				}
+			}
 			// Domain
 			GenericAnnotation ann = anns.getFirstAnnotation(GenericAnnotationType.DOMAIN);
 			if ( ann != null ) {

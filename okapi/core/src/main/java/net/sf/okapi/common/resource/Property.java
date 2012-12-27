@@ -38,12 +38,6 @@ public class Property {
 	public static final String TRANSNOTE = "transNote"; 
 	public static final String COORDINATES = "coordinates"; 
 
-	/**
-	 * ITS Storage Size. A tab-separated values of 1=maximum size in byte
-	 * and 2=the encoding to use.
-	 */
-	public static final String ITS_STORAGESIZE = "its-storageSize"; 
-	
 	private final String name;
 	private String value;
 	private final boolean isReadOnly;

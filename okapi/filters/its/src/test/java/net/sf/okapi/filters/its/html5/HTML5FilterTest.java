@@ -179,9 +179,15 @@ public class HTML5FilterTest {
 		ArrayList<Event> list = getEvents(snippet);
 		ITextUnit tu = FilterTestDriver.getTextUnit(list, 2);
 		assertNotNull(tu);
-		assertEquals("10\tUTF-8\tlf", tu.getProperty(Property.ITS_STORAGESIZE).getValue());
+		GenericAnnotation ga = tu.getAnnotation(GenericAnnotations.class).getFirstAnnotation(GenericAnnotationType.STORAGESIZE);
+		assertEquals(10, (int)ga.getInteger(GenericAnnotationType.STORAGESIZE_SIZE));
+		assertEquals("UTF-8", ga.getString(GenericAnnotationType.STORAGESIZE_ENCODING));
+		assertEquals("lf", ga.getString(GenericAnnotationType.STORAGESIZE_LINEBREAK));
 		tu = FilterTestDriver.getTextUnit(list, 3);
-		assertEquals("22\tISO-8859-1\tlf", tu.getProperty(Property.ITS_STORAGESIZE).getValue());
+		ga = tu.getAnnotation(GenericAnnotations.class).getFirstAnnotation(GenericAnnotationType.STORAGESIZE);
+		assertEquals(22, (int)ga.getInteger(GenericAnnotationType.STORAGESIZE_SIZE));
+		assertEquals("ISO-8859-1", ga.getString(GenericAnnotationType.STORAGESIZE_ENCODING));
+		assertEquals("lf", ga.getString(GenericAnnotationType.STORAGESIZE_LINEBREAK));
 	}
 	
 	@Test
@@ -244,7 +250,7 @@ public class HTML5FilterTest {
 		ArrayList<Event> list = getEvents(snippet);
 		ITextUnit tu = FilterTestDriver.getTextUnit(list, 2);
 		assertEquals("Text", tu.getSource().toString());
-		GenericAnnotations anns = tu.getSource().getAnnotation(GenericAnnotations.class);
+		GenericAnnotations anns = tu.getAnnotation(GenericAnnotations.class);
 		assertNotNull(anns);
 		List<GenericAnnotation> res = anns.getAnnotations(GenericAnnotationType.LQI);
 		assertEquals(1, res.size());
@@ -263,7 +269,7 @@ public class HTML5FilterTest {
 		// First paragraph
 		ITextUnit tu = FilterTestDriver.getTextUnit(list, 2);
 		assertEquals("Paragraph 1", tu.getSource().toString());
-		GenericAnnotations anns = tu.getSource().getAnnotation(GenericAnnotations.class);
+		GenericAnnotations anns = tu.getAnnotation(GenericAnnotations.class);
 		assertNotNull(anns);
 		List<GenericAnnotation> res = anns.getAnnotations(GenericAnnotationType.LQI);
 		assertEquals(2, res.size());
@@ -273,7 +279,7 @@ public class HTML5FilterTest {
 		// Attribute of paragraph 2
 		tu = FilterTestDriver.getTextUnit(list, 3);
 		assertEquals("Text", tu.getSource().toString());
-		anns = tu.getSource().getAnnotation(GenericAnnotations.class);
+		anns = tu.getAnnotation(GenericAnnotations.class);
 		assertNotNull(anns);
 		res = anns.getAnnotations(GenericAnnotationType.LQI);
 		assertEquals(2, res.size());
@@ -283,7 +289,7 @@ public class HTML5FilterTest {
 		// Paragraph 2
 		tu = FilterTestDriver.getTextUnit(list, 4);
 		assertEquals("Paragraph 2", tu.getSource().toString());
-		anns = tu.getSource().getAnnotation(GenericAnnotations.class);
+		anns = tu.getAnnotation(GenericAnnotations.class);
 		assertNotNull(anns);
 		res = anns.getAnnotations(GenericAnnotationType.LQI);
 		assertEquals(2, res.size());
@@ -306,7 +312,7 @@ public class HTML5FilterTest {
 		ArrayList<Event> list = getEvents(snippet);
 		ITextUnit tu = FilterTestDriver.getTextUnit(list, 2);
 		assertEquals("Bad text", tu.getSource().toString());
-		GenericAnnotations anns = tu.getSource().getAnnotation(GenericAnnotations.class);
+		GenericAnnotations anns = tu.getAnnotation(GenericAnnotations.class);
 		assertNotNull(anns);
 		List<GenericAnnotation> res = anns.getAnnotations(GenericAnnotationType.LQI);
 		assertEquals(2, res.size());
@@ -334,7 +340,7 @@ public class HTML5FilterTest {
 		ArrayList<Event> list = getEvents(snippet);
 		ITextUnit tu = FilterTestDriver.getTextUnit(list, 2);
 		assertEquals("Bad text", tu.getSource().toString());
-		GenericAnnotations anns = tu.getSource().getAnnotation(GenericAnnotations.class);
+		GenericAnnotations anns = tu.getAnnotation(GenericAnnotations.class);
 		assertNotNull(anns);
 		List<GenericAnnotation> res = anns.getAnnotations(GenericAnnotationType.LQI);
 		assertEquals(1, res.size());

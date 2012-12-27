@@ -698,7 +698,10 @@ public class XLIFFFilter implements IFilter {
 				if ( enc == null ) enc = "UTF-8";
 				String lb = reader.getAttributeValue(XLIFFWriter.NS_ITS20, "lineBreakType");
 				if ( lb == null ) lb = "lf";
-				tu.setProperty(new Property(Property.ITS_STORAGESIZE, tmp+"\t"+enc+"\t"+lb));
+				GenericAnnotation.addAnnotation(tu, new GenericAnnotation(GenericAnnotationType.STORAGESIZE,
+					GenericAnnotationType.STORAGESIZE_SIZE, Integer.parseInt(tmp),
+					GenericAnnotationType.STORAGESIZE_ENCODING, enc,
+					GenericAnnotationType.STORAGESIZE_LINEBREAK, lb));
 			}
 			// ITS Allowed characters
 			tmp = reader.getAttributeValue(XLIFFWriter.NS_ITS20, "allowedCharacters");

@@ -3154,7 +3154,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 	 * @param attribute the attribute to look up, or null for the element.
 	 * @return the annotation set for the queried node (can be null).
 	 */
-	public GenericAnnotations getTerminology (Attr attribute) {
+	public GenericAnnotations getTerminologyAnnotation (Attr attribute) {
 		if ( attribute == null ) {
 			return trace.peek().termino;
 		}
@@ -3241,7 +3241,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 	 * @param attribute the attribute to look up, or null for the element.
 	 * @return the annotation set for the queried node (can be null).
 	 */
-	public GenericAnnotations getLocQualityIssues (Attr attribute) {
+	public GenericAnnotations getLocQualityIssueAnnotation (Attr attribute) {
 		if ( attribute == null ) {
 			return trace.peek().lqIssues;
 		}
@@ -3323,7 +3323,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 	 * @param attribute the attribute to look up, or null for the element.
 	 * @return the annotation set for the queried node (can be null).
 	 */
-	public GenericAnnotations getDisambiguation (Attr attribute) {
+	public GenericAnnotations getDisambiguationAnnotation (Attr attribute) {
 		if ( attribute == null ) {
 			return trace.peek().disambig;
 		}
@@ -3384,7 +3384,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 	 * Gets the localization quality rating annotation set for the current element.
 	 * @return the annotation set for the queried node (can be null).
 	 */
-	public GenericAnnotations getLocQualityRating () {
+	public GenericAnnotations getLocQualityRatingAnnotation () {
 		return trace.peek().lqRating;
 	}
 	
@@ -3423,6 +3423,16 @@ public class ITSEngine implements IProcessor, ITraversal {
 		return trace.peek().lqRating.getAnnotations(GenericAnnotationType.LQR).get(0).getString(GenericAnnotationType.LQR_PROFILEREF);
 	}
 	
+	public GenericAnnotations getStorageSizeAnnotation (Attr attribute) {
+		if ( attribute == null ) {
+			return trace.peek().storageSize;
+		}
+		String tmp;
+		if ( (tmp = (String)attribute.getUserData(FLAGNAME)) == null ) return null;
+		if ( tmp.charAt(FP_STORAGESIZE) != 'y' ) return null;
+		return new GenericAnnotations(getFlagData(tmp, FP_STORAGESIZE_DATA));
+	}
+
 	@Override
 	public Integer getStorageSize (Attr attribute) {
 		if ( attribute == null ) {

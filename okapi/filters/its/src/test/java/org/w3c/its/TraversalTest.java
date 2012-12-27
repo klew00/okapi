@@ -297,7 +297,7 @@ public class TraversalTest {
 		ITSEngine trav = applyITSRules(doc, null, true, null);
 		Element elem = getElement(trav, "span", 1);
 		assertNotNull(elem);
-		GenericAnnotations anns = trav.getDisambiguation(null);
+		GenericAnnotations anns = trav.getDisambiguationAnnotation(null);
 		assertNotNull(anns);
 		GenericAnnotation ann = anns.getAnnotations(GenericAnnotationType.DISAMB).get(0);
 		assertEquals(GenericAnnotationType.DISAMB_GRANULARITY_ENTITY, ann.getString(GenericAnnotationType.DISAMB_GRANULARITY));
