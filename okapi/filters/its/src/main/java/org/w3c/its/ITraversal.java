@@ -97,7 +97,7 @@ public interface ITraversal {
 	public String getLocQualityIssueComment (Attr attribute,
 		int index);
 	
-	public Float getLocQualityIssueSeverity (Attr attribute,
+	public Double getLocQualityIssueSeverity (Attr attribute,
 		int index);
 	
 	public String getLocQualityIssueProfileRef (Attr attribute,
@@ -135,7 +135,7 @@ public interface ITraversal {
 	 * @param attribute The attribute to query or null for the element.
 	 * @return the confidence associated with the queried part.
 	 */
-	public Float getTermConfidence (Attr attribute);
+	public Double getTermConfidence (Attr attribute);
 	
 	/**
 	 * Gets the localization note of the current element of the traversal or
@@ -192,7 +192,7 @@ public interface ITraversal {
 	 * @param attribute the attribute to query or null for the element.
 	 * @return the MT Confidence value or null if none is set.
 	 */
-	public Float getMtConfidence (Attr attribute);
+	public Double getMtConfidence (Attr attribute);
 
 	public String getDisambigGranularity (Attr attribute);
 
@@ -202,13 +202,13 @@ public interface ITraversal {
 	
 	public String getDisambigIdent (Attr attribute);
 	
-	public Float getDisambigConfidence (Attr attribute);
+	public Double getDisambigConfidence (Attr attribute);
 
-	public Float getLocQualityRatingScore (Attr attribute);
+	public Double getLocQualityRatingScore (Attr attribute);
 	
 	public Integer getLocQualityRatingVote (Attr attribute);
 	
-	public Float getLocQualityRatingScoreThreshold (Attr attribute);
+	public Double getLocQualityRatingScoreThreshold (Attr attribute);
 	
 	public Integer getLocQualityRatingVoteThreshold (Attr attribute);
 	

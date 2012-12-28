@@ -99,6 +99,32 @@ public class XLIFFContentTest {
 			fmt.setContent(tf).toString(true));
 	}
 	
+	@Test
+	public void testVariousAnnotations () {
+		GenericAnnotations anns = new GenericAnnotations();
+		anns.add(new GenericAnnotation(GenericAnnotationType.ALLOWEDCHARS,
+			GenericAnnotationType.ALLOWEDCHARS_PATTERN, "[a-z]"));
+		anns.add(new GenericAnnotation(GenericAnnotationType.STORAGESIZE,
+			GenericAnnotationType.STORAGESIZE_SIZE, 25,
+			GenericAnnotationType.STORAGESIZE_ENCODING, "iso-8859-1",
+			GenericAnnotationType.STORAGESIZE_LINEBREAK, "nel"));
+		anns.add(new GenericAnnotation(GenericAnnotationType.TERM,
+			GenericAnnotationType.TERM_CONFIDENCE, 0.50,
+			GenericAnnotationType.TERM_INFO, "REF:myUri"));
+		anns.add(new GenericAnnotation(GenericAnnotationType.LQI,
+			GenericAnnotationType.LQI_TYPE, "grammar",
+			GenericAnnotationType.LQI_COMMENT, "blah",
+			GenericAnnotationType.LQI_SEVERITY, 98.5));
+		TextFragment tf = new TextFragment("Before the span after.");
+		tf.annotate(7, 15, GenericAnnotationType.GENERIC, anns);
+		assertEquals("Before <mrk mtype=\"x-its\" its:allowedCharacters=\"[a-z]\""
+			+ " its:storageSize=\"25\" its:storageEncoding=\"iso-8859-1\" its:storageLinebreak=\"nel\""
+			+ " its:termConfidence=\"0.5\" its:termInfoRef=\"myUri\""
+			+ " its:locQualityIssueComment=\"blah\" its:locQualityIssueSeverity=\"98.5\" its:locQualityIssueType=\"grammar\""
+			+ ">the span</mrk> after.",
+			fmt.setContent(tf).toString(true));
+	}
+	
 	private TextFragment createTextFragment () {
 		TextFragment tf = new TextFragment();
 		tf.append("t1");

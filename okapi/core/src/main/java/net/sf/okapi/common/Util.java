@@ -1535,12 +1535,12 @@ public final class Util {
 	}
 
 	/**
-	 * Formats a float value so only the significant trailing zeros are displayed.
+	 * Formats a double value so only the significant trailing zeros are displayed.
 	 * Removes the decimal period if there are no significant decimal digits.
-	 * @param value the float value to format (can be null).
+	 * @param value the double value to format (can be null).
 	 * @return the formatted value or an empty string.
 	 */
-	public static String formatFloat (Float value) {
+	public static String formatDouble (Double value) {
 		if ( value == null ) return "";
 		String tmp = String.format("%f", value);
 		// Remove trailing zeros

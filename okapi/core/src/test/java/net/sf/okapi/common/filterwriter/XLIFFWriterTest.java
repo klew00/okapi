@@ -138,13 +138,13 @@ public class XLIFFWriterTest {
 		ann = anns.add(GenericAnnotationType.LQI);
 		ann.setString(GenericAnnotationType.LQI_COMMENT, "rem2");
 		ann.setBoolean(GenericAnnotationType.LQI_ENABLED, true);
-		ann.setFloat(GenericAnnotationType.LQI_SEVERITY, 12.34f);
+		ann.setDouble(GenericAnnotationType.LQI_SEVERITY, 12.34);
 		ann.setString(GenericAnnotationType.LQI_TYPE, "grammar");
 		tf.annotate(0, 2, GenericAnnotationType.GENERIC, anns);
 		tf = tu.createTarget(locFR, false, IResource.COPY_ALL).getFirstContent();
 		ann = ann.clone();
 		ann.setString(GenericAnnotationType.LQI_COMMENT, "rem3");
-		ann.setFloat(GenericAnnotationType.LQI_SEVERITY, 99f);
+		ann.setDouble(GenericAnnotationType.LQI_SEVERITY, 99.0);
 		anns = new GenericAnnotations();
 		anns.add(ann);
 		tf.annotate(3+4, 5+4, GenericAnnotationType.GENERIC, anns); // +4 is for the markers of the previous annotation

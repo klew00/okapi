@@ -344,7 +344,7 @@ public class XLIFFContent {
 			// Disambiguation
 			if ( ann.getType().equals(GenericAnnotationType.DISAMB) ) {
 				printITSStringAttribute(ann.getString(GenericAnnotationType.DISAMB_CLASS), "disambigClass", quoteMode, escapeGT, output);
-				printITSFloatAttribute(ann.getFloat(GenericAnnotationType.DISAMB_CONFIDENCE), "disambigConfidence", output);
+				printITSDoubleAttribute(ann.getDouble(GenericAnnotationType.DISAMB_CONFIDENCE), "disambigConfidence", output);
 				//TODO: needs annotatorsRef if confidence is there
 				String value = ann.getString(GenericAnnotationType.DISAMB_GRANULARITY);
 				if ( !value.equals(GenericAnnotationType.DISAMB_GRANULARITY_ENTITY) ) { // Output only the non-default value
@@ -356,8 +356,22 @@ public class XLIFFContent {
 			
 			// Terminology
 			else if ( ann.getType().equals(GenericAnnotationType.TERM) ) {
-				printITSFloatAttribute(ann.getFloat(GenericAnnotationType.TERM_CONFIDENCE), "termConfidence", output);
-				printITSFloatAttribute(ann.getFloat(GenericAnnotationType.TERM_INFO), "termInfo", output);
+				printITSDoubleAttribute(ann.getDouble(GenericAnnotationType.TERM_CONFIDENCE), "termConfidence", output);
+				printITSStringAttribute(ann.getString(GenericAnnotationType.TERM_INFO), "termInfo", quoteMode, escapeGT, output);
+			}
+			
+			// Allowed Characters
+			else if ( ann.getType().equals(GenericAnnotationType.ALLOWEDCHARS) ) {
+				printITSStringAttribute(ann.getString(GenericAnnotationType.ALLOWEDCHARS_PATTERN), "allowedCharacters", quoteMode, escapeGT, output);
+			}
+			
+			// Storage Size
+			else if ( ann.getType().equals(GenericAnnotationType.STORAGESIZE) ) {
+				printITSIntegerAttribute(ann.getInteger(GenericAnnotationType.STORAGESIZE_SIZE), "storageSize", output);
+				String tmp = ann.getString(GenericAnnotationType.STORAGESIZE_ENCODING);
+				if ( !tmp.equals("UTF-8") ) printITSStringAttribute(tmp, "storageEncoding", quoteMode, escapeGT, output);
+				tmp = ann.getString(GenericAnnotationType.STORAGESIZE_LINEBREAK);
+				if ( !tmp.equals("lf") ) printITSStringAttribute(tmp, "storageLinebreak", quoteMode, escapeGT, output);
 			}
 			
 			// Localization Quality issue
@@ -377,7 +391,7 @@ public class XLIFFContent {
 				printITSBooleanAttribute(booVal, "locQualityIssueEnabled", output);
 			}
 			printITSStringAttribute(ann.getString(GenericAnnotationType.LQI_PROFILEREF), "locQualityIssueProfile", quoteMode, escapeGT, output);
-			printITSFloatAttribute(ann.getFloat(GenericAnnotationType.LQI_SEVERITY), "locQualityIssueSeverity", output);
+			printITSDoubleAttribute(ann.getDouble(GenericAnnotationType.LQI_SEVERITY), "locQualityIssueSeverity", output);
 			printITSStringAttribute(ann.getString(GenericAnnotationType.LQI_TYPE), "locQualityIssueType", quoteMode, escapeGT, output);
 		}
 		else if ( list.size() > 1 ) {
@@ -409,12 +423,21 @@ public class XLIFFContent {
 		}
 	}
 
-	private void printITSFloatAttribute (Float value,
+	private void printITSDoubleAttribute (Double value,
 		String attrName,
 		StringBuilder output)
 	{
 		if ( value != null ) {
-			output.append(" "+ITS_PREFIX+attrName+"=\""+Util.formatFloat(value)+"\"");
+			output.append(" "+ITS_PREFIX+attrName+"=\""+Util.formatDouble(value)+"\"");
+		}
+	}
+
+	private void printITSIntegerAttribute (Integer value,
+		String attrName,
+		StringBuilder output)
+	{
+		if ( value != null ) {
+			output.append(" "+ITS_PREFIX+attrName+"=\""+value+"\"");
 		}
 	}
 

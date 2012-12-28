@@ -131,11 +131,11 @@ public class GenericAnnotationsTest {
 		ann.setString("lqiType", "typographical");
 		ann.setString("lqiComment", "Sentence without capitalization");
 		ann.setString("lqiProfileRef", "http://example.org/qaModel/v13");
-		ann.setFloat("lqiSeverity", 50.0f);
+		ann.setDouble("lqiSeverity", 50.0);
 		ann.setBoolean("lqiEnabled", true);
 		
 		ann = anns.getAnnotations("its-lqi").get(0);
-		assertEquals(50.0, ann.getFloat("lqiSeverity"), 0);
+		assertEquals(50.0, ann.getDouble("lqiSeverity"), 0);
 		assertEquals("typographical", ann.getString("lqiType"));
 		assertEquals("Sentence without capitalization", ann.getString("lqiComment"));
 		assertEquals("http://example.org/qaModel/v13", ann.getString("lqiProfileRef"));

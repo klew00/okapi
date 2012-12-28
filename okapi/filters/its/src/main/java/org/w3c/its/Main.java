@@ -302,9 +302,9 @@ public class Main {
 			}
 			out1 = (trav.getTerm(attr) ? "yes" : "no");
 			if ( out1 != null ) writer.print(String.format("\tterm=\"%s\"", escape(out1)));
-			Float outF1 = trav.getTermConfidence(attr);
+			Double outF1 = trav.getTermConfidence(attr);
 			if ( outF1 != null ) {
-				writer.print(String.format("\ttermConfidence=\"%s\"", Util.formatFloat(outF1)));
+				writer.print(String.format("\ttermConfidence=\"%s\"", Util.formatDouble(outF1)));
 			}
 			out1 = trav.getTermInfo(attr);
 			if ( out1 != null ){
@@ -363,9 +363,9 @@ public class Main {
 					writer.print(String.format("\tdisambigClass=\"%s\"", escape(out1)));
 				}
 			}
-			Float outFloat = trav.getDisambigConfidence(attr);
+			Double outFloat = trav.getDisambigConfidence(attr);
 			if ( outFloat != null ) {
-				writer.print(String.format("\tdisambigConfidence=\"%s\"", Util.formatFloat(outFloat)));
+				writer.print(String.format("\tdisambigConfidence=\"%s\"", Util.formatDouble(outFloat)));
 			}
 			out1 = trav.getDisambigGranularity(attr);
 			if ( out1 != null ) writer.print(String.format("\tdisambigGranularity=\"%s\"", escape(out1)));
@@ -448,13 +448,13 @@ public class Main {
 					}
 				}
 				// Severity
-				Float outFloat1 = trav.getLocQualityIssueSeverity(attr, i);
+				Double outFloat1 = trav.getLocQualityIssueSeverity(attr, i);
 				if ( outFloat1 != null ) {
 					if ( standoff ) {
-						writer.print(String.format("\tlocQualityIssueSeverity[%d]=\"%s\"", i+1, Util.formatFloat(outFloat1)));
+						writer.print(String.format("\tlocQualityIssueSeverity[%d]=\"%s\"", i+1, Util.formatDouble(outFloat1)));
 					}
 					else {
-						writer.print(String.format("\tlocQualityIssueSeverity=\"%s\"", Util.formatFloat(outFloat1)));
+						writer.print(String.format("\tlocQualityIssueSeverity=\"%s\"", Util.formatDouble(outFloat1)));
 					}
 				}
 				// Type
@@ -474,13 +474,13 @@ public class Main {
 			if ( out1 != null ) {
 				writer.print(String.format("\tlocQualityRatingProfileRef=\"%s\"", escape(out1.substring(ITSEngine.REF_PREFIX.length()))));
 			}
-			Float outF1 = trav.getLocQualityRatingScore(attr);
+			Double outF1 = trav.getLocQualityRatingScore(attr);
 			if ( outF1 != null ) {
-				writer.print(String.format("\tlocQualityRatingScore=\"%s\"", Util.formatFloat(outF1)));
+				writer.print(String.format("\tlocQualityRatingScore=\"%s\"", Util.formatDouble(outF1)));
 			}
 			outF1 = trav.getLocQualityRatingScoreThreshold(attr);
 			if ( outF1 != null ) {
-				writer.print(String.format("\tlocQualityRatingScoreThreshold=\"%s\"", Util.formatFloat(outF1)));
+				writer.print(String.format("\tlocQualityRatingScoreThreshold=\"%s\"", Util.formatDouble(outF1)));
 			}
 			Integer outInt = trav.getLocQualityRatingVote(attr);
 			if ( outInt != null ) {
@@ -496,9 +496,9 @@ public class Main {
 			if ( out1 != null ) {
 				writer.print(String.format("\tannotatorsRef=\"%s\"", escape(out1)));
 			}
-			Float outFloat1 = trav.getMtConfidence(attr);
+			Double outFloat1 = trav.getMtConfidence(attr);
 			if ( outFloat1 != null ) {
-				writer.print(String.format("\tmtConfidence=\"%s\"", Util.formatFloat(outFloat1)));
+				writer.print(String.format("\tmtConfidence=\"%s\"", Util.formatDouble(outFloat1)));
 			}
 		}
 		else if ( dc.equals(DC_STORAGESIZE) ) {

@@ -320,8 +320,8 @@ public class HTML5FilterTest {
 		assertEquals("comment2", res.get(1).getString(GenericAnnotationType.LQI_COMMENT));
 		assertEquals("misspelling", res.get(0).getString(GenericAnnotationType.LQI_TYPE));
 		assertEquals(null, res.get(1).getString(GenericAnnotationType.LQI_TYPE));
-		assertEquals(10, res.get(0).getFloat(GenericAnnotationType.LQI_SEVERITY), 0);
-		assertEquals(null, res.get(1).getFloat(GenericAnnotationType.LQI_SEVERITY));
+		assertEquals(10, res.get(0).getDouble(GenericAnnotationType.LQI_SEVERITY), 0);
+		assertEquals(null, res.get(1).getDouble(GenericAnnotationType.LQI_SEVERITY));
 		assertEquals(true, res.get(0).getBoolean(GenericAnnotationType.LQI_ENABLED));
 		assertEquals(false, res.get(1).getBoolean(GenericAnnotationType.LQI_ENABLED));
 		assertEquals(null, res.get(0).getString(GenericAnnotationType.LQI_PROFILEREF));
@@ -346,7 +346,7 @@ public class HTML5FilterTest {
 		assertEquals(1, res.size());
 		assertEquals("note", res.get(0).getString(GenericAnnotationType.LQI_COMMENT));
 		assertEquals("misspelling", res.get(0).getString(GenericAnnotationType.LQI_TYPE));
-		assertEquals(11, res.get(0).getFloat(GenericAnnotationType.LQI_SEVERITY), 0);
+		assertEquals(11, res.get(0).getDouble(GenericAnnotationType.LQI_SEVERITY), 0);
 		assertEquals("uri", res.get(0).getString(GenericAnnotationType.LQI_PROFILEREF));
 		assertEquals(false, res.get(0).getBoolean(GenericAnnotationType.LQI_ENABLED));
 	}

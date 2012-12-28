@@ -818,7 +818,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 			if ( !Util.isEmpty(severityP) ) {
 				throw new ITSException("Cannot have both locQualityIssueSeverity and locQualityIssueSeverityPointer.");
 			}
-			// Do not convert the float yet, this is done when triggering the rule
+			// Do not convert the Double yet, this is done when triggering the rule
 			ann.setString(GenericAnnotationType.LQI_SEVERITY, np[3]);
 		}
 		else if ( severityP != null ) {
@@ -1307,7 +1307,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 		
 		if ( data.charAt(FP_MTCONFIDENCE) != '?' ) {
 			value = getFlagData(data, FP_MTCONFIDENCE_DATA);
-			trace.peek().mtConfidence = Float.parseFloat(value);
+			trace.peek().mtConfidence = Double.parseDouble(value);
 		}
 		
 		if ( data.charAt(FP_ALLOWEDCHARS) != '?' ) {
@@ -1599,8 +1599,8 @@ public class ITSEngine implements IProcessor, ITraversal {
 								if ( data1.startsWith(PTRFLAG) ) {
 									data1 = resolvePointer(NL.item(i), data1.substring(PTRFLAG.length()));
 								}
-								// Convert the string to the float value
-								upd.setFloat(GenericAnnotationType.LQI_SEVERITY, Float.parseFloat(data1));
+								// Convert the string to the Double value
+								upd.setDouble(GenericAnnotationType.LQI_SEVERITY, Double.parseDouble(data1));
 							}
 							// Get and resolve 'profile reference'
 							data1 = ann.getString(GenericAnnotationType.LQI_PROFILEREF);
@@ -1878,7 +1878,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 					GenericAnnotations anns = new GenericAnnotations();
 					GenericAnnotation ann = anns.add(GenericAnnotationType.TERM);
 					if ( values[1] != null ) ann.setString(GenericAnnotationType.TERM_INFO, values[1]);
-					if ( values[2] != null ) ann.setFloat(GenericAnnotationType.TERM_CONFIDENCE, Float.parseFloat(values[2]));
+					if ( values[2] != null ) ann.setDouble(GenericAnnotationType.TERM_CONFIDENCE, Double.parseDouble(values[2]));
 					// Set the updated flags
 					setFlag(attr.getOwnerElement(), FP_TERMINOLOGY, 'y', attr.getSpecified());
 					setFlag(attr.getOwnerElement(), FP_TERMINOLOGY_DATA, anns.toString(), attr.getSpecified()); 
@@ -2065,7 +2065,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 						GenericAnnotation ann = addIssueItem(anns);
 						if ( values[1] != null ) ann.setString(GenericAnnotationType.LQI_TYPE, values[1]);
 						if ( values[2] != null ) ann.setString(GenericAnnotationType.LQI_COMMENT, values[2]);
-						if ( values[3] != null ) ann.setFloat(GenericAnnotationType.LQI_SEVERITY, Float.parseFloat(values[3]));
+						if ( values[3] != null ) ann.setDouble(GenericAnnotationType.LQI_SEVERITY, Double.parseDouble(values[3]));
 						if ( values[4] != null ) ann.setString(GenericAnnotationType.LQI_PROFILEREF, values[4]);
 						if ( values[5] != null ) ann.setBoolean(GenericAnnotationType.LQI_ENABLED, values[5].equals("yes"));
 					}
@@ -2106,7 +2106,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 					if ( values[0] != null ) ann.setString(GenericAnnotationType.DISAMB_CLASS, values[0]);
 					if ( values[1] != null ) ann.setString(GenericAnnotationType.DISAMB_SOURCE, values[1]);
 					if ( values[2] != null ) ann.setString(GenericAnnotationType.DISAMB_IDENT, values[2]);
-					if ( values[3] != null ) ann.setFloat(GenericAnnotationType.DISAMB_CONFIDENCE, Float.parseFloat(values[3]));
+					if ( values[3] != null ) ann.setDouble(GenericAnnotationType.DISAMB_CONFIDENCE, Double.parseDouble(values[3]));
 					if ( values[4] != null ) ann.setString(GenericAnnotationType.DISAMB_GRANULARITY, values[4]);
 					// Set the updated flags
 					setFlag(attr.getOwnerElement(), FP_DISAMBIGUATION, 'y', attr.getSpecified());
@@ -2136,9 +2136,9 @@ public class ITSEngine implements IProcessor, ITraversal {
 					// Convert the values into an annotation
 					GenericAnnotations anns = new GenericAnnotations();
 					GenericAnnotation ann = anns.add(GenericAnnotationType.LQR);
-					if ( values[0] != null ) ann.setFloat(GenericAnnotationType.LQR_SCORE, Float.parseFloat(values[0]));
+					if ( values[0] != null ) ann.setDouble(GenericAnnotationType.LQR_SCORE, Double.parseDouble(values[0]));
 					if ( values[1] != null ) ann.setInteger(GenericAnnotationType.LQR_VOTE, Integer.parseInt(values[1]));
-					if ( values[2] != null ) ann.setFloat(GenericAnnotationType.LQR_SCORETHRESHOLD, Float.parseFloat(values[2]));
+					if ( values[2] != null ) ann.setDouble(GenericAnnotationType.LQR_SCORETHRESHOLD, Double.parseDouble(values[2]));
 					if ( values[3] != null ) ann.setInteger(GenericAnnotationType.LQR_VOTETHRESHOLD, Integer.parseInt(values[3]));
 					if ( values[4] != null ) ann.setString(GenericAnnotationType.LQR_PROFILEREF, values[4]);
 					// Set the updated flags
@@ -2264,13 +2264,13 @@ public class ITSEngine implements IProcessor, ITraversal {
 		}
 	}
 
-	private boolean validateFloat (String value,
-		float minimum,
-		float maximum,
+	private boolean validateDouble (String value,
+		Double minimum,
+		Double maximum,
 		String name)
 	{
 		try {
-			float f = Float.parseFloat(value);
+			Double f = Double.parseDouble(value);
 			if (( f < minimum ) || ( f > maximum )) {
 				logger.error("Invalid value for {}: {}. It should be between [{} and {}]", name, value, minimum, maximum);
 			}
@@ -2441,7 +2441,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 			if ( elem.hasAttribute(name) )
 				value = elem.getAttribute(name);
 		}
-		if ( validateFloat(value, 0.0F, 1.0F, name) ) {
+		if ( validateDouble(value, 0.0, 1.0, name) ) {
 			return value;
 		}
 		return null; // No or bad value 
@@ -2864,7 +2864,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 			}
 			if ( values[1] != null ) ann.setString(GenericAnnotationType.LQI_TYPE, values[1]);
 			if ( values[2] != null ) ann.setString(GenericAnnotationType.LQI_COMMENT, values[2]);
-			if ( values[3] != null ) ann.setFloat(GenericAnnotationType.LQI_SEVERITY, Float.parseFloat(values[3]));
+			if ( values[3] != null ) ann.setDouble(GenericAnnotationType.LQI_SEVERITY, Double.parseDouble(values[3]));
 			if ( values[4] != null ) ann.setString(GenericAnnotationType.LQI_PROFILEREF, values[4]);
 			if ( values[5] != null ) ann.setBoolean(GenericAnnotationType.LQI_ENABLED, values[5].equals("yes"));
 		}
@@ -3136,16 +3136,16 @@ public class ITSEngine implements IProcessor, ITraversal {
 	}
 
 	@Override
-	public Float getTermConfidence (Attr attribute) {
+	public Double getTermConfidence (Attr attribute) {
 		if ( attribute == null ) {
 			if ( trace.peek().termino == null ) return null;
-			return trace.peek().termino.getAnnotations(GenericAnnotationType.TERM).get(0).getFloat(GenericAnnotationType.TERM_CONFIDENCE);
+			return trace.peek().termino.getAnnotations(GenericAnnotationType.TERM).get(0).getDouble(GenericAnnotationType.TERM_CONFIDENCE);
 		}
 		String tmp;
 		if ( (tmp = (String)attribute.getUserData(FLAGNAME)) == null ) return null;
 		if ( tmp.charAt(FP_TERMINOLOGY) != 'y' ) return null;
 		GenericAnnotations anns = new GenericAnnotations(getFlagData(tmp, FP_TERMINOLOGY_DATA));
-		return anns.getAnnotations(GenericAnnotationType.TERM).get(0).getFloat(GenericAnnotationType.TERM_CONFIDENCE);
+		return anns.getAnnotations(GenericAnnotationType.TERM).get(0).getDouble(GenericAnnotationType.TERM_CONFIDENCE);
 	}
 
 	/**
@@ -3266,18 +3266,18 @@ public class ITSEngine implements IProcessor, ITraversal {
 	}
 
 	@Override
-	public Float getLocQualityIssueSeverity (Attr attribute,
+	public Double getLocQualityIssueSeverity (Attr attribute,
 		int index)
 	{
 		if ( attribute == null ) {
 			if ( trace.peek().lqIssues == null ) return null;
-			return trace.peek().lqIssues.getAnnotations(GenericAnnotationType.LQI).get(index).getFloat(GenericAnnotationType.LQI_SEVERITY);
+			return trace.peek().lqIssues.getAnnotations(GenericAnnotationType.LQI).get(index).getDouble(GenericAnnotationType.LQI_SEVERITY);
 		}
 		String tmp;
 		if ( (tmp = (String)attribute.getUserData(FLAGNAME)) == null ) return null;
 		if ( tmp.charAt(FP_LQISSUE) != 'y' ) return null;
 		GenericAnnotations anns = new GenericAnnotations(getFlagData(tmp, FP_LQISSUE_DATA));
-		return anns.getAnnotations(GenericAnnotationType.LQI).get(index).getFloat(GenericAnnotationType.LQI_SEVERITY);
+		return anns.getAnnotations(GenericAnnotationType.LQI).get(index).getDouble(GenericAnnotationType.LQI_SEVERITY);
 	}
 
 	@Override
@@ -3354,16 +3354,16 @@ public class ITSEngine implements IProcessor, ITraversal {
 	}
 
 	@Override
-	public Float getDisambigConfidence (Attr attribute) {
+	public Double getDisambigConfidence (Attr attribute) {
 		if ( attribute == null ) {
 			if ( trace.peek().disambig == null ) return null;
-			return trace.peek().disambig.getAnnotations(GenericAnnotationType.DISAMB).get(0).getFloat(GenericAnnotationType.DISAMB_CONFIDENCE);
+			return trace.peek().disambig.getAnnotations(GenericAnnotationType.DISAMB).get(0).getDouble(GenericAnnotationType.DISAMB_CONFIDENCE);
 		}
 		String tmp;
 		if ( (tmp = (String)attribute.getUserData(FLAGNAME)) == null ) return null;
 		if ( tmp.charAt(FP_DISAMBIGUATION) != 'y' ) return null;
 		GenericAnnotations anns = new GenericAnnotations(getFlagData(tmp, FP_DISAMBIGUATION_DATA));
-		return anns.getAnnotations(GenericAnnotationType.DISAMB).get(0).getFloat(GenericAnnotationType.DISAMB_CONFIDENCE);
+		return anns.getAnnotations(GenericAnnotationType.DISAMB).get(0).getDouble(GenericAnnotationType.DISAMB_CONFIDENCE);
 	}
 
 	private String getDisambValue (String fieldName,
@@ -3389,10 +3389,10 @@ public class ITSEngine implements IProcessor, ITraversal {
 	}
 	
 	@Override
-	public Float getLocQualityRatingScore (Attr attribute) {
+	public Double getLocQualityRatingScore (Attr attribute) {
 		if ( attribute != null ) return null;
 		if ( trace.peek().lqRating == null ) return null;
-		return trace.peek().lqRating.getAnnotations(GenericAnnotationType.LQR).get(0).getFloat(GenericAnnotationType.LQR_SCORE);
+		return trace.peek().lqRating.getAnnotations(GenericAnnotationType.LQR).get(0).getDouble(GenericAnnotationType.LQR_SCORE);
 	}
 	
 	@Override
@@ -3403,10 +3403,10 @@ public class ITSEngine implements IProcessor, ITraversal {
 	}
 	
 	@Override
-	public Float getLocQualityRatingScoreThreshold (Attr attribute) {
+	public Double getLocQualityRatingScoreThreshold (Attr attribute) {
 		if ( attribute != null ) return null;
 		if ( trace.peek().lqRating == null ) return null;
-		return trace.peek().lqRating.getAnnotations(GenericAnnotationType.LQR).get(0).getFloat(GenericAnnotationType.LQR_SCORETHRESHOLD);
+		return trace.peek().lqRating.getAnnotations(GenericAnnotationType.LQR).get(0).getDouble(GenericAnnotationType.LQR_SCORETHRESHOLD);
 	}
 	
 	@Override
@@ -3495,12 +3495,12 @@ public class ITSEngine implements IProcessor, ITraversal {
 	}
 	
 	@Override
-	public Float getMtConfidence (Attr attribute) {
+	public Double getMtConfidence (Attr attribute) {
 		if ( attribute == null ) return trace.peek().mtConfidence;
 		String tmp;
 		if ( (tmp = (String)attribute.getUserData(FLAGNAME)) == null ) return null;
 		if ( tmp.charAt(FP_MTCONFIDENCE) != 'y' ) return trace.peek().mtConfidence;
-		return Float.parseFloat(getFlagData(tmp, FP_MTCONFIDENCE_DATA));
+		return Double.parseDouble(getFlagData(tmp, FP_MTCONFIDENCE_DATA));
 	}
 	
 	/**

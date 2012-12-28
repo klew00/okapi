@@ -393,11 +393,11 @@ public class UtilTest {
 	}
 
 	@Test
-	public void testFormatFloat () {
-		assertEquals("1.2", Util.formatFloat(1.2f));
-		assertEquals("1.01", Util.formatFloat(1.01f));
-		assertEquals("100", Util.formatFloat(100.0f));
-		assertEquals("0.1", Util.formatFloat(0.1f));
+	public void testFormatDouble () {
+		assertEquals("1.2", Util.formatDouble(1.2));
+		assertEquals("1.01", Util.formatDouble(1.01));
+		assertEquals("100", Util.formatDouble(100.0));
+		assertEquals("0.1", Util.formatDouble(0.1));
 	}
 	
 	@Test

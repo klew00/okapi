@@ -767,9 +767,9 @@ public class XLIFFWriter implements IFilterWriter {
 			if ( strVal != null ) {
 				writer.writeAttributeString("locQualityIssueProfileRef", strVal);
 			}
-			Float floVal = ann.getFloat(GenericAnnotationType.LQI_SEVERITY);
-			if ( floVal != null ) {
-				writer.writeAttributeString("locQualityIssueSeverity", Util.formatFloat(floVal));
+			Double dblVal = ann.getDouble(GenericAnnotationType.LQI_SEVERITY);
+			if ( dblVal != null ) {
+				writer.writeAttributeString("locQualityIssueSeverity", Util.formatDouble(dblVal));
 			}
 			strVal = ann.getString(GenericAnnotationType.LQI_TYPE);
 			if ( strVal != null ) {

@@ -100,8 +100,8 @@ public class GenericAnnotation {
 			else if ( list[i+1] instanceof Integer ) {
 				setInteger((String)list[i], (Integer)list[i+1]);
 			}
-			else if ( list[i+1] instanceof Float ) {
-				setFloat((String)list[i], (Float)list[i+1]);
+			else if ( list[i+1] instanceof Double ) {
+				setDouble((String)list[i], (Double)list[i+1]);
 			}
 			else {
 				throw new InvalidParameterException("Invalid field value in key+value pair.");
@@ -161,18 +161,18 @@ public class GenericAnnotation {
 		setObject(name, value);
 	}
 	
-	public Float getFloat (String name) {
+	public Double getDouble (String name) {
 		if ( map == null ) return null;
 		Object obj = map.get(name);
 		if ( obj == null ) return null;
-		if ( !(obj instanceof Float) ) {
-			throw new InvalidParameterException(String.format("The field '%s' is not a float.", name));
+		if ( !(obj instanceof Double) ) {
+			throw new InvalidParameterException(String.format("The field '%s' is not a double.", name));
 		}
-		return (Float)obj;
+		return (Double)obj;
 	}
 
-	public void setFloat (String name,
-		Float value)
+	public void setDouble (String name,
+		Double value)
 	{
 		setObject(name, value);
 	}
@@ -205,7 +205,7 @@ public class GenericAnnotation {
 			if ( value instanceof String ) sb.append('s');
 			else if ( value instanceof Boolean ) sb.append('b');
 			else if ( value instanceof Integer ) sb.append('i');
-			else if ( value instanceof Float ) sb.append('f');
+			else if ( value instanceof Double ) sb.append('f');
 			sb.append(PART_SEPARATOR);
 			sb.append(value); // Value
 		}
@@ -227,7 +227,7 @@ public class GenericAnnotation {
 				setInteger(parts[0], Integer.parseInt(parts[2]));
 			}
 			else if ( parts[1].equals("f") ) {
-				setFloat(parts[0], Float.parseFloat(parts[2]));
+				setDouble(parts[0], Double.parseDouble(parts[2]));
 			}
 			else {
 				throw new RuntimeException(String.format("Unknow field type in annotation: '%s'", parts[1]));

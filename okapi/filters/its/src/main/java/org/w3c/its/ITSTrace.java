@@ -43,7 +43,7 @@ class ITSTrace {
 	String lqIssuesRef;
 	GenericAnnotations lqIssues;
 	String annotatorsRef;
-	Float mtConfidence;
+	Double mtConfidence;
 	GenericAnnotations storageSize;
 	GenericAnnotations disambig;
 	GenericAnnotations lqRating;

@@ -48,11 +48,11 @@ public class GenericAnnotationTest {
 	}
 
 	@Test
-	public void testFloat () {
+	public void testDouble () {
 		GenericAnnotation ann = new GenericAnnotation("type1");
 		assertEquals("type1", ann.getType());
-		ann.setFloat("f1", 1.234F);
-		assertEquals(1.234F, ann.getFloat("f1"), 0.0F);
+		ann.setDouble("f1", 1.234);
+		assertEquals(1.234, ann.getDouble("f1"), 0.0);
 	}
 
 	@Test
@@ -71,7 +71,7 @@ public class GenericAnnotationTest {
 		ann1.setBoolean("fb2", false);
 		ann1.setString("fs2", "");
 		ann1.setString("fs3", " \t ");
-		ann1.setFloat("ff1", 1.234F);
+		ann1.setDouble("ff1", 1.234);
 		ann1.setInteger("fi1", 123);
 		String buf = ann1.toString();
 		
@@ -83,7 +83,7 @@ public class GenericAnnotationTest {
 		assertEquals("string1", ann2.getString("fs1"));
 		assertEquals("", ann2.getString("fs2"));
 		assertEquals(" \t ", ann2.getString("fs3"));
-		assertEquals(1.234F, ann2.getFloat("ff1"), 0.0F);
+		assertEquals(1.234, ann2.getDouble("ff1"), 0.0);
 		assertEquals(123, (int)ann2.getInteger("fi1"));
 	}
 
@@ -92,7 +92,7 @@ public class GenericAnnotationTest {
 		GenericAnnotation ann1 = new GenericAnnotation("type1");
 		ann1.setString("f1", "v1");
 		ann1.setBoolean("f2", true);
-		ann1.setFloat("ff1", 1.234F);
+		ann1.setDouble("ff1", 1.234);
 		ann1.setInteger("fi1", 543);
 		
 		GenericAnnotation ann2 = ann1.clone();
@@ -101,7 +101,7 @@ public class GenericAnnotationTest {
 		assertEquals(ann2.getString("f1"), ann1.getString("f1"));
 		assertFalse(ann2.getString("f1")==ann1.getString("f1"));
 		assertEquals(ann2.getBoolean("f2"), ann1.getBoolean("f2"));
-		assertEquals(ann2.getFloat("ff1"), ann1.getFloat("ff1"), 0.0F);
+		assertEquals(ann2.getDouble("ff1"), ann1.getDouble("ff1"), 0.0);
 		assertEquals(ann2.getInteger("fi1"), ann1.getInteger("fi1"));
 	}
 
@@ -110,13 +110,13 @@ public class GenericAnnotationTest {
 		GenericAnnotation ann1 = new GenericAnnotation("type1", 
 			"fs1", "v1",
 			"fb2", true,
-			"ff3", 1.234F,
+			"ff3", 1.234,
 			"fi4", 543);
 		
 		assertEquals("type1", ann1.getType());
 		assertEquals("v1", ann1.getString("fs1"));
 		assertEquals(true, ann1.getBoolean("fb2"));
-		assertEquals(1.234F, ann1.getFloat("ff3"), 0.0F);
+		assertEquals(1.234, ann1.getDouble("ff3"), 0.0);
 		assertEquals(543, (int)ann1.getInteger("fi4"));
 	}
 }
