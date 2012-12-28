@@ -344,9 +344,13 @@ public class ITSEngine implements IProcessor, ITraversal {
 			for ( int i=0; i<nl.getLength(); i++ ) {
 				rulesElem = (Element)nl.item(i);
 				// Check version
+				String prev = version;
 				version = rulesElem.getAttributeNS(null, "version");
 				if ( !version.equals(ITS_VERSION1) && !version.equals(ITS_VERSION2) ) {
 					throw new ITSException(String.format("Invalid or missing ITS version (\"%s\")", version));
+				}
+				if (( prev != null ) && !prev.equals("0") && !version.equals(prev) ) {
+					throw new ITSException(String.format("Two different versions of ITS declared in the same document: '%s' and '%s'.", prev, version));
 				}
 
 				// Check queryLanguage
@@ -474,7 +478,9 @@ public class ITSEngine implements IProcessor, ITraversal {
 						&& !"span".equals(locName) 
 						&& !"locQualityIssues".equals(locName)
 						&& !"locQualityIssue".equals(locName)
-						&& !"locNote".equals(locName) ) {
+						&& !"locNote".equals(locName)
+						&& !"provenanceRecords".equals(locName)
+						&& !"provenanceRecord".equals(locName) ) {
 						logger.warn("Unknown element '{}'.", ruleElem.getNodeName());
 					}
 				}
