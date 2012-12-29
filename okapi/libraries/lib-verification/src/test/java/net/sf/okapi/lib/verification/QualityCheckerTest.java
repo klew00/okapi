@@ -28,6 +28,9 @@ import java.util.List;
 
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.annotation.GenericAnnotation;
+import net.sf.okapi.common.annotation.GenericAnnotationType;
+import net.sf.okapi.common.annotation.GenericAnnotations;
 import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextContainer;
@@ -469,6 +472,36 @@ public class QualityCheckerTest {
 		List<Issue> issues = session.getIssues();
 		assertEquals(1, issues.size());
 		assertEquals(IssueType.TERMINOLOGY, issues.get(0).issueType);
+	}
+
+	@Test
+	public void testStorageSize () {
+		ITextUnit tu = new TextUnit("id", "Summer and\nspring"); // 17 + 1
+		tu.setTarget(locFR, new TextContainer("\u00e9t\u00e9 et printemps")); // 16 + 2
+		tu.setAnnotation(new GenericAnnotations(new GenericAnnotation(GenericAnnotationType.STORAGESIZE,
+			GenericAnnotationType.STORAGESIZE_SIZE, 17,
+			GenericAnnotationType.STORAGESIZE_LINEBREAK, "crlf",
+			GenericAnnotationType.STORAGESIZE_ENCODING, "UTF-8")));
+		session.startProcess(locEN, locFR); // Make sure we re-initialize
+		session.processTextUnit(tu);
+		List<Issue> issues = session.getIssues();
+		assertEquals(2, issues.size());
+		assertEquals(IssueType.SOURCE_LENGTH, issues.get(0).issueType);
+		assertEquals(IssueType.TARGET_LENGTH, issues.get(1).issueType);
+	}
+
+	@Test
+	public void testAllowedCharacters () {
+		ITextUnit tu = new TextUnit("id", "Summer and\nspring");
+		tu.setTarget(locFR, new TextContainer("\u00e9t\u00e9 et printemps"));
+		tu.setAnnotation(new GenericAnnotations(new GenericAnnotation(GenericAnnotationType.ALLOWEDCHARS,
+			GenericAnnotationType.ALLOWEDCHARS_PATTERN, "[a-z ]")));
+		session.startProcess(locEN, locFR); // Make sure we re-initialize
+		session.processTextUnit(tu);
+		List<Issue> issues = session.getIssues();
+		assertEquals(2, issues.size());
+		assertEquals(IssueType.ALLOWED_CHARACTERS, issues.get(0).issueType);
+		assertEquals(IssueType.ALLOWED_CHARACTERS, issues.get(1).issueType);
 	}
 
 }
