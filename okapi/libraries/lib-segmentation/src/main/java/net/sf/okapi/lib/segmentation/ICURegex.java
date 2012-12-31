@@ -193,8 +193,8 @@ public class ICURegex {
 		rule = rule.replace("\\D", "\\P{Nd}");
 		rule = rule.replace("\\w", "[\\p{Ll}\\p{Lu}\\p{Lt}\\p{Lo}\\p{Nd}]");
 		rule = rule.replace("\\W", "[^\\p{Ll}\\p{Lu}\\p{Lt}\\p{Lo}\\p{Nd}]");
-		rule = rule.replace("\\s", "[\\t\\n\\f\\r\\p{Z}]");
-		rule = rule.replace("\\S", "[^\\t\\n\\f\\r\\p{Z}]");
+		rule = rule.replace("\\s", "[\\t\\n\\f\\r\\p{Z}\u200B]");
+		rule = rule.replace("\\S", "[^\\t\\n\\f\\r\\p{Z}\u200B]");
 		
 //		// Non-RBBI, handled by mather
 //		m = xhPatternExtractor.matcher(rule);
