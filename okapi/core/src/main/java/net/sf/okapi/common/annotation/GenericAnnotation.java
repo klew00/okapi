@@ -24,7 +24,9 @@ import java.security.InvalidParameterException;
 import java.util.HashMap;
 
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.ITextUnit;
+import net.sf.okapi.common.resource.TextContainer;
 
 /**
  * Generic annotation allowing access with field names and multiple instance on the same object.
@@ -38,8 +40,9 @@ public class GenericAnnotation {
 	private HashMap<String, Object> map;
 	
 	/**
-	 * Adds an annotation to a set attached to a gievn text unit. If the text unit has
-	 * no annotation set attached, one is created and attached. 
+	 * Adds an annotation to a text unit. If the text unit has
+	 * no annotation set attached yet one is created and attached,
+	 * otherwise the annotation to add is added to the existing set. 
 	 * @param tu the text unit where to attach the annotation.
 	 * @param ann the annotation to attach.
 	 */
@@ -53,7 +56,43 @@ public class GenericAnnotation {
 		}
 		anns.add(ann);
 	}
-
+	
+	/**
+	 * Adds an annotation to a text container. If the text container has
+	 * no annotation set attached yet one is created and attached,
+	 * otherwise the annotation to add is added to the existing set. 
+	 * @param tc the text container where to attach the annotation.
+	 * @param ann the annotation to attach.
+	 */
+	static public void addAnnotation (TextContainer tc,
+		GenericAnnotation ann)
+	{
+		GenericAnnotations anns = tc.getAnnotation(GenericAnnotations.class);
+		if ( anns == null ) {
+			anns = new GenericAnnotations();
+			tc.setAnnotation(anns);
+		}
+		anns.add(ann);
+	}
+	
+	/**
+	 * Adds an annotation to an inline code. If the inline code has
+	 * no annotation set attached yet one is created and attached,
+	 * otherwise the annotation to add is added to the existing set. 
+	 * @param code the code where to add the annotation.
+	 * @param ann the annotation to add (if null, nothing is attached).
+	 */
+	static public void addAnnotation (Code code,
+		GenericAnnotation ann)
+	{
+		GenericAnnotations anns = (GenericAnnotations)code.getAnnotation(GenericAnnotationType.GENERIC);
+		if ( anns == null ) {
+			anns = new GenericAnnotations();
+			code.setAnnotation(GenericAnnotationType.GENERIC, anns);
+		}
+		anns.add(ann);
+	}
+	
 	/**
 	 * Creates a new annotation for a given type.
 	 * <p>Note that it is technically to have two annotations with the same type but different fields.

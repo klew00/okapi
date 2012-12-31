@@ -475,11 +475,10 @@ public abstract class ITSFilter implements IFilter {
 					tmp.append("\"");
 				}
 				else if ( attr.getName().equals("xml:lang") ) { // xml:lang
-					//TODO
 					tmp.append(Util.escapeToXML(attr.getNodeValue(), 3, false, null)
 						+ "\"");
 				}
-				else { //TODO: escape unsupported chars
+				else {
 					tmp.append(Util.escapeToXML(attr.getNodeValue(), 3, false, null)
 						+ "\"");
 				}
@@ -491,6 +490,21 @@ public abstract class ITSFilter implements IFilter {
 		Code code = frag.append((node.hasChildNodes() ? TagType.OPENING : TagType.PLACEHOLDER),
 			node.getLocalName(), tmp.toString());
 		code.setReferenceFlag(id!=null); // Set reference flag if we created TU(s)
+		
+		// Map ITS annotations only if requested
+		if ( !params.mapAnnotations ) return;
+		
+		// Allowed Characters
+		String value = trav.getAllowedCharacters(null);
+		if ( value != null ) {
+			GenericAnnotation.addAnnotation(code, new GenericAnnotation(GenericAnnotationType.ALLOWEDCHARS,
+				GenericAnnotationType.ALLOWEDCHARS_PATTERN, value));
+		}
+		// Storage Size
+		GenericAnnotations anns = trav.getStorageSizeAnnotation(null);
+		if ( anns != null ) {
+			GenericAnnotations.addAnnotations(code, anns);
+		}
 	}
 
 	private void applyCodeFinder (TextFragment tf) {
@@ -546,7 +560,7 @@ public abstract class ITSFilter implements IFilter {
 		}
 		// ITS Storage Size
 		if ( ci.storageSize != null ) {
-			addAnnotations(tu, ci.storageSize);
+			GenericAnnotations.addAnnotations(tu, ci.storageSize);
 		}
 		// ITS Allowed characters
 		if ( ci.allowedChars != null ) {
@@ -554,9 +568,9 @@ public abstract class ITSFilter implements IFilter {
 				GenericAnnotationType.ALLOWEDCHARS_PATTERN, ci.allowedChars)
 			);
 		}
-		// ITS Localization Quality Issue
+		// ITS Localization Quality Issue (on the source)
 		if ( ci.lqIssues != null ) {
-			addAnnotations(tu, ci.lqIssues);
+			GenericAnnotations.addAnnotations(tu.getSource(), ci.lqIssues);
 		}
 
 		queue.add(new Event(EventType.TEXT_UNIT, tu));
@@ -564,19 +578,6 @@ public abstract class ITSFilter implements IFilter {
 		return id;
 	}
 
-	/**
-	 * Accumulate annotation sets for a given text unit.
-	 * @param tu the text unit where to attached the new set.
-	 * @param newSet the new set to attach.
-	 */
-	private void addAnnotations (ITextUnit tu,
-		GenericAnnotations newSet)
-	{
-		GenericAnnotations current = tu.getAnnotation(GenericAnnotations.class);
-		if ( current == null ) tu.setAnnotation(newSet); 
-		else current.addAll(newSet);
-	}
-	
 	private String buildEndTag (Node node) {
 		if ( node.hasChildNodes() ) {
 			return "</"
@@ -915,7 +916,7 @@ public abstract class ITSFilter implements IFilter {
 		}
 		// ITS Storage Size
 		if ( context.peek().storageSize != null ) {
-			addAnnotations(tu, context.peek().storageSize);
+			GenericAnnotations.addAnnotations(tu, context.peek().storageSize);
 		}
 		// ITS Allowed characters
 		if ( context.peek().allowedChars != null ) {
@@ -923,15 +924,14 @@ public abstract class ITSFilter implements IFilter {
 				GenericAnnotationType.ALLOWEDCHARS_PATTERN, context.peek().allowedChars)
 			);
 		}
-		// ITS Localization Quality Issue
+		// ITS Localization Quality Issue (on the source)
 		if ( context.peek().lqIssues != null ) {
-			addAnnotations(tu, context.peek().lqIssues);
+			GenericAnnotations.addAnnotations(tu.getSource(), context.peek().lqIssues);
 		}
 		
 		// Set term info
 		if ( terms != null ) {
 			tu.getSource().setAnnotation(terms);
-			
 //			// Term as a generic annotation
 //			GenericAnnotations anns = tu.getSource().getAnnotation(GenericAnnotations.class);
 //			if ( anns == null ) {

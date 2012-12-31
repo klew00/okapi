@@ -380,16 +380,17 @@ public class XMLFilterTest {
 	}
 	
 	@Test
-	public void testAllowedChars () {
+	public void testAllowedCharsAndStorageSize () {
 		String snippet = "<?xml version=\"1.0\"?>\n"
-			+ "<doc><its:rules version=\"2.0\" xmlns:its=\"http://www.w3.org/2005/11/its\""
+			+ "<doc xmlns:its=\"http://www.w3.org/2005/11/its\"><its:rules version=\"2.0\" "
 			+ " xmlns:itsx=\"http://www.w3.org/2008/12/its-extensions\">"
 			+ "<its:translateRule selector=\"//p/@title\" translate='yes'/>"
+			+ "<its:withinTextRule selector=\"//span\" withinText='yes'/>"
 			+ "<its:allowedCharactersRule selector=\"//p\" allowedCharacters='[a-z]'/>"
 			+ "<its:allowedCharactersRule selector=\"//p/@title\" allowedCharacters='[A-Z]'/>"
 			+ "</its:rules>"
 			+ "<p title='ABC'>text1</p>"
-			+ "<q>text2</q>"
+			+ "<r>text <span its:allowedCharacters='[tex]' its:storageSize='10' its:lineBreakType='crlf'>text</span></r>"
 			+ "</doc>";
 		ArrayList<Event> list = getEvents(snippet);
 		ITextUnit tu = FilterTestDriver.getTextUnit(list, 1);
@@ -400,6 +401,14 @@ public class XMLFilterTest {
 		assertEquals("[a-z]", ga.getString(GenericAnnotationType.ALLOWEDCHARS_PATTERN));
 		tu = FilterTestDriver.getTextUnit(list, 3);
 		assertEquals(null, tu.getAnnotation(GenericAnnotations.class));
+		Code code = tu.getSource().getFirstContent().getCode(0);
+		GenericAnnotations anns = (GenericAnnotations)code.getAnnotation(GenericAnnotationType.GENERIC);
+		assertNotNull(anns);
+		assertEquals("[tex]", anns.getFirstAnnotation(GenericAnnotationType.ALLOWEDCHARS).getString(GenericAnnotationType.ALLOWEDCHARS_PATTERN));
+		ga = anns.getFirstAnnotation(GenericAnnotationType.STORAGESIZE);
+		assertEquals(10, (int)ga.getInteger(GenericAnnotationType.STORAGESIZE_SIZE));
+		assertEquals("UTF-8", ga.getString(GenericAnnotationType.STORAGESIZE_ENCODING));
+		assertEquals("crlf", ga.getString(GenericAnnotationType.STORAGESIZE_LINEBREAK));
 	}
 
 	@Test
@@ -983,18 +992,21 @@ public class XMLFilterTest {
 	@Test
 	public void testLocQualityLocalOnUnit () {
 		String snippet = "<?xml version=\"1.0\"?>\n"
-			+ "<doc its:version=\"1.0\" xmlns:its=\"http://www.w3.org/2005/11/its\">"
+			+ "<doc its:version=\"2.0\" xmlns:its=\"http://www.w3.org/2005/11/its\">"
 			+ "<p text=\"value 1\" its:locQualityIssueComment='comment'>text 1</p></doc>";
 		ArrayList<Event> list = getEvents(snippet);
 		ITextUnit tu = FilterTestDriver.getTextUnit(list, 1);
 		assertNotNull(tu);
-//TODO: test annotation when it's implemented		
+		assertEquals("text 1", tu.getSource().toString());
+		GenericAnnotations anns = tu.getSource().getAnnotation(GenericAnnotations.class);
+		GenericAnnotation ga = anns.getFirstAnnotation(GenericAnnotationType.LQI);
+		assertEquals("comment", ga.getString(GenericAnnotationType.LQI_COMMENT));
 	}
 
 	@Test
 	public void testTerms () {
 		String snippet = "<?xml version=\"1.0\"?>\n"
-			+ "<doc its:version=\"1.0\" xmlns:its=\"http://www.w3.org/2005/11/its\">"
+			+ "<doc its:version=\"2.0\" xmlns:its=\"http://www.w3.org/2005/11/its\">"
 			+ "<p>One <its:span term='yes' termInfo='info1'>term</its:span>, and more.</p></doc>";
 		ArrayList<Event> list = getEvents(snippet);
 		ITextUnit tu = FilterTestDriver.getTextUnit(list, 1);
@@ -1005,7 +1017,7 @@ public class XMLFilterTest {
 	@Test
 	public void testTranslatableAttributes2 () {
 		String snippet = "<?xml version=\"1.0\"?>\n"
-			+ "<doc><its:rules version=\"1.0\" xmlns:its=\"http://www.w3.org/2005/11/its\">"
+			+ "<doc><its:rules version=\"2.0\" xmlns:its=\"http://www.w3.org/2005/11/its\">"
 			+ "<its:translateRule selector=\"//*/@text\" translate=\"yes\"/></its:rules>"
 			+ "<p text=\"value 1 &quot;=quot\">text 1</p><p>text 2 &quot;=quot</p><p>text 3</p></doc>";
 		ArrayList<Event> list = getEvents(snippet);
@@ -1031,11 +1043,11 @@ public class XMLFilterTest {
 	@Test
 	public void testTranslatableAttributesOutputAllowUnescapedQuoteButEscape () {
 		String snippet = "<?xml version=\"1.0\"?>\n"
-			+ "<doc><its:rules version=\"1.0\" xmlns:its=\"http://www.w3.org/2005/11/its\">"
+			+ "<doc><its:rules version=\"2.0\" xmlns:its=\"http://www.w3.org/2005/11/its\">"
 			+ "<its:translateRule selector=\"//*/@text\" translate=\"yes\"/></its:rules>"
 			+ "<p NOTtext='value 1 &apos;=apos, &quot;=quot'>text 1</p><p>text 2 &quot;=quot</p><p>text 3 &apos;=apos</p></doc>";
 		String expected = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-			+ "<doc><its:rules version=\"1.0\" xmlns:its=\"http://www.w3.org/2005/11/its\">"
+			+ "<doc><its:rules version=\"2.0\" xmlns:its=\"http://www.w3.org/2005/11/its\">"
 			+ "<its:translateRule selector=\"//*/@text\" translate=\"yes\"/></its:rules>"
 			+ "<p NOTtext=\"value 1 '=apos, &quot;=quot\">text 1</p><p>text 2 &quot;=quot</p><p>text 3 '=apos</p></doc>";
 		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet),
@@ -1045,18 +1057,18 @@ public class XMLFilterTest {
 	@Test
 	public void testTranslatableAttributesOutputAllowUnescapedQuote () {
 		String snippet = "<?xml version=\"1.0\"?>\n"
-			+ "<doc><its:rules version=\"1.0\" xmlns:its=\"http://www.w3.org/2005/11/its\">"
+			+ "<doc><its:rules version=\"2.0\" xmlns:its=\"http://www.w3.org/2005/11/its\">"
 			+ "<its:translateRule selector=\"//*/@text\" translate=\"yes\"/>"
 			+ "</its:rules>"
 			+ "<p NOTtext='value 1 &apos;=apos, &quot;=quot'>text 1</p><p>text 2 &quot;=quot</p><p>text 3 &apos;=apos</p></doc>";
 		String expected = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-			+ "<doc><its:rules version=\"1.0\" xmlns:its=\"http://www.w3.org/2005/11/its\">"
+			+ "<doc><its:rules version=\"2.0\" xmlns:its=\"http://www.w3.org/2005/11/its\">"
 			+ "<its:translateRule selector=\"//*/@text\" translate=\"yes\"/>"
 			+ "</its:rules>"
 			+ "<p NOTtext=\"value 1 '=apos, &quot;=quot\">text 1</p><p>text 2 \"=quot</p><p>text 3 '=apos</p></doc>";
 		
 		String paramData = "<?xml version=\"1.0\"?>\n"
-			+ "<its:rules version=\"1.0\" xmlns:its=\"http://www.w3.org/2005/11/its\""
+			+ "<its:rules version=\"2.0\" xmlns:its=\"http://www.w3.org/2005/11/its\""
 			+ " xmlns:zzz=\"okapi-framework:xmlfilter-options\">"
 			+ "<zzz:options escapeQuotes=\"no\"/></its:rules>";
 		filter.getParameters().fromString(paramData);

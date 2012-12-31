@@ -69,6 +69,7 @@ public class Parameters implements IParameters {
 	private static final String OMITXMLDECLARATION = "omitXMLDeclaration";
 	private static final String ESCAPEQUOTES = "escapeQuotes";
 	private static final String EXTRACTIFONLYCODES = "extractIfOnlyCodes";
+	private static final String MAPANNOTATIONS = "mapAnnotations";
 
 	private static final String OKP_NS_PREFIX = "okp";
 	private static final String OKP_NS_URI = "okapi-framework:xmlfilter-options";
@@ -99,6 +100,7 @@ public class Parameters implements IParameters {
 	public boolean omitXMLDeclaration;
 	public boolean escapeQuotes;
 	public boolean extractIfOnlyCodes;
+	public boolean mapAnnotations;
 	// Write-only parameters
 	public boolean quoteModeDefined;
 	public int quoteMode;
@@ -247,6 +249,7 @@ public class Parameters implements IParameters {
 		// Quote escaping option
 		escapeQuotes = true;
 		extractIfOnlyCodes = true;
+		mapAnnotations = true;
 	}
 
 	@Override
@@ -302,6 +305,7 @@ public class Parameters implements IParameters {
 		if ( name.equals(XMLEncoder.QUOTEMODEDEFINED) ) return quoteModeDefined;
 		if ( name.equals(ESCAPEQUOTES) ) return escapeQuotes;
 		if ( name.equals(EXTRACTIFONLYCODES) ) return extractIfOnlyCodes;
+		if ( name.equals(MAPANNOTATIONS) ) return mapAnnotations;
 		return false;
 	}
 
@@ -318,6 +322,7 @@ public class Parameters implements IParameters {
 		else if ( name.equals(XMLEncoder.QUOTEMODEDEFINED) ) quoteModeDefined = value;
 		else if ( name.equals(ESCAPEQUOTES) ) escapeQuotes = value;
 		else if ( name.equals(EXTRACTIFONLYCODES) ) extractIfOnlyCodes = value;
+		else if ( name.equals(MAPANNOTATIONS) ) mapAnnotations = value;
 	}
 
 	@Override
@@ -387,6 +392,10 @@ public class Parameters implements IParameters {
 			tmp = elem.getAttribute(OMITXMLDECLARATION);
 			if ( !Util.isEmpty(tmp) ) {
 				omitXMLDeclaration = tmp.equals("yes");
+			}
+			tmp = elem.getAttribute(MAPANNOTATIONS);
+			if ( !Util.isEmpty(tmp) ) {
+				mapAnnotations = tmp.equals("yes");
 			}
 		}
 		// Get the code finder data

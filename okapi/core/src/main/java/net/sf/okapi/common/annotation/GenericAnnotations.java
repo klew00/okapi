@@ -25,7 +25,10 @@ import java.util.Collections;
 import java.util.List;
 
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.resource.Code;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.InlineAnnotation;
+import net.sf.okapi.common.resource.TextContainer;
 
 /**
  * Provides access to a list of {@link GenericAnnotation}.
@@ -36,6 +39,54 @@ public class GenericAnnotations extends InlineAnnotation {
 	private static final String ANNOTATION_SEPARATOR = "\u001d";
 
 	List<GenericAnnotation> list;
+	
+	/**
+	 * Adds a set of annotations to a given text unit. If the text unit has
+	 * no annotation set already attached, one is created and attached,
+	 * otherwise all the annotations of the set passed as argument are added to
+	 * the existing set. 
+	 * @param tu the text unit where to attached the new set.
+	 * @param newSet the new set to add.
+	 */
+	static public void addAnnotations (ITextUnit tu,
+		GenericAnnotations newSet)
+	{
+		GenericAnnotations current = tu.getAnnotation(GenericAnnotations.class);
+		if ( current == null ) tu.setAnnotation(newSet); 
+		else current.addAll(newSet);
+	}
+	
+	/**
+	 * Adds a set of annotations to a given text container. If the text container has
+	 * no annotation set already attached, one is created and attached,
+	 * otherwise all the annotations of the set passed as argument are added to
+	 * the existing set. 
+	 * @param tc the text container where to attached the new set.
+	 * @param newSet the new set to add.
+	 */
+	static public void addAnnotations (TextContainer tc,
+		GenericAnnotations newSet)
+	{
+		GenericAnnotations current = tc.getAnnotation(GenericAnnotations.class);
+		if ( current == null ) tc.setAnnotation(newSet); 
+		else current.addAll(newSet);
+	}
+	
+	/**
+	 * Adds a set of annotations to a given inline code. If the inline code has
+	 * no annotation set attached yet one is created and attached,
+	 * otherwise all the annotations of the set passed as argument are added to
+	 * the existing set. 
+	 * @param code the code where to add the annotation.
+	 * @param newset the new set to add.
+	 */
+	static public void addAnnotations (Code code,
+		GenericAnnotations newSet)
+	{
+		GenericAnnotations current = (GenericAnnotations)code.getAnnotation(GenericAnnotationType.GENERIC);
+		if ( current == null ) code.setAnnotation(GenericAnnotationType.GENERIC, newSet);
+		else current.addAll(newSet);
+	}
 	
 	/**
 	 * Creates an empty annotation set.

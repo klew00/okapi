@@ -18,7 +18,7 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.common;
+package net.sf.okapi.common.annotation;
 
 import static org.junit.Assert.*;
 
@@ -27,7 +27,12 @@ import java.util.List;
 import net.sf.okapi.common.annotation.GenericAnnotation;
 import net.sf.okapi.common.annotation.GenericAnnotations;
 import net.sf.okapi.common.resource.AnnotatedSpan;
+import net.sf.okapi.common.resource.Code;
+import net.sf.okapi.common.resource.ITextUnit;
+import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
+import net.sf.okapi.common.resource.TextFragment.TagType;
+import net.sf.okapi.common.resource.TextUnit;
 
 import org.junit.Test;
 
@@ -66,6 +71,96 @@ public class GenericAnnotationsTest {
 		List<GenericAnnotation> list = anns.getAnnotations("type1");
 		assertEquals(2, list.size());
 		assertEquals("v2", list.get(1).getString("name"));
+	}
+
+	@Test
+	public void testAddAnnotationsOnTU () {
+		GenericAnnotations anns1 = new GenericAnnotations();
+		GenericAnnotation ann11 = anns1.add("type1");
+		ann11.setString("name1", "v1");
+		GenericAnnotation ann12 = anns1.add("type1");
+		ann12.setString("name2", "v2-not-over");
+		ITextUnit tu = new TextUnit("id");
+		GenericAnnotations.addAnnotations(tu, anns1);
+
+		GenericAnnotations res = tu.getAnnotation(GenericAnnotations.class);
+		assertNotNull(res);
+		assertEquals(res, anns1);
+		
+		GenericAnnotations anns2 = new GenericAnnotations();
+		GenericAnnotation ann21 = anns2.add("type1");
+		ann21.setString("name3", "v3");
+		GenericAnnotation ann22 = anns2.add("type1");
+		ann22.setString("name2", "another name2");
+		
+		GenericAnnotations.addAnnotations(tu, anns2);
+		res = tu.getAnnotation(GenericAnnotations.class);
+		assertNotNull(res);
+		assertEquals(res, anns1);
+		List<GenericAnnotation> list = res.getAnnotations("type1");
+		assertEquals(4, list.size());
+		GenericAnnotation ann = list.get(1);
+		assertEquals("v2-not-over", ann.getString("name2"));
+	}
+
+	@Test
+	public void testAddAnnotationsOnTC () {
+		GenericAnnotations anns1 = new GenericAnnotations();
+		GenericAnnotation ann11 = anns1.add("type1");
+		ann11.setString("name1", "v1");
+		GenericAnnotation ann12 = anns1.add("type1");
+		ann12.setString("name2", "v2-not-over");
+		TextContainer tc = new TextContainer();
+		GenericAnnotations.addAnnotations(tc, anns1);
+
+		GenericAnnotations res = tc.getAnnotation(GenericAnnotations.class);
+		assertNotNull(res);
+		assertEquals(res, anns1);
+		
+		GenericAnnotations anns2 = new GenericAnnotations();
+		GenericAnnotation ann21 = anns2.add("type1");
+		ann21.setString("name3", "v3");
+		GenericAnnotation ann22 = anns2.add("type1");
+		ann22.setString("name2", "another name2");
+		
+		GenericAnnotations.addAnnotations(tc, anns2);
+		res = tc.getAnnotation(GenericAnnotations.class);
+		assertNotNull(res);
+		assertEquals(res, anns1);
+		List<GenericAnnotation> list = res.getAnnotations("type1");
+		assertEquals(4, list.size());
+		GenericAnnotation ann = list.get(1);
+		assertEquals("v2-not-over", ann.getString("name2"));
+	}
+
+	@Test
+	public void testAddAnnotationsOnCode () {
+		GenericAnnotations anns1 = new GenericAnnotations();
+		GenericAnnotation ann11 = anns1.add("type1");
+		ann11.setString("name1", "v1");
+		GenericAnnotation ann12 = anns1.add("type1");
+		ann12.setString("name2", "v2-not-over");
+		Code code = new Code(TagType.PLACEHOLDER, "z");
+		GenericAnnotations.addAnnotations(code, anns1);
+
+		GenericAnnotations res = (GenericAnnotations)code.getAnnotation(GenericAnnotationType.GENERIC);
+		assertNotNull(res);
+		assertEquals(res, anns1);
+		
+		GenericAnnotations anns2 = new GenericAnnotations();
+		GenericAnnotation ann21 = anns2.add("type1");
+		ann21.setString("name3", "v3");
+		GenericAnnotation ann22 = anns2.add("type1");
+		ann22.setString("name2", "another name2");
+		
+		GenericAnnotations.addAnnotations(code, anns2);
+		res = (GenericAnnotations)code.getAnnotation(GenericAnnotationType.GENERIC);
+		assertNotNull(res);
+		assertEquals(res, anns1);
+		List<GenericAnnotation> list = res.getAnnotations("type1");
+		assertEquals(4, list.size());
+		GenericAnnotation ann = list.get(1);
+		assertEquals("v2-not-over", ann.getString("name2"));
 	}
 
 	@Test

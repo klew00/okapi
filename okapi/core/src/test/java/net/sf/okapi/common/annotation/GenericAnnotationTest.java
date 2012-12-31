@@ -18,10 +18,15 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.common;
+package net.sf.okapi.common.annotation;
 
 import static org.junit.Assert.*;
 import net.sf.okapi.common.annotation.GenericAnnotation;
+import net.sf.okapi.common.resource.Code;
+import net.sf.okapi.common.resource.ITextUnit;
+import net.sf.okapi.common.resource.TextContainer;
+import net.sf.okapi.common.resource.TextFragment.TagType;
+import net.sf.okapi.common.resource.TextUnit;
 
 import org.junit.Test;
 
@@ -118,5 +123,32 @@ public class GenericAnnotationTest {
 		assertEquals(true, ann1.getBoolean("fb2"));
 		assertEquals(1.234, ann1.getDouble("ff3"), 0.0);
 		assertEquals(543, (int)ann1.getInteger("fi4"));
+	}
+	
+	@Test
+	public void testAddAnnotationOnTU () {
+		ITextUnit tu = new TextUnit("id");
+		GenericAnnotation.addAnnotation(tu, new GenericAnnotation("type1", "name1", "value1"));
+		GenericAnnotations anns = tu.getAnnotation(GenericAnnotations.class);
+		GenericAnnotation res = anns.getFirstAnnotation("type1");
+		assertEquals("value1", res.getString("name1"));
+	}
+
+	@Test
+	public void testAddAnnotationOnTC () {
+		TextContainer tc = new TextContainer();
+		GenericAnnotation.addAnnotation(tc, new GenericAnnotation("type1", "name1", "value1"));
+		GenericAnnotations anns = tc.getAnnotation(GenericAnnotations.class);
+		GenericAnnotation res = anns.getFirstAnnotation("type1");
+		assertEquals("value1", res.getString("name1"));
+	}
+
+	@Test
+	public void testAddAnnotationOnCode () {
+		Code code = new Code(TagType.PLACEHOLDER, "z");
+		GenericAnnotation.addAnnotation(code, new GenericAnnotation("type1", "name1", "value1"));
+		GenericAnnotations anns = (GenericAnnotations)code.getAnnotation(GenericAnnotationType.GENERIC);
+		GenericAnnotation res = anns.getFirstAnnotation("type1");
+		assertEquals("value1", res.getString("name1"));
 	}
 }
