@@ -161,6 +161,7 @@ public class Main {
 	protected boolean mosesOverwriteTarget = false;
 	protected boolean moses2Outputs = false;
 	protected boolean mosesUseGModeInAltTrans = true;
+	protected boolean abortOnFailure = true;
 	protected String mosesFromPath;
 	protected String mosesToPath;
 	protected String skeletonDir;
@@ -489,6 +490,9 @@ public class Main {
 				else if ( arg.equals("-trace") || arg.equals("-logger") ) {
 					// Already set. This is just to avoid warnings about invalid parameters
 				}
+				else if ( arg.equals("-continue") ) {
+					prog.abortOnFailure = false;
+				}
 				//=== Input file or error
 				else if ( !arg.startsWith("-") ) {
 					prog.inputs.add(args.get(i));
@@ -544,22 +548,52 @@ public class Main {
 			}
 			
 			// Process all input files
+			Timer timer = new Timer();
+			int errorCount = 0;
 			for ( int i=0; i<prog.inputs.size(); i++ ) {
 				if ( i > 0 ) {
-					logger.info("------------------------------------------------------------"); //$NON-NLS-1$
+					displayDivider();
 				}
-				prog.process(prog.inputs.get(i));
+				try {
+					prog.process(prog.inputs.get(i));
+				}
+				catch ( Throwable e ) {
+					displayError(e, showTrace, prog.showTraceHint);
+					if ( prog.abortOnFailure ) {
+						System.exit(1);
+					}
+					else {
+						errorCount++;
+					}
+				}
+			}
+			if ( prog.inputs.size() > 1 ) {
+				displayDivider();
+				displaySummary(prog.inputs.size(), errorCount, timer);
 			}
 		}
 		catch ( Throwable e ) {
-			if ( showTrace ) e.printStackTrace();
-			else {
-				logger.error(e.getMessage());
-				Throwable e2 = e.getCause();
-				if ( e2 != null ) logger.error(e2.getMessage());
-				if ( prog.showTraceHint ) logger.info("You can use the -trace option for more details.");
-			}
+			displayError(e, showTrace, prog.showTraceHint);
 			System.exit(1); // Error
+		}
+	}
+	
+	private static void displayDivider() {
+		logger.info("------------------------------------------------------------"); //$NON-NLS-1$
+	}
+	
+	private static void displaySummary(int fileCount, int errorCount, Timer t) {
+		logger.info("Files: " + fileCount + " Errors: " + errorCount + 
+					" Time: " + t);
+	}
+	
+	private static void displayError(Throwable e, boolean showTrace, boolean showTraceHint) {
+		if ( showTrace ) e.printStackTrace();
+		else {
+			logger.error(e.getMessage());
+			Throwable e2 = e.getCause();
+			if ( e2 != null ) logger.error(e2.getMessage());
+			if ( showTraceHint ) logger.info("You can use the -trace option for more details.");
 		}
 	}
 
@@ -870,6 +904,7 @@ public class Main {
 	}
 	
 	protected void process (String input) throws URISyntaxException {
+		Timer timer = new Timer();
 		initialize();
 		RawDocument rd;
 		File file;
@@ -1003,8 +1038,7 @@ public class Main {
 			convertFile(rd, outputURI);
 			break;
 		}
-		logger.info("Done");
-		
+		logger.info("Done in " + timer);		
 	}
 	
 	private void printBanner () {
@@ -1057,6 +1091,7 @@ public class Main {
 		logger.info("Lists all available filter configurations: -lfc or --listconf");
 		logger.info("Outputs all messages to the current logger instead of the console: -logger");
 		logger.info("Outputs debug messages when in console mode (no effect on logger): -trace");
+		logger.info("Does not abort batch processing in case of individual errors: -continue");
 		logger.info("Edits or view filter configurations (UI-dependent command):");
 		logger.info("   -e [[-fc] configId]");
 		logger.info("Extracts a file to XLIFF (and optionally segment and pre-translate):");
@@ -1790,4 +1825,14 @@ public class Main {
 		return tf;
 	}
 
+	private static class Timer {
+		private long startMillis = System.currentTimeMillis();
+		public double elapsedSeconds() {
+			return (double)(System.currentTimeMillis() - startMillis) / 1000;
+		}
+		@Override
+		public String toString() {
+			return "" + elapsedSeconds() + "s";
+		}
+	}
 }
