@@ -268,6 +268,11 @@ public class Main {
 				else if ( arg.equals("-rd") ) {
 					prog.rootDir = prog.getArgument(args, ++i);
 				}
+				else if ( arg.equals("-pd") ) {
+					// This value will be overridden if -fc is 
+					// also specified
+					prog.specifiedConfigIdPath = prog.getArgument(args, ++i);
+				}
 				else if ( arg.equals("-x") ) {
 					prog.command = CMD_EXTRACT;
 				}
@@ -1093,24 +1098,24 @@ public class Main {
 		logger.info("Outputs debug messages when in console mode (no effect on logger): -trace");
 		logger.info("Does not abort batch processing in case of individual errors: -continue");
 		logger.info("Edits or view filter configurations (UI-dependent command):");
-		logger.info("   -e [[-fc] configId]");
+		logger.info("   -e [[-fc] configId] [-pd configDirectory]");
 		logger.info("Extracts a file to XLIFF (and optionally segment and pre-translate):");
 		logger.info("   -x inputFile [inputFile2...] [-fc configId] [-ie encoding] [-sl srcLang]");
 		logger.info("      [-tl trgLang] [-seg [srxFile]] [-tt [hostname[:port]]|-mm [key]");
 		logger.info("      |-pen tmDirectory|-gs configFile|-apertium [configFile]");
 		logger.info("      |-ms configFile|-tda configFile|-gg configFile]");
 		logger.info("      [-maketmx [tmxFile]] [-opt threshold] [-od outputDirectory]");
-		logger.info("      [-rd rootDirectory] [-nocopy] [-noalttrans]");
+		logger.info("      [-rd rootDirectory] [-nocopy] [-noalttrans] [-pd configDirectory]");
 		logger.info("Merges an XLIFF document back to its original format:");
 		logger.info("   -m xliffFile [xliffFile2...] [-fc configId] [-ie encoding] [-oe encoding]");
-		logger.info("      [-sd sourceDirectory] [-od outputDirectory]");
+		logger.info("      [-sd sourceDirectory] [-od outputDirectory] [-pd configDirectory]");
 		logger.info("      [-sl srcLang] [-tl trgLang]");
 		logger.info("Translates a file:");
 		logger.info("   -t inputFile [inputFile2...] [-fc configId] [-ie encoding] [-oe encoding]");
 		logger.info("      [-sl srcLang] [-tl trgLang] [-seg [srxFile]] [-tt [hostname[:port]]");
 		logger.info("      |-mm [key]|-pen tmDirectory|-gs configFile|-apertium [configFile]");
 		logger.info("      |-ms configFile|-tda configFile|-gg configFile] [-rd rootDirectory]");
-		logger.info("      [-maketmx [tmxFile]] [-opt threshold]");
+		logger.info("      [-maketmx [tmxFile]] [-opt threshold] [-pd configDirectory]");
 		logger.info("Extracts a file to Moses InlineText:");
 		logger.info("   -xm inputFile [-fc configId] [-ie encoding] [-seg [srxFile]] [-2]");
 		logger.info("      [-sl srcLang] [-tl trgLang] [-to srcOutputFile] [-rd rootDirectory]");
@@ -1120,7 +1125,7 @@ public class Main {
 		logger.info("      [-from mosesFile] [-to outputFile] [-rd rootDirectory] [-noalttrans]");
 		logger.info("Segments a file:");
 		logger.info("   -s inputFile [-fc configId] [-ie encoding] [-rd rootDirectory]");
-		logger.info("      [-sl srcLang] [-tl trgLang] [-seg [srxFile]]");
+		logger.info("      [-sl srcLang] [-tl trgLang] [-seg [srxFile]] [-pd configDirectory]");
 		logger.info("Queries translation resources:");
 		logger.info("   -q \"source text\" [-sl srcLang] [-tl trgLang] [-opentran]");
 		logger.info("      [-tt [hostname[:port]]] [-mm [key]] [-pen tmDirectory] [-gs configFile]");
@@ -1130,19 +1135,22 @@ public class Main {
 		logger.info("   -a \"source text\" \"target text\" [rating] [-sl srcLang] [-tl trgLang]");
 		logger.info("      -ms configFile");
 		logger.info("Converts to PO format:");
-		logger.info("   -2po inputFile [inputFile2...] [-fc configId] [-ie encoding] [-all] [-generic]");
-		logger.info("      [-sl srcLang] [-tl trgLang] [-trgsource|-trgempty] [-rd rootDirectory]");
+		logger.info("   -2po inputFile [inputFile2...] [-fc configId] [-ie encoding] [-all]");
+		logger.info("      [-generic] [-sl srcLang] [-tl trgLang] [-trgsource|-trgempty]");
+		logger.info("      [-rd rootDirectory] [-pd configDirectory]");
 		logger.info("Converts to TMX format:");
 		logger.info("   -2tmx inputFile [inputFile2...] [-fc configId] [-ie encoding] [-all]");
 		logger.info("      [-sl srcLang] [-tl trgLang] [-trgsource|-trgempty] [-rd rootDirectory]");
+		logger.info("      [-pd configDirectory]");
 		logger.info("Converts to table format:");
 		logger.info("   -2tbl inputFile [inputFile2...] [-fc configId] [-ie encoding]");
 		logger.info("      [-sl srcLang] [-tl trgLang] [-trgsource|-trgempty] [-csv|-tab]");
 		logger.info("      [-xliff|-xliffgx|-tmx|-generic] [-all] [-rd rootDirectory]");
+		logger.info("      [-pd configDirectory]");
 		logger.info("Imports to Pensieve TM:");
 		logger.info("   -imp tmDirectory inputFile [inputFile2...] [-fc configId] [-ie encoding]");
 		logger.info("      [-sl srcLang] [-tl trgLang] [-trgsource|-trgempty] [-all] [-over]");
-		logger.info("      [-rd rootDirectory]");
+		logger.info("      [-rd rootDirectory] [-pd configDirectory]");
 		logger.info("Exports Pensieve TM as TMX:");
 		logger.info("   -exp tmDirectory1 [tmDirectory2...] [-sl srcLang] [-tl trgLang]");
 		logger.info("      [-trgsource|-trgempty] [-all]");
