@@ -596,14 +596,19 @@ public class Parameters extends BaseParameters {
 
 		patterns = new ArrayList<PatternItem>();
 		
-		// Parentheses
+		// Opening parentheses
 		patterns.add(new PatternItem(
-			"[\\(\\)]", "<same>",
-			true, Issue.SEVERITY_LOW, "Parentheses"));
+			"[\\(\\uFF08]", "[\\(\\uFF08]",
+			true, Issue.SEVERITY_LOW, "Opening parenthesis"));
+		
+		// Closing parentheses
+		patterns.add(new PatternItem(
+			"[\\)\\uFF09]", "[\\)\\uFF09]",
+			true, Issue.SEVERITY_LOW, "Closing parenthesis"));
 		
 		// Bracketing characters (except parentheses)
 		patterns.add(new PatternItem(
-			"[\\p{Ps}\\p{Pe}&&[^\\(\\)]]", "<same>",
+			"[\\p{Ps}\\p{Pe}&&[^\\(\\)\\uFF08\\uFF09]]", "<same>",
 			true, Issue.SEVERITY_LOW, "Bracketing characters (except parentheses)"));
 		
 		// Email addresses
