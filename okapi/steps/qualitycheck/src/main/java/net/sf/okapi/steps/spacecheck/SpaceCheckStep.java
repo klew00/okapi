@@ -28,6 +28,7 @@ import net.sf.okapi.common.pipeline.BasePipelineStep;
 import net.sf.okapi.common.pipeline.annotations.StepParameterMapping;
 import net.sf.okapi.common.pipeline.annotations.StepParameterType;
 import net.sf.okapi.lib.verification.Parameters;
+import net.sf.okapi.lib.verification.SpaceChecker;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,8 +40,10 @@ public class SpaceCheckStep extends BasePipelineStep {
 
 	private LocaleId sourceLocale;
 	private LocaleId targetLocale;
+	private SpaceChecker checker;
 
 	public SpaceCheckStep () {
+		this.checker = new SpaceChecker();
 	}
 	
 	@Override
@@ -75,10 +78,8 @@ public class SpaceCheckStep extends BasePipelineStep {
 	}
 	
 	@Override
-	protected Event handleTextUnit (Event event) {
-		//TODO
-		
-		//checker.checkSpaces(event.getTextUnit());
+	protected Event handleTextUnit (Event event) {		
+		checker.checkUnitSpacing(event.getTextUnit(), targetLocale);
 		return event;
 	}
 	
