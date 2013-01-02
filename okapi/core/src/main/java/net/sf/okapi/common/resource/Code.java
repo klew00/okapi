@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2011 by the Okapi Framework contributors
+  Copyright (C) 2008-2013 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -78,7 +78,7 @@ public class Code {
 	/** Initial capacity for creating annotations maps.
 	 * Keeping it small to save space.
 	 */
-	private static final int ANNOTATIONS_INITCAP = 2;
+	private static final int ANNOTATIONS_INITCAP = 1;
 	
 	/**
 	 * Indicates that this code has one reference or more in its data part.

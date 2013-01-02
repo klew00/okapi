@@ -370,7 +370,7 @@ public class XLIFFFilterTest {
 			+ "<xliff version=\"1.2\" xmlns:i='http://www.w3.org/2005/11/its'>"
 			+ "<file source-language=\"en\" target-language=\"fr\" datatype=\"x-test\" original=\"file.ext\">"
 			+ "<body>"
-			+ "<trans-unit id=\"1\" maxbytes='123' i:allowedCharacters='[a-z]'>"
+			+ "<trans-unit id=\"1\" i:storageSize='123' i:allowedCharacters='[a-z]'>"
 			+ "<source>t1</source>"
 			+ "</trans-unit>"
 			+ "</body>"

@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009-2012 by the Okapi Framework contributors
+  Copyright (C) 2009-2013 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -21,6 +21,7 @@
 package net.sf.okapi.common.filterwriter;
 
 import java.io.OutputStream;
+import java.util.List;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
@@ -465,23 +466,23 @@ public class XLIFFWriter implements IFilterWriter {
 					writer.writeAttributeString("its:lineBreakType", tmp);
 				}
 			}
-			// Domain
-			GenericAnnotation ann = anns.getFirstAnnotation(GenericAnnotationType.DOMAIN);
-			if ( ann != null ) {
-				writer.writeAttributeString("okp:itsDomain",
-					ann.getString(GenericAnnotationType.DOMAIN_LIST));
-			}
 			// Allowed Characters
-			ann = anns.getFirstAnnotation(GenericAnnotationType.ALLOWEDCHARS);
-			if ( ann != null ) {
+			ga = anns.getFirstAnnotation(GenericAnnotationType.ALLOWEDCHARS);
+			if ( ga != null ) {
 				writer.writeAttributeString("its:allowedCharacters",
-					ann.getString(GenericAnnotationType.ALLOWEDCHARS_PATTERN));
+					ga.getString(GenericAnnotationType.ALLOWEDCHARS_PATTERN));
+			}
+			// Domain
+			ga = anns.getFirstAnnotation(GenericAnnotationType.DOMAIN);
+			if ( ga != null ) {
+				writer.writeAttributeString("okp:itsDomain",
+					ga.getString(GenericAnnotationType.DOMAIN_LIST));
 			}
 			// External Resoure Reference
-			ann = anns.getFirstAnnotation(GenericAnnotationType.EXTRESREF);
-			if ( ann != null ) {
+			ga = anns.getFirstAnnotation(GenericAnnotationType.EXTRESREF);
+			if ( ga != null ) {
 				writer.writeAttributeString("okp:itsExternalResourceRef",
-					ann.getString(GenericAnnotationType.EXTRESREF_IRI));
+					ga.getString(GenericAnnotationType.EXTRESREF_IRI));
 			}
 		}
 
@@ -497,7 +498,7 @@ public class XLIFFWriter implements IFilterWriter {
 		writer.writeAttributeString("xml:lang", srcLoc.toBCP47());
 		// Write full source content (always without segments markers
 		writer.writeRawXML(xliffCont.toSegmentedString(tc, 0, escapeGt, false, placeholderMode));
-		GenericAnnotations srcStandoff = xliffCont.getStandoff();
+		List<GenericAnnotations> srcStandoff = xliffCont.getStandoff();
 		writer.writeEndElementLineBreak(); // source
 		// Write segmented source (with markers) if needed
 		if ( tc.hasBeenSegmented() ) {
@@ -509,7 +510,7 @@ public class XLIFFWriter implements IFilterWriter {
 
 		//--- Write the target
 		
-		GenericAnnotations trgStandoff = null;
+		List<GenericAnnotations> trgStandoff = null;
 		if ( trgLoc != null ) {
 			// At this point tc contains the source
 			// Do we have an available target to use instead?
@@ -749,35 +750,37 @@ public class XLIFFWriter implements IFilterWriter {
 		writeTextUnit(tu, null);
 	}
 
-	private void writeStandoffLQI (GenericAnnotations anns) {
-		writer.writeStartElement("its:locQualityIssues");
-		writer.writeAttributeString("xml:id", anns.getData());
-		writer.writeLineBreak();
-		for ( GenericAnnotation ann : anns.getAnnotations(GenericAnnotationType.LQI) ) {
-			writer.writeStartElement("its:locQualityIssue");
-			String strVal = ann.getString(GenericAnnotationType.LQI_COMMENT);
-			if ( strVal != null ) {
-				writer.writeAttributeString("locQualityIssueComment", strVal);
-			}
-			Boolean booVal = ann.getBoolean(GenericAnnotationType.LQI_ENABLED);
-			if (( booVal != null ) && !booVal ) {
-				writer.writeAttributeString("locQualityIssueEnabled", "no");
-			}
-			strVal = ann.getString(GenericAnnotationType.LQI_PROFILEREF);
-			if ( strVal != null ) {
-				writer.writeAttributeString("locQualityIssueProfileRef", strVal);
-			}
-			Double dblVal = ann.getDouble(GenericAnnotationType.LQI_SEVERITY);
-			if ( dblVal != null ) {
-				writer.writeAttributeString("locQualityIssueSeverity", Util.formatDouble(dblVal));
-			}
-			strVal = ann.getString(GenericAnnotationType.LQI_TYPE);
-			if ( strVal != null ) {
-				writer.writeAttributeString("locQualityIssueType", strVal);
+	private void writeStandoffLQI (List<GenericAnnotations> list) {
+		for ( GenericAnnotations anns : list ) {
+			writer.writeStartElement("its:locQualityIssues");
+			writer.writeAttributeString("xml:id", anns.getData());
+			writer.writeLineBreak();
+			for ( GenericAnnotation ann : anns.getAnnotations(GenericAnnotationType.LQI) ) {
+				writer.writeStartElement("its:locQualityIssue");
+				String strVal = ann.getString(GenericAnnotationType.LQI_COMMENT);
+				if ( strVal != null ) {
+					writer.writeAttributeString("locQualityIssueComment", strVal);
+				}
+				Boolean booVal = ann.getBoolean(GenericAnnotationType.LQI_ENABLED);
+				if (( booVal != null ) && !booVal ) {
+					writer.writeAttributeString("locQualityIssueEnabled", "no");
+				}
+				strVal = ann.getString(GenericAnnotationType.LQI_PROFILEREF);
+				if ( strVal != null ) {
+					writer.writeAttributeString("locQualityIssueProfileRef", strVal);
+				}
+				Double dblVal = ann.getDouble(GenericAnnotationType.LQI_SEVERITY);
+				if ( dblVal != null ) {
+					writer.writeAttributeString("locQualityIssueSeverity", Util.formatDouble(dblVal));
+				}
+				strVal = ann.getString(GenericAnnotationType.LQI_TYPE);
+				if ( strVal != null ) {
+					writer.writeAttributeString("locQualityIssueType", strVal);
+				}
+				writer.writeEndElementLineBreak();
 			}
 			writer.writeEndElementLineBreak();
 		}
-		writer.writeEndElementLineBreak(); // 
 	}
 		
 }

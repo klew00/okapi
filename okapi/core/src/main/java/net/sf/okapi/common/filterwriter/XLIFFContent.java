@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2012 by the Okapi Framework contributors
+  Copyright (C) 2008-2013 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -21,6 +21,7 @@
 package net.sf.okapi.common.filterwriter;
 
 import java.nio.charset.CharsetEncoder;
+import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.okapi.common.IdGenerator;
@@ -49,7 +50,7 @@ public class XLIFFContent {
 	private List<Code> codes;
 	private XLIFFContent innerContent;
 	private CharsetEncoder chsEnc;
-	private GenericAnnotations standoff;
+	private List<GenericAnnotations> standoff;
 	private IdGenerator idGen;
 	
 	/**
@@ -138,14 +139,7 @@ public class XLIFFContent {
 					tmp.append(code.toString());
 				}
 				else {
-					if ( code.hasAnnotation("protected") ) {
-						tmp.append("<mrk mtype=\"protected\">");
-					}
-					else if ( code.hasAnnotation(GenericAnnotationType.GENERIC) ) { // Temporary code
-						tmp.append("<mrk mtype=\"x-its\"");
-						outputITSAttributes((GenericAnnotations)code.getAnnotation(GenericAnnotationType.GENERIC), quoteMode, escapeGT, tmp);
-						tmp.append(">");
-					}
+					// Output the code (if it's not a marker-only one)
 					if ( !code.getType().equals(GenericAnnotationType.ANNOTATION_ONLY_MARKER) ) {
 						if ( gMode ) {
 							tmp.append(String.format("<g id=\"%d\">", code.getId()));
@@ -156,6 +150,16 @@ public class XLIFFContent {
 							tmp.append("</bpt>");
 						}
 					}
+					// Then, if needed, output the marker element
+					// (Markers linked to original codes have the marker inside the spanned content) 
+					if ( code.hasAnnotation("protected") ) {
+						tmp.append("<mrk mtype=\"protected\">");
+					}
+					else if ( code.hasAnnotation(GenericAnnotationType.GENERIC) ) {
+						tmp.append("<mrk mtype=\"x-its\"");
+						outputITSAttributes((GenericAnnotations)code.getAnnotation(GenericAnnotationType.GENERIC), quoteMode, escapeGT, tmp);
+						tmp.append(">");
+					}
 				}
 				break;
 			case TextFragment.MARKER_CLOSING:
@@ -165,6 +169,14 @@ public class XLIFFContent {
 					tmp.append(code.toString());
 				}
 				else {
+					// Close the marker, if needed
+					if ( code.hasAnnotation(GenericAnnotationType.GENERIC) ) {
+						tmp.append("</mrk>");
+					}
+					else if ( code.hasAnnotation("protected") ) {
+						tmp.append("</mrk>");
+					}
+					// Then close the code
 					if ( !code.getType().equals(GenericAnnotationType.ANNOTATION_ONLY_MARKER) ) {
 						if ( gMode ) {
 							tmp.append("</g>");
@@ -174,12 +186,6 @@ public class XLIFFContent {
 							tmp.append(Util.escapeToXML(code.toString(), quoteMode, escapeGT, chsEnc));
 							tmp.append("</ept>");
 						}
-					}
-					if ( code.hasAnnotation(GenericAnnotationType.GENERIC) ) { // Temporary code
-						tmp.append("</mrk>");
-					}
-					else if ( code.hasAnnotation("protected") ) {
-						tmp.append("</mrk>");
 					}
 				}
 				break;
@@ -325,11 +331,11 @@ public class XLIFFContent {
 
 	/**
 	 * Gets the standoff information for a possible list of annotations.
-	 * @return null if there are no standoff markup to generate, or a {@link GenericAnnotations} object with the
-	 * list of the annotation to put in the standoff element. The data of the object is the id that is used
+	 * @return null if there are no standoff markup to generate, or a list of {@link GenericAnnotations} objects.
+	 * The data of each annotation set is the id that is used
 	 * in the local markup to point to this standoff markup.
 	 */
-	public GenericAnnotations getStandoff () {
+	public List<GenericAnnotations> getStandoff () {
 		return standoff;
 	}
 	
@@ -401,9 +407,11 @@ public class XLIFFContent {
 			if ( idGen == null ) idGen =new IdGenerator(null);
 			String refId = idGen.createId("lqi");
 			output.append(" "+ITS_PREFIX+"locQualityIssuesRef=\"#"+refId+"\"");
-			standoff = new GenericAnnotations();
-			standoff.setData(refId);
-			standoff.addAll(list);
+			if ( standoff == null ) standoff = new ArrayList<GenericAnnotations>();
+			GenericAnnotations newSet = new GenericAnnotations();
+			standoff.add(newSet);
+			newSet.setData(refId);
+			newSet.addAll(list);
 		}
 	}
 	

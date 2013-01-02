@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009-2012 by the Okapi Framework contributors
+  Copyright (C) 2009-2013 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -23,6 +23,7 @@ package net.sf.okapi.common.filterwriter;
 import net.sf.okapi.common.annotation.GenericAnnotation;
 import net.sf.okapi.common.annotation.GenericAnnotationType;
 import net.sf.okapi.common.annotation.GenericAnnotations;
+import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 
@@ -122,6 +123,50 @@ public class XLIFFContentTest {
 			+ " its:termConfidence=\"0.5\" its:termInfoRef=\"myUri\""
 			+ " its:locQualityIssueComment=\"blah\" its:locQualityIssueSeverity=\"98.5\" its:locQualityIssueType=\"grammar\""
 			+ ">the span</mrk> after.",
+			fmt.setContent(tf).toString(true));
+	}
+
+	@Test
+	public void testmultipleLQI () {
+		TextFragment tf = new TextFragment("Span 1 Span 2");
+		//                                  0123456789012
+		// First LQI
+		GenericAnnotations anns = new GenericAnnotations();
+		anns.add(new GenericAnnotation(GenericAnnotationType.LQI,
+			GenericAnnotationType.LQI_COMMENT, "comment-1a"));
+		anns.add(new GenericAnnotation(GenericAnnotationType.LQI,
+			GenericAnnotationType.LQI_COMMENT, "comment-1b"));
+		tf.annotate(0, 6, GenericAnnotationType.GENERIC, anns);
+		// second LQI
+		anns = new GenericAnnotations();
+		anns.add(new GenericAnnotation(GenericAnnotationType.LQI,
+			GenericAnnotationType.LQI_COMMENT, "comment-2a"));
+		anns.add(new GenericAnnotation(GenericAnnotationType.LQI,
+			GenericAnnotationType.LQI_COMMENT, "comment-2b"));
+		tf.annotate(11, 17, GenericAnnotationType.GENERIC, anns); // +4 is for first marker
+		
+		assertEquals("<mrk mtype=\"x-its\" its:locQualityIssuesRef=\"#lqi1\">Span 1</mrk> "
+			+ "<mrk mtype=\"x-its\" its:locQualityIssuesRef=\"#lqi2\">Span 2</mrk>",
+			fmt.setContent(tf).toString(true));
+	}
+
+	@Test
+	public void testAnnotationOnOriginalCode () {
+		// Original text is with an ITS data category
+		TextFragment tf = new TextFragment("Before ");
+		Code start = tf.append(TagType.OPENING, "span", "<its:span allowedCharacters='[a-z]'>");
+		tf.append("the span");
+		Code end = tf.append(TagType.CLOSING, "span", "</its:span>");
+		tf.append(" after.");
+		// And we have a corresponding annotation
+		GenericAnnotations anns = new GenericAnnotations(
+			new GenericAnnotation(GenericAnnotationType.ALLOWEDCHARS,
+				GenericAnnotationType.ALLOWEDCHARS_PATTERN, "[a-z]"));
+		GenericAnnotations.addAnnotations(start, anns);
+//TODO: We have to find a better way to attach annotation on span		
+		GenericAnnotations.addAnnotations(end, anns);
+		// Output
+		assertEquals("Before <g id=\"1\"><mrk mtype=\"x-its\" its:allowedCharacters=\"[a-z]\">the span</mrk></g> after.",
 			fmt.setContent(tf).toString(true));
 	}
 	

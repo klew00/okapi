@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2010-2012 by the Okapi Framework contributors
+  Copyright (C) 2010-2013 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -172,6 +172,67 @@ public class XLIFFWriterTest {
 			+ "</body>\n</file>\n</xliff>\n", result);
 	}
 
+	@Test
+	public void testmultipleLQI ()
+		throws IOException
+	{
+		writer.create(root+"out.xlf", null, locEN, locFR, null, "original.ext", null);
+		writer.writeStartFile(null, null, null);
+		ITextUnit tu = new TextUnit("tu1");
+		
+		TextFragment tf = tu.getSource().getFirstSegment().getContent();
+		tf.setCodedText("Span 1 Span 2");
+		//               0123456789012
+		// First LQI
+		GenericAnnotations anns = new GenericAnnotations();
+		anns.add(new GenericAnnotation(GenericAnnotationType.LQI,
+			GenericAnnotationType.LQI_COMMENT, "comment-1a"));
+		anns.add(new GenericAnnotation(GenericAnnotationType.LQI,
+			GenericAnnotationType.LQI_COMMENT, "comment-1b"));
+		tf.annotate(0, 6, GenericAnnotationType.GENERIC, anns);
+		// second LQI
+		anns = new GenericAnnotations();
+		anns.add(new GenericAnnotation(GenericAnnotationType.LQI,
+			GenericAnnotationType.LQI_COMMENT, "comment-2a"));
+		anns.add(new GenericAnnotation(GenericAnnotationType.LQI,
+			GenericAnnotationType.LQI_COMMENT, "comment-2b"));
+		tf.annotate(11, 17, GenericAnnotationType.GENERIC, anns); // +4 is for first marker
+
+		//This is done by default: tu.createTarget(locFR, false, IResource.COPY_ALL);
+
+		writer.writeTextUnit(tu);
+		writer.writeEndFile();
+		writer.close();
+		
+		String result = readFile(root+"out.xlf");
+		assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+			+ "<xliff version=\"1.2\" xmlns=\"urn:oasis:names:tc:xliff:document:1.2\" xmlns:okp=\"okapi-framework:xliff-extensions\" xmlns:its=\"http://www.w3.org/2005/11/its\">\n"
+			+ "<file original=\"unknown\" source-language=\"en\" target-language=\"fr\" datatype=\"x-undefined\">\n"
+			+ "<body>\n<trans-unit id=\"tu1\">\n"
+			+ "<source xml:lang=\"en\"><mrk mtype=\"x-its\" its:locQualityIssuesRef=\"#lqi1\">Span 1</mrk> "
+			+ "<mrk mtype=\"x-its\" its:locQualityIssuesRef=\"#lqi2\">Span 2</mrk></source>\n"
+			+ "<target xml:lang=\"fr\"><mrk mtype=\"x-its\" its:locQualityIssuesRef=\"#lqi3\">Span 1</mrk> "
+			+ "<mrk mtype=\"x-its\" its:locQualityIssuesRef=\"#lqi4\">Span 2</mrk></target>\n"
+			+ "<its:locQualityIssues xml:id=\"lqi1\">\n"
+			+ "<its:locQualityIssue locQualityIssueComment=\"comment-1a\"></its:locQualityIssue>\n"
+			+ "<its:locQualityIssue locQualityIssueComment=\"comment-1b\"></its:locQualityIssue>\n"
+			+ "</its:locQualityIssues>\n"
+			+ "<its:locQualityIssues xml:id=\"lqi2\">\n"
+			+ "<its:locQualityIssue locQualityIssueComment=\"comment-2a\"></its:locQualityIssue>\n"
+			+ "<its:locQualityIssue locQualityIssueComment=\"comment-2b\"></its:locQualityIssue>\n"
+			+ "</its:locQualityIssues>\n"
+			+ "<its:locQualityIssues xml:id=\"lqi3\">\n"
+			+ "<its:locQualityIssue locQualityIssueComment=\"comment-1a\"></its:locQualityIssue>\n"
+			+ "<its:locQualityIssue locQualityIssueComment=\"comment-1b\"></its:locQualityIssue>\n"
+			+ "</its:locQualityIssues>\n"
+			+ "<its:locQualityIssues xml:id=\"lqi4\">\n"
+			+ "<its:locQualityIssue locQualityIssueComment=\"comment-2a\"></its:locQualityIssue>\n"
+			+ "<its:locQualityIssue locQualityIssueComment=\"comment-2b\"></its:locQualityIssue>\n"
+			+ "</its:locQualityIssues>\n"
+			+ "</trans-unit>\n"
+			+ "</body>\n</file>\n</xliff>\n", result);
+	}
+	
 	@Test
 	public void testTextWithDefaultCodes ()
 		throws IOException

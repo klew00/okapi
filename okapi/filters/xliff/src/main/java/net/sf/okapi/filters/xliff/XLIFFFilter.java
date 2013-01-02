@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2012 by the Okapi Framework contributors
+  Copyright (C) 2008-2013 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -691,8 +691,9 @@ public class XLIFFFilter implements IFilter {
 				}
 			}
 
-			// ITS Storage size (with XLIFF maxbytes)
-			tmp = reader.getAttributeValue(null, "maxbytes");
+			//tmp = reader.getAttributeValue(null, "maxbytes");
+			// ITS Storage size
+			tmp = reader.getAttributeValue(XLIFFWriter.NS_ITS20, "storageSize");
 			if ( tmp != null ) { // Get encoding info
 				String enc = reader.getAttributeValue(XLIFFWriter.NS_ITS20, "storageEncoding");
 				if ( enc == null ) enc = "UTF-8";
@@ -709,12 +710,18 @@ public class XLIFFFilter implements IFilter {
 				GenericAnnotation.addAnnotation(tu, new GenericAnnotation(GenericAnnotationType.ALLOWEDCHARS,
 					GenericAnnotationType.ALLOWEDCHARS_PATTERN, tmp));
 			}
-			
 			// ITS Domain
 			tmp = reader.getAttributeValue(XLIFFWriter.NS_XLIFFOKAPI, "istDomain");
 			if ( tmp != null ) {
 				GenericAnnotation.addAnnotation(tu, new GenericAnnotation(GenericAnnotationType.DOMAIN,
 					GenericAnnotationType.DOMAIN_LIST, tmp)
+				);
+			}
+			// External Resoure Reference
+			tmp = reader.getAttributeValue(XLIFFWriter.NS_XLIFFOKAPI, "itsExternalResourceRef");
+			if ( tmp != null ) {
+				GenericAnnotation.addAnnotation(tu, new GenericAnnotation(GenericAnnotationType.EXTRESREF,
+					GenericAnnotationType.EXTRESREF_IRI, tmp)
 				);
 			}
 			

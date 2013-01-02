@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2012 by the Okapi Framework contributors
+  Copyright (C) 2008-2013 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -119,36 +119,44 @@ public abstract class ITSFilter implements IFilter {
 		variables = map;
 	}
 
+	@Override
 	public void cancel () {
 		canceled = true;
 	}
 
+	@Override
 	public void close () {
 		if (input != null) {
 			input.close();
 		}
 	}
 
+	@Override
 	public ISkeletonWriter createSkeletonWriter () {
 		return new GenericSkeletonWriter();
 	}
 
+	@Override
 	public IFilterWriter createFilterWriter () {
 		return new GenericFilterWriter(createSkeletonWriter(), getEncoderManager());
 	}
 
+	@Override
 	public String getMimeType () {
 		return mimeType;
 	}
 
+	@Override
 	public IParameters getParameters () {
 		return params;
 	}
 
+	@Override
 	public boolean hasNext () {
 		return (queue != null);
 	}
 
+	@Override
 	public Event next () {
 		if ( canceled ) {
 			queue = null;
@@ -173,6 +181,7 @@ public abstract class ITSFilter implements IFilter {
 		}
 	}
 
+	@Override
 	public void open (RawDocument input) {
 		open(input, true);
 	}
@@ -182,6 +191,7 @@ public abstract class ITSFilter implements IFilter {
 		this.fcMapper = fcMapper;
 	}
 
+	@Override
 	public void setParameters (IParameters params) {
 		this.params = (Parameters)params;
 	}
@@ -192,6 +202,7 @@ public abstract class ITSFilter implements IFilter {
 	
 	abstract protected void createStartDocumentSkeleton (StartDocument startDoc);
 
+	@Override
 	public void open (RawDocument input,
 		boolean generateSkeleton)
 	{
@@ -490,7 +501,11 @@ public abstract class ITSFilter implements IFilter {
 		Code code = frag.append((node.hasChildNodes() ? TagType.OPENING : TagType.PLACEHOLDER),
 			node.getLocalName(), tmp.toString());
 		code.setReferenceFlag(id!=null); // Set reference flag if we created TU(s)
-		
+		// Attach ITS annotation if needed
+		attachAnnotations(code);
+	}
+
+	private void attachAnnotations (Code code) {
 		// Map ITS annotations only if requested
 		if ( !params.mapAnnotations ) return;
 		
@@ -505,8 +520,13 @@ public abstract class ITSFilter implements IFilter {
 		if ( anns != null ) {
 			GenericAnnotations.addAnnotations(code, anns);
 		}
+		// Localization Quality Issues
+		anns = trav.getLocQualityIssueAnnotation(null);
+		if ( anns != null ) {
+			GenericAnnotations.addAnnotations(code, anns);
+		}
 	}
-
+	
 	private void applyCodeFinder (TextFragment tf) {
 		// Find the inline codes
 		params.codeFinder.process(tf);
@@ -631,7 +651,8 @@ public abstract class ITSFilter implements IFilter {
 					return addTextUnit(node, true);
 				}
 				else { // Within text
-					frag.append(TagType.CLOSING, node.getLocalName(), buildEndTag(node));
+					Code code = frag.append(TagType.CLOSING, node.getLocalName(), buildEndTag(node));
+					attachAnnotations(code);
 				}
 			}
 		}
