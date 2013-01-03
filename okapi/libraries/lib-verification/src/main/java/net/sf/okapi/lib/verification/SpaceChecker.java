@@ -20,14 +20,40 @@
 
 package net.sf.okapi.lib.verification;
 
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.Code;
+import net.sf.okapi.common.resource.ISegments;
+import net.sf.okapi.common.resource.ITextUnit;
+import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextFragment;
 
-class SpaceChecker {
+public class SpaceChecker {
+
+	/**
+	 * Checks and fixes white spaces for a given text unit.
+	 * The text unit is passed as a parameter is modified.
+	 * @param tu original text unit
+	 * @param trgLoc target locale to update
+	 */
+	public void checkUnitSpacing(ITextUnit tu, LocaleId trgLoc) {
+
+		if (!tu.isEmpty()) {
+			ISegments srcSegs = tu.getSourceSegments();
+			for (Segment srcSeg : srcSegs) {
+				Segment trgSeg = tu.getTargetSegment(trgLoc, srcSeg.getId(), false);
+
+				// Skip non-translatable parts
+				if (trgSeg != null) {
+					checkSpaces(srcSeg.text, trgSeg.text);
+				}
+			}
+		}
+
+	}
 
 	/**
 	 * Checks and fixes white spaces for a given text fragment.
-	 * The target fragment passed as a parameter is modified
+	 * The target fragment passed as a parameter is modified.
 	 * @param srcFrag original fragment
 	 * @param trgFrag the fragment to fix
 	 */
