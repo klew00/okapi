@@ -27,6 +27,7 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -517,7 +518,8 @@ public final class FileUtil {
 
 	/**
 	 * Return a path to a locale based resource using the standard java property resource resolution. Works
-	 * with any kind of files e.g., segmenter_en_US.srx or content_fr_FR.html 
+	 * with any kind of files e.g., segmenter_en_US.srx or content_fr_FR.html
+	 * <p><b>WARNING: Assumes default classLoader only!!</b> 
 	 * @param baseName base name of the resource
 	 * @param extension resource file extension
 	 * @param locale locale of the resource we are looking for
@@ -525,7 +527,6 @@ public final class FileUtil {
 	 */
 	public static String getLocaleBasedFile(String baseName, final String extension, LocaleId locale) {
 		ResourceBundle.Control control = new ResourceBundle.Control() {
-
 			private String resourceFound = null;
 
 			@Override
@@ -534,13 +535,15 @@ public final class FileUtil {
 			}
 
 			@Override
-			public ResourceBundle newBundle(String baseName, Locale locale, 	String format, ClassLoader loader, boolean reload)
+			public ResourceBundle newBundle(String baseName, Locale locale, 
+							String format, ClassLoader loader, boolean reload)
 					throws IllegalAccessException, InstantiationException,	IOException {
 				String bundleName = toBundleName(baseName, locale);
 				String resourceName = toResourceName(bundleName, format);
 
-				if (loader.getResource(resourceName) != null) {
-					resourceFound = resourceName;
+				URL r = loader.getResource(resourceName);
+				if (r != null) {
+					resourceFound = r.getPath();					
 					return new ResourceBundle() {
 
 						@Override
@@ -562,6 +565,7 @@ public final class FileUtil {
 				return resourceFound;
 			}
 		};
+		ResourceBundle.clearCache();
 		ResourceBundle.getBundle(baseName, locale.toJavaLocale(), control);
 		return control.toString();
 	}
