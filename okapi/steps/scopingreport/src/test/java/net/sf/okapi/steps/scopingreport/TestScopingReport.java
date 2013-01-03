@@ -458,7 +458,7 @@ public class TestScopingReport {
 		testPath(outputFilePath);
 		
 		FileCompare fc = new FileCompare();		
-		assertTrue(fc.filesExactlyTheSame(outputFilePath, goldFilePath));
+		assertTrue(fc.compareFilesPerLines(outputFilePath, goldFilePath, "ISO-8859-1"));
 		
 	}	
 	
@@ -570,7 +570,7 @@ public class TestScopingReport {
 		testPath(outputFilePath);
 		
 		FileCompare fc = new FileCompare();		
-		assertTrue(fc.filesExactlyTheSame(outputFilePath, goldFilePath));		
+		assertTrue(fc.compareFilesPerLines(outputFilePath, goldFilePath, "ISO-8859-1"));		
 	}
 	
 	@Test
@@ -699,7 +699,7 @@ public class TestScopingReport {
 		testPath(outputFilePath);
 		
 		FileCompare fc = new FileCompare();		
-		assertTrue(fc.filesExactlyTheSame(outputFilePath, goldFilePath));		
+		assertTrue(fc.compareFilesPerLines(outputFilePath, goldFilePath, "ISO-8859-1"));		
 	}
 }
 

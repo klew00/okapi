@@ -50,6 +50,7 @@ import java.nio.channels.WritableByteChannel;
 import java.nio.charset.CharacterCodingException;
 import java.nio.charset.CharsetEncoder;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Pattern;
 
@@ -1542,7 +1543,7 @@ public final class Util {
 	 */
 	public static String formatDouble (Double value) {
 		if ( value == null ) return "";
-		String tmp = String.format("%f", value);
+		String tmp = String.format(Locale.ENGLISH, "%f", value);
 		// Remove trailing zeros
 		while (( tmp.length() > 1 ) && ( tmp.charAt(tmp.length()-1) == '0' )) {
 			tmp = tmp.substring(0, tmp.length()-1);
