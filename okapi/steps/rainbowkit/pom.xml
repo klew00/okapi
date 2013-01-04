@@ -56,7 +56,6 @@
 		<dependency>
 			<groupId>net.sf.okapi.lib</groupId>
 			<artifactId>okapi-lib-xliff</artifactId>
-			<version>0.19-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>net.sf.okapi.filters</groupId>

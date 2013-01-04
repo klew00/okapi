@@ -9,9 +9,7 @@
 		<relativePath>superpom/pom.xml</relativePath>
 	</parent>
 
-	<groupId>net.sf.okapi</groupId>
 	<artifactId>build-okapi-root</artifactId>
-	<version>0.20-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>Okapi Build Root</name>
 	<url>http://code.google.com/p/okapi</url>

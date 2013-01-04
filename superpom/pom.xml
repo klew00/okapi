@@ -36,38 +36,122 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+		<org.slf4j.version>1.7.2</org.slf4j.version>
+		<org.apache.axis.version>1.4</org.apache.axis.version>
+		<org.apache.httpcomponents.version>4.2.1</org.apache.httpcomponents.version>
+		<org.eclipse.swt.version>4.2</org.eclipse.swt.version>
+
+		<org.jboss.weld.version>1.0.1-Final</org.jboss.weld.version>
+		<org.jboss.weld.cdi.version>1.0-SP1</org.jboss.weld.cdi.version>
+		<org.jboss.weld.logging.version>1.0.0-CR1-SP1</org.jboss.weld.logging.version>
+		<org.jboss.weld.logger.version>1.0.0-CR2</org.jboss.weld.logger.version>
+		<org.jboss.resteasy.version>2.3.4.Final</org.jboss.resteasy.version>
+		<org.codehaus.jackson.version>1.5.0</org.codehaus.jackson.version>
+
+		<!-- Kind of weird, there is a org.jboss.weld.cdi.version with the same value -->
+		<javax.enterprise.cdi.version>1.0-SP1</javax.enterprise.cdi.version>
+
+		<!-- was inconsistent, keeping it, but should be tested changed to *.version -->
+		<org.jboss.resteasy.versionOld>2.0-beta-2</org.jboss.resteasy.versionOld>
+		<org.codehaus.jackson.versionOld>1.4.3</org.codehaus.jackson.versionOld>
+		<org.slf4j.versionOld>1.5.10</org.slf4j.versionOld>
+
 	</properties>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency><groupId>axis</groupId>                        <artifactId>axis-wsdl4j</artifactId>                 <version>1.5.1</version></dependency>
+			<dependency><groupId>ch.qos.cal10n</groupId>               <artifactId>cal10n-api</artifactId>                  <version>0.7.2</version></dependency>
+			<dependency><groupId>com.googlecode.json-simple</groupId>  <artifactId>json-simple</artifactId>                 <version>1.1</version></dependency>
+			<dependency><groupId>com.h2database</groupId>              <artifactId>h2</artifactId>                          <version>1.3.158</version></dependency>
+			<dependency><groupId>com.ibm.icu</groupId>                 <artifactId>icu4j</artifactId>                       <version>4.8.1</version></dependency>
+			<dependency><groupId>com.thaiopensource</groupId>          <artifactId>jing</artifactId>                        <version>20091111</version></dependency>
+			<dependency><groupId>commons-discovery</groupId>           <artifactId>commons-discovery</artifactId>           <version>0.4</version></dependency>
+			<dependency><groupId>commons-io</groupId>                  <artifactId>commons-io</artifactId>                  <version>1.4</version></dependency>
+			<dependency><groupId>commons-lang</groupId>                <artifactId>commons-lang</artifactId>                <version>2.6</version></dependency>
+			<dependency><groupId>commons-logging</groupId>             <artifactId>commons-logging</artifactId>             <version>1.1.1</version></dependency>
+			<dependency><groupId>dtdparser</groupId>                   <artifactId>dtdparser</artifactId>                   <version>1.21</version></dependency>
+			<dependency><groupId>javax.enterprise</groupId>            <artifactId>cdi-api</artifactId>                     <version>${javax.enterprise.cdi.version}</version></dependency>
+			<dependency><groupId>junit</groupId>                       <artifactId>junit</artifactId>                       <version>4.8.1</version></dependency>
+			<dependency><groupId>log4j</groupId>                       <artifactId>log4j</artifactId>                       <version>1.2.17</version></dependency>
+			<dependency><groupId>net.htmlparser.jericho</groupId>      <artifactId>jericho-html</artifactId>                <version>3.2</version></dependency>
+			<dependency><groupId>net.java.dev.javacc</groupId>         <artifactId>javacc</artifactId>                      <version>4.1</version></dependency>
+			<dependency><groupId>net.sf.jacob-project</groupId>        <artifactId>jacob</artifactId>                       <version>1.14.3</version></dependency>
+			<dependency><groupId>net.sf.okapi.lib</groupId>            <artifactId>okapi-lib-xliff</artifactId>             <version>0.19-SNAPSHOT</version></dependency>
+			<dependency><groupId>net.sf.trove4j</groupId>              <artifactId>trove4j</artifactId>                     <version>3.0.2</version></dependency>
+			<dependency><groupId>nu.validator.htmlparser</groupId>     <artifactId>htmlparser</artifactId>                  <version>1.4</version></dependency>
+			<dependency><groupId>org.apache.axis</groupId>             <artifactId>axis-jaxrpc</artifactId>                 <version>${org.apache.axis.version}</version></dependency>
+			<dependency><groupId>org.apache.axis</groupId>             <artifactId>axis-saaj</artifactId>                   <version>${org.apache.axis.version}</version></dependency>
+			<dependency><groupId>org.apache.axis</groupId>             <artifactId>axis</artifactId>                        <version>${org.apache.axis.version}</version></dependency>
+			<dependency><groupId>org.apache.commons</groupId>          <artifactId>commons-exec</artifactId>                <version>1.1</version></dependency>
+			<dependency><groupId>org.apache.httpcomponents</groupId>   <artifactId>httpclient</artifactId>                  <version>${org.apache.httpcomponents.version}</version></dependency>
+			<dependency><groupId>org.apache.httpcomponents</groupId>   <artifactId>httpcore</artifactId>                    <version>${org.apache.httpcomponents.version}</version></dependency>
+			<dependency><groupId>org.apache.httpcomponents</groupId>   <artifactId>httpmime</artifactId>                    <version>${org.apache.httpcomponents.version}</version></dependency>
+			<dependency><groupId>org.apache.lucene</groupId>           <artifactId>lucene-core</artifactId>                 <version>3.3.0</version></dependency>
+			<dependency><groupId>org.apache.poi</groupId>              <artifactId>poi-ooxml</artifactId>                   <version>3.6</version></dependency>
+			<dependency><groupId>org.codehaus.jackson</groupId>        <artifactId>jackson-core-asl</artifactId>            <version>${org.codehaus.jackson.version}</version></dependency>
+			<dependency><groupId>org.codehaus.jackson</groupId>        <artifactId>jackson-core-lgpl</artifactId>           <version>${org.codehaus.jackson.versionOld}</version></dependency>
+			<dependency><groupId>org.codehaus.jackson</groupId>        <artifactId>jackson-jaxrs</artifactId>               <version>${org.codehaus.jackson.version}</version></dependency>
+			<dependency><groupId>org.codehaus.jackson</groupId>        <artifactId>jackson-mapper-asl</artifactId>          <version>${org.codehaus.jackson.version}</version></dependency>
+			<dependency><groupId>org.codehaus.jackson</groupId>        <artifactId>jackson-mapper-lgpl</artifactId>         <version>${org.codehaus.jackson.versionOld}</version></dependency>
+			<dependency><groupId>org.codehaus.jackson</groupId>        <artifactId>jackson-xc</artifactId>                  <version>${org.codehaus.jackson.version}</version></dependency>
+			<dependency><groupId>org.codehaus.woodstox</groupId>       <artifactId>woodstox-core-lgpl</artifactId>          <version>4.1.1</version></dependency>
+			<dependency><groupId>org.eclipse.swt.cocoa</groupId>       <artifactId>macosx-x86_64</artifactId>               <version>${org.eclipse.swt.version}</version></dependency>
+			<dependency><groupId>org.eclipse.swt.cocoa</groupId>       <artifactId>macosx</artifactId>                      <version>${org.eclipse.swt.version}</version></dependency>
+			<dependency><groupId>org.eclipse.swt.gtk2.linux</groupId>  <artifactId>x86</artifactId>                         <version>${org.eclipse.swt.version}</version></dependency>
+			<dependency><groupId>org.eclipse.swt.gtk2.linux</groupId>  <artifactId>x86_64</artifactId>                      <version>${org.eclipse.swt.version}</version></dependency>
+			<dependency><groupId>org.eclipse.swt.win32.win32</groupId> <artifactId>x86</artifactId>                         <version>${org.eclipse.swt.version}</version></dependency>
+			<dependency><groupId>org.eclipse.swt.win32.win32</groupId> <artifactId>x86_64</artifactId>                      <version>${org.eclipse.swt.version}</version></dependency>
+			<dependency><groupId>org.jboss.resteasy</groupId>          <artifactId>resteasy-cdi</artifactId>                <version>${org.jboss.resteasy.versionOld}</version></dependency>
+			<dependency><groupId>org.jboss.resteasy</groupId>          <artifactId>resteasy-jackson-provider</artifactId>   <version>${org.jboss.resteasy.versionOld}</version></dependency>
+			<dependency><groupId>org.jboss.resteasy</groupId>          <artifactId>resteasy-jaxrs</artifactId>              <version>${org.jboss.resteasy.version}</version></dependency>
+			<dependency><groupId>org.jboss.resteasy</groupId>          <artifactId>resteasy-jettison-provider</artifactId>  <version>${org.jboss.resteasy.version}</version></dependency>
+			<dependency><groupId>org.jboss.resteasy</groupId>          <artifactId>resteasy-multipart-provider</artifactId> <version>${org.jboss.resteasy.version}</version></dependency>
+			<dependency><groupId>org.jboss.weld.servlet</groupId>      <artifactId>weld-servlet-int</artifactId>            <version>${org.jboss.weld.version}</version></dependency>
+			<dependency><groupId>org.jboss.weld</groupId>              <artifactId>weld-api</artifactId>                    <version>${org.jboss.weld.cdi.version}</version></dependency>
+			<dependency><groupId>org.jboss.weld</groupId>              <artifactId>weld-core</artifactId>                   <version>${org.jboss.weld.version}</version></dependency>
+			<dependency><groupId>org.jboss.weld</groupId>              <artifactId>weld-logger</artifactId>                 <version>${org.jboss.weld.logger.version}</version></dependency>
+			<dependency><groupId>org.jboss.weld</groupId>              <artifactId>weld-logging</artifactId>                <version>${org.jboss.weld.logging.version}</version></dependency>
+			<dependency><groupId>org.jboss.weld</groupId>              <artifactId>weld-spi</artifactId>                    <version>${org.jboss.weld.cdi.version}</version></dependency>
+			<dependency><groupId>org.mockito</groupId>                 <artifactId>mockito-core</artifactId>                <version>1.8.0</version></dependency>
+			<dependency><groupId>org.slf4j</groupId>                   <artifactId>slf4j-api</artifactId>                   <version>${org.slf4j.version}</version></dependency>
+			<dependency><groupId>org.slf4j</groupId>                   <artifactId>slf4j-jdk14</artifactId>                 <version>${org.slf4j.version}</version></dependency>
+			<dependency><groupId>org.slf4j</groupId>                   <artifactId>slf4j-log4j12</artifactId>               <version>${org.slf4j.version}</version></dependency>
+			<dependency><groupId>org.slf4j</groupId>                   <artifactId>slf4j-simple</artifactId>                <version>${org.slf4j.versionOld}</version></dependency>
+			<dependency><groupId>org.yaml</groupId>                    <artifactId>snakeyaml</artifactId>                   <version>1.10</version></dependency>
+			<dependency><groupId>xstream</groupId>                     <artifactId>xstream</artifactId>                     <version>1.2.2</version></dependency>
+		</dependencies>
+	</dependencyManagement>
 
 	<build>
 		<pluginManagement>
 			<plugins>
-				<!-- The following plugins do not have their version specified: -->
-				<plugin><groupId>org.apache.maven.plugins</groupId><artifactId>maven-clean-plugin</artifactId><version>2.5</version></plugin>
-				<plugin><groupId>org.apache.maven.plugins</groupId><artifactId>maven-deploy-plugin</artifactId><version>2.7</version></plugin>
-				<!-- explicit <plugin><groupId>org.apache.maven.plugins</groupId><artifactId>maven-deploy-plugin</artifactId><version>2.5</version></plugin> -->
-				<plugin><groupId>org.apache.maven.plugins</groupId><artifactId>maven-install-plugin</artifactId><version>2.4</version></plugin>
-				<plugin><groupId>org.apache.maven.plugins</groupId><artifactId>maven-resources-plugin</artifactId><version>2.6</version></plugin>
-				<plugin><groupId>org.apache.maven.plugins</groupId><artifactId>maven-site-plugin</artifactId><version>3.2</version></plugin>
-				<plugin><groupId>org.apache.maven.plugins</groupId><artifactId>maven-surefire-plugin</artifactId><version>2.13</version></plugin>
-				<plugin><groupId>org.apache.maven.plugins</groupId><artifactId>maven-war-plugin</artifactId><version>2.3</version></plugin>
-				<!-- explicit: <plugin><artifactId>maven-war-plugin</artifactId><version>2.1.1</version></plugin> -->
-
-				<!-- These were explicitely specified: -->
-				<plugin><groupId>org.apache.felix</groupId><artifactId>maven-bundle-plugin</artifactId><version>2.3.7</version></plugin>
-				<plugin><groupId>org.apache.maven.plugins</groupId><artifactId>maven-jar-plugin</artifactId><version>2.3.2</version></plugin>
-				<plugin><groupId>org.apache.maven.plugins</groupId><artifactId>maven-assembly-plugin</artifactId><version>2.3</version></plugin>
-				<plugin><groupId>org.apache.maven.plugins</groupId><artifactId>maven-eclipse-plugin</artifactId><version>2.8</version></plugin>
-				<plugin><groupId>org.apache.maven.plugins</groupId><artifactId>maven-shade-plugin</artifactId><version>1.4</version></plugin>
-
-				<plugin><groupId>org.codehaus.mojo</groupId><artifactId>tomcat-maven-plugin</artifactId><version>1.0</version></plugin>
-				<plugin><groupId>org.mortbay.jetty</groupId><artifactId>maven-jetty-plugin</artifactId><version>6.1.16</version></plugin>
-
-				<plugin><groupId>org.apache.maven.plugins</groupId><artifactId>maven-compiler-plugin</artifactId><version>2.3.2</version>
+				<plugin><groupId>org.apache.felix</groupId>         <artifactId>maven-bundle-plugin</artifactId>    <version>2.3.7</version></plugin>
+				<plugin><groupId>org.apache.maven.plugins</groupId> <artifactId>maven-assembly-plugin</artifactId>  <version>2.3</version></plugin>
+				<plugin><groupId>org.apache.maven.plugins</groupId> <artifactId>maven-clean-plugin</artifactId>     <version>2.5</version></plugin>
+				<plugin><groupId>org.apache.maven.plugins</groupId> <artifactId>maven-deploy-plugin</artifactId>    <version>2.7</version></plugin>
+				<plugin><groupId>org.apache.maven.plugins</groupId> <artifactId>maven-install-plugin</artifactId>   <version>2.4</version></plugin>
+				<plugin><groupId>org.apache.maven.plugins</groupId> <artifactId>maven-jar-plugin</artifactId>       <version>2.3.2</version></plugin>
+				<plugin><groupId>org.apache.maven.plugins</groupId> <artifactId>maven-resources-plugin</artifactId> <version>2.6</version></plugin>
+				<plugin><groupId>org.apache.maven.plugins</groupId> <artifactId>maven-shade-plugin</artifactId>     <version>1.4</version></plugin>
+				<plugin><groupId>org.apache.maven.plugins</groupId> <artifactId>maven-site-plugin</artifactId>      <version>3.2</version></plugin>
+				<plugin><groupId>org.apache.maven.plugins</groupId> <artifactId>maven-surefire-plugin</artifactId>  <version>2.13</version></plugin>
+				<plugin><groupId>org.apache.maven.plugins</groupId> <artifactId>maven-war-plugin</artifactId>       <version>2.3</version></plugin>
+				<plugin><groupId>org.codehaus.mojo</groupId>        <artifactId>tomcat-maven-plugin</artifactId>    <version>1.0</version></plugin>
+				<plugin><groupId>org.mortbay.jetty</groupId>        <artifactId>maven-jetty-plugin</artifactId>     <version>6.1.16</version></plugin>
+				<plugin><groupId>org.apache.maven.plugins</groupId> <artifactId>maven-eclipse-plugin</artifactId>   <version>2.8</version>
+					<configuration>
+						<wtpversion>2.0</wtpversion>
+					</configuration>
+				</plugin>
+				<plugin><groupId>org.apache.maven.plugins</groupId> <artifactId>maven-compiler-plugin</artifactId>  <version>2.3.2</version>
 					<configuration>
 					<source>1.6</source>
 					<target>1.6</target>
 					</configuration>
 				</plugin>
+
 			</plugins>
 		</pluginManagement>
 	</build>

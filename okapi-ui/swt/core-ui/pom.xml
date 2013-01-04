@@ -25,7 +25,6 @@
 				<dependency>
 					<groupId>org.eclipse.swt.win32.win32</groupId>
 					<artifactId>x86</artifactId>
-					<version>4.2</version>
 				</dependency>
 			</dependencies>
 		</profile>
@@ -41,7 +40,6 @@
 				<dependency>
 					<groupId>org.eclipse.swt.win32.win32</groupId>
 					<artifactId>x86_64</artifactId>
-					<version>4.2</version>
 				</dependency>
 			</dependencies>
 		</profile>
@@ -58,7 +56,6 @@
                 <dependency>
                     <groupId>org.eclipse.swt.cocoa</groupId>
                     <artifactId>macosx-x86_64</artifactId>
-                    <version>4.2</version>
                 </dependency>
             </dependencies>
         </profile>
@@ -74,7 +71,6 @@
                 <dependency>
                     <groupId>org.eclipse.swt.cocoa</groupId>
                     <artifactId>macosx</artifactId>
-                    <version>4.2</version>
                 </dependency>
             </dependencies>
         </profile>
@@ -90,7 +86,6 @@
                 <dependency>
                     <groupId>org.eclipse.swt.gtk2.linux</groupId>
                     <artifactId>x86</artifactId>
-                    <version>4.2</version>
                 </dependency>
             </dependencies>
         </profile>
@@ -106,7 +101,6 @@
                 <dependency>
                     <groupId>org.eclipse.swt.gtk2.linux</groupId>
                     <artifactId>x86_64</artifactId>
-                    <version>4.2</version>
                 </dependency>
             </dependencies>
         </profile>
@@ -121,7 +115,7 @@
         <dependency>
         	<groupId>net.sf.okapi.lib</groupId>
         	<artifactId>okapi-lib-extra</artifactId>
-        	<version>0.20-SNAPSHOT</version>
+        	<version>${project.version}</version>
         </dependency>
     </dependencies>
 

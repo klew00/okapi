@@ -18,7 +18,6 @@
         <dependency>
 			<groupId>net.htmlparser.jericho</groupId>
 			<artifactId>jericho-html</artifactId>
-			<version>3.2</version>
 		</dependency>        
     </dependencies>
 </project>
