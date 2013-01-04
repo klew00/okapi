@@ -51,16 +51,33 @@ public class GenericAnnotationsTest {
 	@Test
 	public void testConstructors () {
 		GenericAnnotations anns = new GenericAnnotations();
+		assertEquals(null, anns.getData());
 		assertFalse(anns.hasAnnotation("type1"));
 		
 		anns = new GenericAnnotations(new GenericAnnotation("type1"));
+		assertEquals(null, anns.getData());
 		assertTrue(anns.hasAnnotation("type1"));
 		String storage = anns.toString();
-		
 		anns = new GenericAnnotations(storage);
+		assertEquals(null, anns.getData());
 		assertTrue(anns.hasAnnotation("type1"));
 	}
 
+	@Test
+	public void testToFromString () {
+		GenericAnnotations anns1 = new GenericAnnotations(new GenericAnnotation("type1", "field1", "value1"));
+		anns1.add("type2-no-fields");
+		anns1.setData("dataText");
+		String storage = anns1.toString();
+		GenericAnnotations anns2 = new GenericAnnotations(storage);
+		assertEquals("dataText", anns2.getData());
+		assertEquals(2, anns2.getAllAnnotations().size());
+		GenericAnnotation ga = anns2.getFirstAnnotation("type1");
+		assertEquals("value1", ga.getString("field1"));
+		ga = anns2.getFirstAnnotation("type2-no-fields");
+		assertNotNull(ga);
+	}
+	
 	@Test
 	public void testSeveral () {
 		GenericAnnotations anns = new GenericAnnotations();

@@ -1004,6 +1004,39 @@ public class XMLFilterTest {
 	}
 
 	@Test
+	public void testLocQualityLocalOnCodes () {
+		String snippet = "<?xml version=\"1.0\"?>\n"
+			+ "<doc its:version=\"2.0\" xmlns:its=\"http://www.w3.org/2005/11/its\">"
+			+ "<its:rules version='2.0'>"
+			+ "<its:withinTextRule selector='//s' withinText='yes'/>"
+			+ "</its:rules>"
+			+ "<p its:locQualityIssueComment='issue-1'>text 1"
+			+ "<s its:allowedCharacters='[abc]' its:locQualityIssueComment='issue-2'>bad</s>"
+			+ " and "
+			+ "<s its:locQualityIssueComment='issue-3'>more</s>"
+			+ "</p></doc>";
+		ArrayList<Event> list = getEvents(snippet);
+		ITextUnit tu = FilterTestDriver.getTextUnit(list, 1);
+		assertNotNull(tu);
+		assertEquals("text 1<1>bad</1> and <2>more</2>",
+			fmt.setContent(tu.getSource().getFirstContent()).toString());
+		GenericAnnotations anns = tu.getSource().getAnnotation(GenericAnnotations.class);
+		List<GenericAnnotation> res = anns.getAnnotations(GenericAnnotationType.LQI);
+		assertEquals(3, res.size());
+		assertEquals("issue-1", res.get(0).getString(GenericAnnotationType.LQI_COMMENT));
+		assertEquals("issue-2", res.get(1).getString(GenericAnnotationType.LQI_COMMENT));
+		assertEquals(8, (int)res.get(1).getInteger(GenericAnnotationType.LQI_XSTART));
+		assertEquals(11, (int)res.get(1).getInteger(GenericAnnotationType.LQI_XEND));
+		assertEquals("issue-3", res.get(2).getString(GenericAnnotationType.LQI_COMMENT));
+		assertEquals(20, (int)res.get(2).getInteger(GenericAnnotationType.LQI_XSTART));
+		assertEquals(24, (int)res.get(2).getInteger(GenericAnnotationType.LQI_XEND));
+		// Check inline ones
+		anns = (GenericAnnotations)tu.getSource().getFirstContent().getCodes().get(0).getAnnotation(GenericAnnotationType.GENERIC);
+		assertNotNull(anns);
+		assertEquals("[abc]", anns.getFirstAnnotation(GenericAnnotationType.ALLOWEDCHARS).getString(GenericAnnotationType.ALLOWEDCHARS_PATTERN));
+	}
+
+	@Test
 	public void testTerms () {
 		String snippet = "<?xml version=\"1.0\"?>\n"
 			+ "<doc its:version=\"2.0\" xmlns:its=\"http://www.w3.org/2005/11/its\">"

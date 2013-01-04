@@ -20,6 +20,7 @@
 
 package net.sf.okapi.filters.its;
 
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -100,6 +101,7 @@ public abstract class ITSFilter implements IFilter {
 	private IEncoder cfEncoder;
 	private TermsAnnotation terms;
 	private Map<String, String> variables;
+	private LinkedHashMap<String, GenericAnnotations> inlineLQIs;
 
 	public ITSFilter (boolean isHTML5,
 		String mimeType)
@@ -278,13 +280,13 @@ public abstract class ITSFilter implements IFilter {
 	
 	private void process () {
 		Node node;
-		frag = null;
+		nullFragment();
 		skel = new GenericSkeleton();
 		
 		if ( context.size() > 0 ) {
 			// If we are within an element, reset the fragment to append to it
 			if ( context.peek().translate ) { // The stack is up-to-date already
-				frag = new TextFragment();
+				initFragment();
 			}
 		}
 		
@@ -502,10 +504,12 @@ public abstract class ITSFilter implements IFilter {
 			node.getLocalName(), tmp.toString());
 		code.setReferenceFlag(id!=null); // Set reference flag if we created TU(s)
 		// Attach ITS annotation if needed
-		attachAnnotations(code);
+		attachAnnotations(code, frag);
 	}
 
-	private void attachAnnotations (Code code) {
+	private void attachAnnotations (Code code,
+		TextFragment frag)
+	{
 		// Map ITS annotations only if requested
 		if ( !params.mapAnnotations ) return;
 		
@@ -520,10 +524,26 @@ public abstract class ITSFilter implements IFilter {
 		if ( anns != null ) {
 			GenericAnnotations.addAnnotations(code, anns);
 		}
+		
 		// Localization Quality Issues
 		anns = trav.getLocQualityIssueAnnotation(null);
-		if ( anns != null ) {
-			GenericAnnotations.addAnnotations(code, anns);
+		if ( anns == null ) return; // Done
+		// Else: inline LQI are converted to text container-level annotation with offsets 
+		if ( code.getTagType() == TagType.CLOSING ) {
+			// Set the ending for the annotations we close
+			anns = inlineLQIs.get(anns.getData());
+			for ( GenericAnnotation ann : anns ) {
+				// End position: frag length minus the last code length
+				ann.setInteger(GenericAnnotationType.LQI_XEND, frag.length()-2);
+			}
+		}
+		else { // Opening or place-holder
+			if ( inlineLQIs == null ) inlineLQIs = new LinkedHashMap<String, GenericAnnotations>(2);
+			for ( GenericAnnotation ann : anns ) {
+				// Start position: fragment length (== position just after the last code)
+				ann.setInteger(GenericAnnotationType.LQI_XSTART, frag.length());
+			}
+			inlineLQIs.put(anns.getData(), anns);
 		}
 	}
 	
@@ -643,7 +663,7 @@ public abstract class ITSFilter implements IFilter {
 				skel.add(buildEndTag(node));
 				if ( node.isSameNode(context.peek().node) ) context.pop();
 				if ( isContextTranslatable() ) { // We are after non-translatable withinText='no', check parent again.
-					frag = new TextFragment();
+					initFragment();
 				}
 			}
 			else { // Else we are within an extraction
@@ -652,7 +672,7 @@ public abstract class ITSFilter implements IFilter {
 				}
 				else { // Within text
 					Code code = frag.append(TagType.CLOSING, node.getLocalName(), buildEndTag(node));
-					attachAnnotations(code);
+					attachAnnotations(code, frag);
 				}
 			}
 		}
@@ -703,7 +723,7 @@ public abstract class ITSFilter implements IFilter {
 				if ( frag == null ) { // Not yet in extraction
 					addStartTagToSkeleton(node);
 					if ( extract() ) {
-						frag = new TextFragment();
+						initFragment();
 					}
 					if ( node.hasChildNodes() ) {
 						context.push(new ContextItem(node, trav));
@@ -715,7 +735,7 @@ public abstract class ITSFilter implements IFilter {
 					addStartTagToSkeleton(node);
 					// And create a new one
 					if ( extract() ) {
-						frag = new TextFragment();
+						initFragment();
 					}
 					if ( node.hasChildNodes() ) {
 						context.push(new ContextItem(node, trav));
@@ -891,6 +911,7 @@ public abstract class ITSFilter implements IFilter {
 			// Deal with inline codes if needed
 			if ( params.useCodeFinder ) {
 				applyCodeFinder(frag);
+//TODO: probably need to adjust the LQI annotations!				
 			}
 		
 			// Update the flag after the new codes
@@ -902,12 +923,12 @@ public abstract class ITSFilter implements IFilter {
 			if ( !frag.isEmpty() ) { // Nothing but white spaces
 				skel.add(frag.toText().replace("\n", (params.escapeLineBreak ? "&#10;" : lineBreak))); // Pass them as skeleton
 			}
-			frag = null;
+			nullFragment();
 			if ( popStack ) {
 				context.pop();
 				skel.add(buildEndTag(node));
 				if ( isContextTranslatable() ) {
-					frag = new TextFragment();
+					initFragment();
 				}
 			}
 			return false;
@@ -945,9 +966,16 @@ public abstract class ITSFilter implements IFilter {
 				GenericAnnotationType.ALLOWEDCHARS_PATTERN, context.peek().allowedChars)
 			);
 		}
-		// ITS Localization Quality Issue (on the source)
+		// ITS Localization Quality Issue
 		if ( context.peek().lqIssues != null ) {
 			GenericAnnotations.addAnnotations(tu.getSource(), context.peek().lqIssues);
+		}
+		// Attach also the inline LQI annotations at the text container level
+		// (more logical to have the inline ones after the parent level ones)
+		if ( inlineLQIs != null ) {
+			for ( GenericAnnotations anns : inlineLQIs.values() ) {
+				GenericAnnotations.addAnnotations(tu.getSource(), anns);
+			}
 		}
 		
 		// Set term info
@@ -990,12 +1018,27 @@ public abstract class ITSFilter implements IFilter {
 		}
 		tu.setSkeleton(skel);
 		queue.add(new Event(EventType.TEXT_UNIT, tu));
-		frag = null;
+		nullFragment();
 		if ( popStack && isContextTranslatable() ) {
-			frag = new TextFragment();
+			initFragment();
 		}
 		skel = new GenericSkeleton();
 		return true;
 	}
+	
+	/**
+	 * Initializes the frag global variable and its annotations.
+	 */
+	private void initFragment () {
+		frag = new TextFragment();
+		inlineLQIs = null;
+	}
 
+	/**
+	 * Nullifies the frag global variables and its annotations.
+	 */
+	private void nullFragment () {
+		frag = null;
+		inlineLQIs = null;
+	}
 }

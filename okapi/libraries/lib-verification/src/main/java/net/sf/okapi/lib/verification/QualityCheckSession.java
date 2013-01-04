@@ -157,7 +157,7 @@ public class QualityCheckSession {
 	
 	public void resetDisabledIssues () {
 		for ( Issue issue : issues ) {
-			issue.enabled = true;
+			issue.setEnabled(true);
 		}
 		modified = true;
 	}
@@ -231,7 +231,7 @@ public class QualityCheckSession {
 		Iterator<Issue> iter = issues.iterator();
 		while ( iter.hasNext() ) {
 			Issue issue = iter.next();
-			if ( !issue.enabled ) {
+			if ( !issue.getEnabled() ) {
 				list.add(issue.getSignature());
 			}
 		}
@@ -250,9 +250,9 @@ public class QualityCheckSession {
 		Iterator<Issue> iter = issues.iterator();
 		while ( iter.hasNext() ) {
 			Issue issue = iter.next();
-			if ( issue.docURI.equals(docId) ) {
+			if ( issue.getDocumentURI().equals(docId) ) {
 				// Generate signature if the issue is disabled
-				if ( generateSigList && !issue.enabled ) {
+				if ( generateSigList && !issue.getEnabled() ) {
 					sigList.add(issue.getSignature());
 				}
 				// Remove issue
@@ -451,31 +451,31 @@ public class QualityCheckSession {
 			URI docId = null;
 			for ( Issue issue : issues ) {
 				// Skip disabled issues
-				if ( !issue.enabled ) continue;
+				if ( !issue.getEnabled() ) continue;
 				// Do we start a new input document?
-				if (( docId == null ) || !docId.equals(issue.docURI) ) {
+				if (( docId == null ) || !docId.equals(issue.getDocumentURI()) ) {
 					// Ruler only after first input document
 					if ( docId != null ) writer.writeRawXML("<hr />");
-					docId = issue.docURI;
+					docId = issue.getDocumentURI();
 					writer.writeElementString("p", "Input: "+docId.getPath());
 				}
 
-				String position = String.format("ID=%s", issue.tuId);
-				if ( issue.tuName != null ) {
-					position += (" ("+issue.tuName+")");
+				String position = String.format("ID=%s", issue.getTuId());
+				if ( issue.getTuName() != null ) {
+					position += (" ("+issue.getTuName()+")");
 				}
-				if ( issue.segId != null ) {
-					position += String.format(", segment=%s", issue.segId);
+				if ( issue.getSegId() != null ) {
+					position += String.format(", segment=%s", issue.getSegId());
 				}
 				writer.writeStartElement("p");
 				writer.writeString(position+":");
 				writer.writeRawXML("<br />");
-				writer.writeString(issue.message);
+				writer.writeString(issue.getMessage());
 				writer.writeEndElementLineBreak(); // p
 				writer.writeRawXML("<p class='s'>");
-				writer.writeRawXML("S: '"+highlight(issue.oriSource, issue.srcStart, issue.srcEnd)+"'");
+				writer.writeRawXML("S: '"+highlight(issue.getSource(), issue.getSourceStart(), issue.getSourceEnd())+"'");
 				writer.writeRawXML("<p><p class='t'>");
-				writer.writeRawXML("T: '"+highlight(issue.oriTarget, issue.trgStart, issue.trgEnd)+"'");
+				writer.writeRawXML("T: '"+highlight(issue.getTarget(), issue.getTargetStart(), issue.getTargetEnd())+"'");
 				writer.writeRawXML("</p>");
 				writer.writeLineBreak();
 
@@ -502,26 +502,26 @@ public class QualityCheckSession {
 			URI docId = null;
 			for ( Issue issue : issues ) {
 				// Skip disabled issues
-				if ( !issue.enabled ) continue;
+				if ( !issue.getEnabled() ) continue;
 				// Do we start a new input document?
-				if (( docId == null ) || !docId.equals(issue.docURI) ) {
+				if (( docId == null ) || !docId.equals(issue.getDocumentURI()) ) {
 					// Ruler only after first input document
-					docId = issue.docURI;
+					docId = issue.getDocumentURI();
 					writer.println(docId.getPath()+"\t\t\t");
 				}
 
-				String position = String.format("ID=%s", issue.tuId);
-				if ( issue.tuName != null ) {
-					position += (" ("+issue.tuName+")");
+				String position = String.format("ID=%s", issue.getTuId());
+				if ( issue.getTuName() != null ) {
+					position += (" ("+issue.getTuName()+")");
 				}
-				if ( issue.segId != null ) {
-					position += String.format(", segment=%s", issue.segId);
+				if ( issue.getSegId() != null ) {
+					position += String.format(", segment=%s", issue.getSegId());
 				}
 				// position<tab>message<tab>source<tab>target
 				writer.print(position+"\t");
-				writer.print(issue.message+"\t");
-				writer.print(escape(issue.oriSource)+"\t");
-				writer.println(escape(issue.oriTarget));
+				writer.print(issue.getMessage()+"\t");
+				writer.print(escape(issue.getSource())+"\t");
+				writer.println(escape(issue.getTarget()));
 
 			} // End of for issues
 		}
@@ -545,18 +545,18 @@ public class QualityCheckSession {
 			// Process the issues
 			for ( Issue issue : issues ) {
 				// Skip disabled issues
-				if ( !issue.enabled ) continue;
+				if ( !issue.getEnabled() ) continue;
 
 				writer.writeStartElement("issue");		writer.writeLineBreak();
-				writeIndentedElementString( writer, "input", issue.docURI.getPath());
-				writeIndentedElementString( writer, "tuName", issue.tuName);
-				writeIndentedElementString( writer, "tuId", issue.tuId);
-				writeIndentedElementString( writer, "segId", issue.segId);
-				writeIndentedElementString( writer, "severity", Integer.toString(issue.severity));
-				writeIndentedElementString( writer, "issueType", issue.issueType.toString());
-				writeIndentedElementString( writer, "message", issue.message);
-				writeIndentedElementStringHilite(writer,"source", issue.oriSource, issue.srcStart, issue.srcEnd );
-				writeIndentedElementStringHilite(writer,"target", issue.oriTarget, issue.trgStart, issue.trgEnd );
+				writeIndentedElementString( writer, "input", issue.getDocumentURI().getPath());
+				writeIndentedElementString( writer, "tuName", issue.getTuName());
+				writeIndentedElementString( writer, "tuId", issue.getTuId());
+				writeIndentedElementString( writer, "segId", issue.getSegId());
+				writeIndentedElementString( writer, "severity", Integer.toString(issue.getSeverity()));
+				writeIndentedElementString( writer, "issueType", issue.getIssueType().toString());
+				writeIndentedElementString( writer, "message", issue.getMessage());
+				writeIndentedElementStringHilite(writer,"source", issue.getSource(), issue.getSourceStart(), issue.getSourceEnd());
+				writeIndentedElementStringHilite(writer,"target", issue.getTarget(), issue.getTargetStart(), issue.getTargetEnd());
 
 				writer.writeEndElementLineBreak(); // issue
 			} // End of for issues

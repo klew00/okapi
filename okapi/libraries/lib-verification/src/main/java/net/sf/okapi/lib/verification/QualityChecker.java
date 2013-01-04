@@ -301,8 +301,7 @@ class QualityChecker {
 			if ( termChecker != null ) {
 				if ( termChecker.verify(currentDocId, tu, srcSeg, trgSeg) > 0 ) {
 					for ( Issue issue : termChecker.getIssues() ) {
-						reportIssue(issue.issueType, tu, issue.segId, issue.message, issue.srcStart, issue.srcEnd,
-							issue.trgStart, issue.trgEnd, issue.severity, srcSeg.toString(), trgSeg.toString(), null);
+						reportIssue(issue, tu, srcSeg.toString(), trgSeg.toString(), null);
 					}
 				}
 			}
@@ -319,9 +318,8 @@ class QualityChecker {
 			if ( ltConn != null ) {
 				if ( ltConn.checkSegment(currentDocId, srcSeg, trgSeg, tu) > 0 ) {
 					for ( Issue issue : ltConn.getIssues() ) {
-						reportIssue(issue.issueType, tu, issue.segId, issue.message, issue.srcStart, issue.srcEnd,
-							issue.trgStart, issue.trgEnd, issue.severity, srcSeg.toString(), trgSeg.toString(), null);
-						if ( issue.srcEnd == -99 ) {
+						reportIssue(issue, tu, srcSeg.toString(), trgSeg.toString(), null);
+						if ( issue.getSourceEnd() == -99 ) {
 							// Special marker indicating a server error
 							ltConn = null; // Do not check it again until next re-processing
 						}
@@ -780,7 +778,6 @@ class QualityChecker {
 		}
 	}
 
-	
 	private void checkStorageSize (ITextUnit tu,
 		TextContainer tc,
 		boolean isSource)
@@ -788,6 +785,7 @@ class QualityChecker {
 		if ( tc == null ) return;
 		GenericAnnotations anns = tu.getAnnotation(GenericAnnotations.class);
 		if ( anns == null ) return;
+		
 		GenericAnnotation ga = anns.getFirstAnnotation(GenericAnnotationType.STORAGESIZE);
 		if ( ga == null ) return;
 		try {
@@ -1038,15 +1036,36 @@ class QualityChecker {
 	{
 		Issue issue = new Issue(currentDocId, issueType, tu.getId(), segId, message,
 			srcStart, srcEnd, trgStart, trgEnd, severity, tu.getName());
-		issue.extra = extra;
+		issue.setExtra(extra);
 		issues.add(issue);
-		issue.enabled = true;
-		issue.oriSource = srcOri;
-		issue.oriTarget = trgOri;
+		issue.setEnabled(true);
+		issue.setSource(srcOri);
+		issue.setTarget(trgOri);
 		
 		if ( sigList != null ) {
 			// Disable any issue for which we have the signature in the list
-			issue.enabled = !sigList.contains(issue.getSignature());
+			issue.setEnabled(!sigList.contains(issue.getSignature()));
+		}
+	}
+
+	private void reportIssue (Issue init,
+		ITextUnit tu,
+		String srcOri,
+		String trgOri,
+		Object extra)
+	{
+		Issue issue = new Issue(currentDocId, init.getIssueType(), tu.getId(), init.getSegId(), init.getMessage(),
+				init.getSourceStart(), init.getSourceEnd(), init.getTargetStart(), init.getTargetEnd(),
+				init.getSeverity(), tu.getName());
+		issue.setExtra(init.getExtra());
+		issues.add(issue);
+		issue.setEnabled(true);
+		issue.setSource(srcOri);
+		issue.setTarget(trgOri);
+		
+		if ( sigList != null ) {
+			// Disable any issue for which we have the signature in the list
+			issue.setEnabled(!sigList.contains(issue.getSignature()));
 		}
 	}
 

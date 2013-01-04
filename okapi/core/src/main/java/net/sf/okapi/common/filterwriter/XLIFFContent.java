@@ -24,7 +24,6 @@ import java.nio.charset.CharsetEncoder;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.sf.okapi.common.IdGenerator;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.annotation.GenericAnnotation;
 import net.sf.okapi.common.annotation.GenericAnnotationType;
@@ -51,7 +50,6 @@ public class XLIFFContent {
 	private XLIFFContent innerContent;
 	private CharsetEncoder chsEnc;
 	private List<GenericAnnotations> standoff;
-	private IdGenerator idGen;
 	
 	/**
 	 * Creates a new XLIFFContent object without any content.
@@ -344,7 +342,7 @@ public class XLIFFContent {
 		boolean escapeGT,
 		StringBuilder output)
 	{
-		for ( GenericAnnotation ann : anns.getAllAnnotations() ) {
+		for ( GenericAnnotation ann : anns ) {
 			// AnnotatorsRef
 			//TODO
 			// Disambiguation
@@ -404,8 +402,7 @@ public class XLIFFContent {
 			// If there are 2 or more: the items need to be output as standoff markup.
 			// This generates the reference and creates initializes the standoff data.
 			// Call getStandoff() to get the items to output in the standoff element.
-			if ( idGen == null ) idGen =new IdGenerator(null);
-			String refId = idGen.createId("lqi");
+			String refId = anns.getData(); // ID to use is already generated in the annotation
 			output.append(" "+ITS_PREFIX+"locQualityIssuesRef=\"#"+refId+"\"");
 			if ( standoff == null ) standoff = new ArrayList<GenericAnnotations>();
 			GenericAnnotations newSet = new GenericAnnotations();

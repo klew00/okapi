@@ -15,7 +15,7 @@
             <artifactId>okapi-lib-verification</artifactId>
             <version>${project.version}</version>
         </dependency>
-
+		<!-- For tests -->
         <dependency>
         	<groupId>net.sf.okapi.filters</groupId>
         	<artifactId>okapi-filter-xliff</artifactId>
@@ -54,7 +54,7 @@
         </dependency>
         <dependency>
         	<groupId>net.sf.okapi.filters</groupId>
-        	<artifactId>okapi-filter-html</artifactId>
+        	<artifactId>okapi-filter-its</artifactId>
         	<version>${project.version}</version>
         	<scope>test</scope>
         </dependency>
