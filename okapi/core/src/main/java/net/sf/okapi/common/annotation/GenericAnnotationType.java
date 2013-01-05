@@ -47,6 +47,9 @@ public class GenericAnnotationType {
 	public static final String LQI_SEVERITY = "lqiSeverity"; // Float
 	public static final String LQI_PROFILEREF = "lqiProfileRef";
 	public static final String LQI_ENABLED = "lqiEnabled"; // Boolean
+	// Extensions
+	public static final String LQI_XSTART = "lqiXStart"; // Integer
+	public static final String LQI_XEND = "lqiXEnd"; // Integer
 
 	/**
 	 * Annotation identifier for the

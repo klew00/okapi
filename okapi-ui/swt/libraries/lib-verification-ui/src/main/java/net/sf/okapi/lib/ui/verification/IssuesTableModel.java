@@ -99,15 +99,15 @@ class IssuesTableModel {
 			// Select the type of items to show
 			switch ( displayType ) {
 			case QualityCheckEditor.ISSUETYPE_ENABLED: // Enabled
-				if ( !issue.enabled ) continue;
+				if ( !issue.getEnabled() ) continue;
 				break;
 			case QualityCheckEditor.ISSUETYPE_DISABLED: // Disabled
-				if ( issue.enabled ) continue;
+				if ( issue.getEnabled() ) continue;
 				break;
 			}
 			// Select the issue type
 			if ( issueType > 0 ) {
-				switch ( issue.issueType ) {
+				switch ( issue.getIssueType() ) {
 				case MISSING_TARGETTU:
 					if ( issueType != 1 ) continue;
 					break;
@@ -162,17 +162,17 @@ class IssuesTableModel {
 			}
 			// Display the item
 			TableItem item = new TableItem(table, SWT.NONE);
-			item.setChecked(issue.enabled);
-			item.setForeground(1, colors[issue.severity]);
+			item.setChecked(issue.getEnabled());
+			item.setForeground(1, colors[issue.getSeverity()]);
 			item.setText(1, "\u2588");
-			if ( issue.tuName == null ) {
-				item.setText(2, issue.tuId);
+			if ( issue.getTuName() == null ) {
+				item.setText(2, issue.getTuId());
 			}
 			else {
-				item.setText(2, issue.tuId + " (" + issue.tuName + ")");
+				item.setText(2, issue.getTuId() + " (" + issue.getTuName() + ")");
 			}
-			item.setText(3, (issue.segId == null ? "" : issue.segId));
-			item.setText(4, issue.message);
+			item.setText(3, (issue.getSegId() == null ? "" : issue.getSegId()));
+			item.setText(4, issue.getMessage());
 			item.setData(issue);
 		}
 		

@@ -39,6 +39,7 @@ import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
+import net.sf.okapi.common.IdGenerator;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.annotation.GenericAnnotation;
 import net.sf.okapi.common.annotation.GenericAnnotationType;
@@ -139,7 +140,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 	private final boolean isHTML5;
 	
 	private DocumentBuilderFactory xmlFactory;
-	
+
 	private Document doc;
 	private URI docURI;
 	private XPath xpath;
@@ -156,6 +157,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 	private boolean targetPointerRuleTriggered;
 	private boolean hasTargetPointer;
 	private String version;
+	private IdGenerator idGen;
 
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 	
@@ -201,6 +203,8 @@ public class ITSEngine implements IProcessor, ITraversal {
 		xpath.setNamespaceContext(nsContext);
 		xpath.setXPathVariableResolver(varResolver);
 		defaultIdsDone = false;
+		
+		idGen = null;
 	}
 	
 	public void setVariables (Map<String, String> map) {
@@ -777,7 +781,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 		{
 			throw new ITSException("You must have at least a type or a comment or isses reference ainformation defined.");
 		}
-		rule.annotations = new GenericAnnotations();
+		rule.annotations = createLQIAnnotationSet();
 		GenericAnnotation ann = addIssueItem(rule.annotations);
 		
 		if ( !Util.isEmpty(np[0]) ) {
@@ -857,6 +861,13 @@ public class ITSEngine implements IProcessor, ITraversal {
 
 		// Add the rule
 		rules.add(rule);
+	}
+	
+	private GenericAnnotations createLQIAnnotationSet () {
+		GenericAnnotations anns = new GenericAnnotations();
+		if ( idGen == null ) idGen = new IdGenerator(null, "lqi");
+		anns.setData(idGen.createId());
+		return anns;
 	}
 
 	private void compileDisambiguationRule (Element elem,
@@ -1581,7 +1592,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 						else {
 							// Not a stand-off annotation
 							GenericAnnotation ann = rule.annotations.getAnnotations(GenericAnnotationType.LQI).get(0);
-							anns = new GenericAnnotations();
+							anns = createLQIAnnotationSet();
 							GenericAnnotation upd = addIssueItem(anns);
 							// Get and resolve 'type'
 							data1 = ann.getString(GenericAnnotationType.LQI_TYPE);
@@ -2067,7 +2078,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 						anns = fetchLocQualityStandoffData(values[0], values[0]);
 					}
 					else { // Not an stand-off reference
-						anns = new GenericAnnotations();
+						anns = createLQIAnnotationSet();
 						GenericAnnotation ann = addIssueItem(anns);
 						if ( values[1] != null ) ann.setString(GenericAnnotationType.LQI_TYPE, values[1]);
 						if ( values[2] != null ) ann.setString(GenericAnnotationType.LQI_COMMENT, values[2]);
@@ -2795,7 +2806,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 		}
 		
 		// Create the new annotation set
-		GenericAnnotations anns = new GenericAnnotations();
+		GenericAnnotations anns = createLQIAnnotationSet();
 		Document issuesDoc = null;
 		XPath issuesXPath = null;
 
@@ -3157,6 +3168,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 	/**
 	 * Gets the terminology annotation set for the current element
 	 * or one of its attributes. 
+	 * Note that the returned object is not the same at each each call.
 	 * @param attribute the attribute to look up, or null for the element.
 	 * @return the annotation set for the queried node (can be null).
 	 */
@@ -3243,7 +3255,8 @@ public class ITSEngine implements IProcessor, ITraversal {
 	
 	/**
 	 * Gets the localization quality issue annotation set for the current element
-	 * or one of its attributes. 
+	 * or one of its attributes.
+	 * Note that the returned object is not the same at each each call.
 	 * @param attribute the attribute to look up, or null for the element.
 	 * @return the annotation set for the queried node (can be null).
 	 */
@@ -3326,6 +3339,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 	/**
 	 * Gets the disambiguation annotation set for the current element
 	 * or one of its attributes. 
+	 * Note that the returned object is not the same at each each call.
 	 * @param attribute the attribute to look up, or null for the element.
 	 * @return the annotation set for the queried node (can be null).
 	 */

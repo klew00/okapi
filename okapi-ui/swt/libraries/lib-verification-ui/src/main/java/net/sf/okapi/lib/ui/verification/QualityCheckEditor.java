@@ -644,28 +644,28 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 				
 				// Copy TU id
 				MenuItem item = new MenuItem(contextMenu, SWT.PUSH);
-				item.setText(String.format("Copy Text Unit Extraction ID (\"%s\")", issue.tuId));
-				item.setData(issue.tuId);
+				item.setText(String.format("Copy Text Unit Extraction ID (\"%s\")", issue.getTuId()));
+				item.setData(issue.getTuId());
 				item.addSelectionListener(copyItemDataAdapter);
 				
 				// Copy resource name (if available)
-				if ( !Util.isEmpty(issue.tuName) ) {
+				if ( !Util.isEmpty(issue.getTuName()) ) {
 					item = new MenuItem(contextMenu, SWT.PUSH);
-					item.setText(String.format("Copy Text Unit Resource ID/Name (\"%s\")", issue.tuName));
-					item.setData(issue.tuName);
+					item.setText(String.format("Copy Text Unit Resource ID/Name (\"%s\")", issue.getTuName()));
+					item.setData(issue.getTuName());
 					item.addSelectionListener(copyItemDataAdapter);
 				}
 
 				// Extra data cases
-				if ( issue.extra == null ) return;
-				if ( ((ArrayList<Code>)issue.extra).size() == 0 ) return;
+				if ( issue.getExtra() == null ) return;
+				if ( ((ArrayList<Code>)issue.getExtra()).size() == 0 ) return;
 				// If we have extra data attached to the issue:
 				// Add actions to the menu
 				new MenuItem(contextMenu, SWT.SEPARATOR);
-				for ( Code code : (ArrayList<Code>)issue.extra ) {
+				for ( Code code : (ArrayList<Code>)issue.getExtra() ) {
 					item = new MenuItem(contextMenu, SWT.PUSH);
 					item.setData(code.getData());
-					if ( issue.issueType == IssueType.EXTRA_CODE ) {
+					if ( issue.getIssueType() == IssueType.EXTRA_CODE ) {
 						item.setText(String.format("Allow \"%s\" as an Extra Code", code.getData()));
 						item.addSelectionListener(allowExtraCodesAdapter);
 					}
@@ -929,7 +929,7 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 				if ( event.detail == SWT.CHECK ) {
 					// Do not force the selection: tblIssues.setSelection((TableItem)event.item);
 					Issue issue = (Issue)event.item.getData();
-					issue.enabled = !issue.enabled;
+					issue.setEnabled(!issue.getEnabled());
 					session.setModified(true);
 				}
 				updateCurrentIssue();
@@ -943,8 +943,8 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 					for ( TableItem ti : tblIssues.getSelection() ) {
 						if ( ti == si ) continue; // Skip focused item because it will get set by SelectionAdapter()
 						Issue issue = (Issue)ti.getData();
-						issue.enabled = !issue.enabled;
-						ti.setChecked(issue.enabled);
+						issue.setEnabled(!issue.getEnabled());
+						ti.setChecked(issue.getEnabled());
 						session.setModified(true);
 					}
 				}
@@ -1257,7 +1257,7 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 		// Find the first issue for that document in from the top of the displayed issues
 		for ( int i=0; i<tblIssues.getItemCount(); i++ ) {
 			Issue issue = (Issue)tblIssues.getItem(i).getData();
-			if ( uri.equals(issue.docURI) ) {
+			if ( uri.equals(issue.getDocumentURI()) ) {
 				tblIssues.setTopIndex(i);
 				tblIssues.setSelection(i);
 				updateCurrentIssue();
@@ -1278,8 +1278,8 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 			}
 			else {
 				Issue issue = (Issue)tblIssues.getItem(n).getData();
-				cbDocument.setText(issue.docURI.getPath());
-				edMessage.setText(issue.message);
+				cbDocument.setText(issue.getDocumentURI().getPath());
+				edMessage.setText(issue.getMessage());
 				setTexts(issue);
 			}
 			statusBar.setCounter(n, tblIssues.getItemCount(), session.getIssues().size());
@@ -1290,24 +1290,24 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 	}
 	
 	private void setTexts (Issue issue) {
-		edSource.setText(issue.oriSource);
-		edTarget.setText(issue.oriTarget);
-		if ( issue.srcEnd > 0 ) {
+		edSource.setText(issue.getSource());
+		edTarget.setText(issue.getTarget());
+		if ( issue.getSourceEnd() > 0 ) {
 			StyleRange sr = new StyleRange();
 			sr.background = shell.getDisplay().getSystemColor(SWT.COLOR_YELLOW);
-			sr.start = issue.srcStart;
-			sr.length = issue.srcEnd-issue.srcStart;
+			sr.start = issue.getSourceStart();
+			sr.length = issue.getSourceEnd()-issue.getSourceStart();
 			edSource.setStyleRange(sr);
-			edSource.setCaretOffset(issue.srcEnd);
+			edSource.setCaretOffset(issue.getSourceEnd());
 			edSource.showSelection();
 		}
-		if ( issue.trgEnd > 0 ) {
+		if ( issue.getTargetEnd() > 0 ) {
 			StyleRange sr = new StyleRange();
 			sr.background = shell.getDisplay().getSystemColor(SWT.COLOR_YELLOW);
-			sr.start = issue.trgStart;
-			sr.length = issue.trgEnd-issue.trgStart;
+			sr.start = issue.getTargetStart();
+			sr.length = issue.getTargetEnd()-issue.getTargetStart();
 			edTarget.setStyleRange(sr);
-			edTarget.setCaretOffset(issue.trgEnd);
+			edTarget.setCaretOffset(issue.getTargetEnd());
 			edTarget.showSelection();
 		}
 	}
@@ -1364,7 +1364,7 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 		try {
 			int n = tblIssues.getSelectionIndex();
 			if ( n < 0 ) return;
-			URI uri = ((Issue)tblIssues.getItem(n).getData()).docURI;
+			URI uri = ((Issue)tblIssues.getItem(n).getData()).getDocumentURI();
 			startWaiting("Checking current document...");
 			session.recheckDocument(uri);
 			resetTableDisplay();

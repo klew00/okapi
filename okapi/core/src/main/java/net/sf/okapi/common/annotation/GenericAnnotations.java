@@ -22,6 +22,7 @@ package net.sf.okapi.common.annotation;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 import net.sf.okapi.common.Util;
@@ -34,11 +35,11 @@ import net.sf.okapi.common.resource.TextContainer;
  * Provides access to a list of {@link GenericAnnotation}.
  * <p>This annotation can be used inline as well as on structural objects.
  */
-public class GenericAnnotations extends InlineAnnotation {
+public class GenericAnnotations extends InlineAnnotation implements Iterable<GenericAnnotation> {
 
 	private static final String ANNOTATION_SEPARATOR = "\u001d";
 
-	List<GenericAnnotation> list;
+	private List<GenericAnnotation> list;
 	
 	/**
 	 * Adds a set of annotations to a given text unit. If the text unit has
@@ -144,7 +145,7 @@ public class GenericAnnotations extends InlineAnnotation {
 	}
 
 	/**
-	 * Gets the first occurence of an annotation for a given type.
+	 * Gets the first occurrence of an annotation for a given type.
 	 * @param type the type of annotation to retrieve.
 	 * @return the first annotation of the given type, or null if none exists.
 	 */
@@ -237,11 +238,15 @@ public class GenericAnnotations extends InlineAnnotation {
 	
 	@Override
 	public String toString () {
-		if ( Util.isEmpty(list) ) return "";
+		// Format: <baseClassData or empty><sep><dataForAnnotation1><sep>...
+		if ( Util.isEmpty(list) ) {
+			return (data == null ? "" : data);
+		}
 		// Else: store the annotations
 		StringBuilder sb = new StringBuilder();
+		if ( data != null ) sb.append(data);
 		for ( GenericAnnotation ann : list ) {
-			if ( sb.length() > 0 ) sb.append(ANNOTATION_SEPARATOR); 
+			sb.append(ANNOTATION_SEPARATOR); 
 			sb.append(ann.toString());
 		}
 		return sb.toString();
@@ -250,10 +255,20 @@ public class GenericAnnotations extends InlineAnnotation {
 	@Override
 	public void fromString (String storage) {
 		String[] parts = storage.split(ANNOTATION_SEPARATOR, 0);
-		for ( String data : parts ) {
-			GenericAnnotation ann = add("z");
-			ann.fromString(data);
+		if ( !parts[0].isEmpty() ) data = parts[0];
+		for ( int i=1; i<parts.length; i++ ) {
+			GenericAnnotation ann = add("z"); // This type will be replaced by fromString
+			ann.fromString(parts[i]);
 		}
+	}
+
+	@Override
+	public Iterator<GenericAnnotation> iterator() {
+		if ( list == null ) {
+			List<GenericAnnotation> tmp = Collections.emptyList();
+			return tmp.iterator();
+		}
+		return list.iterator();
 	}
 
 }

@@ -49,22 +49,22 @@ public class IssueComparator implements Comparator<Issue> {
 	{
 		switch ( type ) {
 		case TYPE_ENABLED:
-			if ( issue1.enabled == issue2.enabled ) return 0;
+			if ( issue1.getEnabled() == issue2.getEnabled() ) return 0;
 			if ( direction == DIR_ASC ) {
-				return issue1.enabled ? 1 : -1;
+				return issue1.getEnabled() ? 1 : -1;
 			}
-			return issue1.enabled ? -1 : 1;
+			return issue1.getEnabled() ? -1 : 1;
 
 		case TYPE_SEVERITY:
-			if ( issue1.severity == issue2.severity ) return 0;
+			if ( issue1.getSeverity() == issue2.getSeverity() ) return 0;
 			if ( direction == DIR_ASC ) {
-				return (issue1.severity > issue2.severity) ? 1 : -1;
+				return (issue1.getSeverity() > issue2.getSeverity()) ? 1 : -1;
 			}
-			return (issue1.severity > issue2.severity) ? -1 : 1;
+			return (issue1.getSeverity() > issue2.getSeverity()) ? -1 : 1;
 
 		case TYPE_TU:
-			String key1 = issue1.docURI.toString()+issue1.tuId;
-			String key2 = issue2.docURI.toString()+issue2.tuId;
+			String key1 = issue1.getDocumentURI().toString()+issue1.getTuId();
+			String key2 = issue2.getDocumentURI().toString()+issue2.getTuId();
 			if ( key1.equals(key2) ) return 0;
 			if ( direction == DIR_ASC ) {
 				return key1.compareTo(key2);
@@ -72,8 +72,8 @@ public class IssueComparator implements Comparator<Issue> {
 			return key2.compareTo(key1);
 
 		case TYPE_SEG:
-			key1 = issue1.docURI.toString()+issue1.tuId + (issue1.segId==null ? "" : issue1.segId);
-			key2 = issue2.docURI.toString()+issue2.tuId + (issue2.segId==null ? "" : issue2.segId);
+			key1 = issue1.getDocumentURI().toString()+issue1.getTuId() + (issue1.getSegId()==null ? "" : issue1.getSegId());
+			key2 = issue2.getDocumentURI().toString()+issue2.getTuId() + (issue2.getSegId()==null ? "" : issue2.getSegId());
 			if ( key1.equals(key2) ) return 0;
 			if ( direction == DIR_ASC ) {
 				return key1.compareTo(key2);
@@ -81,11 +81,11 @@ public class IssueComparator implements Comparator<Issue> {
 			return key2.compareTo(key1);
 
 		case TYPE_MESSAGE:
-			if ( issue1.message.equals(issue2.message) ) return 0;
+			if ( issue1.getMessage().equals(issue2.getMessage()) ) return 0;
 			if ( direction == DIR_ASC ) {
-				return issue1.message.compareTo(issue2.message);
+				return issue1.getMessage().compareTo(issue2.getMessage());
 			}
-			return issue2.message.compareTo(issue1.message);
+			return issue2.getMessage().compareTo(issue1.getMessage());
 		}
 		return 0;
 	}
