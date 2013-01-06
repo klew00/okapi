@@ -39,6 +39,7 @@ class ContextItem {
 	String allowedChars;
 	GenericAnnotations lqIssues;
 	GenericAnnotations storageSize;
+	GenericAnnotations lqRating;
 
 	public ContextItem (Node node,
 		ITSEngine trav)
@@ -62,6 +63,7 @@ class ContextItem {
 		this.allowedChars = trav.getAllowedCharacters(attribute);
 		this.storageSize = trav.getStorageSizeAnnotation(attribute);
 		this.lqIssues = trav.getLocQualityIssueAnnotation(attribute);
+		this.lqRating = trav.getLocQualityRatingAnnotation();
 	}
 
 }

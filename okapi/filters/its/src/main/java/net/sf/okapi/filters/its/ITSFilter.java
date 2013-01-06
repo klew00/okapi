@@ -608,6 +608,10 @@ public abstract class ITSFilter implements IFilter {
 				GenericAnnotationType.ALLOWEDCHARS_PATTERN, ci.allowedChars)
 			);
 		}
+		// ITS Localization Quality Rating
+		if ( ci.lqRating != null ) {
+			GenericAnnotations.addAnnotations(tu, ci.lqRating);
+		}
 		// ITS Localization Quality Issue (on the source)
 		if ( ci.lqIssues != null ) {
 			GenericAnnotations.addAnnotations(tu.getSource(), ci.lqIssues);
@@ -965,6 +969,10 @@ public abstract class ITSFilter implements IFilter {
 			GenericAnnotation.addAnnotation(tu, new GenericAnnotation(GenericAnnotationType.ALLOWEDCHARS,
 				GenericAnnotationType.ALLOWEDCHARS_PATTERN, context.peek().allowedChars)
 			);
+		}
+		// ITS Localization Quality rating
+		if ( context.peek().lqRating != null ) {
+			GenericAnnotations.addAnnotations(tu, context.peek().lqRating);
 		}
 		// ITS Localization Quality Issue
 		if ( context.peek().lqIssues != null ) {

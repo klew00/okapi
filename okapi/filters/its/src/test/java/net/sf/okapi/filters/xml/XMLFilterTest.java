@@ -988,7 +988,34 @@ public class XMLFilterTest {
 		assertNotNull(tu);
 		assertEquals("value 1", tu.getSource().toString());
 	}
-	
+
+	@Test
+	public void testLocQualityRatingLocal () {
+		String snippet = "<?xml version=\"1.0\"?>\n"
+			+ "<doc xml:lang='nl' xmlns:its=\"http://www.w3.org/2005/11/its\" its:version=\"2.0\""
+			+ " its:locQualityRatingScore='100' its:locQualityRatingScoreThreshold='95'"
+			+ " its:locQualityRatingProfileRef='http://example.org/qaModel/v13'>"
+			+ "<title>text 1</title>"
+			+ "<p its:locQualityRatingVote='-2' its:locQualityRatingVoteThreshold='0'>text 2</p>"
+			+ "</doc>";
+		ArrayList<Event> list = getEvents(snippet);
+		ITextUnit tu = FilterTestDriver.getTextUnit(list, 1);
+		assertNotNull(tu);
+		assertEquals("text 1", tu.getSource().toString());
+		GenericAnnotations anns = tu.getAnnotation(GenericAnnotations.class);
+		GenericAnnotation ga = anns.getFirstAnnotation(GenericAnnotationType.LQR);
+		assertEquals(100.0, ga.getDouble(GenericAnnotationType.LQR_SCORE), 0.0);
+		assertEquals(95.0, ga.getDouble(GenericAnnotationType.LQR_SCORETHRESHOLD), 0.0);
+		assertEquals("REF:http://example.org/qaModel/v13", ga.getString(GenericAnnotationType.LQR_PROFILEREF));
+		tu = FilterTestDriver.getTextUnit(list, 2);
+		assertEquals("text 2", tu.getSource().toString());
+		anns = tu.getAnnotation(GenericAnnotations.class);
+		ga = anns.getFirstAnnotation(GenericAnnotationType.LQR);
+		assertEquals(-2, (int)ga.getInteger(GenericAnnotationType.LQR_VOTE));
+		assertEquals(0, (int)ga.getInteger(GenericAnnotationType.LQR_VOTETHRESHOLD));
+		assertEquals(null, ga.getString(GenericAnnotationType.LQR_PROFILEREF)); // No value because complete override
+	}
+
 	@Test
 	public void testLocQualityLocalOnUnit () {
 		String snippet = "<?xml version=\"1.0\"?>\n"
