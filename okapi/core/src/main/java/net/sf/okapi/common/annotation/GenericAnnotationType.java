@@ -50,6 +50,9 @@ public class GenericAnnotationType {
 	// Extensions
 	public static final String LQI_XSTART = "lqiXStart"; // Integer
 	public static final String LQI_XEND = "lqiXEnd"; // Integer
+	public static final String LQI_XTRGSTART = "lqiXTrgStart"; // Integer
+	public static final String LQI_XTRGEND = "lqiXTrgEnd"; // Integer
+	public static final String LQI_XTYPE = "lqiXType"; // Object
 
 	/**
 	 * Annotation identifier for the

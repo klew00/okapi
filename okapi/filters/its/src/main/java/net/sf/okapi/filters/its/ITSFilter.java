@@ -592,7 +592,7 @@ public abstract class ITSFilter implements IFilter {
 				GenericAnnotationType.DOMAIN_LIST, ci.domains)
 			);
 		}
-		// ITS External resources Reference
+		// ITS External Resource
 		if ( !Util.isEmpty(ci.externalRes) ) {
 			GenericAnnotation.addAnnotation(tu, new GenericAnnotation(GenericAnnotationType.EXTRESREF,
 				GenericAnnotationType.EXTRESREF_IRI, ci.externalRes)
@@ -1006,7 +1006,7 @@ public abstract class ITSFilter implements IFilter {
 		if ( context.peek().preserveWS ) {
 			tu.setPreserveWhitespaces(true);
 		}
-		else { // We laso unwrap if we don't have to preserve
+		else { // We also unwrap if we don't have to preserve
 			tu.setPreserveWhitespaces(false);
 			tu.getSource().unwrap(false, true);
 		}

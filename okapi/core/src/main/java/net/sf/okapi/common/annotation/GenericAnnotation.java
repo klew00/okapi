@@ -176,7 +176,7 @@ public class GenericAnnotation {
 	/**
 	 * Sets a string field.
 	 * @param name the name of the field to set.
-	 * @param value the value to set, use null to remove the value.
+	 * @param value the value to set, use null to remove the field.
 	 */
 	public void setString (String name,
 		String value)
@@ -194,6 +194,11 @@ public class GenericAnnotation {
 		return (Boolean)obj;
 	}
 
+	/**
+	 * sets a boolean field.
+	 * @param name the name of the field to set.
+	 * @param value the value to set, use null to remove the field.
+	 */
 	public void setBoolean (String name,
 		Boolean value)
 	{

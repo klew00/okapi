@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009-2011 by the Okapi Framework contributors
+  Copyright (C) 2009-2013 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -22,7 +22,6 @@ package net.sf.okapi.steps.formatconversion;
 
 import java.io.File;
 import java.net.URI;
-import java.nio.charset.Charset;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
@@ -39,7 +38,6 @@ import net.sf.okapi.common.pipeline.annotations.StepParameterType;
 import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.ITextUnit;
-import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.filters.pensieve.PensieveFilterWriter;
 import net.sf.okapi.filters.po.POWriter;
 
@@ -141,7 +139,7 @@ public class FormatConversionStep extends BasePipelineStep {
 			break;
 			
 		case START_DOCUMENT:
-			if (!firstOutputCreated)
+			if ( !firstOutputCreated )
 				writer.setOptions(targetLocale, "UTF-8"); // in case target locale changed in this document
 			if ( !firstOutputCreated || !params.getSingleOutput() ) {
 				switch ( outputType ) {
@@ -161,7 +159,6 @@ public class FormatConversionStep extends BasePipelineStep {
 					startCorpusOutput();
 					break;
 				}
-				StartDocument sd = (StartDocument) event.getResource(); 
 				writer.handleEvent(event);
 			}
 			break;
