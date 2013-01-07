@@ -366,7 +366,7 @@ public class XLIFFContent {
 			
 			// Allowed Characters
 			else if ( ann.getType().equals(GenericAnnotationType.ALLOWEDCHARS) ) {
-				printITSStringAttribute(ann.getString(GenericAnnotationType.ALLOWEDCHARS_PATTERN), "allowedCharacters", quoteMode, escapeGT, output);
+				printITSStringAttribute(ann.getString(GenericAnnotationType.ALLOWEDCHARS_VALUE), "allowedCharacters", quoteMode, escapeGT, output);
 			}
 			
 			// Storage Size

@@ -834,7 +834,7 @@ class QualityChecker {
 		GenericAnnotation ga = anns.getFirstAnnotation(GenericAnnotationType.ALLOWEDCHARS);
 		if ( ga == null ) return;
 		try {
-			String pattern = ga.getString(GenericAnnotationType.ALLOWEDCHARS_PATTERN);
+			String pattern = ga.getString(GenericAnnotationType.ALLOWEDCHARS_VALUE);
 			// Re-set the compiled pattern if needed
 			if (( itsAllowedChars == null ) || !itsAllowedCharsPattern.equals(pattern) ) {
 				itsAllowedCharsPattern = pattern; // Remember for next time

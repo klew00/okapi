@@ -377,7 +377,7 @@ public class XLIFFFilterTest {
 			+ "</file></xliff>";
 		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 		GenericAnnotation ga = tu.getAnnotation(GenericAnnotations.class).getFirstAnnotation(GenericAnnotationType.ALLOWEDCHARS);
-		assertEquals("[a-z]", ga.getString(GenericAnnotationType.ALLOWEDCHARS_PATTERN));
+		assertEquals("[a-z]", ga.getString(GenericAnnotationType.ALLOWEDCHARS_VALUE));
 		ga = tu.getAnnotation(GenericAnnotations.class).getFirstAnnotation(GenericAnnotationType.STORAGESIZE);
 		assertEquals(123, (int)ga.getInteger(GenericAnnotationType.STORAGESIZE_SIZE));
 		assertEquals("UTF-8", ga.getString(GenericAnnotationType.STORAGESIZE_ENCODING));

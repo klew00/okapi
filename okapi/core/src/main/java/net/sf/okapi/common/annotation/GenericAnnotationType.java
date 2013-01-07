@@ -36,6 +36,43 @@ public class GenericAnnotationType {
 	public static final String ANNOTATION_ONLY_MARKER = "_annotation_";
 
 	/**
+	 * Annotation identifier for the 
+	 * <a href='http://www.w3.org/TR/its20/#terminology'>ITS Terminology</a> data category.
+	 */
+	public static final String TERM = "its-term";
+	public static final String TERM_INFO = "termInfo";
+	public static final String TERM_CONFIDENCE = "termConfidence";
+	
+	/**
+	 * Annotation identifier for the 
+	 * <a href='http://www.w3.org/TR/its20/#domain'>ITS Domain</a> data category.
+	 */
+	public static final String DOMAIN = "its-domain";
+	public static final String DOMAIN_VALUE = "domainValue";
+	
+	/**
+	 * Annotation identifier for the
+	 * <a href='http://www.w3.org/TR/its20/#Disambiguation'>ITS Disambiguation</a> data category.
+	 */
+	public static final String DISAMB = "its-disamb";
+	public static final String DISAMB_CLASS = "disambClass";
+	public static final String DISAMB_SOURCE = "disambSource";
+	public static final String DISAMB_IDENT = "disambIdent";
+	public static final String DISAMB_CONFIDENCE = "disambConfidence"; // Float
+	public static final String DISAMB_GRANULARITY = "disambGranularity";
+	// Values for the granularity information of the Disambiguation data category.
+	public static final String DISAMB_GRANULARITY_LEXICAL = "lexical-concept";
+	public static final String DISAMB_GRANULARITY_ONTOLOGY = "ontology-concept";
+	public static final String DISAMB_GRANULARITY_ENTITY = "entity";
+
+	/**
+	 * Annotation identifier for the 
+	 * <a href='http://www.w3.org/TR/its20/#externalresource'>ITS External resource</a> data category.
+	 */
+	public static final String EXTERNALRES = "its-externalres";
+	public static final String EXTERNALRES_VALUE = "its-externalresValue";
+	
+	/**
 	 * Annotation identifier for the
 	 * <a href='http://www.w3.org/TR/its20/#lqissue'>ITS Localization Quality Issue</a> data category.
 	 * 
@@ -56,30 +93,7 @@ public class GenericAnnotationType {
 
 	/**
 	 * Annotation identifier for the
-	 * <a href='http://www.w3.org/TR/its20/#Disambiguation'>ITS Disambiguation</a> data category.
-	 */
-	public static final String DISAMB = "its-disamb";
-	public static final String DISAMB_CLASS = "disambClass";
-	public static final String DISAMB_SOURCE = "disambSource";
-	public static final String DISAMB_IDENT = "disambIdent";
-	public static final String DISAMB_CONFIDENCE = "disambConfidence"; // Float
-	public static final String DISAMB_GRANULARITY = "disambGranularity";
-	
-	public static final String DISAMB_GRANULARITY_LEXICAL = "lexical-concept";
-	public static final String DISAMB_GRANULARITY_ONTOLOGY = "ontology-concept";
-	public static final String DISAMB_GRANULARITY_ENTITY = "entity";
-
-	/**
-	 * Annotation identifier for the 
-	 * <a href='http://www.w3.org/TR/its20/#terminology'>ITS Terminology</a> data category.
-	 */
-	public static final String TERM = "its-term";
-	public static final String TERM_INFO = "termInfo";
-	public static final String TERM_CONFIDENCE = "termConfidence";
-	
-	/**
-	 * Annotation identifier for the
-	 * <a href='http://www.w3.org/TR/its20/#lqrating'>Localization Quality Rating</a> data category.
+	 * <a href='http://www.w3.org/TR/its20/#lqrating'>ITS Localization Quality Rating</a> data category.
 	 */
 	public static final String LQR = "its-lqr";
 	public static final String LQR_SCORE = "lqrScore";
@@ -88,15 +102,24 @@ public class GenericAnnotationType {
 	public static final String LQR_VOTETHRESHOLD = "lqrVoteThreshold";
 	public static final String LQR_PROFILEREF = "lqrProfileRef";
 	
-	public static final String ALLOWEDCHARS = "its-allowedchars";
-	public static final String ALLOWEDCHARS_PATTERN = "allowedcharsPattern";
+	/**
+	 * Annotation identifier for the
+	 * <a href='http://www.w3.org/TR/its20/#mtconfidence'>ITS MT Confidence</a> data category.
+	 */
+	public static final String MTCONFIDENCE = "its-mtconfidence";
+	public static final String MTCONFIDENCE_VALUE = "its-mtconfidenceValue";
 
-	public static final String EXTRESREF = "its-extresref";
-	public static final String EXTRESREF_IRI = "its-extresrefIri";
-	
-	public static final String DOMAIN = "its-domain";
-	public static final String DOMAIN_LIST = "domainList";
-	
+	/**
+	 * Annotation identifier for the
+	 * <a href='http://www.w3.org/TR/its20/#allowedchars'>ITS Allowed Characters</a> data category.
+	 */
+	public static final String ALLOWEDCHARS = "its-allowedchars";
+	public static final String ALLOWEDCHARS_VALUE = "allowedcharsValue";
+
+	/**
+	 * Annotation identifier for the
+	 * <a href='http://www.w3.org/TR/its20/#storagesize'>ITS Storage Size</a> data category.
+	 */
 	public static final String STORAGESIZE = "its-storagesize";
 	public static final String STORAGESIZE_SIZE = "storagesizeSize";
 	public static final String STORAGESIZE_ENCODING = "storagesizeEncoding";

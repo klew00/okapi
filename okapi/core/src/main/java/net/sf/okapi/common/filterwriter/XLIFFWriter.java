@@ -470,19 +470,19 @@ public class XLIFFWriter implements IFilterWriter {
 			ga = anns.getFirstAnnotation(GenericAnnotationType.ALLOWEDCHARS);
 			if ( ga != null ) {
 				writer.writeAttributeString("its:allowedCharacters",
-					ga.getString(GenericAnnotationType.ALLOWEDCHARS_PATTERN));
+					ga.getString(GenericAnnotationType.ALLOWEDCHARS_VALUE));
 			}
 			// Domain
 			ga = anns.getFirstAnnotation(GenericAnnotationType.DOMAIN);
 			if ( ga != null ) {
 				writer.writeAttributeString("okp:itsDomain",
-					ga.getString(GenericAnnotationType.DOMAIN_LIST));
+					ga.getString(GenericAnnotationType.DOMAIN_VALUE));
 			}
 			// External Resoure Reference
-			ga = anns.getFirstAnnotation(GenericAnnotationType.EXTRESREF);
+			ga = anns.getFirstAnnotation(GenericAnnotationType.EXTERNALRES);
 			if ( ga != null ) {
 				writer.writeAttributeString("okp:itsExternalResourceRef",
-					ga.getString(GenericAnnotationType.EXTRESREF_IRI));
+					ga.getString(GenericAnnotationType.EXTERNALRES_VALUE));
 			}
 		}
 

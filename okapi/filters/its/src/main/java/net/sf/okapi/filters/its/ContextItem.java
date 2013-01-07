@@ -40,6 +40,7 @@ class ContextItem {
 	GenericAnnotations lqIssues;
 	GenericAnnotations storageSize;
 	GenericAnnotations lqRating;
+	Double mtConfidence;
 
 	public ContextItem (Node node,
 		ITSEngine trav)
@@ -64,6 +65,7 @@ class ContextItem {
 		this.storageSize = trav.getStorageSizeAnnotation(attribute);
 		this.lqIssues = trav.getLocQualityIssueAnnotation(attribute);
 		this.lqRating = trav.getLocQualityRatingAnnotation();
+		this.mtConfidence = trav.getMtConfidence(attribute);
 	}
 
 }

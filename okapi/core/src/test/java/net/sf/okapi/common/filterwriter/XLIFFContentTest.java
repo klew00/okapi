@@ -104,7 +104,7 @@ public class XLIFFContentTest {
 	public void testVariousAnnotations () {
 		GenericAnnotations anns = new GenericAnnotations();
 		anns.add(new GenericAnnotation(GenericAnnotationType.ALLOWEDCHARS,
-			GenericAnnotationType.ALLOWEDCHARS_PATTERN, "[a-z]"));
+			GenericAnnotationType.ALLOWEDCHARS_VALUE, "[a-z]"));
 		anns.add(new GenericAnnotation(GenericAnnotationType.STORAGESIZE,
 			GenericAnnotationType.STORAGESIZE_SIZE, 25,
 			GenericAnnotationType.STORAGESIZE_ENCODING, "iso-8859-1",
@@ -163,7 +163,7 @@ public class XLIFFContentTest {
 		// And we have a corresponding annotation
 		GenericAnnotations anns = new GenericAnnotations(
 			new GenericAnnotation(GenericAnnotationType.ALLOWEDCHARS,
-				GenericAnnotationType.ALLOWEDCHARS_PATTERN, "[a-z]"));
+				GenericAnnotationType.ALLOWEDCHARS_VALUE, "[a-z]"));
 		GenericAnnotations.addAnnotations(start, anns);
 //TODO: We have to find a better way to attach annotation on span		
 		GenericAnnotations.addAnnotations(end, anns);

@@ -110,7 +110,7 @@ public class HTML5FilterTest {
 		ITextUnit tu = FilterTestDriver.getTextUnit(list, 1);
 		assertEquals("Title", fmt.setContent(tu.getSource().getFirstContent()).toString());
 		GenericAnnotation ga = tu.getAnnotation(GenericAnnotations.class).getFirstAnnotation(GenericAnnotationType.DOMAIN);
-		assertEquals("domA, dom2, domB, dom1, dom3", ga.getString(GenericAnnotationType.DOMAIN_LIST));		
+		assertEquals("domA, dom2, domB, dom1, dom3", ga.getString(GenericAnnotationType.DOMAIN_VALUE));		
 	}
 
 	@Test
@@ -163,7 +163,7 @@ public class HTML5FilterTest {
 		ITextUnit tu = FilterTestDriver.getTextUnit(list, 2);
 		assertNotNull(tu);
 		GenericAnnotation ga = tu.getAnnotation(GenericAnnotations.class).getFirstAnnotation(GenericAnnotationType.ALLOWEDCHARS);
-		assertEquals("[a-z]", ga.getString(GenericAnnotationType.ALLOWEDCHARS_PATTERN));
+		assertEquals("[a-z]", ga.getString(GenericAnnotationType.ALLOWEDCHARS_VALUE));
 		tu = FilterTestDriver.getTextUnit(list, 3);
 		assertEquals(null, tu.getAnnotation(GenericAnnotations.class));
 	}

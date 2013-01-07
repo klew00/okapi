@@ -517,7 +517,7 @@ public abstract class ITSFilter implements IFilter {
 		String value = trav.getAllowedCharacters(null);
 		if ( value != null ) {
 			GenericAnnotation.addAnnotation(code, new GenericAnnotation(GenericAnnotationType.ALLOWEDCHARS,
-				GenericAnnotationType.ALLOWEDCHARS_PATTERN, value));
+				GenericAnnotationType.ALLOWEDCHARS_VALUE, value));
 		}
 		// Storage Size
 		GenericAnnotations anns = trav.getStorageSizeAnnotation(null);
@@ -579,6 +579,7 @@ public abstract class ITSFilter implements IFilter {
 		}
 
 		// Set the ITS context for this attribute and set the relevant properties
+		// (we could use directly trav, but this allows to avoid many tarv.getXYZ() calls)
 		ContextItem ci = new ContextItem(
 			(context.isEmpty() ? attr.getParentNode() : context.peek().node), trav, attr);
 		
@@ -589,13 +590,19 @@ public abstract class ITSFilter implements IFilter {
 		// ITS Domain
 		if ( !Util.isEmpty(ci.domains) ) {
 			GenericAnnotation.addAnnotation(tu, new GenericAnnotation(GenericAnnotationType.DOMAIN,
-				GenericAnnotationType.DOMAIN_LIST, ci.domains)
+				GenericAnnotationType.DOMAIN_VALUE, ci.domains)
 			);
 		}
 		// ITS External Resource
 		if ( !Util.isEmpty(ci.externalRes) ) {
-			GenericAnnotation.addAnnotation(tu, new GenericAnnotation(GenericAnnotationType.EXTRESREF,
-				GenericAnnotationType.EXTRESREF_IRI, ci.externalRes)
+			GenericAnnotation.addAnnotation(tu, new GenericAnnotation(GenericAnnotationType.EXTERNALRES,
+				GenericAnnotationType.EXTERNALRES_VALUE, ci.externalRes)
+			);
+		}
+		// ITS MT confidence
+		if ( ci.mtConfidence != null ) {
+			GenericAnnotation.addAnnotation(tu, new GenericAnnotation(GenericAnnotationType.MTCONFIDENCE,
+				GenericAnnotationType.MTCONFIDENCE_VALUE, ci.mtConfidence)
 			);
 		}
 		// ITS Storage Size
@@ -605,7 +612,7 @@ public abstract class ITSFilter implements IFilter {
 		// ITS Allowed characters
 		if ( ci.allowedChars != null ) {
 			GenericAnnotation.addAnnotation(tu, new GenericAnnotation(GenericAnnotationType.ALLOWEDCHARS,
-				GenericAnnotationType.ALLOWEDCHARS_PATTERN, ci.allowedChars)
+				GenericAnnotationType.ALLOWEDCHARS_VALUE, ci.allowedChars)
 			);
 		}
 		// ITS Localization Quality Rating
@@ -951,13 +958,19 @@ public abstract class ITSFilter implements IFilter {
 		// ITS Domain
 		if ( !Util.isEmpty(context.peek().domains) ) {
 			GenericAnnotation.addAnnotation(tu, new GenericAnnotation(GenericAnnotationType.DOMAIN,
-				GenericAnnotationType.DOMAIN_LIST, context.peek().domains)
+				GenericAnnotationType.DOMAIN_VALUE, context.peek().domains)
 			);
 		}
 		// ITS External resources Reference
 		if ( !Util.isEmpty(context.peek().externalRes) ) {
-			GenericAnnotation.addAnnotation(tu, new GenericAnnotation(GenericAnnotationType.EXTRESREF,
-				GenericAnnotationType.EXTRESREF_IRI, context.peek().externalRes)
+			GenericAnnotation.addAnnotation(tu, new GenericAnnotation(GenericAnnotationType.EXTERNALRES,
+				GenericAnnotationType.EXTERNALRES_VALUE, context.peek().externalRes)
+			);
+		}
+		// ITS MT confidence
+		if ( context.peek().mtConfidence != null ) {
+			GenericAnnotation.addAnnotation(tu, new GenericAnnotation(GenericAnnotationType.MTCONFIDENCE,
+				GenericAnnotationType.MTCONFIDENCE_VALUE, context.peek().mtConfidence)
 			);
 		}
 		// ITS Storage Size
@@ -967,7 +980,7 @@ public abstract class ITSFilter implements IFilter {
 		// ITS Allowed characters
 		if ( context.peek().allowedChars != null ) {
 			GenericAnnotation.addAnnotation(tu, new GenericAnnotation(GenericAnnotationType.ALLOWEDCHARS,
-				GenericAnnotationType.ALLOWEDCHARS_PATTERN, context.peek().allowedChars)
+				GenericAnnotationType.ALLOWEDCHARS_VALUE, context.peek().allowedChars)
 			);
 		}
 		// ITS Localization Quality rating

@@ -708,20 +708,20 @@ public class XLIFFFilter implements IFilter {
 			tmp = reader.getAttributeValue(XLIFFWriter.NS_ITS20, "allowedCharacters");
 			if ( tmp != null ) { // Get Allowed Character info
 				GenericAnnotation.addAnnotation(tu, new GenericAnnotation(GenericAnnotationType.ALLOWEDCHARS,
-					GenericAnnotationType.ALLOWEDCHARS_PATTERN, tmp));
+					GenericAnnotationType.ALLOWEDCHARS_VALUE, tmp));
 			}
 			// ITS Domain
 			tmp = reader.getAttributeValue(XLIFFWriter.NS_XLIFFOKAPI, "istDomain");
 			if ( tmp != null ) {
 				GenericAnnotation.addAnnotation(tu, new GenericAnnotation(GenericAnnotationType.DOMAIN,
-					GenericAnnotationType.DOMAIN_LIST, tmp)
+					GenericAnnotationType.DOMAIN_VALUE, tmp)
 				);
 			}
 			// External Resoure Reference
 			tmp = reader.getAttributeValue(XLIFFWriter.NS_XLIFFOKAPI, "itsExternalResourceRef");
 			if ( tmp != null ) {
-				GenericAnnotation.addAnnotation(tu, new GenericAnnotation(GenericAnnotationType.EXTRESREF,
-					GenericAnnotationType.EXTRESREF_IRI, tmp)
+				GenericAnnotation.addAnnotation(tu, new GenericAnnotation(GenericAnnotationType.EXTERNALRES,
+					GenericAnnotationType.EXTERNALRES_VALUE, tmp)
 				);
 			}
 			

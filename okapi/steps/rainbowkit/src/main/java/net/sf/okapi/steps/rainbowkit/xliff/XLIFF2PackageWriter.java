@@ -346,19 +346,19 @@ public class XLIFF2PackageWriter extends BasePackageWriter {
 			ga = anns.getFirstAnnotation(GenericAnnotationType.DOMAIN);
 			if ( ga != null ) {
 				unit.getExtendedAttributes().setAttribute(Names.NS_XLIFFOKAPI, "itsDomain",
-					ga.getString(GenericAnnotationType.DOMAIN_LIST));
+					ga.getString(GenericAnnotationType.DOMAIN_VALUE));
 			}
 			// Allowed characters
 			ga = anns.getFirstAnnotation(GenericAnnotationType.ALLOWEDCHARS);
 			if ( ga != null ) {
 				unit.getExtendedAttributes().setAttribute(Names.NS_ITS, "allowedCharacters",
-					ga.getString(GenericAnnotationType.ALLOWEDCHARS_PATTERN));
+					ga.getString(GenericAnnotationType.ALLOWEDCHARS_VALUE));
 			}
 			// External Resource reference
-			ga = anns.getFirstAnnotation(GenericAnnotationType.EXTRESREF);
+			ga = anns.getFirstAnnotation(GenericAnnotationType.EXTERNALRES);
 			if ( ga != null ) {
 				unit.getExtendedAttributes().setAttribute(Names.NS_XLIFFOKAPI, "itsExternalResourceRef",
-					ga.getString(GenericAnnotationType.EXTRESREF_IRI));
+					ga.getString(GenericAnnotationType.EXTERNALRES_VALUE));
 			}
 		}
 		

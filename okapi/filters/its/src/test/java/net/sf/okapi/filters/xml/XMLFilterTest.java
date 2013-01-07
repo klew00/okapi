@@ -356,7 +356,7 @@ public class XMLFilterTest {
 		ArrayList<Event> list = getEvents(snippet);
 		ITextUnit tu = FilterTestDriver.getTextUnit(list, 1);
 		GenericAnnotation ga = tu.getAnnotation(GenericAnnotations.class).getFirstAnnotation(GenericAnnotationType.DOMAIN);
-		assertEquals("domZ, domC, domD", ga.getString(GenericAnnotationType.DOMAIN_LIST));		
+		assertEquals("domZ, domC, domD", ga.getString(GenericAnnotationType.DOMAIN_VALUE));		
 	}
 	
 	@Test
@@ -376,7 +376,7 @@ public class XMLFilterTest {
 		ArrayList<Event> list = getEvents(snippet);
 		ITextUnit tu = FilterTestDriver.getTextUnit(list, 1);
 		GenericAnnotation ga = tu.getAnnotation(GenericAnnotations.class).getFirstAnnotation(GenericAnnotationType.DOMAIN);
-		assertEquals("domA, domB, domY", ga.getString(GenericAnnotationType.DOMAIN_LIST));		
+		assertEquals("domA, domB, domY", ga.getString(GenericAnnotationType.DOMAIN_VALUE));		
 	}
 	
 	@Test
@@ -395,16 +395,16 @@ public class XMLFilterTest {
 		ArrayList<Event> list = getEvents(snippet);
 		ITextUnit tu = FilterTestDriver.getTextUnit(list, 1);
 		GenericAnnotation ga = tu.getAnnotation(GenericAnnotations.class).getFirstAnnotation(GenericAnnotationType.ALLOWEDCHARS);
-		assertEquals("[A-Z]", ga.getString(GenericAnnotationType.ALLOWEDCHARS_PATTERN));
+		assertEquals("[A-Z]", ga.getString(GenericAnnotationType.ALLOWEDCHARS_VALUE));
 		tu = FilterTestDriver.getTextUnit(list, 2);
 		ga = tu.getAnnotation(GenericAnnotations.class).getFirstAnnotation(GenericAnnotationType.ALLOWEDCHARS);
-		assertEquals("[a-z]", ga.getString(GenericAnnotationType.ALLOWEDCHARS_PATTERN));
+		assertEquals("[a-z]", ga.getString(GenericAnnotationType.ALLOWEDCHARS_VALUE));
 		tu = FilterTestDriver.getTextUnit(list, 3);
 		assertEquals(null, tu.getAnnotation(GenericAnnotations.class));
 		Code code = tu.getSource().getFirstContent().getCode(0);
 		GenericAnnotations anns = (GenericAnnotations)code.getAnnotation(GenericAnnotationType.GENERIC);
 		assertNotNull(anns);
-		assertEquals("[tex]", anns.getFirstAnnotation(GenericAnnotationType.ALLOWEDCHARS).getString(GenericAnnotationType.ALLOWEDCHARS_PATTERN));
+		assertEquals("[tex]", anns.getFirstAnnotation(GenericAnnotationType.ALLOWEDCHARS).getString(GenericAnnotationType.ALLOWEDCHARS_VALUE));
 		ga = anns.getFirstAnnotation(GenericAnnotationType.STORAGESIZE);
 		assertEquals(10, (int)ga.getInteger(GenericAnnotationType.STORAGESIZE_SIZE));
 		assertEquals("UTF-8", ga.getString(GenericAnnotationType.STORAGESIZE_ENCODING));
@@ -1017,6 +1017,30 @@ public class XMLFilterTest {
 	}
 
 	@Test
+	public void testMTConfidence () {
+		String snippet = "<?xml version=\"1.0\"?>\n"
+			+ "<doc xml:lang='nl' xmlns:its=\"http://www.w3.org/2005/11/its\" its:version=\"2.0\""
+			+ " its:annotatorsRef=\"mt-confidence|file:///tools.xml#T1\""
+			+ " its:mtConfidence='0.56'>"
+			+ "<title>text 1</title>"
+			+ "<p its:mtConfidence='0.78'>text 2</p>"
+			+ "</doc>";
+		ArrayList<Event> list = getEvents(snippet);
+		ITextUnit tu = FilterTestDriver.getTextUnit(list, 1);
+		assertNotNull(tu);
+		assertEquals("text 1", tu.getSource().toString());
+		GenericAnnotations anns = tu.getAnnotation(GenericAnnotations.class);
+		GenericAnnotation ga = anns.getFirstAnnotation(GenericAnnotationType.MTCONFIDENCE);
+		assertEquals(0.56, ga.getDouble(GenericAnnotationType.MTCONFIDENCE_VALUE), 0.0);
+		//TODO: annotatorsref
+		tu = FilterTestDriver.getTextUnit(list, 2);
+		assertEquals("text 2", tu.getSource().toString());
+		anns = tu.getAnnotation(GenericAnnotations.class);
+		ga = anns.getFirstAnnotation(GenericAnnotationType.MTCONFIDENCE);
+		assertEquals(0.78, ga.getDouble(GenericAnnotationType.MTCONFIDENCE_VALUE), 0.0);
+	}
+
+	@Test
 	public void testLocQualityLocalOnUnit () {
 		String snippet = "<?xml version=\"1.0\"?>\n"
 			+ "<doc its:version=\"2.0\" xmlns:its=\"http://www.w3.org/2005/11/its\">"
@@ -1060,7 +1084,7 @@ public class XMLFilterTest {
 		// Check inline ones
 		anns = (GenericAnnotations)tu.getSource().getFirstContent().getCodes().get(0).getAnnotation(GenericAnnotationType.GENERIC);
 		assertNotNull(anns);
-		assertEquals("[abc]", anns.getFirstAnnotation(GenericAnnotationType.ALLOWEDCHARS).getString(GenericAnnotationType.ALLOWEDCHARS_PATTERN));
+		assertEquals("[abc]", anns.getFirstAnnotation(GenericAnnotationType.ALLOWEDCHARS).getString(GenericAnnotationType.ALLOWEDCHARS_VALUE));
 	}
 
 	@Test

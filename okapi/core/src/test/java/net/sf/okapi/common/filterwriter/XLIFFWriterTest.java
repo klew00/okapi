@@ -354,9 +354,9 @@ public class XLIFFWriterTest {
 		writer.create(root+"out.xlf", null, locEN, null, null, "original.ext", null);
 		ITextUnit tu = new TextUnit("tu1", "text");
 		GenericAnnotation.addAnnotation(tu, new GenericAnnotation(GenericAnnotationType.DOMAIN,
-			GenericAnnotationType.DOMAIN_LIST, "dom1, dom2"));
-		GenericAnnotation.addAnnotation(tu, new GenericAnnotation(GenericAnnotationType.EXTRESREF,
-			GenericAnnotationType.EXTRESREF_IRI, "http://example.com/res"));
+			GenericAnnotationType.DOMAIN_VALUE, "dom1, dom2"));
+		GenericAnnotation.addAnnotation(tu, new GenericAnnotation(GenericAnnotationType.EXTERNALRES,
+			GenericAnnotationType.EXTERNALRES_VALUE, "http://example.com/res"));
 		writer.writeTextUnit(tu);
 		writer.close();
 

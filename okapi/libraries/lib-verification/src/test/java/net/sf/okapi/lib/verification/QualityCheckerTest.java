@@ -495,7 +495,7 @@ public class QualityCheckerTest {
 		ITextUnit tu = new TextUnit("id", "Summer and\nspring");
 		tu.setTarget(locFR, new TextContainer("\u00e9t\u00e9 et printemps"));
 		tu.setAnnotation(new GenericAnnotations(new GenericAnnotation(GenericAnnotationType.ALLOWEDCHARS,
-			GenericAnnotationType.ALLOWEDCHARS_PATTERN, "[a-z ]")));
+			GenericAnnotationType.ALLOWEDCHARS_VALUE, "[a-z ]")));
 		session.startProcess(locEN, locFR); // Make sure we re-initialize
 		session.processTextUnit(tu);
 		List<Issue> issues = session.getIssues();
