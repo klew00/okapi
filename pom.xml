@@ -15,6 +15,7 @@
 	<url>http://code.google.com/p/okapi</url>
 	
 	<modules>
+		<module>superpom/pom.xml</module>
 		<module>okapi</module>
 		<module>okapi-ui/swt</module>
 		<module>applications</module>
