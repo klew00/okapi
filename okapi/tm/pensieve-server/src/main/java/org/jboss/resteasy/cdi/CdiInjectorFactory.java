@@ -78,7 +78,7 @@ public ConstructorInjector createConstructor(Constructor constructor)
       return noopPropertyInjector;
    }
 
-   @Override
+   @SuppressWarnings("rawtypes")
    public ValueInjector createParameterExtractor(Class injectTargetClass, AccessibleObject injectTarget, Class type, Type genericType, Annotation[] annotations, boolean z)
    {
       return createParameterExtractor(injectTargetClass, injectTarget, type, genericType, annotations, true);
