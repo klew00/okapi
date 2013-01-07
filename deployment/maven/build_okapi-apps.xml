@@ -1,6 +1,8 @@
 <?xml version="1.0"?> 
 <project name="okapi-apps" default="all" basedir="."> 
 
+	<property file="libVersions.properties" />
+
 	<!-- This script assumes build_okapi-lib.xml has been run alreday -->
 	
 	<!-- Guess the platform if this build file is not called with the platform already set -->
@@ -20,22 +22,22 @@
 		<os name="Linux" arch="x86_64"/>
 	</condition>
 
-	<condition property="swtdep" value="win32/win32/x86/4.2">
+	<condition property="swtdep" value="win32/win32/x86/${org.eclipse.swt.version}">
 		<equals arg1="${platform}" arg2="win32-x86"/>
 	</condition>
-	<condition property="swtdep" value="win32/win32/x86_64/4.2">
+	<condition property="swtdep" value="win32/win32/x86_64/${org.eclipse.swt.version}">
 		<equals arg1="${platform}" arg2="win32-x86_64"/>
 	</condition>
-	<condition property="swtdep" value="cocoa/macosx/4.2">
+	<condition property="swtdep" value="cocoa/macosx/${org.eclipse.swt.version}">
 		<equals arg1="${platform}" arg2="cocoa-macosx"/>
 	</condition>
-	<condition property="swtdep" value="cocoa/macosx-x86_64/4.2">
+	<condition property="swtdep" value="cocoa/macosx-x86_64/${org.eclipse.swt.version}">
 		<equals arg1="${platform}" arg2="cocoa-macosx-x86_64"/>
 	</condition>
-	<condition property="swtdep" value="gtk2/linux/x86/4.2">
+	<condition property="swtdep" value="gtk2/linux/x86/${org.eclipse.swt.version}">
 		<equals arg1="${platform}" arg2="gtk2-linux-x86"/>
 	</condition>
-	<condition property="swtdep" value="gtk2/linux/x86_64/4.2">
+	<condition property="swtdep" value="gtk2/linux/x86_64/${org.eclipse.swt.version}">
 		<equals arg1="${platform}" arg2="gtk2-linux-x86_64"/>
 	</condition>
 

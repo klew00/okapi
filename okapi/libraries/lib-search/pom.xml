@@ -37,7 +37,7 @@
 		</dependency>
 
 		<!-- PLEASE DO NOT REMOVE!!!!!
-			Add this to properties:
+			Add this to properties, to the superpom:
 			<org.apache.lucene.version>3.1.0</org.apache.lucene.version>
 
 			<dependency> <groupId>org.apache.lucene</groupId> 
