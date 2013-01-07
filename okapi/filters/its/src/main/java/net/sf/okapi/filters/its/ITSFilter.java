@@ -507,20 +507,30 @@ public abstract class ITSFilter implements IFilter {
 		attachAnnotations(code, frag);
 	}
 
+	/**
+	 * Attaches the annotations of the current node to a give code.
+	 * @param code the code (corresponding to the node being processed).
+	 * @param frag the fragmnent where the inline code has been added.
+	 */
 	private void attachAnnotations (Code code,
 		TextFragment frag)
 	{
 		// Map ITS annotations only if requested
 		if ( !params.mapAnnotations ) return;
 		
-		// Allowed Characters
+		// ITS Disambiguation
+		GenericAnnotations anns = trav.getDisambiguationAnnotation(null);
+		if ( anns != null ) {
+			GenericAnnotations.addAnnotations(code, anns);
+		}
+		// ITS Allowed Characters
 		String value = trav.getAllowedCharacters(null);
 		if ( value != null ) {
 			GenericAnnotation.addAnnotation(code, new GenericAnnotation(GenericAnnotationType.ALLOWEDCHARS,
 				GenericAnnotationType.ALLOWEDCHARS_VALUE, value));
 		}
-		// Storage Size
-		GenericAnnotations anns = trav.getStorageSizeAnnotation(null);
+		// ITS Storage Size
+		anns = trav.getStorageSizeAnnotation(null);
 		if ( anns != null ) {
 			GenericAnnotations.addAnnotations(code, anns);
 		}
@@ -592,6 +602,10 @@ public abstract class ITSFilter implements IFilter {
 			GenericAnnotation.addAnnotation(tu, new GenericAnnotation(GenericAnnotationType.DOMAIN,
 				GenericAnnotationType.DOMAIN_VALUE, ci.domains)
 			);
+		}
+		// ITS Disambiguation
+		if ( ci.disambig != null ) {
+			GenericAnnotations.addAnnotations(tu.getSource(), ci.disambig);
 		}
 		// ITS External Resource
 		if ( !Util.isEmpty(ci.externalRes) ) {
@@ -960,6 +974,10 @@ public abstract class ITSFilter implements IFilter {
 			GenericAnnotation.addAnnotation(tu, new GenericAnnotation(GenericAnnotationType.DOMAIN,
 				GenericAnnotationType.DOMAIN_VALUE, context.peek().domains)
 			);
+		}
+		// ITS Disambiguation
+		if ( context.peek().disambig != null ) {
+			GenericAnnotations.addAnnotations(tu.getSource(), context.peek().disambig);
 		}
 		// ITS External resources Reference
 		if ( !Util.isEmpty(context.peek().externalRes) ) {

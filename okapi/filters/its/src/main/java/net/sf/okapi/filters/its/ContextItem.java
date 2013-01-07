@@ -40,6 +40,7 @@ class ContextItem {
 	GenericAnnotations lqIssues;
 	GenericAnnotations storageSize;
 	GenericAnnotations lqRating;
+	GenericAnnotations disambig;
 	Double mtConfidence;
 
 	public ContextItem (Node node,
@@ -66,6 +67,7 @@ class ContextItem {
 		this.lqIssues = trav.getLocQualityIssueAnnotation(attribute);
 		this.lqRating = trav.getLocQualityRatingAnnotation();
 		this.mtConfidence = trav.getMtConfidence(attribute);
+		this.disambig = trav.getDisambiguationAnnotation(attribute);
 	}
 
 }
