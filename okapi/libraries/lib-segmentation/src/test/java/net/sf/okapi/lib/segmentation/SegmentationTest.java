@@ -344,6 +344,14 @@ public class SegmentationTest {
 		assertEquals("[<1>Part 1</1>.][ Part 2.]", fmt.printSegmentedContent(tu.getSource(), true));
 	}
 	
+	@Test
+	public void testSegmentationWithEmptyString() {
+		TextContainer tc = createSegmentedContainer("", segmenter);
+		ISegments segments = tc.getSegments();
+		// FIXME: Why is this 1 - why not 0?
+		assertEquals(1, segments.count());
+	}
+	
 	private TextContainer createSimpleContent () {
 		TextFragment tf = new TextFragment();
 		tf.append(TagType.OPENING, "s", "<s>");

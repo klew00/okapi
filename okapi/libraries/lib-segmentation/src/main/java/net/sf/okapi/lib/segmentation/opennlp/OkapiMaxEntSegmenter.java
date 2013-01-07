@@ -66,8 +66,7 @@ public class OkapiMaxEntSegmenter implements ISegmenter {
 			// find a locale based default model
 			mp = FileUtil.getLocaleBasedFile(DEFAULT_MODEL_PATH, "bin", locale);
 			if (mp == null) {
-				throw new OkapiIOException(
-						"Cannot find default OpenNLP sentence breaking model for: "
+				throw new OkapiIOException("Cannot find default OpenNLP sentence breaking model for: "
 								+ locale.toString());
 			}
 		} else {
@@ -76,11 +75,9 @@ public class OkapiMaxEntSegmenter implements ISegmenter {
 
 		try {
 			model = new SentenceModel(new FileInputStream(mp));
-			this.sentenceDetector = new SentenceDetectorME(model,
-					new OkapiSentenceDetectorFactory(locale));
+			this.sentenceDetector = new SentenceDetectorME(model, new OkapiSentenceDetectorFactory(locale));
 		} catch (Exception e) {
-			throw new OkapiIOException(
-					"Error loading OpenNLP sentence breaking model: " + mp, e);
+			throw new OkapiIOException("Error loading OpenNLP sentence breaking model: " + mp, e);
 		}
 	}
 
@@ -95,8 +92,7 @@ public class OkapiMaxEntSegmenter implements ISegmenter {
 		oneSegmentIncludesAll = false; // Extension
 		trimLeadingWS = false; // Extension IN TEST (was true for StringInfo)
 		trimTrailingWS = false; // Extension IN TEST (was true for StringInfo)
-		trimCodes = false; // Extension IN TEST (was false for StringInfo) NOT
-							// USED for now
+		trimCodes = false; // Extension IN TEST (was false for StringInfo) NOT USED FOR NOW						
 	}
 
 	/**
@@ -169,8 +165,9 @@ public class OkapiMaxEntSegmenter implements ISegmenter {
 				splits.put(sentencePositions[i+1].getEnd() - sentencePositions[i].getStart(), false);
 			}
 		}
-		// handle trailing non-segment characters
-		if (codedText.length() - sentencePositions[i-1].getEnd() > 0) {
+		// handle trailing non-segment characters		
+		if (codedText.length() > 0 && 
+				codedText.length() - sentencePositions[i-1].getEnd() > 0) {
 			splits.put(codedText.length(), false);
 		}
 

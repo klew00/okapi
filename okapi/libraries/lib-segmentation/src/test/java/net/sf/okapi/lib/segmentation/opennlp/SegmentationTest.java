@@ -23,6 +23,7 @@ package net.sf.okapi.lib.segmentation.opennlp;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
@@ -41,6 +42,10 @@ import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.resource.TextPart;
 import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.lib.segmentation.LanguageMap;
+import net.sf.okapi.lib.segmentation.Rule;
+import net.sf.okapi.lib.segmentation.SRXDocument;
+import net.sf.okapi.lib.segmentation.SRXSegmenter;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -150,16 +155,11 @@ public class SegmentationTest {
 
 	@Test
 	public void testSegmentationSimple1() {
-		TextContainer tc = createSegmentedContainer("already. Zoey", segmenter);
+		TextContainer tc = createSegmentedContainer("There is already time. Zoey is there", segmenter);
 		ISegments segments = tc.getSegments();
 		assertEquals(2, segments.count());
-		assertEquals("already.", segments.get(0).toString());
-		assertEquals(" Zoey", segments.get(1).toString());
-		tc = createSegmentedContainer("a. z", segmenterTrim);
-		segments = tc.getSegments();
-		assertEquals(2, segments.count());
-		assertEquals("already.", segments.get(0).toString());
-		assertEquals(" Zoey", segments.get(1).toString());
+		assertEquals("There is already time.", segments.get(0).toString());
+		assertEquals(" Zoey is there", segments.get(1).toString());
 	}
 
 	@Test
@@ -178,19 +178,9 @@ public class SegmentationTest {
 
 	@Test
 	public void testSegmentationWithEmpty() {
-		TextContainer tc = createSegmentedContainer(" a. | b.", segmenter);
+		TextContainer tc = createSegmentedContainer("", segmenter);
 		ISegments segments = tc.getSegments();
-		assertEquals(3, segments.count());
-		assertEquals(" a.", segments.get(0).toString());
-		assertEquals(" |", segments.get(1).toString());
-		assertEquals(" b.", segments.get(2).toString());
-		// 1 segment only because the last one is only made of whitespaces
-		tc = createSegmentedContainer(" a. |  b.", segmenterTrim);
-		segments = tc.getSegments();
-		assertEquals(3, segments.count());
-		assertEquals("a.", segments.get(0).toString());
-		assertEquals("|", segments.get(1).toString());
-		assertEquals("b.", segments.get(2).toString());
+		assertEquals(1, segments.count());
 	}
 
 	@Test
@@ -201,18 +191,6 @@ public class SegmentationTest {
 		
 		segter.computeSegments(" a ");
 		List<Range> list = segter.getRanges();
-		assertEquals(1, list.get(0).start);
-		assertEquals(2, list.get(0).end);
-
-		segter = new OkapiMaxEntSegmenter(null, LocaleId.ENGLISH);
-		segter.computeSegments(" a ");
-		list = segter.getRanges();
-		assertEquals(0, list.get(0).start);
-		assertEquals(3, list.get(0).end);
-
-		segter = new OkapiMaxEntSegmenter(null, LocaleId.ENGLISH);
-		segter.computeSegments(" a ");
-		list = segter.getRanges();
 		assertEquals(1, list.get(0).start);
 		assertEquals(2, list.get(0).end);
 	}
@@ -317,6 +295,41 @@ public class SegmentationTest {
 		// We should get the same result
 		assertEquals("[<1>Part 1</1>.][ Part 2.]",
 				fmt.printSegmentedContent(tu.getSource(), true));
+	}
+	
+	@Test
+	public void testRealSentences() {
+		OkapiMaxEntSegmenter seg = new OkapiMaxEntSegmenter(null, LocaleId.ENGLISH);
+		assertNotNull(seg);
+		assertEquals(seg.getLanguage(), "en");
+		assertNull(seg.getRanges()); // Null set yet
+		seg.computeSegments("Mr. Holmes. The detective.");
+		assertNotNull(seg.getRanges());
+		assertEquals(seg.getRanges().size(), 2);
+		seg.computeSegments("MR. Holmes. The detective.");
+		assertEquals(seg.getRanges().size(), 3);
+		
+		TextFragment tf = new TextFragment("One.");
+		tf.append(TagType.OPENING, "b", "<b>");
+		tf.append(" Two.");
+		tf.append(TagType.CLOSING, "b", "</b>");
+		TextContainer tc = new TextContainer(tf);
+		seg.setOptions(true, true, true, false, false, false, false);
+		seg.computeSegments(tc);
+		// "One.XX Two.YY" --> "[One.XX][ Two.YY]"
+		List<Range> ranges = seg.getRanges();
+		assertNotNull(ranges);
+		assertEquals(ranges.size(), 2);
+		assertEquals(ranges.get(0).end, 6);
+		assertEquals(ranges.get(1).start, 6);
+		seg.setOptions(true, false, true, false, false, false, false);
+		seg.computeSegments(tc);
+		// "One.XX Two.YY" --> "[One.][XX Two.YY]"
+		ranges = seg.getRanges();
+		assertNotNull(ranges);
+		assertEquals(ranges.size(), 2);
+		assertEquals(ranges.get(0).end, 4);
+		assertEquals(ranges.get(1).start, 4);
 	}
 
 	private TextContainer createSimpleContent() {
