@@ -237,7 +237,7 @@ public class TraversalTest {
 			+ "<meta charset=utf-8><title>Title</title></head>"
 			+ "<body its-annotators-ref='MT-ConFiDeNce|file:///tools.xml#T1'><p>"
 			+ "<span its-mt-confidence=0.8982>Dublin is the capital of Ireland.</span> "
-			+ "<span its-mt-confidence=0.8536 >The capital of the Czech Republic is Prague.</span>"
+			+ "<span its-mt-confidence=0.8536 its-annotators-ref='mt-Confidence|t2'>The capital of the Czech Republic is Prague.</span>"
 			+ "</p></body>/html>"));
 		Document doc = htmlDocBuilder.parse(is);
 		ITraversal trav = applyITSRules(doc, null, true, null);
@@ -245,10 +245,12 @@ public class TraversalTest {
 		assertNotNull(elem);
 		assertEquals(0.8982, trav.getMtConfidence(null), 0.0);
 		assertEquals("mt-confidence|file:///tools.xml#T1", trav.getAnnotatorsRef());
+		assertEquals("file:///tools.xml#T1", trav.getAnnotatorRef("mt-confidence"));
 		elem = getElement(trav, "span", 2);
 		assertNotNull(elem);
 		assertEquals(0.8536, trav.getMtConfidence(null), 0.0);
-		assertEquals("mt-confidence|file:///tools.xml#T1", trav.getAnnotatorsRef());
+		assertEquals("mt-confidence|t2", trav.getAnnotatorsRef());
+		assertEquals("t2", trav.getAnnotatorRef("mt-confidence"));
 	}
 
 	@Test
@@ -272,11 +274,13 @@ public class TraversalTest {
 		Attr attr = elem.getAttributeNode("title");
 		assertEquals(0.785, trav.getMtConfidence(attr), 0.0);
 		assertEquals("mt-confidence|file:///tools.xml#T1", trav.getAnnotatorsRef());
+		assertEquals("file:///tools.xml#T1", trav.getAnnotatorRef("mt-confidence"));
 		elem = getElement(trav, "img", 2);
 		assertNotNull(elem);
 		attr = elem.getAttributeNode("title");
 		assertEquals(0.805, trav.getMtConfidence(attr), 0.0);
 		assertEquals("mt-confidence|file:///tools.xml#T1", trav.getAnnotatorsRef());
+		assertEquals("file:///tools.xml#T1", trav.getAnnotatorRef("mt-confidence"));
 	}
 	
 	@Test

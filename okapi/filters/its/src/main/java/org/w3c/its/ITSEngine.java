@@ -2003,7 +2003,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 				// Validate the values
 				Map<String, String> map = annotatorsRefToMap(value);
 				for ( String dc : map.keySet() ) {
-					validateAnnotatorsRefValue(dc);
+					validateDataCategoryNames(dc);
 				}
 				// Set the flag
 				setFlag(attr.getOwnerElement(), FP_ANNOTATORSREF,
@@ -2012,7 +2012,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 						value, attr.getSpecified()); 
 			}
 			
-			// locale filter
+			// Locale filter
 			if (( (dataCategories & IProcessor.DC_LOCFILTER) > 0 ) && isVersion2() ) {
 				if ( isHTML5 ) {
 					expr = xpath.compile("//*/@its-locale-filter-list");
@@ -2303,15 +2303,14 @@ public class ITSEngine implements IProcessor, ITraversal {
 		}
 	}
 	
-	private String validateAnnotatorsRefValue (String data) {
-		if ( Util.isEmpty(data) || ( ("allowed-characters|directionality|disambiguation|domain|elements-within-text|"
+	private void validateDataCategoryNames (String dc) {
+		if ( Util.isEmpty(dc) || ( ("allowed-characters|directionality|disambiguation|domain|elements-within-text|"
 			+ "external-resource|id-value|language-information|locale-filter|localization-note|lq-issue|lq-rating|"
-			+ "mt-confidence|provenance|ruby|storage-size|target-pointer|terminology|translate").indexOf(data)==-1 ))
+			+ "mt-confidence|provenance|ruby|storage-size|target-pointer|terminology|translate").indexOf(dc)==-1 ))
 		{
 			// Log an error, but don't stop the process
-			logger.error("Invalid value for annotatorsRef/its-annotators-ref: '{}'", data);
+			logger.error("Invalid data category name: '{}'.", dc);
 		}
-		return data;
 	}
 	
 	/**
@@ -3512,6 +3511,15 @@ public class ITSEngine implements IProcessor, ITraversal {
 	@Override
 	public String getAnnotatorsRef () {
 		return trace.peek().annotatorsRef;
+	}
+
+	@Override
+	public String getAnnotatorRef (String dc) {
+		validateDataCategoryNames(dc);
+		String tmp = trace.peek().annotatorsRef;
+		if ( tmp == null ) return null;
+		Map<String, String> map = annotatorsRefToMap(tmp);
+		return map.get(dc);
 	}
 	
 	@Override

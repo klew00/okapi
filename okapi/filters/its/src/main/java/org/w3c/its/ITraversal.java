@@ -187,6 +187,13 @@ public interface ITraversal {
 	public String getAnnotatorsRef ();
 	
 	/**
+	 * Gets the annotator reference for a given data category.
+	 * @param dc the name of the data category to look up.
+	 * @return the reference for the given data category, or null.
+	 */
+	public String getAnnotatorRef (String dc);
+	
+	/**
 	 * Gets the MT Confidence value for the current element of the traversal or one
 	 * of its attributes.
 	 * @param attribute the attribute to query or null for the element.
