@@ -18,6 +18,7 @@
 		<module>superpom/pom.xml</module>
 		<module>okapi</module>
 		<module>okapi-ui/swt</module>
+		<module>okapi-ui/rwt</module>
 		<module>applications</module>
 	</modules>
 </project>
