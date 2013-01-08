@@ -15,6 +15,7 @@
     <modules>
         <module>rainbow</module>
         <module>ratel</module>
+		<module>ratel-webapp</module>
         <module>checkmate</module>
         <module>serval</module> <!-- For TM debug -->
         <module>longhorn</module>

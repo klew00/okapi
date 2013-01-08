@@ -4,25 +4,37 @@
     <artifactId>build-okapi-ui-rwt</artifactId>
     <version>0.20-SNAPSHOT</version>
   </parent>
+  
   <modelVersion>4.0.0</modelVersion>
   <artifactId>okapi-core-ui-rwt</artifactId>
   <!--Used for display purposes only-->
     <name>Eclipse RWT Okapi Core UI</name>
    
+  	<repositories>
+		<!-- In Project repository -->
+		<repository>
+		<id>in-project</id>
+		<name>RWT 1.5.1 In-project Repo</name>
+		<url>file://${project.basedir}/repo</url>
+		</repository>
+	</repositories>
+  
   <dependencies>
   	<dependency>
-  		<groupId>commons-fileupload</groupId>
-  		<artifactId>commons-fileupload</artifactId>
-  		<version>1.2.2</version>
+  		<groupId>org.eclipse.rap</groupId>
+  		<artifactId>rwt</artifactId>
+  		<version>1.5.1</version>
   	</dependency>
   	<dependency>
-  		<groupId>commons-io</groupId>
-  		<artifactId>commons-io</artifactId>
-  		</dependency>
+  		<groupId>org.eclipse.rap</groupId>
+  		<artifactId>rwt-fileupload</artifactId>
+  		<version>1.5.1</version>
+  	</dependency>
   	<dependency>
-  		<groupId>javax.servlet</groupId>
-  		<artifactId>javax.servlet-api</artifactId>
-  		<version>3.0.1</version>
+  		<groupId>org.eclipse.rap</groupId>
+  		<artifactId>rwt-filedialog</artifactId>
+  		<version>1.5.1</version>
   	</dependency>
   </dependencies>
+  
 </project>

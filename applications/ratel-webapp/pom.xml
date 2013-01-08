@@ -1,0 +1,48 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>net.sf.okapi.applications</groupId>
+    <artifactId>build-applications</artifactId>
+    <version>0.20-SNAPSHOT</version>
+  </parent>
+  <artifactId>okapi-application-ratel-webapp</artifactId>
+  <packaging>war</packaging>
+  <name>Okapi Ratel (Web version)</name>
+  <dependencies>
+  	<dependency>
+  		<groupId>net.sf.okapi</groupId>
+  		<artifactId>okapi-core-ui-rwt</artifactId>
+  		<version>${project.version}</version>
+  	</dependency>
+  	<dependency>
+  		<groupId>net.sf.okapi.lib</groupId>
+  		<artifactId>okapi-lib-segmentation-ui</artifactId>
+  		<version>${project.version}</version>
+  	</dependency>
+  </dependencies>
+  
+  <build>
+  	<finalName>okapi-ratel</finalName>
+  	<plugins>
+<!--   		<plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-deploy-plugin</artifactId>
+            <configuration>
+                <skip>true</skip>
+            </configuration>
+        </plugin>
+ -->        
+        <plugin>
+        	<groupId>org.apache.maven.plugins</groupId>
+        	<artifactId>maven-war-plugin</artifactId>
+            <configuration>
+            <!-- 
+                <attachClasses>true</attachClasses>
+                <classesClassifier>classes</classesClassifier>
+                -->
+                <webXml>WEB-INF\web.xml</webXml>
+            </configuration>
+        </plugin>    
+  	</plugins>
+  </build>
+</project>

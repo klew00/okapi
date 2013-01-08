@@ -1,0 +1,8 @@
+mvn install:install-file -Dfile=org.eclipse.rap.rwt_1.5.1.20120917-1116_unsigned.jar -DgroupId=org.eclipse.rap -DartifactId=rwt -Dversion=1.5.1 -Dpackaging=jar -DlocalRepositoryPath=repo -DcreateChecksum=true
+mvn install:install-file -Dfile=org.eclipse.rap.rwt.supplemental.filedialog_1.5.0.20120220-1720_unsigned.jar -DgroupId=org.eclipse.rap -DartifactId=rwt-filedialog -Dversion=1.5.1 -Dpackaging=jar -DlocalRepositoryPath=repo -DcreateChecksum=true
+mvn install:install-file -Dfile=org.eclipse.rap.rwt.supplemental.fileupload_1.5.0.20120220-1720_unsigned.jar -DgroupId=org.eclipse.rap -DartifactId=rwt-fileupload -Dversion=1.5.1 -Dpackaging=jar -DlocalRepositoryPath=repo -DcreateChecksum=true
+
+mvn install:install-file -Dfile=org.eclipse.rap.rwt_1.5.1.20120917-1116_unsigned.jar -DpomFile=rwt-1.5.1.pom -Dpackaging=jar -DlocalRepositoryPath=repo -DcreateChecksum=true
+mvn install:install-file -Dfile=org.eclipse.rap.rwt.supplemental.filedialog_1.5.0.20120220-1720_unsigned.jar -DpomFile=rwt-filedialog-1.5.1.pom -Dpackaging=jar -DlocalRepositoryPath=repo -DcreateChecksum=true
+mvn install:install-file -Dfile=org.eclipse.rap.rwt.supplemental.fileupload_1.5.0.20120220-1720_unsigned.jar -DpomFile=rwt-fileupload-1.5.1.pom -Dpackaging=jar -DlocalRepositoryPath=repo -DcreateChecksum=true
+
