@@ -32,7 +32,7 @@ public interface IProcessor {
 	public static final long DC_LOCNOTE           = 0x00000008;
 	public static final long DC_TERMINOLOGY       = 0x00000010;
 	public static final long DC_DIRECTIONALITY    = 0x00000020;
-	public static final long DC_RUBY              = 0x00000040;
+	// Not used: public static final long DC_RUBY              = 0x00000040;
 	public static final long DC_IDVALUE           = 0x00000080; // ITS 2.0
 	public static final long DC_DOMAIN            = 0x00000100; // ITS 2.0
 	public static final long DC_TARGETPOINTER     = 0x00000200; // ITS 2.0
@@ -45,9 +45,9 @@ public interface IProcessor {
 	public static final long DC_MTCONFIDENCE      = 0x00010000; // ITS 2.0
 	public static final long DC_DISAMBIGUATION    = 0x00020000; // ITS 2.0
 	public static final long DC_LOCQUALITYRATING  = 0x00040000; // ITS 2.0
-//TODO	public static final long DC_PROVENANCE        = 0x00080000; // ITS 2.0
+	public static final long DC_PROVENANCE        = 0x00080000; // ITS 2.0
 	
-	public static final long DC_SUBFILTER         = 0x00080000; // Extension
+	public static final long DC_SUBFILTER         = 0x00100000; // Extension
 
 	public static final long DC_ALL               = 0xFFFFFFFF;
 	

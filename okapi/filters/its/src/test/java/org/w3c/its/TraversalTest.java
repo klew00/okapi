@@ -647,6 +647,24 @@ public class TraversalTest {
 	}
 
 	@Test
+	public void testProvenanceLocal () throws SAXException, IOException, ParserConfigurationException {
+		InputSource is = new InputSource(new StringReader("<doc xmlns:i='"+ITSEngine.ITS_NS_URI+"' i:version='2.0'>"
+			+ "<p i:person='p1' i:orgRef='oRef1' i:tool='t1' i:revPersonRef='rpRef1' i:revOrg='ro1' i:revToolRef='rtRef1' i:provRef='provref1'>Text</p>"
+			+ "</doc>"));
+		Document doc = fact.newDocumentBuilder().parse(is);
+		ITraversal trav = applyITSRules(doc, null, false, null);
+		getElement(trav, "p", 1);
+		assertEquals(null, trav.getProvRecordsRef(null));
+		assertEquals("p1", trav.getProvPerson(null, 0));
+		assertEquals("REF:oRef1", trav.getProvOrg(null, 0));
+		assertEquals("t1", trav.getProvTool(null, 0));
+		assertEquals("REF:rpRef1", trav.getProvRevPerson(null, 0));
+		assertEquals("ro1", trav.getProvRevOrg(null, 0));
+		assertEquals("REF:rtRef1", trav.getProvRevTool(null, 0));
+		assertEquals("REF:provref1", trav.getProvRef(null, 0));
+	}
+
+	@Test
 	public void testAnnotatorsRef () throws SAXException, IOException, ParserConfigurationException {
 		InputSource is = new InputSource(new StringReader("<doc xmlns:i='"+ITSEngine.ITS_NS_URI+"' i:version='2.0'>"
 			+ "<group i:annotatorsRef='terminology|uri2 mt-confidence|uri1'>"

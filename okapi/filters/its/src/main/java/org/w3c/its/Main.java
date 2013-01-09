@@ -56,7 +56,7 @@ public class Main {
 	public static final String DC_DOMAIN = "domain";
 	public static final String DC_DISAMBIGUATION = "disambiguation";
 	public static final String DC_LOCALEFILTER = "localefilter";
-	// TODO: public static final String DC_PROVENANCE = "provenance";
+	public static final String DC_PROVENANCE = "provenance";
 	public static final String DC_EXTERNALRESOURCE = "externalresource";
 	public static final String DC_TARGETPOINTER = "targetpointer";
 	public static final String DC_IDVALUE = "idvalue";
@@ -102,6 +102,7 @@ public class Main {
 						+ "\n" + DC_DOMAIN
 						+ "\n" + DC_DISAMBIGUATION
 						+ "\n" + DC_LOCALEFILTER
+						+ "\n" + DC_PROVENANCE
 						+ "\n" + DC_EXTERNALRESOURCE
 						+ "\n" + DC_TARGETPOINTER
 						+ "\n" + DC_IDVALUE
@@ -387,6 +388,30 @@ public class Main {
 			out1 = trav.getLocaleFilter();
 			if ( out1 != null ) writer.print(String.format("\tlocaleFilterList=\"%s\"", escape(out1)));
 		}
+		else if ( dc.equals(DC_PROVENANCE) ) {
+			int count = trav.getProvRecordCount(attr);
+			if ( count == 0 ) {
+				writer.print("\n");
+				return; // Done for this node
+			}
+			// Else: print the entries
+			// IssuesRef
+			boolean standoff = false;
+			out1 = trav.getProvRecordsRef(attr);
+			if ( out1 != null ) {
+				writer.print(String.format("\tprovenanceRecordsRef=\"%s\"", escape(out1)));
+				standoff = true;
+			}
+			for ( int i=0; i<count; i++ ) {
+				printProvString(standoff, trav.getProvOrg(attr, i), "org", i, writer);
+				printProvString(standoff, trav.getProvPerson(attr, i), "person", i, writer);
+				printProvString(standoff, trav.getProvRef(attr, i), "provRef", i, writer);
+				printProvString(standoff, trav.getProvRevOrg(attr, i), "revOrg", i, writer);
+				printProvString(standoff, trav.getProvRevPerson(attr, i), "revPerson", i, writer);
+				printProvString(standoff, trav.getProvRevTool(attr, i), "revTool", i, writer);
+				printProvString(standoff, trav.getProvTool(attr, i), "tool", i, writer);
+			}
+		}
 		else if ( dc.equals(DC_EXTERNALRESOURCE) ) {
 			out1 = trav.getExternalResourceRef(attr);
 			if ( out1 != null ) writer.print(String.format("\texternalResourceRef=\"%s\"", escape(out1)));
@@ -518,7 +543,28 @@ public class Main {
 		
 		writer.print("\n");
 	}
-	
+
+	private static void printProvString (boolean standoff,
+		String value,
+		String name, 
+		int index, 
+		PrintWriter writer)
+	{
+		if ( value != null ) {
+			String suffix = "";
+			if ( value.startsWith(ITSEngine.REF_PREFIX) ) {
+				value = value.substring(ITSEngine.REF_PREFIX.length());
+				suffix = "Ref";
+			}
+			if ( standoff ) {
+				writer.print(String.format("\t%s%s[%d]=\"%s\"", name, suffix, index+1, escape(value)));
+			}
+			else {
+				writer.print(String.format("\t%s%s=\"%s\"", name, suffix, escape(value)));
+			}
+		}
+		
+	}
 	private static String unwrap (String text){
 		TextFragment tf = new TextFragment(text);
 		TextFragment.unwrap(tf);

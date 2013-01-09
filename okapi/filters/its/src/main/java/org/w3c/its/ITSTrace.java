@@ -47,6 +47,7 @@ class ITSTrace {
 	GenericAnnotations storageSize;
 	GenericAnnotations disambig;
 	GenericAnnotations lqRating;
+	GenericAnnotations prov;
 
 	ITSTrace () {
 		// Default constructor

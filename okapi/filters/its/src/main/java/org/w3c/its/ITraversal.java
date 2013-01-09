@@ -221,4 +221,30 @@ public interface ITraversal {
 	
 	public String getLocQualityRatingProfileRef (Attr attribute);
 	
+	public String getProvRecordsRef (Attr attribute);
+	
+	public int getProvRecordCount (Attr attribute);
+	
+	public String getProvPerson (Attr attribute,
+		int index);
+		
+	public String getProvOrg (Attr attribute,
+		int index);
+		
+	public String getProvTool (Attr attribute,
+		int index);
+		
+	public String getProvRevPerson (Attr attribute,
+		int index);
+		
+	public String getProvRevOrg (Attr attribute,
+		int index);
+		
+	public String getProvRevTool (Attr attribute,
+		int index);
+		
+	public String getProvRef (Attr attribute,
+		int index);
+			
+		
 }

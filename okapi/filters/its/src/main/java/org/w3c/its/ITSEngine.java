@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2012 by the Okapi Framework contributors
+  Copyright (C) 2008-2013 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -83,9 +83,9 @@ public class ITSEngine implements IProcessor, ITraversal {
 	
 	// Must have '?' as many times as there are FP_XXX entries +1
 	// Must have +FLAGSEP as many times as there are FP_XXX_DATA entries +1
-	private static final String   FLAGDEFAULTDATA     = "???????????????????"
+	private static final String   FLAGDEFAULTDATA     = "????????????????????"
 		+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP
-		+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP;
+		+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP;
 
 	private static final String SRC_TRGPTRFLAGNAME = "\u10ff"; // Name of the user-data property that holds the target pointer flag in the source
 	private static final String TRG_TRGPTRFLAGNAME = "\u20ff"; // Name of the user-data property that holds the target pointer flag in the target
@@ -113,6 +113,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 	private static final int      FP_MTCONFIDENCE          = 16;
 	private static final int      FP_DISAMBIGUATION        = 17;
 	private static final int      FP_LQRATING              = 18;
+	private static final int      FP_PROVENANCE            = 19;
 	
 	// Data position 
 	private static final int      FP_TERMINOLOGY_DATA      = 0;
@@ -131,6 +132,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 	private static final int      FP_MTCONFIDENCE_DATA     = 13;
 	private static final int      FP_DISAMBIGUATION_DATA   = 14;
 	private static final int      FP_LQRATING_DATA         = 15;
+	private static final int      FP_PROVENANCE_DATA       = 16;
 	
 	private static final int      INFOTYPE_TEXT            = 0;
 	private static final int      INFOTYPE_REF             = 1;
@@ -158,6 +160,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 	private boolean hasTargetPointer;
 	private String version;
 	private IdGenerator idGen;
+	private IdGenerator idProvGen;
 
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 	
@@ -205,6 +208,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 		defaultIdsDone = false;
 		
 		idGen = null;
+		idProvGen = null;
 	}
 	
 	public void setVariables (Map<String, String> map) {
@@ -459,6 +463,9 @@ public class ITSEngine implements IProcessor, ITraversal {
 					}
 					else if ( "locQualityIssueRule".equals(locName) ) {
 						compileLocQualityIssueRule(ruleElem, isInternal);
+					}
+					else if ( "provRule".equals(locName) ) {
+						compileProvRule(ruleElem, isInternal);
 					}
 					else if ( "storageSizeRule".equals(locName) ) {
 						compileStorageSizeRule(ruleElem, isInternal);
@@ -863,10 +870,37 @@ public class ITSEngine implements IProcessor, ITraversal {
 		rules.add(rule);
 	}
 	
+	private void compileProvRule (Element elem,
+		boolean isInternal)
+	{
+		ITSRule rule = new ITSRule(IProcessor.DC_PROVENANCE);
+		rule.selector = elem.getAttribute("selector");
+		rule.isInternal = isInternal;
+
+		String pointer = elem.getAttribute("provenanceRecordsRefPointer");
+		if ( Util.isEmpty(pointer) ) {
+			throw new ITSException("You must have a provenanceRecordsRefPointer attribute defined.");
+		}
+		rule.annotations = createProvenanceAnnotationSet();
+		GenericAnnotation ann = addIssueItem(rule.annotations);
+		rule.info = pointer;
+		rule.infoType = INFOTYPE_REFPOINTER;
+
+		// Add the rule
+		rules.add(rule);
+	}
+	
 	private GenericAnnotations createLQIAnnotationSet () {
 		GenericAnnotations anns = new GenericAnnotations();
 		if ( idGen == null ) idGen = new IdGenerator(null, "lqi");
 		anns.setData(idGen.createId());
+		return anns;
+	}
+
+	private GenericAnnotations createProvenanceAnnotationSet () {
+		GenericAnnotations anns = new GenericAnnotations();
+		if ( idProvGen == null ) idProvGen = new IdGenerator(null, "prov");
+		anns.setData(idProvGen.createId());
 		return anns;
 	}
 
@@ -1306,6 +1340,10 @@ public class ITSEngine implements IProcessor, ITraversal {
 			trace.peek().lqIssues = new GenericAnnotations(getFlagData(data, FP_LQISSUE_DATA));
 		}
 
+		if ( data.charAt(FP_PROVENANCE) == 'y' ) {
+			trace.peek().prov = new GenericAnnotations(getFlagData(data, FP_PROVENANCE_DATA));
+		}
+
 		if ( data.charAt(FP_DISAMBIGUATION) == 'y' ) {
 			trace.peek().disambig = new GenericAnnotations(getFlagData(data, FP_DISAMBIGUATION_DATA));
 		}
@@ -1639,6 +1677,26 @@ public class ITSEngine implements IProcessor, ITraversal {
 						// Decorate the node with the resolved annotation data
 						setFlag(NL.item(i), FP_LQISSUE, 'y', true);
 						setFlag(NL.item(i), FP_LQISSUE_DATA, anns.toString(), true);
+					}
+
+					else if ( rule.ruleType == IProcessor.DC_PROVENANCE ) {
+						GenericAnnotations anns = null;
+						String oriRef = data1 = rule.info;
+						if ( data1 != null ) {
+							if ( rule.infoType == INFOTYPE_REFPOINTER) {
+								oriRef = data1 = resolvePointer(NL.item(i), data1);
+							}
+							// Fetch the stand-off data
+							anns = fetchProvenanceStandoffData(data1, oriRef);
+						}
+						else {
+							// Not a stand-off annotation
+							// There is no pointer to resove, we can re-use the same annotation
+							anns = rule.annotations;
+						}
+						// Decorate the node with the resolved annotation data
+						setFlag(NL.item(i), FP_PROVENANCE, 'y', true);
+						setFlag(NL.item(i), FP_PROVENANCE_DATA, anns.toString(), true);
 					}
 
 					else if ( rule.ruleType == IProcessor.DC_DISAMBIGUATION ) {
@@ -2089,6 +2147,66 @@ public class ITSEngine implements IProcessor, ITraversal {
 					// Set the updated flags
 					setFlag(attr.getOwnerElement(), FP_LQISSUE, 'y', attr.getSpecified());
 					setFlag(attr.getOwnerElement(), FP_LQISSUE_DATA, anns.toString(), attr.getSpecified()); 
+				}
+			}
+			
+			// provenance
+			if ( isVersion2() && ( (dataCategories & IProcessor.DC_PROVENANCE) > 0 )) {
+				if ( isHTML5 ) {
+					expr = xpath.compile("//*/@its-person|//*/@its-org|//*/@its-tool"
+						+ "|//*/@its-person-ref|//*/@its-org-ref|//*/@its-tool-ref"
+						+ "|//*/@its-rev-person|//*/@its-rev-org|//*/@its-rev-tool"
+						+ "|//*/@its-rev-person-ref|//*/@its-rev-org-ref|//*/@its-rev-tool-ref"
+						+ "|//*/@its-prov-ref|//*/@its-provenance-records-ref");
+				}
+				else {
+					expr = xpath.compile("//*/@"+ITS_NS_PREFIX+":person|//"+ITS_NS_PREFIX+":span/@person"
+						+ "|//*/@"+ITS_NS_PREFIX+":personRef|//"+ITS_NS_PREFIX+":span/@personRef"
+						+ "|//*/@"+ITS_NS_PREFIX+":org|//"+ITS_NS_PREFIX+":span/@org"
+						+ "|//*/@"+ITS_NS_PREFIX+":orgRef|//"+ITS_NS_PREFIX+":span/@orgRef"
+						+ "|//*/@"+ITS_NS_PREFIX+":tool|//"+ITS_NS_PREFIX+":span/@tool"
+						+ "|//*/@"+ITS_NS_PREFIX+":toolRef|//"+ITS_NS_PREFIX+":span/@toolRef"
+						+ "|//*/@"+ITS_NS_PREFIX+":revPerson|//"+ITS_NS_PREFIX+":span/@revPerson"
+						+ "|//*/@"+ITS_NS_PREFIX+":revPersonRef|//"+ITS_NS_PREFIX+":span/@revPersonRef"
+						+ "|//*/@"+ITS_NS_PREFIX+":revOrg|//"+ITS_NS_PREFIX+":span/@revOrg"
+						+ "|//*/@"+ITS_NS_PREFIX+":revOrgRef|//"+ITS_NS_PREFIX+":span/@revOrgRef"
+						+ "|//*/@"+ITS_NS_PREFIX+":revTool|//"+ITS_NS_PREFIX+":span/@revTool"
+						+ "|//*/@"+ITS_NS_PREFIX+":revToolRef|//"+ITS_NS_PREFIX+":span/@revToolRef"
+						+ "|//*/@"+ITS_NS_PREFIX+":provRef|//"+ITS_NS_PREFIX+":span/@provRef"
+						+ "|//*/@"+ITS_NS_PREFIX+":provenanceRecordsRef|//"+ITS_NS_PREFIX+":span/@provenanceRecordsRef");
+				}
+
+				NL = (NodeList)expr.evaluate(doc, XPathConstants.NODESET);
+				for ( int i=0; i<NL.getLength(); i++ ) {
+					attr = (Attr)NL.item(i);
+					// Skip irrelevant nodes
+					if ( ITS_NS_URI.equals(attr.getOwnerElement().getNamespaceURI())
+						&& "provRule".equals(attr.getOwnerElement().getLocalName()) ) continue;
+					// Set the flag
+					boolean qualified = true;
+					String ns = attr.getOwnerElement().getNamespaceURI();
+					if ( !Util.isEmpty(ns) ) qualified = !ns.equals(ITS_NS_URI);
+					String[] values = retrieveProvenanceData(attr.getOwnerElement(), qualified, isHTML5);
+					// Convert the values into an annotation
+					GenericAnnotations anns = null;
+					if ( values[0] != null ) { // stand-off reference
+						// Fetch the stand-off data 
+						anns = fetchProvenanceStandoffData(values[0], values[0]);
+					}
+					else { // Not an stand-off reference
+						anns = createProvenanceAnnotationSet();
+						GenericAnnotation ann = anns.add(GenericAnnotationType.PROV);
+						if ( values[1] != null ) ann.setString(GenericAnnotationType.PROV_PERSON, values[1]);
+						if ( values[2] != null ) ann.setString(GenericAnnotationType.PROV_ORG, values[2]);
+						if ( values[3] != null ) ann.setString(GenericAnnotationType.PROV_TOOL, values[3]);
+						if ( values[4] != null ) ann.setString(GenericAnnotationType.PROV_REVPERSON, values[4]);
+						if ( values[5] != null ) ann.setString(GenericAnnotationType.PROV_REVORG, values[5]);
+						if ( values[6] != null ) ann.setString(GenericAnnotationType.PROV_REVTOOL, values[6]);
+						if ( values[7] != null ) ann.setString(GenericAnnotationType.PROV_PROVREF, values[7]);
+					}
+					// Set the updated flags
+					setFlag(attr.getOwnerElement(), FP_PROVENANCE, 'y', attr.getSpecified());
+					setFlag(attr.getOwnerElement(), FP_PROVENANCE_DATA, anns.toString(), attr.getSpecified()); 
 				}
 			}
 			
@@ -2585,6 +2703,132 @@ public class ITSEngine implements IProcessor, ITraversal {
 	}
 	
 	/**
+	 * Retrieves the non-pointer information of the Provenance data category.
+	 * @param elem the element where to get the data.
+	 * @param qualified true if the attributes are expected to be qualified.
+	 * @return an array of the value: records reference, person, org, tool, revPerson, revOrg, revTool, provRef
+	 */
+	private String[] retrieveProvenanceData (Element elem,
+		boolean qualified,
+		boolean useHTML5)
+	{
+		String[] data = new String[8];
+		
+		if ( useHTML5 ) {
+			if ( elem.hasAttribute("its-provenance-records-ref") )
+				data[0] = elem.getAttribute("its-provenance-records-ref");
+			
+			if ( elem.hasAttribute("its-person") )
+				data[1] = elem.getAttribute("its-person");
+			else if ( elem.hasAttribute("its-person-ref") )
+				data[1] = REF_PREFIX+elem.getAttribute("its-person-ref");
+			
+			if ( elem.hasAttribute("its-org") )
+				data[2] = elem.getAttribute("its-org");
+			else if ( elem.hasAttribute("its-org-ref") )
+				data[2] = REF_PREFIX+elem.getAttribute("its-org-ref");
+
+			if ( elem.hasAttribute("its-tool") )
+				data[3] = elem.getAttribute("its-tool");
+			else if ( elem.hasAttribute("its-tool-ref") )
+				data[3] = REF_PREFIX+elem.getAttribute("its-tool-ref");
+
+			if ( elem.hasAttribute("its-rev-person") )
+				data[4] = elem.getAttribute("its-rev-person");
+			else if ( elem.hasAttribute("its-rev-person-ref") )
+				data[4] = REF_PREFIX+elem.getAttribute("its-rev-person-ref");
+			
+			if ( elem.hasAttribute("its-rev-org") )
+				data[5] = elem.getAttribute("its-rev-org");
+			else if ( elem.hasAttribute("its-rev-org-ref") )
+				data[5] = REF_PREFIX+elem.getAttribute("its-rev-org-ref");
+
+			if ( elem.hasAttribute("its-rev-tool") )
+				data[6] = elem.getAttribute("its-rev-tool");
+			else if ( elem.hasAttribute("its-rev-tool-ref") )
+				data[6] = REF_PREFIX+elem.getAttribute("its-rev-tool-ref");
+
+			if ( elem.hasAttribute("its-prov-ref") )
+				data[7] = elem.getAttribute("its-prov-ref");
+		}
+		else if ( qualified ) {
+			if ( elem.hasAttributeNS(ITS_NS_URI, "provenanceRecordsRef") )
+				data[0] = elem.getAttributeNS(ITS_NS_URI, "provenanceRecordsRef");
+
+			if ( elem.hasAttributeNS(ITS_NS_URI, "person") )
+				data[1] = elem.getAttributeNS(ITS_NS_URI, "person");
+			else if ( elem.hasAttributeNS(ITS_NS_URI, "personRef") )
+				data[1] = REF_PREFIX+elem.getAttributeNS(ITS_NS_URI, "personRef");
+			
+			if ( elem.hasAttributeNS(ITS_NS_URI, "org") )
+				data[2] = elem.getAttributeNS(ITS_NS_URI, "org");
+			else if ( elem.hasAttributeNS(ITS_NS_URI, "orgRef") )
+				data[2] = REF_PREFIX+elem.getAttributeNS(ITS_NS_URI, "orgRef");
+			
+			if ( elem.hasAttributeNS(ITS_NS_URI, "tool") )
+				data[3] = elem.getAttributeNS(ITS_NS_URI, "tool");
+			else if ( elem.hasAttributeNS(ITS_NS_URI, "toolRef") )
+				data[3] = REF_PREFIX+elem.getAttributeNS(ITS_NS_URI, "toolRef");
+			
+			if ( elem.hasAttributeNS(ITS_NS_URI, "revPerson") )
+				data[4] = elem.getAttributeNS(ITS_NS_URI, "revPerson");
+			else if ( elem.hasAttributeNS(ITS_NS_URI, "revPersonRef") )
+				data[4] = REF_PREFIX+elem.getAttributeNS(ITS_NS_URI, "revPersonRef");
+			
+			if ( elem.hasAttributeNS(ITS_NS_URI, "revOrg") )
+				data[5] = elem.getAttributeNS(ITS_NS_URI, "revOrg");
+			else if ( elem.hasAttributeNS(ITS_NS_URI, "revOrgRef") )
+				data[5] = REF_PREFIX+elem.getAttributeNS(ITS_NS_URI, "revOrgRef");
+			
+			if ( elem.hasAttributeNS(ITS_NS_URI, "revTool") )
+				data[6] = elem.getAttributeNS(ITS_NS_URI, "revTool");
+			else if ( elem.hasAttributeNS(ITS_NS_URI, "revToolRef") )
+				data[6] = REF_PREFIX+elem.getAttributeNS(ITS_NS_URI, "revToolRef");
+			
+			if ( elem.hasAttributeNS(ITS_NS_URI, "provRef") )
+				data[7] = elem.getAttributeNS(ITS_NS_URI, "provRef");
+		}
+		else {
+			if ( elem.hasAttribute("provenanceRecordsRef") )
+				data[0] = elem.getAttribute("provenanceRecordsRef");
+
+			if ( elem.hasAttribute("person") )
+				data[1] = elem.getAttribute("person");
+			else if ( elem.hasAttribute("personRef") )
+				data[1] = REF_PREFIX+elem.getAttribute("personRef");
+			
+			if ( elem.hasAttribute("org") )
+				data[2] = elem.getAttribute("org");
+			else if ( elem.hasAttribute("orgRef") )
+				data[2] = REF_PREFIX+elem.getAttribute("orgRef");
+			
+			if ( elem.hasAttribute("tool") )
+				data[3] = elem.getAttribute("tool");
+			else if ( elem.hasAttribute("toolRef") )
+				data[3] = REF_PREFIX+elem.getAttribute("toolRef");
+			
+			if ( elem.hasAttribute("revPerson") )
+				data[4] = elem.getAttribute("revPerson");
+			else if ( elem.hasAttribute("revPersonRef") )
+				data[4] = REF_PREFIX+elem.getAttribute("revPersonRef");
+			
+			if ( elem.hasAttribute("revOrg") )
+				data[5] = elem.getAttribute("revOrg");
+			else if ( elem.hasAttribute("revOrgRef") )
+				data[5] = REF_PREFIX+elem.getAttribute("revOrgRef");
+			
+			if ( elem.hasAttribute("revTool") )
+				data[6] = elem.getAttribute("revTool");
+			else if ( elem.hasAttribute("revToolRef") )
+				data[6] = REF_PREFIX+elem.getAttribute("revToolRef");
+			
+			if ( elem.hasAttribute("provRef") )
+				data[7] = elem.getAttribute("provRef");
+		}
+		return data;
+	}
+	
+	/**
 	 * Retrieves the non-pointer information of the Disambiguation data category.
 	 * @param elem the element where to get the data.
 	 * @param qualified true if the attributes are expected to be qualified.
@@ -2888,6 +3132,153 @@ public class ITSEngine implements IProcessor, ITraversal {
 		return anns;
 	}
 	
+	private GenericAnnotations fetchProvenanceStandoffData (String ref,
+		String originalRef)
+	{
+		if ( Util.isEmpty(ref) ) {
+			throw new InvalidParameterException("The reference URI cannot be null or empty.");
+		}
+		// Identify the type of reference (internal/external)
+		// and get the element
+		int n = ref.lastIndexOf('#');
+		String id = null;
+		String firstPart = null;
+		if ( n > -1 ) {
+			id = ref.substring(n+1);
+			firstPart = ref.substring(0, n);
+		}
+		else {
+			// No ID in the URI
+			throw new RuntimeException(String.format("URI to standoff markup does not have an id: '%s'.", ref));
+		}
+
+		boolean useHTML5 = isHTML5;
+		Document containerDoc = null;
+		XPath containerXPath = null;
+		
+		if ( !Util.isEmpty(firstPart) ) {
+			// Load the document and the rules
+			try {
+				String baseFolder = "";
+				if ( docURI != null) baseFolder = getPartBeforeFile(docURI);
+				if ( baseFolder.length() > 0 ) {
+					if ( baseFolder.endsWith("/") )
+						baseFolder = baseFolder.substring(0, baseFolder.length()-1);
+					if ( !ref.startsWith("/") ) ref = baseFolder + "/" + ref;
+					else ref = baseFolder + ref;
+				}
+
+				// Remove the ID if any
+				int p = ref.lastIndexOf('#');
+				if ( p > -1 ) {
+					ref = ref.substring(0, p);
+				}
+				// Detect format based on extension: .html and .html as HTML, everything else as XML.
+				useHTML5 = ( ref.endsWith(".html") || ref.endsWith(".htm") );
+				if ( useHTML5 ) {
+					containerDoc = parseHTMLDocument(ref);
+				}
+				else {
+					containerDoc = parseXMLDocument(ref);
+				}
+				containerXPath = createXPath();
+			}
+			catch ( Throwable e) {
+				throw new RuntimeException(String.format("Error with URI '%s'.\n"+e.getMessage(), ref));
+			}
+		}
+		else {
+			// Else, the standoff markup is in the same document as the annotated content
+			containerDoc = doc;
+			containerXPath = xpath;
+		}
+		
+		// Create the new annotation set
+		GenericAnnotations anns = createProvenanceAnnotationSet();
+		Document issuesDoc = null;
+		XPath issuesXPath = null;
+
+		if ( useHTML5 ) {
+			// If the standoff markup is inside an HTML file:
+			// Get the script that holds the its:locQualityIssues element
+			try {
+				String tmp = String.format("//%s:script[@id='%s']", HTML_NS_PREFIX, id);
+				//String tmp = String.format("//script[@id='%s']", id);
+				XPathExpression expr = containerXPath.compile(tmp);
+				Element scriptElem = (Element)expr.evaluate(containerDoc, XPathConstants.NODE);
+				if ( scriptElem == null ) {
+					logger.warn("Cannot find standoff script element for '{}'", id);
+					GenericAnnotation ann = anns.add(GenericAnnotationType.PROV);
+					ann.setString(GenericAnnotationType.PROV_RECSREF, ref); // For information only
+					return anns;
+				}
+				// Else: parse the locQualityIssues element inside the script
+				String content = scriptElem.getTextContent();
+				// Strip white spaces
+				content = content.trim();
+				// Create the context and XPath engine 
+				issuesXPath = createXPath();
+				// Parse the content
+				try {
+					InputSource is = new InputSource(new ByteArrayInputStream(content.getBytes()));
+					issuesDoc = parseXMLDocument(is);
+				}
+				catch ( Throwable e ) {
+					throw new RuntimeException("Error parsing a script element.", e);
+				}
+			}
+			catch ( XPathExpressionException e ) {
+				throw new RuntimeException("XPath error.", e);
+			}
+		}
+		else {
+			issuesDoc = containerDoc;
+			issuesXPath = containerXPath;
+		}
+		
+		// Now get the element holding the list of issues
+		Element elem1;
+		try {
+			String tmp = String.format("//%s:provenanceRecords[@xml:id='%s']", ITS_NS_PREFIX, id);
+			XPathExpression expr = issuesXPath.compile(tmp);
+			elem1 = (Element)expr.evaluate(issuesDoc, XPathConstants.NODE);
+		}
+		catch ( XPathExpressionException e ) {
+			throw new RuntimeException("XPath error.", e);
+		}
+		if ( elem1 == null ) {
+			// Entry not found
+			logger.warn("Cannot find standoff markup for '{}'", originalRef);
+			GenericAnnotation ann = anns.add(GenericAnnotationType.PROV);
+			ann.setString(GenericAnnotationType.PROV_RECSREF, originalRef); // For information only
+			return anns;
+		}
+		
+		// Then get the list of items in the element
+		NodeList items = elem1.getElementsByTagNameNS(ITS_NS_URI, "provenanceRecord");
+		for ( int i=0; i<items.getLength(); i++ ) {
+			// For each entry 
+			Element elem2 = (Element)items.item(i);
+			// Add the annotation to the set
+			GenericAnnotation ann = anns.add(GenericAnnotationType.PROV);
+			ann.setString(GenericAnnotationType.PROV_RECSREF, originalRef); // For information only
+			// Gather the local information (never in HTML since if it's HTML it's inside a script)
+			String[] values = retrieveProvenanceData(elem2, false, false);
+			if ( values[0] != null ) {
+				logger.warn("Cannot have a standoff reference in a standoff element (reference='{}').", ref);
+			}
+			if ( values[1] != null ) ann.setString(GenericAnnotationType.PROV_PERSON, values[1]);
+			if ( values[2] != null ) ann.setString(GenericAnnotationType.PROV_ORG, values[2]);
+			if ( values[3] != null ) ann.setString(GenericAnnotationType.PROV_TOOL, values[3]);
+			if ( values[4] != null ) ann.setString(GenericAnnotationType.PROV_REVPERSON, values[4]);
+			if ( values[5] != null ) ann.setString(GenericAnnotationType.PROV_REVORG, values[5]);
+			if ( values[6] != null ) ann.setString(GenericAnnotationType.PROV_REVTOOL, values[6]);
+			if ( values[7] != null ) ann.setString(GenericAnnotationType.PROV_PROVREF, values[7]);
+		}
+
+		return anns;
+	}
+		
 	private boolean isVersion2 () throws XPathExpressionException {
 		// If the version is not detected yet: detect it.
 		if ( version.equals("0") ) {
@@ -3638,4 +4029,87 @@ public class ITSEngine implements IProcessor, ITraversal {
 		return tpe;
 	}
 
+	@Override
+	public String getProvRecordsRef (Attr attribute) {
+		return getProvValue(GenericAnnotationType.PROV_RECSREF, attribute, 0);
+	}
+	
+	@Override
+	public int getProvRecordCount (Attr attribute) {
+		if ( attribute == null ) {
+			GenericAnnotations anns = trace.peek().prov;
+			if ( anns == null ) return 0;
+			return anns.size();
+		}
+		String tmp;
+		if ( (tmp = (String)attribute.getUserData(FLAGNAME)) == null ) return 0;
+		if ( tmp.charAt(FP_PROVENANCE) != 'y' ) return 0;
+		GenericAnnotations anns = new GenericAnnotations(getFlagData(tmp, FP_PROVENANCE_DATA));
+		return anns.getAnnotations(GenericAnnotationType.PROV).size();
+	}
+
+	@Override
+	public String getProvPerson (Attr attribute,
+		int index)
+	{
+		return getProvValue(GenericAnnotationType.PROV_PERSON, attribute, index);
+	}
+
+	@Override
+	public String getProvOrg (Attr attribute,
+		int index)
+	{
+		return getProvValue(GenericAnnotationType.PROV_ORG, attribute, index);
+	}
+
+	@Override
+	public String getProvTool (Attr attribute,
+		int index)
+	{
+		return getProvValue(GenericAnnotationType.PROV_TOOL, attribute, index);
+	}
+
+	@Override
+	public String getProvRevPerson(Attr attribute,
+		int index)
+	{
+		return getProvValue(GenericAnnotationType.PROV_REVPERSON, attribute, index);
+	}
+
+	@Override
+	public String getProvRevOrg (Attr attribute,
+		int index)
+	{
+		return getProvValue(GenericAnnotationType.PROV_REVORG, attribute, index);
+	}
+
+	@Override
+	public String getProvRevTool (Attr attribute,
+		int index)
+	{
+		return getProvValue(GenericAnnotationType.PROV_REVTOOL, attribute, index);
+	}
+
+	@Override
+	public String getProvRef (Attr attribute,
+		int index)
+	{
+		return getProvValue(GenericAnnotationType.PROV_PROVREF, attribute, index);
+	}
+
+	private String getProvValue (String fieldName,
+		Attr attribute,
+		int index)
+	{
+		if ( attribute == null ) {
+			if ( trace.peek().prov == null ) return null;
+			return trace.peek().prov.getAnnotations(GenericAnnotationType.PROV).get(index).getString(fieldName);
+		}
+		String tmp;
+		if ( (tmp = (String)attribute.getUserData(FLAGNAME)) == null ) return null;
+		if ( tmp.charAt(FP_PROVENANCE) != 'y' ) return null;
+		GenericAnnotations anns = new GenericAnnotations(getFlagData(tmp, FP_PROVENANCE_DATA));
+		return anns.getAnnotations(GenericAnnotationType.PROV).get(index).getString(fieldName);
+	}
+	
 }

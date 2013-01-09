@@ -66,6 +66,21 @@ public class GenericAnnotationType {
 	public static final String DISAMB_GRANULARITY_ENTITY = "entity";
 
 	/**
+	 * Annotation identifier for the
+	 * <a href='http://www.w3.org/TR/its20/#provenance'>ITS Provenance</a> data category.
+	 * 
+	 */
+	public static final String PROV = "its-prov";
+	public static final String PROV_RECSREF = "provRecsRef";
+	public static final String PROV_PERSON = "provPerson";
+	public static final String PROV_ORG = "provOrg";
+	public static final String PROV_TOOL = "provTool";
+	public static final String PROV_REVPERSON = "provRevPerson";
+	public static final String PROV_REVORG = "provRevOrg";
+	public static final String PROV_REVTOOL = "provRevTool";
+	public static final String PROV_PROVREF = "provRef";
+
+	/**
 	 * Annotation identifier for the 
 	 * <a href='http://www.w3.org/TR/its20/#externalresource'>ITS External resource</a> data category.
 	 */
