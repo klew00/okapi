@@ -300,7 +300,7 @@ public class HTML5FilterTest {
 	@Test
 	public void testStandofftLocQualityIssues () {
 		String snippet = "<!DOCTYPE html><html lang=en><head><meta charset=utf-8><title>Title</title>"
-			+ "<script id='lqi1'>"
+			+ "<script id='lqi1' type=application/its+xml>"
 			+ "<its:locQualityIssues xml:id='lqi1' xmlns:its='http://www.w3.org/2005/11/its'>"
 			+ "<its:locQualityIssue locQualityIssueType='misspelling' locQualityIssueComment='comment1' locQualityIssueSeverity='10'/>"
 			+ "<its:locQualityIssue locQualityIssueComment='comment2' locQualityIssueEnabled='no' locQualityIssueProfileRef='uri'/>"
@@ -354,16 +354,16 @@ public class HTML5FilterTest {
 	@Test
 	public void testProvenanceStandoff () {
 		String snippet = "<!DOCTYPE html><html lang=en><head><meta charset=utf-8><title>Title</title>"
-			+ "<script id='prv1'>"
+			+ "<script id='prv1' type=application/its+xml>"
 			+ "<its:provenanceRecords xml:id='prv1' xmlns:its='http://www.w3.org/2005/11/its' version='2.0'>"
 			+ "<its:provenanceRecord person='p1' org='o1' tool='t1' provRef='ref1'/>"
 			+ "<its:provenanceRecord personRef='pRef2' orgRef='oRef2' toolRef='tRef2'/>"
-			+ "<its:provenanceRecord revPerson='revp3' revOrg'revo3' revTool='revt3'/>"
-			+ "<its:provenanceRecord revPersonRef='revpRef4' revOrgRef'revoRef4' revToolRef='revtRef4'/>"
+			+ "<its:provenanceRecord revPerson='revp3' revOrg='revo3' revTool='revt3'/>"
+			+ "<its:provenanceRecord revPersonRef='revpRef4' revOrgRef='revoRef4' revToolRef='revtRef4'/>"
 			+ "</its:provenanceRecords>"
 			+ "</script>"
 			+ "</head><body>"
-			+ "<p its-proveance-records-ref='#prv1'>Text</p>"
+			+ "<p its-provenance-records-ref='#prv1'>Text</p>"
 			+ "</body></html>";
 		ArrayList<Event> list = getEvents(snippet);
 		ITextUnit tu = FilterTestDriver.getTextUnit(list, 2);
@@ -372,12 +372,38 @@ public class HTML5FilterTest {
 		assertNotNull(anns);
 		List<GenericAnnotation> res = anns.getAnnotations(GenericAnnotationType.PROV);
 		assertEquals(4, res.size());
+		// first
 		assertEquals("p1", res.get(0).getString(GenericAnnotationType.PROV_PERSON));
 		assertEquals("o1", res.get(0).getString(GenericAnnotationType.PROV_ORG));
 		assertEquals("t1", res.get(0).getString(GenericAnnotationType.PROV_TOOL));
 		assertEquals(null, res.get(0).getString(GenericAnnotationType.PROV_REVPERSON));
 		assertEquals(null, res.get(0).getString(GenericAnnotationType.PROV_REVORG));
 		assertEquals(null, res.get(0).getString(GenericAnnotationType.PROV_REVTOOL));
+		assertEquals("ref1", res.get(0).getString(GenericAnnotationType.PROV_PROVREF));
+		// second
+		assertEquals("REF:pRef2", res.get(1).getString(GenericAnnotationType.PROV_PERSON));
+		assertEquals("REF:oRef2", res.get(1).getString(GenericAnnotationType.PROV_ORG));
+		assertEquals("REF:tRef2", res.get(1).getString(GenericAnnotationType.PROV_TOOL));
+		assertEquals(null, res.get(1).getString(GenericAnnotationType.PROV_REVPERSON));
+		assertEquals(null, res.get(1).getString(GenericAnnotationType.PROV_REVORG));
+		assertEquals(null, res.get(1).getString(GenericAnnotationType.PROV_REVTOOL));
+		assertEquals(null, res.get(1).getString(GenericAnnotationType.PROV_PROVREF));
+		// third
+		assertEquals(null, res.get(2).getString(GenericAnnotationType.PROV_PERSON));
+		assertEquals(null, res.get(2).getString(GenericAnnotationType.PROV_ORG));
+		assertEquals(null, res.get(2).getString(GenericAnnotationType.PROV_TOOL));
+		assertEquals("revp3", res.get(2).getString(GenericAnnotationType.PROV_REVPERSON));
+		assertEquals("revo3", res.get(2).getString(GenericAnnotationType.PROV_REVORG));
+		assertEquals("revt3", res.get(2).getString(GenericAnnotationType.PROV_REVTOOL));
+		assertEquals(null, res.get(2).getString(GenericAnnotationType.PROV_PROVREF));
+		// fourth
+		assertEquals(null, res.get(3).getString(GenericAnnotationType.PROV_PERSON));
+		assertEquals(null, res.get(3).getString(GenericAnnotationType.PROV_ORG));
+		assertEquals(null, res.get(3).getString(GenericAnnotationType.PROV_TOOL));
+		assertEquals("REF:revpRef4", res.get(3).getString(GenericAnnotationType.PROV_REVPERSON));
+		assertEquals("REF:revoRef4", res.get(3).getString(GenericAnnotationType.PROV_REVORG));
+		assertEquals("REF:revtRef4", res.get(3).getString(GenericAnnotationType.PROV_REVTOOL));
+		assertEquals(null, res.get(3).getString(GenericAnnotationType.PROV_PROVREF));
 	}
 	
 	@Test

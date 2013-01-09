@@ -3224,7 +3224,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 					issuesDoc = parseXMLDocument(is);
 				}
 				catch ( Throwable e ) {
-					throw new RuntimeException("Error parsing a script element.", e);
+					throw new RuntimeException("Error parsing a script element: ."+e.getMessage(), e);
 				}
 			}
 			catch ( XPathExpressionException e ) {
@@ -4029,6 +4029,16 @@ public class ITSEngine implements IProcessor, ITraversal {
 		return tpe;
 	}
 
+	public GenericAnnotations getProvenanceAnnotation (Attr attribute) {
+		if ( attribute == null ) {
+			return trace.peek().prov;
+		}
+		String tmp;
+		if ( (tmp = (String)attribute.getUserData(FLAGNAME)) == null ) return null;
+		if ( tmp.charAt(FP_PROVENANCE) != 'y' ) return null;
+		return new GenericAnnotations(getFlagData(tmp, FP_PROVENANCE_DATA));
+	}
+	
 	@Override
 	public String getProvRecordsRef (Attr attribute) {
 		return getProvValue(GenericAnnotationType.PROV_RECSREF, attribute, 0);

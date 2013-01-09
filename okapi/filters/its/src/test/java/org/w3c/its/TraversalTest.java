@@ -661,7 +661,7 @@ public class TraversalTest {
 		assertEquals("REF:rpRef1", trav.getProvRevPerson(null, 0));
 		assertEquals("ro1", trav.getProvRevOrg(null, 0));
 		assertEquals("REF:rtRef1", trav.getProvRevTool(null, 0));
-		assertEquals("REF:provref1", trav.getProvRef(null, 0));
+		assertEquals("provref1", trav.getProvRef(null, 0));
 	}
 
 	@Test

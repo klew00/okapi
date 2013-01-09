@@ -629,6 +629,10 @@ public abstract class ITSFilter implements IFilter {
 				GenericAnnotationType.ALLOWEDCHARS_VALUE, ci.allowedChars)
 			);
 		}
+		// ITS Provenance
+		if ( ci.prov != null ) {
+			GenericAnnotations.addAnnotations(tu, ci.prov);
+		}
 		// ITS Localization Quality Rating
 		if ( ci.lqRating != null ) {
 			GenericAnnotations.addAnnotations(tu, ci.lqRating);
@@ -965,49 +969,54 @@ public abstract class ITSFilter implements IFilter {
 		
 		tu.setSourceContent(frag);
 		
+		ContextItem ci = context.peek();
 		// ITS Localization Note
-		if ( !Util.isEmpty(context.peek().locNote) ) {
-			tu.setProperty(new Property(Property.NOTE, context.peek().locNote));
+		if ( !Util.isEmpty(ci.locNote) ) {
+			tu.setProperty(new Property(Property.NOTE, ci.locNote));
 		}
 		// ITS Domain
-		if ( !Util.isEmpty(context.peek().domains) ) {
+		if ( !Util.isEmpty(ci.domains) ) {
 			GenericAnnotation.addAnnotation(tu, new GenericAnnotation(GenericAnnotationType.DOMAIN,
-				GenericAnnotationType.DOMAIN_VALUE, context.peek().domains)
+				GenericAnnotationType.DOMAIN_VALUE, ci.domains)
 			);
 		}
 		// ITS Disambiguation
-		if ( context.peek().disambig != null ) {
-			GenericAnnotations.addAnnotations(tu.getSource(), context.peek().disambig);
+		if ( ci.disambig != null ) {
+			GenericAnnotations.addAnnotations(tu.getSource(), ci.disambig);
 		}
 		// ITS External resources Reference
-		if ( !Util.isEmpty(context.peek().externalRes) ) {
+		if ( !Util.isEmpty(ci.externalRes) ) {
 			GenericAnnotation.addAnnotation(tu, new GenericAnnotation(GenericAnnotationType.EXTERNALRES,
-				GenericAnnotationType.EXTERNALRES_VALUE, context.peek().externalRes)
+				GenericAnnotationType.EXTERNALRES_VALUE, ci.externalRes)
 			);
 		}
 		// ITS MT confidence
-		if ( context.peek().mtConfidence != null ) {
+		if ( ci.mtConfidence != null ) {
 			GenericAnnotation.addAnnotation(tu, new GenericAnnotation(GenericAnnotationType.MTCONFIDENCE,
-				GenericAnnotationType.MTCONFIDENCE_VALUE, context.peek().mtConfidence)
+				GenericAnnotationType.MTCONFIDENCE_VALUE, ci.mtConfidence)
 			);
 		}
 		// ITS Storage Size
-		if ( context.peek().storageSize != null ) {
-			GenericAnnotations.addAnnotations(tu, context.peek().storageSize);
+		if ( ci.storageSize != null ) {
+			GenericAnnotations.addAnnotations(tu, ci.storageSize);
 		}
 		// ITS Allowed characters
-		if ( context.peek().allowedChars != null ) {
+		if ( ci.allowedChars != null ) {
 			GenericAnnotation.addAnnotation(tu, new GenericAnnotation(GenericAnnotationType.ALLOWEDCHARS,
-				GenericAnnotationType.ALLOWEDCHARS_VALUE, context.peek().allowedChars)
+				GenericAnnotationType.ALLOWEDCHARS_VALUE, ci.allowedChars)
 			);
 		}
+		// ITS Provenance
+		if ( ci.prov != null ) {
+			GenericAnnotations.addAnnotations(tu, ci.prov);
+		}
 		// ITS Localization Quality rating
-		if ( context.peek().lqRating != null ) {
-			GenericAnnotations.addAnnotations(tu, context.peek().lqRating);
+		if ( ci.lqRating != null ) {
+			GenericAnnotations.addAnnotations(tu, ci.lqRating);
 		}
 		// ITS Localization Quality Issue
-		if ( context.peek().lqIssues != null ) {
-			GenericAnnotations.addAnnotations(tu.getSource(), context.peek().lqIssues);
+		if ( ci.lqIssues != null ) {
+			GenericAnnotations.addAnnotations(tu.getSource(), ci.lqIssues);
 		}
 		// Attach also the inline LQI annotations at the text container level
 		// (more logical to have the inline ones after the parent level ones)
@@ -1034,15 +1043,15 @@ public abstract class ITSFilter implements IFilter {
 		}
 
 		// Set the resname value (or null, which is fine)
-		tu.setName(context.peek().idValue);
+		tu.setName(ci.idValue);
 		
 		// Set the information about preserving or not white-spaces
 		if ( isHTML5 ) {
 			if ( node.getNodeName().equals("pre") ) {
-				context.peek().preserveWS = true;
+				ci.preserveWS = true;
 			}
 		}
-		if ( context.peek().preserveWS ) {
+		if ( ci.preserveWS ) {
 			tu.setPreserveWhitespaces(true);
 		}
 		else { // We also unwrap if we don't have to preserve
