@@ -35,6 +35,16 @@
   		<artifactId>rwt-filedialog</artifactId>
   		<version>1.5.1</version>
   	</dependency>
+  	<dependency>
+  		<groupId>javax.servlet</groupId>
+  		<artifactId>javax.servlet-api</artifactId>
+  		<version>3.0.1</version>
+  	</dependency>
+  	<dependency>
+  		<groupId>net.sf.okapi</groupId>
+  		<artifactId>okapi-core-ui</artifactId>
+  		<version>${project.version}</version>
+  	</dependency>
   </dependencies>
   
 </project>

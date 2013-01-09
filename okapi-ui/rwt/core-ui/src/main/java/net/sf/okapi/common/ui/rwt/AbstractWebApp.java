@@ -2,9 +2,11 @@ package net.sf.okapi.common.ui.rwt;
 
 import java.util.Locale;
 
+import javax.servlet.http.HttpServletRequest;
+
+import org.eclipse.rwt.RWT;
 import org.eclipse.rwt.lifecycle.IEntryPoint;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
@@ -22,6 +24,10 @@ public abstract class AbstractWebApp implements IEntryPoint {
 		Locale.setDefault(Locale.ENGLISH); // To have non-localized OK/Cancel etc. buttons in dialogs
 		Display display = new Display();
 				
+		HttpServletRequest request = RWT.getRequest();
+		RWT.getSessionStore().setAttribute("userAgent", request.getHeader("User-Agent"));
+		RWT.getSessionStore().setAttribute("app", this);
+		
 		final Shell shell = new Shell(display, SWT.TITLE | SWT.RESIZE | SWT.MAX);
 		shell.setText(getName()); // Default title
 		createUI(shell);
@@ -46,5 +52,8 @@ public abstract class AbstractWebApp implements IEntryPoint {
 		}
 		return 0;
 	}
-
+	
+	void criticalError(String message) {		
+		throw new RuntimeException(message);
+	}
 }

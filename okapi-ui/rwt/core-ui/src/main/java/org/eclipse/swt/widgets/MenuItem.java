@@ -20,7 +20,6 @@ import org.eclipse.swt.events.*;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.internal.widgets.ItemHolder;
 
-
 /**
  * Instances of this class represent a selectable user interface object
  * that issues notification when pressed and released.
@@ -600,10 +599,10 @@ public class MenuItem extends Item {
     super.reskinChildren( flags );
   }
   
-  /**
-   * Stub
-   */
-  public  void setAccelerator(int accelerator) {
-	  
+/*******************************************************************************
+ * Stubs/overlaps start here
+ ******************************************************************************/
+  public  void setAccelerator(int accelerator) {	  
   }
+  
 }
