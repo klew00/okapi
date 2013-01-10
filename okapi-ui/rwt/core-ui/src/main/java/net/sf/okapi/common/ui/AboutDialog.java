@@ -20,8 +20,6 @@
 
 package net.sf.okapi.common.ui;
 
-import java.text.NumberFormat;
-
 import org.eclipse.rwt.RWT;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -122,10 +120,10 @@ public class AboutDialog {
 		shell.setDefaultButton(pnlActions.btClose);
 		
 		shell.pack();
-		shell.setMinimumSize(shell.getSize());
-		Point startSize = shell.getMinimumSize();
-		if ( startSize.x < 350 ) startSize.x = 350;
-		shell.setSize(startSize);
+//		shell.setMinimumSize(shell.getSize());
+//		Point startSize = shell.getMinimumSize();
+//		if ( startSize.x < 350 ) startSize.x = 350;
+//		shell.setSize(startSize);
 		Dialogs.centerWindow(shell, parent);
 	}
 

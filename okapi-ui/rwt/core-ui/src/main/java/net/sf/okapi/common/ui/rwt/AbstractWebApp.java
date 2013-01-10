@@ -15,6 +15,8 @@ import org.eclipse.swt.widgets.Shell;
 
 public abstract class AbstractWebApp implements IEntryPoint {
 
+	private Shell shell;
+	
 	protected abstract void createUI(Shell shell);
 	protected abstract String getName();
 	
@@ -28,7 +30,7 @@ public abstract class AbstractWebApp implements IEntryPoint {
 		RWT.getSessionStore().setAttribute("userAgent", request.getHeader("User-Agent"));
 		RWT.getSessionStore().setAttribute("app", this);
 		
-		final Shell shell = new Shell(display, SWT.TITLE | SWT.RESIZE | SWT.MAX);
+		shell = new Shell(display, SWT.TITLE | SWT.RESIZE | SWT.MAX);
 		shell.setText(getName()); // Default title
 		createUI(shell);
 		
@@ -55,5 +57,9 @@ public abstract class AbstractWebApp implements IEntryPoint {
 	
 	void criticalError(String message) {		
 		throw new RuntimeException(message);
+	}
+	
+	public Shell getShell() {
+		return shell;
 	}
 }

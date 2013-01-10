@@ -1109,4 +1109,12 @@ public class SRXEditor {
 		}
 	}
 
+	public FileProcessor getFileProcessor() {
+		return fileProc;
+	}
+
+	public ISegmenter getSegmenter() {
+		return segmenter;
+	}
+	
 }

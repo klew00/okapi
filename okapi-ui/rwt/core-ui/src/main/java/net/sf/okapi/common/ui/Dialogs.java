@@ -22,6 +22,7 @@ package net.sf.okapi.common.ui;
 
 import java.io.File;
 
+import org.eclipse.rwt.widgets.FileUpload;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.FileDialog;
@@ -76,59 +77,6 @@ public class Dialogs {
 		}		
 		return aPaths;
 	}
-
-	/**
-	 * Browse to select a file to save to. If the selected file exists, the user is
-	 * prompted to confirm overwrite.
-	 * @param parent Parent of the dialog.
-	 * @param title Title of the dialog box.
-	 * @param root Directory where to start. Use null for default directory.
-	 * @param fileName the default filename. Use null for none.
-	 * @param filterNames List of filter names (tab-separated) to use. Can be null.
-	 * @param filterExtensions List of filter extensions (tab-separated) to use.
-	 * Can be null.
-	 * Must be the same number of items as for filterNames.
-	 * @return The full path of the selected file or null if the user canceled
-	 * the command or an error occurred.
-	 */
-	static public String browseFilenamesForSave (Shell parent,
-			String title,
-			String root,
-			String fileName,
-			String filterNames,
-			String filterExtensions)
-		{
-			String[] aExts = null;
-			String[] aNames = null;
-			if ( filterExtensions != null ) aExts = filterExtensions.split("\t", -2); //$NON-NLS-1$
-			if ( filterNames != null ) aNames = filterNames.split("\t", -2); //$NON-NLS-1$
-			String path = null;
-			// Call the SaveAs dialog until we are done
-			while ( true ) {
-				FileDialog dlg = new FileDialog(parent, SWT.SAVE);
-				dlg.setFilterPath(root); // Can be null
-				dlg.setFileName(fileName); // Can be null
-				if ( filterNames != null ) dlg.setFilterNames(aNames);
-				if ( filterExtensions != null ) dlg.setFilterExtensions(aExts);
-				dlg.setText(title);
-				path = dlg.open();
-				if ( path == null ) return null; // Canceled by user
-				// Else: Confirm overwriting if needed
-				File file = new File(path);
-				if ( file.exists() ) {
-					// Asks for confirmation
-					MessageBox mb = new MessageBox(dlg.getParent(), SWT.ICON_WARNING
-						| SWT.YES | SWT.NO | SWT.CANCEL);
-					mb.setText(title);
-					mb.setMessage(path + Res.getString("dialogs.browseForSave")); //$NON-NLS-1$
-					int result = mb.open();
-					if ( result == SWT.YES ) return path;
-					if ( result == SWT.CANCEL ) return null;
-					// If NO: ask the path again
-				}
-				else return path;
-			}
-		}
 	
 	/**
 	 * Centers a given window on a given window.
@@ -213,5 +161,64 @@ public class Dialogs {
 		dlg.setText(Res.getString("dialogs.warningCaption")); //$NON-NLS-1$
 		dlg.open();
 	}
-		
+
+/*******************************************************************************
+ * Stubs/overlaps start here
+ ******************************************************************************/
+				
+	/**
+	 * Browse to select a file to save to. If the selected file exists, the user is
+	 * prompted to confirm overwrite.
+	 * @param parent Parent of the dialog.
+	 * @param title Title of the dialog box.
+	 * @param root Directory where to start. Use null for default directory.
+	 * @param fileName the default filename. Use null for none.
+	 * @param filterNames List of filter names (tab-separated) to use. Can be null.
+	 * @param filterExtensions List of filter extensions (tab-separated) to use.
+	 * Can be null.
+	 * Must be the same number of items as for filterNames.
+	 * @return The full path of the selected file or null if the user canceled
+	 * the command or an error occurred.
+	 */
+	static public String browseFilenamesForSave (Shell parent,
+			String title,
+			String root,
+			String fileName,
+			String filterNames,
+			String filterExtensions)
+		{
+			String[] aExts = null;
+			String[] aNames = null;
+			if ( filterExtensions != null ) aExts = filterExtensions.split("\t", -2); //$NON-NLS-1$
+			if ( filterNames != null ) aNames = filterNames.split("\t", -2); //$NON-NLS-1$
+			String path = null;
+			
+			//FileUpload fup = new FileUpload(parent, 0);			
+			// Call the SaveAs dialog until we are done
+			while ( true ) {
+				FileDialog dlg = new FileDialog(parent, SWT.SAVE);
+				dlg.setFilterPath(root); // Can be null
+				dlg.setFileName(fileName); // Can be null
+				if ( filterNames != null ) dlg.setFilterNames(aNames);
+				if ( filterExtensions != null ) dlg.setFilterExtensions(aExts);
+				dlg.setText(title);
+				path = dlg.open();
+				if ( path == null ) return null; // Canceled by user
+				// Else: Confirm overwriting if needed
+				File file = new File(path);
+				if ( file.exists() ) {
+					// Asks for confirmation
+					MessageBox mb = new MessageBox(dlg.getParent(), SWT.ICON_WARNING
+						| SWT.YES | SWT.NO | SWT.CANCEL);
+					mb.setText(title);
+					mb.setMessage(path + Res.getString("dialogs.browseForSave")); //$NON-NLS-1$
+					int result = mb.open();
+					if ( result == SWT.YES ) return path;
+					if ( result == SWT.CANCEL ) return null;
+					// If NO: ask the path again
+				}
+				else return path;
+			}
+			//return path;
+		}	
 }
