@@ -31,6 +31,9 @@
 
 	<!-- Get the version information to use from file -->
 	<property file="../shared/release.properties" />
+
+	<property file="libVersions.properties" />
+
 	<property name="okapilibStamp" value="${okapilibVersion}${releaseInfo}" />
 
  	<property name="tmp" value="tmp"/>
@@ -64,8 +67,7 @@
 		<mkdir dir="${tmp}"/>
 
 		<property name="plg001" value="okapiTradosUtilities-${okapilibStamp}"/>
-		<property name="jacobVersion" value="1.14.3"/>
-		<property name="jacobJar" value="jacob-${jacobVersion}.jar"/>
+		<property name="jacobJar" value="jacob-${net.sf.jacob-project.jacob.version}.jar"/>
 	
 		<jar destfile="${tmp}/${plg001}.jar">
 			<manifest>
@@ -74,9 +76,9 @@
 			<fileset dir="../../okapi/steps/tradosutils/target/classes" includes="net/**" />
 		</jar>
 
-		<copy todir="${tmp}" file="${mavenStore}/net/sf/jacob-project/jacob/${jacobVersion}/${jacobJar}"/>
-		<copy todir="${tmp}" file="data/okapi-plugins/jacob-${jacobVersion}-x86.dll" overwrite="true"/>
-		<copy todir="${tmp}" file="data/okapi-plugins/jacob-${jacobVersion}-x64.dll" overwrite="true"/>
+		<copy todir="${tmp}" file="${mavenStore}/net/sf/jacob-project/jacob/${net.sf.jacob-project.jacob.version}/${jacobJar}"/>
+		<copy todir="${tmp}" file="data/okapi-plugins/jacob-${net.sf.jacob-project.jacob.version}-x86.dll" overwrite="true"/>
+		<copy todir="${tmp}" file="data/okapi-plugins/jacob-${net.sf.jacob-project.jacob.version}-x64.dll" overwrite="true"/>
 		<zip destfile="${dist_plugins}/${plg001}.zip" basedir="${tmp}"/>
 
 		<!-- ============== okapi-step-xmlvalidation -->
@@ -88,7 +90,7 @@
 		<copy todir="${tmp}" file="../../okapi/steps/xmlvalidation/target/${plg001}.jar"/>
 		<mkdir dir="${tmp}/lib"/>
 		<copy todir="${tmp}/lib">
-		   <fileset dir="${mavenStore}/dtdparser/dtdparser/1.21" includes="**/dtdparser-1.21.jar"/>
+		   <fileset dir="${mavenStore}/dtdparser/dtdparser/${dtdparser.dtdparser.version}" includes="**/dtdparser-${dtdparser.dtdparser.version}.jar"/>
 		   <fileset dir="../shared/licenses" includes="**/dtdparser-*"/>
 		</copy>
 		<zip destfile="${dist_plugins}/${plg001}.zip" basedir="${tmp}"/>

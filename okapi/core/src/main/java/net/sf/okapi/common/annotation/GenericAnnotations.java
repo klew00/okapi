@@ -79,7 +79,7 @@ public class GenericAnnotations extends InlineAnnotation implements Iterable<Gen
 	 * otherwise all the annotations of the set passed as argument are added to
 	 * the existing set. 
 	 * @param code the code where to add the annotation.
-	 * @param newset the new set to add.
+	 * @param newSet the new set to add.
 	 */
 	static public void addAnnotations (Code code,
 		GenericAnnotations newSet)

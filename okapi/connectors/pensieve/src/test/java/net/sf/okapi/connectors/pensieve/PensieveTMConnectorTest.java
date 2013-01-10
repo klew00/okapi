@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2009-2013 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -29,12 +29,12 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 
-import net.sf.okapi.common.Util;
 import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.Util;
+import net.sf.okapi.common.query.QueryResult;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.lib.translation.ITMQuery;
-import net.sf.okapi.common.query.QueryResult;
 import net.sf.okapi.tm.pensieve.common.TranslationUnit;
 import net.sf.okapi.tm.pensieve.common.TranslationUnitVariant;
 import net.sf.okapi.tm.pensieve.writer.ITmWriter;
@@ -42,8 +42,11 @@ import net.sf.okapi.tm.pensieve.writer.TmWriterFactory;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.FixMethodOrder;
 import org.junit.Test;
+import org.junit.runners.MethodSorters;
 
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class PensieveTMConnectorTest {
 	
 	private ITMQuery connector;
@@ -72,7 +75,8 @@ public class PensieveTMConnectorTest {
 	}
 
 	@Test
-	public void testCreateTM () throws IOException, URISyntaxException {
+	// This method must be run first
+	public void aaaTestCreateTM () throws IOException, URISyntaxException {
 		if ( connector != null ) {
 			connector.close(); // Close the connector created by setUp()
 		}

@@ -14,7 +14,9 @@
     <modules>
         <module>simpletm</module>
         <module>pensieve</module>
+<!--
         <module>pensieve-server</module>
+-->
         <module>pensieve-integration-tests</module>
     </modules>
 </project>

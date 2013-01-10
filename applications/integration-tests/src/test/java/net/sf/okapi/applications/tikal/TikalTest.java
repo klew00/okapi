@@ -10,9 +10,13 @@ import net.sf.okapi.common.StreamGobbler;
 import net.sf.okapi.common.Util;
 
 import org.junit.Before;
+import org.junit.FixMethodOrder;
 import org.junit.Test;
+import org.junit.runners.MethodSorters;
+
 import static org.junit.Assert.*;
 
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TikalTest {
 	
 	private String javaTikal;
@@ -424,9 +428,10 @@ public class TikalTest {
     	assertTrue("File different from gold", compareWithGoldFile("tmxtest-attributes.tmx.po", "UTF-8"));
     }
 
+    // Keep these test at the end for visual verification
+    
     @Test
-    // Keep this one the last test
-    public void testQuerySeveralConnectors () throws IOException, InterruptedException {
+    public void zz1TestQuerySeveralConnectors () throws IOException, InterruptedException {
     	assertEquals(0, runTikal("-imp pensieveTM tmxtest-attributes.tmx -sl EN-US -tl FR-FR"));
     	// test local TM
     	assertEquals(0, runTikal("-q \"Close the <b>application</b>.\" -sl EN-US -tl FR-FR -pen pensieveTM"));
@@ -441,7 +446,7 @@ public class TikalTest {
     }
 
     @Test
-    public void testTranslateXML () throws IOException, InterruptedException {
+    public void zz2TestTranslateXML () throws IOException, InterruptedException {
     	// Delete previous output
     	assertTrue(deleteOutputFile("xmltest2out.xml"));
     	int res = runTikal("-t -sl en -tl eo xmltest2.xml -apertium myApertium.cfg -oe UTF-8 -trace");

@@ -20,7 +20,6 @@
 		<dependency>
 			<groupId>com.thaiopensource</groupId>
 			<artifactId>jing</artifactId>
-			<version>20091111</version>
 			<scope>test</scope>
 		</dependency>
 		<!--<dependency> <groupId>net.java.dev.msv</groupId> <artifactId>msv-core</artifactId> 
