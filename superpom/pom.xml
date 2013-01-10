@@ -34,6 +34,11 @@
 		</repository>
 	</repositories>
 
+	<!--
+		If you change/add/remove any entries here, you should run
+		ant -f build_getVerProp.xml in deployment/maven to generate
+		libVersions.properties for the ant build
+	-->
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
@@ -49,6 +54,9 @@
 		<org.jboss.resteasy.version>2.3.4.Final</org.jboss.resteasy.version>
 		<org.codehaus.jackson.version>1.5.0</org.codehaus.jackson.version>
 
+		<!-- Not used by pom(s) during buid, but needed for the final redistributable package of jars -->
+		<org.codehaus.woodstox.stax2-api.version>3.1.1</org.codehaus.woodstox.stax2-api.version>
+
 		<!-- Kind of weird, there is a org.jboss.weld.cdi.version with the same value -->
 		<javax.enterprise.cdi.version>1.0-SP1</javax.enterprise.cdi.version>
 
@@ -59,6 +67,11 @@
 
 	</properties>
 
+	<!--
+		If you change/add/remove any entries here, you should run
+		ant -f build_getVerProp.xml in deployment/maven to generate
+		libVersions.properties for the ant build
+	-->
 	<dependencyManagement>
 		<dependencies>
 			<dependency><groupId>axis</groupId>                        <artifactId>axis-wsdl4j</artifactId>                 <version>1.5.1</version></dependency>
