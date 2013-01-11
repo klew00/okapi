@@ -21,6 +21,7 @@
 package net.sf.okapi.steps.rainbowkit.omegat;
 
 import java.io.File;
+import java.net.URISyntaxException;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.Util;
@@ -30,6 +31,8 @@ import net.sf.okapi.steps.rainbowkit.xliff.XLIFFPackageWriter;
 
 public class OmegaTPackageWriter extends XLIFFPackageWriter {
 
+	public static final String OKAPI_HOME = "OKAPI_HOME";
+	
 	Options options;
 	
 	public OmegaTPackageWriter () {
@@ -113,6 +116,51 @@ public class OmegaTPackageWriter extends XLIFFPackageWriter {
 			// Otherwise use the user's choice
 			XR.writeRawXML(getPreSegmented() ? "false" : (options.getAllowSegmentation() ? "true" : "false"));
 			XR.writeEndElementLineBreak(); // sentence_seg
+
+			// Include post-processing hook to trigger the Translation Kit Post-Processing pipeline
+			if (options.getIncludePostProcessingHook()) {
+				
+				String jarPath = null;
+				
+				// First check if there's a valid OKAPI_HOME envar
+				String home = System.getenv().get(OKAPI_HOME);
+				if (home != null) {
+					String jarRelPath = "lib" + File.separator + "rainbow.jar";
+					File jar = new File(home, jarRelPath);
+					try {
+						if (jar.exists() && jar.isFile()) {
+							jarPath = String.format("${%s}%s%s",
+									OKAPI_HOME,
+									home.endsWith(File.separator) ? "" : File.separator,
+									jarRelPath);
+						}
+					} catch (SecurityException e) {
+						// Nothing
+					}
+				}
+				
+				// Next try the ClassLoader
+				if (jarPath == null) {
+					try {
+						File jar = new File(ClassLoader.getSystemResource("rainbow.jar").toURI());
+						jarPath = jar.getAbsolutePath();
+					} catch (NullPointerException e) {
+						// The above just doesn't work in some environments, e.g. Jython:
+						// getSystemResource() returns null.
+					} catch (URISyntaxException e) {
+						// Nothing
+					}
+				}
+				
+				// Finally, write the element only if we have a path
+				if (jarPath != null) {
+					String externalCmd = String.format("java -jar \"%s\" -x TranslationKitPostProcessing -np \"${projectRoot}manifest.rkm\" -fc okf_rainbowkit-noprompt",
+							jarPath);
+					XR.writeStartElement("external_command");
+					XR.writeString(externalCmd);
+					XR.writeEndElementLineBreak(); // external_command
+				}
+			}
 
 			XR.writeEndElementLineBreak(); // project
 			XR.writeEndElement(); // omegat
