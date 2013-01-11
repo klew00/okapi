@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2010-2011 by the Okapi Framework contributors
+  Copyright (C) 2010-2013 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -118,21 +118,23 @@ public class OmegaTPackageWriter extends XLIFFPackageWriter {
 			XR.writeEndElementLineBreak(); // sentence_seg
 
 			// Include post-processing hook to trigger the Translation Kit Post-Processing pipeline
-			if (options.getIncludePostProcessingHook()) {
+			// IMPORTANT: Part of this code cannot be tested in debug mode
+			// (i.e. is not complied in a jar file)
+			if ( options.getIncludePostProcessingHook() ) {
 				
 				String jarPath = null;
 				
 				// First check if there's a valid OKAPI_HOME envar
 				String home = System.getenv().get(OKAPI_HOME);
-				if (home != null) {
+				if ( home != null ) {
 					String jarRelPath = "lib" + File.separator + "rainbow.jar";
 					File jar = new File(home, jarRelPath);
 					try {
-						if (jar.exists() && jar.isFile()) {
+						if ( jar.exists() && jar.isFile() ) {
 							jarPath = String.format("${%s}%s%s",
-									OKAPI_HOME,
-									home.endsWith(File.separator) ? "" : File.separator,
-									jarRelPath);
+								OKAPI_HOME,
+								home.endsWith(File.separator) ? "" : File.separator,
+								jarRelPath);
 						}
 					} catch (SecurityException e) {
 						// Nothing
@@ -140,8 +142,9 @@ public class OmegaTPackageWriter extends XLIFFPackageWriter {
 				}
 				
 				// Next try the ClassLoader
-				if (jarPath == null) {
+				if ( jarPath == null ) {
 					try {
+						// Note for debugging: this will return null if the code is not in a jar
 						File jar = new File(ClassLoader.getSystemResource("rainbow.jar").toURI());
 						jarPath = jar.getAbsolutePath();
 					} catch (NullPointerException e) {
@@ -153,9 +156,9 @@ public class OmegaTPackageWriter extends XLIFFPackageWriter {
 				}
 				
 				// Finally, write the element only if we have a path
-				if (jarPath != null) {
+				if ( jarPath != null ) {
 					String externalCmd = String.format("java -jar \"%s\" -x TranslationKitPostProcessing -np \"${projectRoot}manifest.rkm\" -fc okf_rainbowkit-noprompt",
-							jarPath);
+						jarPath);
 					XR.writeStartElement("external_command");
 					XR.writeString(externalCmd);
 					XR.writeEndElementLineBreak(); // external_command
