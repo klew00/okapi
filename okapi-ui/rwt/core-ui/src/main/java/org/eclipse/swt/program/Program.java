@@ -12,10 +12,10 @@
  *******************************************************************************/
 package org.eclipse.swt.program;
 
-import net.sf.okapi.common.Util;
+import net.sf.okapi.common.ui.rwt.AbstractWebApp;
 import net.sf.okapi.common.ui.rwt.RwtNotImplementedException;
 
-import org.eclipse.swt.graphics.*;
+import org.eclipse.swt.graphics.ImageData;
 
 /**
  * Instances of this class represent programs and
@@ -105,7 +105,8 @@ public static Program [] getPrograms () {
  */
 public static boolean launch (String fileName) {
 	//throw new RwtNotImplementedException("org.eclipse.swt.program.Program.launch (String fileName)");
-	Util.openURL(fileName);
+	//Util.openURL(fileName);
+	AbstractWebApp.getApp().openURL(fileName);	
 	return true;
 }
 

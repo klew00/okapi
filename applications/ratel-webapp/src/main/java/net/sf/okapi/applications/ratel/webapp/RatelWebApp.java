@@ -3,8 +3,8 @@ package net.sf.okapi.applications.ratel.webapp;
 import net.sf.okapi.common.ui.BaseHelp;
 import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.UIUtil;
+import net.sf.okapi.common.ui.filedownload.FileDownload;
 import net.sf.okapi.common.ui.rwt.AbstractWebApp;
-import net.sf.okapi.lib.ui.segmentation.FileProcessingDialog;
 import net.sf.okapi.lib.ui.segmentation.SRXEditor;
 import net.sf.okapi.lib.ui.segmentation.WebFileProcessingDialog;
 
@@ -24,7 +24,6 @@ public class RatelWebApp extends AbstractWebApp {
 	private SRXEditor editor;
 	private BaseHelp help;
 	
-	@SuppressWarnings("unused")
 	@Override
 	protected void createUI(Shell shell) {
 		Rectangle shellBounds = shell.getBounds();
@@ -83,7 +82,8 @@ public class RatelWebApp extends AbstractWebApp {
 			editor.getFileProcessor().process(testInputPath, testOutputPath, htmlOutput, editor.getSegmenter());
 
 			// Show the result TODO !!! Opens on the server, change to download
-			UIUtil.start("file://" + testOutputPath);
+			//UIUtil.start("file://" + testOutputPath);
+			FileDownload.open(testOutputPath);
 		}
 		catch ( Throwable e ) {
 			Dialogs.showError(getShell(), e.getLocalizedMessage(), null);

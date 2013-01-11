@@ -5,8 +5,10 @@ import java.util.Locale;
 import javax.servlet.http.HttpServletRequest;
 
 import org.eclipse.rwt.RWT;
+import org.eclipse.rwt.internal.widgets.JSExecutor;
 import org.eclipse.rwt.lifecycle.IEntryPoint;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
@@ -61,5 +63,29 @@ public abstract class AbstractWebApp implements IEntryPoint {
 	
 	public Shell getShell() {
 		return shell;
+	}
+	
+	public static AbstractWebApp getApp() {
+		return (AbstractWebApp) RWT.getSessionStore().getAttribute("app");
+	}
+	
+	public void openURL(String fileName) {
+//		Util.openURL(fileName);
+//		Browser browser = new Browser(shell, SWT.NONE);
+//		browser.setUrl(fileName);
+		//browser.execute("try{window.open(\"http://www.w3schools.com\")} catch(e) {alert(e)});");
+		
+//		int browserStyle = ExternalBrowser.LOCATION_BAR | ExternalBrowser.NAVIGATION_BAR;
+//	    ExternalBrowser.open(getApp().getName(), fileName, browserStyle );
+//		//ExternalBrowser.open("_blank", fileName, browserStyle );
+		if (fileName.startsWith("mailto:")) {
+			(new Browser(shell, SWT.NONE)).setUrl(fileName);
+			return;
+		}
+//		HelpDialog hd = new HelpDialog(shell, getName() + " Help", fileName);
+//		hd.showDialog();
+		//JSExecutor.executeJS("alert( \"Hello World!\" );");
+		//JSExecutor.executeJS("window.location=" + fileName + ";");
+		JSExecutor.executeJS("window.open(\"" + fileName + "\");");
 	}
 }

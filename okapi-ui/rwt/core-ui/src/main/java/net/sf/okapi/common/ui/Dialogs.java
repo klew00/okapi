@@ -22,6 +22,8 @@ package net.sf.okapi.common.ui;
 
 import java.io.File;
 
+import net.sf.okapi.common.ui.Res;
+
 import org.eclipse.rwt.widgets.FileUpload;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Rectangle;

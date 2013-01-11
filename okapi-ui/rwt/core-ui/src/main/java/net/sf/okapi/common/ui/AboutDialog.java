@@ -25,7 +25,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -89,7 +88,7 @@ public class AboutDialog {
 		label.setLayoutData(gdTmp);
 		
 		label = new Label(cmpTmp, SWT.NONE);
-		label.setText("Web version"); //$NON-NLS-1$
+		label.setText("Web version (BETA)"); //$NON-NLS-1$
 		gdTmp = new GridData(GridData.HORIZONTAL_ALIGN_CENTER | GridData.GRAB_HORIZONTAL
 			| GridData.VERTICAL_ALIGN_CENTER | GridData.GRAB_VERTICAL);
 		label.setLayoutData(gdTmp);		
@@ -111,6 +110,8 @@ public class AboutDialog {
 		//--- Dialog-level buttons
 
 		SelectionAdapter CloseActions = new SelectionAdapter() {
+			private static final long serialVersionUID = 4631437271255187216L;
+
 			public void widgetSelected(SelectionEvent e) {
 				shell.close();
 			};

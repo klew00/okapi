@@ -28,6 +28,7 @@ import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.OKCancelPanel;
 import net.sf.okapi.common.ui.UIUtil;
 
+import org.eclipse.rwt.RWT;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -67,6 +68,8 @@ public class WebFileProcessingDialog {
 
 		Label label = new Label(cmpTmp, SWT.NONE);
 		label.setText(Res.getString("testFileDlg.inputPath")); //$NON-NLS-1$
+//		label.setText("<a href=\"http://code.google.com/p/okapi/" target=\"_blank\">Okapi Framework</a>");
+//		label.setData( RWT.MARKUP_ENABLED, Boolean.TRUE );
 		gdTmp = new GridData();
 		gdTmp.horizontalSpan = 2;
 		label.setLayoutData(gdTmp);
