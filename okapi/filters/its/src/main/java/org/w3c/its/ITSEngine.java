@@ -881,11 +881,8 @@ public class ITSEngine implements IProcessor, ITraversal {
 		if ( Util.isEmpty(pointer) ) {
 			throw new ITSException("You must have a provenanceRecordsRefPointer attribute defined.");
 		}
-		rule.annotations = createProvenanceAnnotationSet();
-		GenericAnnotation ann = addIssueItem(rule.annotations);
 		rule.info = pointer;
 		rule.infoType = INFOTYPE_REFPOINTER;
-
 		// Add the rule
 		rules.add(rule);
 	}

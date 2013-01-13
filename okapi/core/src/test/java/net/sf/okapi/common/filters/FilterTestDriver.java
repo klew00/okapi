@@ -659,8 +659,7 @@ public class FilterTestDriver {
 	 *            code of the target (output) language.
 	 * @param skelWriter
 	 *            the ISkeletonWriter to use.
-	 * @param the
-	 *            encoder manager.
+	 * @param encoderManager the encoder manager.
 	 * @return The generated output string.
 	 */
 	public static String generateOutput(List<Event> list, LocaleId trgLang,

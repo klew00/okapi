@@ -1,6 +1,16 @@
 package net.sf.okapi.filters.its.html5;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+import java.io.File;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.List;
+
 import net.sf.okapi.common.Event;
+import net.sf.okapi.common.IResource;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.TestUtil;
 import net.sf.okapi.common.annotation.GenericAnnotation;
 import net.sf.okapi.common.annotation.GenericAnnotationType;
@@ -8,26 +18,21 @@ import net.sf.okapi.common.annotation.GenericAnnotations;
 import net.sf.okapi.common.annotation.TermsAnnotation;
 import net.sf.okapi.common.filters.FilterTestDriver;
 import net.sf.okapi.common.filterwriter.GenericContent;
-import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.RawDocument;
-import static org.junit.Assert.*;
+import net.sf.okapi.common.resource.TextFragment;
 
 import org.junit.Before;
 import org.junit.Test;
-
-import java.io.File;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.List;
 
 public class HTML5FilterTest {
 
 	private HTML5Filter filter;
 	private GenericContent fmt;
 	private String root;
-	private LocaleId locEN = LocaleId.fromString("en");
+	private LocaleId locEN = LocaleId.ENGLISH;
+	private LocaleId locFR = LocaleId.FRENCH;
 
 	@Before
 	public void setUp() {
@@ -422,11 +427,78 @@ public class HTML5FilterTest {
 		String expected = "<!DOCTYPE html>\n<html lang=\"en\"><head><meta charset=\"UTF-8\"><title>Title</title></head><body>"
 			+ "<p>Text <img alt=\"Text\" src=\"test.png\">.</p>"
 			+ "</body></html>";
-		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet),
-			filter.getEncoderManager(), locEN));
+		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet), locFR,
+			filter.createSkeletonWriter(), filter.getEncoderManager()));
 	}
 	
-	
+	@Test
+	public void testAddITSAnnotations1 () {
+		String snippet = "<!DOCTYPE html>\n<html lang=en><head><meta charset=utf-8><title>Title</title></head><body>"
+			+ "<p>Text1 text2 text3</p>"
+			+ "</body></html>";
+		ArrayList<Event> list = getEvents(snippet);
+		ITextUnit tu = FilterTestDriver.getTextUnit(list, 2);
+		// Creates a target
+		TextFragment tf = tu.createTarget(locFR, false, IResource.COPY_ALL).getFirstContent();
+		// Add a simple LQI annotation
+		GenericAnnotations anns = new GenericAnnotations(
+			new GenericAnnotation(GenericAnnotationType.DISAMB,
+				GenericAnnotationType.DISAMB_GRANULARITY, GenericAnnotationType.DISAMB_GRANULARITY_ENTITY, // Default
+				GenericAnnotationType.DISAMB_CLASS, "REF:classRefWith\"'&<>[]{}"));
+		anns.add(new GenericAnnotation(GenericAnnotationType.ALLOWEDCHARS,
+			GenericAnnotationType.ALLOWEDCHARS_VALUE, "[a-z]"));
+		anns.add(new GenericAnnotation(GenericAnnotationType.TERM,
+			GenericAnnotationType.TERM_INFO, "terminfo",
+			GenericAnnotationType.TERM_CONFIDENCE, 0.123));
+		tf.annotate(6, 11, GenericAnnotationType.GENERIC, anns);
+		// Test if it's annotated
+		GenericAnnotations anns2 = (GenericAnnotations)tf.getCode(0).getAnnotation(GenericAnnotationType.GENERIC);
+		assertEquals(anns, anns2);
+		// Test the output
+		String expected = "<!DOCTYPE html>\n<html lang=\"en\"><head><meta charset=\"UTF-8\"><title>Title</title></head><body>"
+			+ "<p>Text1 <span its-disambig-class-ref=\"classRefWith&quot;&#39;&amp;&lt;>[]{}\""
+			+ " its-allowed-characters=\"[a-z]\""
+			+ " its-term=\"yes\" its-term-confidence=\"0.123\" its-term-info=\"terminfo\""
+			+ ">text2</span> text3</p>"
+			+ "</body></html>";
+		assertEquals(expected, FilterTestDriver.generateOutput(list, locFR,
+			filter.createSkeletonWriter(), filter.getEncoderManager()));
+	}
+
+	@Test
+	public void testAddITSAnnotations2 () {
+		String snippet = "<!DOCTYPE html>\n<html lang=en><head><meta charset=utf-8><title>Title</title></head><body>"
+			+ "<p>Text1 text2 text3</p>"
+			+ "</body></html>";
+		ArrayList<Event> list = getEvents(snippet);
+		ITextUnit tu = FilterTestDriver.getTextUnit(list, 2);
+		// Creates a target
+		TextFragment tf = tu.createTarget(locFR, false, IResource.COPY_ALL).getFirstContent();
+		// Add a simple LQI annotation
+		GenericAnnotations anns = new GenericAnnotations(
+			new GenericAnnotation(GenericAnnotationType.LQI,
+				GenericAnnotationType.LQI_COMMENT, "comment1"));
+		anns.setData("myId");
+		anns.add(new GenericAnnotation(GenericAnnotationType.LQI,
+			GenericAnnotationType.LQI_TYPE, "terminology",
+			GenericAnnotationType.LQI_SEVERITY, 50.5));
+		anns.add(new GenericAnnotation(GenericAnnotationType.LQI,
+			GenericAnnotationType.LQI_COMMENT, "comment2",
+			GenericAnnotationType.LQI_ENABLED, false));
+		tf.annotate(6, 11, GenericAnnotationType.GENERIC, anns);
+		// Test if it's annotated
+		GenericAnnotations anns2 = (GenericAnnotations)tf.getCode(0).getAnnotation(GenericAnnotationType.GENERIC);
+		assertEquals(anns, anns2);
+		// Test the output
+		String expected = "<!DOCTYPE html>\n<html lang=\"en\"><head><meta charset=\"UTF-8\"><title>Title</title></head><body>"
+			+ "<p>Text1 <span its-loc-quality-issues-ref=\"#myId\""
+			+ ">text2</span> text3</p>"
+//TODO: standoff			
+			+ "</body></html>";
+		assertEquals(expected, FilterTestDriver.generateOutput(list, locFR,
+			filter.createSkeletonWriter(), filter.getEncoderManager()));
+	}
+
 	@Test
 	public void testOpenTwice () throws URISyntaxException {
 		File file = new File(root+"test01.html");

@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2012 by the Okapi Framework contributors
+  Copyright (C) 2012-2013 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -30,11 +30,6 @@ public class GenericAnnotationType {
 	 */
 	public static final String GENERIC = "generic";
 	
-	/**
-	 * Code type to use for annotation-only markers.
-	 */
-	public static final String ANNOTATION_ONLY_MARKER = "_annotation_";
-
 	/**
 	 * Annotation identifier for the 
 	 * <a href='http://www.w3.org/TR/its20/#terminology'>ITS Terminology</a> data category.

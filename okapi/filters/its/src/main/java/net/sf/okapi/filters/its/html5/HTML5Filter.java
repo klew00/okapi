@@ -39,6 +39,7 @@ import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
+import net.sf.okapi.common.skeleton.ISkeletonWriter;
 import net.sf.okapi.filters.its.ITSFilter;
 import net.sf.okapi.filters.its.Parameters;
 import nu.validator.htmlparser.dom.HtmlDocumentBuilder;
@@ -89,6 +90,11 @@ public class HTML5Filter extends ITSFilter {
 		return list;
 	}
 	
+	@Override
+	public ISkeletonWriter createSkeletonWriter() {
+		return new HTML5SkeletonWriter();
+	}
+
 	@Override
 	public EncoderManager getEncoderManager () {
 		if ( encoderManager == null ) {

@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2010 by the Okapi Framework contributors
+  Copyright (C) 2008-2013 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -27,8 +27,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import net.sf.okapi.common.annotation.GenericAnnotationType;
 
 /**
  * Implements the methods for creating and manipulating a pre-parsed
@@ -1383,7 +1381,7 @@ public class TextFragment implements Appendable, CharSequence, Comparable<Object
 		String startBuf = ""; // Empty by default
 		if ( startCode == null ) {
 			// Create the new start code
-			startCode = new Code(TagType.OPENING, GenericAnnotationType.ANNOTATION_ONLY_MARKER);
+			startCode = new Code(TagType.OPENING, Code.TYPE_ANNOTATION_ONLY);
 			startBuf = ""+((char)MARKER_OPENING)+toChar(codes.size());
 			startCode.id = ++lastCodeID;
 			// Insert the start marker
@@ -1394,7 +1392,7 @@ public class TextFragment implements Appendable, CharSequence, Comparable<Object
 
 		if ( endCode == null ) {
 			// Create the new end code
-			endCode = new Code(TagType.CLOSING, GenericAnnotationType.ANNOTATION_ONLY_MARKER);
+			endCode = new Code(TagType.CLOSING, Code.TYPE_ANNOTATION_ONLY);
 			String endBuf = ""+((char)MARKER_CLOSING)+toChar(codes.size());
 			endCode.id = startCode.id;
 			// Insert the end code, startBuf length is 0 or 2

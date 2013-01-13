@@ -68,6 +68,10 @@ public class Code {
 	 * Code type value for reference.
 	 */
 	public static final String TYPE_REFERENCE = "ref";
+	/**
+	 * Special type value indicating the code/marker is only there to hold an annotation.
+	 */
+	public static final String TYPE_ANNOTATION_ONLY = "_annotation_";
 	
 	/**
 	 * Initial capacity for data and outerData objects.
@@ -418,6 +422,16 @@ public class Code {
 	public boolean hasAnnotation (String type) {
 		if ( annotations == null ) return false;
 		return annotations.containsKey(type);
+	}
+	
+	/**
+	 * Indicates if the code is only a marker for an annotation.
+	 * @return true if the code has an annotation (not null) and its type is set to Code.TYPE_ANNOTATION_ONLY.
+	 * False if there is no annotation (even with a type set to Code.TYPE_ANNOTATION_ONLY), or if the type is not Code.TYPE_ANNOTATION_ONLY.
+	 */
+	public boolean hasOnlyAnnotation () {
+		if ( annotations == null ) return false;
+		return type.equals(Code.TYPE_ANNOTATION_ONLY);
 	}
 	
 	/**

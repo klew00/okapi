@@ -120,7 +120,7 @@ public class XLIFFContentTest {
 		tf.annotate(7, 15, GenericAnnotationType.GENERIC, anns);
 		assertEquals("Before <mrk mtype=\"x-its\" its:allowedCharacters=\"[a-z]\""
 			+ " its:storageSize=\"25\" its:storageEncoding=\"iso-8859-1\" its:storageLinebreak=\"nel\""
-			+ " its:termConfidence=\"0.5\" its:termInfoRef=\"myUri\""
+			+ " its:term=\"yes\" its:termConfidence=\"0.5\" its:termInfoRef=\"myUri\""
 			+ " its:locQualityIssueComment=\"blah\" its:locQualityIssueSeverity=\"98.5\" its:locQualityIssueType=\"grammar\""
 			+ ">the span</mrk> after.",
 			fmt.setContent(tf).toString(true));

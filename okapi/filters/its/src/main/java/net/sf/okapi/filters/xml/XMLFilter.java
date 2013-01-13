@@ -39,6 +39,7 @@ import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
+import net.sf.okapi.common.skeleton.ISkeletonWriter;
 import net.sf.okapi.filters.its.ITSFilter;
 import net.sf.okapi.filters.its.Parameters;
 
@@ -116,6 +117,11 @@ public class XMLFilter extends ITSFilter {
 		return list;
 	}
 	
+	@Override
+	public ISkeletonWriter createSkeletonWriter () {
+		return new XMLSkeletonWriter();
+	}
+
 	@Override
 	public EncoderManager getEncoderManager () {
 		if ( encoderManager == null ) {

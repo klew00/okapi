@@ -58,7 +58,6 @@ import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
-import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
 import net.sf.okapi.common.skeleton.ISkeletonWriter;
 
 import org.slf4j.Logger;
@@ -134,9 +133,7 @@ public abstract class ITSFilter implements IFilter {
 	}
 
 	@Override
-	public ISkeletonWriter createSkeletonWriter () {
-		return new GenericSkeletonWriter();
-	}
+	abstract public ISkeletonWriter createSkeletonWriter ();
 
 	@Override
 	public IFilterWriter createFilterWriter () {

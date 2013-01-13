@@ -138,7 +138,7 @@ public class XLIFFContent {
 				}
 				else {
 					// Output the code (if it's not a marker-only one)
-					if ( !code.getType().equals(GenericAnnotationType.ANNOTATION_ONLY_MARKER) ) {
+					if ( !code.hasOnlyAnnotation() ) {
 						if ( gMode ) {
 							tmp.append(String.format("<g id=\"%d\">", code.getId()));
 						}
@@ -175,7 +175,7 @@ public class XLIFFContent {
 						tmp.append("</mrk>");
 					}
 					// Then close the code
-					if ( !code.getType().equals(GenericAnnotationType.ANNOTATION_ONLY_MARKER) ) {
+					if ( !code.hasOnlyAnnotation() ) {
 						if ( gMode ) {
 							tmp.append("</g>");
 						}
@@ -360,6 +360,7 @@ public class XLIFFContent {
 			
 			// Terminology
 			else if ( ann.getType().equals(GenericAnnotationType.TERM) ) {
+				printITSBooleanAttribute(true, "term", output);
 				printITSDoubleAttribute(ann.getDouble(GenericAnnotationType.TERM_CONFIDENCE), "termConfidence", output);
 				printITSStringAttribute(ann.getString(GenericAnnotationType.TERM_INFO), "termInfo", quoteMode, escapeGT, output);
 			}
