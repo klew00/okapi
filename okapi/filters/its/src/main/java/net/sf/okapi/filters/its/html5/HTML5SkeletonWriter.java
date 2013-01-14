@@ -23,15 +23,22 @@ package net.sf.okapi.filters.its.html5;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.w3c.its.ITSEngine;
+
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.annotation.GenericAnnotation;
 import net.sf.okapi.common.annotation.GenericAnnotationType;
 import net.sf.okapi.common.annotation.GenericAnnotations;
 import net.sf.okapi.common.encoder.EncoderContext;
+import net.sf.okapi.common.filterwriter.ITSContent;
 import net.sf.okapi.common.resource.Code;
+import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.TextFragment;
+import net.sf.okapi.common.skeleton.GenericSkeleton;
+import net.sf.okapi.common.skeleton.GenericSkeletonPart;
 import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
+import net.sf.okapi.filters.its.ITSFilter;
 
 /**
  * Implements ISkeletonWriter for the ITS filters 
@@ -41,6 +48,7 @@ public class HTML5SkeletonWriter extends GenericSkeletonWriter {
 	public static final String REF_PREFIX = "REF:";
 
 	private List<GenericAnnotations> standoff;
+	private ITSContent itsCont;
 
 	/**
 	 * Gets the original content of a TextFragment.
@@ -157,7 +165,28 @@ public class HTML5SkeletonWriter extends GenericSkeletonWriter {
 		}
 		return tmp.toString();
 	}
+	
+	@Override
+	public String processDocumentPart (DocumentPart resource) {
+		GenericSkeleton skel = (GenericSkeleton)resource.getSkeleton();
+		if ( skel != null ) {
+			GenericSkeletonPart part = skel.getFirstPart();
+			// Is it a standoff placeholder
+			if ( part.getData().toString().equals(ITSFilter.STANDOFFMARKER) ) {
+				part.setData(""); // Clear the marker in all cases
+				// And add the markup if there is something to output
+				if ( !Util.isEmpty(standoff) ) {
+					if ( itsCont == null ) itsCont = new ITSContent(encoderManager.getCharsetEncoder(), true);
+					part.append(itsCont.writeStandoffLQI(standoff));
+					part.append(itsCont.writeStandoffProvenance(standoff));
+				}
+			}
+		}
 
+		// Then do the normal process
+		return super.processDocumentPart(resource);
+	}
+	
 	private void outputAnnotation (Code code,
 		StringBuilder output)
 	{
@@ -205,6 +234,11 @@ public class HTML5SkeletonWriter extends GenericSkeletonWriter {
 			else if ( ann.getType().equals(GenericAnnotationType.LQI) ) {
 				continue; // LQI are dealt with separately
 			}
+			
+			// Provenance
+			else if ( ann.getType().equals(GenericAnnotationType.PROV) ) {
+				continue; // Provenance are dealt with separately
+			}
 		}
 			
 		// Deal with LQI information
@@ -226,6 +260,33 @@ public class HTML5SkeletonWriter extends GenericSkeletonWriter {
 			// Inside a ,script> at the end of the document.
 			String refId = anns.getData(); // ID to use is already generated in the annotation
 			output.append(" its-loc-quality-issues-ref=\"#"+refId+"\"");
+			if ( standoff == null ) standoff = new ArrayList<GenericAnnotations>();
+			GenericAnnotations newSet = new GenericAnnotations();
+			standoff.add(newSet);
+			newSet.setData(refId);
+			newSet.addAll(list);
+		}
+
+		// Deal with Provenance information
+		list = anns.getAnnotations(GenericAnnotationType.PROV);
+		if ( list.size() == 1 ) {
+//TODO			
+			// If there is only one QI entry: we output it locally
+//			GenericAnnotation ann = list.get(0);
+//			printITSStringAttribute(ann.getString(GenericAnnotationType.LQI_COMMENT), "loc-quality-issue-comment", output);
+//			Boolean booVal = ann.getBoolean(GenericAnnotationType.LQI_ENABLED);
+//			if (( booVal != null ) && !booVal ) { // Output only non-default value (if one is set)
+//				printITSBooleanAttribute(booVal, "loc-quality-issue-enabled", output);
+//			}
+//			printITSStringAttribute(ann.getString(GenericAnnotationType.LQI_PROFILEREF), "loc-quality-issue-profile", output);
+//			printITSDoubleAttribute(ann.getDouble(GenericAnnotationType.LQI_SEVERITY), "loc-quality-issue-severity", output);
+//			printITSStringAttribute(ann.getString(GenericAnnotationType.LQI_TYPE), "loc-quality-issue-type", output);
+		}
+		else if ( list.size() > 1 ) {
+			// If there are 2 or more: the items need to be output as standoff markup.
+			// Inside a ,script> at the end of the document.
+			String refId = anns.getData(); // ID to use is already generated in the annotation
+			output.append(" its-provenance-records-ref=\"#"+refId+"\"");
 			if ( standoff == null ) standoff = new ArrayList<GenericAnnotations>();
 			GenericAnnotations newSet = new GenericAnnotations();
 			standoff.add(newSet);

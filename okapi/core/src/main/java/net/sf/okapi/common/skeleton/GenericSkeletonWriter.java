@@ -273,7 +273,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 	}
 	
 	protected String getString (GenericSkeletonPart part,
-			EncoderContext context)
+		EncoderContext context)
 	{
 		// If it is not a reference marker, just use the data
 		//if ( !part.data.toString().startsWith(TextFragment.REFMARKER_START) ) {

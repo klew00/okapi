@@ -71,6 +71,8 @@ import org.w3c.its.ITraversal;
 import org.w3c.its.TargetPointerEntry;
 
 public abstract class ITSFilter implements IFilter {
+	
+	public static final String STANDOFFMARKER = "$#@StandOff@#$";
 
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -88,6 +90,7 @@ public abstract class ITSFilter implements IFilter {
 	
 	private final String mimeType;
 	private final boolean isHTML5;
+	private boolean hasStandoffLocation;
 	
 	private String trgLangCode; // can be null
 	private ITSEngine trav;
@@ -212,6 +215,7 @@ public abstract class ITSFilter implements IFilter {
 		canceled = false;
 		tuId = 0;
 		otherId = new IdGenerator(null, "o");
+		hasStandoffLocation = false;
 
 		initializeDocument();
 		
@@ -488,6 +492,9 @@ public abstract class ITSFilter implements IFilter {
 					tmp.append(Util.escapeToXML(attr.getNodeValue(), 3, false, null)
 						+ "\"");
 				}
+//				else if ( isHTML5 && attr.getLocalName().startsWith("its-") ) {
+//					// Strip out the ITS attributes, they will be re-generated on output
+//				}
 				else {
 					tmp.append(Util.escapeToXML(attr.getNodeValue(), 3, false, null)
 						+ "\"");
@@ -683,6 +690,19 @@ public abstract class ITSFilter implements IFilter {
 					terms = new TermsAnnotation();
 				}
 				terms.add(node.getTextContent(), trav.getTermInfo(null));
+			}
+			
+			// Check for standoff insertion point
+			if ( isHTML5 && node.getNodeName().equals("body") && !hasStandoffLocation ) {
+				hasStandoffLocation = true;
+				if ( frag != null ) { // Close the previous skeleton if needed
+					addTextUnit(node, false);
+				}
+				// Add the marker for the standoff markup location
+				skel.add(STANDOFFMARKER);
+				DocumentPart dp = new DocumentPart(otherId.createId(), false, skel);
+				queue.add(new Event(EventType.DOCUMENT_PART, dp));
+				skel = new GenericSkeleton();
 			}
 
 			if ( frag == null ) { // Not an extraction: in skeleton

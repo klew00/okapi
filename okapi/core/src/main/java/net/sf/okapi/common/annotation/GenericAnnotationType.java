@@ -31,6 +31,11 @@ public class GenericAnnotationType {
 	public static final String GENERIC = "generic";
 	
 	/**
+	 * Prefix used to indicate a reference value.
+	 */
+	public static final String REF_PREFIX = "REF:";
+	
+	/**
 	 * Annotation identifier for the 
 	 * <a href='http://www.w3.org/TR/its20/#terminology'>ITS Terminology</a> data category.
 	 */

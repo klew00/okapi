@@ -430,6 +430,17 @@ public class HTML5FilterTest {
 		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet), locFR,
 			filter.createSkeletonWriter(), filter.getEncoderManager()));
 	}
+
+	@Test
+	public void testMinimalHTML5Output () {
+		String snippet = "<!DOCTYPE html>\n<head><title>t1</title></head>t2";
+		String expected = "<!DOCTYPE html>\n<html><head><title>t1</title></head><body>t2</body></html>";
+		ArrayList<Event> list = getEvents(snippet);
+		ITextUnit tu = FilterTestDriver.getTextUnit(list, 1);
+		assertEquals("t1", tu.getSource().toString());
+		assertEquals(expected, FilterTestDriver.generateOutput(list, locFR,
+			filter.createSkeletonWriter(), filter.getEncoderManager()));
+	}
 	
 	@Test
 	public void testAddITSAnnotations1 () {
@@ -438,22 +449,7 @@ public class HTML5FilterTest {
 			+ "</body></html>";
 		ArrayList<Event> list = getEvents(snippet);
 		ITextUnit tu = FilterTestDriver.getTextUnit(list, 2);
-		// Creates a target
-		TextFragment tf = tu.createTarget(locFR, false, IResource.COPY_ALL).getFirstContent();
-		// Add a simple LQI annotation
-		GenericAnnotations anns = new GenericAnnotations(
-			new GenericAnnotation(GenericAnnotationType.DISAMB,
-				GenericAnnotationType.DISAMB_GRANULARITY, GenericAnnotationType.DISAMB_GRANULARITY_ENTITY, // Default
-				GenericAnnotationType.DISAMB_CLASS, "REF:classRefWith\"'&<>[]{}"));
-		anns.add(new GenericAnnotation(GenericAnnotationType.ALLOWEDCHARS,
-			GenericAnnotationType.ALLOWEDCHARS_VALUE, "[a-z]"));
-		anns.add(new GenericAnnotation(GenericAnnotationType.TERM,
-			GenericAnnotationType.TERM_INFO, "terminfo",
-			GenericAnnotationType.TERM_CONFIDENCE, 0.123));
-		tf.annotate(6, 11, GenericAnnotationType.GENERIC, anns);
-		// Test if it's annotated
-		GenericAnnotations anns2 = (GenericAnnotations)tf.getCode(0).getAnnotation(GenericAnnotationType.GENERIC);
-		assertEquals(anns, anns2);
+		addVariousAnnotations(tu);
 		// Test the output
 		String expected = "<!DOCTYPE html>\n<html lang=\"en\"><head><meta charset=\"UTF-8\"><title>Title</title></head><body>"
 			+ "<p>Text1 <span its-disambig-class-ref=\"classRefWith&quot;&#39;&amp;&lt;>[]{}\""
@@ -472,33 +468,52 @@ public class HTML5FilterTest {
 			+ "</body></html>";
 		ArrayList<Event> list = getEvents(snippet);
 		ITextUnit tu = FilterTestDriver.getTextUnit(list, 2);
-		// Creates a target
-		TextFragment tf = tu.createTarget(locFR, false, IResource.COPY_ALL).getFirstContent();
-		// Add a simple LQI annotation
-		GenericAnnotations anns = new GenericAnnotations(
-			new GenericAnnotation(GenericAnnotationType.LQI,
-				GenericAnnotationType.LQI_COMMENT, "comment1"));
-		anns.setData("myId");
-		anns.add(new GenericAnnotation(GenericAnnotationType.LQI,
-			GenericAnnotationType.LQI_TYPE, "terminology",
-			GenericAnnotationType.LQI_SEVERITY, 50.5));
-		anns.add(new GenericAnnotation(GenericAnnotationType.LQI,
-			GenericAnnotationType.LQI_COMMENT, "comment2",
-			GenericAnnotationType.LQI_ENABLED, false));
-		tf.annotate(6, 11, GenericAnnotationType.GENERIC, anns);
-		// Test if it's annotated
-		GenericAnnotations anns2 = (GenericAnnotations)tf.getCode(0).getAnnotation(GenericAnnotationType.GENERIC);
-		assertEquals(anns, anns2);
+		addStandoffAnnotations(tu);
 		// Test the output
 		String expected = "<!DOCTYPE html>\n<html lang=\"en\"><head><meta charset=\"UTF-8\"><title>Title</title></head><body>"
-			+ "<p>Text1 <span its-loc-quality-issues-ref=\"#myId\""
+			+ "<p><span its-provenance-records-ref=\"#myProv\">Text1</span> "
+			+ "<span its-loc-quality-issues-ref=\"#myLqi\""
 			+ ">text2</span> text3</p>"
-//TODO: standoff			
+			+ "<script id=\"myLqi\" type=\"application/its+xml\">"
+			+ "<its:locQualityIssues xmlns:its=\"http://www.w3.org/2005/11/its\" version=\"2.0\" xml:id=\"myLqi\">"
+			+ "<its:locQualityIssue locQualityIssueComment=\"comment1\"/>"
+			+ "<its:locQualityIssue locQualityIssueSeverity=\"50.5\" locQualityIssueType=\"terminology\"/>"
+			+ "<its:locQualityIssue locQualityIssueComment=\"comment2\" locQualityIssueEnabled=\"no\"/>"
+			+ "</its:locQualityIssues></script>"
+			+ "<script id=\"myProv\" type=\"application/its+xml\">"
+			+ "<its:provenanceRecords xmlns:its=\"http://www.w3.org/2005/11/its\" version=\"2.0\" xml:id=\"myProv\">"
+			+ "<its:provenanceRecord person=\"person1\"/><its:provenanceRecord orgRef=\"org1\"/>"
+			+ "</its:provenanceRecords></script>"
 			+ "</body></html>";
 		assertEquals(expected, FilterTestDriver.generateOutput(list, locFR,
 			filter.createSkeletonWriter(), filter.getEncoderManager()));
 	}
 
+	@Test
+	public void testMinimalHTMLWithStandoff () {
+		String snippet = "<!DOCTYPE html>\n<head><title>t1</title></head>Text1 text2 text3";
+		ArrayList<Event> list = getEvents(snippet);
+		ITextUnit tu = FilterTestDriver.getTextUnit(list, 2);
+		assertEquals("Text1 text2 text3", tu.getSource().toString());
+		addStandoffAnnotations(tu);
+		String expected = "<!DOCTYPE html>\n<html><head><title>t1</title></head><body>"
+			+ "<span its-provenance-records-ref=\"#myProv\">Text1</span> <span its-loc-quality-issues-ref=\"#myLqi\""
+			+ ">text2</span> text3"
+			+ "<script id=\"myLqi\" type=\"application/its+xml\">"
+			+ "<its:locQualityIssues xmlns:its=\"http://www.w3.org/2005/11/its\" version=\"2.0\" xml:id=\"myLqi\">"
+			+ "<its:locQualityIssue locQualityIssueComment=\"comment1\"/>"
+			+ "<its:locQualityIssue locQualityIssueSeverity=\"50.5\" locQualityIssueType=\"terminology\"/>"
+			+ "<its:locQualityIssue locQualityIssueComment=\"comment2\" locQualityIssueEnabled=\"no\"/>"
+			+ "</its:locQualityIssues></script>"
+			+ "<script id=\"myProv\" type=\"application/its+xml\">"
+			+ "<its:provenanceRecords xmlns:its=\"http://www.w3.org/2005/11/its\" version=\"2.0\" xml:id=\"myProv\">"
+			+ "<its:provenanceRecord person=\"person1\"/><its:provenanceRecord orgRef=\"org1\"/>"
+			+ "</its:provenanceRecords></script>"
+			+ "</body></html>";
+		assertEquals(expected, FilterTestDriver.generateOutput(list, locFR,
+			filter.createSkeletonWriter(), filter.getEncoderManager()));
+	}
+	
 	@Test
 	public void testOpenTwice () throws URISyntaxException {
 		File file = new File(root+"test01.html");
@@ -508,7 +523,53 @@ public class HTML5FilterTest {
 		filter.open(rawDoc);
 		filter.close();
 	}
+
+	private void addStandoffAnnotations (ITextUnit tu) {
+		// Content is "Text1 text2 text3"
+		// Creates a target (no override)
+		TextFragment tf = tu.createTarget(locFR, false, IResource.COPY_ALL).getFirstContent();
+
+		// Add LQI annotations
+		GenericAnnotations anns = new GenericAnnotations(
+			new GenericAnnotation(GenericAnnotationType.LQI,
+				GenericAnnotationType.LQI_COMMENT, "comment1"));
+		anns.setData("myLqi");
+		anns.add(new GenericAnnotation(GenericAnnotationType.LQI,
+			GenericAnnotationType.LQI_TYPE, "terminology",
+			GenericAnnotationType.LQI_SEVERITY, 50.5));
+		anns.add(new GenericAnnotation(GenericAnnotationType.LQI,
+			GenericAnnotationType.LQI_COMMENT, "comment2",
+			GenericAnnotationType.LQI_ENABLED, false));
+		// Set the annotations
+		tf.annotate(6, 11, GenericAnnotationType.GENERIC, anns);
+		
+		// Add Prov annotations
+		anns = new GenericAnnotations(
+			new GenericAnnotation(GenericAnnotationType.PROV,
+				GenericAnnotationType.PROV_PERSON, "person1"));
+			anns.setData("myProv");
+		anns.add(new GenericAnnotation(GenericAnnotationType.PROV,
+				GenericAnnotationType.PROV_ORG, "REF:org1"));
+		// Set the annotations
+		tf.annotate(0, 5, GenericAnnotationType.GENERIC, anns);
+	}
 	
+	private void addVariousAnnotations (ITextUnit tu) {
+		// Creates a target
+		TextFragment tf = tu.createTarget(locFR, false, IResource.COPY_ALL).getFirstContent();
+		// Add a simple LQI annotation
+		GenericAnnotations anns = new GenericAnnotations(
+			new GenericAnnotation(GenericAnnotationType.DISAMB,
+				GenericAnnotationType.DISAMB_GRANULARITY, GenericAnnotationType.DISAMB_GRANULARITY_ENTITY, // Default
+				GenericAnnotationType.DISAMB_CLASS, "REF:classRefWith\"'&<>[]{}"));
+		anns.add(new GenericAnnotation(GenericAnnotationType.ALLOWEDCHARS,
+			GenericAnnotationType.ALLOWEDCHARS_VALUE, "[a-z]"));
+		anns.add(new GenericAnnotation(GenericAnnotationType.TERM,
+			GenericAnnotationType.TERM_INFO, "terminfo",
+			GenericAnnotationType.TERM_CONFIDENCE, 0.123));
+		tf.annotate(6, 11, GenericAnnotationType.GENERIC, anns);
+	}
+
 	private ArrayList<Event> getEvents (String snippet) {
 		ArrayList<Event> list = new ArrayList<Event>();
 		filter.open(new RawDocument(snippet, locEN, LocaleId.FRENCH));
