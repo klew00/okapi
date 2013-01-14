@@ -785,12 +785,16 @@ public class SRXEditor {
 	
 	private void updateCaption () {
 		String filename;
-		if ( srxPath != null ) filename = Util.getFilename(srxPath, true);
+		if ( srxPath != null ) filename = updateCaption_getFileName(srxPath);
 		else filename = Res.getString("SRXEditor.untitled");  //$NON-NLS-1$
 		String text = Res.getString("edit.captionApp");  //$NON-NLS-1$
 		shell.setText(filename + " - " + text); //$NON-NLS-1$
 	}
 	
+	protected String updateCaption_getFileName(String srxPath) {
+		return Util.getFilename(srxPath, true);
+	}
+
 	private void updateAll () {
 		cbGroup.removeAll();
 		setSurfaceData();
@@ -896,6 +900,7 @@ public class SRXEditor {
 				dlg.open();
 			}
 			srxPath = path; // Set the path only after the load is fine
+			loadSRXDocument_rulesLoaded(srxPath);
 		}
 		catch ( Throwable e ) {
 			Dialogs.showError(shell, e.getLocalizedMessage(), null);
@@ -906,6 +911,9 @@ public class SRXEditor {
 		}
 	}
 	
+	protected void loadSRXDocument_rulesLoaded(String path) {
+	}
+
 	private void copySRXDocumentToClipboard () {
 		if ( !srxDoc.getVersion().equals("2.0") ) { //$NON-NLS-1$
 			MessageBox dlg = new MessageBox(shell, SWT.ICON_QUESTION | SWT.YES | SWT.NO | SWT.CANCEL);
@@ -935,10 +943,9 @@ public class SRXEditor {
 				dlg.setMessage(Res.getString("edit.saveDocVersionWarning")); //$NON-NLS-1$
 				if ( dlg.open() != SWT.YES ) return false;
 			}
-			if ( path == null ) {
-				path = Dialogs.browseFilenamesForSave(shell, Res.getString("edit.saveDocCaption"), null, null, //$NON-NLS-1$
-					Res.getString("edit.saveDocFileTypes"), //$NON-NLS-1$
-					Res.getString("edit.saveDocFilters")); //$NON-NLS-1$
+			boolean saveAsMode = path == null;
+			if ( saveAsMode ) {
+				path = saveSRXDocument_getPath();
 				if ( path == null ) return false;
 			}
 			getSurfaceData();
@@ -946,11 +953,22 @@ public class SRXEditor {
 			srxDoc.saveRules(path, true, false);
 			srxPath = path;
 			updateCaption();
+			saveSRXDocument_afterSave(path, saveAsMode);
 		}
 		catch ( Exception e ) {
 			Dialogs.showError(shell, e.getLocalizedMessage(), null);
 		}
 		return true;
+	}
+
+	protected String saveSRXDocument_getPath() {
+		return Dialogs.browseFilenamesForSave(shell, Res.getString("edit.saveDocCaption"), null, null, //$NON-NLS-1$
+			Res.getString("edit.saveDocFileTypes"), //$NON-NLS-1$
+			Res.getString("edit.saveDocFilters")); //$NON-NLS-1$
+	}
+	
+	protected void saveSRXDocument_afterSave(String path, boolean saveAsMode) {
+		// Do nothing
 	}
 	
 	private void editRule (boolean createNewRule) {
@@ -1090,9 +1108,7 @@ public class SRXEditor {
 
 	private void segmentTextFile () {
 		try {
-			// Get the input file
-			FileProcessingDialog dlg = new FileProcessingDialog(shell, help);
-			String[] result = dlg.showDialog(testInputPath, testOutputPath, htmlOutput);
+			String[] result = segmentTextFile_getPaths(testInputPath, testOutputPath, htmlOutput);
 			if ( result == null ) return; // Canceled
 			testInputPath = result[0];
 			testOutputPath = result[1];
@@ -1100,21 +1116,24 @@ public class SRXEditor {
 
 			// Process
 			fileProc.process(testInputPath, testOutputPath, htmlOutput, segmenter);
-
-			// Show the result
-			UIUtil.start(testOutputPath);
+			
+			segmentTextFile_processResult(testOutputPath);
 		}
 		catch ( Throwable e ) {
 			Dialogs.showError(shell, e.getLocalizedMessage(), null);
 		}
 	}
 
-	public FileProcessor getFileProcessor() {
-		return fileProc;
+	protected String[] segmentTextFile_getPaths(String testInputPath, String testOutputPath, boolean htmlOutput) {
+		// Get the input file
+		FileProcessingDialog dlg = new FileProcessingDialog(shell, help);
+		String[] result = dlg.showDialog(testInputPath, testOutputPath, htmlOutput);
+		return result;
 	}
 
-	public ISegmenter getSegmenter() {
-		return segmenter;
+	protected void segmentTextFile_processResult(String testOutputPath) {
+		// Show the result
+		UIUtil.start(testOutputPath);
 	}
 	
 }

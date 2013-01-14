@@ -631,7 +631,8 @@ Shell:maximized, Shell:maximized:inactive {
 }
 
 Shell-DisplayOverlay {
-  animation: fadeIn 200ms linear, fadeOut 400ms ease-out;
+  /*animation: fadeIn 200ms linear, fadeOut 400ms ease-out;*/
+  animation: none; /* workaround for control#setFocus() https://bugs.eclipse.org/bugs/show_bug.cgi?id=386053 */
   background-image: none;
   background-color: #808080;
   opacity: 0.2;
@@ -2344,7 +2345,8 @@ Shell[BORDER]:inactive, Shell[TITLE]:inactive {
 }
 
 Shell-DisplayOverlay {
-  animation: fadeIn 150ms linear, fadeOut 400ms ease-out;
+  /*animation: fadeIn 150ms linear, fadeOut 400ms ease-out;*/
+  animation: none; /* workaround for control#setFocus() https://bugs.eclipse.org/bugs/show_bug.cgi?id=386053 */
   background-image: none;
   background-color: #FFFFFF;
   opacity: 0.5;
@@ -2392,7 +2394,8 @@ Shell.toolbarLayer {
 }
 
 Shell-DisplayOverlay.confDialog {
-  animation: fadeIn 150ms linear, fadeOut 400ms ease-out;
+  /*animation: fadeIn 150ms linear, fadeOut 400ms ease-out;*/
+  animation: none; /* workaround for control#setFocus() https://bugs.eclipse.org/bugs/show_bug.cgi?id=386053 */
   background-image: none;
   background-color: #999999;
   opacity: 0.5;

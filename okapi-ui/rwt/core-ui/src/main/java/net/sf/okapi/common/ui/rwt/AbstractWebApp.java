@@ -69,23 +69,23 @@ public abstract class AbstractWebApp implements IEntryPoint {
 		return (AbstractWebApp) RWT.getSessionStore().getAttribute("app");
 	}
 	
-	public void openURL(String fileName) {
-//		Util.openURL(fileName);
+	public void openURL(String url) {
+//		Util.openURL(url);
 //		Browser browser = new Browser(shell, SWT.NONE);
-//		browser.setUrl(fileName);
+//		browser.setUrl(url);
 		//browser.execute("try{window.open(\"http://www.w3schools.com\")} catch(e) {alert(e)});");
 		
 //		int browserStyle = ExternalBrowser.LOCATION_BAR | ExternalBrowser.NAVIGATION_BAR;
-//	    ExternalBrowser.open(getApp().getName(), fileName, browserStyle );
-//		//ExternalBrowser.open("_blank", fileName, browserStyle );
-		if (fileName.startsWith("mailto:")) {
-			(new Browser(shell, SWT.NONE)).setUrl(fileName);
+//	    ExternalBrowser.open(getApp().getName(), url, browserStyle );
+//		//ExternalBrowser.open("_blank", url, browserStyle );
+		if (url.startsWith("mailto:")) {
+			(new Browser(shell, SWT.NONE)).setUrl(url);
 			return;
 		}
-//		HelpDialog hd = new HelpDialog(shell, getName() + " Help", fileName);
+//		HelpDialog hd = new HelpDialog(shell, getName() + " Help", url);
 //		hd.showDialog();
 		//JSExecutor.executeJS("alert( \"Hello World!\" );");
-		//JSExecutor.executeJS("window.location=" + fileName + ";");
-		JSExecutor.executeJS("window.open(\"" + fileName + "\");");
+		//JSExecutor.executeJS("window.location=" + url + ";");
+		JSExecutor.executeJS("window.open(\"" + url + "\");");
 	}
 }

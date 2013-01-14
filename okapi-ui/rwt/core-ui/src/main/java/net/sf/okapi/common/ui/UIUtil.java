@@ -22,8 +22,6 @@ package net.sf.okapi.common.ui;
 
 import java.io.IOException;
 
-import net.sf.okapi.common.ui.rwt.RwtNotImplementedException;
-
 import org.eclipse.rwt.RWT;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;

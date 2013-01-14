@@ -8,8 +8,6 @@ import java.io.IOException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
 
-import net.sf.okapi.common.Util;
-
 import org.apache.commons.io.FileUtils;
 import org.eclipse.rwt.RWT;
 import org.eclipse.rwt.service.IServiceHandler;
@@ -17,15 +15,16 @@ import org.eclipse.rwt.service.IServiceHandler;
 public class DownloadServiceHandler implements IServiceHandler {
 	
 	public void service() throws IOException, ServletException {
-	    final String fileName = RWT.getRequest().getParameter("filename");
-	    final byte[] download = FileUtils.readFileToByteArray(new File(fileName));
+	    final String serverFileName = RWT.getRequest().getParameter("server-filename");
+	    final String clientFileName = RWT.getRequest().getParameter("client-filename");
+	    final byte[] download = FileUtils.readFileToByteArray(new File(serverFileName));
 	    
 	    // Send the file in the response
 	    HttpServletResponse response = RWT.getResponse();
 	    response.setContentType("application/octet-stream");
 	    response.setContentLength(download.length);
 	    String contentDisposition = "attachment; filename=\"" + 
-	    		Util.getFilename(fileName, true) + "\"";
+	    		clientFileName + "\"";
 	    response.setHeader("Content-Disposition", contentDisposition);
 	    response.getOutputStream().write(download);
 	}

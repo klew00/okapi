@@ -22,6 +22,8 @@ package net.sf.okapi.common.ui;
 
 import java.io.File;
 
+import net.sf.okapi.common.Util;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.FileDialog;
@@ -69,7 +71,7 @@ public class Dialogs {
 		dlg.setText(title);
 		if ( dlg.open() == null ) return null;
 		String[] aPaths = dlg.getFileNames();
-		if (dlg.getFilterPath() != null) {
+		if (!Util.isEmpty(dlg.getFilterPath())) {
 			for ( int i=0; i<aPaths.length; i++ ) {
 				aPaths[i] = dlg.getFilterPath() + File.separator + aPaths[i];
 			}

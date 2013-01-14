@@ -78,7 +78,7 @@ public class FileProcessingDialog {
 		btGetInput.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				String[] paths = Dialogs.browseFilenames(shell, Res.getString("testFileDlg.getInputCaption"), false, //$NON-NLS-1$
-					edInput.getText(), Res.getString("testFileDlg.getInputFileTypes"), Res.getString("testFileDlg.getInputFilter")); //$NON-NLS-1$ //$NON-NLS-2$
+					Util.getDirectoryName(edInput.getText()), Res.getString("testFileDlg.getInputFileTypes"), Res.getString("testFileDlg.getInputFilter")); //$NON-NLS-1$ //$NON-NLS-2$
 				if ( paths == null ) return;
 				edInput.setText(paths[0]);
 				edInput.selectAll();

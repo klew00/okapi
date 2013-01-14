@@ -20,7 +20,6 @@
 
 package net.sf.okapi.common;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -466,7 +465,7 @@ public final class FileUtil {
 	 * @throws OkapiIOException if a file cannot be deleted.
 	 * @param directoryPath - the path to the directory
 	 */
-	public static void deleteAllFilesinDirectory(String directoryPath) {
+	public static void deleteAllFilesInDirectory(String directoryPath) {
 		File directory = new File(directoryPath);
 		// Get all files in directory
 		File[] files = directory.listFiles();
@@ -485,4 +484,18 @@ public final class FileUtil {
 		}
 	}
 
+	public static String createTempFile(String prefix, String extension) {
+		try {
+			File res = File.createTempFile(prefix, extension);
+			res.deleteOnExit();
+			return res.getAbsolutePath();
+		} catch (IOException e) {
+			throw new OkapiIOException("Cannot create temporary file.", e);
+		}		
+	}
+	
+	public static String createTempFile(String prefix) {
+		return createTempFile(prefix, ".tmp");
+	}
+	
 }

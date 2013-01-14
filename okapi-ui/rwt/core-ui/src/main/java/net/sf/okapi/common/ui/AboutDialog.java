@@ -25,6 +25,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -121,10 +122,10 @@ public class AboutDialog {
 		shell.setDefaultButton(pnlActions.btClose);
 		
 		shell.pack();
-//		shell.setMinimumSize(shell.getSize());
-//		Point startSize = shell.getMinimumSize();
-//		if ( startSize.x < 350 ) startSize.x = 350;
-//		shell.setSize(startSize);
+		shell.setMinimumSize(shell.getSize());
+		Point startSize = shell.getMinimumSize();
+		if ( startSize.x < 400 ) startSize.x = 400;
+		shell.setSize(startSize);
 		Dialogs.centerWindow(shell, parent);
 	}
 
