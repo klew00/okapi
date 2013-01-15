@@ -18,6 +18,7 @@
     <servlet-class>org.eclipse.rwt.engine.RWTServlet</servlet-class>
   </servlet>
 
+<!-- http://localhost:8080/okapi-ratel/ui -->
   <servlet-mapping>
     <servlet-name>ratel-ui</servlet-name>
     <url-pattern>/ui/*</url-pattern>
