@@ -23,17 +23,14 @@ package net.sf.okapi.steps.spacecheck;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.LocaleId;
-import net.sf.okapi.common.UsingParameters;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
 import net.sf.okapi.common.pipeline.annotations.StepParameterMapping;
 import net.sf.okapi.common.pipeline.annotations.StepParameterType;
-import net.sf.okapi.lib.verification.Parameters;
 import net.sf.okapi.lib.verification.SpaceChecker;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@UsingParameters(Parameters.class)
 public class SpaceCheckStep extends BasePipelineStep {
 
 	private final Logger LOGGER = LoggerFactory.getLogger(getClass());
