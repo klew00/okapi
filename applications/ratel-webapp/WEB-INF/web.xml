@@ -14,12 +14,13 @@
   </listener>
 
   <servlet>
-    <servlet-name>rwtServlet</servlet-name>
+    <servlet-name>ratel-ui</servlet-name>
     <servlet-class>org.eclipse.rwt.engine.RWTServlet</servlet-class>
   </servlet>
 
   <servlet-mapping>
-    <servlet-name>rwtServlet</servlet-name>
-    <url-pattern>/ratel</url-pattern>
+    <servlet-name>ratel-ui</servlet-name>
+    <url-pattern>/ui/*</url-pattern>
   </servlet-mapping>
+  
 </web-app> 

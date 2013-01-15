@@ -8,7 +8,7 @@ public class RatelWebAppConfiguration extends AbstractWebAppConfig {
 
 	@Override
 	protected String getEntryPointId() {
-		return "ratel";
+		return "ui";
 	}
 
 	@Override

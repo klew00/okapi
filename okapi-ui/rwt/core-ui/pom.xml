@@ -48,11 +48,46 @@
   		<groupId>javax.servlet</groupId>
   		<artifactId>javax.servlet-api</artifactId>
   		<version>3.0.1</version>
+  		<scope>provided</scope> <!-- !!! Not to include it in the WAR/lib -->
   	</dependency>
   	<dependency>
   		<groupId>net.sf.okapi</groupId>
   		<artifactId>okapi-core-ui</artifactId>
   		<version>${project.version}</version>
+  		<exclusions>
+			<exclusion>
+				<artifactId>macosx</artifactId>
+				<groupId>org.eclipse.swt.carbon</groupId>
+			</exclusion>
+			<exclusion>
+				<artifactId>ppc</artifactId>
+				<groupId>org.eclipse.swt.gtk.linux</groupId>
+			</exclusion>
+			<exclusion>
+				<artifactId>x86</artifactId>
+				<groupId>org.eclipse.swt.gtk.linux</groupId>
+			</exclusion>
+			<exclusion>
+				<artifactId>x86_64</artifactId>
+				<groupId>org.eclipse.swt.gtk.linux</groupId>
+			</exclusion>
+			<exclusion>
+				<artifactId>sparc</artifactId>
+				<groupId>org.eclipse.swt.gtk.solaris</groupId>
+			</exclusion>
+			<exclusion>
+				<artifactId>ppc</artifactId>
+				<groupId>org.eclipse.swt.motif.aix</groupId>
+			</exclusion>
+			<exclusion>
+				<artifactId>x86</artifactId>
+				<groupId>org.eclipse.swt.win32.win32</groupId>
+			</exclusion>
+			<exclusion>
+				<artifactId>x86</artifactId>
+				<groupId>org.eclipse.swt.wpf.win32</groupId>
+			</exclusion>
+		</exclusions>		
   	</dependency>
   </dependencies>
   

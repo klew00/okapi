@@ -21,7 +21,6 @@ public class WebSRXEditor extends SRXEditor {
 		this.helpParam = helpParam;		
 	}
 
-	@Override
 	protected void loadSRXDocument_rulesLoaded(String path) {
 		serverPath = path;
 		clientPath = Util.getFilename(path, true);

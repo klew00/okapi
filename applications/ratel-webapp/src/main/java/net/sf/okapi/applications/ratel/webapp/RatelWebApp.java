@@ -1,17 +1,9 @@
 package net.sf.okapi.applications.ratel.webapp;
 
 import net.sf.okapi.common.ui.BaseHelp;
-import net.sf.okapi.common.ui.Dialogs;
-import net.sf.okapi.common.ui.filedownload.FileDownload;
 import net.sf.okapi.common.ui.rwt.AbstractWebApp;
-import net.sf.okapi.lib.ui.segmentation.SRXDocumentHandler;
-import net.sf.okapi.lib.ui.segmentation.SRXEditor;
-import net.sf.okapi.lib.ui.segmentation.WebFileProcessingDialog;
 import net.sf.okapi.lib.ui.segmentation.WebSRXEditor;
 
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;

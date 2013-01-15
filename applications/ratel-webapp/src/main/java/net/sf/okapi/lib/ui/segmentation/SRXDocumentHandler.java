@@ -3,8 +3,6 @@ package net.sf.okapi.lib.ui.segmentation;
 import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.lib.segmentation.SRXDocument;
 
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 
 public class SRXDocumentHandler {
