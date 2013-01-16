@@ -29,6 +29,8 @@ local.properties
 #python specific
 *.pyc
 
+/okapi/deployment/okapi-lib/dependency-reduced-pom.xml
+/deployment/maven/libVersions.properties
 /deployment/maven/dist_cocoa-macosx
 /deployment/maven/dist_cocoa-macosx-x86_64
 /deployment/maven/dist_common/
@@ -42,6 +44,5 @@ local.properties
 /deployment/maven/dist_xlifflib
 /deployment/maven/done/
 /deployment/maven/tmp/
-
 /deployment/website/dist
 
