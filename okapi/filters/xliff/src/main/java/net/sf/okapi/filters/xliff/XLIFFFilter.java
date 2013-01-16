@@ -1223,6 +1223,12 @@ public class XLIFFFilter implements IFilter {
 							current.invalidate(); // To handle bracketing open/close cases							
 							continue;
 						}
+						else if (( type != null ) && type.equals("protected") ) {
+							id = retrieveId(id, reader.getAttributeValue(null, "mid"), false);
+							code = appendCode(TagType.PLACEHOLDER, id, name, name, store, current);
+							code.setDeleteable(false);
+							continue;
+						}
 					}
 					// Other cases
 					if ( name.equals("g") || name.equals("mrk") ) {
@@ -1230,45 +1236,38 @@ public class XLIFFFilter implements IFilter {
 						idStack.push(id);
 						code = current.append(TagType.OPENING, name, "", id);
 						// Get the outer code
-						String prefix = reader.getPrefix();
-						StringBuilder tmpg = new StringBuilder();
-						if (( prefix != null ) && ( prefix.length()>0 )) {
-							tmpg.append("<"+prefix+":"+reader.getLocalName());
-						}
-						else {
-							tmpg.append("<"+reader.getLocalName());
-						}
-						int count = reader.getNamespaceCount();
-						for ( int i=0; i<count; i++ ) {
-							prefix = reader.getNamespacePrefix(i);
-//							tmpg.append(String.format(" xmlns%s=\"%s\"",
-//								(!Util.isEmpty(prefix) ? ":"+prefix : ""),
-//								reader.getNamespaceURI(i)));
-							tmpg.append(" xmlns");
-							if (!Util.isEmpty(prefix))
-								tmpg.append(":" + prefix);
-							tmpg.append("=\"");
-							tmpg.append(reader.getNamespaceURI(i));
-							tmpg.append("\"");
-						}
-						count = reader.getAttributeCount();
-						for ( int i=0; i<count; i++ ) {
-							if ( !reader.isAttributeSpecified(i) ) continue; // Skip defaults
-							prefix = reader.getAttributePrefix(i); 
-//							tmpg.append(String.format(" %s%s=\"%s\"",
-//								(((prefix==null)||(prefix.length()==0)) ? "" : prefix+":"),
-//								reader.getAttributeLocalName(i),
-//								Util.escapeToXML(reader.getAttributeValue(i), 3, params.getEscapeGT(), null)));
-							tmpg.append(" ");
-							if ((prefix!=null) && (prefix.length()!=0))
-								tmpg.append(prefix + ":");
-							tmpg.append(reader.getAttributeLocalName(i));
-							tmpg.append("=\"");
-							tmpg.append(Util.escapeToXML(reader.getAttributeValue(i), 3, params.getEscapeGT(), null));
-							tmpg.append("\"");
-						}
-						tmpg.append(">");
-						code.setOuterData(tmpg.toString());
+//						String prefix = reader.getPrefix();
+//						StringBuilder tmpg = new StringBuilder();
+//						if (( prefix != null ) && ( prefix.length()>0 )) {
+//							tmpg.append("<"+prefix+":"+reader.getLocalName());
+//						}
+//						else {
+//							tmpg.append("<"+reader.getLocalName());
+//						}
+//						int count = reader.getNamespaceCount();
+//						for ( int i=0; i<count; i++ ) {
+//							prefix = reader.getNamespacePrefix(i);
+//							tmpg.append(" xmlns");
+//							if (!Util.isEmpty(prefix))
+//								tmpg.append(":" + prefix);
+//							tmpg.append("=\"");
+//							tmpg.append(reader.getNamespaceURI(i));
+//							tmpg.append("\"");
+//						}
+//						count = reader.getAttributeCount();
+//						for ( int i=0; i<count; i++ ) {
+//							if ( !reader.isAttributeSpecified(i) ) continue; // Skip defaults
+//							prefix = reader.getAttributePrefix(i); 
+//							tmpg.append(" ");
+//							if ((prefix!=null) && (prefix.length()!=0))
+//								tmpg.append(prefix + ":");
+//							tmpg.append(reader.getAttributeLocalName(i));
+//							tmpg.append("=\"");
+//							tmpg.append(Util.escapeToXML(reader.getAttributeValue(i), 3, params.getEscapeGT(), null));
+//							tmpg.append("\"");
+//						}
+//						tmpg.append(">");
+						code.setOuterData(buildStartCode());
 					}
 					else if ( name.equals("x") ) {
 						id = retrieveId(id, reader.getAttributeValue(null, "id"), false);
@@ -1326,6 +1325,41 @@ public class XLIFFFilter implements IFilter {
 		}
 	}
 
+	private String buildStartCode () {
+		String prefix = reader.getPrefix();
+		StringBuilder tmpg = new StringBuilder();
+		if (( prefix != null ) && ( prefix.length()>0 )) {
+			tmpg.append("<"+prefix+":"+reader.getLocalName());
+		}
+		else {
+			tmpg.append("<"+reader.getLocalName());
+		}
+		int count = reader.getNamespaceCount();
+		for ( int i=0; i<count; i++ ) {
+			prefix = reader.getNamespacePrefix(i);
+			tmpg.append(" xmlns");
+			if (!Util.isEmpty(prefix))
+				tmpg.append(":" + prefix);
+			tmpg.append("=\"");
+			tmpg.append(reader.getNamespaceURI(i));
+			tmpg.append("\"");
+		}
+		count = reader.getAttributeCount();
+		for ( int i=0; i<count; i++ ) {
+			if ( !reader.isAttributeSpecified(i) ) continue; // Skip defaults
+			prefix = reader.getAttributePrefix(i); 
+			tmpg.append(" ");
+			if ((prefix!=null) && (prefix.length()!=0))
+				tmpg.append(prefix + ":");
+			tmpg.append(reader.getAttributeLocalName(i));
+			tmpg.append("=\"");
+			tmpg.append(Util.escapeToXML(reader.getAttributeValue(i), 3, params.getEscapeGT(), null));
+			tmpg.append("\"");
+		}
+		tmpg.append(">");
+		return tmpg.toString();
+	}
+	
 	private int retrieveId (int currentIdValue,
 		String id,
 		boolean useMinusOneasDefault)
@@ -1351,8 +1385,9 @@ public class XLIFFFilter implements IFilter {
 	 * @param type the type of code (bpt and ept must use the same one so they can match!) 
 	 * @param store true if we need to store the data in the skeleton.
 	 * @param content the object where to put the code.
+	 * @return the code that was appended.
 	 */
-	private void appendCode (TagType tagType,
+	private Code appendCode (TagType tagType,
 		int id,
 		String tagName,
 		String type,
@@ -1449,7 +1484,7 @@ public class XLIFFFilter implements IFilter {
 							}
 							else outerCode.append("</"+tagName+">");
 							code.setOuterData(outerCode.toString());
-							return;
+							return code;
 						}
 						// Else: fall thru
 					}
@@ -1479,6 +1514,7 @@ public class XLIFFFilter implements IFilter {
 		catch ( XMLStreamException e) {
 			throw new OkapiIOException(e);
 		}
+		return null; // Not used as the exit is in the loop.
 	}
 	
 	private void processNote () {

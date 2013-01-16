@@ -37,6 +37,7 @@ import net.sf.okapi.common.filterwriter.GenericContent;
 import net.sf.okapi.common.filterwriter.XLIFFWriter;
 import net.sf.okapi.common.query.MatchType;
 import net.sf.okapi.common.resource.Code;
+import net.sf.okapi.common.resource.InlineAnnotation;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.ISegments;
@@ -1265,6 +1266,38 @@ public class XLIFFFilterTest {
 		tu.setTarget(LocaleId.FRENCH, tu.getSource());
 		assertEquals("code=", tu.getTarget(LocaleId.FRENCH).toString());
 		assertNotNull(tu);
+	}
+
+	@Test
+	public void testTranslateOnTU () {
+		String snippet = "<?xml version=\"1.0\"?>\r"
+			+ "<xliff version=\"1.2\">\r"
+			+ "<file source-language=\"en\" datatype=\"plaintext\" original=\"file.ext\"><body>"
+			+ "<trans-unit id=\"1\"><source>t1</source></trans-unit>"
+			+ "<trans-unit id=\"2\" translate=\"no\"><source>t2</source></trans-unit>"
+			+ "<trans-unit id=\"3\" translate=\"yes\"><source>t3</source></trans-unit>"
+			+ "</body></file></xliff>";
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		assertEquals("t1", tu.getSource().toString());
+		assertTrue(tu.isTranslatable());
+		tu = FilterTestDriver.getTextUnit(getEvents(snippet), 2);
+		assertEquals("t2", tu.getSource().toString());
+		assertFalse(tu.isTranslatable());
+		tu = FilterTestDriver.getTextUnit(getEvents(snippet), 3);
+		assertEquals("t3", tu.getSource().toString());
+		assertTrue(tu.isTranslatable());
+	}
+
+	@Test
+	public void testProtectedOnMRK () {
+		String snippet = "<?xml version=\"1.0\"?>\r"
+			+ "<xliff version=\"1.2\">\r"
+			+ "<file source-language=\"en\" datatype=\"plaintext\" original=\"file.ext\"><body>"
+			+ "<trans-unit id=\"1\"><source>A <mrk mtype='protected'>code</mrk> Z</source></trans-unit>"
+			+ "</body></file></xliff>";
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		assertEquals("A <1/> Z", fmt.setContent(tu.getSource().getFirstContent()).toString());
+		assertEquals("<mrk mtype=\"protected\">code</mrk>", tu.getSource().getFirstContent().getCode(0).getOuterData());
 	}
 
 	private ArrayList<Event> createSimpleXLIFF () {
