@@ -16,4 +16,13 @@ public class RatelWebAppConfiguration extends AbstractWebAppConfig {
 		return RatelWebApp.class;
 	}
 
+	@Override
+	protected String getFaviconPath() {
+		return "ratel16.png";
+	}
+	
+	@Override
+	protected String getPageTitle() {
+		return "Okapi Ratel";
+	}
 }

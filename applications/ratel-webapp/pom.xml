@@ -23,15 +23,39 @@
   
   <build>
   	<finalName>okapi-ratel</finalName>
+  	
+<!-- Unpack to /WEB-INF/classes/ the dependency JARs with packages replacing those same-named of SWT/okapi-core-ui, to have those hooked up instead -->
   	<plugins>
-<!--   		<plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-deploy-plugin</artifactId>
-            <configuration>
-                <skip>true</skip>
-            </configuration>
-        </plugin>
- -->        
+	 	<plugin>
+	        <groupId>org.apache.maven.plugins</groupId>
+	        <artifactId>maven-dependency-plugin</artifactId>
+	        <version>2.6</version>
+	        <executions>
+	          <execution>
+	            <id>unpack</id>
+	            <phase>prepare-package</phase>
+	            <goals>
+	              <goal>unpack</goal>
+	            </goals>
+	            <configuration>
+		            <artifactItems>
+		                <artifactItem>
+		                  <groupId>net.sf.okapi</groupId>
+	  					  <artifactId>okapi-core-ui-rwt</artifactId>
+	  					  <version>${project.version}</version>
+		                  <overWrite>true</overWrite>
+		                </artifactItem>
+		                <artifactItem>
+		                  <groupId>net.sf.okapi.lib</groupId>
+	  					  <artifactId>okapi-lib-segmentation-ui</artifactId>
+	  					  <version>${project.version}</version>
+		                </artifactItem>
+		            </artifactItems>
+		            <outputDirectory>${project.build.directory}/okapi-ratel/WEB-INF/classes</outputDirectory>
+	            </configuration>
+	          </execution>
+	        </executions>
+	    </plugin>  
         <plugin>
         	<groupId>org.apache.maven.plugins</groupId>
         	<artifactId>maven-war-plugin</artifactId>
@@ -39,10 +63,41 @@
             <!-- 
                 <attachClasses>true</attachClasses>
                 <classesClassifier>classes</classesClassifier>
-                -->
+                -->                
                 <webXml>WEB-INF/web.xml</webXml>
             </configuration>
         </plugin>    
   	</plugins>
+  	
+<!-- Block the error "maven-dependency-plugin (goals "copy-dependencies", "unpack") is not supported by m2e" 
+see http://www.journaldev.com/503/how-to-fix-maven-dependency-plugin-goals-copy-dependencies-unpack-is-not-supported-by-m2e-in-eclipse -->   	
+  	<pluginManagement>
+	  <plugins>
+	    <plugin>
+	      <groupId>org.eclipse.m2e</groupId>
+	      <artifactId>lifecycle-mapping</artifactId>
+	      <version>1.0.0</version>
+	      <configuration>
+	        <lifecycleMappingMetadata>
+	          <pluginExecutions>
+	            <pluginExecution>
+	              <pluginExecutionFilter>
+	                <groupId>org.apache.maven.plugins</groupId>
+	                <artifactId>maven-dependency-plugin</artifactId>
+	                <versionRange>[2.0,)</versionRange>
+	                <goals>
+	                  <goal>unpack</goal>
+	                </goals>
+	              </pluginExecutionFilter>
+	              <action>
+	                <ignore></ignore>
+	              </action>
+	            </pluginExecution>
+	          </pluginExecutions>
+	        </lifecycleMappingMetadata>
+	      </configuration>
+	    </plugin>
+	  </plugins>
+	</pluginManagement>
   </build>
 </project>
