@@ -517,15 +517,29 @@ public class XmlStreamEventTest {
 		addEndEvents(events);
 
 		try {
-			/*
-			ArrayList<Event> output = getEvents(snippet);
-			for (int i = 0; i < events.size(); i++) {
-				Event e = output.get(i);
-				boolean b = FilterTestDriver.laxCompareEvent(events.get(i), e);
-				System.out.println("" + i + " --> " + b);
-				assertTrue(b);
-			}*/
 			assertTrue(FilterTestDriver.laxCompareEvents(events, getEvents(snippet)));
+		}
+		finally {
+			parameters = originalParameters;
+		}
+	}
+	
+	@Test
+	public void testEntitiesInSkeletonParts() throws Exception {
+		URL originalParameters = parameters;
+		parameters = XmlStreamEventTest.class.getResource("/excludeByDefault.yml");
+		String snippet = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" + 
+				"<xml><foo>&lt;foo&gt;and &amp; and &lt;/foo&gt;</foo></xml>\n";
+		ArrayList<Event> expectedEvents = new ArrayList<Event>();
+		addStartEvents(expectedEvents);
+		GenericSkeleton skel = new GenericSkeleton();
+		DocumentPart dp = new DocumentPart("dp1", false);
+		skel.add(snippet);
+		dp.setSkeleton(skel);
+		expectedEvents.add(new Event(EventType.DOCUMENT_PART, dp));
+		addEndEvents(expectedEvents);
+		try {
+			assertTrue(FilterTestDriver.laxCompareEvents(expectedEvents, getEvents(snippet)));
 		}
 		finally {
 			parameters = originalParameters;
