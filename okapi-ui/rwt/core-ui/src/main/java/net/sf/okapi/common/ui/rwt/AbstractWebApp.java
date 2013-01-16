@@ -1,17 +1,12 @@
 package net.sf.okapi.common.ui.rwt;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.Locale;
 
 import javax.servlet.http.HttpServletRequest;
 
-import net.sf.okapi.common.exceptions.OkapiIOException;
-
 import org.eclipse.rwt.RWT;
 import org.eclipse.rwt.internal.widgets.JSExecutor;
 import org.eclipse.rwt.lifecycle.IEntryPoint;
-import org.eclipse.rwt.resources.IResourceManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.widgets.Display;
@@ -32,13 +27,6 @@ public abstract class AbstractWebApp implements IEntryPoint {
 	public int createUI() {
 		Locale.setDefault(Locale.ENGLISH); // To have non-localized OK/Cancel etc. buttons in dialogs
 		Display display = new Display();
-		String path = RWT.getRequest().getContextPath();		
-//		try {
-//			registerImage("img/favicon.png");
-//		} catch (IOException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
 		
 		HttpServletRequest request = RWT.getRequest();
 		RWT.getSessionStore().setAttribute("userAgent", request.getHeader("User-Agent"));
@@ -79,23 +67,6 @@ public abstract class AbstractWebApp implements IEntryPoint {
 	
 	public static AbstractWebApp getApp() {
 		return (AbstractWebApp) RWT.getSessionStore().getAttribute("app");
-	}
-	
-	protected String registerImage(String resourceName) throws IOException {		
-		IResourceManager resourceManager = RWT.getResourceManager();
-		if( !resourceManager.isRegistered(resourceName) ) {
-		    InputStream inputStream = this.getClass().getResourceAsStream(resourceName);
-		    if( inputStream == null ) {
-		      throw new OkapiIOException("Resource not found: " + resourceName);
-		    }
-		    try {
-		    	resourceManager.register(resourceName, inputStream);	    	
-		    } 
-		    finally {		    	
-		    	inputStream.close();		    
-		    }
-		}
-		return resourceManager.getLocation( resourceName );
 	}
 	
 	public void openURL(String url) {
