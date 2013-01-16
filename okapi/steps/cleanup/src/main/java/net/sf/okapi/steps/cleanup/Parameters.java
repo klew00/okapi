@@ -31,37 +31,31 @@ import net.sf.okapi.common.uidescription.IEditorDescriptionProvider;
 @EditorFor(Parameters.class)
 public class Parameters extends BaseParameters implements IEditorDescriptionProvider {
 
-	public Parameters() {
-
+	public Parameters () {
 		reset();
 	}
 
-	public void reset() {
-
+	public void reset () {
 	}
 
-	public void fromString(String data) {
-
+	public void fromString (String data) {
 		reset();
 		buffer.fromString(data);
 	}
 
-	public String toString() {
-
+	public String toString () {
 		buffer.reset();
 		return buffer.toString();
 	}
 
 	@Override
-	public ParametersDescription getParametersDescription() {
-
+	public ParametersDescription getParametersDescription () {
 		ParametersDescription desc = new ParametersDescription(this);
 		return desc;
 	}
 
-	public EditorDescription createEditorDescription(ParametersDescription paramDesc) {
-
-		EditorDescription desc = new EditorDescription("Format Conversion", true, false);
+	public EditorDescription createEditorDescription (ParametersDescription paramDesc) {
+		EditorDescription desc = new EditorDescription("Cleanup", true, false);
 		return desc;
 	}
 
