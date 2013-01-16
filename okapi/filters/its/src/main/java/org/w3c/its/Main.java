@@ -31,6 +31,7 @@ import java.util.Stack;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.annotation.GenericAnnotationType;
 import net.sf.okapi.common.exceptions.OkapiBadFilterParametersException;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.filters.its.html5.HTML5Filter;
@@ -286,8 +287,8 @@ public class Main {
 				//--TODO: May need to be done more selectively--
 				out1 = unwrap(out1);
 				//--re-formatting the refs--
-				if ( out1.startsWith(ITSEngine.REF_PREFIX) ) {
-					writer.print(String.format("\tlocNoteRef=\"%s\"", escape(out1.substring(ITSEngine.REF_PREFIX.length())).replace("&quot;", "\"")));
+				if ( out1.startsWith(GenericAnnotationType.REF_PREFIX) ) {
+					writer.print(String.format("\tlocNoteRef=\"%s\"", escape(out1.substring(GenericAnnotationType.REF_PREFIX.length())).replace("&quot;", "\"")));
 				}
 				else {
 					writer.print(String.format("\tlocNote=\"%s\"", escape(out1).replace("&quot;", "\"")));					
@@ -309,8 +310,8 @@ public class Main {
 			}
 			out1 = trav.getTermInfo(attr);
 			if ( out1 != null ){
-				if ( out1.startsWith(ITSEngine.REF_PREFIX) ) {
-					writer.print(String.format("\ttermInfoRef=\"%s\"", escape(out1.substring(ITSEngine.REF_PREFIX.length()) )));
+				if ( out1.startsWith(GenericAnnotationType.REF_PREFIX) ) {
+					writer.print(String.format("\ttermInfoRef=\"%s\"", escape(out1.substring(GenericAnnotationType.REF_PREFIX.length()) )));
 				}
 				else {
 					if ( !Util.isEmpty(out1) ) {
@@ -357,8 +358,8 @@ public class Main {
 			}
 			out1 = trav.getDisambigClass(attr);
 			if ( out1 != null ) {
-				if ( out1.startsWith(ITSEngine.REF_PREFIX) ) {
-					writer.print(String.format("\tdisambigClassRef=\"%s\"", escape(out1.substring(ITSEngine.REF_PREFIX.length()))));
+				if ( out1.startsWith(GenericAnnotationType.REF_PREFIX) ) {
+					writer.print(String.format("\tdisambigClassRef=\"%s\"", escape(out1.substring(GenericAnnotationType.REF_PREFIX.length()))));
 				}
 				else {
 					writer.print(String.format("\tdisambigClass=\"%s\"", escape(out1)));
@@ -372,8 +373,8 @@ public class Main {
 			if ( out1 != null ) writer.print(String.format("\tdisambigGranularity=\"%s\"", escape(out1)));
 			out1 = trav.getDisambigIdent(attr);
 			if ( out1 != null ) {
-				if ( out1.startsWith(ITSEngine.REF_PREFIX) ) {
-					writer.print(String.format("\tdisambigIdentRef=\"%s\"", escape(out1.substring(ITSEngine.REF_PREFIX.length()))));
+				if ( out1.startsWith(GenericAnnotationType.REF_PREFIX) ) {
+					writer.print(String.format("\tdisambigIdentRef=\"%s\"", escape(out1.substring(GenericAnnotationType.REF_PREFIX.length()))));
 				}
 				else {
 					writer.print(String.format("\tdisambigIdent=\"%s\"", escape(out1)));
@@ -497,7 +498,7 @@ public class Main {
 		else if ( dc.equals(DC_LOCQUALITYRATING) ) {
 			out1 = trav.getLocQualityRatingProfileRef(attr);
 			if ( out1 != null ) {
-				writer.print(String.format("\tlocQualityRatingProfileRef=\"%s\"", escape(out1.substring(ITSEngine.REF_PREFIX.length()))));
+				writer.print(String.format("\tlocQualityRatingProfileRef=\"%s\"", escape(out1.substring(GenericAnnotationType.REF_PREFIX.length()))));
 			}
 			Double outF1 = trav.getLocQualityRatingScore(attr);
 			if ( outF1 != null ) {
@@ -552,8 +553,8 @@ public class Main {
 	{
 		if ( value != null ) {
 			String suffix = "";
-			if ( value.startsWith(ITSEngine.REF_PREFIX) ) {
-				value = value.substring(ITSEngine.REF_PREFIX.length());
+			if ( value.startsWith(GenericAnnotationType.REF_PREFIX) ) {
+				value = value.substring(GenericAnnotationType.REF_PREFIX.length());
 				suffix = "Ref";
 			}
 			if ( standoff ) {

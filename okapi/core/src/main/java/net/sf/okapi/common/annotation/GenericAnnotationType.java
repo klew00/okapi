@@ -34,6 +34,12 @@ public class GenericAnnotationType {
 	 * Prefix used to indicate a reference value.
 	 */
 	public static final String REF_PREFIX = "REF:";
+
+	/**
+	 * Annotation identifier for the ITS annotators reference.
+	 */
+	public static final String ANNOT = "its-annotators";
+	public static final String ANNOT_VALUEREF = "annotatorsValue";
 	
 	/**
 	 * Annotation identifier for the 

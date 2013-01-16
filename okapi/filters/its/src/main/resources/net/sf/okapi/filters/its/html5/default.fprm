@@ -33,7 +33,10 @@
  <its:dirRule selector="//h:*[@dir='rtl']" dir="rtl"/>
  <its:dirRule selector="//h:bdo[@dir='ltr']" dir="lro"/>
  <its:dirRule selector="//h:bdo[@dir='rtl']" dir="rlo"/>
- 
+
+ <!-- Terminology -->
+ <its:termRule selector="//h:dfn" term="yes"/>
+  
  <!-- Id Value -->
  <its:idValueRule selector="//h:*[@id]" idValue="@id"/>
  

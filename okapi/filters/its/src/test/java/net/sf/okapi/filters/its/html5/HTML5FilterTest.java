@@ -196,6 +196,21 @@ public class HTML5FilterTest {
 	}
 	
 	@Test
+	public void testTerminologyDefault () {
+		String snippet = "<!DOCTYPE html><html lang=en><head><meta charset=utf-8><title>Title</title></head><body>"
+			+ "<p>This is a <dfn>quibble</dfn>.</p>"
+			+ "</body></html>";
+		ArrayList<Event> list = getEvents(snippet);
+		ITextUnit tu = FilterTestDriver.getTextUnit(list, 2);
+		assertNotNull(tu);
+		assertEquals("<dfn>", tu.getSource().getFirstContent().getCode(0).getData());
+//TODO: verify the proper ITS term annotation when implemented		
+		TermsAnnotation ann = tu.getSource().getAnnotation(TermsAnnotation.class);
+		assertNotNull(ann);
+		assertEquals("quibble", ann.getTerm(0));
+	}
+	
+	@Test
 	public void testTerminologyLocal () {
 		String snippet = "<!DOCTYPE html><html lang=en><head><meta charset=utf-8><title>Title</title></head><body>"
 			+ "<dl><dt its-term=yes its-term-info-ref='some URI'>motherboard</dt><dd>Some text</dd></dl>"

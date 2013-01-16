@@ -76,8 +76,6 @@ public class ITSEngine implements IProcessor, ITraversal {
 	public static final String    HTML_NS_PREFIX  = "h";
 	public static final String    ITS_MIMETYPE    = "application/its+xml";
 	
-	public static final String    REF_PREFIX = "REF:"; // Prefix added at the front of the information that are references
-
 	private static final String   FLAGNAME = "\u00ff"; // Name of the user-data property that holds the flags
 	private static final String   FLAGSEP  = "\u001c"; // Separator between data categories
 	
@@ -1536,7 +1534,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 								data1 = data1.substring(PTRFLAG.length());
 								boolean ref = data1.startsWith(REFFLAG);
 								if ( ref ) data1 = data1.substring(REFFLAG.length());
-								data1 = (ref ? REF_PREFIX : "")+resolvePointer(NL.item(i), data1);
+								data1 = (ref ? GenericAnnotationType.REF_PREFIX : "")+resolvePointer(NL.item(i), data1);
 							}
 							ann.setString(GenericAnnotationType.TERM_INFO, data1);
 						}
@@ -1556,10 +1554,10 @@ public class ITSEngine implements IProcessor, ITraversal {
 							setFlag(NL.item(i), FP_LOCNOTE_DATA, resolvePointer(NL.item(i), rule.info), true);
 							break;
 						case INFOTYPE_REF:
-							setFlag(NL.item(i), FP_LOCNOTE_DATA, REF_PREFIX+rule.info, true);
+							setFlag(NL.item(i), FP_LOCNOTE_DATA, GenericAnnotationType.REF_PREFIX+rule.info, true);
 							break;
 						case INFOTYPE_REFPOINTER:
-							setFlag(NL.item(i), FP_LOCNOTE_DATA, REF_PREFIX+resolvePointer(NL.item(i), rule.info), true);
+							setFlag(NL.item(i), FP_LOCNOTE_DATA, GenericAnnotationType.REF_PREFIX+resolvePointer(NL.item(i), rule.info), true);
 							break;
 						}
 					}
@@ -1707,7 +1705,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 								data1 = data1.substring(PTRFLAG.length());
 								boolean ref = data1.startsWith(REFFLAG);
 								if ( ref ) data1 = data1.substring(REFFLAG.length());
-								data1 = (ref ? REF_PREFIX : "")+resolvePointer(NL.item(i), data1);
+								data1 = (ref ? GenericAnnotationType.REF_PREFIX : "")+resolvePointer(NL.item(i), data1);
 							}
 							ann.setString(GenericAnnotationType.DISAMB_CLASS, data1);
 						}
@@ -1726,7 +1724,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 								data1 = data1.substring(PTRFLAG.length());
 								boolean ref = data1.startsWith(REFFLAG);
 								if ( ref ) data1 = data1.substring(REFFLAG.length());
-								data1 = (ref ? REF_PREFIX : "")+resolvePointer(NL.item(i), data1);
+								data1 = (ref ? GenericAnnotationType.REF_PREFIX : "")+resolvePointer(NL.item(i), data1);
 							}
 							ann.setString(GenericAnnotationType.DISAMB_IDENT, data1);
 						}
@@ -1985,7 +1983,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 					}
 					else if ( localName.equals("locNoteRef") || localName.equals("its-loc-note-ref") ) {
 						setFlag(attr.getOwnerElement(), FP_LOCNOTE_DATA,
-							REF_PREFIX+attr.getValue(), attr.getSpecified());
+								GenericAnnotationType.REF_PREFIX+attr.getValue(), attr.getSpecified());
 					}
 				}
 			}
@@ -2465,7 +2463,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 			if ( elem.hasAttribute("its-term") )
 				data[0] = elem.getAttribute("its-term").toLowerCase();
 			if ( elem.hasAttribute("its-term-info-ref") )
-				data[1] = REF_PREFIX+elem.getAttribute("its-term-info-ref");
+				data[1] = GenericAnnotationType.REF_PREFIX+elem.getAttribute("its-term-info-ref");
 			if ( elem.hasAttribute("its-term-confidence") )
 				data[2] = elem.getAttribute("its-term-confidence");
 		}
@@ -2473,7 +2471,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 			if ( elem.hasAttributeNS(ITS_NS_URI, "term") )
 				data[0] = elem.getAttributeNS(ITS_NS_URI, "term");
 			if ( elem.hasAttributeNS(ITS_NS_URI, "termInfoRef") )
-				data[1] = REF_PREFIX+elem.getAttributeNS(ITS_NS_URI, "termInfoRef");
+				data[1] = GenericAnnotationType.REF_PREFIX+elem.getAttributeNS(ITS_NS_URI, "termInfoRef");
 			if ( elem.hasAttributeNS(ITS_NS_URI, "termConfidence") )
 				data[2] = elem.getAttributeNS(ITS_NS_URI, "termConfidence");
 		}
@@ -2481,7 +2479,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 			if ( elem.hasAttribute("term") )
 				data[0] = elem.getAttribute("term");
 			if ( elem.hasAttribute("termInfoRef") )
-				data[1] = REF_PREFIX+elem.getAttribute("termInfoRef");
+				data[1] = GenericAnnotationType.REF_PREFIX+elem.getAttribute("termInfoRef");
 			if ( elem.hasAttribute("termConfidence") )
 				data[2] = elem.getAttribute("termConfidence");
 		}
@@ -2718,32 +2716,32 @@ public class ITSEngine implements IProcessor, ITraversal {
 			if ( elem.hasAttribute("its-person") )
 				data[1] = elem.getAttribute("its-person");
 			else if ( elem.hasAttribute("its-person-ref") )
-				data[1] = REF_PREFIX+elem.getAttribute("its-person-ref");
+				data[1] = GenericAnnotationType.REF_PREFIX+elem.getAttribute("its-person-ref");
 			
 			if ( elem.hasAttribute("its-org") )
 				data[2] = elem.getAttribute("its-org");
 			else if ( elem.hasAttribute("its-org-ref") )
-				data[2] = REF_PREFIX+elem.getAttribute("its-org-ref");
+				data[2] = GenericAnnotationType.REF_PREFIX+elem.getAttribute("its-org-ref");
 
 			if ( elem.hasAttribute("its-tool") )
 				data[3] = elem.getAttribute("its-tool");
 			else if ( elem.hasAttribute("its-tool-ref") )
-				data[3] = REF_PREFIX+elem.getAttribute("its-tool-ref");
+				data[3] = GenericAnnotationType.REF_PREFIX+elem.getAttribute("its-tool-ref");
 
 			if ( elem.hasAttribute("its-rev-person") )
 				data[4] = elem.getAttribute("its-rev-person");
 			else if ( elem.hasAttribute("its-rev-person-ref") )
-				data[4] = REF_PREFIX+elem.getAttribute("its-rev-person-ref");
+				data[4] = GenericAnnotationType.REF_PREFIX+elem.getAttribute("its-rev-person-ref");
 			
 			if ( elem.hasAttribute("its-rev-org") )
 				data[5] = elem.getAttribute("its-rev-org");
 			else if ( elem.hasAttribute("its-rev-org-ref") )
-				data[5] = REF_PREFIX+elem.getAttribute("its-rev-org-ref");
+				data[5] = GenericAnnotationType.REF_PREFIX+elem.getAttribute("its-rev-org-ref");
 
 			if ( elem.hasAttribute("its-rev-tool") )
 				data[6] = elem.getAttribute("its-rev-tool");
 			else if ( elem.hasAttribute("its-rev-tool-ref") )
-				data[6] = REF_PREFIX+elem.getAttribute("its-rev-tool-ref");
+				data[6] = GenericAnnotationType.REF_PREFIX+elem.getAttribute("its-rev-tool-ref");
 
 			if ( elem.hasAttribute("its-prov-ref") )
 				data[7] = elem.getAttribute("its-prov-ref");
@@ -2755,32 +2753,32 @@ public class ITSEngine implements IProcessor, ITraversal {
 			if ( elem.hasAttributeNS(ITS_NS_URI, "person") )
 				data[1] = elem.getAttributeNS(ITS_NS_URI, "person");
 			else if ( elem.hasAttributeNS(ITS_NS_URI, "personRef") )
-				data[1] = REF_PREFIX+elem.getAttributeNS(ITS_NS_URI, "personRef");
+				data[1] = GenericAnnotationType.REF_PREFIX+elem.getAttributeNS(ITS_NS_URI, "personRef");
 			
 			if ( elem.hasAttributeNS(ITS_NS_URI, "org") )
 				data[2] = elem.getAttributeNS(ITS_NS_URI, "org");
 			else if ( elem.hasAttributeNS(ITS_NS_URI, "orgRef") )
-				data[2] = REF_PREFIX+elem.getAttributeNS(ITS_NS_URI, "orgRef");
+				data[2] = GenericAnnotationType.REF_PREFIX+elem.getAttributeNS(ITS_NS_URI, "orgRef");
 			
 			if ( elem.hasAttributeNS(ITS_NS_URI, "tool") )
 				data[3] = elem.getAttributeNS(ITS_NS_URI, "tool");
 			else if ( elem.hasAttributeNS(ITS_NS_URI, "toolRef") )
-				data[3] = REF_PREFIX+elem.getAttributeNS(ITS_NS_URI, "toolRef");
+				data[3] = GenericAnnotationType.REF_PREFIX+elem.getAttributeNS(ITS_NS_URI, "toolRef");
 			
 			if ( elem.hasAttributeNS(ITS_NS_URI, "revPerson") )
 				data[4] = elem.getAttributeNS(ITS_NS_URI, "revPerson");
 			else if ( elem.hasAttributeNS(ITS_NS_URI, "revPersonRef") )
-				data[4] = REF_PREFIX+elem.getAttributeNS(ITS_NS_URI, "revPersonRef");
+				data[4] = GenericAnnotationType.REF_PREFIX+elem.getAttributeNS(ITS_NS_URI, "revPersonRef");
 			
 			if ( elem.hasAttributeNS(ITS_NS_URI, "revOrg") )
 				data[5] = elem.getAttributeNS(ITS_NS_URI, "revOrg");
 			else if ( elem.hasAttributeNS(ITS_NS_URI, "revOrgRef") )
-				data[5] = REF_PREFIX+elem.getAttributeNS(ITS_NS_URI, "revOrgRef");
+				data[5] = GenericAnnotationType.REF_PREFIX+elem.getAttributeNS(ITS_NS_URI, "revOrgRef");
 			
 			if ( elem.hasAttributeNS(ITS_NS_URI, "revTool") )
 				data[6] = elem.getAttributeNS(ITS_NS_URI, "revTool");
 			else if ( elem.hasAttributeNS(ITS_NS_URI, "revToolRef") )
-				data[6] = REF_PREFIX+elem.getAttributeNS(ITS_NS_URI, "revToolRef");
+				data[6] = GenericAnnotationType.REF_PREFIX+elem.getAttributeNS(ITS_NS_URI, "revToolRef");
 			
 			if ( elem.hasAttributeNS(ITS_NS_URI, "provRef") )
 				data[7] = elem.getAttributeNS(ITS_NS_URI, "provRef");
@@ -2792,32 +2790,32 @@ public class ITSEngine implements IProcessor, ITraversal {
 			if ( elem.hasAttribute("person") )
 				data[1] = elem.getAttribute("person");
 			else if ( elem.hasAttribute("personRef") )
-				data[1] = REF_PREFIX+elem.getAttribute("personRef");
+				data[1] = GenericAnnotationType.REF_PREFIX+elem.getAttribute("personRef");
 			
 			if ( elem.hasAttribute("org") )
 				data[2] = elem.getAttribute("org");
 			else if ( elem.hasAttribute("orgRef") )
-				data[2] = REF_PREFIX+elem.getAttribute("orgRef");
+				data[2] = GenericAnnotationType.REF_PREFIX+elem.getAttribute("orgRef");
 			
 			if ( elem.hasAttribute("tool") )
 				data[3] = elem.getAttribute("tool");
 			else if ( elem.hasAttribute("toolRef") )
-				data[3] = REF_PREFIX+elem.getAttribute("toolRef");
+				data[3] = GenericAnnotationType.REF_PREFIX+elem.getAttribute("toolRef");
 			
 			if ( elem.hasAttribute("revPerson") )
 				data[4] = elem.getAttribute("revPerson");
 			else if ( elem.hasAttribute("revPersonRef") )
-				data[4] = REF_PREFIX+elem.getAttribute("revPersonRef");
+				data[4] = GenericAnnotationType.REF_PREFIX+elem.getAttribute("revPersonRef");
 			
 			if ( elem.hasAttribute("revOrg") )
 				data[5] = elem.getAttribute("revOrg");
 			else if ( elem.hasAttribute("revOrgRef") )
-				data[5] = REF_PREFIX+elem.getAttribute("revOrgRef");
+				data[5] = GenericAnnotationType.REF_PREFIX+elem.getAttribute("revOrgRef");
 			
 			if ( elem.hasAttribute("revTool") )
 				data[6] = elem.getAttribute("revTool");
 			else if ( elem.hasAttribute("revToolRef") )
-				data[6] = REF_PREFIX+elem.getAttribute("revToolRef");
+				data[6] = GenericAnnotationType.REF_PREFIX+elem.getAttribute("revToolRef");
 			
 			if ( elem.hasAttribute("provRef") )
 				data[7] = elem.getAttribute("provRef");
@@ -2839,7 +2837,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 		
 		if ( useHTML5 ) {
 			if ( elem.hasAttribute("its-disambig-class-ref") )
-				data[0] = REF_PREFIX+elem.getAttribute("its-disambig-class-ref");
+				data[0] = GenericAnnotationType.REF_PREFIX+elem.getAttribute("its-disambig-class-ref");
 			
 			if ( elem.hasAttribute("its-disambig-source") )
 				data[1] = elem.getAttribute("its-disambig-source");
@@ -2848,7 +2846,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 				data[2] = elem.getAttribute("its-disambig-ident");
 			// OR the ref version
 			else if ( elem.hasAttribute("its-disambig-ident-ref") )
-				data[2] = REF_PREFIX+elem.getAttribute("its-disambig-ident-ref");
+				data[2] = GenericAnnotationType.REF_PREFIX+elem.getAttribute("its-disambig-ident-ref");
 			
 			if ( elem.hasAttribute("its-disambig-confidence") )
 				data[3] = elem.getAttribute("its-disambig-confidence");
@@ -2860,7 +2858,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 		}
 		else if ( qualified ) {
 			if ( elem.hasAttributeNS(ITS_NS_URI, "disambigClassRef") )
-				data[0] = REF_PREFIX+elem.getAttributeNS(ITS_NS_URI, "disambigClassRef");
+				data[0] = GenericAnnotationType.REF_PREFIX+elem.getAttributeNS(ITS_NS_URI, "disambigClassRef");
 			
 			if ( elem.hasAttributeNS(ITS_NS_URI, "disambigSource") )
 				data[1] = elem.getAttributeNS(ITS_NS_URI, "disambigSource");
@@ -2869,7 +2867,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 				data[2] = elem.getAttributeNS(ITS_NS_URI, "disambigIdent");
 			// OR the ref version
 			else if ( elem.hasAttributeNS(ITS_NS_URI, "disambigIdentRef") )
-				data[2] = REF_PREFIX+elem.getAttributeNS(ITS_NS_URI, "disambigIdentRef");
+				data[2] = GenericAnnotationType.REF_PREFIX+elem.getAttributeNS(ITS_NS_URI, "disambigIdentRef");
 			
 			if ( elem.hasAttributeNS(ITS_NS_URI, "disambigConfidence") )
 				data[3] = elem.getAttributeNS(ITS_NS_URI, "disambigConfidence");
@@ -2881,7 +2879,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 		}
 		else {
 			if ( elem.hasAttribute("disambigClassRef") )
-				data[0] = REF_PREFIX+elem.getAttribute("disambigClassRef");
+				data[0] = GenericAnnotationType.REF_PREFIX+elem.getAttribute("disambigClassRef");
 			
 			if ( elem.hasAttribute("disambigSource") )
 				data[1] = elem.getAttribute("disambigSource");
@@ -2890,7 +2888,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 				data[2] = elem.getAttribute("disambigIdent");
 			// OR the ref version
 			else if ( elem.hasAttribute("disambigIdentRef") )
-				data[2] = REF_PREFIX+elem.getAttribute("disambigIdentRef");
+				data[2] = GenericAnnotationType.REF_PREFIX+elem.getAttribute("disambigIdentRef");
 			
 			if ( elem.hasAttribute("disambigConfidence") )
 				data[3] = elem.getAttribute("disambigConfidence");
@@ -2932,7 +2930,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 				data[3] = elem.getAttribute("its-loc-quality-rating-vote-threshold");
 			
 			if ( elem.hasAttribute("its-loc-quality-rating-profile-ref") )
-				data[4] = REF_PREFIX+elem.getAttribute("its-loc-quality-rating-profile-ref");
+				data[4] = GenericAnnotationType.REF_PREFIX+elem.getAttribute("its-loc-quality-rating-profile-ref");
 		}
 		else if ( qualified ) {
 			if ( elem.hasAttributeNS(ITS_NS_URI, "locQualityRatingScore") )
@@ -2948,7 +2946,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 				data[3] = elem.getAttributeNS(ITS_NS_URI, "locQualityRatingVoteThreshold");
 			
 			if ( elem.hasAttributeNS(ITS_NS_URI, "locQualityRatingProfileRef") )
-				data[4] = REF_PREFIX+elem.getAttributeNS(ITS_NS_URI, "locQualityRatingProfileRef");
+				data[4] = GenericAnnotationType.REF_PREFIX+elem.getAttributeNS(ITS_NS_URI, "locQualityRatingProfileRef");
 		}
 		else {
 			if ( elem.hasAttribute("locQualityRatingScore") )
@@ -2964,7 +2962,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 				data[3] = elem.getAttribute("locQualityRatingVoteThreshold");
 
 			if ( elem.hasAttribute("locQualityRatingProfileRef") )
-				data[4] = REF_PREFIX+elem.getAttribute("locQualityRatingProfileRef");
+				data[4] = GenericAnnotationType.REF_PREFIX+elem.getAttribute("locQualityRatingProfileRef");
 		}
 		
 		// Basic validation

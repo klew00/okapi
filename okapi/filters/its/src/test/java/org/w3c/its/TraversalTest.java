@@ -305,8 +305,8 @@ public class TraversalTest {
 		assertNotNull(anns);
 		GenericAnnotation ann = anns.getAnnotations(GenericAnnotationType.DISAMB).get(0);
 		assertEquals(GenericAnnotationType.DISAMB_GRANULARITY_ENTITY, ann.getString(GenericAnnotationType.DISAMB_GRANULARITY));
-		assertEquals(ITSEngine.REF_PREFIX+"http:/nerd.eurecom.fr/ontology#Place", ann.getString(GenericAnnotationType.DISAMB_CLASS));
-		assertEquals(ITSEngine.REF_PREFIX+"http://dbpedia.org/resource/Dublin", ann.getString(GenericAnnotationType.DISAMB_IDENT));
+		assertEquals(GenericAnnotationType.REF_PREFIX+"http:/nerd.eurecom.fr/ontology#Place", ann.getString(GenericAnnotationType.DISAMB_CLASS));
+		assertEquals(GenericAnnotationType.REF_PREFIX+"http://dbpedia.org/resource/Dublin", ann.getString(GenericAnnotationType.DISAMB_IDENT));
 	}
 
 	@Test
@@ -320,12 +320,12 @@ public class TraversalTest {
 		ITSEngine trav = applyITSRules(doc, null, true, null);
 		Element elem = getElement(trav, "span", 1);
 		assertEquals("sweet", elem.getTextContent());
-		assertEquals("REF:http://purl.org/vocabularies/princeton/wn30/synset-sweet-adjective-1.rdf", trav.getDisambigIdent(null));
+		assertEquals(GenericAnnotationType.REF_PREFIX+"http://purl.org/vocabularies/princeton/wn30/synset-sweet-adjective-1.rdf", trav.getDisambigIdent(null));
 		assertEquals(GenericAnnotationType.DISAMB_GRANULARITY_LEXICAL, trav.getDisambigGranularity(null));
 		elem = getElement(trav, "span", 2);
 		assertEquals("Paris", elem.getTextContent());
-		assertEquals("REF:http://dbpedia.org/resource/Paris", trav.getDisambigIdent(null));
-		assertEquals("REF:http://schema.org/Place", trav.getDisambigClass(null));
+		assertEquals(GenericAnnotationType.REF_PREFIX+"http://dbpedia.org/resource/Paris", trav.getDisambigIdent(null));
+		assertEquals(GenericAnnotationType.REF_PREFIX+"http://schema.org/Place", trav.getDisambigClass(null));
 		assertEquals(GenericAnnotationType.DISAMB_GRANULARITY_ENTITY, trav.getDisambigGranularity(null));
 	}
 

@@ -522,13 +522,20 @@ public abstract class ITSFilter implements IFilter {
 		// Map ITS annotations only if requested
 		if ( !params.mapAnnotations ) return;
 		
+		// ITS annotators reference
+		String value = trav.getAnnotatorsRef();
+		if ( value != null ) {
+			GenericAnnotation.addAnnotation(code, new GenericAnnotation(GenericAnnotationType.ANNOT,
+				GenericAnnotationType.ANNOT_VALUEREF, value));
+		}
+		
 		// ITS Disambiguation
 		GenericAnnotations anns = trav.getDisambiguationAnnotation(null);
 		if ( anns != null ) {
 			GenericAnnotations.addAnnotations(code, anns);
 		}
 		// ITS Allowed Characters
-		String value = trav.getAllowedCharacters(null);
+		value = trav.getAllowedCharacters(null);
 		if ( value != null ) {
 			GenericAnnotation.addAnnotation(code, new GenericAnnotation(GenericAnnotationType.ALLOWEDCHARS,
 				GenericAnnotationType.ALLOWEDCHARS_VALUE, value));
@@ -596,6 +603,14 @@ public abstract class ITSFilter implements IFilter {
 		// (we could use directly trav, but this allows to avoid many tarv.getXYZ() calls)
 		ContextItem ci = new ContextItem(
 			(context.isEmpty() ? attr.getParentNode() : context.peek().node), trav, attr);
+		
+		// ITS annotators reference
+//TODO: how to attach the info?		
+		String value = trav.getAnnotatorsRef();
+		if ( value != null ) {
+			GenericAnnotation.addAnnotation(tu, new GenericAnnotation(GenericAnnotationType.ANNOT,
+				GenericAnnotationType.ANNOT_VALUEREF, value));
+		}
 		
 		// ITS Localization Note
 		if ( !Util.isEmpty(ci.locNote) ) {

@@ -13,6 +13,8 @@
  <!-- Id Value -->
  <its:idValueRule selector="//h:*[@id]" idValue="@id"/>
  
+ <!-- HTML's translate attribute is hard coded in the filter -->
+ 
  <!-- Note: Preserve space is not handled by ITS -->
  
 </its:rules>
