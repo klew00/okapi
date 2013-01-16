@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2012-2013 by the Okapi Framework contributors
+  Copyright (C) 2012 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -28,9 +28,14 @@ import net.sf.okapi.common.pipeline.annotations.StepParameterMapping;
 import net.sf.okapi.common.pipeline.annotations.StepParameterType;
 import net.sf.okapi.lib.verification.SpaceChecker;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class SpaceCheckStep extends BasePipelineStep {
 
-//	private LocaleId sourceLocale;
+	private final Logger LOGGER = LoggerFactory.getLogger(getClass());
+
+	private LocaleId sourceLocale;
 	private LocaleId targetLocale;
 	private SpaceChecker checker;
 
@@ -64,11 +69,10 @@ public class SpaceCheckStep extends BasePipelineStep {
 		this.targetLocale = targetLocale;
 	}
 	
-// Not used for now	
-//	@StepParameterMapping(parameterType = StepParameterType.SOURCE_LOCALE)
-//	public void setSourceLocale (LocaleId sourceLocale) {
-//		this.sourceLocale = sourceLocale;
-//	}
+	@StepParameterMapping(parameterType = StepParameterType.SOURCE_LOCALE)
+	public void setSourceLocale (LocaleId sourceLocale) {
+		this.sourceLocale = sourceLocale;
+	}
 	
 	@Override
 	protected Event handleTextUnit (Event event) {		

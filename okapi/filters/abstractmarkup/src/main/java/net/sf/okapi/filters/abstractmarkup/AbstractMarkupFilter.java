@@ -654,7 +654,11 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 	 *            - the character entity
 	 */
 	protected void handleNumericEntity(NumericCharacterReference entity) {
-		handleText(CharacterReference.decode(entity.toString(), false));
+		if (ruleState.isExludedState() || ruleState.isInlineExcludedState()) {
+			handleText(entity.toString());
+		} else {
+			handleText(CharacterReference.decode(entity.toString(), false));
+		}
 	}
 
 	/**
@@ -664,7 +668,11 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 	 *            - the numeric entity
 	 */
 	protected void handleCharacterEntity(CharacterEntityReference entity) {
-		handleText(CharacterReference.decode(entity.toString(), false));
+		if (ruleState.isExludedState() || ruleState.isInlineExcludedState()) {
+			handleText(entity.toString());
+		} else {
+			handleText(CharacterReference.decode(entity.toString(), false));
+		}
 	}
 
 	/**

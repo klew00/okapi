@@ -49,6 +49,11 @@ distribution.</p>
 	converted to inline codes by the code finder.</li>
 </ul>
 	</li>
+	<li>TXML Filter:<ul>
+	<li>Fixed issue #266: Translations in the <code>&lt;revisions&gt;</code> elements 
+	are now ignored.</li>
+</ul>
+	</li>
 </ul>
 	</li>
 	<li>Connectors:<ul>
@@ -65,6 +70,11 @@ distribution.</p>
 </ul>
 	</li>
 	<li>Steps:<ul>
+	<li>Rainbow Translation Kit Creation:<ul>
+	<li>Added the &quot;Include post-processing hook&quot; option for OmegaT packages. 
+	this allows OmegaT to merge back the documents automatically.</li>
+</ul>
+	</li>
 	<li>Remove Target:<ul>
 	<li>Fixed issue #270 where the step could not be run without some of the 
 	optional parameters set.</li>
@@ -82,6 +92,9 @@ distribution.</p>
 	</li>
 	<li>Added the Space Check Step. It allows to fix automatically spaces around 
 	inline codes of the target based on the source.</li>
+	<li>Added the Cleanup Step. It allows to normalize quotation marks, 
+	punctuations, remove suspect entries, etc. this can be used for example when 
+	preparing an aligned document for MT training.</li>
 </ul>
 	</li>
 </ul>

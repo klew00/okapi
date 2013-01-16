@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2011 by the Okapi Framework contributors
+  Copyright (C) 2011-2013 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -119,7 +119,7 @@ public class TXMLFilter implements IFilter {
 
 	@Override
 	public String getDisplayName () {
-		return "TXML Filter (BETA)";
+		return "TXML Filter";
 	}
 
 	@Override
@@ -401,6 +401,7 @@ public class TXMLFilter implements IFilter {
 		String tmp;
 		boolean gtmt = false;
 		boolean modified = false;
+		boolean inRevision = false;
 		
 		while ( reader.hasNext() ) {
 			switch ( reader.next() ) {
@@ -421,18 +422,21 @@ public class TXMLFilter implements IFilter {
 //						contAnn.setUnconfirmed(tmp.equals("true"));
 //					}
 				}
-				else if ( "source".equals(name) ) {
+				else if ( !inRevision && "source".equals(name) ) {
 					tf = processContent(name);
 					srcSeg = new Segment(segId, tf);
 					srcDone = true;
 				}
-				else if ( "target".equals(name) ) {
+				else if ( !inRevision && "target".equals(name) ) {
 					tf = processContent(name); // Use the same id as the source
 					trgSeg = new Segment(segId, tf);
 				}
 				else if ( "ws".equals(name) ) {
 					if ( srcDone ) ws2 = new TextPart(processContent(name));
 					else ws1 = new TextPart(processContent(name));
+				}
+				else if ( "revisions".equals(name) ) {
+					inRevision = true;
 				}
 				else {
 					// Comments
@@ -483,6 +487,9 @@ public class TXMLFilter implements IFilter {
 					srcDone = false;
 					gtmt = false;
 					modified = false;
+				}
+				else if ( "revisions".equals(name) ) {
+					inRevision = false;
 				}
 				else if ( "translatable".equals(name) ) {
 					if ( !hasOneTarget ) {

@@ -15,6 +15,7 @@
         <module>aligner</module>
         <module>bomconversion</module>
 		<module>charlisting</module>
+		<module>cleanup</module>
         <module>codeshandling</module>
 		<module>common</module>
         <module>diffleverage</module>
