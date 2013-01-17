@@ -17,6 +17,11 @@
     <servlet-name>ratel-ui</servlet-name>
     <servlet-class>org.eclipse.rwt.engine.RWTServlet</servlet-class>
   </servlet>
+  
+  <servlet>
+    <servlet-name>ratel-ui-fullscreen</servlet-name>
+    <servlet-class>org.eclipse.rwt.engine.RWTServlet</servlet-class>
+  </servlet>
 
 <!-- http://localhost:8080/okapi-ratel/ui -->
   <servlet-mapping>
@@ -24,4 +29,10 @@
     <url-pattern>/ui/*</url-pattern>
   </servlet-mapping>
   
+<!-- http://localhost:8080/okapi-ratel/ui-fs --> 
+  <servlet-mapping>
+    <servlet-name>ratel-ui-fullscreen</servlet-name>
+    <url-pattern>/ui-fs/*</url-pattern>
+  </servlet-mapping>
+    
 </web-app> 

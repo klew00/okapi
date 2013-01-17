@@ -103,8 +103,14 @@ public class AboutDialog {
 		
 		label = new Label(cmpTmp, SWT.NONE);
 		label.setText("Browser:"); //$NON-NLS-1$
-		label = new Label(cmpTmp, SWT.NONE);
+		label.setLayoutData(new GridData(SWT.LEFT, SWT.TOP, false, false, 1, 1));
+		
+		label = new Label(cmpTmp, SWT.WRAP);
+		GridData gd_label = new GridData(SWT.LEFT, SWT.CENTER, true, false, 1, 1);
+		gd_label.widthHint = 500;
+		label.setLayoutData(gd_label);
 		label.setText((String) RWT.getSessionStore().getAttribute("userAgent")); //$NON-NLS-1$
+		
 //		label = new Label(cmpTmp, SWT.NONE);
 //		label.setText("");
 		

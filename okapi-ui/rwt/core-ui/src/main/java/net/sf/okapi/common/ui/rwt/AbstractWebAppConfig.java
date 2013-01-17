@@ -14,6 +14,8 @@ import org.eclipse.rwt.resources.IResourceManager.RegisterOptions;
 
 public abstract class AbstractWebAppConfig implements ApplicationConfiguration {
 
+	static final String FULL_SCREEN_SUFFIX = "-fs";
+
 	protected abstract String getEntryPointId(); 
 	protected abstract Class<? extends IEntryPoint> getEntryPointClass();
 	
@@ -24,10 +26,13 @@ public abstract class AbstractWebAppConfig implements ApplicationConfiguration {
 		properties.put(WebClient.FAVICON, getFaviconPath());
 		//application.addStyleSheet(FANCY_THEME_ID, "theme/fancy/fancy.css");
 		application.addStyleSheet(RWT.DEFAULT_THEME_ID, getThemePath());
-		application.addEntryPoint("/" + getEntryPointId(), getEntryPointClass(), properties);
+		application.addEntryPoint("/" + getEntryPointId(), getEntryPointClass(), properties);		
+		application.addEntryPoint("/" + getEntryPointId() + FULL_SCREEN_SUFFIX, getEntryPointClass(), properties);
+		
+		// Resources
 		application.addResource(createResource(getFaviconPath()));
 	}
-	
+		
 	// http://git.eclipse.org/c/rap/org.eclipse.rap.git/tree/bundles/org.eclipse.rap.examples/src/org/eclipse/rap/examples/internal/ExampleApplication.java?h=streams/1.5-maintenance
 	private static IResource createResource(final String resourceName) {
 	    return new IResource() {

@@ -1,10 +1,13 @@
 package net.sf.okapi.common.ui.rwt;
 
 import java.util.Locale;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.eclipse.rwt.RWT;
+import org.eclipse.rwt.internal.application.RWTFactory;
+import org.eclipse.rwt.internal.lifecycle.EntryPointUtil;
 import org.eclipse.rwt.internal.widgets.JSExecutor;
 import org.eclipse.rwt.lifecycle.IEntryPoint;
 import org.eclipse.swt.SWT;
@@ -29,10 +32,11 @@ public abstract class AbstractWebApp implements IEntryPoint {
 		Display display = new Display();
 		
 		HttpServletRequest request = RWT.getRequest();
+		boolean fullScreenMode = request.getServletPath().endsWith(AbstractWebAppConfig.FULL_SCREEN_SUFFIX);
 		RWT.getSessionStore().setAttribute("userAgent", request.getHeader("User-Agent"));
 		RWT.getSessionStore().setAttribute("app", this);
 		
-		shell = new Shell(display, SWT.TITLE | SWT.RESIZE | SWT.MAX);
+		shell = new Shell(display, fullScreenMode ? SWT.NONE : SWT.TITLE | SWT.RESIZE | SWT.MAX);
 		shell.setText(getName()); // Default title
 		createUI(shell);
 		
@@ -48,6 +52,7 @@ public abstract class AbstractWebApp implements IEntryPoint {
 		      }
 		    });
 		
+		if (fullScreenMode) shell.setMaximized(true);
 		shell.open();	    
 		while (!shell.isDisposed()) {
 			if (!display.readAndDispatch()) {

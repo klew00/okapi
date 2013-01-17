@@ -15,7 +15,7 @@ public class RatelWebAppConfiguration extends AbstractWebAppConfig {
 	protected Class<? extends IEntryPoint> getEntryPointClass() {
 		return RatelWebApp.class;
 	}
-
+	
 	@Override
 	protected String getFaviconPath() {
 		return "ratel16.png";
