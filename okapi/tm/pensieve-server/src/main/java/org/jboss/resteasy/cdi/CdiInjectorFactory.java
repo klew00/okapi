@@ -77,6 +77,12 @@ public ConstructorInjector createConstructor(Constructor constructor)
       // wrapper and then again by RESTEasy. To eliminate this, we return a noop PropertyInjector.
       return noopPropertyInjector;
    }
+
+   @SuppressWarnings("rawtypes")
+   public ValueInjector createParameterExtractor(Class injectTargetClass, AccessibleObject injectTarget, Class type, Type genericType, Annotation[] annotations, boolean z)
+   {
+      return createParameterExtractor(injectTargetClass, injectTarget, type, genericType, annotations, true);
+   }
    
    @SuppressWarnings("rawtypes")
    public ValueInjector createParameterExtractor(Class injectTargetClass, AccessibleObject injectTarget, Class type, Type genericType, Annotation[] annotations)

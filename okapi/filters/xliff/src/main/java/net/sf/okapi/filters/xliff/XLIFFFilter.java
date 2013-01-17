@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2011 by the Okapi Framework contributors
+  Copyright (C) 2008-2013 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -25,8 +25,6 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.xml.XMLConstants;
 import javax.xml.stream.XMLInputFactory;
@@ -47,6 +45,8 @@ import net.sf.okapi.common.UsingParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.annotation.AltTranslation;
 import net.sf.okapi.common.annotation.AltTranslationsAnnotation;
+import net.sf.okapi.common.annotation.GenericAnnotation;
+import net.sf.okapi.common.annotation.GenericAnnotationType;
 import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.exceptions.OkapiIllegalFilterOperationException;
@@ -61,6 +61,7 @@ import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.ISegments;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.Segment;
@@ -69,11 +70,13 @@ import net.sf.okapi.common.resource.StartGroup;
 import net.sf.okapi.common.resource.StartSubDocument;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
-import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.resource.TextFragment.TagType;
-import net.sf.okapi.common.resource.ITextUnit;
+import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.common.skeleton.ISkeletonWriter;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @UsingParameters(Parameters.class)
 public class XLIFFFilter implements IFilter {
@@ -688,25 +691,38 @@ public class XLIFFFilter implements IFilter {
 				}
 			}
 
-			// ITS Storage size (with XLIFF maxbytes)
-			tmp = reader.getAttributeValue(null, "maxbytes");
+			//tmp = reader.getAttributeValue(null, "maxbytes");
+			// ITS Storage size
+			tmp = reader.getAttributeValue(XLIFFWriter.NS_ITS20, "storageSize");
 			if ( tmp != null ) { // Get encoding info
 				String enc = reader.getAttributeValue(XLIFFWriter.NS_ITS20, "storageEncoding");
 				if ( enc == null ) enc = "UTF-8";
 				String lb = reader.getAttributeValue(XLIFFWriter.NS_ITS20, "lineBreakType");
 				if ( lb == null ) lb = "lf";
-				tu.setProperty(new Property(Property.ITS_STORAGESIZE, tmp+"\t"+enc+"\t"+lb));
+				GenericAnnotation.addAnnotation(tu, new GenericAnnotation(GenericAnnotationType.STORAGESIZE,
+					GenericAnnotationType.STORAGESIZE_SIZE, Integer.parseInt(tmp),
+					GenericAnnotationType.STORAGESIZE_ENCODING, enc,
+					GenericAnnotationType.STORAGESIZE_LINEBREAK, lb));
 			}
 			// ITS Allowed characters
 			tmp = reader.getAttributeValue(XLIFFWriter.NS_ITS20, "allowedCharacters");
-			if ( tmp != null ) { // Get encoding info
-				tu.setProperty(new Property(Property.ITS_ALLOWEDCHARACTERS, tmp));
+			if ( tmp != null ) { // Get Allowed Character info
+				GenericAnnotation.addAnnotation(tu, new GenericAnnotation(GenericAnnotationType.ALLOWEDCHARS,
+					GenericAnnotationType.ALLOWEDCHARS_PATTERN, tmp));
 			}
-			
 			// ITS Domain
 			tmp = reader.getAttributeValue(XLIFFWriter.NS_XLIFFOKAPI, "istDomain");
 			if ( tmp != null ) {
-				tu.setProperty(new Property(Property.ITS_DOMAIN, tmp));
+				GenericAnnotation.addAnnotation(tu, new GenericAnnotation(GenericAnnotationType.DOMAIN,
+					GenericAnnotationType.DOMAIN_LIST, tmp)
+				);
+			}
+			// External Resoure Reference
+			tmp = reader.getAttributeValue(XLIFFWriter.NS_XLIFFOKAPI, "itsExternalResourceRef");
+			if ( tmp != null ) {
+				GenericAnnotation.addAnnotation(tu, new GenericAnnotation(GenericAnnotationType.EXTRESREF,
+					GenericAnnotationType.EXTRESREF_IRI, tmp)
+				);
 			}
 			
 			// Set restype (can be null)

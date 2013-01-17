@@ -32,6 +32,14 @@ distribution.</p>
 	</li>
 	<li>Tikal:<ul>
 	<li>Fixed -lfc command output.</li>
+    <li>Use the -continue option to specify that batch operations should 
+        continue processing even if one or more files in the batch fail
+        to process.</li>
+    <li>Summary information will be included at the end of batch commands.</li>
+    <li>Timing information is included for each file processed, and total 
+        elapsed time is included in the batch summary.</li>
+    <li>Added the -pd option to specify a directory to search for custom
+        filter configurations.</li>
 </ul>
 	</li>
 	<li>Filters:<ul>
@@ -39,6 +47,11 @@ distribution.</p>
 	<li>Continued the implementation of ITS 2.0</li>
 	<li>Fixed issue where the HTML-type special characters were not escaped when 
 	converted to inline codes by the code finder.</li>
+</ul>
+	</li>
+	<li>TXML Filter:<ul>
+	<li>Fixed issue #266: Translations in the <code>&lt;revisions&gt;</code> elements 
+	are now ignored.</li>
 </ul>
 	</li>
 </ul>
@@ -57,6 +70,11 @@ distribution.</p>
 </ul>
 	</li>
 	<li>Steps:<ul>
+	<li>Rainbow Translation Kit Creation:<ul>
+	<li>Added the &quot;Include post-processing hook&quot; option for OmegaT packages. 
+	this allows OmegaT to merge back the documents automatically.</li>
+</ul>
+	</li>
 	<li>Remove Target:<ul>
 	<li>Fixed issue #270 where the step could not be run without some of the 
 	optional parameters set.</li>
@@ -67,6 +85,16 @@ distribution.</p>
 	the input of the next step.</li>
 </ul>
 	</li>
+	<li>Quality Check Step:<ul>
+	<li>Fixed issue #304 where the default check on parentheses didn&#39;t include 
+	full-width characters.</li>
+</ul>
+	</li>
+	<li>Added the Space Check Step. It allows to fix automatically spaces around 
+	inline codes of the target based on the source.</li>
+	<li>Added the Cleanup Step. It allows to normalize quotation marks, 
+	punctuations, remove suspect entries, etc. this can be used for example when 
+	preparing an aligned document for MT training.</li>
 </ul>
 	</li>
 </ul>

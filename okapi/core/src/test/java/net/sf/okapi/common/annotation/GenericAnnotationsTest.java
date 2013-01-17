@@ -18,7 +18,7 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.common;
+package net.sf.okapi.common.annotation;
 
 import static org.junit.Assert.*;
 
@@ -27,7 +27,12 @@ import java.util.List;
 import net.sf.okapi.common.annotation.GenericAnnotation;
 import net.sf.okapi.common.annotation.GenericAnnotations;
 import net.sf.okapi.common.resource.AnnotatedSpan;
+import net.sf.okapi.common.resource.Code;
+import net.sf.okapi.common.resource.ITextUnit;
+import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
+import net.sf.okapi.common.resource.TextFragment.TagType;
+import net.sf.okapi.common.resource.TextUnit;
 
 import org.junit.Test;
 
@@ -44,6 +49,36 @@ public class GenericAnnotationsTest {
 	}
 
 	@Test
+	public void testConstructors () {
+		GenericAnnotations anns = new GenericAnnotations();
+		assertEquals(null, anns.getData());
+		assertFalse(anns.hasAnnotation("type1"));
+		
+		anns = new GenericAnnotations(new GenericAnnotation("type1"));
+		assertEquals(null, anns.getData());
+		assertTrue(anns.hasAnnotation("type1"));
+		String storage = anns.toString();
+		anns = new GenericAnnotations(storage);
+		assertEquals(null, anns.getData());
+		assertTrue(anns.hasAnnotation("type1"));
+	}
+
+	@Test
+	public void testToFromString () {
+		GenericAnnotations anns1 = new GenericAnnotations(new GenericAnnotation("type1", "field1", "value1"));
+		anns1.add("type2-no-fields");
+		anns1.setData("dataText");
+		String storage = anns1.toString();
+		GenericAnnotations anns2 = new GenericAnnotations(storage);
+		assertEquals("dataText", anns2.getData());
+		assertEquals(2, anns2.getAllAnnotations().size());
+		GenericAnnotation ga = anns2.getFirstAnnotation("type1");
+		assertEquals("value1", ga.getString("field1"));
+		ga = anns2.getFirstAnnotation("type2-no-fields");
+		assertNotNull(ga);
+	}
+	
+	@Test
 	public void testSeveral () {
 		GenericAnnotations anns = new GenericAnnotations();
 		GenericAnnotation ann1 = anns.add("type1");
@@ -53,6 +88,96 @@ public class GenericAnnotationsTest {
 		List<GenericAnnotation> list = anns.getAnnotations("type1");
 		assertEquals(2, list.size());
 		assertEquals("v2", list.get(1).getString("name"));
+	}
+
+	@Test
+	public void testAddAnnotationsOnTU () {
+		GenericAnnotations anns1 = new GenericAnnotations();
+		GenericAnnotation ann11 = anns1.add("type1");
+		ann11.setString("name1", "v1");
+		GenericAnnotation ann12 = anns1.add("type1");
+		ann12.setString("name2", "v2-not-over");
+		ITextUnit tu = new TextUnit("id");
+		GenericAnnotations.addAnnotations(tu, anns1);
+
+		GenericAnnotations res = tu.getAnnotation(GenericAnnotations.class);
+		assertNotNull(res);
+		assertEquals(res, anns1);
+		
+		GenericAnnotations anns2 = new GenericAnnotations();
+		GenericAnnotation ann21 = anns2.add("type1");
+		ann21.setString("name3", "v3");
+		GenericAnnotation ann22 = anns2.add("type1");
+		ann22.setString("name2", "another name2");
+		
+		GenericAnnotations.addAnnotations(tu, anns2);
+		res = tu.getAnnotation(GenericAnnotations.class);
+		assertNotNull(res);
+		assertEquals(res, anns1);
+		List<GenericAnnotation> list = res.getAnnotations("type1");
+		assertEquals(4, list.size());
+		GenericAnnotation ann = list.get(1);
+		assertEquals("v2-not-over", ann.getString("name2"));
+	}
+
+	@Test
+	public void testAddAnnotationsOnTC () {
+		GenericAnnotations anns1 = new GenericAnnotations();
+		GenericAnnotation ann11 = anns1.add("type1");
+		ann11.setString("name1", "v1");
+		GenericAnnotation ann12 = anns1.add("type1");
+		ann12.setString("name2", "v2-not-over");
+		TextContainer tc = new TextContainer();
+		GenericAnnotations.addAnnotations(tc, anns1);
+
+		GenericAnnotations res = tc.getAnnotation(GenericAnnotations.class);
+		assertNotNull(res);
+		assertEquals(res, anns1);
+		
+		GenericAnnotations anns2 = new GenericAnnotations();
+		GenericAnnotation ann21 = anns2.add("type1");
+		ann21.setString("name3", "v3");
+		GenericAnnotation ann22 = anns2.add("type1");
+		ann22.setString("name2", "another name2");
+		
+		GenericAnnotations.addAnnotations(tc, anns2);
+		res = tc.getAnnotation(GenericAnnotations.class);
+		assertNotNull(res);
+		assertEquals(res, anns1);
+		List<GenericAnnotation> list = res.getAnnotations("type1");
+		assertEquals(4, list.size());
+		GenericAnnotation ann = list.get(1);
+		assertEquals("v2-not-over", ann.getString("name2"));
+	}
+
+	@Test
+	public void testAddAnnotationsOnCode () {
+		GenericAnnotations anns1 = new GenericAnnotations();
+		GenericAnnotation ann11 = anns1.add("type1");
+		ann11.setString("name1", "v1");
+		GenericAnnotation ann12 = anns1.add("type1");
+		ann12.setString("name2", "v2-not-over");
+		Code code = new Code(TagType.PLACEHOLDER, "z");
+		GenericAnnotations.addAnnotations(code, anns1);
+
+		GenericAnnotations res = (GenericAnnotations)code.getAnnotation(GenericAnnotationType.GENERIC);
+		assertNotNull(res);
+		assertEquals(res, anns1);
+		
+		GenericAnnotations anns2 = new GenericAnnotations();
+		GenericAnnotation ann21 = anns2.add("type1");
+		ann21.setString("name3", "v3");
+		GenericAnnotation ann22 = anns2.add("type1");
+		ann22.setString("name2", "another name2");
+		
+		GenericAnnotations.addAnnotations(code, anns2);
+		res = (GenericAnnotations)code.getAnnotation(GenericAnnotationType.GENERIC);
+		assertNotNull(res);
+		assertEquals(res, anns1);
+		List<GenericAnnotation> list = res.getAnnotations("type1");
+		assertEquals(4, list.size());
+		GenericAnnotation ann = list.get(1);
+		assertEquals("v2-not-over", ann.getString("name2"));
 	}
 
 	@Test
@@ -118,11 +243,11 @@ public class GenericAnnotationsTest {
 		ann.setString("lqiType", "typographical");
 		ann.setString("lqiComment", "Sentence without capitalization");
 		ann.setString("lqiProfileRef", "http://example.org/qaModel/v13");
-		ann.setFloat("lqiSeverity", 50.0f);
+		ann.setDouble("lqiSeverity", 50.0);
 		ann.setBoolean("lqiEnabled", true);
 		
 		ann = anns.getAnnotations("its-lqi").get(0);
-		assertEquals(50.0, ann.getFloat("lqiSeverity"), 0);
+		assertEquals(50.0, ann.getDouble("lqiSeverity"), 0);
 		assertEquals("typographical", ann.getString("lqiType"));
 		assertEquals("Sentence without capitalization", ann.getString("lqiComment"));
 		assertEquals("http://example.org/qaModel/v13", ann.getString("lqiProfileRef"));

@@ -29,6 +29,9 @@ import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.TestUtil;
 import net.sf.okapi.common.annotation.AltTranslation;
 import net.sf.okapi.common.annotation.AltTranslationsAnnotation;
+import net.sf.okapi.common.annotation.GenericAnnotation;
+import net.sf.okapi.common.annotation.GenericAnnotationType;
+import net.sf.okapi.common.annotation.GenericAnnotations;
 import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filterwriter.GenericContent;
 import net.sf.okapi.common.filterwriter.XLIFFWriter;
@@ -367,14 +370,18 @@ public class XLIFFFilterTest {
 			+ "<xliff version=\"1.2\" xmlns:i='http://www.w3.org/2005/11/its'>"
 			+ "<file source-language=\"en\" target-language=\"fr\" datatype=\"x-test\" original=\"file.ext\">"
 			+ "<body>"
-			+ "<trans-unit id=\"1\" maxbytes='123' i:allowedCharacters='[a-z]'>"
+			+ "<trans-unit id=\"1\" i:storageSize='123' i:allowedCharacters='[a-z]'>"
 			+ "<source>t1</source>"
 			+ "</trans-unit>"
 			+ "</body>"
 			+ "</file></xliff>";
 		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
-		assertEquals("[a-z]", tu.getProperty(Property.ITS_ALLOWEDCHARACTERS).getValue());
-		assertEquals("123\tUTF-8\tlf", tu.getProperty(Property.ITS_STORAGESIZE).getValue());
+		GenericAnnotation ga = tu.getAnnotation(GenericAnnotations.class).getFirstAnnotation(GenericAnnotationType.ALLOWEDCHARS);
+		assertEquals("[a-z]", ga.getString(GenericAnnotationType.ALLOWEDCHARS_PATTERN));
+		ga = tu.getAnnotation(GenericAnnotations.class).getFirstAnnotation(GenericAnnotationType.STORAGESIZE);
+		assertEquals(123, (int)ga.getInteger(GenericAnnotationType.STORAGESIZE_SIZE));
+		assertEquals("UTF-8", ga.getString(GenericAnnotationType.STORAGESIZE_ENCODING));
+		assertEquals("lf", ga.getString(GenericAnnotationType.STORAGESIZE_LINEBREAK));
 	}
 
 	@Test

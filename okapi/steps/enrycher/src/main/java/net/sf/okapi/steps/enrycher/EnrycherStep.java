@@ -358,7 +358,7 @@ public class EnrycherStep extends BasePipelineStep {
 				ga.setString(GenericAnnotationType.DISAMB_IDENT, REF_PREFIX+attr.getValue());
 			}
 			else if ( attr.getKey().equals("its-disambig-confidence") ) {
-				ga.setFloat(GenericAnnotationType.DISAMB_CONFIDENCE, Float.parseFloat(attr.getValue()));
+				ga.setDouble(GenericAnnotationType.DISAMB_CONFIDENCE, Double.parseDouble(attr.getValue()));
 			}
 			else if ( attr.getKey().equals("its-disambig-granularity") ) {
 				ga.setString(GenericAnnotationType.DISAMB_GRANULARITY, attr.getValue());

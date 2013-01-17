@@ -28,8 +28,10 @@ import net.sf.okapi.common.uidescription.IEditorDescriptionProvider;
 public class Options extends BaseParameters implements IEditorDescriptionProvider {
 
 	private static final String ALLOWSEGMENTATION = "allowSegmentation"; //$NON-NLS-1$
+	private static final String INCLUDEPOSTPROCESSINGHOOK = "includePostProcessingHook"; //$NON-NLS-1$
 	
 	private boolean allowSegmentation;
+	private boolean includePostProcessingHook;
 
 	public Options () {
 		reset();
@@ -38,6 +40,7 @@ public class Options extends BaseParameters implements IEditorDescriptionProvide
 	@Override
 	public void reset() {
 		allowSegmentation = true;
+		includePostProcessingHook = true;
 	}
 
 	@Override
@@ -45,21 +48,31 @@ public class Options extends BaseParameters implements IEditorDescriptionProvide
 		reset();
 		buffer.fromString(data);
 		allowSegmentation = buffer.getBoolean(ALLOWSEGMENTATION, allowSegmentation);
+		includePostProcessingHook = buffer.getBoolean(INCLUDEPOSTPROCESSINGHOOK, includePostProcessingHook);
 	}
 
 	@Override
 	public String toString () {
 		buffer.reset();
 		buffer.setParameter(ALLOWSEGMENTATION, allowSegmentation);
+		buffer.setParameter(INCLUDEPOSTPROCESSINGHOOK, includePostProcessingHook);
 		return buffer.toString();
 	}
 
 	public boolean getAllowSegmentation () {
 		return allowSegmentation;
 	}
+	
+	public boolean getIncludePostProcessingHook () {
+		return includePostProcessingHook;
+	}
 
 	public void setAllowSegmentation (boolean allowSegmentation) {
 		this.allowSegmentation = allowSegmentation;
+	}
+	
+	public void setIncludePostProcessingHook (boolean includePostProcessingHook) {
+		this.includePostProcessingHook = includePostProcessingHook;
 	}
 	
 	@Override
@@ -67,6 +80,9 @@ public class Options extends BaseParameters implements IEditorDescriptionProvide
 		ParametersDescription desc = new ParametersDescription(this);
 		desc.add(ALLOWSEGMENTATION, "Allow segmentation in the OmegaT project",
 			"Allow or not segmentation in the project. Ignored if there is a segmentation step.");
+		desc.add(INCLUDEPOSTPROCESSINGHOOK, "Include post-processing hook",
+			"Set up the project so that OmegaT's \"Create Translated Documents\" command will "
+		  + "automatically trigger Okapi's Translation Kit Post-Processing pipeline.");
 		return desc;
 	}
 
@@ -74,6 +90,7 @@ public class Options extends BaseParameters implements IEditorDescriptionProvide
 	public EditorDescription createEditorDescription(ParametersDescription paramsDesc) {
 		EditorDescription desc = new EditorDescription("OmegaT Project", true, false);
 		desc.addCheckboxPart(paramsDesc.get(ALLOWSEGMENTATION));
+		desc.addCheckboxPart(paramsDesc.get(INCLUDEPOSTPROCESSINGHOOK));
 		return desc;
 	}
 

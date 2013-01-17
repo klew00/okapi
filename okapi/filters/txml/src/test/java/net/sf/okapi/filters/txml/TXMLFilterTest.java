@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2011 by the Okapi Framework contributors
+  Copyright (C) 2011-2013 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -63,6 +63,33 @@ public class TXMLFilterTest {
 			+ "<translatable blockId=\"b1\" datatype=\"html\">"
 			+ "<segment segmentId=\"s1\" modified=\"true\">"
 			+ "<source>Segment one</source><target>Segment un</target>"
+			+ "</segment>"
+			+ "<segment segmentId=\"2\">"
+			+ "<source>segment two</source>"
+			+ "</segment>"
+			+ "</translatable>"
+			+ "</txml>";
+
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(filter1, snippet, locFR), 1);
+		assertNotNull(tu);
+		assertEquals("b1", tu.getId());
+		assertEquals("Segment one", tu.getSource().getFirstSegment().toString());
+		TextContainer tc = tu.getTarget(locFR);
+		assertNotNull(tc);
+		assertEquals("Segment un", tc.getFirstSegment().toString());
+	}
+
+	@Test
+	public void testRevisedEntry () {
+		String snippet = STARTFILE
+			+ "<translatable blockId=\"b1\" datatype=\"html\">"
+			+ "<segment segmentId=\"s1\" modified=\"true\">"
+			+ "<source>Segment one</source><target>Segment un</target>"
+			+ "<revisions>"
+			+ "<revision id=\"1\" creationid=\"Roberto\" creationdate=\"20130109T162701Z\" type=\"target\">"
+			+ "<target>previous translation</target>"
+			+ "</revision>"
+			+ "</revisions>"
 			+ "</segment>"
 			+ "<segment segmentId=\"2\">"
 			+ "<source>segment two</source>"

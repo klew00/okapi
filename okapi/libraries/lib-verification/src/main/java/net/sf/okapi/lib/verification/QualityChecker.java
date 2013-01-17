@@ -35,6 +35,9 @@ import java.util.regex.Pattern;
 
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.annotation.GenericAnnotation;
+import net.sf.okapi.common.annotation.GenericAnnotationType;
+import net.sf.okapi.common.annotation.GenericAnnotations;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.ISegments;
 import net.sf.okapi.common.resource.Property;
@@ -298,8 +301,7 @@ class QualityChecker {
 			if ( termChecker != null ) {
 				if ( termChecker.verify(currentDocId, tu, srcSeg, trgSeg) > 0 ) {
 					for ( Issue issue : termChecker.getIssues() ) {
-						reportIssue(issue.issueType, tu, issue.segId, issue.message, issue.srcStart, issue.srcEnd,
-							issue.trgStart, issue.trgEnd, issue.severity, srcSeg.toString(), trgSeg.toString(), null);
+						reportIssue(issue, tu, srcSeg.toString(), trgSeg.toString(), null);
 					}
 				}
 			}
@@ -316,9 +318,8 @@ class QualityChecker {
 			if ( ltConn != null ) {
 				if ( ltConn.checkSegment(currentDocId, srcSeg, trgSeg, tu) > 0 ) {
 					for ( Issue issue : ltConn.getIssues() ) {
-						reportIssue(issue.issueType, tu, issue.segId, issue.message, issue.srcStart, issue.srcEnd,
-							issue.trgStart, issue.trgEnd, issue.severity, srcSeg.toString(), trgSeg.toString(), null);
-						if ( issue.srcEnd == -99 ) {
+						reportIssue(issue, tu, srcSeg.toString(), trgSeg.toString(), null);
+						if ( issue.getSourceEnd() == -99 ) {
 							// Special marker indicating a server error
 							ltConn = null; // Do not check it again until next re-processing
 						}
@@ -777,47 +778,49 @@ class QualityChecker {
 		}
 	}
 
-	
 	private void checkStorageSize (ITextUnit tu,
 		TextContainer tc,
 		boolean isSource)
 	{
 		if ( tc == null ) return;
-		if ( tu.hasProperty(Property.ITS_STORAGESIZE) ) {
-			try {
-				String[] values = tu.getProperty(Property.ITS_STORAGESIZE).getValue().split("\t", -1);
-				if ( values[0].isEmpty() ) return; // No limits
-				int max = Integer.parseInt(values[0]);
-				if (( encoder2 == null ) || !encoder2.charset().name().equals(values[1]) ) {
-					encoder2 = Charset.forName(values[1]).newEncoder();
-				}
-				
-				// Get the plain text
-				TextFragment tf;
-				if ( tc.contentIsOneSegment() ) tf = tc.getFirstContent();
-				else tf = tc.getUnSegmentedContentCopy();
-				String  tmp = TextUnitUtil.getText(tf);
-				// Convert the line breaks if needed
-				if ( values[2].equals("crlf") ) tmp = tmp.replaceAll("\n", "\r\n");
-				// Else: all other values are a single byte, like the default lf, no need to replace
-				
-				// Compute the byte length
-				ByteBuffer buf = encoder2.encode(CharBuffer.wrap(tmp));
-				int len = buf.limit();
-				if ( len > max ) {
-					reportIssue(isSource ? IssueType.SOURCE_LENGTH : IssueType.TARGET_LENGTH, tu, null,
-						String.format("Number of bytes in the %s (using %s) is: %d. Number allowed: %d.",
-							(isSource ? "source" : "target"), values[1], len, max),
-						0, -1, 0, -1, Issue.SEVERITY_HIGH,
-						(isSource ? tc.toString() : "N/A"), (isSource ? "N/A" : tc.toString()), null);
-				}
+		GenericAnnotations anns = tu.getAnnotation(GenericAnnotations.class);
+		if ( anns == null ) return;
+		
+		GenericAnnotation ga = anns.getFirstAnnotation(GenericAnnotationType.STORAGESIZE);
+		if ( ga == null ) return;
+		try {
+			int max = ga.getInteger(GenericAnnotationType.STORAGESIZE_SIZE);
+			String enc = ga.getString(GenericAnnotationType.STORAGESIZE_ENCODING);
+			if (( encoder2 == null ) || !encoder2.charset().name().equals(enc) ) {
+				encoder2 = Charset.forName(enc).newEncoder();
 			}
-			catch ( Throwable e ) {
+			String lb = ga.getString(GenericAnnotationType.STORAGESIZE_LINEBREAK);
+			
+			// Get the plain text
+			TextFragment tf;
+			if ( tc.contentIsOneSegment() ) tf = tc.getFirstContent();
+			else tf = tc.getUnSegmentedContentCopy();
+			String  tmp = TextUnitUtil.getText(tf);
+			// Convert the line breaks if needed
+			if ( lb.equals("crlf") ) tmp = tmp.replaceAll("\n", "\r\n");
+			// Else: all other values are a single byte, like the default lf, no need to replace
+			
+			// Compute the byte length
+			ByteBuffer buf = encoder2.encode(CharBuffer.wrap(tmp));
+			int len = buf.limit();
+			if ( len > max ) {
 				reportIssue(isSource ? IssueType.SOURCE_LENGTH : IssueType.TARGET_LENGTH, tu, null,
-					"Problem when trying use use ITS storage size property: "+e.getMessage(),
+					String.format("Number of bytes in the %s (using %s) is: %d. Number allowed: %d.",
+						(isSource ? "source" : "target"), enc, len, max),
 					0, -1, 0, -1, Issue.SEVERITY_HIGH,
 					(isSource ? tc.toString() : "N/A"), (isSource ? "N/A" : tc.toString()), null);
 			}
+		}
+		catch ( Throwable e ) {
+			reportIssue(isSource ? IssueType.SOURCE_LENGTH : IssueType.TARGET_LENGTH, tu, null,
+				"Problem when trying use use ITS storage size property: "+e.getMessage(),
+				0, -1, 0, -1, Issue.SEVERITY_HIGH,
+				(isSource ? tc.toString() : "N/A"), (isSource ? "N/A" : tc.toString()), null);
 		}
 	}
 	
@@ -826,9 +829,12 @@ class QualityChecker {
 		boolean isSource)
 	{
 		if ( tc == null ) return;
-		if ( !tu.hasProperty(Property.ITS_ALLOWEDCHARACTERS) ) return;
+		GenericAnnotations anns = tu.getAnnotation(GenericAnnotations.class);
+		if ( anns == null ) return;
+		GenericAnnotation ga = anns.getFirstAnnotation(GenericAnnotationType.ALLOWEDCHARS);
+		if ( ga == null ) return;
 		try {
-			String pattern = tu.getProperty(Property.ITS_ALLOWEDCHARACTERS).getValue();
+			String pattern = ga.getString(GenericAnnotationType.ALLOWEDCHARS_PATTERN);
 			// Re-set the compiled pattern if needed
 			if (( itsAllowedChars == null ) || !itsAllowedCharsPattern.equals(pattern) ) {
 				itsAllowedCharsPattern = pattern; // Remember for next time
@@ -1030,15 +1036,36 @@ class QualityChecker {
 	{
 		Issue issue = new Issue(currentDocId, issueType, tu.getId(), segId, message,
 			srcStart, srcEnd, trgStart, trgEnd, severity, tu.getName());
-		issue.extra = extra;
+		issue.setExtra(extra);
 		issues.add(issue);
-		issue.enabled = true;
-		issue.oriSource = srcOri;
-		issue.oriTarget = trgOri;
+		issue.setEnabled(true);
+		issue.setSource(srcOri);
+		issue.setTarget(trgOri);
 		
 		if ( sigList != null ) {
 			// Disable any issue for which we have the signature in the list
-			issue.enabled = !sigList.contains(issue.getSignature());
+			issue.setEnabled(!sigList.contains(issue.getSignature()));
+		}
+	}
+
+	private void reportIssue (Issue init,
+		ITextUnit tu,
+		String srcOri,
+		String trgOri,
+		Object extra)
+	{
+		Issue issue = new Issue(currentDocId, init.getIssueType(), tu.getId(), init.getSegId(), init.getMessage(),
+				init.getSourceStart(), init.getSourceEnd(), init.getTargetStart(), init.getTargetEnd(),
+				init.getSeverity(), tu.getName());
+		issue.setExtra(init.getExtra());
+		issues.add(issue);
+		issue.setEnabled(true);
+		issue.setSource(srcOri);
+		issue.setTarget(trgOri);
+		
+		if ( sigList != null ) {
+			// Disable any issue for which we have the signature in the list
+			issue.setEnabled(!sigList.contains(issue.getSignature()));
 		}
 	}
 

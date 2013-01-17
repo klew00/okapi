@@ -22,20 +22,72 @@ package net.sf.okapi.common.annotation;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.resource.Code;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.InlineAnnotation;
+import net.sf.okapi.common.resource.TextContainer;
 
 /**
  * Provides access to a list of {@link GenericAnnotation}.
  * <p>This annotation can be used inline as well as on structural objects.
  */
-public class GenericAnnotations extends InlineAnnotation {
+public class GenericAnnotations extends InlineAnnotation implements Iterable<GenericAnnotation> {
 
 	private static final String ANNOTATION_SEPARATOR = "\u001d";
 
-	List<GenericAnnotation> list;
+	private List<GenericAnnotation> list;
+	
+	/**
+	 * Adds a set of annotations to a given text unit. If the text unit has
+	 * no annotation set already attached, one is created and attached,
+	 * otherwise all the annotations of the set passed as argument are added to
+	 * the existing set. 
+	 * @param tu the text unit where to attached the new set.
+	 * @param newSet the new set to add.
+	 */
+	static public void addAnnotations (ITextUnit tu,
+		GenericAnnotations newSet)
+	{
+		GenericAnnotations current = tu.getAnnotation(GenericAnnotations.class);
+		if ( current == null ) tu.setAnnotation(newSet); 
+		else current.addAll(newSet);
+	}
+	
+	/**
+	 * Adds a set of annotations to a given text container. If the text container has
+	 * no annotation set already attached, one is created and attached,
+	 * otherwise all the annotations of the set passed as argument are added to
+	 * the existing set. 
+	 * @param tc the text container where to attached the new set.
+	 * @param newSet the new set to add.
+	 */
+	static public void addAnnotations (TextContainer tc,
+		GenericAnnotations newSet)
+	{
+		GenericAnnotations current = tc.getAnnotation(GenericAnnotations.class);
+		if ( current == null ) tc.setAnnotation(newSet); 
+		else current.addAll(newSet);
+	}
+	
+	/**
+	 * Adds a set of annotations to a given inline code. If the inline code has
+	 * no annotation set attached yet one is created and attached,
+	 * otherwise all the annotations of the set passed as argument are added to
+	 * the existing set. 
+	 * @param code the code where to add the annotation.
+	 * @param newSet the new set to add.
+	 */
+	static public void addAnnotations (Code code,
+		GenericAnnotations newSet)
+	{
+		GenericAnnotations current = (GenericAnnotations)code.getAnnotation(GenericAnnotationType.GENERIC);
+		if ( current == null ) code.setAnnotation(GenericAnnotationType.GENERIC, newSet);
+		else current.addAll(newSet);
+	}
 	
 	/**
 	 * Creates an empty annotation set.
@@ -51,6 +103,14 @@ public class GenericAnnotations extends InlineAnnotation {
 	 */
 	public GenericAnnotations (String storage) {
 		fromString(storage);
+	}
+	
+	/**
+	 * Creates an annotation set and add a given one.
+	 * @param annotation the annotation to add.
+	 */
+	public GenericAnnotations (GenericAnnotation annotation) {
+		this.add(annotation);
 	}
 	
 	@Override
@@ -84,6 +144,21 @@ public class GenericAnnotations extends InlineAnnotation {
 		return res;
 	}
 
+	/**
+	 * Gets the first occurrence of an annotation for a given type.
+	 * @param type the type of annotation to retrieve.
+	 * @return the first annotation of the given type, or null if none exists.
+	 */
+	public GenericAnnotation getFirstAnnotation (String type) {
+		if ( Util.isEmpty(list) ) return null;
+		for ( GenericAnnotation ann : list ) {
+			if ( ann.getType().equals(type) ) {
+				return ann;
+			}
+		}
+		return null;
+	}
+	
 	/**
 	 * Gets the unmodifiable list of all the annotation in this annotation set.
 	 * @return the live list, or an empty one if there are no annotations.
@@ -163,11 +238,15 @@ public class GenericAnnotations extends InlineAnnotation {
 	
 	@Override
 	public String toString () {
-		if ( Util.isEmpty(list) ) return "";
+		// Format: <baseClassData or empty><sep><dataForAnnotation1><sep>...
+		if ( Util.isEmpty(list) ) {
+			return (data == null ? "" : data);
+		}
 		// Else: store the annotations
 		StringBuilder sb = new StringBuilder();
+		if ( data != null ) sb.append(data);
 		for ( GenericAnnotation ann : list ) {
-			if ( sb.length() > 0 ) sb.append(ANNOTATION_SEPARATOR); 
+			sb.append(ANNOTATION_SEPARATOR); 
 			sb.append(ann.toString());
 		}
 		return sb.toString();
@@ -176,10 +255,20 @@ public class GenericAnnotations extends InlineAnnotation {
 	@Override
 	public void fromString (String storage) {
 		String[] parts = storage.split(ANNOTATION_SEPARATOR, 0);
-		for ( String data : parts ) {
-			GenericAnnotation ann = add("z");
-			ann.fromString(data);
+		if ( !parts[0].isEmpty() ) data = parts[0];
+		for ( int i=1; i<parts.length; i++ ) {
+			GenericAnnotation ann = add("z"); // This type will be replaced by fromString
+			ann.fromString(parts[i]);
 		}
+	}
+
+	@Override
+	public Iterator<GenericAnnotation> iterator() {
+		if ( list == null ) {
+			List<GenericAnnotation> tmp = Collections.emptyList();
+			return tmp.iterator();
+		}
+		return list.iterator();
 	}
 
 }

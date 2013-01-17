@@ -109,7 +109,8 @@ public class HTML5FilterTest {
 		ArrayList<Event> list = getEvents(snippet);
 		ITextUnit tu = FilterTestDriver.getTextUnit(list, 1);
 		assertEquals("Title", fmt.setContent(tu.getSource().getFirstContent()).toString());
-		assertEquals("domA, dom2, domB, dom1, dom3", tu.getProperty(Property.ITS_DOMAIN).getValue());		
+		GenericAnnotation ga = tu.getAnnotation(GenericAnnotations.class).getFirstAnnotation(GenericAnnotationType.DOMAIN);
+		assertEquals("domA, dom2, domB, dom1, dom3", ga.getString(GenericAnnotationType.DOMAIN_LIST));		
 	}
 
 	@Test
@@ -161,9 +162,10 @@ public class HTML5FilterTest {
 		ArrayList<Event> list = getEvents(snippet);
 		ITextUnit tu = FilterTestDriver.getTextUnit(list, 2);
 		assertNotNull(tu);
-		assertEquals("[a-z]", tu.getProperty(Property.ITS_ALLOWEDCHARACTERS).getValue());
+		GenericAnnotation ga = tu.getAnnotation(GenericAnnotations.class).getFirstAnnotation(GenericAnnotationType.ALLOWEDCHARS);
+		assertEquals("[a-z]", ga.getString(GenericAnnotationType.ALLOWEDCHARS_PATTERN));
 		tu = FilterTestDriver.getTextUnit(list, 3);
-		assertFalse(tu.hasProperty(Property.ITS_ALLOWEDCHARACTERS));
+		assertEquals(null, tu.getAnnotation(GenericAnnotations.class));
 	}
 	
 	@Test
@@ -177,9 +179,15 @@ public class HTML5FilterTest {
 		ArrayList<Event> list = getEvents(snippet);
 		ITextUnit tu = FilterTestDriver.getTextUnit(list, 2);
 		assertNotNull(tu);
-		assertEquals("10\tUTF-8\tlf", tu.getProperty(Property.ITS_STORAGESIZE).getValue());
+		GenericAnnotation ga = tu.getAnnotation(GenericAnnotations.class).getFirstAnnotation(GenericAnnotationType.STORAGESIZE);
+		assertEquals(10, (int)ga.getInteger(GenericAnnotationType.STORAGESIZE_SIZE));
+		assertEquals("UTF-8", ga.getString(GenericAnnotationType.STORAGESIZE_ENCODING));
+		assertEquals("lf", ga.getString(GenericAnnotationType.STORAGESIZE_LINEBREAK));
 		tu = FilterTestDriver.getTextUnit(list, 3);
-		assertEquals("22\tISO-8859-1\tlf", tu.getProperty(Property.ITS_STORAGESIZE).getValue());
+		ga = tu.getAnnotation(GenericAnnotations.class).getFirstAnnotation(GenericAnnotationType.STORAGESIZE);
+		assertEquals(22, (int)ga.getInteger(GenericAnnotationType.STORAGESIZE_SIZE));
+		assertEquals("ISO-8859-1", ga.getString(GenericAnnotationType.STORAGESIZE_ENCODING));
+		assertEquals("lf", ga.getString(GenericAnnotationType.STORAGESIZE_LINEBREAK));
 	}
 	
 	@Test
@@ -253,7 +261,7 @@ public class HTML5FilterTest {
 		assertEquals(null, res.get(0).getString(GenericAnnotationType.LQI_ISSUESREF));
 		assertEquals(true, res.get(0).getBoolean(GenericAnnotationType.LQI_ENABLED));
 	}
-	
+
 	@Test
 	public void testLocQualityIssuesExternalXMLStandoff () {
 		ArrayList<Event> list = getEvents(new File(root+"lqi-test1.html"));
@@ -312,8 +320,8 @@ public class HTML5FilterTest {
 		assertEquals("comment2", res.get(1).getString(GenericAnnotationType.LQI_COMMENT));
 		assertEquals("misspelling", res.get(0).getString(GenericAnnotationType.LQI_TYPE));
 		assertEquals(null, res.get(1).getString(GenericAnnotationType.LQI_TYPE));
-		assertEquals(10, res.get(0).getFloat(GenericAnnotationType.LQI_SEVERITY), 0);
-		assertEquals(null, res.get(1).getFloat(GenericAnnotationType.LQI_SEVERITY));
+		assertEquals(10, res.get(0).getDouble(GenericAnnotationType.LQI_SEVERITY), 0);
+		assertEquals(null, res.get(1).getDouble(GenericAnnotationType.LQI_SEVERITY));
 		assertEquals(true, res.get(0).getBoolean(GenericAnnotationType.LQI_ENABLED));
 		assertEquals(false, res.get(1).getBoolean(GenericAnnotationType.LQI_ENABLED));
 		assertEquals(null, res.get(0).getString(GenericAnnotationType.LQI_PROFILEREF));
@@ -338,7 +346,7 @@ public class HTML5FilterTest {
 		assertEquals(1, res.size());
 		assertEquals("note", res.get(0).getString(GenericAnnotationType.LQI_COMMENT));
 		assertEquals("misspelling", res.get(0).getString(GenericAnnotationType.LQI_TYPE));
-		assertEquals(11, res.get(0).getFloat(GenericAnnotationType.LQI_SEVERITY), 0);
+		assertEquals(11, res.get(0).getDouble(GenericAnnotationType.LQI_SEVERITY), 0);
 		assertEquals("uri", res.get(0).getString(GenericAnnotationType.LQI_PROFILEREF));
 		assertEquals(false, res.get(0).getBoolean(GenericAnnotationType.LQI_ENABLED));
 	}

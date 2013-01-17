@@ -36,9 +36,9 @@ class ContextItem {
 	boolean preserveWS;
 	String domains;
 	String externalRes;
-	String storageSize;
 	String allowedChars;
 	GenericAnnotations lqIssues;
+	GenericAnnotations storageSize;
 
 	public ContextItem (Node node,
 		ITSEngine trav)
@@ -60,14 +60,8 @@ class ContextItem {
 		this.domains = trav.getDomains(attribute);
 		this.externalRes = trav.getExternalResourceRef(attribute);
 		this.allowedChars = trav.getAllowedCharacters(attribute);
-		
-		if ( trav.getStorageSize(attribute) != null ) {
-			this.storageSize = trav.getStorageSize(attribute)
-				+ "\t" + trav.getStorageEncoding(attribute)
-				+ "\t" + trav.getLineBreakType(attribute);
-		}
-		
-		this.lqIssues = trav.getLocQualityIssues(attribute);
+		this.storageSize = trav.getStorageSizeAnnotation(attribute);
+		this.lqIssues = trav.getLocQualityIssueAnnotation(attribute);
 	}
 
 }

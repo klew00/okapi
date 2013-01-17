@@ -28,6 +28,9 @@ import java.util.List;
 
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.annotation.GenericAnnotation;
+import net.sf.okapi.common.annotation.GenericAnnotationType;
+import net.sf.okapi.common.annotation.GenericAnnotations;
 import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextContainer;
@@ -66,7 +69,7 @@ public class QualityCheckerTest {
 		session.processTextUnit(tu);
 		List<Issue> issues = session.getIssues();
 		assertEquals(1, issues.size());
-		assertEquals(IssueType.MISSING_TARGETTU, issues.get(0).issueType);
+		assertEquals(IssueType.MISSING_TARGETTU, issues.get(0).getIssueType());
 	}
 
 	@Test
@@ -79,7 +82,7 @@ public class QualityCheckerTest {
 		session.processTextUnit(tu);
 		List<Issue> issues = session.getIssues();
 		assertEquals(1, issues.size());
-		assertEquals(IssueType.EMPTY_TARGETSEG, issues.get(0).issueType);
+		assertEquals(IssueType.EMPTY_TARGETSEG, issues.get(0).getIssueType());
 	}
 
 	@Test
@@ -92,7 +95,7 @@ public class QualityCheckerTest {
 		session.processTextUnit(tu);
 		List<Issue> issues = session.getIssues();
 		assertEquals(1, issues.size());
-		assertEquals(IssueType.EMPTY_SOURCESEG, issues.get(0).issueType);
+		assertEquals(IssueType.EMPTY_SOURCESEG, issues.get(0).getIssueType());
 	}
 
 	@Test
@@ -108,7 +111,7 @@ public class QualityCheckerTest {
 		session.processTextUnit(tu);
 		List<Issue> issues = session.getIssues();
 		assertEquals(1, issues.size());
-		assertEquals(IssueType.MISSING_TARGETSEG, issues.get(0).issueType);
+		assertEquals(IssueType.MISSING_TARGETSEG, issues.get(0).getIssueType());
 	}
 
 	@Test
@@ -126,7 +129,7 @@ public class QualityCheckerTest {
 		session.processTextUnit(tu);
 		List<Issue> issues = session.getIssues();
 		assertEquals(1, issues.size());
-		assertEquals(IssueType.EMPTY_TARGETSEG, issues.get(0).issueType);
+		assertEquals(IssueType.EMPTY_TARGETSEG, issues.get(0).getIssueType());
 	}
 
 	@Test
@@ -137,7 +140,7 @@ public class QualityCheckerTest {
 		session.processTextUnit(tu);
 		List<Issue> issues = session.getIssues();
 		assertEquals(1, issues.size());
-		assertEquals(IssueType.MISSINGORDIFF_LEADINGWS, issues.get(0).issueType);
+		assertEquals(IssueType.MISSINGORDIFF_LEADINGWS, issues.get(0).getIssueType());
 	}
 
 	@Test
@@ -148,7 +151,7 @@ public class QualityCheckerTest {
 		session.processTextUnit(tu);
 		List<Issue> issues = session.getIssues();
 		assertEquals(1, issues.size());
-		assertEquals(IssueType.MISSINGORDIFF_TRAILINGWS, issues.get(0).issueType);
+		assertEquals(IssueType.MISSINGORDIFF_TRAILINGWS, issues.get(0).getIssueType());
 	}
 
 	@Test
@@ -159,7 +162,7 @@ public class QualityCheckerTest {
 		session.processTextUnit(tu);
 		List<Issue> issues = session.getIssues();
 		assertEquals(1, issues.size());
-		assertEquals(IssueType.EXTRAORDIFF_LEADINGWS, issues.get(0).issueType);
+		assertEquals(IssueType.EXTRAORDIFF_LEADINGWS, issues.get(0).getIssueType());
 	}
 
 	@Test
@@ -170,7 +173,7 @@ public class QualityCheckerTest {
 		session.processTextUnit(tu);
 		List<Issue> issues = session.getIssues();
 		assertEquals(1, issues.size());
-		assertEquals(IssueType.EXTRAORDIFF_TRAILINGWS, issues.get(0).issueType);
+		assertEquals(IssueType.EXTRAORDIFF_TRAILINGWS, issues.get(0).getIssueType());
 	}
 
 	@Test
@@ -181,7 +184,7 @@ public class QualityCheckerTest {
 		session.processTextUnit(tu);
 		List<Issue> issues = session.getIssues();
 		assertEquals(1, issues.size());
-		assertEquals(IssueType.TARGET_SAME_AS_SOURCE, issues.get(0).issueType);
+		assertEquals(IssueType.TARGET_SAME_AS_SOURCE, issues.get(0).getIssueType());
 	}
 	
 	@Test
@@ -204,7 +207,7 @@ public class QualityCheckerTest {
 		session.processTextUnit(tu);
 		List<Issue> issues = session.getIssues();
 		assertEquals(1, issues.size());
-		assertEquals(IssueType.TARGET_SAME_AS_SOURCE, issues.get(0).issueType);
+		assertEquals(IssueType.TARGET_SAME_AS_SOURCE, issues.get(0).getIssueType());
 	}
 	
 	@Test
@@ -218,8 +221,8 @@ public class QualityCheckerTest {
 		List<Issue> issues = session.getIssues();
 		// We have code difference warnings but no target==source warning
 		assertEquals(2, issues.size());
-		assertEquals(IssueType.MISSING_CODE, issues.get(0).issueType);
-		assertEquals(IssueType.EXTRA_CODE, issues.get(1).issueType);
+		assertEquals(IssueType.MISSING_CODE, issues.get(0).getIssueType());
+		assertEquals(IssueType.EXTRA_CODE, issues.get(1).getIssueType());
 	}
 	
 	@Test
@@ -234,9 +237,9 @@ public class QualityCheckerTest {
 		List<Issue> issues = session.getIssues();
 		// We have code difference and target==source warnings
 		assertEquals(3, issues.size());
-		assertEquals(IssueType.MISSING_CODE, issues.get(0).issueType);
-		assertEquals(IssueType.EXTRA_CODE, issues.get(1).issueType);
-		assertEquals(IssueType.TARGET_SAME_AS_SOURCE, issues.get(2).issueType);
+		assertEquals(IssueType.MISSING_CODE, issues.get(0).getIssueType());
+		assertEquals(IssueType.EXTRA_CODE, issues.get(1).getIssueType());
+		assertEquals(IssueType.TARGET_SAME_AS_SOURCE, issues.get(2).getIssueType());
 	}
 	
 	@Test
@@ -249,8 +252,8 @@ public class QualityCheckerTest {
 		session.processTextUnit(tu);
 		List<Issue> issues = session.getIssues();
 		assertEquals(2, issues.size());
-		assertEquals(IssueType.MISSING_CODE, issues.get(0).issueType);
-		assertEquals(IssueType.EXTRA_CODE, issues.get(1).issueType);
+		assertEquals(IssueType.MISSING_CODE, issues.get(0).getIssueType());
+		assertEquals(IssueType.EXTRA_CODE, issues.get(1).getIssueType());
 	}
 
 	@Test
@@ -267,7 +270,7 @@ public class QualityCheckerTest {
 		session.processTextUnit(tu);
 		List<Issue> issues = session.getIssues();
 		assertEquals(1, issues.size());
-		assertEquals(IssueType.SUSPECT_CODE, issues.get(0).issueType);
+		assertEquals(IssueType.SUSPECT_CODE, issues.get(0).getIssueType());
 	}
 
 	@Test
@@ -340,7 +343,7 @@ public class QualityCheckerTest {
 		List<Issue> issues = session.getIssues();
 		// Codes are different, since the option is NOT code-sensitive: issue raised (target = source)
 		assertEquals(1, issues.size());
-		assertEquals(IssueType.TARGET_SAME_AS_SOURCE, issues.get(0).issueType);
+		assertEquals(IssueType.TARGET_SAME_AS_SOURCE, issues.get(0).getIssueType());
 	}
 	
 	@Test
@@ -367,12 +370,12 @@ public class QualityCheckerTest {
 		session.processTextUnit(tu);
 		List<Issue> issues = session.getIssues();
 		assertEquals(3, issues.size());
-		assertEquals(IssueType.UNEXPECTED_PATTERN, issues.get(0).issueType);
-		assertEquals(9, issues.get(0).srcStart); 
-		assertEquals(IssueType.UNEXPECTED_PATTERN, issues.get(1).issueType);
-		assertEquals(10, issues.get(1).srcStart); 
-		assertEquals(IssueType.UNEXPECTED_PATTERN, issues.get(2).issueType);
-		assertEquals(12, issues.get(2).srcStart); 
+		assertEquals(IssueType.UNEXPECTED_PATTERN, issues.get(0).getIssueType());
+		assertEquals(9, issues.get(0).getSourceStart()); 
+		assertEquals(IssueType.UNEXPECTED_PATTERN, issues.get(1).getIssueType());
+		assertEquals(10, issues.get(1).getSourceStart()); 
+		assertEquals(IssueType.UNEXPECTED_PATTERN, issues.get(2).getIssueType());
+		assertEquals(12, issues.get(2).getSourceStart()); 
 	}
 
 	@Test
@@ -383,9 +386,9 @@ public class QualityCheckerTest {
 		session.processTextUnit(tu);
 		List<Issue> issues = session.getIssues();
 		assertEquals(1, issues.size());
-		assertEquals(IssueType.UNEXPECTED_PATTERN, issues.get(0).issueType);
-		assertEquals(6, issues.get(0).srcStart); 
-		assertEquals(28, issues.get(0).srcEnd); 
+		assertEquals(IssueType.UNEXPECTED_PATTERN, issues.get(0).getIssueType());
+		assertEquals(6, issues.get(0).getSourceStart()); 
+		assertEquals(28, issues.get(0).getSourceEnd()); 
 	}
 
 	@Test
@@ -410,7 +413,7 @@ public class QualityCheckerTest {
 		session.processTextUnit(tu);
 		List<Issue> issues = session.getIssues();
 		assertEquals(1, issues.size());
-		assertEquals(IssueType.TARGET_LENGTH, issues.get(0).issueType);
+		assertEquals(IssueType.TARGET_LENGTH, issues.get(0).getIssueType());
 
 		tu = new TextUnit("id", "abcdefghi"); // 9 chars -> use below
 		tu.setTarget(locFR, new TextContainer("123456789012345678")); // 18 chars (==200% of src)
@@ -424,7 +427,7 @@ public class QualityCheckerTest {
 		session.processTextUnit(tu);
 		issues = session.getIssues();
 		assertEquals(1, issues.size());
-		assertEquals(IssueType.TARGET_LENGTH, issues.get(0).issueType);
+		assertEquals(IssueType.TARGET_LENGTH, issues.get(0).getIssueType());
 	}
 
 	@Test
@@ -439,7 +442,7 @@ public class QualityCheckerTest {
 		session.processTextUnit(tu);
 		List<Issue> issues = session.getIssues();
 		assertEquals(1, issues.size());
-		assertEquals(IssueType.TARGET_LENGTH, issues.get(0).issueType);
+		assertEquals(IssueType.TARGET_LENGTH, issues.get(0).getIssueType());
 
 		tu = new TextUnit("id", "abcdefghi"); // 9 chars -> use below
 		tu.setTarget(locFR, new TextContainer("12345")); // 5 chars (==50% of src)
@@ -453,7 +456,7 @@ public class QualityCheckerTest {
 		session.processTextUnit(tu);
 		issues = session.getIssues();
 		assertEquals(1, issues.size());
-		assertEquals(IssueType.TARGET_LENGTH, issues.get(0).issueType);
+		assertEquals(IssueType.TARGET_LENGTH, issues.get(0).getIssueType());
 	}
 
 	@Test
@@ -468,7 +471,37 @@ public class QualityCheckerTest {
 		session.processTextUnit(tu);
 		List<Issue> issues = session.getIssues();
 		assertEquals(1, issues.size());
-		assertEquals(IssueType.TERMINOLOGY, issues.get(0).issueType);
+		assertEquals(IssueType.TERMINOLOGY, issues.get(0).getIssueType());
+	}
+
+	@Test
+	public void testStorageSize () {
+		ITextUnit tu = new TextUnit("id", "Summer and\nspring"); // 17 + 1
+		tu.setTarget(locFR, new TextContainer("\u00e9t\u00e9 et printemps")); // 16 + 2
+		tu.setAnnotation(new GenericAnnotations(new GenericAnnotation(GenericAnnotationType.STORAGESIZE,
+			GenericAnnotationType.STORAGESIZE_SIZE, 17,
+			GenericAnnotationType.STORAGESIZE_LINEBREAK, "crlf",
+			GenericAnnotationType.STORAGESIZE_ENCODING, "UTF-8")));
+		session.startProcess(locEN, locFR); // Make sure we re-initialize
+		session.processTextUnit(tu);
+		List<Issue> issues = session.getIssues();
+		assertEquals(2, issues.size());
+		assertEquals(IssueType.SOURCE_LENGTH, issues.get(0).getIssueType());
+		assertEquals(IssueType.TARGET_LENGTH, issues.get(1).getIssueType());
+	}
+
+	@Test
+	public void testAllowedCharacters () {
+		ITextUnit tu = new TextUnit("id", "Summer and\nspring");
+		tu.setTarget(locFR, new TextContainer("\u00e9t\u00e9 et printemps"));
+		tu.setAnnotation(new GenericAnnotations(new GenericAnnotation(GenericAnnotationType.ALLOWEDCHARS,
+			GenericAnnotationType.ALLOWEDCHARS_PATTERN, "[a-z ]")));
+		session.startProcess(locEN, locFR); // Make sure we re-initialize
+		session.processTextUnit(tu);
+		List<Issue> issues = session.getIssues();
+		assertEquals(2, issues.size());
+		assertEquals(IssueType.ALLOWED_CHARACTERS, issues.get(0).getIssueType());
+		assertEquals(IssueType.ALLOWED_CHARACTERS, issues.get(1).getIssueType());
 	}
 
 }

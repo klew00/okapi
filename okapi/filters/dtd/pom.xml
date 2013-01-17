@@ -25,7 +25,6 @@
         <dependency>
             <groupId>dtdparser</groupId>
             <artifactId>dtdparser</artifactId>
-            <version>1.21</version>
         </dependency>
     </dependencies>
 </project>

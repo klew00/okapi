@@ -25,7 +25,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,6 +39,7 @@ import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
+import net.sf.okapi.common.IdGenerator;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.annotation.GenericAnnotation;
 import net.sf.okapi.common.annotation.GenericAnnotationType;
@@ -140,7 +140,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 	private final boolean isHTML5;
 	
 	private DocumentBuilderFactory xmlFactory;
-	
+
 	private Document doc;
 	private URI docURI;
 	private XPath xpath;
@@ -157,6 +157,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 	private boolean targetPointerRuleTriggered;
 	private boolean hasTargetPointer;
 	private String version;
+	private IdGenerator idGen;
 
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 	
@@ -202,6 +203,8 @@ public class ITSEngine implements IProcessor, ITraversal {
 		xpath.setNamespaceContext(nsContext);
 		xpath.setXPathVariableResolver(varResolver);
 		defaultIdsDone = false;
+		
+		idGen = null;
 	}
 	
 	public void setVariables (Map<String, String> map) {
@@ -345,9 +348,13 @@ public class ITSEngine implements IProcessor, ITraversal {
 			for ( int i=0; i<nl.getLength(); i++ ) {
 				rulesElem = (Element)nl.item(i);
 				// Check version
+				String prev = version;
 				version = rulesElem.getAttributeNS(null, "version");
 				if ( !version.equals(ITS_VERSION1) && !version.equals(ITS_VERSION2) ) {
 					throw new ITSException(String.format("Invalid or missing ITS version (\"%s\")", version));
+				}
+				if (( prev != null ) && !prev.equals("0") && !version.equals(prev) ) {
+					throw new ITSException(String.format("Two different versions of ITS declared in the same document: '%s' and '%s'.", prev, version));
 				}
 
 				// Check queryLanguage
@@ -475,7 +482,9 @@ public class ITSEngine implements IProcessor, ITraversal {
 						&& !"span".equals(locName) 
 						&& !"locQualityIssues".equals(locName)
 						&& !"locQualityIssue".equals(locName)
-						&& !"locNote".equals(locName) ) {
+						&& !"locNote".equals(locName)
+						&& !"provenanceRecords".equals(locName)
+						&& !"provenanceRecord".equals(locName) ) {
 						logger.warn("Unknown element '{}'.", ruleElem.getNodeName());
 					}
 				}
@@ -669,33 +678,29 @@ public class ITSEngine implements IProcessor, ITraversal {
 			throw new ITSException("You must have at least an attribute storageSize or storageSizePointer.");
 		}
 		
-		rule.map = new HashMap<String, String>();
-
+		rule.annotations = new GenericAnnotations();
+		GenericAnnotation ann = rule.annotations.add(GenericAnnotationType.STORAGESIZE);
+		
 		// Check pointer vs non-pointers
 		if ( !Util.isEmpty(np[0]) ) {
 			if ( !Util.isEmpty(storageSizeP) ) {
 				throw new ITSException("Cannot have both storageSize and storageSizePointer.");
 			}
-			rule.map.put("size", np[0]);
+			ann.setString(GenericAnnotationType.STORAGESIZE_SIZE, np[0]);
 		}
 		else {
-			rule.map.put("sizePointer", storageSizeP);
+			ann.setString(GenericAnnotationType.STORAGESIZE_SIZE, PTRFLAG+storageSizeP);
 		}
 		
-		if ( !Util.isEmpty(np[1]) ) {
-			if ( !Util.isEmpty(storageEncodingP) ) {
-				throw new ITSException("Cannot have both storageEncoding and storageEncodingPointer.");
-			}
-			rule.map.put("encoding", np[1]);
+		if ( !Util.isEmpty(storageEncodingP) ) {
+			ann.setString(GenericAnnotationType.STORAGESIZE_ENCODING, PTRFLAG+storageEncodingP);
 		}
-		else {
-			rule.map.put("encodingPointer", storageEncodingP);
+		else { // Always has a default
+			ann.setString(GenericAnnotationType.STORAGESIZE_ENCODING, np[1]);
 		}
 
-		// No pointer for line break type
-		if ( !Util.isEmpty(np[2]) ) {
-			rule.map.put("linebreak", np[2]);
-		}
+		// No pointer for line break type (and always has a default)
+		ann.setString(GenericAnnotationType.STORAGESIZE_LINEBREAK, np[2]);
 		
 		// Add the rule
 		rules.add(rule);
@@ -776,7 +781,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 		{
 			throw new ITSException("You must have at least a type or a comment or isses reference ainformation defined.");
 		}
-		rule.annotations = new GenericAnnotations();
+		rule.annotations = createLQIAnnotationSet();
 		GenericAnnotation ann = addIssueItem(rule.annotations);
 		
 		if ( !Util.isEmpty(np[0]) ) {
@@ -823,7 +828,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 			if ( !Util.isEmpty(severityP) ) {
 				throw new ITSException("Cannot have both locQualityIssueSeverity and locQualityIssueSeverityPointer.");
 			}
-			// Do not convert the float yet, this is done when triggering the rule
+			// Do not convert the Double yet, this is done when triggering the rule
 			ann.setString(GenericAnnotationType.LQI_SEVERITY, np[3]);
 		}
 		else if ( severityP != null ) {
@@ -856,6 +861,13 @@ public class ITSEngine implements IProcessor, ITraversal {
 
 		// Add the rule
 		rules.add(rule);
+	}
+	
+	private GenericAnnotations createLQIAnnotationSet () {
+		GenericAnnotations anns = new GenericAnnotations();
+		if ( idGen == null ) idGen = new IdGenerator(null, "lqi");
+		anns.setData(idGen.createId());
+		return anns;
 	}
 
 	private void compileDisambiguationRule (Element elem,
@@ -890,9 +902,6 @@ public class ITSEngine implements IProcessor, ITraversal {
 
 		// Granularity is only non-pointer
 		
-		// Check we have the mandatory attributes
-		//TODO later when the dta category is stable
-
 		rule.annotations = new GenericAnnotations();
 		GenericAnnotation ann = rule.annotations.add(GenericAnnotationType.DISAMB);
 		
@@ -1310,15 +1319,12 @@ public class ITSEngine implements IProcessor, ITraversal {
 		}
 		
 		if ( data.charAt(FP_STORAGESIZE) != '?' ) {
-			String[] values = fromSingleString(getFlagData(data, FP_STORAGESIZE_DATA));
-			trace.peek().storageSize = values[0];
-			trace.peek().storageEncoding = values[1];
-			trace.peek().lineBreakType = values[2];
+			trace.peek().storageSize = new GenericAnnotations(getFlagData(data, FP_STORAGESIZE_DATA));
 		}
 		
 		if ( data.charAt(FP_MTCONFIDENCE) != '?' ) {
 			value = getFlagData(data, FP_MTCONFIDENCE_DATA);
-			trace.peek().mtConfidence = Float.parseFloat(value);
+			trace.peek().mtConfidence = Double.parseDouble(value);
 		}
 		
 		if ( data.charAt(FP_ALLOWEDCHARS) != '?' ) {
@@ -1586,7 +1592,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 						else {
 							// Not a stand-off annotation
 							GenericAnnotation ann = rule.annotations.getAnnotations(GenericAnnotationType.LQI).get(0);
-							anns = new GenericAnnotations();
+							anns = createLQIAnnotationSet();
 							GenericAnnotation upd = addIssueItem(anns);
 							// Get and resolve 'type'
 							data1 = ann.getString(GenericAnnotationType.LQI_TYPE);
@@ -1610,8 +1616,8 @@ public class ITSEngine implements IProcessor, ITraversal {
 								if ( data1.startsWith(PTRFLAG) ) {
 									data1 = resolvePointer(NL.item(i), data1.substring(PTRFLAG.length()));
 								}
-								// Convert the string to the float value
-								upd.setFloat(GenericAnnotationType.LQI_SEVERITY, Float.parseFloat(data1));
+								// Convert the string to the Double value
+								upd.setDouble(GenericAnnotationType.LQI_SEVERITY, Double.parseDouble(data1));
 							}
 							// Get and resolve 'profile reference'
 							data1 = ann.getString(GenericAnnotationType.LQI_PROFILEREF);
@@ -1636,6 +1642,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 					}
 
 					else if ( rule.ruleType == IProcessor.DC_DISAMBIGUATION ) {
+//TODO: handle case where rule is applied to several nodes (pointers must be reset)						
 						GenericAnnotations anns = rule.annotations;
 						GenericAnnotation ann = anns.getAnnotations(GenericAnnotationType.DISAMB).get(0);
 						// Get and resolve 'classRef'
@@ -1691,23 +1698,28 @@ public class ITSEngine implements IProcessor, ITraversal {
 					}
 						
 					else if ( rule.ruleType == IProcessor.DC_STORAGESIZE ) {
-						data1 = rule.map.get("size");
-						if ( data1 == null ) {
-							data1 = rule.map.get("sizePointer");
-							if ( !Util.isEmpty(data1) ) data1 = resolvePointer(NL.item(i), data1);
+						GenericAnnotation ann = rule.annotations.getFirstAnnotation(GenericAnnotationType.STORAGESIZE);
+						// Create the clone (pointers need to be re-computed, etc.)
+						GenericAnnotations anns = new GenericAnnotations();
+						GenericAnnotation upd = anns.add(GenericAnnotationType.STORAGESIZE);
+						// Get and resolve 'size'
+						data1 = ann.getString(GenericAnnotationType.STORAGESIZE_SIZE);
+						if ( data1.startsWith(PTRFLAG) ) {
+							data1 = resolvePointer(NL.item(i), data1.substring(PTRFLAG.length()));
 						}
-						String data2 = rule.map.get("encoding");
-						if ( data2 == null ) {
-							data2 = rule.map.get("encodingPointer");
-							if ( !Util.isEmpty(data2) ) data2 = resolvePointer(NL.item(i), data2);
+						upd.setInteger(GenericAnnotationType.STORAGESIZE_SIZE, Integer.parseInt(data1));
+						// Get and resolve 'encoding'
+						data1 = ann.getString(GenericAnnotationType.STORAGESIZE_ENCODING);
+						if ( data1.startsWith(PTRFLAG) ) {
+							data1 = data1.substring(PTRFLAG.length());
+							data1 = resolvePointer(NL.item(i), data1);
 						}
-						String data3 = rule.map.get("linebreak");
-						if ( data3 == null ) {
-							data3 = rule.map.get("linebreakPointer");
-							if ( !Util.isEmpty(data3) ) data3 = resolvePointer(NL.item(i), data3);
-						}
+						upd.setString(GenericAnnotationType.STORAGESIZE_ENCODING, data1);
+						// Copy the line-break info (it's never a pointer)
+						upd.setString(GenericAnnotationType.STORAGESIZE_LINEBREAK, ann.getString(GenericAnnotationType.STORAGESIZE_LINEBREAK));
+						// set the flag and data
 						setFlag(NL.item(i), FP_STORAGESIZE, 'y', true);
-						setFlag(NL.item(i), FP_STORAGESIZE_DATA, toSingleString(data1, data2, data3), true);
+						setFlag(NL.item(i), FP_STORAGESIZE_DATA, anns.toString(), true);
 					}
 
 					else if ( rule.ruleType == IProcessor.DC_SUBFILTER ) {
@@ -1777,28 +1789,28 @@ public class ITSEngine implements IProcessor, ITraversal {
 		return list;
 	}
 	
-	/**
-	 * Converts a list of strings arguments to a single string that is delimited with end-of-group characters. 
-	 * @param values the values to store. Null values are ok and mean no value.
-	 * @return a single string with all values.
-	 */
-	private String toSingleString (String ... values) {
-		StringBuilder data = new StringBuilder();
-		for ( String value : values ) {
-			if ( value == null ) data.append("\u001A");
-			if ( value != null ) data.append(value);
-			data.append("\u001D");
-		}
-		return data.toString();
-	}
+//	/**
+//	 * Converts a list of strings arguments to a single string that is delimited with end-of-group characters. 
+//	 * @param values the values to store. Null values are ok and mean no value.
+//	 * @return a single string with all values.
+//	 */
+//	private String toSingleString (String ... values) {
+//		StringBuilder data = new StringBuilder();
+//		for ( String value : values ) {
+//			if ( value == null ) data.append("\u001A");
+//			if ( value != null ) data.append(value);
+//			data.append("\u001D");
+//		}
+//		return data.toString();
+//	}
 	
-	private String[] fromSingleString (String data) {
-		String[] values = data.split("\u001D", -1);
-		for ( int i=0; i<values.length; i++ ) {
-			if ( values[i].equals("\u001A") ) values[i] = null;
-		}
-		return values;
-	}
+//	private String[] fromSingleString (String data) {
+//		String[] values = data.split("\u001D", -1);
+//		for ( int i=0; i<values.length; i++ ) {
+//			if ( values[i].equals("\u001A") ) values[i] = null;
+//		}
+//		return values;
+//	}
 	
 	private void processLocalRules (long dataCategories) {
 		XPathExpression expr;
@@ -1883,7 +1895,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 					GenericAnnotations anns = new GenericAnnotations();
 					GenericAnnotation ann = anns.add(GenericAnnotationType.TERM);
 					if ( values[1] != null ) ann.setString(GenericAnnotationType.TERM_INFO, values[1]);
-					if ( values[2] != null ) ann.setFloat(GenericAnnotationType.TERM_CONFIDENCE, Float.parseFloat(values[2]));
+					if ( values[2] != null ) ann.setDouble(GenericAnnotationType.TERM_CONFIDENCE, Double.parseDouble(values[2]));
 					// Set the updated flags
 					setFlag(attr.getOwnerElement(), FP_TERMINOLOGY, 'y', attr.getSpecified());
 					setFlag(attr.getOwnerElement(), FP_TERMINOLOGY_DATA, anns.toString(), attr.getSpecified()); 
@@ -2066,11 +2078,11 @@ public class ITSEngine implements IProcessor, ITraversal {
 						anns = fetchLocQualityStandoffData(values[0], values[0]);
 					}
 					else { // Not an stand-off reference
-						anns = new GenericAnnotations();
+						anns = createLQIAnnotationSet();
 						GenericAnnotation ann = addIssueItem(anns);
 						if ( values[1] != null ) ann.setString(GenericAnnotationType.LQI_TYPE, values[1]);
 						if ( values[2] != null ) ann.setString(GenericAnnotationType.LQI_COMMENT, values[2]);
-						if ( values[3] != null ) ann.setFloat(GenericAnnotationType.LQI_SEVERITY, Float.parseFloat(values[3]));
+						if ( values[3] != null ) ann.setDouble(GenericAnnotationType.LQI_SEVERITY, Double.parseDouble(values[3]));
 						if ( values[4] != null ) ann.setString(GenericAnnotationType.LQI_PROFILEREF, values[4]);
 						if ( values[5] != null ) ann.setBoolean(GenericAnnotationType.LQI_ENABLED, values[5].equals("yes"));
 					}
@@ -2111,7 +2123,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 					if ( values[0] != null ) ann.setString(GenericAnnotationType.DISAMB_CLASS, values[0]);
 					if ( values[1] != null ) ann.setString(GenericAnnotationType.DISAMB_SOURCE, values[1]);
 					if ( values[2] != null ) ann.setString(GenericAnnotationType.DISAMB_IDENT, values[2]);
-					if ( values[3] != null ) ann.setFloat(GenericAnnotationType.DISAMB_CONFIDENCE, Float.parseFloat(values[3]));
+					if ( values[3] != null ) ann.setDouble(GenericAnnotationType.DISAMB_CONFIDENCE, Double.parseDouble(values[3]));
 					if ( values[4] != null ) ann.setString(GenericAnnotationType.DISAMB_GRANULARITY, values[4]);
 					// Set the updated flags
 					setFlag(attr.getOwnerElement(), FP_DISAMBIGUATION, 'y', attr.getSpecified());
@@ -2141,9 +2153,9 @@ public class ITSEngine implements IProcessor, ITraversal {
 					// Convert the values into an annotation
 					GenericAnnotations anns = new GenericAnnotations();
 					GenericAnnotation ann = anns.add(GenericAnnotationType.LQR);
-					if ( values[0] != null ) ann.setFloat(GenericAnnotationType.LQR_SCORE, Float.parseFloat(values[0]));
+					if ( values[0] != null ) ann.setDouble(GenericAnnotationType.LQR_SCORE, Double.parseDouble(values[0]));
 					if ( values[1] != null ) ann.setInteger(GenericAnnotationType.LQR_VOTE, Integer.parseInt(values[1]));
-					if ( values[2] != null ) ann.setFloat(GenericAnnotationType.LQR_SCORETHRESHOLD, Float.parseFloat(values[2]));
+					if ( values[2] != null ) ann.setDouble(GenericAnnotationType.LQR_SCORETHRESHOLD, Double.parseDouble(values[2]));
 					if ( values[3] != null ) ann.setInteger(GenericAnnotationType.LQR_VOTETHRESHOLD, Integer.parseInt(values[3]));
 					if ( values[4] != null ) ann.setString(GenericAnnotationType.LQR_PROFILEREF, values[4]);
 					// Set the updated flags
@@ -2197,9 +2209,15 @@ public class ITSEngine implements IProcessor, ITraversal {
 					if ( !Util.isEmpty(ns) ) qualified = !ns.equals(ITS_NS_URI);
 					String[] values = retrieveStorageSizeData(attr.getOwnerElement(), qualified, isHTML5);
 					// Set the updated flags
+					GenericAnnotations anns = new GenericAnnotations(
+						new GenericAnnotation(GenericAnnotationType.STORAGESIZE,
+							GenericAnnotationType.STORAGESIZE_SIZE, Integer.parseInt(values[0]),
+							GenericAnnotationType.STORAGESIZE_ENCODING, values[1],
+							GenericAnnotationType.STORAGESIZE_LINEBREAK, values[2]
+						)
+					);
 					setFlag(attr.getOwnerElement(), FP_STORAGESIZE, 'y', attr.getSpecified());
-					setFlag(attr.getOwnerElement(), FP_STORAGESIZE_DATA,
-						toSingleString(values[0], values[1], values[2]), attr.getSpecified()); 
+					setFlag(attr.getOwnerElement(), FP_STORAGESIZE_DATA, anns.toString(), attr.getSpecified()); 
 				}
 			}
 
@@ -2263,13 +2281,13 @@ public class ITSEngine implements IProcessor, ITraversal {
 		}
 	}
 
-	private boolean validateFloat (String value,
-		float minimum,
-		float maximum,
+	private boolean validateDouble (String value,
+		Double minimum,
+		Double maximum,
 		String name)
 	{
 		try {
-			float f = Float.parseFloat(value);
+			Double f = Double.parseDouble(value);
 			if (( f < minimum ) || ( f > maximum )) {
 				logger.error("Invalid value for {}: {}. It should be between [{} and {}]", name, value, minimum, maximum);
 			}
@@ -2440,7 +2458,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 			if ( elem.hasAttribute(name) )
 				value = elem.getAttribute(name);
 		}
-		if ( validateFloat(value, 0.0F, 1.0F, name) ) {
+		if ( validateDouble(value, 0.0, 1.0, name) ) {
 			return value;
 		}
 		return null; // No or bad value 
@@ -2475,6 +2493,9 @@ public class ITSEngine implements IProcessor, ITraversal {
 			if ( elem.hasAttribute("lineBreakType") )
 				data[2] = elem.getAttribute("lineBreakType");
 		}
+		// Defaults
+		if ( data[1] == null ) data[1] = "UTF-8";
+		if ( data[2] == null ) data[2] = "lf";
 		return data;
 	}
 
@@ -2785,7 +2806,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 		}
 		
 		// Create the new annotation set
-		GenericAnnotations anns = new GenericAnnotations();
+		GenericAnnotations anns = createLQIAnnotationSet();
 		Document issuesDoc = null;
 		XPath issuesXPath = null;
 
@@ -2860,7 +2881,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 			}
 			if ( values[1] != null ) ann.setString(GenericAnnotationType.LQI_TYPE, values[1]);
 			if ( values[2] != null ) ann.setString(GenericAnnotationType.LQI_COMMENT, values[2]);
-			if ( values[3] != null ) ann.setFloat(GenericAnnotationType.LQI_SEVERITY, Float.parseFloat(values[3]));
+			if ( values[3] != null ) ann.setDouble(GenericAnnotationType.LQI_SEVERITY, Double.parseDouble(values[3]));
 			if ( values[4] != null ) ann.setString(GenericAnnotationType.LQI_PROFILEREF, values[4]);
 			if ( values[5] != null ) ann.setBoolean(GenericAnnotationType.LQI_ENABLED, values[5].equals("yes"));
 		}
@@ -3132,25 +3153,26 @@ public class ITSEngine implements IProcessor, ITraversal {
 	}
 
 	@Override
-	public Float getTermConfidence (Attr attribute) {
+	public Double getTermConfidence (Attr attribute) {
 		if ( attribute == null ) {
 			if ( trace.peek().termino == null ) return null;
-			return trace.peek().termino.getAnnotations(GenericAnnotationType.TERM).get(0).getFloat(GenericAnnotationType.TERM_CONFIDENCE);
+			return trace.peek().termino.getAnnotations(GenericAnnotationType.TERM).get(0).getDouble(GenericAnnotationType.TERM_CONFIDENCE);
 		}
 		String tmp;
 		if ( (tmp = (String)attribute.getUserData(FLAGNAME)) == null ) return null;
 		if ( tmp.charAt(FP_TERMINOLOGY) != 'y' ) return null;
 		GenericAnnotations anns = new GenericAnnotations(getFlagData(tmp, FP_TERMINOLOGY_DATA));
-		return anns.getAnnotations(GenericAnnotationType.TERM).get(0).getFloat(GenericAnnotationType.TERM_CONFIDENCE);
+		return anns.getAnnotations(GenericAnnotationType.TERM).get(0).getDouble(GenericAnnotationType.TERM_CONFIDENCE);
 	}
 
 	/**
 	 * Gets the terminology annotation set for the current element
 	 * or one of its attributes. 
+	 * Note that the returned object is not the same at each each call.
 	 * @param attribute the attribute to look up, or null for the element.
 	 * @return the annotation set for the queried node (can be null).
 	 */
-	public GenericAnnotations getTerminology (Attr attribute) {
+	public GenericAnnotations getTerminologyAnnotation (Attr attribute) {
 		if ( attribute == null ) {
 			return trace.peek().termino;
 		}
@@ -3233,11 +3255,12 @@ public class ITSEngine implements IProcessor, ITraversal {
 	
 	/**
 	 * Gets the localization quality issue annotation set for the current element
-	 * or one of its attributes. 
+	 * or one of its attributes.
+	 * Note that the returned object is not the same at each each call.
 	 * @param attribute the attribute to look up, or null for the element.
 	 * @return the annotation set for the queried node (can be null).
 	 */
-	public GenericAnnotations getLocQualityIssues (Attr attribute) {
+	public GenericAnnotations getLocQualityIssueAnnotation (Attr attribute) {
 		if ( attribute == null ) {
 			return trace.peek().lqIssues;
 		}
@@ -3262,18 +3285,18 @@ public class ITSEngine implements IProcessor, ITraversal {
 	}
 
 	@Override
-	public Float getLocQualityIssueSeverity (Attr attribute,
+	public Double getLocQualityIssueSeverity (Attr attribute,
 		int index)
 	{
 		if ( attribute == null ) {
 			if ( trace.peek().lqIssues == null ) return null;
-			return trace.peek().lqIssues.getAnnotations(GenericAnnotationType.LQI).get(index).getFloat(GenericAnnotationType.LQI_SEVERITY);
+			return trace.peek().lqIssues.getAnnotations(GenericAnnotationType.LQI).get(index).getDouble(GenericAnnotationType.LQI_SEVERITY);
 		}
 		String tmp;
 		if ( (tmp = (String)attribute.getUserData(FLAGNAME)) == null ) return null;
 		if ( tmp.charAt(FP_LQISSUE) != 'y' ) return null;
 		GenericAnnotations anns = new GenericAnnotations(getFlagData(tmp, FP_LQISSUE_DATA));
-		return anns.getAnnotations(GenericAnnotationType.LQI).get(index).getFloat(GenericAnnotationType.LQI_SEVERITY);
+		return anns.getAnnotations(GenericAnnotationType.LQI).get(index).getDouble(GenericAnnotationType.LQI_SEVERITY);
 	}
 
 	@Override
@@ -3316,10 +3339,11 @@ public class ITSEngine implements IProcessor, ITraversal {
 	/**
 	 * Gets the disambiguation annotation set for the current element
 	 * or one of its attributes. 
+	 * Note that the returned object is not the same at each each call.
 	 * @param attribute the attribute to look up, or null for the element.
 	 * @return the annotation set for the queried node (can be null).
 	 */
-	public GenericAnnotations getDisambiguation (Attr attribute) {
+	public GenericAnnotations getDisambiguationAnnotation (Attr attribute) {
 		if ( attribute == null ) {
 			return trace.peek().disambig;
 		}
@@ -3350,16 +3374,16 @@ public class ITSEngine implements IProcessor, ITraversal {
 	}
 
 	@Override
-	public Float getDisambigConfidence (Attr attribute) {
+	public Double getDisambigConfidence (Attr attribute) {
 		if ( attribute == null ) {
 			if ( trace.peek().disambig == null ) return null;
-			return trace.peek().disambig.getAnnotations(GenericAnnotationType.DISAMB).get(0).getFloat(GenericAnnotationType.DISAMB_CONFIDENCE);
+			return trace.peek().disambig.getAnnotations(GenericAnnotationType.DISAMB).get(0).getDouble(GenericAnnotationType.DISAMB_CONFIDENCE);
 		}
 		String tmp;
 		if ( (tmp = (String)attribute.getUserData(FLAGNAME)) == null ) return null;
 		if ( tmp.charAt(FP_DISAMBIGUATION) != 'y' ) return null;
 		GenericAnnotations anns = new GenericAnnotations(getFlagData(tmp, FP_DISAMBIGUATION_DATA));
-		return anns.getAnnotations(GenericAnnotationType.DISAMB).get(0).getFloat(GenericAnnotationType.DISAMB_CONFIDENCE);
+		return anns.getAnnotations(GenericAnnotationType.DISAMB).get(0).getDouble(GenericAnnotationType.DISAMB_CONFIDENCE);
 	}
 
 	private String getDisambValue (String fieldName,
@@ -3380,15 +3404,15 @@ public class ITSEngine implements IProcessor, ITraversal {
 	 * Gets the localization quality rating annotation set for the current element.
 	 * @return the annotation set for the queried node (can be null).
 	 */
-	public GenericAnnotations getLocQualityRating () {
+	public GenericAnnotations getLocQualityRatingAnnotation () {
 		return trace.peek().lqRating;
 	}
 	
 	@Override
-	public Float getLocQualityRatingScore (Attr attribute) {
+	public Double getLocQualityRatingScore (Attr attribute) {
 		if ( attribute != null ) return null;
 		if ( trace.peek().lqRating == null ) return null;
-		return trace.peek().lqRating.getAnnotations(GenericAnnotationType.LQR).get(0).getFloat(GenericAnnotationType.LQR_SCORE);
+		return trace.peek().lqRating.getAnnotations(GenericAnnotationType.LQR).get(0).getDouble(GenericAnnotationType.LQR_SCORE);
 	}
 	
 	@Override
@@ -3399,10 +3423,10 @@ public class ITSEngine implements IProcessor, ITraversal {
 	}
 	
 	@Override
-	public Float getLocQualityRatingScoreThreshold (Attr attribute) {
+	public Double getLocQualityRatingScoreThreshold (Attr attribute) {
 		if ( attribute != null ) return null;
 		if ( trace.peek().lqRating == null ) return null;
-		return trace.peek().lqRating.getAnnotations(GenericAnnotationType.LQR).get(0).getFloat(GenericAnnotationType.LQR_SCORETHRESHOLD);
+		return trace.peek().lqRating.getAnnotations(GenericAnnotationType.LQR).get(0).getDouble(GenericAnnotationType.LQR_SCORETHRESHOLD);
 	}
 	
 	@Override
@@ -3419,44 +3443,53 @@ public class ITSEngine implements IProcessor, ITraversal {
 		return trace.peek().lqRating.getAnnotations(GenericAnnotationType.LQR).get(0).getString(GenericAnnotationType.LQR_PROFILEREF);
 	}
 	
-	@Override
-	public String getStorageSize (Attr attribute) {
-		if ( attribute == null ) return trace.peek().storageSize;
+	public GenericAnnotations getStorageSizeAnnotation (Attr attribute) {
+		if ( attribute == null ) {
+			return trace.peek().storageSize;
+		}
 		String tmp;
 		if ( (tmp = (String)attribute.getUserData(FLAGNAME)) == null ) return null;
 		if ( tmp.charAt(FP_STORAGESIZE) != 'y' ) return null;
-		String[] values = fromSingleString(getFlagData(tmp, FP_STORAGESIZE_DATA));
-		return values[0];
+		return new GenericAnnotations(getFlagData(tmp, FP_STORAGESIZE_DATA));
+	}
+
+	@Override
+	public Integer getStorageSize (Attr attribute) {
+		if ( attribute == null ) {
+			if ( trace.peek().storageSize == null ) return null;
+			return trace.peek().storageSize.getFirstAnnotation(GenericAnnotationType.STORAGESIZE).getInteger(GenericAnnotationType.STORAGESIZE_SIZE);
+		}
+		String tmp;
+		if ( (tmp = (String)attribute.getUserData(FLAGNAME)) == null ) return null;
+		if ( tmp.charAt(FP_STORAGESIZE) != 'y' ) return null;
+		GenericAnnotations anns = new GenericAnnotations(getFlagData(tmp, FP_STORAGESIZE_DATA));
+		return anns.getFirstAnnotation(GenericAnnotationType.STORAGESIZE).getInteger(GenericAnnotationType.STORAGESIZE_SIZE);
 	}
 
 	@Override
 	public String getStorageEncoding (Attr attribute) {
-		String tmp;
 		if ( attribute == null ) {
-			tmp = trace.peek().storageEncoding;
-			if ( tmp == null ) return "UTF-8";
-			else return tmp;
+			if ( trace.peek().storageSize == null ) return "UTF-8";
+			return trace.peek().storageSize.getFirstAnnotation(GenericAnnotationType.STORAGESIZE).getString(GenericAnnotationType.STORAGESIZE_ENCODING);
 		}
-		if ( (tmp = (String)attribute.getUserData(FLAGNAME)) == null ) return null;
-		if ( tmp.charAt(FP_STORAGESIZE) != 'y' ) return null;
-		String[] values = fromSingleString(getFlagData(tmp, FP_STORAGESIZE_DATA));
-		if ( values[1] == null ) return "UTF-8";
-		else return values[1];
+		String tmp;
+		if ( (tmp = (String)attribute.getUserData(FLAGNAME)) == null ) return "UTF-8";
+		if ( tmp.charAt(FP_STORAGESIZE) != 'y' ) return "UTF-8";
+		GenericAnnotations anns = new GenericAnnotations(getFlagData(tmp, FP_STORAGESIZE_DATA));
+		return anns.getFirstAnnotation(GenericAnnotationType.STORAGESIZE).getString(GenericAnnotationType.STORAGESIZE_ENCODING);
 	}
 
 	@Override
 	public String getLineBreakType (Attr attribute) {
-		String tmp;
 		if ( attribute == null ) {
-			tmp = trace.peek().lineBreakType;
-			if ( tmp == null ) return "lf";
-			else return tmp;
+			if ( trace.peek().storageSize == null ) return "lf";
+			return trace.peek().storageSize.getFirstAnnotation(GenericAnnotationType.STORAGESIZE).getString(GenericAnnotationType.STORAGESIZE_LINEBREAK);
 		}
-		if ( (tmp = (String)attribute.getUserData(FLAGNAME)) == null ) return null;
-		if ( tmp.charAt(FP_STORAGESIZE) != 'y' ) return null;
-		String[] values = fromSingleString(getFlagData(tmp, FP_STORAGESIZE_DATA));
-		if ( values[2] == null ) return "lf";
-		else return values[2];
+		String tmp;
+		if ( (tmp = (String)attribute.getUserData(FLAGNAME)) == null ) return "lf";
+		if ( tmp.charAt(FP_STORAGESIZE) != 'y' ) return "lf";
+		GenericAnnotations anns = new GenericAnnotations(getFlagData(tmp, FP_STORAGESIZE_DATA));
+		return anns.getFirstAnnotation(GenericAnnotationType.STORAGESIZE).getString(GenericAnnotationType.STORAGESIZE_LINEBREAK);
 	}
 
 	@Override
@@ -3482,12 +3515,12 @@ public class ITSEngine implements IProcessor, ITraversal {
 	}
 	
 	@Override
-	public Float getMtConfidence (Attr attribute) {
+	public Double getMtConfidence (Attr attribute) {
 		if ( attribute == null ) return trace.peek().mtConfidence;
 		String tmp;
 		if ( (tmp = (String)attribute.getUserData(FLAGNAME)) == null ) return null;
 		if ( tmp.charAt(FP_MTCONFIDENCE) != 'y' ) return trace.peek().mtConfidence;
-		return Float.parseFloat(getFlagData(tmp, FP_MTCONFIDENCE_DATA));
+		return Double.parseDouble(getFlagData(tmp, FP_MTCONFIDENCE_DATA));
 	}
 	
 	/**

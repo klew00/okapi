@@ -18,7 +18,6 @@
       <dependency>
          <groupId>nu.validator.htmlparser</groupId>
          <artifactId>htmlparser</artifactId>
-         <version>1.4</version>
       </dependency>
       <dependency>
          <groupId>net.sf.okapi</groupId>

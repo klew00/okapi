@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2012 by the Okapi Framework contributors
+  Copyright (C) 2008-2013 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -20,6 +20,7 @@
 
 package net.sf.okapi.filters.its;
 
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -100,6 +101,7 @@ public abstract class ITSFilter implements IFilter {
 	private IEncoder cfEncoder;
 	private TermsAnnotation terms;
 	private Map<String, String> variables;
+	private LinkedHashMap<String, GenericAnnotations> inlineLQIs;
 
 	public ITSFilter (boolean isHTML5,
 		String mimeType)
@@ -119,36 +121,44 @@ public abstract class ITSFilter implements IFilter {
 		variables = map;
 	}
 
+	@Override
 	public void cancel () {
 		canceled = true;
 	}
 
+	@Override
 	public void close () {
 		if (input != null) {
 			input.close();
 		}
 	}
 
+	@Override
 	public ISkeletonWriter createSkeletonWriter () {
 		return new GenericSkeletonWriter();
 	}
 
+	@Override
 	public IFilterWriter createFilterWriter () {
 		return new GenericFilterWriter(createSkeletonWriter(), getEncoderManager());
 	}
 
+	@Override
 	public String getMimeType () {
 		return mimeType;
 	}
 
+	@Override
 	public IParameters getParameters () {
 		return params;
 	}
 
+	@Override
 	public boolean hasNext () {
 		return (queue != null);
 	}
 
+	@Override
 	public Event next () {
 		if ( canceled ) {
 			queue = null;
@@ -173,6 +183,7 @@ public abstract class ITSFilter implements IFilter {
 		}
 	}
 
+	@Override
 	public void open (RawDocument input) {
 		open(input, true);
 	}
@@ -182,6 +193,7 @@ public abstract class ITSFilter implements IFilter {
 		this.fcMapper = fcMapper;
 	}
 
+	@Override
 	public void setParameters (IParameters params) {
 		this.params = (Parameters)params;
 	}
@@ -192,6 +204,7 @@ public abstract class ITSFilter implements IFilter {
 	
 	abstract protected void createStartDocumentSkeleton (StartDocument startDoc);
 
+	@Override
 	public void open (RawDocument input,
 		boolean generateSkeleton)
 	{
@@ -267,13 +280,13 @@ public abstract class ITSFilter implements IFilter {
 	
 	private void process () {
 		Node node;
-		frag = null;
+		nullFragment();
 		skel = new GenericSkeleton();
 		
 		if ( context.size() > 0 ) {
 			// If we are within an element, reset the fragment to append to it
 			if ( context.peek().translate ) { // The stack is up-to-date already
-				frag = new TextFragment();
+				initFragment();
 			}
 		}
 		
@@ -475,11 +488,10 @@ public abstract class ITSFilter implements IFilter {
 					tmp.append("\"");
 				}
 				else if ( attr.getName().equals("xml:lang") ) { // xml:lang
-					//TODO
 					tmp.append(Util.escapeToXML(attr.getNodeValue(), 3, false, null)
 						+ "\"");
 				}
-				else { //TODO: escape unsupported chars
+				else {
 					tmp.append(Util.escapeToXML(attr.getNodeValue(), 3, false, null)
 						+ "\"");
 				}
@@ -491,8 +503,50 @@ public abstract class ITSFilter implements IFilter {
 		Code code = frag.append((node.hasChildNodes() ? TagType.OPENING : TagType.PLACEHOLDER),
 			node.getLocalName(), tmp.toString());
 		code.setReferenceFlag(id!=null); // Set reference flag if we created TU(s)
+		// Attach ITS annotation if needed
+		attachAnnotations(code, frag);
 	}
 
+	private void attachAnnotations (Code code,
+		TextFragment frag)
+	{
+		// Map ITS annotations only if requested
+		if ( !params.mapAnnotations ) return;
+		
+		// Allowed Characters
+		String value = trav.getAllowedCharacters(null);
+		if ( value != null ) {
+			GenericAnnotation.addAnnotation(code, new GenericAnnotation(GenericAnnotationType.ALLOWEDCHARS,
+				GenericAnnotationType.ALLOWEDCHARS_PATTERN, value));
+		}
+		// Storage Size
+		GenericAnnotations anns = trav.getStorageSizeAnnotation(null);
+		if ( anns != null ) {
+			GenericAnnotations.addAnnotations(code, anns);
+		}
+		
+		// Localization Quality Issues
+		anns = trav.getLocQualityIssueAnnotation(null);
+		if ( anns == null ) return; // Done
+		// Else: inline LQI are converted to text container-level annotation with offsets 
+		if ( code.getTagType() == TagType.CLOSING ) {
+			// Set the ending for the annotations we close
+			anns = inlineLQIs.get(anns.getData());
+			for ( GenericAnnotation ann : anns ) {
+				// End position: frag length minus the last code length
+				ann.setInteger(GenericAnnotationType.LQI_XEND, frag.length()-2);
+			}
+		}
+		else { // Opening or place-holder
+			if ( inlineLQIs == null ) inlineLQIs = new LinkedHashMap<String, GenericAnnotations>(2);
+			for ( GenericAnnotation ann : anns ) {
+				// Start position: fragment length (== position just after the last code)
+				ann.setInteger(GenericAnnotationType.LQI_XSTART, frag.length());
+			}
+			inlineLQIs.put(anns.getData(), anns);
+		}
+	}
+	
 	private void applyCodeFinder (TextFragment tf) {
 		// Find the inline codes
 		params.codeFinder.process(tf);
@@ -534,30 +588,36 @@ public abstract class ITSFilter implements IFilter {
 		}
 		// ITS Domain
 		if ( !Util.isEmpty(ci.domains) ) {
-			tu.setProperty(new Property(Property.ITS_DOMAIN, ci.domains));
+			GenericAnnotation.addAnnotation(tu, new GenericAnnotation(GenericAnnotationType.DOMAIN,
+				GenericAnnotationType.DOMAIN_LIST, ci.domains)
+			);
 		}
 		// ITS External resources Reference
 		if ( !Util.isEmpty(ci.externalRes) ) {
-			tu.setProperty(new Property(Property.ITS_EXTERNALRESREF, ci.externalRes));
+			GenericAnnotation.addAnnotation(tu, new GenericAnnotation(GenericAnnotationType.EXTRESREF,
+				GenericAnnotationType.EXTRESREF_IRI, ci.externalRes)
+			);
 		}
 		// ITS Storage Size
 		if ( ci.storageSize != null ) {
-			tu.setProperty(new Property(Property.ITS_STORAGESIZE, ci.storageSize));
+			GenericAnnotations.addAnnotations(tu, ci.storageSize);
 		}
 		// ITS Allowed characters
 		if ( ci.allowedChars != null ) {
-			tu.setProperty(new Property(Property.ITS_ALLOWEDCHARACTERS, ci.allowedChars));
+			GenericAnnotation.addAnnotation(tu, new GenericAnnotation(GenericAnnotationType.ALLOWEDCHARS,
+				GenericAnnotationType.ALLOWEDCHARS_PATTERN, ci.allowedChars)
+			);
 		}
-		// ITS Localization Quality Issue
+		// ITS Localization Quality Issue (on the source)
 		if ( ci.lqIssues != null ) {
-			tu.getSource().setAnnotation(ci.lqIssues);
+			GenericAnnotations.addAnnotations(tu.getSource(), ci.lqIssues);
 		}
 
 		queue.add(new Event(EventType.TEXT_UNIT, tu));
 		if ( addToSkeleton ) skel.addReference(tu);
 		return id;
 	}
-	
+
 	private String buildEndTag (Node node) {
 		if ( node.hasChildNodes() ) {
 			return "</"
@@ -603,7 +663,7 @@ public abstract class ITSFilter implements IFilter {
 				skel.add(buildEndTag(node));
 				if ( node.isSameNode(context.peek().node) ) context.pop();
 				if ( isContextTranslatable() ) { // We are after non-translatable withinText='no', check parent again.
-					frag = new TextFragment();
+					initFragment();
 				}
 			}
 			else { // Else we are within an extraction
@@ -611,7 +671,8 @@ public abstract class ITSFilter implements IFilter {
 					return addTextUnit(node, true);
 				}
 				else { // Within text
-					frag.append(TagType.CLOSING, node.getLocalName(), buildEndTag(node));
+					Code code = frag.append(TagType.CLOSING, node.getLocalName(), buildEndTag(node));
+					attachAnnotations(code, frag);
 				}
 			}
 		}
@@ -662,7 +723,7 @@ public abstract class ITSFilter implements IFilter {
 				if ( frag == null ) { // Not yet in extraction
 					addStartTagToSkeleton(node);
 					if ( extract() ) {
-						frag = new TextFragment();
+						initFragment();
 					}
 					if ( node.hasChildNodes() ) {
 						context.push(new ContextItem(node, trav));
@@ -674,7 +735,7 @@ public abstract class ITSFilter implements IFilter {
 					addStartTagToSkeleton(node);
 					// And create a new one
 					if ( extract() ) {
-						frag = new TextFragment();
+						initFragment();
 					}
 					if ( node.hasChildNodes() ) {
 						context.push(new ContextItem(node, trav));
@@ -850,6 +911,7 @@ public abstract class ITSFilter implements IFilter {
 			// Deal with inline codes if needed
 			if ( params.useCodeFinder ) {
 				applyCodeFinder(frag);
+//TODO: probably need to adjust the LQI annotations!				
 			}
 		
 			// Update the flag after the new codes
@@ -861,12 +923,12 @@ public abstract class ITSFilter implements IFilter {
 			if ( !frag.isEmpty() ) { // Nothing but white spaces
 				skel.add(frag.toText().replace("\n", (params.escapeLineBreak ? "&#10;" : lineBreak))); // Pass them as skeleton
 			}
-			frag = null;
+			nullFragment();
 			if ( popStack ) {
 				context.pop();
 				skel.add(buildEndTag(node));
 				if ( isContextTranslatable() ) {
-					frag = new TextFragment();
+					initFragment();
 				}
 			}
 			return false;
@@ -884,29 +946,41 @@ public abstract class ITSFilter implements IFilter {
 		}
 		// ITS Domain
 		if ( !Util.isEmpty(context.peek().domains) ) {
-			tu.setProperty(new Property(Property.ITS_DOMAIN, context.peek().domains));
+			GenericAnnotation.addAnnotation(tu, new GenericAnnotation(GenericAnnotationType.DOMAIN,
+				GenericAnnotationType.DOMAIN_LIST, context.peek().domains)
+			);
 		}
 		// ITS External resources Reference
 		if ( !Util.isEmpty(context.peek().externalRes) ) {
-			tu.setProperty(new Property(Property.ITS_EXTERNALRESREF, context.peek().externalRes));
+			GenericAnnotation.addAnnotation(tu, new GenericAnnotation(GenericAnnotationType.EXTRESREF,
+				GenericAnnotationType.EXTRESREF_IRI, context.peek().externalRes)
+			);
 		}
 		// ITS Storage Size
 		if ( context.peek().storageSize != null ) {
-			tu.setProperty(new Property(Property.ITS_STORAGESIZE, context.peek().storageSize));
+			GenericAnnotations.addAnnotations(tu, context.peek().storageSize);
 		}
 		// ITS Allowed characters
 		if ( context.peek().allowedChars != null ) {
-			tu.setProperty(new Property(Property.ITS_ALLOWEDCHARACTERS, context.peek().allowedChars));
+			GenericAnnotation.addAnnotation(tu, new GenericAnnotation(GenericAnnotationType.ALLOWEDCHARS,
+				GenericAnnotationType.ALLOWEDCHARS_PATTERN, context.peek().allowedChars)
+			);
 		}
 		// ITS Localization Quality Issue
 		if ( context.peek().lqIssues != null ) {
-			tu.getSource().setAnnotation(context.peek().lqIssues);
+			GenericAnnotations.addAnnotations(tu.getSource(), context.peek().lqIssues);
+		}
+		// Attach also the inline LQI annotations at the text container level
+		// (more logical to have the inline ones after the parent level ones)
+		if ( inlineLQIs != null ) {
+			for ( GenericAnnotations anns : inlineLQIs.values() ) {
+				GenericAnnotations.addAnnotations(tu.getSource(), anns);
+			}
 		}
 		
 		// Set term info
 		if ( terms != null ) {
 			tu.getSource().setAnnotation(terms);
-			
 //			// Term as a generic annotation
 //			GenericAnnotations anns = tu.getSource().getAnnotation(GenericAnnotations.class);
 //			if ( anns == null ) {
@@ -944,12 +1018,27 @@ public abstract class ITSFilter implements IFilter {
 		}
 		tu.setSkeleton(skel);
 		queue.add(new Event(EventType.TEXT_UNIT, tu));
-		frag = null;
+		nullFragment();
 		if ( popStack && isContextTranslatable() ) {
-			frag = new TextFragment();
+			initFragment();
 		}
 		skel = new GenericSkeleton();
 		return true;
 	}
+	
+	/**
+	 * Initializes the frag global variable and its annotations.
+	 */
+	private void initFragment () {
+		frag = new TextFragment();
+		inlineLQIs = null;
+	}
 
+	/**
+	 * Nullifies the frag global variables and its annotations.
+	 */
+	private void nullFragment () {
+		frag = null;
+		inlineLQIs = null;
+	}
 }

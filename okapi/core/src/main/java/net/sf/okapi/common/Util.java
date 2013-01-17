@@ -50,6 +50,7 @@ import java.nio.channels.WritableByteChannel;
 import java.nio.charset.CharacterCodingException;
 import java.nio.charset.CharsetEncoder;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Pattern;
 
@@ -1535,14 +1536,14 @@ public final class Util {
 	}
 
 	/**
-	 * Formats a float value so only the significant trailing zeros are displayed.
+	 * Formats a double value so only the significant trailing zeros are displayed.
 	 * Removes the decimal period if there are no significant decimal digits.
-	 * @param value the float value to format (can be null).
+	 * @param value the double value to format (can be null).
 	 * @return the formatted value or an empty string.
 	 */
-	public static String formatFloat (Float value) {
+	public static String formatDouble (Double value) {
 		if ( value == null ) return "";
-		String tmp = String.format("%f", value);
+		String tmp = String.format(Locale.ENGLISH, "%f", value);
 		// Remove trailing zeros
 		while (( tmp.length() > 1 ) && ( tmp.charAt(tmp.length()-1) == '0' )) {
 			tmp = tmp.substring(0, tmp.length()-1);

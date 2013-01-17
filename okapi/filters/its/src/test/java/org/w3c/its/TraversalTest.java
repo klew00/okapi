@@ -122,7 +122,7 @@ public class TraversalTest {
 		assertTrue(trav.getTerm(null));
 		assertEquals("REF:#TDPV", trav.getTermInfo(null));
 	}
-	
+
 	@Test
 	public void testTermLocally () throws SAXException, IOException, ParserConfigurationException {
 		InputSource is = new InputSource(new StringReader("<doc xmlns:its=\"http://www.w3.org/2005/11/its\" its:version=\"2.0\">"
@@ -211,7 +211,7 @@ public class TraversalTest {
 		Attr attr = elem.getAttributeNode("id");
 		assertEquals("finalDom1, dom3, final dom2, Dom4", trav.getDomains(attr));
 	}
-	
+
 	@Test
 	public void testMtConfidenceLocal () throws SAXException, IOException, ParserConfigurationException {
 		InputSource is = new InputSource(new StringReader("	<text xmlns:its='http://www.w3.org/2005/11/its' its:version='2.0' "
@@ -222,12 +222,12 @@ public class TraversalTest {
 		ITraversal trav = applyITSRules(doc, null, false, null);
 		Element elem = getElement(trav, "span", 1);
 		assertNotNull(elem);
-		assertEquals(0.8982F, trav.getMtConfidence(null), 0.0F);
+		assertEquals(0.8982, trav.getMtConfidence(null), 0.0);
 		assertEquals("mt-confidence|file:///tools.xml#T1", trav.getAnnotatorsRef());
 		elem = getElement(trav, "its:span", 1);
 		assertNotNull(elem);
 		assertEquals("capital city", elem.getTextContent());
-		assertEquals(1.0F, trav.getMtConfidence(null), 0.0F);
+		assertEquals(1.0, trav.getMtConfidence(null), 0.0);
 		assertEquals("mt-confidence|uri2", trav.getAnnotatorsRef());
 	}
 
@@ -243,11 +243,11 @@ public class TraversalTest {
 		ITraversal trav = applyITSRules(doc, null, true, null);
 		Element elem = getElement(trav, "span", 1);
 		assertNotNull(elem);
-		assertEquals(0.8982F, trav.getMtConfidence(null), 0.0F);
+		assertEquals(0.8982, trav.getMtConfidence(null), 0.0);
 		assertEquals("mt-confidence|file:///tools.xml#T1", trav.getAnnotatorsRef());
 		elem = getElement(trav, "span", 2);
 		assertNotNull(elem);
-		assertEquals(0.8536F, trav.getMtConfidence(null), 0.0F);
+		assertEquals(0.8536, trav.getMtConfidence(null), 0.0);
 		assertEquals("mt-confidence|file:///tools.xml#T1", trav.getAnnotatorsRef());
 	}
 
@@ -270,12 +270,12 @@ public class TraversalTest {
 		Element elem = getElement(trav, "img", 1);
 		assertNotNull(elem);
 		Attr attr = elem.getAttributeNode("title");
-		assertEquals(0.785F, trav.getMtConfidence(attr), 0.0F);
+		assertEquals(0.785, trav.getMtConfidence(attr), 0.0);
 		assertEquals("mt-confidence|file:///tools.xml#T1", trav.getAnnotatorsRef());
 		elem = getElement(trav, "img", 2);
 		assertNotNull(elem);
 		attr = elem.getAttributeNode("title");
-		assertEquals(0.805F, trav.getMtConfidence(attr), 0.0F);
+		assertEquals(0.805, trav.getMtConfidence(attr), 0.0);
 		assertEquals("mt-confidence|file:///tools.xml#T1", trav.getAnnotatorsRef());
 	}
 	
@@ -297,7 +297,7 @@ public class TraversalTest {
 		ITSEngine trav = applyITSRules(doc, null, true, null);
 		Element elem = getElement(trav, "span", 1);
 		assertNotNull(elem);
-		GenericAnnotations anns = trav.getDisambiguation(null);
+		GenericAnnotations anns = trav.getDisambiguationAnnotation(null);
 		assertNotNull(anns);
 		GenericAnnotation ann = anns.getAnnotations(GenericAnnotationType.DISAMB).get(0);
 		assertEquals(GenericAnnotationType.DISAMB_GRANULARITY_ENTITY, ann.getString(GenericAnnotationType.DISAMB_GRANULARITY));
@@ -354,8 +354,8 @@ public class TraversalTest {
 		ITSEngine trav = applyITSRules(doc, null, true, null);
 		Element elem = getElement(trav, "span", 1);
 		assertNotNull(elem);
-		assertEquals(5.4321F, trav.getLocQualityRatingScore(null), 0.0);
-		assertEquals(5.0F, trav.getLocQualityRatingScoreThreshold(null), 0.0);
+		assertEquals(5.4321, trav.getLocQualityRatingScore(null), 0.0);
+		assertEquals(5.0, trav.getLocQualityRatingScoreThreshold(null), 0.0);
 		assertEquals(null, trav.getLocQualityRatingVote(null));
 		assertEquals(null, trav.getLocQualityRatingVoteThreshold(null));
 		assertEquals(null, trav.getLocQualityRatingProfileRef(null));
@@ -385,8 +385,8 @@ public class TraversalTest {
 		assertEquals("REF:u1", trav.getLocQualityRatingProfileRef(null));
 		elem = getElement(trav, "i:span", 1);
 		assertNotNull(elem);
-		assertEquals(88.22F, trav.getLocQualityRatingScore(null), 0.0F);
-		assertEquals(100.0F, trav.getLocQualityRatingScoreThreshold(null), 0.0F);
+		assertEquals(88.22, trav.getLocQualityRatingScore(null), 0.0);
+		assertEquals(100.0, trav.getLocQualityRatingScoreThreshold(null), 0.0);
 		assertEquals(null, trav.getLocQualityRatingVote(null));
 		assertEquals(null, trav.getLocQualityRatingVoteThreshold(null));
 		assertEquals("REF:u2", trav.getLocQualityRatingProfileRef(null));
@@ -503,7 +503,7 @@ public class TraversalTest {
 		Document doc = fact.newDocumentBuilder().parse(is);
 		ITraversal trav = applyITSRules(doc, null, false, null);
 		getElement(trav, "p", 1);
-		assertEquals("255", trav.getStorageSize(null));
+		assertEquals(255, (int)trav.getStorageSize(null));
 		assertEquals("UTF-8", trav.getStorageEncoding(null));
 		assertEquals("crlf", trav.getLineBreakType(null));
 		getElement(trav, "q", 1); // Not inherited
@@ -522,7 +522,7 @@ public class TraversalTest {
 		Document doc = fact.newDocumentBuilder().parse(is);
 		ITraversal trav = applyITSRules(doc, null, false, null);
 		getElement(trav, "p", 1);
-		assertEquals("222", trav.getStorageSize(null));
+		assertEquals(222, (int)trav.getStorageSize(null));
 		assertEquals("UTF-16", trav.getStorageEncoding(null));
 		assertEquals("cr", trav.getLineBreakType(null));
 		getElement(trav, "b", 1);
@@ -538,7 +538,7 @@ public class TraversalTest {
 		Document doc = fact.newDocumentBuilder().parse(is);
 		ITraversal trav = applyITSRules(doc, null, false, null);
 		getElement(trav, "p", 1);
-		assertEquals("111", trav.getStorageSize(null));
+		assertEquals(111, (int)trav.getStorageSize(null));
 		assertEquals("Shift-JIS", trav.getStorageEncoding(null));
 		assertEquals("lf", trav.getLineBreakType(null));
 	}

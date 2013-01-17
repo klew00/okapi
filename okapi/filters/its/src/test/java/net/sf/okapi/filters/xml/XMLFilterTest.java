@@ -20,8 +20,22 @@
 
 package net.sf.okapi.filters.xml;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+import java.io.File;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.List;
+
 import net.sf.okapi.common.Event;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.TestUtil;
+import net.sf.okapi.common.annotation.GenericAnnotation;
+import net.sf.okapi.common.annotation.GenericAnnotationType;
+import net.sf.okapi.common.annotation.GenericAnnotations;
 import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.FilterConfigurationMapper;
 import net.sf.okapi.common.filters.FilterTestDriver;
@@ -29,25 +43,16 @@ import net.sf.okapi.common.filters.IFilterConfigurationMapper;
 import net.sf.okapi.common.filters.InputDocument;
 import net.sf.okapi.common.filters.RoundTripComparison;
 import net.sf.okapi.common.filterwriter.GenericContent;
-import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.ITextUnit;
-import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextFragment.TagType;
-import net.sf.okapi.filters.xml.XMLFilter;
-import static org.junit.Assert.*;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.w3c.its.ITSEngine;
 import org.w3c.its.ITSException;
-
-import java.io.File;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.List;
 
 public class XMLFilterTest {
 
@@ -350,9 +355,8 @@ public class XMLFilterTest {
 			+ "</doc>";
 		ArrayList<Event> list = getEvents(snippet);
 		ITextUnit tu = FilterTestDriver.getTextUnit(list, 1);
-		Property prop = tu.getProperty(Property.ITS_DOMAIN);
-		assertNotNull(prop);
-		assertEquals("domZ, domC, domD", prop.getValue());
+		GenericAnnotation ga = tu.getAnnotation(GenericAnnotations.class).getFirstAnnotation(GenericAnnotationType.DOMAIN);
+		assertEquals("domZ, domC, domD", ga.getString(GenericAnnotationType.DOMAIN_LIST));		
 	}
 	
 	@Test
@@ -371,30 +375,40 @@ public class XMLFilterTest {
 			+ "</doc>";
 		ArrayList<Event> list = getEvents(snippet);
 		ITextUnit tu = FilterTestDriver.getTextUnit(list, 1);
-		Property prop = tu.getProperty(Property.ITS_DOMAIN);
-		assertNotNull(prop);
-		assertEquals("domA, domB, domY", prop.getValue());
+		GenericAnnotation ga = tu.getAnnotation(GenericAnnotations.class).getFirstAnnotation(GenericAnnotationType.DOMAIN);
+		assertEquals("domA, domB, domY", ga.getString(GenericAnnotationType.DOMAIN_LIST));		
 	}
 	
 	@Test
-	public void testAllowedChars () {
+	public void testAllowedCharsAndStorageSize () {
 		String snippet = "<?xml version=\"1.0\"?>\n"
-			+ "<doc><its:rules version=\"2.0\" xmlns:its=\"http://www.w3.org/2005/11/its\""
+			+ "<doc xmlns:its=\"http://www.w3.org/2005/11/its\"><its:rules version=\"2.0\" "
 			+ " xmlns:itsx=\"http://www.w3.org/2008/12/its-extensions\">"
 			+ "<its:translateRule selector=\"//p/@title\" translate='yes'/>"
+			+ "<its:withinTextRule selector=\"//span\" withinText='yes'/>"
 			+ "<its:allowedCharactersRule selector=\"//p\" allowedCharacters='[a-z]'/>"
 			+ "<its:allowedCharactersRule selector=\"//p/@title\" allowedCharacters='[A-Z]'/>"
 			+ "</its:rules>"
-			+ "<p title='ABC'>text</p>"
-			+ "<q>text</q>"
+			+ "<p title='ABC'>text1</p>"
+			+ "<r>text <span its:allowedCharacters='[tex]' its:storageSize='10' its:lineBreakType='crlf'>text</span></r>"
 			+ "</doc>";
 		ArrayList<Event> list = getEvents(snippet);
 		ITextUnit tu = FilterTestDriver.getTextUnit(list, 1);
-		assertEquals("[A-Z]", tu.getProperty(Property.ITS_ALLOWEDCHARACTERS).getValue());
+		GenericAnnotation ga = tu.getAnnotation(GenericAnnotations.class).getFirstAnnotation(GenericAnnotationType.ALLOWEDCHARS);
+		assertEquals("[A-Z]", ga.getString(GenericAnnotationType.ALLOWEDCHARS_PATTERN));
 		tu = FilterTestDriver.getTextUnit(list, 2);
-		assertEquals("[a-z]", tu.getProperty(Property.ITS_ALLOWEDCHARACTERS).getValue());
+		ga = tu.getAnnotation(GenericAnnotations.class).getFirstAnnotation(GenericAnnotationType.ALLOWEDCHARS);
+		assertEquals("[a-z]", ga.getString(GenericAnnotationType.ALLOWEDCHARS_PATTERN));
 		tu = FilterTestDriver.getTextUnit(list, 3);
-		assertFalse(tu.hasProperty(Property.ITS_ALLOWEDCHARACTERS));
+		assertEquals(null, tu.getAnnotation(GenericAnnotations.class));
+		Code code = tu.getSource().getFirstContent().getCode(0);
+		GenericAnnotations anns = (GenericAnnotations)code.getAnnotation(GenericAnnotationType.GENERIC);
+		assertNotNull(anns);
+		assertEquals("[tex]", anns.getFirstAnnotation(GenericAnnotationType.ALLOWEDCHARS).getString(GenericAnnotationType.ALLOWEDCHARS_PATTERN));
+		ga = anns.getFirstAnnotation(GenericAnnotationType.STORAGESIZE);
+		assertEquals(10, (int)ga.getInteger(GenericAnnotationType.STORAGESIZE_SIZE));
+		assertEquals("UTF-8", ga.getString(GenericAnnotationType.STORAGESIZE_ENCODING));
+		assertEquals("crlf", ga.getString(GenericAnnotationType.STORAGESIZE_LINEBREAK));
 	}
 
 	@Test
@@ -410,9 +424,15 @@ public class XMLFilterTest {
 			+ "</doc>";
 		ArrayList<Event> list = getEvents(snippet);
 		ITextUnit tu = FilterTestDriver.getTextUnit(list, 1);
-		assertEquals("5\tShift-JIS\tlf", tu.getProperty(Property.ITS_STORAGESIZE).getValue());
+		GenericAnnotation ga = tu.getAnnotation(GenericAnnotations.class).getFirstAnnotation(GenericAnnotationType.STORAGESIZE);
+		assertEquals(5, (int)ga.getInteger(GenericAnnotationType.STORAGESIZE_SIZE));
+		assertEquals("Shift-JIS", ga.getString(GenericAnnotationType.STORAGESIZE_ENCODING));
+		assertEquals("lf", ga.getString(GenericAnnotationType.STORAGESIZE_LINEBREAK));
 		tu = FilterTestDriver.getTextUnit(list, 2);
-		assertEquals("10\tUTF-16\tlf", tu.getProperty(Property.ITS_STORAGESIZE).getValue());
+		ga = tu.getAnnotation(GenericAnnotations.class).getFirstAnnotation(GenericAnnotationType.STORAGESIZE);
+		assertEquals(10, (int)ga.getInteger(GenericAnnotationType.STORAGESIZE_SIZE));
+		assertEquals("UTF-16", ga.getString(GenericAnnotationType.STORAGESIZE_ENCODING));
+		assertEquals("lf", ga.getString(GenericAnnotationType.STORAGESIZE_LINEBREAK));
 	}
 	
 	@Test
@@ -972,18 +992,54 @@ public class XMLFilterTest {
 	@Test
 	public void testLocQualityLocalOnUnit () {
 		String snippet = "<?xml version=\"1.0\"?>\n"
-			+ "<doc its:version=\"1.0\" xmlns:its=\"http://www.w3.org/2005/11/its\">"
+			+ "<doc its:version=\"2.0\" xmlns:its=\"http://www.w3.org/2005/11/its\">"
 			+ "<p text=\"value 1\" its:locQualityIssueComment='comment'>text 1</p></doc>";
 		ArrayList<Event> list = getEvents(snippet);
 		ITextUnit tu = FilterTestDriver.getTextUnit(list, 1);
 		assertNotNull(tu);
-//TODO: test annotation when it's implemented		
+		assertEquals("text 1", tu.getSource().toString());
+		GenericAnnotations anns = tu.getSource().getAnnotation(GenericAnnotations.class);
+		GenericAnnotation ga = anns.getFirstAnnotation(GenericAnnotationType.LQI);
+		assertEquals("comment", ga.getString(GenericAnnotationType.LQI_COMMENT));
+	}
+
+	@Test
+	public void testLocQualityLocalOnCodes () {
+		String snippet = "<?xml version=\"1.0\"?>\n"
+			+ "<doc its:version=\"2.0\" xmlns:its=\"http://www.w3.org/2005/11/its\">"
+			+ "<its:rules version='2.0'>"
+			+ "<its:withinTextRule selector='//s' withinText='yes'/>"
+			+ "</its:rules>"
+			+ "<p its:locQualityIssueComment='issue-1'>text 1"
+			+ "<s its:allowedCharacters='[abc]' its:locQualityIssueComment='issue-2'>bad</s>"
+			+ " and "
+			+ "<s its:locQualityIssueComment='issue-3'>more</s>"
+			+ "</p></doc>";
+		ArrayList<Event> list = getEvents(snippet);
+		ITextUnit tu = FilterTestDriver.getTextUnit(list, 1);
+		assertNotNull(tu);
+		assertEquals("text 1<1>bad</1> and <2>more</2>",
+			fmt.setContent(tu.getSource().getFirstContent()).toString());
+		GenericAnnotations anns = tu.getSource().getAnnotation(GenericAnnotations.class);
+		List<GenericAnnotation> res = anns.getAnnotations(GenericAnnotationType.LQI);
+		assertEquals(3, res.size());
+		assertEquals("issue-1", res.get(0).getString(GenericAnnotationType.LQI_COMMENT));
+		assertEquals("issue-2", res.get(1).getString(GenericAnnotationType.LQI_COMMENT));
+		assertEquals(8, (int)res.get(1).getInteger(GenericAnnotationType.LQI_XSTART));
+		assertEquals(11, (int)res.get(1).getInteger(GenericAnnotationType.LQI_XEND));
+		assertEquals("issue-3", res.get(2).getString(GenericAnnotationType.LQI_COMMENT));
+		assertEquals(20, (int)res.get(2).getInteger(GenericAnnotationType.LQI_XSTART));
+		assertEquals(24, (int)res.get(2).getInteger(GenericAnnotationType.LQI_XEND));
+		// Check inline ones
+		anns = (GenericAnnotations)tu.getSource().getFirstContent().getCodes().get(0).getAnnotation(GenericAnnotationType.GENERIC);
+		assertNotNull(anns);
+		assertEquals("[abc]", anns.getFirstAnnotation(GenericAnnotationType.ALLOWEDCHARS).getString(GenericAnnotationType.ALLOWEDCHARS_PATTERN));
 	}
 
 	@Test
 	public void testTerms () {
 		String snippet = "<?xml version=\"1.0\"?>\n"
-			+ "<doc its:version=\"1.0\" xmlns:its=\"http://www.w3.org/2005/11/its\">"
+			+ "<doc its:version=\"2.0\" xmlns:its=\"http://www.w3.org/2005/11/its\">"
 			+ "<p>One <its:span term='yes' termInfo='info1'>term</its:span>, and more.</p></doc>";
 		ArrayList<Event> list = getEvents(snippet);
 		ITextUnit tu = FilterTestDriver.getTextUnit(list, 1);
@@ -994,7 +1050,7 @@ public class XMLFilterTest {
 	@Test
 	public void testTranslatableAttributes2 () {
 		String snippet = "<?xml version=\"1.0\"?>\n"
-			+ "<doc><its:rules version=\"1.0\" xmlns:its=\"http://www.w3.org/2005/11/its\">"
+			+ "<doc><its:rules version=\"2.0\" xmlns:its=\"http://www.w3.org/2005/11/its\">"
 			+ "<its:translateRule selector=\"//*/@text\" translate=\"yes\"/></its:rules>"
 			+ "<p text=\"value 1 &quot;=quot\">text 1</p><p>text 2 &quot;=quot</p><p>text 3</p></doc>";
 		ArrayList<Event> list = getEvents(snippet);
@@ -1020,11 +1076,11 @@ public class XMLFilterTest {
 	@Test
 	public void testTranslatableAttributesOutputAllowUnescapedQuoteButEscape () {
 		String snippet = "<?xml version=\"1.0\"?>\n"
-			+ "<doc><its:rules version=\"1.0\" xmlns:its=\"http://www.w3.org/2005/11/its\">"
+			+ "<doc><its:rules version=\"2.0\" xmlns:its=\"http://www.w3.org/2005/11/its\">"
 			+ "<its:translateRule selector=\"//*/@text\" translate=\"yes\"/></its:rules>"
 			+ "<p NOTtext='value 1 &apos;=apos, &quot;=quot'>text 1</p><p>text 2 &quot;=quot</p><p>text 3 &apos;=apos</p></doc>";
 		String expected = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-			+ "<doc><its:rules version=\"1.0\" xmlns:its=\"http://www.w3.org/2005/11/its\">"
+			+ "<doc><its:rules version=\"2.0\" xmlns:its=\"http://www.w3.org/2005/11/its\">"
 			+ "<its:translateRule selector=\"//*/@text\" translate=\"yes\"/></its:rules>"
 			+ "<p NOTtext=\"value 1 '=apos, &quot;=quot\">text 1</p><p>text 2 &quot;=quot</p><p>text 3 '=apos</p></doc>";
 		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet),
@@ -1034,18 +1090,18 @@ public class XMLFilterTest {
 	@Test
 	public void testTranslatableAttributesOutputAllowUnescapedQuote () {
 		String snippet = "<?xml version=\"1.0\"?>\n"
-			+ "<doc><its:rules version=\"1.0\" xmlns:its=\"http://www.w3.org/2005/11/its\">"
+			+ "<doc><its:rules version=\"2.0\" xmlns:its=\"http://www.w3.org/2005/11/its\">"
 			+ "<its:translateRule selector=\"//*/@text\" translate=\"yes\"/>"
 			+ "</its:rules>"
 			+ "<p NOTtext='value 1 &apos;=apos, &quot;=quot'>text 1</p><p>text 2 &quot;=quot</p><p>text 3 &apos;=apos</p></doc>";
 		String expected = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-			+ "<doc><its:rules version=\"1.0\" xmlns:its=\"http://www.w3.org/2005/11/its\">"
+			+ "<doc><its:rules version=\"2.0\" xmlns:its=\"http://www.w3.org/2005/11/its\">"
 			+ "<its:translateRule selector=\"//*/@text\" translate=\"yes\"/>"
 			+ "</its:rules>"
 			+ "<p NOTtext=\"value 1 '=apos, &quot;=quot\">text 1</p><p>text 2 \"=quot</p><p>text 3 '=apos</p></doc>";
 		
 		String paramData = "<?xml version=\"1.0\"?>\n"
-			+ "<its:rules version=\"1.0\" xmlns:its=\"http://www.w3.org/2005/11/its\""
+			+ "<its:rules version=\"2.0\" xmlns:its=\"http://www.w3.org/2005/11/its\""
 			+ " xmlns:zzz=\"okapi-framework:xmlfilter-options\">"
 			+ "<zzz:options escapeQuotes=\"no\"/></its:rules>";
 		filter.getParameters().fromString(paramData);

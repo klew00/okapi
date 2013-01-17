@@ -24,10 +24,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.xml.namespace.QName;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.FileUtil;
@@ -36,6 +32,9 @@ import net.sf.okapi.common.ISkeleton;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.annotation.AltTranslation;
 import net.sf.okapi.common.annotation.AltTranslationsAnnotation;
+import net.sf.okapi.common.annotation.GenericAnnotation;
+import net.sf.okapi.common.annotation.GenericAnnotationType;
+import net.sf.okapi.common.annotation.GenericAnnotations;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.ISegments;
@@ -48,8 +47,6 @@ import net.sf.okapi.common.resource.TextPart;
 import net.sf.okapi.filters.rainbowkit.Manifest;
 import net.sf.okapi.filters.rainbowkit.MergingInfo;
 import net.sf.okapi.lib.xliff.Candidate;
-import net.sf.okapi.lib.xliff.ExtendedContent;
-import net.sf.okapi.lib.xliff.ExtendedElement;
 import net.sf.okapi.lib.xliff.Fragment;
 import net.sf.okapi.lib.xliff.Note;
 import net.sf.okapi.lib.xliff.Unit;
@@ -64,6 +61,8 @@ import org.oasisopen.xliff.v2.IPart;
 import org.oasisopen.xliff.v2.IWithCandidates;
 import org.oasisopen.xliff.v2.Names;
 import org.oasisopen.xliff.v2.OriginalDataStyle;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class XLIFF2PackageWriter extends BasePackageWriter {
 
@@ -326,28 +325,41 @@ public class XLIFF2PackageWriter extends BasePackageWriter {
 			unit.addNote(new Note(tu.getTargetProperty(manifest.getTargetLocale(), Property.NOTE).getValue(), INote.AppliesTo.TARGET));
 		}
 		
-		
-		// External resource reference
-		if ( tu.hasProperty(Property.ITS_EXTERNALRESREF) ) {
-			unit.getExtendedAttributes().setAttribute(Names.NS_XLIFFOKAPI, "itsExternalResourceRef",
-				tu.getProperty(Property.ITS_EXTERNALRESREF).getValue());
-		}
-		// Storage size
-		if ( tu.hasProperty(Property.ITS_STORAGESIZE) ) {
-			String[] values = tu.getProperty(Property.ITS_STORAGESIZE).getValue().split("\t", -1);
-			unit.getExtendedAttributes().setAttribute(Names.NS_ITS, "storageSize", values[0]);
-			unit.getExtendedAttributes().setAttribute(Names.NS_ITS, "storageSizeEncoding", values[1]);
-			unit.getExtendedAttributes().setAttribute(Names.NS_ITS, "lineBreakType", values[2]);
-		}
-		// Allowed characters
-		if ( tu.hasProperty(Property.ITS_ALLOWEDCHARACTERS) ) {
-			unit.getExtendedAttributes().setAttribute(Names.NS_ITS, "allowedCharacters",
-				tu.getProperty(Property.ITS_ALLOWEDCHARACTERS).getValue());
-		}
-		// Domain
-		if ( tu.hasProperty(Property.ITS_DOMAIN) ) {
-			unit.getExtendedAttributes().setAttribute(Names.NS_XLIFFOKAPI, "itsDomain",
-				tu.getProperty(Property.ITS_DOMAIN).getValue());
+		GenericAnnotations anns = tu.getAnnotation(GenericAnnotations.class);
+		if ( anns != null ) {
+			// Storage Size
+			GenericAnnotation ga = anns.getFirstAnnotation(GenericAnnotationType.STORAGESIZE);
+			if ( ga != null ) {
+				unit.getExtendedAttributes().setAttribute(Names.NS_ITS, "storageSize",
+					ga.getString(GenericAnnotationType.STORAGESIZE_SIZE));
+				String tmp = ga.getString(GenericAnnotationType.STORAGESIZE_ENCODING);
+				if ( !tmp.equals("UTF-8") ) {
+					unit.getExtendedAttributes().setAttribute(Names.NS_ITS, "storageEncoding", tmp);
+				}
+				tmp = ga.getString(GenericAnnotationType.STORAGESIZE_LINEBREAK);
+				if ( !tmp.equals("lf") ) {
+					unit.getExtendedAttributes().setAttribute(Names.NS_ITS, "lineBreakType", tmp);
+				}
+			}
+			
+			// Domain
+			ga = anns.getFirstAnnotation(GenericAnnotationType.DOMAIN);
+			if ( ga != null ) {
+				unit.getExtendedAttributes().setAttribute(Names.NS_XLIFFOKAPI, "itsDomain",
+					ga.getString(GenericAnnotationType.DOMAIN_LIST));
+			}
+			// Allowed characters
+			ga = anns.getFirstAnnotation(GenericAnnotationType.ALLOWEDCHARS);
+			if ( ga != null ) {
+				unit.getExtendedAttributes().setAttribute(Names.NS_ITS, "allowedCharacters",
+					ga.getString(GenericAnnotationType.ALLOWEDCHARS_PATTERN));
+			}
+			// External Resource reference
+			ga = anns.getFirstAnnotation(GenericAnnotationType.EXTRESREF);
+			if ( ga != null ) {
+				unit.getExtendedAttributes().setAttribute(Names.NS_XLIFFOKAPI, "itsExternalResourceRef",
+					ga.getString(GenericAnnotationType.EXTRESREF_IRI));
+			}
 		}
 		
 		// Go through the parts: Use the source to drive the order

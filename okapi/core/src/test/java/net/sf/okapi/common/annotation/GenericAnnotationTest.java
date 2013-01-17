@@ -18,10 +18,15 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.common;
+package net.sf.okapi.common.annotation;
 
 import static org.junit.Assert.*;
 import net.sf.okapi.common.annotation.GenericAnnotation;
+import net.sf.okapi.common.resource.Code;
+import net.sf.okapi.common.resource.ITextUnit;
+import net.sf.okapi.common.resource.TextContainer;
+import net.sf.okapi.common.resource.TextFragment.TagType;
+import net.sf.okapi.common.resource.TextUnit;
 
 import org.junit.Test;
 
@@ -48,11 +53,11 @@ public class GenericAnnotationTest {
 	}
 
 	@Test
-	public void testFloat () {
+	public void testDouble () {
 		GenericAnnotation ann = new GenericAnnotation("type1");
 		assertEquals("type1", ann.getType());
-		ann.setFloat("f1", 1.234F);
-		assertEquals(1.234F, ann.getFloat("f1"), 0.0F);
+		ann.setDouble("f1", 1.234);
+		assertEquals(1.234, ann.getDouble("f1"), 0.0);
 	}
 
 	@Test
@@ -71,7 +76,7 @@ public class GenericAnnotationTest {
 		ann1.setBoolean("fb2", false);
 		ann1.setString("fs2", "");
 		ann1.setString("fs3", " \t ");
-		ann1.setFloat("ff1", 1.234F);
+		ann1.setDouble("ff1", 1.234);
 		ann1.setInteger("fi1", 123);
 		String buf = ann1.toString();
 		
@@ -83,7 +88,7 @@ public class GenericAnnotationTest {
 		assertEquals("string1", ann2.getString("fs1"));
 		assertEquals("", ann2.getString("fs2"));
 		assertEquals(" \t ", ann2.getString("fs3"));
-		assertEquals(1.234F, ann2.getFloat("ff1"), 0.0F);
+		assertEquals(1.234, ann2.getDouble("ff1"), 0.0);
 		assertEquals(123, (int)ann2.getInteger("fi1"));
 	}
 
@@ -92,7 +97,7 @@ public class GenericAnnotationTest {
 		GenericAnnotation ann1 = new GenericAnnotation("type1");
 		ann1.setString("f1", "v1");
 		ann1.setBoolean("f2", true);
-		ann1.setFloat("ff1", 1.234F);
+		ann1.setDouble("ff1", 1.234);
 		ann1.setInteger("fi1", 543);
 		
 		GenericAnnotation ann2 = ann1.clone();
@@ -101,7 +106,49 @@ public class GenericAnnotationTest {
 		assertEquals(ann2.getString("f1"), ann1.getString("f1"));
 		assertFalse(ann2.getString("f1")==ann1.getString("f1"));
 		assertEquals(ann2.getBoolean("f2"), ann1.getBoolean("f2"));
-		assertEquals(ann2.getFloat("ff1"), ann1.getFloat("ff1"), 0.0F);
+		assertEquals(ann2.getDouble("ff1"), ann1.getDouble("ff1"), 0.0);
 		assertEquals(ann2.getInteger("fi1"), ann1.getInteger("fi1"));
+	}
+
+	@Test
+	public void testSetFields () {
+		GenericAnnotation ann1 = new GenericAnnotation("type1", 
+			"fs1", "v1",
+			"fb2", true,
+			"ff3", 1.234,
+			"fi4", 543);
+		
+		assertEquals("type1", ann1.getType());
+		assertEquals("v1", ann1.getString("fs1"));
+		assertEquals(true, ann1.getBoolean("fb2"));
+		assertEquals(1.234, ann1.getDouble("ff3"), 0.0);
+		assertEquals(543, (int)ann1.getInteger("fi4"));
+	}
+	
+	@Test
+	public void testAddAnnotationOnTU () {
+		ITextUnit tu = new TextUnit("id");
+		GenericAnnotation.addAnnotation(tu, new GenericAnnotation("type1", "name1", "value1"));
+		GenericAnnotations anns = tu.getAnnotation(GenericAnnotations.class);
+		GenericAnnotation res = anns.getFirstAnnotation("type1");
+		assertEquals("value1", res.getString("name1"));
+	}
+
+	@Test
+	public void testAddAnnotationOnTC () {
+		TextContainer tc = new TextContainer();
+		GenericAnnotation.addAnnotation(tc, new GenericAnnotation("type1", "name1", "value1"));
+		GenericAnnotations anns = tc.getAnnotation(GenericAnnotations.class);
+		GenericAnnotation res = anns.getFirstAnnotation("type1");
+		assertEquals("value1", res.getString("name1"));
+	}
+
+	@Test
+	public void testAddAnnotationOnCode () {
+		Code code = new Code(TagType.PLACEHOLDER, "z");
+		GenericAnnotation.addAnnotation(code, new GenericAnnotation("type1", "name1", "value1"));
+		GenericAnnotations anns = (GenericAnnotations)code.getAnnotation(GenericAnnotationType.GENERIC);
+		GenericAnnotation res = anns.getFirstAnnotation("type1");
+		assertEquals("value1", res.getString("name1"));
 	}
 }

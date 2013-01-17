@@ -24,6 +24,9 @@ import java.security.InvalidParameterException;
 import java.util.HashMap;
 
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.resource.Code;
+import net.sf.okapi.common.resource.ITextUnit;
+import net.sf.okapi.common.resource.TextContainer;
 
 /**
  * Generic annotation allowing access with field names and multiple instance on the same object.
@@ -37,6 +40,60 @@ public class GenericAnnotation {
 	private HashMap<String, Object> map;
 	
 	/**
+	 * Adds an annotation to a text unit. If the text unit has
+	 * no annotation set attached yet one is created and attached,
+	 * otherwise the annotation to add is added to the existing set. 
+	 * @param tu the text unit where to attach the annotation.
+	 * @param ann the annotation to attach.
+	 */
+	static public void addAnnotation (ITextUnit tu,
+		GenericAnnotation ann)
+	{
+		GenericAnnotations anns = tu.getAnnotation(GenericAnnotations.class);
+		if ( anns == null ) {
+			anns = new GenericAnnotations();
+			tu.setAnnotation(anns);
+		}
+		anns.add(ann);
+	}
+	
+	/**
+	 * Adds an annotation to a text container. If the text container has
+	 * no annotation set attached yet one is created and attached,
+	 * otherwise the annotation to add is added to the existing set. 
+	 * @param tc the text container where to attach the annotation.
+	 * @param ann the annotation to attach.
+	 */
+	static public void addAnnotation (TextContainer tc,
+		GenericAnnotation ann)
+	{
+		GenericAnnotations anns = tc.getAnnotation(GenericAnnotations.class);
+		if ( anns == null ) {
+			anns = new GenericAnnotations();
+			tc.setAnnotation(anns);
+		}
+		anns.add(ann);
+	}
+	
+	/**
+	 * Adds an annotation to an inline code. If the inline code has
+	 * no annotation set attached yet one is created and attached,
+	 * otherwise the annotation to add is added to the existing set. 
+	 * @param code the code where to add the annotation.
+	 * @param ann the annotation to add (if null, nothing is attached).
+	 */
+	static public void addAnnotation (Code code,
+		GenericAnnotation ann)
+	{
+		GenericAnnotations anns = (GenericAnnotations)code.getAnnotation(GenericAnnotationType.GENERIC);
+		if ( anns == null ) {
+			anns = new GenericAnnotations();
+			code.setAnnotation(GenericAnnotationType.GENERIC, anns);
+		}
+		anns.add(ann);
+	}
+	
+	/**
 	 * Creates a new annotation for a given type.
 	 * <p>Note that it is technically to have two annotations with the same type but different fields.
 	 * This is a side effect of the capability to access the annotation in a generic way.
@@ -48,6 +105,47 @@ public class GenericAnnotation {
 			throw new InvalidParameterException("The type of an annotation must not be null or empty.");
 		}
 		this.type = type;
+	}
+
+	/**
+	 * Creates a new annotation for a given type.
+	 * With a list of fields. This method simply call the {@link #setFields(Object...)} method after
+	 * creating the annotation.
+	 * @param type the identifier of the type (cannot be null or empty).
+	 * @param list the list of key+value pairs to set.
+	 */
+	public GenericAnnotation (String type, Object ... list) {
+		this(type);
+		setFields(list);
+	}
+	
+	/**
+	 * Sets a list of key+values pairs for this annotation.
+	 * Each pair must be made of a string that is the name of the field, and an object that is the value to set.
+	 * Only supported types must be used.
+	 * @param list the list of key+value pairs to set.
+	 */
+	public void setFields (Object ... list) {
+		for ( int i=0; i<list.length; i += 2 ) {
+			if ( !(list[i] instanceof String) ) {
+				throw new InvalidParameterException("Invalid field name in key+value pair.");
+			}
+			if ( list[i+1] instanceof String ) {
+				setString((String)list[i], (String)list[i+1]);
+			}
+			else if ( list[i+1] instanceof Boolean ) {
+				setBoolean((String)list[i], (Boolean)list[i+1]);
+			}
+			else if ( list[i+1] instanceof Integer ) {
+				setInteger((String)list[i], (Integer)list[i+1]);
+			}
+			else if ( list[i+1] instanceof Double ) {
+				setDouble((String)list[i], (Double)list[i+1]);
+			}
+			else {
+				throw new InvalidParameterException("Invalid field value in key+value pair.");
+			}
+		}
 	}
 	
 	@Override
@@ -102,18 +200,18 @@ public class GenericAnnotation {
 		setObject(name, value);
 	}
 	
-	public Float getFloat (String name) {
+	public Double getDouble (String name) {
 		if ( map == null ) return null;
 		Object obj = map.get(name);
 		if ( obj == null ) return null;
-		if ( !(obj instanceof Float) ) {
-			throw new InvalidParameterException(String.format("The field '%s' is not a float.", name));
+		if ( !(obj instanceof Double) ) {
+			throw new InvalidParameterException(String.format("The field '%s' is not a double.", name));
 		}
-		return (Float)obj;
+		return (Double)obj;
 	}
 
-	public void setFloat (String name,
-		Float value)
+	public void setDouble (String name,
+		Double value)
 	{
 		setObject(name, value);
 	}
@@ -146,7 +244,7 @@ public class GenericAnnotation {
 			if ( value instanceof String ) sb.append('s');
 			else if ( value instanceof Boolean ) sb.append('b');
 			else if ( value instanceof Integer ) sb.append('i');
-			else if ( value instanceof Float ) sb.append('f');
+			else if ( value instanceof Double ) sb.append('f');
 			sb.append(PART_SEPARATOR);
 			sb.append(value); // Value
 		}
@@ -168,7 +266,7 @@ public class GenericAnnotation {
 				setInteger(parts[0], Integer.parseInt(parts[2]));
 			}
 			else if ( parts[1].equals("f") ) {
-				setFloat(parts[0], Float.parseFloat(parts[2]));
+				setDouble(parts[0], Double.parseDouble(parts[2]));
 			}
 			else {
 				throw new RuntimeException(String.format("Unknow field type in annotation: '%s'", parts[1]));
