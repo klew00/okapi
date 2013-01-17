@@ -33,6 +33,7 @@ import net.sf.okapi.common.filterwriter.GenericContent;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.ui.AboutDialog;
 import net.sf.okapi.common.ui.CharacterInfoDialog;
+import net.sf.okapi.common.ui.ConstrainedSashForm;
 import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.InputDialog;
 import net.sf.okapi.common.ui.ResourceManager;
@@ -164,8 +165,8 @@ public class SRXEditor {
 		
 		createMenus();
 		
-		SashForm sashForm = new SashForm(shell, SWT.VERTICAL);
-		sashForm.setLayoutData(new GridData(GridData.FILL_BOTH));
+		ConstrainedSashForm sashForm = new ConstrainedSashForm(shell, false);
+		sashForm.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
 		sashForm.setSashWidth(3);
 		sashForm.setBackground(shell.getDisplay().getSystemColor(SWT.COLOR_WIDGET_NORMAL_SHADOW));
 		
@@ -208,13 +209,14 @@ public class SRXEditor {
 		tblRules.setLinesVisible(true);
 		gdTmp = new GridData(GridData.FILL_BOTH);
 		gdTmp.horizontalSpan = 6;
-		gdTmp.minimumHeight = 130;
+		gdTmp.minimumHeight = 40;
+		gdTmp.grabExcessVerticalSpace = true;
 		tblRules.setLayoutData(gdTmp);
 		tblRules.addControlListener(new ControlAdapter() {
 		    public void controlResized(ControlEvent e) {
 		    	Rectangle rect = tblRules.getClientArea();
 				//TODO: Check behavior when manual resize a column width out of client area
-		    	int typeColWidth = 75;
+		    	int typeColWidth = 90;
 				int nHalf = (int)((rect.width-typeColWidth) / 2);
 				tblRules.getColumn(0).setWidth(typeColWidth);
 				tblRules.getColumn(1).setWidth(nHalf);
@@ -379,6 +381,7 @@ public class SRXEditor {
 		gdTmp.horizontalSpan = 3;
 		edResults.setEditable(false);
 		edResults.setFont(sampleFont);
+		sashForm.setWeights(new int[] {1, 1});
 
 		edSampleText.addModifyListener(new ModifyListener () {
 			public void modifyText(ModifyEvent e) {

@@ -68,7 +68,7 @@ public class RatelWebApp extends AbstractWebApp {
 	    
 	    if( !shell.getMaximized() && shellBounds.x == 0 && shellBounds.y == 0 ) {
 		      shell.setLocation(100, 50);
-		      shell.setSize(600, 400);
+		      shell.setSize(600, 450);
 		}
 	}
 
