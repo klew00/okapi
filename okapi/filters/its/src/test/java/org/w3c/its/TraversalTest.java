@@ -811,6 +811,39 @@ public class TraversalTest {
 		assertFalse(trav.getTranslate(elem.getAttributeNode("test")));
 	}
 
+	@Test
+	public void testLocalLanguageInfo () throws SAXException, IOException, ParserConfigurationException {
+		InputSource is = new InputSource(new StringReader("<!DOCTYPE html><html lang=en><head>"
+			+ "<meta charset=utf-8><title>Title</title></head>"
+			+ "<body><p>t1<span lang=\"fr\">tf</span></p></body>/html>"));
+		Document doc = htmlDocBuilder.parse(is);
+		ITraversal trav = applyITSRules(doc, null, true, null);
+		Element elem = getElement(trav, "head", 1);
+		assertEquals("en", trav.getLanguage());
+		elem = getElement(trav, "span", 1);
+		assertEquals("fr", trav.getLanguage());
+	}
+	
+	@Test
+	public void testGlobalAndLocalLanguageInfo () throws SAXException, IOException, ParserConfigurationException {
+		InputSource is = new InputSource(new StringReader("<!DOCTYPE html><html lang=en><head>"
+			+ "<meta charset=utf-8><title>Title</title>"
+			+ "<script type='application/its+xml'>"
+			+ "<its:rules xmlns:its='http://www.w3.org/2005/11/its' version='2.0' xmlns:h='http://www.w3.org/1999/xhtml'>"
+			+ " <its:langRule selector='/h:*' langPointer='//h:html/@lang'/>"        
+//			+ " <its:langRule selector='//h:*' langPointer='@lang'/>"        
+			+ "</its:rules>"
+			+ "</script>"
+			+ "</head>"
+			+ "<body><p>t1<span lang=\"fr\">tf</span></p></body>/html>"));
+		Document doc = htmlDocBuilder.parse(is);
+		ITraversal trav = applyITSRules(doc, null, true, null);
+		Element elem = getElement(trav, "head", 1);
+		assertEquals("en", trav.getLanguage());
+		elem = getElement(trav, "span", 1);
+		assertEquals("fr", trav.getLanguage());
+	}
+
 	private static Element getElement (ITraversal trav,
 		String name,
 		int number)

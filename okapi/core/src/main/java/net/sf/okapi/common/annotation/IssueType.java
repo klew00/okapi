@@ -18,7 +18,7 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.lib.verification;
+package net.sf.okapi.common.annotation;
 
 public enum IssueType {
 
@@ -56,5 +56,56 @@ public enum IssueType {
 	
 	TERMINOLOGY,
 	
-	LANGUAGETOOL_ERROR
+	LANGUAGETOOL_ERROR;
+
+
+	public static String getITSType (IssueType issueType) {
+		switch (issueType ) {
+			case MISSING_TARGETTU:
+			case MISSING_TARGETSEG:
+			case EMPTY_TARGETSEG:
+			case EMPTY_SOURCESEG:
+				return "ommission";
+				
+			case EXTRA_TARGETSEG:
+				return "addition";
+				
+			case MISSING_LEADINGWS:
+			case MISSINGORDIFF_LEADINGWS:
+			case EXTRA_LEADINGWS:
+			case EXTRAORDIFF_LEADINGWS:
+			case MISSING_TRAILINGWS:
+			case MISSINGORDIFF_TRAILINGWS:
+			case EXTRA_TRAILINGWS:
+			case EXTRAORDIFF_TRAILINGWS:
+				return "whitespace";
+				
+			case TARGET_SAME_AS_SOURCE:
+				return "untranslated";
+				
+			case MISSING_CODE:
+			case EXTRA_CODE:
+			case SUSPECT_CODE:
+				return "markup";
+				
+			case UNEXPECTED_PATTERN:
+				return "pattern-problem";
+				
+			case SUSPECT_PATTERN:
+			case SOURCE_LENGTH:
+			case TARGET_LENGTH:
+				return "length";
+				
+			case ALLOWED_CHARACTERS:
+				
+			case TERMINOLOGY:
+				return "terminology";
+				
+			case LANGUAGETOOL_ERROR:
+				return "other";
+				
+			default:
+				return "uncategorized";
+		}
+	}
 }

@@ -332,7 +332,7 @@ public class Main {
 		}
 		else if ( dc.equals(DC_LANGUAGEINFORMATION) ) {
 			out1 = trav.getLanguage();
-			if ( out1 != null && !Util.isEmpty(out1)) writer.print(String.format("\tlang=\"%s\"", escape(out1)));			
+			if ( out1 != null ) writer.print(String.format("\tlang=\"%s\"", out1));			
 		}
 		else if ( dc.equals(DC_WITHINTEXT) ) {
 			if ( attr != null ){

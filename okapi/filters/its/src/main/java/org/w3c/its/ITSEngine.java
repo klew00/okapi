@@ -1543,33 +1543,46 @@ public class ITSEngine implements IProcessor, ITraversal {
 						setFlag(NL.item(i), FP_TERMINOLOGY, 'y', true);
 						setFlag(NL.item(i), FP_TERMINOLOGY_DATA, anns.toString(), true);
 					}
-						
+
 					else if ( rule.ruleType == IProcessor.DC_LOCNOTE ) {
-						setFlag(NL.item(i), FP_LOCNOTE, (rule.flag ? 'a' : 'd'), true); // Type alert or description
+						boolean setFlag = true;
 						switch ( rule.infoType ) {
 						case INFOTYPE_TEXT:
 							setFlag(NL.item(i), FP_LOCNOTE_DATA, rule.info, true);
 							break;
 						case INFOTYPE_POINTER:
-							setFlag(NL.item(i), FP_LOCNOTE_DATA, resolvePointer(NL.item(i), rule.info), true);
+							String value = resolvePointer(NL.item(i), rule.info);
+							if ( value != null ) setFlag(NL.item(i), FP_LOCNOTE_DATA, value, true);
+							else setFlag = false;
 							break;
 						case INFOTYPE_REF:
 							setFlag(NL.item(i), FP_LOCNOTE_DATA, GenericAnnotationType.REF_PREFIX+rule.info, true);
 							break;
 						case INFOTYPE_REFPOINTER:
-							setFlag(NL.item(i), FP_LOCNOTE_DATA, GenericAnnotationType.REF_PREFIX+resolvePointer(NL.item(i), rule.info), true);
+							value = resolvePointer(NL.item(i), rule.info);
+							if ( value != null ) setFlag(NL.item(i), FP_LOCNOTE_DATA, GenericAnnotationType.REF_PREFIX+value, true);
+							else  setFlag = false;
 							break;
+						}
+						if ( setFlag ) {
+							setFlag(NL.item(i), FP_LOCNOTE, (rule.flag ? 'a' : 'd'), true); // Type alert or description
 						}
 					}
 						
 					else if ( rule.ruleType == IProcessor.DC_LANGINFO ) {
-						setFlag(NL.item(i), FP_LANGINFO, 'y', true);
-						setFlag(NL.item(i), FP_LANGINFO_DATA, resolvePointer(NL.item(i), rule.info), true);
+						String value = resolvePointer(NL.item(i), rule.info);
+						if ( value != null ) {
+							setFlag(NL.item(i), FP_LANGINFO, 'y', true);
+							setFlag(NL.item(i), FP_LANGINFO_DATA, value, true);
+						}
 					}
 						
 					else if ( rule.ruleType == IProcessor.DC_EXTERNALRES ) {
-						setFlag(NL.item(i), FP_EXTERNALRES, 'y', true);
-						setFlag(NL.item(i), FP_EXTERNALRES_DATA, resolvePointer(NL.item(i), rule.info), true);
+						String value = resolvePointer(NL.item(i), rule.info);
+						if ( value != null ) {
+							setFlag(NL.item(i), FP_EXTERNALRES, 'y', true);
+							setFlag(NL.item(i), FP_EXTERNALRES_DATA, value, true);
+						}
 					}
 						
 					else if ( rule.ruleType == IProcessor.DC_LOCFILTER ) {
@@ -1989,7 +2002,13 @@ public class ITSEngine implements IProcessor, ITraversal {
 			}
 
 			if ( (dataCategories & IProcessor.DC_LANGINFO) > 0 ) {
-				expr = xpath.compile("//*/@"+XML_NS_PREFIX+":lang");
+				if ( isHTML5 ) {
+					expr = xpath.compile("//*/@lang");
+				}
+				else {
+					expr = xpath.compile("//*/@"+XML_NS_PREFIX+":lang");
+				}
+				
 				NL = (NodeList)expr.evaluate(doc, XPathConstants.NODESET);
 				for ( int i=0; i<NL.getLength(); i++ ) {
 					attr = (Attr)NL.item(i);
@@ -3326,7 +3345,8 @@ public class ITSEngine implements IProcessor, ITraversal {
 			XPathExpression expr = xpath.compile(pointer);
 			NodeList list = (NodeList)expr.evaluate(node, XPathConstants.NODESET);
 			if (( list == null ) || ( list.getLength() == 0 )) {
-				return "";
+				logger.debug("No node match the pointer '{}'.", pointer);
+				return null;
 			}
 			switch ( list.item(0).getNodeType() ) {
 			case Node.ELEMENT_NODE:
@@ -3335,10 +3355,10 @@ public class ITSEngine implements IProcessor, ITraversal {
 				return list.item(0).getNodeValue();
 			}
 		}
-		catch (XPathExpressionException e) {
-			return "Bad XPath expression in pointer \""+pointer+"\".";
+		catch ( XPathExpressionException e ) {
+			logger.error("Bad XPath expression in pointer '{}:\n{}'.", pointer, e.getMessage());
 		}
-		return "pointer("+pointer+")";
+		return null;
 	}
 	
 	/**

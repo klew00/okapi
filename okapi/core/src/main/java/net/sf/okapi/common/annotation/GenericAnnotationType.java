@@ -96,7 +96,6 @@ public class GenericAnnotationType {
 	/**
 	 * Annotation identifier for the
 	 * <a href='http://www.w3.org/TR/its20/#lqissue'>ITS Localization Quality Issue</a> data category.
-	 * 
 	 */
 	public static final String LQI = "its-lqi";
 	public static final String LQI_ISSUESREF = "lqiIssuesRef";
@@ -106,11 +105,13 @@ public class GenericAnnotationType {
 	public static final String LQI_PROFILEREF = "lqiProfileRef";
 	public static final String LQI_ENABLED = "lqiEnabled"; // Boolean
 	// Extensions
+	public static final String LQI_XTYPE = "lqiXType"; // String
+	public static final String LQI_XSEGID = "lqiXSegId"; // String
 	public static final String LQI_XSTART = "lqiXStart"; // Integer
 	public static final String LQI_XEND = "lqiXEnd"; // Integer
 	public static final String LQI_XTRGSTART = "lqiXTrgStart"; // Integer
 	public static final String LQI_XTRGEND = "lqiXTrgEnd"; // Integer
-	public static final String LQI_XTYPE = "lqiXType"; // Object
+	public static final String LQI_XCODES = "lqiXCodes"; // String
 
 	/**
 	 * Annotation identifier for the

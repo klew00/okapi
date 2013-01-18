@@ -33,6 +33,7 @@ import net.sf.okapi.common.BaseContext;
 import net.sf.okapi.common.IHelp;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.annotation.IssueType;
 import net.sf.okapi.common.filters.IFilterConfigurationMapper;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.RawDocument;
@@ -47,7 +48,6 @@ import net.sf.okapi.common.UserConfiguration;
 import net.sf.okapi.lib.verification.IQualityCheckEditor;
 import net.sf.okapi.lib.verification.Issue;
 import net.sf.okapi.lib.verification.IssueComparator;
-import net.sf.okapi.lib.verification.IssueType;
 import net.sf.okapi.lib.verification.Parameters;
 import net.sf.okapi.lib.verification.QualityCheckSession;
 
@@ -633,7 +633,6 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 		
 		// Add listener to manage the actions
 		contextMenu.addMenuListener(new MenuListener() {
-			@SuppressWarnings("unchecked")
 			@Override
 			public void menuShown(MenuEvent arg0) {
 				// Clear possible previous menu entries
@@ -657,12 +656,11 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 				}
 
 				// Extra data cases
-				if ( issue.getExtra() == null ) return;
-				if ( ((ArrayList<Code>)issue.getExtra()).size() == 0 ) return;
+				if ( Util.isEmpty(issue.getCodes()) ) return;
 				// If we have extra data attached to the issue:
 				// Add actions to the menu
 				new MenuItem(contextMenu, SWT.SEPARATOR);
-				for ( Code code : (ArrayList<Code>)issue.getExtra() ) {
+				for ( Code code : issue.getCodes() ) {
 					item = new MenuItem(contextMenu, SWT.PUSH);
 					item.setData(code.getData());
 					if ( issue.getIssueType() == IssueType.EXTRA_CODE ) {

@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2010-2011 by the Okapi Framework contributors
+  Copyright (C) 2010-2013 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -40,6 +40,7 @@ import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.connectors.google.GoogleMTv2Connector;
 import net.sf.okapi.connectors.google.GoogleMTv2Parameters;
+import net.sf.okapi.common.annotation.IssueType;
 import net.sf.okapi.common.query.IQuery;
 
 public class LanguageToolConnector {

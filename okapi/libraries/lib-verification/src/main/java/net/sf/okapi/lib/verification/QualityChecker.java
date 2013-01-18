@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2010-2011 by the Okapi Framework contributors
+  Copyright (C) 2010-2013 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -38,6 +38,8 @@ import net.sf.okapi.common.Util;
 import net.sf.okapi.common.annotation.GenericAnnotation;
 import net.sf.okapi.common.annotation.GenericAnnotationType;
 import net.sf.okapi.common.annotation.GenericAnnotations;
+import net.sf.okapi.common.annotation.IssueAnnotation;
+import net.sf.okapi.common.annotation.IssueType;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.ISegments;
 import net.sf.okapi.common.resource.Property;
@@ -177,6 +179,8 @@ class QualityChecker {
 		TextContainer srcCont = tu.getSource();
 		TextContainer trgCont = tu.getTarget(trgLoc);
 		
+		harvestAnnotations(srcCont, trgCont);
+		
 		// Check ITS Storage size for source
 		if ( params.getCheckStorageSize() ) {
 			checkStorageSize(tu, srcCont, true);
@@ -192,6 +196,9 @@ class QualityChecker {
 				reportIssue(IssueType.MISSING_TARGETTU, tu, null,
 					"Missing translation.",
 					0, -1, 0, -1, Issue.SEVERITY_HIGH, srcCont.toString(), "", null);
+				addAnnotation(srcCont, null, IssueType.MISSING_TARGETTU,
+					"Missing translation",
+					0, -1, 0, -1, IssueAnnotation.SEVERITY_HIGH, null);
 			}
 			return;
 		}
@@ -229,6 +236,9 @@ class QualityChecker {
 			reportIssue(IssueType.SUSPECT_PATTERN, tu, null,
 				"Target content has at least one hidden part.",
 				0, -1, start, end, Issue.SEVERITY_HIGH, srcCont.toString(), trgCont.toString(), null);
+			addAnnotation(trgCont, null, IssueType.SUSPECT_PATTERN,
+				"Target content has at least one hidden part.",
+				0, -1, start, end, Issue.SEVERITY_HIGH, null);
 		}
 		
 		for ( Segment srcSeg : srcSegs ) {
@@ -237,6 +247,9 @@ class QualityChecker {
 				reportIssue(IssueType.MISSING_TARGETSEG, tu, srcSeg.getId(),
 					"The source segment has no corresponding target segment.",
 					0, -1, 0, -1, Issue.SEVERITY_HIGH, srcSeg.toString(), "", null);
+				addAnnotation(srcCont, srcSeg.getId(), IssueType.MISSING_TARGETSEG,
+					"The source segment has no corresponding target segment.",
+					0, -1, 0, -1, Issue.SEVERITY_HIGH, null);
 				continue; // Cannot go further for that segment
 			}
 			
@@ -246,6 +259,10 @@ class QualityChecker {
 					reportIssue(IssueType.EMPTY_TARGETSEG, tu, srcSeg.getId(),
 						"The target segment is empty, but its source is not empty.",
 						0, -1, 0, -1, Issue.SEVERITY_HIGH, srcSeg.toString(), "", null);
+					addAnnotation(srcCont, srcSeg.getId(), IssueType.EMPTY_TARGETSEG,
+						"The target segment is empty, but its source is not empty.",
+						0, -1, 0, -1, Issue.SEVERITY_HIGH, null);
+
 					continue; // No need to check more if it's empty
 				}
 			}
@@ -255,6 +272,9 @@ class QualityChecker {
 					reportIssue(IssueType.EMPTY_SOURCESEG, tu, srcSeg.getId(),
 						"The target segment is not empty, but its source is empty.",
 						0, -1, 0, -1, Issue.SEVERITY_HIGH, srcSeg.toString(), "", null);
+					addAnnotation(srcCont, srcSeg.getId(), IssueType.EMPTY_SOURCESEG,
+						"The target segment is not empty, but its source is empty.",
+						0, -1, 0, -1, Issue.SEVERITY_HIGH, null);
 					continue; // No need to check more if the source is empty
 				}
 			}
@@ -287,6 +307,9 @@ class QualityChecker {
 								reportIssue(IssueType.TARGET_SAME_AS_SOURCE, tu, srcSeg.getId(),
 									"Translation is the same as the source.",
 									0, -1, 0, -1, Issue.SEVERITY_MEDIUM, srcSeg.toString(), trgSeg.toString(), null);
+								addAnnotation(srcCont, srcSeg.getId(), IssueType.TARGET_SAME_AS_SOURCE,
+									"Translation is the same as the source.",
+									0, -1, 0, -1, Issue.SEVERITY_MEDIUM, null);
 							}
 						}
 					}
@@ -302,6 +325,7 @@ class QualityChecker {
 				if ( termChecker.verify(currentDocId, tu, srcSeg, trgSeg) > 0 ) {
 					for ( Issue issue : termChecker.getIssues() ) {
 						reportIssue(issue, tu, srcSeg.toString(), trgSeg.toString(), null);
+//TODO						addAnnotation(tc, segId, issue.getissueType, comment, srcStart, srcEnd, trgStart, trgEnd, severity)
 					}
 				}
 			}
@@ -319,6 +343,7 @@ class QualityChecker {
 				if ( ltConn.checkSegment(currentDocId, srcSeg, trgSeg, tu) > 0 ) {
 					for ( Issue issue : ltConn.getIssues() ) {
 						reportIssue(issue, tu, srcSeg.toString(), trgSeg.toString(), null);
+//TODO						addAnnotation(tc, segId, issueType, comment, srcStart, srcEnd, trgStart, trgEnd, severity);
 						if ( issue.getSourceEnd() == -99 ) {
 							// Special marker indicating a server error
 							ltConn = null; // Do not check it again until next re-processing
@@ -336,6 +361,9 @@ class QualityChecker {
 				reportIssue(IssueType.EXTRA_TARGETSEG, tu, trgSeg.getId(),
 					String.format("Extra target segment (id=%s).", trgSeg.getId()),
 					0, -1, 0, -1, Issue.SEVERITY_HIGH, "", trgSeg.toString(), null);
+				addAnnotation(trgCont, trgSeg.getId(), IssueType.EXTRA_TARGETSEG,
+					String.format("Extra target segment (id=%s).", trgSeg.getId()),
+					0, -1, 0, -1, Issue.SEVERITY_HIGH, null);
 				continue; // Cannot go further for that segment
 			}
 		}
@@ -426,6 +454,10 @@ class QualityChecker {
 					String.format("The character '%c' (U+%04X) is not allowed in the target text."
 						+ " Other forbidden characters found: ", badChar, (int)badChar)+badChars.toString(),
 						0, -1, pos, pos+1, Issue.SEVERITY_MEDIUM, srcOri, trgOri, null);
+//TODO				addAnnotation(tu, IssueType.ALLOWED_CHARACTERS, tu, null,
+//						String.format("The character '%c' (U+%04X) is not allowed in the target text."
+//							+ " Other forbidden characters found: ", badChar, (int)badChar)+badChars.toString(),
+//							0, -1, pos, pos+1, Issue.SEVERITY_MEDIUM, srcOri, trgOri, null);
 			}
 			else {
 				reportIssue(IssueType.ALLOWED_CHARACTERS, tu, null,
@@ -434,6 +466,18 @@ class QualityChecker {
 			}
 		}
 		
+	}
+	
+	private void harvestAnnotations (TextContainer srcCont,
+		TextContainer trgCont)
+	{
+		GenericAnnotations anns = (GenericAnnotations)srcCont.getAnnotation(GenericAnnotations.class);
+		if ( anns == null ) return;
+		
+		List<GenericAnnotation> list = anns.getAnnotations(GenericAnnotationType.LQI);
+		for ( GenericAnnotation ann : list ) {
+			
+		}
 	}
 	
 	// Create a copy of the codes and strip out any that has empty data.
@@ -519,6 +563,9 @@ class QualityChecker {
 				"Missing codes in the target: "+buildCodeList(srcList),
 				0, -1, 0, -1, Issue.SEVERITY_MEDIUM, srcSeg.toString(), trgSeg.toString(),
 				srcList);
+//			addAnnotation(trgCont, srcSeg.getId(), IssueType.MISSING_CODE,
+//					"Missing codes in the target: "+buildCodeList(srcList),
+//					0, -1, 0, -1, Issue.SEVERITY_MEDIUM, srcList);
 			checkOC = false;
 		}
 		
@@ -1021,6 +1068,22 @@ class QualityChecker {
 		}
 	}
 	
+	
+	private void addAnnotation (TextContainer tc,
+		String segId,
+		IssueType issueType,
+		String comment,
+		int srcStart,
+		int srcEnd,
+		int trgStart,
+		int trgEnd,
+		int severity,
+		List<Code> codes)
+	{
+		IssueAnnotation ann = new IssueAnnotation(issueType, comment, severity, segId, srcStart, srcEnd, trgStart, trgEnd, codes);
+		GenericAnnotation.addAnnotation(tc, ann);
+	}
+	
 	private void reportIssue (IssueType issueType,
 		ITextUnit tu,
 		String segId,
@@ -1032,11 +1095,11 @@ class QualityChecker {
 		int severity,
 		String srcOri,
 		String trgOri,
-		Object extra)
+		List<Code> codes)
 	{
 		Issue issue = new Issue(currentDocId, issueType, tu.getId(), segId, message,
 			srcStart, srcEnd, trgStart, trgEnd, severity, tu.getName());
-		issue.setExtra(extra);
+		issue.setCodes(codes);
 		issues.add(issue);
 		issue.setEnabled(true);
 		issue.setSource(srcOri);
@@ -1055,9 +1118,9 @@ class QualityChecker {
 		Object extra)
 	{
 		Issue issue = new Issue(currentDocId, init.getIssueType(), tu.getId(), init.getSegId(), init.getMessage(),
-				init.getSourceStart(), init.getSourceEnd(), init.getTargetStart(), init.getTargetEnd(),
-				init.getSeverity(), tu.getName());
-		issue.setExtra(init.getExtra());
+			init.getSourceStart(), init.getSourceEnd(), init.getTargetStart(), init.getTargetEnd(),
+			init.getSeverity(), tu.getName());
+		issue.setCodes(init.getCodes());
 		issues.add(issue);
 		issue.setEnabled(true);
 		issue.setSource(srcOri);

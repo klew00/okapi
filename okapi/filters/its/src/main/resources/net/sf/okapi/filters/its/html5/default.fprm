@@ -34,8 +34,7 @@
  <its:dirRule selector="//h:bdo[@dir='ltr']" dir="lro"/>
  <its:dirRule selector="//h:bdo[@dir='rtl']" dir="rlo"/>
 
- <!-- Terminology -->
- <its:termRule selector="//h:dfn" term="yes"/>
+ <!-- Note: dfn and dt don't match exactly the Terminology data category -->
   
  <!-- Id Value -->
  <its:idValueRule selector="//h:*[@id]" idValue="@id"/>

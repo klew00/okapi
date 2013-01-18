@@ -21,10 +21,13 @@
 package net.sf.okapi.lib.verification;
 
 import java.net.URI;
+import java.util.List;
 
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.annotation.GenericAnnotation;
 import net.sf.okapi.common.annotation.GenericAnnotationType;
+import net.sf.okapi.common.annotation.IssueType;
+import net.sf.okapi.common.resource.Code;
 
 public class Issue extends GenericAnnotation {
 
@@ -39,7 +42,7 @@ public class Issue extends GenericAnnotation {
 	private String tuName;
 	private int trgStart;
 	private int trgEnd;
-	private Object extra;
+	private List<Code> codes;
 	private String source;
 	private String target;
 	
@@ -125,12 +128,12 @@ public class Issue extends GenericAnnotation {
 		return getString(GenericAnnotationType.LQI_COMMENT);
 	}
 	
-	public Object getExtra () {
-		return extra;
+	public List<Code> getCodes () {
+		return codes;
 	
 	}
-	public void setExtra (Object extra) {
-		this.extra = extra;
+	public void setCodes (List<Code> codes) {
+		this.codes = codes;
 	}
 	
 	public String getSource () {

@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2010-2011 by the Okapi Framework contributors
+  Copyright (C) 2010-2013 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -48,13 +48,15 @@ import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.ITextUnit;
 
 public class QualityCheckSession {
+	
+	public static final String FILE_EXTENSION = ".qcs";
+	
 	private static final String serialSignature = "OQCS";
 	private static final long serialVersionUID = 1L;
 
-	public static String FILE_EXTENSION = ".qcs";
-	
 	Map<URI, RawDocument> rawDocs; // Temporary solution waiting for the DB
 	IFilterConfigurationMapper fcMapper;
+	
 	private Parameters params;
 	private List<Issue> issues;
 	private QualityChecker checker;
@@ -321,8 +323,6 @@ public class QualityCheckSession {
 	public void loadSession (String path) {
 		try {
 			loadSessionFromStream(new FileInputStream(path));
-			//TEST
-			
 		}
 		catch ( Throwable e ) {
 			throw new OkapiIOException("Error reading session file.\n"+e.getMessage(), e);
@@ -571,13 +571,21 @@ public class QualityCheckSession {
 		}
 	}
 
-	private static void writeIndentedElementString(XMLWriter writer, String element, String text) {
+	private static void writeIndentedElementString (XMLWriter writer,
+		String element,
+		String text)
+	{
 		writer.writeString("\t");
 		writer.writeElementString(element, text);
 		writer.writeLineBreak();
 	}
 
-	private static void writeIndentedElementStringHilite(XMLWriter writer, String element, String text, int start, int end) {
+	private static void writeIndentedElementStringHilite (XMLWriter writer,
+		String element,
+		String text,
+		int start,
+		int end)
+	{
 		if (end > 0) {
 			writer.writeString("\t");
 			writer.writeStartElement(element);
