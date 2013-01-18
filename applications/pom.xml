@@ -15,10 +15,13 @@
     <modules>
         <module>rainbow</module>
         <module>ratel</module>
-		<module>ratel-webapp</module>
         <module>checkmate</module>
         <module>serval</module> <!-- For TM debug -->
         <module>longhorn</module>
+		<module>rainbow-webapp</module>
+		<module>ratel-webapp</module>
+		<module>checkmate-webapp</module>
+        <module>serval-webapp</module>
         <!-- For now: to launch it separately after the ant build
         <module>integration-tests</module>-->
     </modules>
