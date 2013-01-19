@@ -296,7 +296,7 @@ public interface ISegments extends Iterable<Segment> {
 
     /**
      * Gets the part index for a given segment index.
-     * <p>For example in the container "[segment1] [segment2] [segment3]" the sgment index for "[segment2]" is
+     * <p>For example in the container "[segment1] [segment2] [segment3]" the segment index for "[segment2]" is
      * 1 and its part index is 2 because there is one non-segment part before.
      *
      * @param segIndex the segment index to convert to part index.

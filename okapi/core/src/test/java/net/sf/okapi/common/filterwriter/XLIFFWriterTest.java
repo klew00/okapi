@@ -26,12 +26,15 @@ import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 
+import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.TestUtil;
 import net.sf.okapi.common.annotation.GenericAnnotation;
 import net.sf.okapi.common.annotation.GenericAnnotationType;
+import net.sf.okapi.common.annotation.GenericAnnotations;
 import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.TextContainer;
+import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.resource.TextUnit;
 
@@ -129,6 +132,7 @@ public class XLIFFWriterTest {
 //		TextFragment tf = tu.getSource().getFirstSegment().getContent();
 //		tf.append("t1 t2");
 //		GenericAnnotations anns = new GenericAnnotations();
+//		anns.setData("lqi1");
 //		GenericAnnotation ann = anns.add(GenericAnnotationType.LQI);
 //		ann.setString(GenericAnnotationType.LQI_COMMENT, "rem1");
 //		ann.setBoolean(GenericAnnotationType.LQI_ENABLED, false);
@@ -144,6 +148,7 @@ public class XLIFFWriterTest {
 //		ann.setString(GenericAnnotationType.LQI_COMMENT, "rem3");
 //		ann.setDouble(GenericAnnotationType.LQI_SEVERITY, 99.0);
 //		anns = new GenericAnnotations();
+//		anns.setData("lqi2");
 //		anns.add(ann);
 //		tf.annotate(3+4, 5+4, GenericAnnotationType.GENERIC, anns); // +4 is for the markers of the previous annotation
 //		writer.writeTextUnit(tu);

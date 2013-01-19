@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2010 by the Okapi Framework contributors
+  Copyright (C) 2008-2013 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -1285,6 +1285,27 @@ public class TextContainerTest {
 		assertEquals(originalText, tc.toString());
 	}
 
+	@Test
+	public void testSegmentRemoval () {
+		String originalText = "[seg1][seg2] [seg3]";
+		TextContainer tc = new TextContainer(originalText);
+		ISegments segments = tc.getSegments();
+		// Test segmenting from an array
+		List<Range> ranges = new ArrayList<Range>();
+		ranges.add(new Range(0, 6));
+		ranges.add(new Range(6, 12));
+		ranges.add(new Range(13, 19));
+		segments.create(ranges);
+		assertTrue(tc.hasBeenSegmented());
+		assertEquals("[seg2]", segments.get(1).toString());
+		tc.remove(segments.getPartIndex(1));
+		assertEquals("[seg3]", segments.get(1).toString());
+		tc.remove(segments.getPartIndex(0));
+		assertEquals("[seg3]", segments.get(0).toString());
+		tc.remove(segments.getPartIndex(0));
+		assertEquals("", segments.get(0).toString()); // Always 1 segment at least
+	}
+	
 	@Test
 	public void testSegmentsFromArray () {
 		String originalText = "[seg1][seg2] [seg3]";

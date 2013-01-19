@@ -119,7 +119,7 @@ public class MosesTextFilterWriterTest {
 		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(res), 3);
 		assertNotNull(tu);
 		assertEquals("3", tu.getId());
-		assertEquals("<g id=\"1\">word1</g>, <g id=\"2\">word2</g>, <x id=\"3\"/>word3, <x id=\"4\"/>word5, <mrk mtype=\"protected\">to protect</mrk>, etc.",
+		assertEquals("<g id=\"1\">word1</g>, <g id=\"2\">word2</g>, <x id=\"3\"/>word3, <x id=\"4\"/>word5, <x id=\"5\"/>, etc.",
 			tu.getSource().toString());
 		
 		tu = FilterTestDriver.getTextUnit(getEvents(res), 4);

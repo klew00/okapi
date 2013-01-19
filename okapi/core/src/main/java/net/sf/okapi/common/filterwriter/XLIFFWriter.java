@@ -478,7 +478,7 @@ public class XLIFFWriter implements IFilterWriter {
 				writer.writeAttributeString("okp:itsDomain",
 					ga.getString(GenericAnnotationType.DOMAIN_VALUE));
 			}
-			// External Resoure Reference
+			// External Resource
 			ga = anns.getFirstAnnotation(GenericAnnotationType.EXTERNALRES);
 			if ( ga != null ) {
 				writer.writeAttributeString("okp:itsExternalResourceRef",
