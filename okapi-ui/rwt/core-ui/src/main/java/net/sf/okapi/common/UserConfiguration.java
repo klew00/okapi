@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2012 by the Okapi Framework contributors
+  Copyright (C) 2008-2013 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -23,14 +23,14 @@ package net.sf.okapi.common;
 import java.util.Properties;
 
 /**
- * Blocking any global config by now.
- * TODO Consider saving session data in browser cookies.
+ * Stores user settings in a RWT session settings store (persisted in browser cookies).
  */
 public class UserConfiguration extends Properties {
 	
 	private static final long serialVersionUID = 1L;
 	
 	public UserConfiguration () {
+		super();
 	}
 
 	/**
@@ -41,22 +41,15 @@ public class UserConfiguration extends Properties {
 	}
 	
 	public void save (String appName,
-		String version) {
+		String version)	{
 	}
 	
-	public String getProperty(String key) {
-		return "";
-	}
-	
-	public String getProperty(String key, String defaultValue) {
-		return "";
-	}
-		
 	@Override
 	public Object setProperty (String key,
 		String value)
 	{
-		return "";
+		if ( value == null ) return remove(key);
+		else return super.setProperty(key, value);
 	}
 	
 	/**
@@ -66,7 +59,7 @@ public class UserConfiguration extends Properties {
 	 * does not exists or if it is set to "false".
 	 */
 	public boolean getBoolean (String key) {
-		return false;
+		return "true".equals(getProperty(key, "false"));
 	}
 
 	/**
@@ -79,7 +72,7 @@ public class UserConfiguration extends Properties {
 	public boolean getBoolean (String key,
 		boolean defaultValue)
 	{
-		return false;
+		return "true".equals(getProperty(key, (defaultValue ? "true" : "false")));
 	}
 	
 	/**
@@ -92,7 +85,7 @@ public class UserConfiguration extends Properties {
 	public Object setProperty (String key,
 		boolean value)
 	{
-		return false;
+		return super.setProperty(key, (value ? "true" : "false"));
 	}
 
 	/**
@@ -102,7 +95,7 @@ public class UserConfiguration extends Properties {
 	 * does not exists.
 	 */
 	public int getInteger (String key) {
-		return 0;
+		return Integer.valueOf(getProperty(key, "0"));
 	}
 	
 	/**
@@ -115,7 +108,7 @@ public class UserConfiguration extends Properties {
 	public Object setProperty (String key,
 		int value)
 	{
-		return 0;
+		return super.setProperty(key, String.valueOf(value));
 	}
 	
 }

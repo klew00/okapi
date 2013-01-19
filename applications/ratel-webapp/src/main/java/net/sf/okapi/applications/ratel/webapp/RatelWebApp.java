@@ -4,7 +4,6 @@ import net.sf.okapi.common.ui.BaseHelp;
 import net.sf.okapi.common.ui.rwt.AbstractWebApp;
 import net.sf.okapi.lib.ui.segmentation.WebSRXEditor;
 
-import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
@@ -19,7 +18,7 @@ public class RatelWebApp extends AbstractWebApp {
 	
 	@Override
 	protected void createUI(Shell shell) {
-		Rectangle shellBounds = shell.getBounds();
+//		Rectangle shellBounds = shell.getBounds();
 		
 		help = new BaseHelp("help"); //$NON-NLS-1$
 		new WebSRXEditor(shell, false, help); // populate the shell
@@ -66,10 +65,10 @@ public class RatelWebApp extends AbstractWebApp {
 //            }
 //		});
 	    
-	    if( !shell.getMaximized() && shellBounds.x == 0 && shellBounds.y == 0 ) {
-		      shell.setLocation(100, 50);
-		      shell.setSize(600, 450);
-		}
+//	    if( !shell.getMaximized() && shellBounds.x == 0 && shellBounds.y == 0 ) {
+//		      shell.setLocation(100, 50);
+//		      shell.setSize(600, 450);
+//		}
 	}
 
 	@Override

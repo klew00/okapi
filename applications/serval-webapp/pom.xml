@@ -6,6 +6,5 @@
     <version>0.20-SNAPSHOT</version>
   </parent>
   <artifactId>okapi-application-serval-webapp</artifactId>
-  <packaging>war</packaging>
   <name>Okapi Serval (Web version)</name>
 </project>

@@ -152,7 +152,8 @@ public class ConstrainedSashForm extends SashForm {
 					setWeights(new int[] {sr.y, rect.height - sr.y});
 				}
 				
-				// Workaround for RWT shrinking the sash form at times 
+				// Workaround for RWT shrinking the sash form at times
+//				ConstrainedSashForm.this.getParent().layout();
 				Rectangle r0 = ConstrainedSashForm.this.getParent().getBounds();
 				Rectangle r1 = ConstrainedSashForm.this.getBounds();
 				if (r0.width - r1.width != wDelta ||

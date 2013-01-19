@@ -12,8 +12,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
-import org.eclipse.swt.events.ShellAdapter;
-import org.eclipse.swt.events.ShellEvent;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
@@ -40,6 +38,14 @@ public abstract class AbstractWebApp implements IEntryPoint {
 		
 		shell = new Shell(display, fullScreenMode ? SWT.NONE : SWT.TITLE | SWT.RESIZE | SWT.MAX);
 		shell.setText(getName()); // Default title
+		if (fullScreenMode) {
+			shell.setMaximized(true);
+		}
+		else {
+			// Set default bounds, can be changed in createUI
+			shell.setLocation(100, 50);
+			shell.setSize(600, 450);
+		}
 		createUI(shell);
 		UICallBack.activate(shell.getClass().getName() + hashCode()); // For async runs to wake up the display
 
@@ -61,8 +67,7 @@ public abstract class AbstractWebApp implements IEntryPoint {
 		        event.doit = messageBox.open() == SWT.OK;
 		      }
 		    });
-		
-		if (fullScreenMode) shell.setMaximized(true);
+				
 		shell.open();	    
 		while (!shell.isDisposed()) {
 			if (!display.readAndDispatch()) {

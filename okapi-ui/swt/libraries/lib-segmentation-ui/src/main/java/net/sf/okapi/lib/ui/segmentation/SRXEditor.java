@@ -418,16 +418,15 @@ public class SRXEditor {
 		// Size
 		shell.pack();
 		shell.setMinimumSize(shell.getSize());
-		Point startSize = shell.getMinimumSize();
-		if ( startSize.x < 700 ) startSize.x = 700; 
-		if ( startSize.y < 600 ) startSize.y = 600; 
-		shell.setSize(startSize);
+		//shell.setSize(SRXEditor_getStartSize());
+		shell.setBounds(SRXEditor_getStartBounds(shell));
 		
 		// Maximize if requested
 		if ( config.getBoolean(OPT_MAXIMIZED) ) {
 			shell.setMaximized(true);
 		}
 		else { // Or try to re-use the bounds of the previous session
+			shell.setMaximized(false);
 			Rectangle ar = UIUtil.StringToRectangle(config.getProperty(OPT_BOUNDS));
 			if ( ar != null ) {
 				Rectangle dr = shell.getDisplay().getBounds();
@@ -443,6 +442,15 @@ public class SRXEditor {
 
 		// Start with a default document
 		newSRXDocument(1, false);
+	}
+
+	protected Rectangle SRXEditor_getStartBounds(Shell shell) {
+		Point startOrigin = shell.getLocation();
+		Point startSize = shell.getMinimumSize();
+		if ( startSize.x < 700 ) startSize.x = 700; 
+		if ( startSize.y < 600 ) startSize.y = 600;
+		return new Rectangle(startOrigin.x, startOrigin.y,
+				startSize.x, startSize.y);
 	}
 	
 	private void createMenus () {
