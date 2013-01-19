@@ -227,7 +227,7 @@ public class Main {
 							
 							for ( String attrName : list ) {
 								Attr attr = (Attr)map.getNamedItem(attrName);
-								if ( attr.getNodeName().startsWith("xmlns:") ) continue; // Skip NS declarations
+								if ( attr.getNodeName().startsWith("xmlns") ) continue; // Skip NS declarations
 								// gather and output the values for the attribute
 								output(writer, dc, path+"/@"+attr.getNodeName(), trav, attr);
 							}
