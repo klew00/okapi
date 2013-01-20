@@ -5,6 +5,8 @@ mvn clean
 mvn install
 
 cd deployment/maven
+ant -f build_getVerProp.xml
+
 ant -f build_okapi-lib.xml
 
 ant -f build_okapi-apps.xml -Dplatform=gtk2-linux-x86

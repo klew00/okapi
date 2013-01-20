@@ -5,6 +5,8 @@ cd ../..
 #mvn install
 
 cd deployment/maven
+ant -f build_getVerProp.xml
+
 ant -f build_okapi-lib.xml
 
 ant -f build_okapi-apps.xml -Dplatform=win32-x86
