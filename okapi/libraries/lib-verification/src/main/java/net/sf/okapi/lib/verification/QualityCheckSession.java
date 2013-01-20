@@ -51,8 +51,8 @@ public class QualityCheckSession {
 	
 	public static final String FILE_EXTENSION = ".qcs";
 	
-	private static final String serialSignature = "OQCS";
-	private static final long serialVersionUID = 1L;
+	private static final String SERIALSIGNATURE = "OQCS";
+	private static final long SERIALVERSIONUID = 1L;
 
 	Map<URI, RawDocument> rawDocs; // Temporary solution waiting for the DB
 	IFilterConfigurationMapper fcMapper;
@@ -279,8 +279,8 @@ public class QualityCheckSession {
 			dos = new DataOutputStream(outputStream);
 			
 			// Header
-			dos.writeBytes(serialSignature);
-			dos.writeLong(serialVersionUID);
+			dos.writeBytes(SERIALSIGNATURE);
+			dos.writeLong(SERIALVERSIONUID);
 			
 			// Locales
 			dos.writeUTF(sourceLocale.toString());
@@ -339,11 +339,11 @@ public class QualityCheckSession {
 			byte[] buf = new byte[4];
 			dis.read(buf, 0, 4);
 			String tmp = new String(buf);
-			if ( !tmp.equals(serialSignature) ) {
+			if ( !tmp.equals(SERIALSIGNATURE) ) {
 				throw new OkapiIOException("Invalid signature: This file is not a QCS file, or is corrupted.");
 			}
 			long version = dis.readLong();
-			if ( version != serialVersionUID ) {
+			if ( version != SERIALVERSIONUID ) {
 				// For now just check the number, later we may have different ways of reading
 				throw new OkapiIOException("Invalid version number: This file is not a QCS file, or is corrupted.");
 			}
