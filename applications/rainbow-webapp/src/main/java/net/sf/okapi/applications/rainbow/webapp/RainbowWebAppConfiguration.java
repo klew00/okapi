@@ -18,7 +18,7 @@ public class RainbowWebAppConfiguration extends AbstractWebAppConfig {
 	
 	@Override
 	protected String getFaviconPath() {
-		return "Rainbow.png";
+		return "rainbow16.png";
 	}
 	
 	@Override

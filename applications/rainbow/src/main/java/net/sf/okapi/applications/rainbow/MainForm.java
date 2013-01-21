@@ -302,7 +302,7 @@ public class MainForm { //implements IParametersProvider {
 	{
 		GridLayout layTmp = new GridLayout(3, false);
 		shell.setLayout(layTmp);
-		shell.setImage(rm.getImage("Rainbow")); //$NON-NLS-1$
+		shell.setImages(rm.getImages("rainbow")); //$NON-NLS-1$
 		
 		// Handling of the closing event
 		shell.addShellListener(new ShellListener() {
@@ -1417,16 +1417,16 @@ public class MainForm { //implements IParametersProvider {
 		GridData gdTmp = new GridData(GridData.FILL_BOTH);
 		gdTmp.horizontalSpan = 3;
 		table.setLayoutData(gdTmp);
-		table.addControlListener(new ControlAdapter() {
-		    public void controlResized(ControlEvent e) {
-		    	Table table = (Table)e.getSource();
-		    	Rectangle rect = table.getClientArea();
-				//TODO: Check behavior when manual resize a column width out of client area
-				int nPart = (int)(rect.width / 100);
-				table.getColumn(0).setWidth(70*nPart);
-				table.getColumn(1).setWidth(rect.width-table.getColumn(0).getWidth());
-		    }
-		});
+//		table.addControlListener(new ControlAdapter() {
+//		    public void controlResized(ControlEvent e) {
+//		    	Table table = (Table)e.getSource();
+//		    	Rectangle rect = table.getClientArea();
+//				//TODO: Check behavior when manual resize a column width out of client area
+//				int nPart = (int)(rect.width / 100);
+//				table.getColumn(0).setWidth(70*nPart);
+//				table.getColumn(1).setWidth(rect.width-table.getColumn(0).getWidth());
+//		    }
+//		});
 		table.addKeyListener(new KeyAdapter() {
 			public void keyPressed(KeyEvent e) {
 				if ( e.character == ' ' ) {
@@ -1894,7 +1894,7 @@ public class MainForm { //implements IParametersProvider {
 		throws Exception 
 	{
 		rm = new ResourceManager(MainForm.class, shell.getDisplay());
-		rm.addImage("Rainbow"); //$NON-NLS-1$
+		rm.addImages("rainbow", "rainbow16", "rainbow32"); //$NON-NLS-1$
 		rm.addImage("newproject"); //$NON-NLS-1$
 		rm.addImage("openproject"); //$NON-NLS-1$
 		rm.addImage("saveproject"); //$NON-NLS-1$

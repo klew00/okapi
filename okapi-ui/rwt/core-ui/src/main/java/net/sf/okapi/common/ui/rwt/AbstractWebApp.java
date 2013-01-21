@@ -4,6 +4,8 @@ import java.util.Locale;
 
 import javax.servlet.http.HttpServletRequest;
 
+import net.sf.okapi.common.UserConfiguration;
+
 import org.eclipse.rwt.RWT;
 import org.eclipse.rwt.internal.widgets.JSExecutor;
 import org.eclipse.rwt.lifecycle.IEntryPoint;
@@ -28,6 +30,7 @@ public abstract class AbstractWebApp implements IEntryPoint {
 	@SuppressWarnings("serial")
 	@Override
 	public int createUI() {
+		UserConfiguration uc = new UserConfiguration();
 		Locale.setDefault(Locale.ENGLISH); // To have non-localized OK/Cancel etc. buttons in dialogs
 		Display display = new Display();
 		

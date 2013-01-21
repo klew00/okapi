@@ -20,28 +20,54 @@
 
 package net.sf.okapi.common;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.Reader;
+import java.util.Collections;
 import java.util.Properties;
 
+import net.sf.okapi.common.ui.rwt.RwtNotImplementedException;
+
+import org.eclipse.rwt.RWT;
+
 /**
- * Stores user settings in a RWT session settings store (persisted in browser cookies).
+ * Stores user settings in a session store (persisted in browser cookies).
  */
 public class UserConfiguration extends Properties {
 	
-	private static final long serialVersionUID = 1L;
-	
-	public UserConfiguration () {
-		super();
+	private static final long serialVersionUID = 6498362881893256039L;
+
+	public UserConfiguration() {
+		super(new Properties());
 	}
 
-	/**
-	 * 
-	 * @param appName
-	 */
-	public void load (String appName) {
+	@SuppressWarnings("unchecked")
+	public void load(String appName) {
+		for (Object attrName : Collections.list(RWT.getSettingStore().getAttributeNames())) {
+			// Populate own hashmap with all attributes from the settings store
+			super.put(attrName, RWT.getSettingStore().getAttribute((String) attrName));
+		}		
 	}
 	
-	public void save (String appName,
-		String version)	{
+	@Override
+	public synchronized void load(InputStream inStream) throws IOException {
+		throw new RwtNotImplementedException(this, ".load(InputStream inStream)");
+	}
+	
+	@Override
+	public synchronized void load(Reader reader) throws IOException {
+		throw new RwtNotImplementedException(this, ".load(Reader reader)");
+	}
+	
+	public void save(String appName,
+		String version) {
+		for (Object attrName : super.keySet()) {
+			try {
+				RWT.getSettingStore().setAttribute(attrName.toString(), super.get(attrName).toString());
+			} catch (Exception e) {
+				// Silently ignore
+			}
+		}
 	}
 	
 	@Override
@@ -109,6 +135,5 @@ public class UserConfiguration extends Properties {
 		int value)
 	{
 		return super.setProperty(key, String.valueOf(value));
-	}
-	
+	}	
 }

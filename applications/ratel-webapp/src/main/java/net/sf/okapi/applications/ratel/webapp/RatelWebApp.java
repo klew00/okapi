@@ -14,14 +14,11 @@ public class RatelWebApp extends AbstractWebApp {
 //	private String testOutputPath;
 //	private boolean htmlOutput;
 //	private WebSRXEditor editor;
-	private BaseHelp help;
+//	private BaseHelp help;
 	
 	@Override
 	protected void createUI(Shell shell) {
-//		Rectangle shellBounds = shell.getBounds();
-		
-		help = new BaseHelp("help"); //$NON-NLS-1$
-		new WebSRXEditor(shell, false, help); // populate the shell
+		new WebSRXEditor(shell, false, new BaseHelp("help")); // populate the shell
 	    	    
 	    // Disable unsupported items on menu system
 	    Menu menuBar = shell.getMenuBar();
