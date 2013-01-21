@@ -300,4 +300,22 @@ public class UIUtil {
 		return -1; // Unknown
 	}
 
+	/**
+	 * Centers a given shell on its display. If the shell size exceeds the display size,
+	 * the shell is resized to fit in.
+	 * @param shell the given shell.
+	 */
+	public static void centerShell(Shell shell) {
+		if (shell == null) return;
+		Rectangle ar = shell.getBounds();
+		Rectangle dr = shell.getDisplay().getBounds();
+		if (ar.width > dr.width) {
+			ar.width = dr.width;
+		}
+		if (ar.height > dr.height) {
+			ar.height = dr.height;
+		}
+		shell.setBounds((dr.width - ar.width) / 2, (dr.height - ar.height) / 2,
+				ar.width, ar.height);
+	}
 }

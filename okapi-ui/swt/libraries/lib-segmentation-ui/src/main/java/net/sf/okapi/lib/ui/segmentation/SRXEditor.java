@@ -28,6 +28,7 @@ import java.util.regex.PatternSyntaxException;
 import net.sf.okapi.common.IHelp;
 import net.sf.okapi.common.ISegmenter;
 import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.UserConfiguration;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filterwriter.GenericContent;
 import net.sf.okapi.common.resource.TextContainer;
@@ -38,13 +39,11 @@ import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.InputDialog;
 import net.sf.okapi.common.ui.ResourceManager;
 import net.sf.okapi.common.ui.UIUtil;
-import net.sf.okapi.common.UserConfiguration;
 import net.sf.okapi.lib.segmentation.LanguageMap;
 import net.sf.okapi.lib.segmentation.Rule;
 import net.sf.okapi.lib.segmentation.SRXDocument;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.dnd.Clipboard;
 import org.eclipse.swt.dnd.DND;
 import org.eclipse.swt.dnd.DropTarget;
@@ -418,7 +417,8 @@ public class SRXEditor {
 		// Size
 		shell.pack();
 		shell.setMinimumSize(shell.getSize());
-		//shell.setSize(SRXEditor_getStartSize());
+		
+		UIUtil.centerShell(shell);
 		shell.setBounds(SRXEditor_getStartBounds(shell));
 		
 		// Maximize if requested

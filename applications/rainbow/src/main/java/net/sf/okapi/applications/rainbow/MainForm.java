@@ -1152,6 +1152,13 @@ public class MainForm { //implements IParametersProvider {
 		shell.pack();
 		shell.setMinimumSize(shell.getSize());
 		shell.setSize(startSize);
+		
+		// Workaround for RWT (stretches the shell horizontally when column widths are adjusted)
+		shell.setMaximized(true);
+		shell.setMaximized(false);
+
+		UIUtil.centerShell(shell);
+		
 		// Maximize if requested
 		if ( config.getBoolean("maximized") ) { //$NON-NLS-1$
 			shell.setMaximized(true);
@@ -1408,25 +1415,25 @@ public class MainForm { //implements IParametersProvider {
 	}
 	
 	private void buildInputTab (int index,
-		Composite comp)
+		final Composite comp)
 	{
 		final Table table = new Table(comp, SWT.BORDER | SWT.MULTI | SWT.FULL_SELECTION);
 		
 		table.setHeaderVisible(true);
 		table.setLinesVisible(true);
 		GridData gdTmp = new GridData(GridData.FILL_BOTH);
-		gdTmp.horizontalSpan = 3;
+		gdTmp.horizontalSpan = 1;
 		table.setLayoutData(gdTmp);
-//		table.addControlListener(new ControlAdapter() {
-//		    public void controlResized(ControlEvent e) {
-//		    	Table table = (Table)e.getSource();
-//		    	Rectangle rect = table.getClientArea();
-//				//TODO: Check behavior when manual resize a column width out of client area
-//				int nPart = (int)(rect.width / 100);
-//				table.getColumn(0).setWidth(70*nPart);
-//				table.getColumn(1).setWidth(rect.width-table.getColumn(0).getWidth());
-//		    }
-//		});
+		table.addControlListener(new ControlAdapter() {
+		    public void controlResized(ControlEvent e) {
+		    	Table table = (Table)e.getSource();
+		    	Rectangle rect = table.getClientArea();
+				//TODO: Check behavior when manual resize a column width out of client area
+				int nPart = (int)(rect.width / 100);
+				table.getColumn(0).setWidth(70*nPart);
+				table.getColumn(1).setWidth(rect.width-table.getColumn(0).getWidth());
+		    }
+		});
 		table.addKeyListener(new KeyAdapter() {
 			public void keyPressed(KeyEvent e) {
 				if ( e.character == ' ' ) {
