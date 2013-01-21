@@ -414,31 +414,33 @@ public class SRXEditor {
 			}
 		});
 
-		// Size
-		shell.pack();
-		shell.setMinimumSize(shell.getSize());
-		
-		UIUtil.centerShell(shell);
-		shell.setBounds(SRXEditor_getStartBounds(shell));
-		
-		// Maximize if requested
-		if ( config.getBoolean(OPT_MAXIMIZED) ) {
-			shell.setMaximized(true);
-		}
-		else { // Or try to re-use the bounds of the previous session
-			shell.setMaximized(false);
-			Rectangle ar = UIUtil.StringToRectangle(config.getProperty(OPT_BOUNDS));
-			if ( ar != null ) {
-				Rectangle dr = shell.getDisplay().getBounds();
-				if ( dr.contains(ar.x+ar.width, ar.y+ar.height)
-					&& dr.contains(ar.x, ar.y) ) {
-					shell.setBounds(ar);
+		if (!shell.getMaximized()) { // not RWT full-screen mode 
+			// Size
+			shell.pack();
+			shell.setMinimumSize(shell.getSize());
+			
+			UIUtil.centerShell(shell);
+			shell.setBounds(SRXEditor_getStartBounds(shell));
+				
+			// Maximize if requested
+			if ( config.getBoolean(OPT_MAXIMIZED) ) {
+				shell.setMaximized(true);
+			}
+			else { // Or try to re-use the bounds of the previous session
+				shell.setMaximized(false);
+				Rectangle ar = UIUtil.StringToRectangle(config.getProperty(OPT_BOUNDS));
+				if ( ar != null ) {
+					Rectangle dr = shell.getDisplay().getBounds();
+					if ( dr.contains(ar.x+ar.width, ar.y+ar.height)
+						&& dr.contains(ar.x, ar.y) ) {
+						shell.setBounds(ar);
+					}
+				}
+				else if ( asDialog ) {
+					Dialogs.centerWindow(shell, parent);
 				}
 			}
-			else if ( asDialog ) {
-				Dialogs.centerWindow(shell, parent);
-			}
-		}
+		}		
 
 		// Start with a default document
 		newSRXDocument(1, false);

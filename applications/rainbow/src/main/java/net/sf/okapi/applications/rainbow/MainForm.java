@@ -1146,33 +1146,35 @@ public class MainForm { //implements IParametersProvider {
 		statusBar = new StatusBar(shell, SWT.NONE);
 		updateMRU();
 		
-		// Set the minimal size to the packed size
-		// And then set the start size
-		Point startSize = shell.getSize();
-		shell.pack();
-		shell.setMinimumSize(shell.getSize());
-		shell.setSize(startSize);
-		
-		// Workaround for RWT (stretches the shell horizontally when column widths are adjusted)
-		shell.setMaximized(true);
-		shell.setMaximized(false);
-
-		UIUtil.centerShell(shell);
-		
-		// Maximize if requested
-		if ( config.getBoolean("maximized") ) { //$NON-NLS-1$
+		if (!shell.getMaximized()) { // not RWT full-screen mode
+			// Set the minimal size to the packed size
+			// And then set the start size
+			Point startSize = shell.getSize();
+			shell.pack();
+			shell.setMinimumSize(shell.getSize());
+			shell.setSize(startSize);
+			
+			// Workaround for RWT (stretches the shell horizontally when column widths are adjusted)
 			shell.setMaximized(true);
-		}
-		else { // Or try to re-use the bounds of the previous session
-			Rectangle ar = UIUtil.StringToRectangle(config.getProperty(OPT_BOUNDS));
-			if ( ar != null ) {
-				Rectangle dr = shell.getDisplay().getBounds();
-				if ( dr.contains(ar.x+ar.width, ar.y+ar.height)
-					&& dr.contains(ar.x, ar.y) ) {
-					shell.setBounds(ar);
+			shell.setMaximized(false);
+
+			UIUtil.centerShell(shell);
+			
+			// Maximize if requested
+			if ( config.getBoolean("maximized") ) { //$NON-NLS-1$
+				shell.setMaximized(true);
+			}
+			else { // Or try to re-use the bounds of the previous session
+				Rectangle ar = UIUtil.StringToRectangle(config.getProperty(OPT_BOUNDS));
+				if ( ar != null ) {
+					Rectangle dr = shell.getDisplay().getBounds();
+					if ( dr.contains(ar.x+ar.width, ar.y+ar.height)
+						&& dr.contains(ar.x, ar.y) ) {
+						shell.setBounds(ar);
+					}
 				}
 			}
-		}
+		}		
 	}
 
 	private void updatePluginsAndDependencies () {

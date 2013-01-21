@@ -36,7 +36,7 @@ public abstract class AbstractWebApp implements IEntryPoint {
 		RWT.getSessionStore().setAttribute("userAgent", request.getHeader("User-Agent"));
 		RWT.getSessionStore().setAttribute("app", this);
 		
-		shell = new Shell(display, fullScreenMode ? SWT.NONE : SWT.TITLE | SWT.RESIZE | SWT.MAX);
+		shell = new Shell(display, fullScreenMode ? SWT.NO_TRIM : SWT.TITLE | SWT.RESIZE | SWT.MAX);
 		shell.setText(getName()); // Default title
 		if (fullScreenMode) {
 			shell.setMaximized(true);
