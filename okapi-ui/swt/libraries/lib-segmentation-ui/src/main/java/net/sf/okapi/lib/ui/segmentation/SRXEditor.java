@@ -416,11 +416,16 @@ public class SRXEditor {
 
 		if (!shell.getMaximized()) { // not RWT full-screen mode 
 			// Size
+			Point startSize = shell.getSize();
 			shell.pack();
 			shell.setMinimumSize(shell.getSize());
+			shell.setSize(startSize);
 			
-			UIUtil.centerShell(shell);
-			shell.setBounds(SRXEditor_getStartBounds(shell));
+			// Workaround for RWT (stretches the shell horizontally when column widths are adjusted)
+			shell.setMaximized(true);
+			shell.setMaximized(false);
+			
+			UIUtil.centerShell(shell);			
 				
 			// Maximize if requested
 			if ( config.getBoolean(OPT_MAXIMIZED) ) {
@@ -446,15 +451,6 @@ public class SRXEditor {
 		newSRXDocument(1, false);
 	}
 
-	protected Rectangle SRXEditor_getStartBounds(Shell shell) {
-		Point startOrigin = shell.getLocation();
-		Point startSize = shell.getMinimumSize();
-		if ( startSize.x < 700 ) startSize.x = 700; 
-		if ( startSize.y < 600 ) startSize.y = 600;
-		return new Rectangle(startOrigin.x, startOrigin.y,
-				startSize.x, startSize.y);
-	}
-	
 	private void createMenus () {
 		// Menus
 	    Menu menuBar = new Menu(shell, SWT.BAR);

@@ -18,6 +18,7 @@ public class RatelWebApp extends AbstractWebApp {
 	
 	@Override
 	protected void createUI(Shell shell) {
+		if (!shell.getMaximized()) shell.setSize(800, 500);
 		new WebSRXEditor(shell, false, new BaseHelp("help")); // populate the shell
 	    	    
 	    // Disable unsupported items on menu system

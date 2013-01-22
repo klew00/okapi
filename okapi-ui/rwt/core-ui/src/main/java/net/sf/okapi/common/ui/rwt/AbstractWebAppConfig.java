@@ -3,6 +3,8 @@ package net.sf.okapi.common.ui.rwt;
 import java.util.HashMap;
 import java.util.Map;
 
+import net.sf.okapi.common.Util;
+
 import org.eclipse.rwt.RWT;
 import org.eclipse.rwt.application.Application;
 import org.eclipse.rwt.application.Application.OperationMode;
@@ -23,14 +25,16 @@ public abstract class AbstractWebAppConfig implements ApplicationConfiguration {
 		application.setOperationMode(OperationMode.SWT_COMPATIBILITY);
 		Map<String, String> properties = new HashMap<String, String>();
 		properties.put(WebClient.PAGE_TITLE, getPageTitle());
-		properties.put(WebClient.FAVICON, getFaviconPath());
+		if (!Util.isEmpty(getFaviconPath())) 
+			properties.put(WebClient.FAVICON, getFaviconPath());
 		//application.addStyleSheet(FANCY_THEME_ID, "theme/fancy/fancy.css");
 		application.addStyleSheet(RWT.DEFAULT_THEME_ID, getThemePath());
 		application.addEntryPoint("/" + getEntryPointId(), getEntryPointClass(), properties);		
 		application.addEntryPoint("/" + getEntryPointId() + FULL_SCREEN_SUFFIX, getEntryPointClass(), properties);
 		
 		// Resources
-		application.addResource(createResource(getFaviconPath()));
+		if (!Util.isEmpty(getFaviconPath()))
+			application.addResource(createResource(getFaviconPath()));
 	}
 		
 	// http://git.eclipse.org/c/rap/org.eclipse.rap.git/tree/bundles/org.eclipse.rap.examples/src/org/eclipse/rap/examples/internal/ExampleApplication.java?h=streams/1.5-maintenance

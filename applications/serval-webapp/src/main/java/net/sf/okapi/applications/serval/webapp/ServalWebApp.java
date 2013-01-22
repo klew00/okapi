@@ -1,16 +1,25 @@
-package net.sf.okapi.applications.rainbow.webapp;
+package net.sf.okapi.applications.serval.webapp;
 
-import net.sf.okapi.applications.rainbow.MainForm;
+import net.sf.okapi.applications.serval.ServalForm;
 import net.sf.okapi.common.ui.rwt.AbstractWebApp;
 
 import org.eclipse.swt.widgets.Shell;
 
-public class RainbowWebApp extends AbstractWebApp {
+public class ServalWebApp extends AbstractWebApp {
 
 	@Override
 	protected void createUI(Shell shell) {
 		if (!shell.getMaximized()) shell.setBounds(50, 50, 800, 500);
-		new MainForm(shell, null); // populate the shell
+		//BaseHelp help = new BaseHelp("help"); //$NON-NLS-1$
+		
+		//ServalForm editor = new ServalForm(shell);
+		new ServalForm(shell);
+//		// Create and fill the configuration mapper
+//		IFilterConfigurationMapper fcMapper = new FilterConfigurationMapper();
+//		DefaultFilters.setMappings(fcMapper, false, true);
+//		
+//		// Initialize the editor
+//		editor.initialize(shell, false, help, fcMapper, null);
 	    	    
 	    // Disable unsupported items on menu system
 //	    Menu menuBar = shell.getMenuBar();
@@ -58,6 +67,6 @@ public class RainbowWebApp extends AbstractWebApp {
 
 	@Override
 	protected String getName() {
-		return "Rainbow";
+		return "Serval";
 	}
 }

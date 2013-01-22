@@ -77,16 +77,16 @@
 	  					  <artifactId>okapi-core-ui-rwt</artifactId>
 	  					  <version>${project.version}</version>
 		                  <overWrite>true</overWrite>
-		                </artifactItem>
-		                <!-- 
+		                </artifactItem>		                	               
 		                <artifactItem>
-		                  <groupId>net.sf.okapi.lib</groupId>
-	  					  <artifactId>okapi-lib-segmentation-ui</artifactId>
-	  					  <version>${project.version}</version>
-		                </artifactItem>
-		                 -->
+		                  <groupId>net.sf.okapi.applications</groupId>
+						  <artifactId>okapi-application-rainbow</artifactId>
+						  <version>${project.version}</version>
+		                  <overWrite>true</overWrite>
+		                  <outputDirectory>${project.build.directory}/okapi-rainbow/WEB-INF/lib</outputDirectory>
+		                </artifactItem>		                 
 		            </artifactItems>
-		            <outputDirectory>${project.build.directory}/okapi-ratel/WEB-INF/classes</outputDirectory>
+		            <outputDirectory>${project.build.directory}/okapi-rainbow/WEB-INF/classes</outputDirectory>
 	            </configuration>
 	          </execution>
 	        </executions>

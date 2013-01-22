@@ -6,7 +6,6 @@ import net.sf.okapi.common.Util;
 import net.sf.okapi.common.ui.filedownload.FileDownload;
 import net.sf.okapi.common.ui.filedownload.SaveAsDialog;
 
-import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
@@ -19,7 +18,7 @@ public class WebSRXEditor extends SRXEditor {
 	private String clientPath;
 	
 	public WebSRXEditor(Shell parent, boolean asDialog, IHelp helpParam) {
-		super(parent, asDialog, helpParam);
+		super(parent, asDialog, helpParam);		
 		this.parent = parent;
 		this.helpParam = helpParam;
 //		Rectangle shellBounds = shell.getBounds();
@@ -116,10 +115,5 @@ public class WebSRXEditor extends SRXEditor {
 	protected void segmentTextFile_processResult(String testOutputPath) {
 		FileDownload fd = new FileDownload();
 		fd.open(testOutputPath, Util.getFilename(testOutputPath, true));
-	}
-	
-	@Override
-	protected Rectangle SRXEditor_getStartBounds(Shell shell) {
-		return new Rectangle(100, 50, 600, 450);
 	}
 }
