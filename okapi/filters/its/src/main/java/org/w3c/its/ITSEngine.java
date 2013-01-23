@@ -909,10 +909,6 @@ public class ITSEngine implements IProcessor, ITraversal {
 		// Get the local attributes
 		String np[] = retrieveDisambiguationData(elem, false, false);
 		
-		String classP = null;
-		if ( elem.hasAttribute("disambigClassPointer") )
-			classP = elem.getAttribute("disambigClassPointer");
-
 		String classRefP = null;
 		if ( elem.hasAttribute("disambigClassRefPointer") )
 			classRefP = elem.getAttribute("disambigClassRefPointer");
@@ -937,10 +933,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 		// For the annotation info, we add '@@' in front if it is a pointer
 		// also flag with REFFLAG if it is a ref version
 		
-		if ( classP != null ) {
-			ann.setString(GenericAnnotationType.DISAMB_CLASS, PTRFLAG+classP);
-		}
-		else if ( classRefP != null ) {
+		if ( classRefP != null ) {
 			ann.setString(GenericAnnotationType.DISAMB_CLASS, PTRFLAG+REFFLAG+classRefP);
 		}
 		else if ( np[0] != null ) {
