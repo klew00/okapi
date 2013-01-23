@@ -322,4 +322,23 @@ public class ReportGeneratorTest {
 				"// description 2\n   import [?IMPORT]; // description 3", 
 				gen.generate());
 	}
+	
+	@Test
+	public void tableReportTest12() {
+		ReportGenerator gen = new ReportGenerator(this.getClass().getResourceAsStream("test_template4.txt"));
+		assertFalse(gen.isHtmlReport());
+		assertTrue(gen.isMultiItemReport());
+		
+		gen.setField("IMPORT", "import1");
+		gen.setField("IMPORT", "import2");
+		gen.setField("IMPORT", "import3");
+		
+		gen.setField("IMPORT_DESCR", "description 1");
+		gen.setField("IMPORT_DESCR", "description 2");
+		gen.setField("IMPORT_DESCR", "description 3");
+		
+		assertEquals("     line 1\n  line 2\n   import import1; // description 1\n   import import2; " +
+				"// description 2\n   import import3; // description 3", 
+				gen.generate());
+	}
 }

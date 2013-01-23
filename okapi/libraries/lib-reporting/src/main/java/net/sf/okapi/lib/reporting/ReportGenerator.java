@@ -38,12 +38,14 @@ import net.sf.okapi.common.Util;
 public class ReportGenerator {
 
 	private static final String FIELD_REGEX = "\\[([A-Za-z0-9_]+)\\]";
-	private static final String TABLE_REGEX = "\\[(.*\\[.+\\][\\r\\n \\t,;]*)\\]";
+	private static final String TABLE_REGEX = "([ \\t]*)\\[(.*\\[.+\\][\\r\\n \\t,;]*)\\]";
+	private static final String WS_REGEX = "[ \\t]+";
 	private String template;
 	private String lineBreak = "\n";
 	
 	private Pattern fieldPattern = RegexUtil.getPattern(FIELD_REGEX);
 	private Pattern tablePattern = RegexUtil.getPattern(TABLE_REGEX);
+	private Pattern wsPattern = RegexUtil.getPattern(WS_REGEX);
 	
 	private Hashtable<String, String> simpleFields = new Hashtable<String, String>();
 	private Hashtable<String, LinkedList<String>> multiFields = new Hashtable<String, LinkedList<String>>();
@@ -150,11 +152,14 @@ public class ReportGenerator {
 		        int start = matcher.start(0);
 		        int end = matcher.end(0);
 		        
-		        int start2 = matcher.start(1);
-		        int end2 = matcher.end(1);
+		        int start1 = matcher.start(1);
+		        int end1 = matcher.end(1);
+		        
+		        int start2 = matcher.start(2);
+		        int end2 = matcher.end(2);
 		        
 		        String tableField = st.substring(start, end);
-		        String table = st.substring(start2, end2);
+		        String table = st.substring(start1, end1) + st.substring(start2, end2);
 		        
 		        registerField(table, false);
 		        st = RegexUtil.replaceAll(st, RegexUtil.escape(tableField), 0, ""); // remove table not to get in the way of simple fields search
@@ -184,17 +189,22 @@ public class ReportGenerator {
 		        int start = matcher.start(0);
 		        int end = matcher.end(0);
 		        
-		        int start2 = matcher.start(1);
-		        int end2 = matcher.end(1);
+		        int start1 = matcher.start(1);
+		        int end1 = matcher.end(1);
+		        
+		        int start2 = matcher.start(2);
+		        int end2 = matcher.end(2);
 		        
 		        String field = st.substring(start, end);
-		        String fieldName = st.substring(start2, end2);
+		        String fieldName = st.substring(start1, end1) + st.substring(start2, end2);
 		        //System.out.println("---" + fieldName + "---");
 		        String value = getData(fieldName);
 		        if (! Util.isEmpty(value))
 		        	st = RegexUtil.replaceAll(st, RegexUtil.escape(field), 0, value);
 		        else {		        	
-		        	st = RegexUtil.replaceAll(st, RegexUtil.escape(field), 0, "[?" + fieldName + "]");
+		        	//st = RegexUtil.replaceAll(st, RegexUtil.escape(field), 0, "[?" + fieldName + "]");
+		        	st = RegexUtil.replaceAll(st, RegexUtil.escape(field), 0, st.substring(start1, end1) + 
+		        			"[?" + st.substring(start2, end2) + "]");
 		        	break;
 		        }		        	
 		    }
@@ -320,6 +330,11 @@ public class ReportGenerator {
 
 	private String fillRow(String tableTemplate, int rowIndex) {
 		String st = tableTemplate;
+		Matcher m = wsPattern.matcher(st);
+		String leadingWhitespace = null;
+		if (m.find()) { // Find the 1-st whitespace
+			leadingWhitespace = m.group();
+		}
 		
 		while (true) {
 		    Matcher matcher = fieldPattern.matcher(st);
@@ -336,6 +351,7 @@ public class ReportGenerator {
 		        
 		        List<String> column = multiFields.get(fieldName);
 		        st = RegexUtil.replaceAll(st, RegexUtil.escape(field), 0, column.get(rowIndex));
+		        st = st.replaceAll("\n", "\n" + leadingWhitespace);
 		    }
 		    else 
 		    	break;

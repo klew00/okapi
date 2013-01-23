@@ -169,6 +169,21 @@ public class ClassUtil {
 		
 		return "";
 	}
+	
+	/**
+	 * Extracts the class name part of a qualified class name.
+	 * @param className Qualified class name
+	 * @return Class name
+	 */
+	public static String extractShortClassName(String className) {
+		if (Util.isEmpty(className)) return "";
+		
+		int index = className.lastIndexOf(".");
+		if (index > -1)
+			return className.substring(index + 1);
+		
+		return className;
+	}
 
 	/**
 	 * Gets a qualified class name.  
