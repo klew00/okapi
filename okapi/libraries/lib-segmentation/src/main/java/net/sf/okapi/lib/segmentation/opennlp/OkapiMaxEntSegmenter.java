@@ -81,9 +81,7 @@ public class OkapiMaxEntSegmenter implements ISegmenter {
 		}
 	}
 
-	/**
-	 * Resets the options to their defaults, and the compiled rules to nothing.
-	 */
+	@Override
 	public void reset() {
 		segmentSubFlows = true; // SRX default
 		includeStartCodes = false; // SRX default
@@ -95,29 +93,7 @@ public class OkapiMaxEntSegmenter implements ISegmenter {
 		trimCodes = false; // Extension IN TEST (was false for StringInfo) NOT USED FOR NOW						
 	}
 
-	/**
-	 * Sets the options for this segmenter.
-	 * 
-	 * @param segmentSubFlows
-	 *            true to segment sub-flows, false to no segment them.
-	 * @param includeStartCodes
-	 *            true to include start codes just before a break in the 'left'
-	 *            segment, false to put them in the next segment.
-	 * @param includeEndCodes
-	 *            true to include end codes just before a break in the 'left'
-	 *            segment, false to put them in the next segment.
-	 * @param includeIsolatedCodes
-	 *            true to include isolated codes just before a break in the
-	 *            'left' segment, false to put them in the next segment.
-	 * @param oneSegmentIncludesAll
-	 *            true to include everything in segments that are alone.
-	 * @param trimLeadingWS
-	 *            true to trim leading white-spaces from the segments, false to
-	 *            keep them.
-	 * @param trimTrailingWS
-	 *            true to trim trailing white-spaces from the segments, false to
-	 *            keep them.
-	 */
+	@Override
 	public void setOptions(boolean segmentSubFlows, boolean includeStartCodes,
 			boolean includeEndCodes, boolean includeIsolatedCodes,
 			boolean oneSegmentIncludesAll, boolean trimLeadingWS,
@@ -342,31 +318,17 @@ public class OkapiMaxEntSegmenter implements ISegmenter {
 		return locale;
 	}
 
-	/**
-	 * Indicates if, when there is a single segment in a text, it should include
-	 * the whole text (no spaces or codes trim left/right)
-	 * 
-	 * @return true if a text with a single segment should include the whole
-	 *         text.
-	 */
+	@Override
 	public boolean oneSegmentIncludesAll() {
 		return oneSegmentIncludesAll;
 	}
 
-	/**
-	 * Indicates if sub-flows must be segmented.
-	 * 
-	 * @return true if sub-flows must be segmented, false otherwise.
-	 */
+	@Override
 	public boolean segmentSubFlows() {
 		return segmentSubFlows;
 	}
 
-	/**
-	 * Indicates if leading white-spaces should be left outside the segments.
-	 * 
-	 * @return true if the leading white-spaces should be trimmed.
-	 */
+	@Override
 	public boolean trimLeadingWhitespaces() {
 		return trimLeadingWS;
 	}
@@ -376,68 +338,68 @@ public class OkapiMaxEntSegmenter implements ISegmenter {
 	 * 
 	 * @return true if the trailing white-spaces should be trimmed.
 	 */
+	@Override
 	public boolean trimTrailingWhitespaces() {
 		return trimTrailingWS;
 	}
 
-	/**
-	 * Indicates if start codes should be included (See SRX implementation
-	 * notes).
-	 * 
-	 * @return true if they should be included, false otherwise.
-	 */
+	@Override
 	public boolean includeStartCodes() {
 		return includeStartCodes;
 	}
 
-	/**
-	 * Indicates if end codes should be included (See SRX implementation notes).
-	 * 
-	 * @return true if they should be included, false otherwise.
-	 */
+	@Override
 	public boolean includeEndCodes() {
 		return includeEndCodes;
 	}
 
-	/**
-	 * Indicates if isolated codes should be included (See SRX implementation
-	 * notes).
-	 * 
-	 * @return true if they should be included, false otherwise.
-	 */
+	@Override
 	public boolean includeIsolatedCodes() {
 		return includeIsolatedCodes;
 	}
 
+	@Override
 	public void setSegmentSubFlows(boolean segmentSubFlows) {
 		this.segmentSubFlows = segmentSubFlows;
 	}
 
+	@Override
 	public void setIncludeStartCodes(boolean includeStartCodes) {
 		this.includeStartCodes = includeStartCodes;
 	}
 
+	@Override
 	public void setIncludeEndCodes(boolean includeEndCodes) {
 		this.includeEndCodes = includeEndCodes;
 	}
 
+	@Override
 	public void setIncludeIsolatedCodes(boolean includeIsolatedCodes) {
 		this.includeIsolatedCodes = includeIsolatedCodes;
 	}
 
+	@Override
 	public void setOneSegmentIncludesAll(boolean oneSegmentIncludesAll) {
 		this.oneSegmentIncludesAll = oneSegmentIncludesAll;
 	}
 
+	@Override
 	public void setTrimLeadingWS(boolean trimLeadingWS) {
 		this.trimLeadingWS = trimLeadingWS;
 	}
 
+	@Override
 	public void setTrimTrailingWS(boolean trimTrailingWS) {
 		this.trimTrailingWS = trimTrailingWS;
 	}
 
+	@Override
 	public void setTrimCodes(boolean trimCodes) {
 		this.trimCodes = trimCodes;
+	}
+	
+	@Override
+	public void setLanguage (LocaleId languageCode) {
+		locale = languageCode;
 	}
 }

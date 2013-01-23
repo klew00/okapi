@@ -42,10 +42,6 @@ import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.resource.TextPart;
 import net.sf.okapi.common.resource.TextUnit;
-import net.sf.okapi.lib.segmentation.LanguageMap;
-import net.sf.okapi.lib.segmentation.Rule;
-import net.sf.okapi.lib.segmentation.SRXDocument;
-import net.sf.okapi.lib.segmentation.SRXSegmenter;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -62,8 +58,8 @@ public class SegmentationTest {
 	public void setUp() {
 		segmenter = new OkapiMaxEntSegmenter(null, locEN);
 		segmenterTrim = new OkapiMaxEntSegmenter(null, locEN);
-		((OkapiMaxEntSegmenter)segmenterTrim).setTrimLeadingWS(true);
-		((OkapiMaxEntSegmenter)segmenterTrim).setTrimTrailingWS(true);
+		segmenterTrim.setTrimLeadingWS(true);
+		segmenterTrim.setTrimTrailingWS(true);
 	}
 
 	@Test
@@ -186,8 +182,8 @@ public class SegmentationTest {
 	@Test
 	public void testTrimOptionsSetting() {
 		ISegmenter segter = new OkapiMaxEntSegmenter(null, LocaleId.ENGLISH);
-		((OkapiMaxEntSegmenter)segter).setTrimLeadingWS(true);
-		((OkapiMaxEntSegmenter)segter).setTrimTrailingWS(true);
+		segter.setTrimLeadingWS(true);
+		segter.setTrimTrailingWS(true);
 		
 		segter.computeSegments(" a ");
 		List<Range> list = segter.getRanges();

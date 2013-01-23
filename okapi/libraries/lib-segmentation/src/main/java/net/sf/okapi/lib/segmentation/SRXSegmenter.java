@@ -65,10 +65,7 @@ public class SRXSegmenter implements ISegmenter {
 		reset();
 	}
 
-	/**
-	 * Resets the options to their defaults, and the compiled rules
-	 * to nothing.
-	 */
+	@Override
 	public void reset () {
 		currentLanguageCode = null;
 		rules = new ArrayList<CompiledRule>();
@@ -120,20 +117,30 @@ public class SRXSegmenter implements ISegmenter {
 		this.useJavaRegex = useJavaRegex;
 	}
 	
-	/**
-	 * Indicates if, when there is a single segment in a text, it should include
-	 * the whole text (no spaces or codes trim left/right)
-	 * @return true if a text with a single segment should include the whole
-	 * text.
-	 */
+	@Override
+	public void setOptions (boolean segmentSubFlows,
+		boolean includeStartCodes,
+		boolean includeEndCodes,
+		boolean includeIsolatedCodes,
+		boolean oneSegmentIncludesAll,
+		boolean trimLeadingWS,
+		boolean trimTrailingWS)
+	{
+		this.segmentSubFlows = segmentSubFlows;
+		this.includeStartCodes = includeStartCodes;
+		this.includeEndCodes = includeEndCodes;
+		this.includeIsolatedCodes = includeIsolatedCodes;
+		this.oneSegmentIncludesAll = oneSegmentIncludesAll;
+		this.trimLeadingWS = trimLeadingWS;
+		this.trimTrailingWS = trimTrailingWS;		
+	}
+	
+	@Override
 	public boolean oneSegmentIncludesAll () {
 		return oneSegmentIncludesAll;
 	}
 
-	/**
-	 * Indicates if sub-flows must be segmented.
-	 * @return true if sub-flows must be segmented, false otherwise.
-	 */
+	@Override
 	public boolean segmentSubFlows () {
 		return segmentSubFlows;
 	}
@@ -147,18 +154,12 @@ public class SRXSegmenter implements ISegmenter {
 		return cascade;
 	}
 	
-	/**
-	 * Indicates if leading white-spaces should be left outside the segments.
-	 * @return true if the leading white-spaces should be trimmed.
-	 */
+	@Override
 	public boolean trimLeadingWhitespaces () {
 		return trimLeadingWS;
 	}
 	
-	/**
-	 * Indicates if trailing white-spaces should be left outside the segments.
-	 * @return true if the trailing white-spaces should be trimmed.
-	 */
+	@Override
 	public boolean trimTrailingWhitespaces () {
 		return trimTrailingWS;
 	}
@@ -179,26 +180,17 @@ public class SRXSegmenter implements ISegmenter {
 		this.useJavaRegex = useJavaRegex;
 	}
 	
-	/**
-	 * Indicates if start codes should be included (See SRX implementation notes).
-	 * @return true if they should be included, false otherwise.
-	 */
+	@Override
 	public boolean includeStartCodes () {
 		return includeStartCodes;
 	}
 	
-	/**
-	 * Indicates if end codes should be included (See SRX implementation notes).
-	 * @return true if they should be included, false otherwise.
-	 */
+	@Override
 	public boolean includeEndCodes () {
 		return includeEndCodes;
 	}
 	
-	/**
-	 * Indicates if isolated codes should be included (See SRX implementation notes).
-	 * @return true if they should be included, false otherwise.
-	 */
+	@Override
 	public boolean includeIsolatedCodes () {
 		return includeIsolatedCodes;
 	}
@@ -397,67 +389,7 @@ public class SRXSegmenter implements ISegmenter {
 	
 	@Override
 	public Range getNextSegmentRange (TextContainer container) {
-//TODO: Is this method really needed now that we assume no-incremental segmentation?		
-return null;		
-//		String text = container.getCodedText();
-//		int start = 0;
-//		if ( container.isSegmented() ) {
-//			// Find the last segment marker in the main coded text
-//			for ( int i=text.length()-1; i>=0; i-- ) {
-//				if ( text.charAt(i) == TextFragment.MARKER_SEGMENT ) {
-//					start = i+2; // Just after the marker
-//					break;
-//				}
-//			}
-//		}
-//
-//		// Do we have reach the end?
-//		if ( start >= text.length() ) return null;
-//
-//		//TODO: implement same trimming at computeSegments()		
-//		
-//		// Else: search for next segment
-//		Matcher m;
-//		CompiledRule rule;
-//		int end = -1;
-//		int pos = start;
-//		for ( int i=0; i<rules.size(); i++ ) {
-//			rule = rules.get(i);
-//			m = rule.pattern.matcher(text.substring(pos));
-//			if ( m.find() ) {
-//				if ( !rule.isBreak ) {
-//					pos = pos+m.start()+m.group(1).length()+1;
-//					if ( pos == text.length() ) break;
-//					i = 0; // Look at all rules again
-//				}
-//				else {
-//					end = pos+m.start()+m.group(1).length();
-//					break;
-//				}
-//			}
-//		}
-//
-//		// If not found: take all the remainder as the fragment
-//		if ( end < 0 ) end = text.length()-1;
-////TODO: implement same trimming at computeSegments()		
-//		// Trim the white-spaces at the front of the segment
-//		while ( true ) {
-//			if ( start > end ) break;
-//			if ( Character.isWhitespace(text.charAt(start)) ) start++;
-//			else break;
-//		}
-//
-//		// Trim the white-spaces and required codes at the end of the segment
-//		end = TextFragment.indexOfLastNonWhitespace(text, end, start,
-//			!includeStartCodes, !includeEndCodes, !includeIsolatedCodes, trimTrailingWS);
-//		
-//		// Adjust for +1 position (it's a range)
-//		if ( end == -1 ) return null;
-//		else end++;
-//
-//		// Return the range
-//		if ( start == end ) return null;
-//		return new Range(start, end);
+		return null;		
 	}
 
 	@Override
@@ -484,11 +416,8 @@ return null;
 		return currentLanguageCode;
 	}
 
-	/**
-	 * Sets the language used to apply the rules.
-	 * @param languageCode Code of the language to use to apply the rules.
-	 */
-	protected void setLanguage (LocaleId languageCode) {
+	@Override
+	public void setLanguage (LocaleId languageCode) {
 		currentLanguageCode = languageCode;
 		icuRegex.setLanguage(languageCode);
 	}
@@ -524,5 +453,44 @@ return null;
 	public ICURegex getICURegex() {
 		return icuRegex;
 	}
+	
+	@Override
+	public void setSegmentSubFlows(boolean segmentSubFlows) {
+		this.segmentSubFlows = segmentSubFlows;
+	}
 
+	@Override
+	public void setIncludeStartCodes(boolean includeStartCodes) {
+		this.includeStartCodes = includeStartCodes;
+	}
+
+	@Override
+	public void setIncludeEndCodes(boolean includeEndCodes) {
+		this.includeEndCodes = includeEndCodes;
+	}
+
+	@Override
+	public void setIncludeIsolatedCodes(boolean includeIsolatedCodes) {
+		this.includeIsolatedCodes = includeIsolatedCodes;
+	}
+
+	@Override
+	public void setOneSegmentIncludesAll(boolean oneSegmentIncludesAll) {
+		this.oneSegmentIncludesAll = oneSegmentIncludesAll;
+	}
+
+	@Override
+	public void setTrimLeadingWS(boolean trimLeadingWS) {
+		this.trimLeadingWS = trimLeadingWS;
+	}
+
+	@Override
+	public void setTrimTrailingWS(boolean trimTrailingWS) {
+		this.trimTrailingWS = trimTrailingWS;
+	}
+
+	@Override
+	public void setTrimCodes(boolean trimCodes) {
+		this.trimCodes = trimCodes;
+	}
 }
