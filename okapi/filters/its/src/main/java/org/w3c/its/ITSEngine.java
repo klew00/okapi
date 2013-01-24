@@ -1091,8 +1091,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 				if ( map == null ) {
 					map = new LinkedHashMap<String, String>();
 				}
-				// Left value must be lowercase
-				map.put(left.toString().toLowerCase(), right.toString());
+				map.put(left.toString(), right.toString());
 			}
 		}
 		
@@ -1675,6 +1674,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 								upd.setBoolean(GenericAnnotationType.LQI_ENABLED, data1.equals("yes"));
 							}
 						}
+						validateLQIData(anns);
 						// Decorate the node with the resolved annotation data
 						setFlag(NL.item(i), FP_LQISSUE, 'y', true);
 						setFlag(NL.item(i), FP_LQISSUE_DATA, anns.toString(), true);
@@ -1837,9 +1837,8 @@ public class ITSEngine implements IProcessor, ITraversal {
 		}
 		for ( String part : parts ) {
 			// If there is a map and the part is listed in it
-			String lcPart = part.toLowerCase();
-			if (( map != null ) && map.containsKey(lcPart) ) {
-				part = map.get(lcPart); // Use the mapped value
+			if (( map != null ) && map.containsKey(part) ) {
+				part = map.get(part); // Use the mapped value
 			}
 			if ( !list.contains(part) ) {
 				list.add(part);
@@ -2152,6 +2151,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 						if ( values[5] != null ) ann.setBoolean(GenericAnnotationType.LQI_ENABLED, values[5].equals("yes"));
 					}
 					// Set the updated flags
+					validateLQIData(anns);
 					setFlag(attr.getOwnerElement(), FP_LQISSUE, 'y', attr.getSpecified());
 					setFlag(attr.getOwnerElement(), FP_LQISSUE_DATA, anns.toString(), attr.getSpecified()); 
 				}
@@ -2427,12 +2427,21 @@ public class ITSEngine implements IProcessor, ITraversal {
 			return false;
 		}
 	}
+
+	private void validateLQIData (GenericAnnotations anns) {
+		for ( GenericAnnotation ann : anns ) {
+			if ( !ann.getType().equals(GenericAnnotationType.LQI) ) continue;
+			String type = ann.getString(GenericAnnotationType.LQI_TYPE);
+			if (( type != null ) && type.equals("uncategorized") ) {
+				if ( Util.isEmpty(ann.getString(GenericAnnotationType.LQI_COMMENT)) ) {
+					logger.error("Issue of type '{}' must have a comment.", type);
+				}
+			}
+		}
+	}
 	
 	private void validateDataCategoryNames (String dc) {
-		if ( Util.isEmpty(dc) || ( ("allowed-characters|directionality|disambiguation|domain|elements-within-text|"
-			+ "external-resource|id-value|language-information|locale-filter|localization-note|lq-issue|lq-rating|"
-			+ "mt-confidence|provenance|ruby|storage-size|target-pointer|terminology|translate").indexOf(dc)==-1 ))
-		{
+		if ( Util.isEmpty(dc) || ( ("disambiguation|mt-confidence|terminology").indexOf(dc)==-1 )) {
 			// Log an error, but don't stop the process
 			logger.error("Invalid data category name: '{}'.", dc);
 		}
