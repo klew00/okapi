@@ -23,8 +23,6 @@ package net.sf.okapi.filters.its.html5;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.w3c.its.ITSEngine;
-
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.annotation.GenericAnnotation;
@@ -172,7 +170,7 @@ public class HTML5SkeletonWriter extends GenericSkeletonWriter {
 		if ( skel != null ) {
 			GenericSkeletonPart part = skel.getFirstPart();
 			// Is it a standoff placeholder
-			if ( part.getData().toString().equals(ITSFilter.STANDOFFMARKER) ) {
+			if ( part.getData().toString().equals(ITSContent.STANDOFFMARKER) ) {
 				part.setData(""); // Clear the marker in all cases
 				// And add the markup if there is something to output
 				if ( !Util.isEmpty(standoff) ) {

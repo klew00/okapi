@@ -47,6 +47,7 @@ import net.sf.okapi.common.filters.InlineCodeFinder;
 import net.sf.okapi.common.filters.SubFilter;
 import net.sf.okapi.common.filterwriter.GenericFilterWriter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
+import net.sf.okapi.common.filterwriter.ITSContent;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Ending;
@@ -72,8 +73,6 @@ import org.w3c.its.TargetPointerEntry;
 
 public abstract class ITSFilter implements IFilter {
 	
-	public static final String STANDOFFMARKER = "$#@StandOff@#$";
-
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 
 	protected Parameters params;
@@ -714,7 +713,7 @@ public abstract class ITSFilter implements IFilter {
 					addTextUnit(node, false);
 				}
 				// Add the marker for the standoff markup location
-				skel.add(STANDOFFMARKER);
+				skel.add(ITSContent.STANDOFFMARKER);
 				DocumentPart dp = new DocumentPart(otherId.createId(), false, skel);
 				queue.add(new Event(EventType.DOCUMENT_PART, dp));
 				skel = new GenericSkeleton();

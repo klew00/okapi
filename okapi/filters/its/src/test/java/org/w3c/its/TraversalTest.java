@@ -201,15 +201,15 @@ public class TraversalTest {
 		ITraversal trav = applyITSRules(doc, null, false, null);
 		Element elem = getElement(trav, "doc", 1);
 		assertNotNull(elem);
-		assertEquals("finalDom1, dom3, final dom2, Dom4", trav.getDomains(null));
+		assertEquals("finalDom1, dom3, dom2 val, Dom4", trav.getDomains(null));
 		elem = getElement(trav, "head", 1);
 		assertNotNull(elem);
-		assertEquals("finalDom1, dom3, final dom2, Dom4", trav.getDomains(null));
+		assertEquals("finalDom1, dom3, dom2 val, Dom4", trav.getDomains(null));
 		elem = getElement(trav, "p", 1);
 		assertNotNull(elem);
-		assertEquals("finalDom1, dom3, final dom2, Dom4", trav.getDomains(null));
+		assertEquals("finalDom1, dom3, dom2 val, Dom4", trav.getDomains(null));
 		Attr attr = elem.getAttributeNode("id");
-		assertEquals("finalDom1, dom3, final dom2, Dom4", trav.getDomains(attr));
+		assertEquals("finalDom1, dom3, dom2 val, Dom4", trav.getDomains(attr));
 	}
 
 	@Test
@@ -706,6 +706,29 @@ public class TraversalTest {
 		Element elem = getElement(trav, "par", 1);
 		assertTrue(trav.getTranslate(elem.getAttributeNode("title")));
 	}
+	
+	@Test
+	public void testlangVsXmlLangInXHtml () throws SAXException, IOException, ParserConfigurationException {
+		InputSource is = new InputSource(new StringReader("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+			+ "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\""
+			+ " http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">"
+			+ "<html xmlns=\"http://www.w3.org/1999/xhtml\" xml:lang=\"en\">"
+			+ "<head><title>title</title>"
+			+ "</head>"
+			+ "<body>"
+			+ "<p lang='es' xml:lang='pt'>t1</p>"
+			+ "</body></html>"));
+		Document doc = htmlDocBuilder.parse(is);
+		ITraversal trav = applyITSRules(doc, null, true, null);
+		Element elem = getElement(trav, "html", 1);
+		assertNotNull(elem);
+		assertEquals("en", trav.getLanguage());
+		elem = getElement(trav, "p", 1);
+		assertNotNull(elem);
+		assertEquals("pt", trav.getLanguage());
+	}
+
+	
 
 	@Test (expected=ITSException.class)
 	public void testBadQueryLanguage () throws SAXException, IOException, ParserConfigurationException {

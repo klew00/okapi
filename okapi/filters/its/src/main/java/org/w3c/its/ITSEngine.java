@@ -1995,15 +1995,25 @@ public class ITSEngine implements IProcessor, ITraversal {
 
 			if ( (dataCategories & IProcessor.DC_LANGINFO) > 0 ) {
 				if ( isHTML5 ) {
-					expr = xpath.compile("//*/@lang");
+					expr = xpath.compile("//*/@lang|//*/@xmlU00003Alang"); // correct: //*/@"+XML_NS_PREFIX+":lang");
 				}
 				else {
 					expr = xpath.compile("//*/@"+XML_NS_PREFIX+":lang");
 				}
-				
+				//TODO: xml;lang takes precedence over lang in XHTML if both are on the same node
 				NL = (NodeList)expr.evaluate(doc, XPathConstants.NODESET);
 				for ( int i=0; i<NL.getLength(); i++ ) {
 					attr = (Attr)NL.item(i);
+					if ( isHTML5 ) {
+						if ( attr.getNodeName().equals("lang") ) { // It's lang, see if there is a xml;lang
+							//TODO: fix the getAttribute, this makes no sense!
+							//Attr xlang = attr.getOwnerElement().getAttributeNodeNS(XML_NS_URI, "lang");
+							Attr xlang = (Attr)attr.getOwnerElement().getAttributes().getNamedItem("xmlU00003Alang");
+							if ( xlang != null ) {
+								attr = xlang; // Use xml;lang, it overrides lang
+							}
+						}
+					}
 					// Set the flag
 					setFlag(attr.getOwnerElement(), FP_LANGINFO, 'y', attr.getSpecified());
 					setFlag(attr.getOwnerElement(), FP_LANGINFO_DATA,
@@ -2637,6 +2647,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 		NSContextManager nsc = new NSContextManager();
 		nsc.addNamespace(ITS_NS_PREFIX, ITS_NS_URI);
 		nsc.addNamespace(HTML_NS_PREFIX, HTML_NS_URI);
+		nsc.addNamespace(XML_NS_PREFIX, XML_NS_URI);
 		xpath.setNamespaceContext(nsc);
 		return xpath;
 	}

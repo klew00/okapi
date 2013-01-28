@@ -21,6 +21,8 @@
 package net.sf.okapi.filters.xliff;
 
 import java.nio.charset.CharsetEncoder;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,9 +34,11 @@ import net.sf.okapi.common.annotation.AltTranslationsAnnotation;
 import net.sf.okapi.common.encoder.EncoderContext;
 import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.filterwriter.ILayerProvider;
+import net.sf.okapi.common.filterwriter.ITSContent;
 import net.sf.okapi.common.filterwriter.XLIFFContent;
 import net.sf.okapi.common.filterwriter.XLIFFWriter;
 import net.sf.okapi.common.query.MatchType;
+import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.INameable;
 import net.sf.okapi.common.resource.IReferenceable;
 import net.sf.okapi.common.resource.Property;
@@ -59,6 +63,7 @@ public class XLIFFSkeletonWriter extends GenericSkeletonWriter {
 	
 	private Parameters params;
 	private XLIFFContent fmt;
+	private ITSContent itsCont;
 	private CharsetEncoder chsEnc;
 
 	// For serialization
@@ -513,4 +518,113 @@ public class XLIFFSkeletonWriter extends GenericSkeletonWriter {
 		}
 	}
 
+//	@Override
+//	public String getContent (TextFragment tf,
+//		LocaleId locToUse,
+//		EncoderContext context)
+//	{
+//		// Output simple text
+//		if ( !tf.hasCode() ) {
+//			if ( encoderManager == null ) {
+//				if ( layer == null ) {
+//					return tf.toText();
+//				}
+//				else {
+//					return layer.encode(tf.toText(), context);
+//				}
+//			}
+//			else {
+//				if ( layer == null ) {
+//					return encoderManager.encode(tf.toText(), context);
+//				}
+//				else {
+//					return layer.encode(
+//						encoderManager.encode(tf.toText(), context), context);
+//				}
+//			}
+//		}
+//
+//		// Output text with in-line codes
+//		List<Code> codes = tf.getCodes();
+//		StringBuilder tmp = new StringBuilder();
+//		String text = tf.getCodedText();
+//		Code code;
+//		char ch;
+//		for ( int i=0; i<text.length(); i++ ) {
+//			ch = text.charAt(i);
+//			switch ( ch ) {
+//			case TextFragment.MARKER_OPENING:
+//				code = codes.get(TextFragment.toIndex(text.charAt(++i)));
+//				if ( code.hasOnlyAnnotation() ) {
+//					if ( itsCont == null ) itsCont = new ITSContent(encoderManager.getCharsetEncoder(), false);
+//					tmp.append("<mrk");
+//					itsCont.outputAnnotations(code, tmp);
+//					tmp.append(">");
+//				}
+//				else {
+//					tmp.append(expandCodeContent(code, locToUse, context));
+//				}
+//				break;
+//			case TextFragment.MARKER_CLOSING:
+//				code = codes.get(TextFragment.toIndex(text.charAt(++i)));
+//				if ( code.hasOnlyAnnotation() ) {
+//					tmp.append("</mrk>");
+//				}
+//				else {
+//					tmp.append(expandCodeContent(code, locToUse, context));
+//				}
+//				break;
+//			case TextFragment.MARKER_ISOLATED:
+//				code = codes.get(TextFragment.toIndex(text.charAt(++i)));
+//				tmp.append(expandCodeContent(code, locToUse, context));
+//				break;
+//			default:
+//				if ( Character.isHighSurrogate(ch) ) {
+//					int cp = text.codePointAt(i);
+//					i++; // Skip low-surrogate
+//					if ( encoderManager == null ) {
+//						if ( layer == null ) {
+//							tmp.append(new String(Character.toChars(cp)));
+//						}
+//						else {
+//							tmp.append(layer.encode(cp, context));
+//						}
+//					}
+//					else {
+//						if ( layer == null ) {
+//							tmp.append(encoderManager.encode(cp, context));
+//						}
+//						else {
+//							tmp.append(layer.encode(
+//								encoderManager.encode(cp, context),
+//								context));
+//						}
+//					}
+//				}
+//				else { // Non-supplemental case
+//					if ( encoderManager == null ) {
+//						if ( layer == null ) {
+//							tmp.append(ch);
+//						}
+//						else {
+//							tmp.append(layer.encode(ch, context));
+//						}
+//					}
+//					else {
+//						if ( layer == null ) {
+//							tmp.append(encoderManager.encode(ch, context));
+//						}
+//						else {
+//							tmp.append(layer.encode(
+//								encoderManager.encode(ch, context),
+//								context));
+//						}
+//					}
+//				}
+//				break;
+//			}
+//		}
+//		return tmp.toString();
+//	}
+	
 }

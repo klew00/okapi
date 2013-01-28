@@ -717,7 +717,7 @@ public class XLIFFFilter implements IFilter {
 					GenericAnnotationType.DOMAIN_VALUE, tmp)
 				);
 			}
-			// External Resoure Reference
+			// External Resource
 			tmp = reader.getAttributeValue(XLIFFWriter.NS_XLIFFOKAPI, "itsExternalResourceRef");
 			if ( tmp != null ) {
 				GenericAnnotation.addAnnotation(tu, new GenericAnnotation(GenericAnnotationType.EXTERNALRES,
