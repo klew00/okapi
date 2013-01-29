@@ -22,6 +22,7 @@ package net.okapi.steps.codesremoval;
 
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.filterwriter.GenericContent;
+import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.ISegments;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
@@ -155,6 +156,20 @@ public class CodesRemoverTest {
 		assertEquals(0, tf.getCodes().size());
 	}
 	
+	@Test
+	public void testRemoveCodeRemoveContentWithSpace () {
+		params = new Parameters();
+		params.setMode(Parameters.REMOVECODE_REMOVECONTENT);
+		params.setReplaceWithSpace(true);
+		remover = new CodesRemover(params, LocaleId.SPANISH);
+		TextFragment tf = createSimpleFragment();
+		
+		remover.processFragment(tf);
+		System.out.println(tf.toText());
+		assertEquals("t1 t2t3t4 t5 t6 t7 t8 t9 t10 t11 ", tf.toText());
+		assertEquals(0, tf.getCodes().size());
+	}
+	
 	TextFragment createSimpleFragment () {
 		TextFragment tf = new TextFragment("t1");
 		tf.append(TagType.PLACEHOLDER, "br", "<br/>");
@@ -162,6 +177,22 @@ public class CodesRemoverTest {
 		tf.append(TagType.OPENING, "b", "<b>");
 		tf.append("t3");
 		tf.append(TagType.CLOSING, "b", "</b>");
+		tf.append("t4");
+		tf.append(TagType.PLACEHOLDER, "br", "<br>");
+		tf.append("t5");
+		tf.append(TagType.PLACEHOLDER, "br", "<br />");		
+		tf.append("t6");
+		tf.append(TagType.PLACEHOLDER, Code.TYPE_LB, "unspecified");
+		tf.append("t7");
+		tf.append(TagType.PLACEHOLDER, "unspecified", "\n");		
+		tf.append("t8");
+		tf.append(TagType.PLACEHOLDER, "unspecified", "\r");
+		tf.append("t9");
+		tf.append(TagType.PLACEHOLDER, "unspecified", "before\u0085after");
+		tf.append("t10");
+		tf.append(TagType.PLACEHOLDER, "unspecified", "before\u2028after");		
+		tf.append("t11");
+		tf.append(TagType.PLACEHOLDER, "unspecified", "before\u2029after");		
 		return tf;
 	}
 

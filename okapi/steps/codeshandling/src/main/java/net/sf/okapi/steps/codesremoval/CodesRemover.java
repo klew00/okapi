@@ -96,7 +96,13 @@ public class CodesRemover {
 					break;
 				case Parameters.REMOVECODE_REMOVECONTENT:
 				default:
-					i++; // Skip over index
+					if(params.getReplaceWithSpace()){
+						code = codes.get(TextFragment.toIndex(text.charAt(++i)));
+						if (isSpacingCandidate(code))
+							tmp.append(" ");
+					}else{
+						i++; // Just skip over index
+					}
 					break;
 				}
 				break;
@@ -110,4 +116,24 @@ public class CodesRemover {
 		tf.setCodedText(tmp.toString(), remaining);
 	}
 
+	boolean isSpacingCandidate(Code c){
+		if(c.getType()!=null && c.getType().equals(Code.TYPE_LB))
+			return true;
+
+		String data = c.getData().toLowerCase();
+		
+		if (data !=null && (data.contains("<br>") 
+				|| data.contains("<br />") 
+				|| data.contains("<br/>") 
+				|| data.contains("\n") 
+				|| data.contains("\r")
+				|| data.contains("\u0085")     //A next-line character
+				|| data.contains("\u2028")		//A line-separator character
+				|| data.contains("\u2029")		//A paragraph-separator character
+				)) 
+			return true;
+
+		return false;
+	} 
+	
 }
