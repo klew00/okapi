@@ -162,15 +162,24 @@ public class CodesRemoverTest {
 		params.setMode(Parameters.REMOVECODE_REMOVECONTENT);
 		params.setReplaceWithSpace(true);
 		remover = new CodesRemover(params, LocaleId.SPANISH);
-		TextFragment tf = createSimpleFragment();
+		TextFragment tf = createSimpleFragmentWithSpaces();
 		
 		remover.processFragment(tf);
-		System.out.println(tf.toText());
 		assertEquals("t1 t2t3t4 t5 t6 t7 t8 t9 t10 t11 ", tf.toText());
 		assertEquals(0, tf.getCodes().size());
 	}
 	
 	TextFragment createSimpleFragment () {
+		TextFragment tf = new TextFragment("t1");
+		tf.append(TagType.PLACEHOLDER, "br", "<br/>");
+		tf.append("t2");
+		tf.append(TagType.OPENING, "b", "<b>");
+		tf.append("t3");
+		tf.append(TagType.CLOSING, "b", "</b>");
+		return tf;
+	}
+	
+	TextFragment createSimpleFragmentWithSpaces () {
 		TextFragment tf = new TextFragment("t1");
 		tf.append(TagType.PLACEHOLDER, "br", "<br/>");
 		tf.append("t2");
