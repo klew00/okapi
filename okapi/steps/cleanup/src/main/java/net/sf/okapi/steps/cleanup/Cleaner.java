@@ -64,8 +64,19 @@ public class Cleaner {
 
 	private Parameters params;
 	
-	public Cleaner() {
-		
+	/**
+	 * Creates a Cleaner object with default options.
+	 */
+	public Cleaner () {
+		this(null);
+	}
+
+	/**
+	 * Creates a Cleaner object with a given set of options.
+	 * @param params the options to assign to this object (use null for the defaults).
+	 */
+	public Cleaner (Parameters params) {
+		this.params = (params == null ? new Parameters() : params);
 	}
 
 	/**
@@ -677,10 +688,11 @@ public class Cleaner {
 	
 	
 	/**
-	 * Effectively marks the segment for removal by setting the target content
-	 * to null. Tu will be pruned by a different method (see pruneTextUnit).
+	 * Effectively marks the segment for removal by emptying the content
+	 * for the given target. the text unit will be pruned by a different
+	 * method ({@link #pruneTextUnit(ITextUnit, LocaleId)}).
 	 * @param tu the text unit containing the content
-	 * @param seg the segment to be removed
+	 * @param seg the segment to be marked for removal
 	 * @param trgLoc the locale for which the segment should be removed
 	 */
 	protected void markSegmentForRemoval(ITextUnit tu, Segment seg, LocaleId trgLoc) {
