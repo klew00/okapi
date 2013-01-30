@@ -28,6 +28,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
+import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
@@ -36,6 +37,7 @@ import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
+import net.sf.okapi.common.resource.TextUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,7 +69,8 @@ public class Cleaner {
 	/**
 	 * Creates a Cleaner object with default options.
 	 */
-	public Cleaner () {
+	public Cleaner() {
+
 		this(null);
 	}
 
@@ -75,26 +78,83 @@ public class Cleaner {
 	 * Creates a Cleaner object with a given set of options.
 	 * @param params the options to assign to this object (use null for the defaults).
 	 */
-	public Cleaner (Parameters params) {
+	public Cleaner(Parameters params) {
+
 		this.params = (params == null ? new Parameters() : params);
 	}
+	
+	/**
+	 * Performs the cleaning of the text unit according to user selected options.
+	 * @param tu the unit containing the text to clean
+	 * @param targetLocale 
+	 * @return true if tu should be discarded and false otherwise
+	 */
+	public boolean run(ITextUnit tu, LocaleId targetLocale) {
+		
+		if (!tu.isEmpty()) {
+			ISegments srcSegs = tu.getSourceSegments();
+			for (Segment srcSeg : srcSegs) {
+				Segment trgSeg = tu.getTargetSegment(targetLocale, srcSeg.getId(), false);
 
+				// TODO: test trgSeg == null here else continue;
+				if (trgSeg == null) {
+					continue;
+				}
+				
+				// normalized whitespace.
+				// all subsequent steps assume only single spaces
+				normalizeWhitespace(tu, srcSeg, targetLocale);
+				
+				// clean with selected options
+				if (params.getNormalizeQuotes()) {
+					normalizeQuotation(tu, srcSeg, targetLocale);
+				}
+//				if (params.getCheckCharacters()) {
+//					checkCharacters(tu, srcSeg, targetLocale);
+//
+//				}
+				if (params.getMatchRegexExpressions()) {
+					matchRegexExpressions(tu, srcSeg, targetLocale);
+				}
+				
+			}
+		}
+		
+		// return false iff tu has text, else remove tu
+		if (pruneTextUnit(tu, targetLocale) == true) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+
+	/**
+	 * Converts whitespace ({tab}, {space}, {CR}, {LF}) to single space.
+	 * @param tu: the TextUnit containing the segments to update
+	 * @param seg: the Segment to update
+	 * @param targetLocale: the language for which the text should be updated
+	 */
+	protected void normalizeWhitespace(ITextUnit tu, Segment seg, LocaleId targetLocale) {
+		
+		TextFragment.unwrap(seg.getContent());
+		TextFragment.unwrap(tu.getTargetSegment(targetLocale, seg.getId(), false).getContent());
+	}
+	
 	/**
 	 * Converts all quotation marks (curly or language specific) to straight
 	 * quotes. All apostrophes will also be converted to their straight
 	 * equivalents.
 	 * 
-	 * @param srcFrag
-	 *            : original text to be normalized
-	 * @param trgFrag
-	 *            : target text to be normalized
+	 * @param srcFrag: original text to be normalized
+	 * @param trgFrag: target text to be normalized
+	 * @param targetLocale the language for which the text should be updated
 	 */
-	public void normalizeQuotation(TextFragment srcFrag, TextFragment trgFrag) {
-
-		//TODO: update method to take the TU, Segment, Locale as parameters.
+	protected void normalizeQuotation(ITextUnit tu, Segment seg, LocaleId targetLocale) {
 		
-		String srcText = srcFrag.getCodedText();
-		String trgText = trgFrag.getCodedText();
+		TextFragment trgFragment = tu.getTargetSegment(targetLocale, seg.getId(), false).getContent();
+		String srcText = seg.getContent().getCodedText();
+		String trgText = trgFragment.getCodedText();
 
 		Pattern pattern;
 		Matcher matcher;
@@ -124,14 +184,15 @@ public class Cleaner {
 		trgText = matcher.replaceAll(SQ_REPLACE).toString();
 
 		// save updated strings
-		srcFrag.setCodedText(srcText);
-		trgFrag.setCodedText(trgText);
+		seg.getContent().setCodedText(srcText);
+		trgFragment.setCodedText(trgText);
 	}
 
-	public void normalizeMarks(ITextUnit tu, Segment seg, LocaleId trgLoc, boolean doQuotes) {
+	protected void normalizeMarks(ITextUnit tu, Segment seg, LocaleId targetLocale) {
 		
+//		TextFragment trgFrag = tu.getTargetSegment(targetLocale, seg.getId(), false).getContent();
 		StringBuilder srcText = new StringBuilder(seg.text);
-//		StringBuilder trgText = new StringBuilder(tu.getTargetSegment(trgLoc, seg.getId(), false).text);
+//		StringBuilder trgText = new StringBuilder(trgFrag.getCodedText());
 		
 		int cursor = 0;
 		int proxyCheck = 0;
@@ -142,6 +203,7 @@ public class Cleaner {
 		int nearQuote = -1;
 		int nearPunc = -1;
 		
+		boolean doQuotes = params.getNormalizeQuotes();
 		boolean isPunctuation = false;
 		boolean isQuote = false;
 		boolean isNearQuote = false;
@@ -382,7 +444,7 @@ public class Cleaner {
 		}
 		
 		// save updated strings
-		seg.setContent(new TextFragment(srcText.toString()));
+		seg.getContent().setCodedText(srcText.toString());
 	}
 	
 	/**
@@ -398,7 +460,7 @@ public class Cleaner {
 	 * @param trgFrag
 	 *            : target text to be normalized
 	 */
-	public void normalizePunctuation(TextFragment srcFrag, TextFragment trgFrag) {
+	protected void normalizePunctuation(TextFragment srcFrag, TextFragment trgFrag) {
 
 		//TODO: update method to take the TU, Segment, Locale as parameters.
 		
@@ -693,11 +755,11 @@ public class Cleaner {
 	 * method ({@link #pruneTextUnit(ITextUnit, LocaleId)}).
 	 * @param tu the text unit containing the content
 	 * @param seg the segment to be marked for removal
-	 * @param trgLoc the locale for which the segment should be removed
+	 * @param targetLocale the locale for which the segment should be removed
 	 */
-	protected void markSegmentForRemoval(ITextUnit tu, Segment seg, LocaleId trgLoc) {
+	protected void markSegmentForRemoval(ITextUnit tu, Segment seg, LocaleId targetLocale) {
 		
-		tu.getTargetSegment(trgLoc, seg.getId(), false).getContent().clear();	
+		tu.getTargetSegment(targetLocale, seg.getId(), false).getContent().clear();	
 	}
 	
 	/**
@@ -705,28 +767,26 @@ public class Cleaner {
 	 * Allows for marking segments which match user specified regular expressions.
 	 * @param tu the text unit containing the segments to be matched
 	 * @param seg the segment to analyze
-	 * @param trgLoc the locale
-	 * @param doUserRegex whether to perform matching of user specified regular expressions
-	 * @param userRegex the user specified regular expression
+	 * @param targetLocale the locale
 	 */
-	public void matchRegexExpressions(ITextUnit tu, Segment seg, LocaleId trgLoc, boolean doUserRegex, String userRegex) {
+	protected void matchRegexExpressions(ITextUnit tu, Segment seg, LocaleId targetLocale) {
 		
 		Pattern pattern;
 		StringBuilder srcText = new StringBuilder(seg.text);
-		StringBuilder trgText = new StringBuilder(tu.getTargetSegment(trgLoc, seg.getId(), false).text);
+		StringBuilder trgText = new StringBuilder(tu.getTargetSegment(targetLocale, seg.getId(), false).text);
 		boolean alreadyFound = false;
 
 		// match user specified regex expression
-		if (doUserRegex == true) {
-			if ((userRegex != null) && (userRegex != "")) {
+		if (params.getMatchUserRegex() == true) {
+			if ((params.getUserRegex() != null) && (params.getUserRegex() != "")) {
 				// compile user string
 				try {
-					pattern = Pattern.compile(userRegex);
+					pattern = Pattern.compile(params.getUserRegex());
 
 					// find matching text
 					if ((pattern.matcher(srcText).find()) || (pattern.matcher(trgText).find())) {
 						alreadyFound = true;
-						markSegmentForRemoval(tu, seg, trgLoc);
+						markSegmentForRemoval(tu, seg, targetLocale);
 					}
 				} catch (PatternSyntaxException patException) {
 					LOGGER.error("The following error occured \"{}\" in the expression: {}.", patException.getDescription(), patException.getPattern());
@@ -744,11 +804,11 @@ public class Cleaner {
 	 * Removes segments from the text unit marked as not containing
 	 * useful information.
 	 * @param tu text unit to be pruned of unwanted segments
-	 * @param trgLoc locale of target through which to search
+	 * @param targetLocale locale of target through which to search
 	 * @return true if entire text unit is to be discarded
 	 *         false if text unit contains good translated text
 	 */
-	public boolean pruneTextUnit(ITextUnit tu, LocaleId trgLoc) {
+	protected boolean pruneTextUnit(ITextUnit tu, LocaleId targetLocale) {
 		
 		if (!tu.isEmpty()) {
 			TextContainer tc = tu.getSource();
@@ -758,7 +818,7 @@ public class Cleaner {
 			while (cursor <= srcSegs.count() - 1)  {
 				// get segments
 				Segment srcSeg = srcSegs.get(cursor);
-				Segment trgSeg = tu.getTargetSegment(trgLoc, srcSeg.getId(), false);
+				Segment trgSeg = tu.getTargetSegment(targetLocale, srcSeg.getId(), false);
 				
 				// check for segments to remove 
 				if (cursor < srcSegs.count() - 1) {
@@ -780,20 +840,30 @@ public class Cleaner {
 		}
 		return false;
 	}
+
 	
-	
+	/**
+	 * Wrapper for removing character corruption and detecting unexpected characters.
+	 * @param tu: the TextUnit containing the segments to update
+	 * @param seg: the Segment to update
+	 * @param targetLocale: the language for which the text should be updated
+	 */
+	private void checkCharacters(ITextUnit tu, Segment seg, LocaleId targetLocale) {
+		
+		removeCorruptions(tu, seg, targetLocale);
+	}
 	
 	/**
 	 * Attempts to detect character corruption from either the source or target.
 	 * If any corruption are detected, the segment is marked for removal.
 	 * @param tu the text unit to be modified
 	 * @param seg the source segment to be modified
-	 * @param trgLoc the locale used to fetch the target text
+	 * @param targetLocale the locale used to fetch the target text
 	 */
-	private void removeCorruptions(ITextUnit tu, Segment seg, LocaleId trgLoc) {
+	private void removeCorruptions(ITextUnit tu, Segment seg, LocaleId targetLocale) {
 		
 		StringBuilder srcText = new StringBuilder(seg.text);
-		StringBuilder trgText = new StringBuilder(tu.getTargetSegment(trgLoc, seg.getId(), false).text);
+		StringBuilder trgText = new StringBuilder(tu.getTargetSegment(targetLocale, seg.getId(), false).text);
 		
 		Matcher matcher;
 		String corruptionRegex = "\\u00C3[\\u00A4-\\u00B6]|\\u00C3\\u201E|\\u00C3\\u2026|\\u00C3\\u2013";
@@ -801,17 +871,17 @@ public class Cleaner {
 		// find corruption in source
 		matcher = Pattern.compile(corruptionRegex).matcher(srcText);
 		if (matcher.find() == true) {
-			this.markSegmentForRemoval(tu, seg, trgLoc);
+			this.markSegmentForRemoval(tu, seg, targetLocale);
 		}
 		
 		// find corruption in target
 		matcher = Pattern.compile(corruptionRegex).matcher(trgText);
 		if (matcher.find() == true) {
-			this.markSegmentForRemoval(tu, seg, trgLoc);
+			this.markSegmentForRemoval(tu, seg, targetLocale);
 		}
 	}
 	
-	public void checkCharacters(ITextUnit tu, Segment seg, LocaleId trgLoc) {
+	private void checkUnusualCharacters(ITextUnit tu, Segment seg, LocaleId targetLocale) {
 		
 		CharsetEncoder encoder1 = null;
 		CharsetEncoder encoder2 = null;
@@ -819,14 +889,14 @@ public class Cleaner {
 		Pattern itsAllowedChars = null;
 		String itsAllowedCharsPattern = "\u0000";
 
-		StringBuilder trgOri = new StringBuilder(tu.getTargetSegment(trgLoc, seg.getId(), false).text);
+		StringBuilder trgOri = new StringBuilder(tu.getTargetSegment(targetLocale, seg.getId(), false).text);
 		
 		StringBuilder badChars = new StringBuilder();
 		int pos = -1;
 		int badChar = 0;
 		int count = 0;
 
-		// this needs to be set some how from trgLoc
+		// this needs to be set some how from targetLocale
 		String charsetName = null;
 
 		if (!Util.isEmpty(charsetName)) {
