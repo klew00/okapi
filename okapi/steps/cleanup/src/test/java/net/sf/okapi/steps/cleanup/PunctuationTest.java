@@ -38,7 +38,7 @@ import net.sf.okapi.steps.cleanup.Cleaner;
 import org.junit.Before;
 import org.junit.Test;
 
-public class CleanerPunctuationTest {
+public class PunctuationTest {
 
 	private final LocaleId locFR = LocaleId.FRENCH;
 	private final LocaleId locDE = LocaleId.GERMAN;
@@ -119,9 +119,51 @@ public class CleanerPunctuationTest {
 		TextFragment srcTf = new TextFragment("t1, 0 . 235:t2, t3, t4 ; t5 .");
 		TextFragment trgTf = new TextFragment("t1 ,235 : t2 ,t3 , t4 ;t5 . ");
 		
-		cleaner.normalizePunctuation(srcTf, trgTf);
+		ITextUnit tu = new TextUnit("tu1");
+		TextContainer srcTc = tu.getSource();
+		srcTc.append(new Segment("seg1", srcTf));
 		
-		assertEquals("t1, 0.235: t2, t3, t4; t5.", fmt.setContent(srcTf).toString());
-		assertEquals("t1 ,235: t2, t3, t4; t5.", fmt.setContent(trgTf).toString());
+		TextContainer trgTc = tu.createTarget(locFR, true, IResource.CREATE_EMPTY);
+		trgTc.append(new Segment("seg1", trgTf));
+		
+		if (!tu.isEmpty()) {
+			ISegments srcSegs = tu.getSourceSegments();
+			for (Segment srcSeg : srcSegs) {
+				Segment trgSeg = tu.getTargetSegment(locFR, srcSeg.getId(), false);
+				if (trgSeg != null) {
+					cleaner.normalizeMarks(tu, srcSeg, locFR, false);			
+				}
+			}
+		}		
+		
+		assertEquals("[t1, 0.235: t2, t3, t4; t5.]", fmt.printSegmentedContent(tu.getSource(), true, false));
+		assertEquals("[t1, 0.235: t2, t3, t4; t5.]", fmt.printSegmentedContent(tu.getSource(), true, true));
 	}
+	
+//	@Test
+//	public void testSimplePunctuationNearQuote() {
+//		
+//		TextFragment srcTf = new TextFragment("\" t1\" , 0 . 235:t2, t3, t4 ; t5 .");
+//		TextFragment trgTf = new TextFragment("« t1 », ,235 : t2 ,t3 , t4 ;t5 . ");
+//		
+//		ITextUnit tu = new TextUnit("tu1");
+//		TextContainer srcTc = tu.getSource();
+//		srcTc.append(new Segment("seg1", srcTf));
+//		
+//		TextContainer trgTc = tu.createTarget(locFR, true, IResource.CREATE_EMPTY);
+//		trgTc.append(new Segment("seg1", trgTf));
+//		
+//		if (!tu.isEmpty()) {
+//			ISegments srcSegs = tu.getSourceSegments();
+//			for (Segment srcSeg : srcSegs) {
+//				Segment trgSeg = tu.getTargetSegment(locFR, srcSeg.getId(), false);
+//				if (trgSeg != null) {
+//					cleaner.normalizeMarks(tu, srcSeg, locFR, false);			
+//				}
+//			}
+//		}		
+//		
+//		assertEquals("[\"t1\", 0.235: t2, t3, t4; t5.]", fmt.printSegmentedContent(tu.getSource(), true, false));
+//		assertEquals("[\"t1\", 0.235: t2, t3, t4; t5.]", fmt.printSegmentedContent(tu.getSource(), true, true));
+//	}
 }

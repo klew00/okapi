@@ -38,11 +38,13 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	private static final String STRIPTARGET = "stripTarget";
 	private static final String MODE = "mode";
 	private static final String INCLUDENONTRANSLATABLE = "includeNonTranslatable";
+	private static final String REPLACEWITHSPACE = "replaceWithSpace";
 	
 	private boolean stripSource;
 	private boolean stripTarget;
 	private int mode;
 	private boolean includeNonTranslatable;
+	private boolean replaceWithSpace;
 	
 	public Parameters () {
 		reset();
@@ -79,12 +81,21 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	public void setIncludeNonTranslatable (boolean includeNonTranslatable) {
 		this.includeNonTranslatable = includeNonTranslatable;
 	}
+	
+	public boolean getReplaceWithSpace() {
+		return replaceWithSpace;
+	}
+
+	public void setReplaceWithSpace (boolean replaceWithSpace) {
+		this.replaceWithSpace = replaceWithSpace;
+	}
 
 	public void reset() {
 		stripSource = true;
 		stripTarget = true;
 		mode = REMOVECODE_REMOVECONTENT;
 		includeNonTranslatable = true;
+		replaceWithSpace = false;
 	}
 
 	public void fromString (String data) {
@@ -94,6 +105,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		stripTarget = buffer.getBoolean(STRIPTARGET, stripTarget);
 		mode = buffer.getInteger(MODE, mode);
 		includeNonTranslatable = buffer.getBoolean(INCLUDENONTRANSLATABLE, includeNonTranslatable);
+		replaceWithSpace = buffer.getBoolean(REPLACEWITHSPACE, replaceWithSpace);		
 	}
 
 	@Override
@@ -103,6 +115,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		buffer.setBoolean(STRIPTARGET, stripTarget);
 		buffer.setInteger(MODE, mode);
 		buffer.setBoolean(INCLUDENONTRANSLATABLE, includeNonTranslatable);
+		buffer.setBoolean(REPLACEWITHSPACE, replaceWithSpace);		
 		return buffer.toString();
 	}
 
@@ -113,6 +126,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		desc.add(STRIPSOURCE, "Strip codes in the source text", null);
 		desc.add(STRIPTARGET, "Strip codes in the target text", null);
 		desc.add(INCLUDENONTRANSLATABLE, "Apply to non-translatable text units", null);
+		desc.add(REPLACEWITHSPACE, "Replace line break codes with spaces (When removing content AND marker)", null);		
 		return desc;
 	}
 	
@@ -128,6 +142,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		ListSelectionPart lsp = desc.addListSelectionPart(paramDesc.get(MODE), values);
 		lsp.setChoicesLabels(labels);
 
+		desc.addCheckboxPart(paramDesc.get(REPLACEWITHSPACE));
 		desc.addCheckboxPart(paramDesc.get(STRIPSOURCE));
 		desc.addCheckboxPart(paramDesc.get(STRIPTARGET));
 		desc.addCheckboxPart(paramDesc.get(INCLUDENONTRANSLATABLE));
