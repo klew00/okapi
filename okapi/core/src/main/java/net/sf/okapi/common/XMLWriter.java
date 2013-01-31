@@ -210,11 +210,23 @@ public class XMLWriter {
 
     /**
      * Writes a chunk of raw XML (where line-breaks are assumed to be normalized to \n).
+     * If a tag is open, it is closed automatically before the data are written.
+     * Use {@link #appendRawXML(String)} to output without preliminary closing.
      * @param xmlData the data to output. No escaping is performed, but the line-breaks are
      * converted to the line-break type of the output.
      */
     public void writeRawXML (String xmlData) {
     	closeStartTag();
+    	writer.write(xmlData.replace("\n", lineBreak));
+    }
+
+    /**
+     * Writes a chunk of raw XML (where line-breaks are assumed to be normalized to \n).
+     * If a tag is open it is not closed (so this allows you to output raw attributes).
+     * @param xmlData the data to output. No escaping is performed, but the line-breaks are
+     * converted to the line-break type of the output.
+     */
+    public void appendRawXML (String xmlData) {
     	writer.write(xmlData.replace("\n", lineBreak));
     }
 

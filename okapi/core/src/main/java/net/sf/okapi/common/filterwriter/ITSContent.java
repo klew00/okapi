@@ -28,6 +28,7 @@ import net.sf.okapi.common.Util;
 import net.sf.okapi.common.annotation.GenericAnnotation;
 import net.sf.okapi.common.annotation.GenericAnnotationType;
 import net.sf.okapi.common.annotation.GenericAnnotations;
+import net.sf.okapi.common.annotation.IssueAnnotation;
 import net.sf.okapi.common.resource.Code;
 
 /**
@@ -70,6 +71,7 @@ public class ITSContent {
 	 * @return the generated output.
 	 */
 	public String writeStandoffLQI (List<GenericAnnotations> annotations) {
+		if ( annotations == null ) return "";
 		StringBuilder sb = new StringBuilder();
 		for ( GenericAnnotations anns : annotations ) {
 			// Check if we have something to output
@@ -78,8 +80,12 @@ public class ITSContent {
 			// Output
 			if ( isHTML5 ) {
 				sb.append("<script id=\""+anns.getData()+"\" type=\"application/its+xml\">");
+				sb.append("<its:locQualityIssues xmlns:its=\""+ITS_NS_URI+"\" version=\"2.0\" ");
 			}
-			sb.append("<its:locQualityIssues xmlns:its=\""+ITS_NS_URI+"\" version=\"2.0\" ");
+			else {
+				sb.append("<its:locQualityIssues ");
+			}
+			
 			sb.append("xml:id=\""+anns.getData()+"\">");
 			for ( GenericAnnotation ann : list ) {
 				sb.append("<its:locQualityIssue");
@@ -103,6 +109,23 @@ public class ITSContent {
 				if ( strVal != null ) {
 					sb.append(" locQualityIssueType=\"" + strVal + "\"");
 				}
+				// Extended data
+				if ( ann instanceof IssueAnnotation ) {
+					IssueAnnotation iann = (IssueAnnotation)ann;
+					sb.append(" okp:lqiType=\"" + iann.getIssueType().toString() + "\"");
+					sb.append(" okp:lqiSource=\"" + (iann.getForSource() ? "yes" : "no") + "\"");
+					sb.append(String.format(" okp:lqiPos=\"%d %d %d %d\"",
+						iann.getSourceStart(), iann.getSourceEnd(), iann.getTargetStart(), iann.getTargetEnd()));
+					strVal = iann.getCodes();
+					if ( strVal != null ) {
+						sb.append(" okp:lqiCodes=\"" + Util.escapeToXML(strVal, 3, false, encoder) + "\"");
+					}
+					strVal = iann.getSegId();
+					if ( strVal != null ) {
+						sb.append(" okp:lqiSegId=\"" + Util.escapeToXML(strVal, 3, false, encoder) + "\"");
+					}
+				}
+				// End
 				sb.append("/>");
 			}
 			sb.append("</its:locQualityIssues>");
@@ -170,13 +193,24 @@ public class ITSContent {
 	public void outputAnnotations (Code code,
 		StringBuilder output)
 	{
-		GenericAnnotations anns = (GenericAnnotations)code.getAnnotation(GenericAnnotationType.GENERIC);
+		outputAnnotations((GenericAnnotations)code.getAnnotation(GenericAnnotationType.GENERIC), output);
+	}
+
+	/**
+	 * Generates the markup for the ITS attributes for a given annotation set.
+	 * @param anns the annotations set (can be null).
+	 * @param output the buffer where to append the output.
+	 */
+	public void outputAnnotations (GenericAnnotations anns,
+		StringBuilder output)
+	{
+		standoff = null;
 		if ( anns == null ) return;
 		
 		for ( GenericAnnotation ann : anns ) {
 			// AnnotatorsRef
 			//TODO
-
+//TODO: XML
 			// Disambiguation
 			if ( ann.getType().equals(GenericAnnotationType.DISAMB) ) {
 				
@@ -194,22 +228,38 @@ public class ITSContent {
 			// Terminology
 			else if ( ann.getType().equals(GenericAnnotationType.TERM) ) {
 				printITSBooleanAttribute(true, "term", output);
-				printITSDoubleAttribute(ann.getDouble(GenericAnnotationType.TERM_CONFIDENCE), "term-confidence", output);
-				printITSStringAttribute(ann.getString(GenericAnnotationType.TERM_INFO), "term-info", output);
+				printITSDoubleAttribute(ann.getDouble(GenericAnnotationType.TERM_CONFIDENCE),
+					(isHTML5 ? "term-confidence" : "termConfidence"), output);
+				printITSStringAttribute(ann.getString(GenericAnnotationType.TERM_INFO),
+					(isHTML5 ? "term-info" : "termInfo"), output);
 			}
 			
 			// Allowed Characters
 			else if ( ann.getType().equals(GenericAnnotationType.ALLOWEDCHARS) ) {
-				printITSStringAttribute(ann.getString(GenericAnnotationType.ALLOWEDCHARS_VALUE), "allowed-characters", output);
+				printITSStringAttribute(ann.getString(GenericAnnotationType.ALLOWEDCHARS_VALUE),
+					(isHTML5 ? "allowed-characters" : "allowedCharacters"), output);
 			}
 			
 			// Storage Size
 			else if ( ann.getType().equals(GenericAnnotationType.STORAGESIZE) ) {
-				printITSIntegerAttribute(ann.getInteger(GenericAnnotationType.STORAGESIZE_SIZE), "storage-size", output);
+				printITSIntegerAttribute(ann.getInteger(GenericAnnotationType.STORAGESIZE_SIZE),
+					(isHTML5 ? "storage-size" : "storageSize"), output);
 				String tmp = ann.getString(GenericAnnotationType.STORAGESIZE_ENCODING);
-				if ( !tmp.equals("UTF-8") ) printITSStringAttribute(tmp, "storage-encoding", output);
+				if ( !tmp.equals("UTF-8") ) printITSStringAttribute(tmp,
+					(isHTML5 ? "storage-encoding" : "storageEncoding"), output);
 				tmp = ann.getString(GenericAnnotationType.STORAGESIZE_LINEBREAK);
-				if ( !tmp.equals("lf") ) printITSStringAttribute(tmp, "storage-linebreak", output);
+				if ( !tmp.equals("lf") ) printITSStringAttribute(tmp,
+					(isHTML5 ? "storage-linebreak" : "storageLinebreak"), output);
+			}
+
+			// Domain
+			else if ( ann.getType().equals(GenericAnnotationType.DOMAIN) ) {
+				printITSExtStringAttribute(ann.getString(GenericAnnotationType.DOMAIN_VALUE), "itsDomain", output);
+			}
+			
+			// External Resource
+			else if ( ann.getType().equals(GenericAnnotationType.EXTERNALRES) ) {
+				printITSExtStringAttribute(ann.getString(GenericAnnotationType.EXTERNALRES_VALUE), "itsExternalResourceRef", output);
 			}
 			
 			// Localization Quality issue
@@ -241,7 +291,8 @@ public class ITSContent {
 			// If there are 2 or more: the items need to be output as standoff markup.
 			// Inside a ,script> at the end of the document.
 			String refId = anns.getData(); // ID to use is already generated in the annotation
-			output.append(" its-loc-quality-issues-ref=\"#"+refId+"\"");
+			if ( isHTML5 ) output.append(" its-loc-quality-issues-ref=\"#"+refId+"\"");
+			else output.append(" its:locQualityIssuesRef=\"#"+refId+"\"");
 			if ( standoff == null ) standoff = new ArrayList<GenericAnnotations>();
 			GenericAnnotations newSet = new GenericAnnotations();
 			standoff.add(newSet);
@@ -264,17 +315,22 @@ public class ITSContent {
 //				printITSDoubleAttribute(ann.getDouble(GenericAnnotationType.LQI_SEVERITY), "loc-quality-issue-severity", output);
 //				printITSStringAttribute(ann.getString(GenericAnnotationType.LQI_TYPE), "loc-quality-issue-type", output);
 		}
-		else if ( list.size() > 1 ) {
+		else if ( list.size() > 0 ) { // For now all as standoff
 			// If there are 2 or more: the items need to be output as standoff markup.
 			// Inside a ,script> at the end of the document.
 			String refId = anns.getData(); // ID to use is already generated in the annotation
-			output.append(" its-provenance-records-ref=\"#"+refId+"\"");
+			if ( isHTML5 ) output.append(" its-provenance-records-ref=\"#"+refId+"\"");
+			else output.append(" its:provenanceRecordsRef=\"#"+refId+"\"");
 			if ( standoff == null ) standoff = new ArrayList<GenericAnnotations>();
 			GenericAnnotations newSet = new GenericAnnotations();
 			standoff.add(newSet);
 			newSet.setData(refId);
 			newSet.addAll(list);
 		}
+	}
+	
+	public List<GenericAnnotations> getStandoff () {
+		return standoff;
 	}
 
 	private void printITSStringAttribute (String value,
@@ -288,6 +344,15 @@ public class ITSContent {
 				value = value.substring(REF_PREFIX.length());
 			}
 			output.append(" "+ITS_PREFIX+attrName+ref+"=\""+Util.escapeToXML(value, 3, false, encoder)+"\"");
+		}
+	}
+
+	private void printITSExtStringAttribute (String value,
+		String attrName,
+		StringBuilder output)
+	{
+		if ( value != null ) {
+			output.append(" okp:"+attrName+"=\""+Util.escapeToXML(value, 3, false, encoder)+"\"");
 		}
 	}
 

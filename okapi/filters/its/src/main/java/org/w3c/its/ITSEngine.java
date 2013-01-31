@@ -2010,6 +2010,9 @@ public class ITSEngine implements IProcessor, ITraversal {
 							//Attr xlang = attr.getOwnerElement().getAttributeNodeNS(XML_NS_URI, "lang");
 							Attr xlang = (Attr)attr.getOwnerElement().getAttributes().getNamedItem("xmlU00003Alang");
 							if ( xlang != null ) {
+								if ( !attr.getValue().equals(xlang.getValue()) ) {
+									logger.warn("You should not have lang and xml:lang with different values ('{}' and '{}') on the same node.", attr.getValue(), xlang.getValue());
+								}
 								attr = xlang; // Use xml;lang, it overrides lang
 							}
 						}

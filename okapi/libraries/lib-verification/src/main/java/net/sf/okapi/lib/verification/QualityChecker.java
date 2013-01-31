@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Scanner;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -196,7 +197,7 @@ class QualityChecker {
 				reportIssue(IssueType.MISSING_TARGETTU, tu, null,
 					"Missing translation.",
 					0, -1, 0, -1, Issue.SEVERITY_HIGH, srcCont.toString(), "", null);
-				addAnnotation(srcCont, null, IssueType.MISSING_TARGETTU,
+				addAnnotation(tu, true, null, IssueType.MISSING_TARGETTU,
 					"Missing translation",
 					0, -1, 0, -1, IssueAnnotation.SEVERITY_HIGH, null);
 			}
@@ -236,7 +237,7 @@ class QualityChecker {
 			reportIssue(IssueType.SUSPECT_PATTERN, tu, null,
 				"Target content has at least one hidden part.",
 				0, -1, start, end, Issue.SEVERITY_HIGH, srcCont.toString(), trgCont.toString(), null);
-			addAnnotation(trgCont, null, IssueType.SUSPECT_PATTERN,
+			addAnnotation(tu, false, null, IssueType.SUSPECT_PATTERN,
 				"Target content has at least one hidden part.",
 				0, -1, start, end, Issue.SEVERITY_HIGH, null);
 		}
@@ -247,7 +248,7 @@ class QualityChecker {
 				reportIssue(IssueType.MISSING_TARGETSEG, tu, srcSeg.getId(),
 					"The source segment has no corresponding target segment.",
 					0, -1, 0, -1, Issue.SEVERITY_HIGH, srcSeg.toString(), "", null);
-				addAnnotation(srcCont, srcSeg.getId(), IssueType.MISSING_TARGETSEG,
+				addAnnotation(tu, true, srcSeg.getId(), IssueType.MISSING_TARGETSEG,
 					"The source segment has no corresponding target segment.",
 					0, -1, 0, -1, Issue.SEVERITY_HIGH, null);
 				continue; // Cannot go further for that segment
@@ -259,7 +260,7 @@ class QualityChecker {
 					reportIssue(IssueType.EMPTY_TARGETSEG, tu, srcSeg.getId(),
 						"The target segment is empty, but its source is not empty.",
 						0, -1, 0, -1, Issue.SEVERITY_HIGH, srcSeg.toString(), "", null);
-					addAnnotation(srcCont, srcSeg.getId(), IssueType.EMPTY_TARGETSEG,
+					addAnnotation(tu, true, srcSeg.getId(), IssueType.EMPTY_TARGETSEG,
 						"The target segment is empty, but its source is not empty.",
 						0, -1, 0, -1, Issue.SEVERITY_HIGH, null);
 
@@ -272,7 +273,7 @@ class QualityChecker {
 					reportIssue(IssueType.EMPTY_SOURCESEG, tu, srcSeg.getId(),
 						"The target segment is not empty, but its source is empty.",
 						0, -1, 0, -1, Issue.SEVERITY_HIGH, srcSeg.toString(), "", null);
-					addAnnotation(srcCont, srcSeg.getId(), IssueType.EMPTY_SOURCESEG,
+					addAnnotation(tu, true, srcSeg.getId(), IssueType.EMPTY_SOURCESEG,
 						"The target segment is not empty, but its source is empty.",
 						0, -1, 0, -1, Issue.SEVERITY_HIGH, null);
 					continue; // No need to check more if the source is empty
@@ -307,7 +308,7 @@ class QualityChecker {
 								reportIssue(IssueType.TARGET_SAME_AS_SOURCE, tu, srcSeg.getId(),
 									"Translation is the same as the source.",
 									0, -1, 0, -1, Issue.SEVERITY_MEDIUM, srcSeg.toString(), trgSeg.toString(), null);
-								addAnnotation(srcCont, srcSeg.getId(), IssueType.TARGET_SAME_AS_SOURCE,
+								addAnnotation(tu, true, srcSeg.getId(), IssueType.TARGET_SAME_AS_SOURCE,
 									"Translation is the same as the source.",
 									0, -1, 0, -1, Issue.SEVERITY_MEDIUM, null);
 							}
@@ -361,9 +362,9 @@ class QualityChecker {
 				reportIssue(IssueType.EXTRA_TARGETSEG, tu, trgSeg.getId(),
 					String.format("Extra target segment (id=%s).", trgSeg.getId()),
 					0, -1, 0, -1, Issue.SEVERITY_HIGH, "", trgSeg.toString(), null);
-				addAnnotation(trgCont, trgSeg.getId(), IssueType.EXTRA_TARGETSEG,
+				addAnnotation(tu, false, trgSeg.getId(), IssueType.EXTRA_TARGETSEG,
 					String.format("Extra target segment (id=%s).", trgSeg.getId()),
-					0, -1, 0, -1, Issue.SEVERITY_HIGH, null);
+					0, -1, 0, -1, IssueAnnotation.SEVERITY_HIGH, null);
 				continue; // Cannot go further for that segment
 			}
 		}
@@ -392,6 +393,12 @@ class QualityChecker {
 		
 		if ( params.getCheckCharacters() ) {
 			checkCharacters(srcOri, trgOri, tu);
+		}
+		
+		//TODO: make sure the annotation set has an ID
+		GenericAnnotations anns = tu.getAnnotation(GenericAnnotations.class);
+		if ( anns != null ) {
+			anns.setData(Util.makeId(UUID.randomUUID().toString()));
 		}
 	}
 	
@@ -453,16 +460,19 @@ class QualityChecker {
 				reportIssue(IssueType.ALLOWED_CHARACTERS, tu, null,
 					String.format("The character '%c' (U+%04X) is not allowed in the target text."
 						+ " Other forbidden characters found: ", badChar, (int)badChar)+badChars.toString(),
-						0, -1, pos, pos+1, Issue.SEVERITY_MEDIUM, srcOri, trgOri, null);
-//TODO				addAnnotation(tu, IssueType.ALLOWED_CHARACTERS, tu, null,
-//						String.format("The character '%c' (U+%04X) is not allowed in the target text."
-//							+ " Other forbidden characters found: ", badChar, (int)badChar)+badChars.toString(),
-//							0, -1, pos, pos+1, Issue.SEVERITY_MEDIUM, srcOri, trgOri, null);
+					0, -1, pos, pos+1, Issue.SEVERITY_MEDIUM, srcOri, trgOri, null);
+				addAnnotation(tu, false, null, IssueType.ALLOWED_CHARACTERS,
+					String.format("The character '%c' (U+%04X) is not allowed in the target text."
+						+ " Other forbidden characters found: ", badChar, (int)badChar)+badChars.toString(),
+					0, -1, pos, pos+1, IssueAnnotation.SEVERITY_MEDIUM, null);
 			}
 			else {
 				reportIssue(IssueType.ALLOWED_CHARACTERS, tu, null,
 					String.format("The character '%c' (U+%04X) is not allowed in the target text.", badChar, (int)badChar),
 					0, -1, pos, pos+1, Issue.SEVERITY_MEDIUM, srcOri, trgOri, null);
+				addAnnotation(tu, false, null, IssueType.ALLOWED_CHARACTERS,
+					String.format("The character '%c' (U+%04X) is not allowed in the target text.", badChar, (int)badChar),
+					0, -1, pos, pos+1, IssueAnnotation.SEVERITY_MEDIUM, null);
 			}
 		}
 		
@@ -563,9 +573,9 @@ class QualityChecker {
 				"Missing codes in the target: "+buildCodeList(srcList),
 				0, -1, 0, -1, Issue.SEVERITY_MEDIUM, srcSeg.toString(), trgSeg.toString(),
 				srcList);
-//			addAnnotation(trgCont, srcSeg.getId(), IssueType.MISSING_CODE,
-//					"Missing codes in the target: "+buildCodeList(srcList),
-//					0, -1, 0, -1, Issue.SEVERITY_MEDIUM, srcList);
+			addAnnotation(tu, false, srcSeg.getId(), IssueType.MISSING_CODE,
+				"Missing codes in the target: "+buildCodeList(srcList),
+				0, -1, 0, -1, IssueAnnotation.SEVERITY_MEDIUM, srcList);
 			checkOC = false;
 		}
 		
@@ -585,6 +595,9 @@ class QualityChecker {
 				"Extra codes in the target: "+buildCodeList(trgList),
 				0, -1, 0, -1, Issue.SEVERITY_MEDIUM, srcSeg.toString(), trgSeg.toString(),
 				trgList);
+			addAnnotation(tu, false, srcSeg.getId(), IssueType.MISSING_CODE,
+				"Extra codes in the target: "+buildCodeList(trgList),
+				0, -1, 0, -1, IssueAnnotation.SEVERITY_MEDIUM, srcList);
 			checkOC = false;
 		}
 		
@@ -667,6 +680,9 @@ class QualityChecker {
 			reportIssue(IssueType.SUSPECT_PATTERN, tu, null,
 				String.format("Possible corrupted characters in the target (for example: \"%s\").", m.group()),
 				0, -1, m.start(), m.end(), Issue.SEVERITY_HIGH, srcOri, trgOri, null);
+			addAnnotation(tu, false, null, IssueType.SUSPECT_PATTERN,
+				String.format("Possible corrupted characters in the target (for example: \"%s\").", m.group()),
+				0, -1, m.start(), m.end(), IssueAnnotation.SEVERITY_HIGH, null);
 		}
 	}
 
@@ -861,6 +877,10 @@ class QualityChecker {
 						(isSource ? "source" : "target"), enc, len, max),
 					0, -1, 0, -1, Issue.SEVERITY_HIGH,
 					(isSource ? tc.toString() : "N/A"), (isSource ? "N/A" : tc.toString()), null);
+				addAnnotation(tu, isSource, null, (isSource ? IssueType.SOURCE_LENGTH : IssueType.TARGET_LENGTH),
+					String.format("Number of bytes in the %s (using %s) is: %d. Number allowed: %d.",
+						(isSource ? "source" : "target"), enc, len, max),
+					0, -1, 0, -1, IssueAnnotation.SEVERITY_HIGH, null);
 			}
 		}
 		catch ( Throwable e ) {
@@ -1069,7 +1089,8 @@ class QualityChecker {
 	}
 	
 	
-	private void addAnnotation (TextContainer tc,
+	private void addAnnotation (ITextUnit tu,
+		boolean forSource,
 		String segId,
 		IssueType issueType,
 		String comment,
@@ -1080,8 +1101,8 @@ class QualityChecker {
 		int severity,
 		List<Code> codes)
 	{
-		IssueAnnotation ann = new IssueAnnotation(issueType, comment, severity, segId, srcStart, srcEnd, trgStart, trgEnd, codes);
-		GenericAnnotation.addAnnotation(tc, ann);
+		IssueAnnotation ann = new IssueAnnotation(forSource, issueType, comment, severity, segId, srcStart, srcEnd, trgStart, trgEnd, codes);
+		GenericAnnotation.addAnnotation(tu, ann);
 	}
 	
 	private void reportIssue (IssueType issueType,

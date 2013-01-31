@@ -81,6 +81,7 @@ public class XLIFFWriter implements IFilterWriter {
 
 	private XMLWriter writer;
 	private XLIFFContent xliffCont;
+	private ITSContent itsContForUnit;
 	private String skeletonPath;
 	
 	private LocaleId srcLoc;
@@ -449,43 +450,18 @@ public class XLIFFWriter implements IFilterWriter {
 		if ( tu.preserveWhitespaces() ) {
 			writer.writeAttributeString("xml:space", "preserve");
 		}
-		
+
+		// Annotations at the unit level
 		GenericAnnotations anns = tu.getAnnotation(GenericAnnotations.class);
 		if ( anns != null ) {
-			// Storage Size
-			GenericAnnotation ga = anns.getFirstAnnotation(GenericAnnotationType.STORAGESIZE);
-			if ( ga != null ) {
-				writer.writeAttributeString("its:storageSize",
-					ga.getString(GenericAnnotationType.STORAGESIZE_SIZE));
-				tmp = ga.getString(GenericAnnotationType.STORAGESIZE_ENCODING);
-				if ( !tmp.equals("UTF-8") ) {
-					writer.writeAttributeString("its:storageEncoding", tmp);
-				}
-				tmp = ga.getString(GenericAnnotationType.STORAGESIZE_LINEBREAK);
-				if ( !tmp.equals("lf") ) {
-					writer.writeAttributeString("its:lineBreakType", tmp);
-				}
+			StringBuilder sb = new StringBuilder();
+			if ( itsContForUnit == null ) {
+				itsContForUnit = new ITSContent(xliffCont.getCharsetEncoder(), false);
 			}
-			// Allowed Characters
-			ga = anns.getFirstAnnotation(GenericAnnotationType.ALLOWEDCHARS);
-			if ( ga != null ) {
-				writer.writeAttributeString("its:allowedCharacters",
-					ga.getString(GenericAnnotationType.ALLOWEDCHARS_VALUE));
-			}
-			// Domain
-			ga = anns.getFirstAnnotation(GenericAnnotationType.DOMAIN);
-			if ( ga != null ) {
-				writer.writeAttributeString("okp:itsDomain",
-					ga.getString(GenericAnnotationType.DOMAIN_VALUE));
-			}
-			// External Resource
-			ga = anns.getFirstAnnotation(GenericAnnotationType.EXTERNALRES);
-			if ( ga != null ) {
-				writer.writeAttributeString("okp:itsExternalResourceRef",
-					ga.getString(GenericAnnotationType.EXTERNALRES_VALUE));
-			}
+			itsContForUnit.outputAnnotations(anns, sb);
+			writer.appendRawXML(sb.toString());
 		}
-
+		
 		writer.writeLineBreak();
 
 		// Get the source container
@@ -565,6 +541,10 @@ public class XLIFFWriter implements IFilterWriter {
 		}
 		if ( trgStandoff != null ) {
 			writeStandoffLQI(trgStandoff);
+		}
+		if ( itsContForUnit != null ) {
+			writer.writeRawXML(itsContForUnit.writeStandoffLQI(itsContForUnit.getStandoff()));
+			//writeStandoffLQI(itsContForUnit.getStandoff());
 		}
 		
 		// Temporary output for terms annotation
@@ -751,6 +731,7 @@ public class XLIFFWriter implements IFilterWriter {
 	}
 
 	private void writeStandoffLQI (List<GenericAnnotations> list) {
+		if ( list == null ) return;
 		for ( GenericAnnotations anns : list ) {
 			writer.writeStartElement("its:locQualityIssues");
 			writer.writeAttributeString("xml:id", anns.getData());

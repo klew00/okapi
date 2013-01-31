@@ -73,6 +73,14 @@ public class XLIFFContent {
 	public void setCharsetEncoder (CharsetEncoder chsEnc) {
 		this.chsEnc = chsEnc;
 	}
+	
+	/**
+	 * Gets the current character set encoder.
+	 * @return the current character set encoder.
+	 */
+	public CharsetEncoder getCharsetEncoder () {
+		return chsEnc;
+	}
 
 	/**
 	 * Sets the fragment to format.
@@ -324,6 +332,9 @@ public class XLIFFContent {
 				if ( withMarkers ) tmp.append("</mrk>");
 			}
 		}
+		
+		// Get the annotations at the container level
+		//TODO
 		return tmp.toString();
 	}
 

@@ -841,9 +841,9 @@ public class TraversalTest {
 			+ "<body><p>t1<span lang=\"fr\">tf</span></p></body>/html>"));
 		Document doc = htmlDocBuilder.parse(is);
 		ITraversal trav = applyITSRules(doc, null, true, null);
-		Element elem = getElement(trav, "head", 1);
+		getElement(trav, "head", 1);
 		assertEquals("en", trav.getLanguage());
-		elem = getElement(trav, "span", 1);
+		getElement(trav, "span", 1);
 		assertEquals("fr", trav.getLanguage());
 	}
 	
@@ -861,9 +861,9 @@ public class TraversalTest {
 			+ "<body><p>t1<span lang=\"fr\">tf</span></p></body>/html>"));
 		Document doc = htmlDocBuilder.parse(is);
 		ITraversal trav = applyITSRules(doc, null, true, null);
-		Element elem = getElement(trav, "head", 1);
+		getElement(trav, "head", 1);
 		assertEquals("en", trav.getLanguage());
-		elem = getElement(trav, "span", 1);
+		getElement(trav, "span", 1);
 		assertEquals("fr", trav.getLanguage());
 	}
 

@@ -38,7 +38,8 @@ public class IssueAnnotation extends GenericAnnotation {
 	
 	private IssueType issueType;
 	
-	public IssueAnnotation (IssueType issueType,
+	public IssueAnnotation (boolean forSource,
+		IssueType issueType,
 		String comment,
 		int severity,
 		String segId,
@@ -49,6 +50,7 @@ public class IssueAnnotation extends GenericAnnotation {
 		List<Code> codes)
 	{
 		super(GenericAnnotationType.LQI);
+		setForSource(forSource);
 		setBoolean(GenericAnnotationType.LQI_ENABLED, true);
 		setIssueType(issueType);
 		setString(GenericAnnotationType.LQI_COMMENT, comment);
@@ -70,6 +72,7 @@ public class IssueAnnotation extends GenericAnnotation {
 	 */
 	public void setIssueType (IssueType issueType) {
 		this.issueType = issueType;
+		setString(GenericAnnotationType.LQI_XTYPE, issueType.toString());
 		setString(GenericAnnotationType.LQI_TYPE, IssueType.getITSType(issueType));
 	}
 		
@@ -80,7 +83,15 @@ public class IssueAnnotation extends GenericAnnotation {
 	public void setITSType (String itsType) {
 		setString(GenericAnnotationType.LQI_TYPE, itsType);
 	}
-		
+	
+	public void setForSource (boolean forSource) {
+		setBoolean(GenericAnnotationType.LQI_XFORSOURCE, forSource);
+	}
+	
+	public boolean getForSource () {
+		return getBoolean(GenericAnnotationType.LQI_XFORSOURCE);
+	}
+	
 	public String getSegId () {
 		return getString(GenericAnnotationType.LQI_XSEGID);
 	}
@@ -123,16 +134,16 @@ public class IssueAnnotation extends GenericAnnotation {
 		setBoolean(GenericAnnotationType.LQI_ENABLED, enabled);
 	}
 	
-	public int getSeverity () {
-		return getInteger(GenericAnnotationType.LQI_SEVERITY);
+	public double getSeverity () {
+		return getDouble(GenericAnnotationType.LQI_SEVERITY);
 	}
 	
-	public void setSeverity (int severity) {
+	public void setSeverity (double severity) {
 		//TODO: handle severity value mapping
 		if (( severity < SEVERITY_LOW ) || ( severity > SEVERITY_HIGH )) {
 			throw new InvalidParameterException("Invalid severity value.");
 		}
-		setInteger(GenericAnnotationType.LQI_SEVERITY, severity);
+		setDouble(GenericAnnotationType.LQI_SEVERITY, severity);
 	}
 	
 	public String getComment () {
