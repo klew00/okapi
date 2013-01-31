@@ -30,15 +30,11 @@
 		</dependency>
 		<dependency>
 			<groupId>org.apache.opennlp</groupId>
-			<artifactId>opennlp-tools</artifactId>
-			<version>1.5.2-incubating</version>
-			<scope>compile</scope>
+			<artifactId>opennlp-tools</artifactId>				
 		</dependency>
 		<dependency>
 			<groupId>org.apache.opennlp</groupId>
-			<artifactId>opennlp-maxent</artifactId>
-			<version>3.0.2-incubating</version>
-			<scope>compile</scope>
+			<artifactId>opennlp-maxent</artifactId>				
 		</dependency>
 	</dependencies>
 </project>
