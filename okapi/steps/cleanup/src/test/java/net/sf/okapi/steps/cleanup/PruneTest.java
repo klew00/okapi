@@ -47,9 +47,10 @@ public class PruneTest {
 
 	@Before
 	public void setup() {
-
+		
+		Parameters params = new Parameters();
 		fmt = new GenericContent();
-		cleaner = new Cleaner();
+		cleaner = new Cleaner(params);
 	}
 
 	@Test
@@ -133,7 +134,6 @@ public class PruneTest {
 				num += 1;
 			}
 		}
-		cleaner.pruneTextUnit(tu, locFR);
 
 		assertEquals("[t1 t2] [] []", fmt.printSegmentedContent(tu.getTarget(locFR), true, false));
 		assertEquals("[t1 t2] [] []", fmt.printSegmentedContent(tu.getTarget(locFR), true, true));
@@ -178,7 +178,7 @@ public class PruneTest {
 			}
 		}
 		
-		assertEquals(true, cleaner.pruneTextUnit(tu, locFR));
+		assertEquals(true, cleaner.run(tu, locFR));
 	}
 
 }

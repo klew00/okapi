@@ -52,6 +52,8 @@ import java.nio.charset.CharsetEncoder;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
@@ -126,7 +128,11 @@ public final class Util {
 
 	private static final String NEWLINES_REGEX = "\r(\n)?";
 	private static final Pattern NEWLINES_REGEX_PATTERN = Pattern.compile(NEWLINES_REGEX);
-	
+	/**
+	 * Any variable of the type ${varname}.
+	 */
+	private static final String VARIABLE_REGEX = "\\$\\{([^\\}]+)\\}";
+	private static final Pattern VARIABLE_REGEX_PATTERN = Pattern.compile(VARIABLE_REGEX);
 	/**
 	 * Shared flag indicating a translation that was generated using machine translation.
 	 */
@@ -1490,6 +1496,64 @@ public final class Util {
 			inputRootDir = "";
 		}
 		return original.replace(INPUT_ROOT_DIRECTORY_VAR, inputRootDir);
+	}
+	
+	/**
+	 * Expands environment variables by replacing strings of the type
+	 * ${varname} with their values as reported by the system.
+	 * @param original The original string in which to perform the replacement
+	 * @return The original string with all environment variables expanded
+	 */
+	public static String fillSystemEnvars(String original)
+	{
+		for (Entry<String, String> e : System.getenv().entrySet()) {
+			original = original.replace(String.format("${%s}", e.getKey()), e.getValue());
+		}
+		return original;
+	}
+	
+	/**
+	 * Check a piece of text to make sure that all contained variables (${foo})
+	 * are resolvable by the fill...() methods in this class.
+	 * @param text The text to check
+	 * @param allowEnvar Whether or not to allow system environment variables
+	 * @param allowRootDir Whether or not to allow ${rootDir}
+	 * @param allowInputRootDir Whether or not to allow ${inputRootDir}
+	 * @return Whether or not the input text's variables are valid
+	 */
+	public static boolean validateVariables(String text,
+			boolean allowEnvar, boolean allowRootDir, boolean allowInputRootDir) {
+		Matcher m = VARIABLE_REGEX_PATTERN.matcher(text);
+		while (m.find()) {
+			String var = m.group();
+			String varName = m.group(1);
+			if (allowEnvar && System.getenv().containsKey(varName)) continue;
+			if (allowRootDir && var.equals(ROOT_DIRECTORY_VAR)) continue;
+			if (allowInputRootDir && var.equals(INPUT_ROOT_DIRECTORY_VAR)) continue;
+			return false;
+		}
+		return true;
+	}
+	
+	/**
+	 * Expand all supported variables and canonicalize (resolve ".." and ".")
+	 * a path. If the input path has no variables, it is returned unchanged.
+	 * rootDir and inputRootDir can be null.
+	 * @param path The path to expand
+	 * @param rootDir The directory to expand ${rootDir} into
+	 * @param inputRootDir The directory to expand ${inputRootDir} into
+	 * @return The expanded path
+	 * @throws IOException If canonicalizing fails
+	 */
+	public static String expandPath (String path, String rootDir, String inputRootDir)
+			throws IOException {
+		if (!path.contains("${")) return path;
+		
+		path = Util.fillSystemEnvars(path);
+		path = Util.fillRootDirectoryVariable(path, rootDir);
+		path = Util.fillInputRootDirectoryVariable(path, inputRootDir);
+		path = new File(path).getCanonicalPath();
+		return path;
 	}
 
 	/**

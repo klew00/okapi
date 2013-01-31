@@ -49,12 +49,15 @@ public class RegexTest {
 
 	private GenericContent fmt;
 	private Cleaner cleaner;
+	private Parameters params;
 
 	@Before
 	public void setup() {
 
+		params = new Parameters();
+		params.setMatchUserRegex(true);
 		fmt = new GenericContent();
-		cleaner = new Cleaner();
+		cleaner = new Cleaner(params);
 	}
 	
 	@Test
@@ -70,12 +73,14 @@ public class RegexTest {
 		TextContainer trgTc = tu.createTarget(locFR, true, IResource.CREATE_EMPTY);
 		trgTc.append(new Segment("seg1", trgTf));
 		
+		params.setUserRegex("(?:(&(?:amp;)?[a-zA-Z]{2,4};))");
+		
 		if (!tu.isEmpty()) {
 			ISegments srcSegs = tu.getSourceSegments();
 			for (Segment srcSeg : srcSegs) {
 				Segment trgSeg = tu.getTargetSegment(locFR, srcSeg.getId(), false);
 				if (trgSeg != null) {
-					cleaner.matchRegexExpressions(tu, srcSeg, locFR, true, "(?:(&(?:amp;)?[a-zA-Z]{2,4};))");			
+					cleaner.matchRegexExpressions(tu, srcSeg, locFR);			
 				}
 			}
 		}		
@@ -101,12 +106,14 @@ public class RegexTest {
 		TextContainer trgTc = tu.createTarget(locFR, true, IResource.CREATE_EMPTY);
 		trgTc.append(new Segment("seg1", trgTf));
 		
+		params.setUserRegex("(?:(&(?:amp;)?[a-zA-Z}{2,4};))");
+		
 		if (!tu.isEmpty()) {
 			ISegments srcSegs = tu.getSourceSegments();
 			for (Segment srcSeg : srcSegs) {
 				Segment trgSeg = tu.getTargetSegment(locFR, srcSeg.getId(), false);
 				if (trgSeg != null) {
-					cleaner.matchRegexExpressions(tu, srcSeg, locFR, true, "(?:(&(?:amp;)?[a-zA-Z}{2,4};))");			
+					cleaner.matchRegexExpressions(tu, srcSeg, locFR);			
 				}
 			}
 		}		

@@ -152,7 +152,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		ParametersDescription desc = new ParametersDescription(this);
 		
 		desc.add(NORMALIZEQUOTES, "Normalize quotation marks", null);
-		desc.add(CHECKCHARACTERS, "Check for corrupt or unexpected characters", null);
+//		desc.add(CHECKCHARACTERS, "Check for corrupt or unexpected characters", null);
 		desc.add(MATCHREGEXEXPRESSIONS, "Mark segments matching default regular expressions for removal", null);
 		desc.add(MATCHUSERREGEX, "Mark segments matching user defined regular expressions for removal", null);
 		desc.add(USERREGEX, "User defined regex string", null);
@@ -168,9 +168,9 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		desc.addCheckboxPart(paramDesc.get(NORMALIZEQUOTES));
 		desc.addCheckboxPart(paramDesc.get(MATCHREGEXEXPRESSIONS));
 		desc.addCheckboxPart(paramDesc.get(MATCHUSERREGEX));
-		desc.addCheckboxPart(paramDesc.get(CHECKCHARACTERS));
 		TextInputPart tip = desc.addTextInputPart(paramDesc.get(USERREGEX));
 		tip.setAllowEmpty(true);
+//		desc.addCheckboxPart(paramDesc.get(CHECKCHARACTERS));
 		desc.addCheckboxPart(paramDesc.get(PRUNETEXTUNIT));
 
 		return desc;
