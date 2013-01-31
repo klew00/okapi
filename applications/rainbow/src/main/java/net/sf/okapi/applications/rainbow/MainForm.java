@@ -1941,7 +1941,7 @@ public class MainForm { //implements IParametersProvider {
 			InputDialog dlg = new InputDialog(shell,
 				String.format(Res.getString("MainForm.rootCaption"), currentInput+1), //$NON-NLS-1$
 				Res.getString("MainForm.editRootLabel"), //$NON-NLS-1$
-				prj.getInputRoot(currentInput), null, 1, -1, -1);
+				prj.getRawInputRoot(currentInput), null, 1, -1, -1);
 			dlg.setAllowEmptyValue(true);
 			String newRoot = dlg.showDialog();
 			if ( newRoot == null ) return; // Canceled
