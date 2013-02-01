@@ -102,7 +102,7 @@ public class ITSTest_TestSuite {
 		int n = output.lastIndexOf('.');
 		if ( n > -1 ) output = output.substring(0, n);
 		output += "output";
-		output += ".txt"; //Util.getExtension(input);
+		output += ".txt";
 		
 		Main.main(new String[]{input, output, "-dc", dataCategory});
 		assertTrue(new File(output).exists());

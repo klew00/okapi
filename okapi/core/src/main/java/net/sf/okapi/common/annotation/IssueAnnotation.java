@@ -38,8 +38,7 @@ public class IssueAnnotation extends GenericAnnotation {
 	
 	private IssueType issueType;
 	
-	public IssueAnnotation (boolean forSource,
-		IssueType issueType,
+	public IssueAnnotation (IssueType issueType,
 		String comment,
 		int severity,
 		String segId,
@@ -50,7 +49,6 @@ public class IssueAnnotation extends GenericAnnotation {
 		List<Code> codes)
 	{
 		super(GenericAnnotationType.LQI);
-		setForSource(forSource);
 		setBoolean(GenericAnnotationType.LQI_ENABLED, true);
 		setIssueType(issueType);
 		setString(GenericAnnotationType.LQI_COMMENT, comment);
@@ -82,14 +80,6 @@ public class IssueAnnotation extends GenericAnnotation {
 	
 	public void setITSType (String itsType) {
 		setString(GenericAnnotationType.LQI_TYPE, itsType);
-	}
-	
-	public void setForSource (boolean forSource) {
-		setBoolean(GenericAnnotationType.LQI_XFORSOURCE, forSource);
-	}
-	
-	public boolean getForSource () {
-		return getBoolean(GenericAnnotationType.LQI_XFORSOURCE);
 	}
 	
 	public String getSegId () {

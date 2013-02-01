@@ -113,7 +113,6 @@ public class ITSContent {
 				if ( ann instanceof IssueAnnotation ) {
 					IssueAnnotation iann = (IssueAnnotation)ann;
 					sb.append(" okp:lqiType=\"" + iann.getIssueType().toString() + "\"");
-					sb.append(" okp:lqiSource=\"" + (iann.getForSource() ? "yes" : "no") + "\"");
 					sb.append(String.format(" okp:lqiPos=\"%d %d %d %d\"",
 						iann.getSourceStart(), iann.getSourceEnd(), iann.getTargetStart(), iann.getTargetEnd()));
 					strVal = iann.getCodes();

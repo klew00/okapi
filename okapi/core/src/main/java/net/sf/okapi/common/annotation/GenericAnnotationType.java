@@ -105,7 +105,6 @@ public class GenericAnnotationType {
 	public static final String LQI_PROFILEREF = "lqiProfileRef";
 	public static final String LQI_ENABLED = "lqiEnabled"; // Boolean
 	// Extensions
-	public static final String LQI_XFORSOURCE = "lqiXForSource"; // Boolean
 	public static final String LQI_XTYPE = "lqiXType"; // String
 	public static final String LQI_XSEGID = "lqiXSegId"; // String
 	public static final String LQI_XSTART = "lqiXStart"; // Integer

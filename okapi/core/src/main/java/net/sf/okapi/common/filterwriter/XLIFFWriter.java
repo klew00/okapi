@@ -82,6 +82,8 @@ public class XLIFFWriter implements IFilterWriter {
 	private XMLWriter writer;
 	private XLIFFContent xliffCont;
 	private ITSContent itsContForUnit;
+	private ITSContent itsContForSrcCont;
+	private ITSContent itsContForTrgCont;
 	private String skeletonPath;
 	
 	private LocaleId srcLoc;
@@ -472,6 +474,18 @@ public class XLIFFWriter implements IFilterWriter {
 		
 		writer.writeStartElement("source");
 		writer.writeAttributeString("xml:lang", srcLoc.toBCP47());
+		
+		// Annotations at the source container level
+		anns = tc.getAnnotation(GenericAnnotations.class);
+		if ( anns != null ) {
+			StringBuilder sb = new StringBuilder();
+			if ( itsContForSrcCont == null ) {
+				itsContForSrcCont = new ITSContent(xliffCont.getCharsetEncoder(), false);
+			}
+			itsContForSrcCont.outputAnnotations(anns, sb);
+			writer.appendRawXML(sb.toString());
+		}
+		
 		// Write full source content (always without segments markers
 		writer.writeRawXML(xliffCont.toSegmentedString(tc, 0, escapeGt, false, placeholderMode));
 		List<GenericAnnotations> srcStandoff = xliffCont.getStandoff();
@@ -502,6 +516,18 @@ public class XLIFFWriter implements IFilterWriter {
 			if ( outputTarget ) {
 				writer.writeStartElement("target");
 				writer.writeAttributeString("xml:lang", trgLoc.toBCP47());
+
+				// Annotations at the target container level
+				anns = tc.getAnnotation(GenericAnnotations.class);
+				if ( anns != null ) {
+					StringBuilder sb = new StringBuilder();
+					if ( itsContForTrgCont == null ) {
+						itsContForTrgCont = new ITSContent(xliffCont.getCharsetEncoder(), false);
+					}
+					itsContForTrgCont.outputAnnotations(anns, sb);
+					writer.appendRawXML(sb.toString());
+				}
+				
 				// Now tc hold the content to write. Write it with or without marks
 				writer.writeRawXML(xliffCont.toSegmentedString(tc, 0, escapeGt, tc.hasBeenSegmented(), placeholderMode));
 				trgStandoff = xliffCont.getStandoff();
@@ -539,12 +565,17 @@ public class XLIFFWriter implements IFilterWriter {
 		if ( srcStandoff != null ) {
 			writeStandoffLQI(srcStandoff);
 		}
+		if ( itsContForSrcCont != null ) {
+			writer.writeRawXML(itsContForSrcCont.writeStandoffLQI(itsContForSrcCont.getStandoff()));
+		}
 		if ( trgStandoff != null ) {
 			writeStandoffLQI(trgStandoff);
 		}
+		if ( itsContForTrgCont != null ) {
+			writer.writeRawXML(itsContForTrgCont.writeStandoffLQI(itsContForTrgCont.getStandoff()));
+		}
 		if ( itsContForUnit != null ) {
 			writer.writeRawXML(itsContForUnit.writeStandoffLQI(itsContForUnit.getStandoff()));
-			//writeStandoffLQI(itsContForUnit.getStandoff());
 		}
 		
 		// Temporary output for terms annotation
