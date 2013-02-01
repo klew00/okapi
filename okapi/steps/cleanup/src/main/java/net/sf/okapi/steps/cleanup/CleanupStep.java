@@ -23,11 +23,15 @@
 package net.sf.okapi.steps.cleanup;
 
 import net.sf.okapi.common.Event;
+import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
 import net.sf.okapi.common.pipeline.annotations.StepParameterMapping;
 import net.sf.okapi.common.pipeline.annotations.StepParameterType;
+import net.sf.okapi.common.resource.ISegments;
+import net.sf.okapi.common.resource.ITextUnit;
+import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.UsingParameters;
 
 import org.slf4j.Logger;
@@ -46,7 +50,8 @@ public class CleanupStep extends BasePipelineStep {
 
 	public CleanupStep() {
 
-		params = new Parameters();
+		this.params = new Parameters();
+		this.cleaner = new Cleaner(params);
 	}
 
 	@Override
@@ -89,9 +94,16 @@ public class CleanupStep extends BasePipelineStep {
 	@Override
 	protected Event handleTextUnit(Event event) {
 
-		// TODO:
-		// cleaner.blah
-		return null;
+		// TODO: move to cleaner. create run method
+		
+		ITextUnit tu = event.getTextUnit();
+		
+		// return event iff tu has text, else remove tu
+		if (cleaner.run(tu, targetLocale) == true) {
+			return Event.NOOP_EVENT;
+		} else {
+			return event;
+		}
 	}
 
 }

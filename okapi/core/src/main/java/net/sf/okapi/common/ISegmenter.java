@@ -85,5 +85,94 @@ public interface ISegmenter {
 	 * been specified.
 	 */
 	public LocaleId getLanguage ();
-
+		
+	/**
+	 * Indicates if end codes should be included (See SRX implementation notes).
+	 * @return true if they should be included, false otherwise.
+	 */
+	public boolean includeEndCodes();
+	
+	/**
+	 * Indicates if isolated codes should be included (See SRX implementation notes).
+	 * @return true if they should be included, false otherwise.
+	 */
+	public boolean includeIsolatedCodes();
+	
+	/**
+	 * Indicates if start codes should be included (See SRX implementation notes).
+	 * @return true if they should be included, false otherwise.
+	 */
+	public boolean includeStartCodes();
+	
+	/**
+	 * Resets the options to their defaults, and the compiled rules
+	 * to nothing.
+	 */
+	public void reset();
+	
+	/**
+	 * Indicates if sub-flows must be segmented.
+	 * @return true if sub-flows must be segmented, false otherwise.
+	 */
+	public boolean segmentSubFlows();
+	
+	/**
+	 * Indicates if leading white-spaces should be left outside the segments.
+	 * @return true if the leading white-spaces should be trimmed.
+	 */
+	public boolean trimLeadingWhitespaces();
+	
+	/**
+	 * Indicates if trailing white-spaces should be left outside the segments.
+	 * @return true if the trailing white-spaces should be trimmed.
+	 */
+	public boolean trimTrailingWhitespaces();
+	
+	/**
+	 * Indicates if, when there is a single segment in a text, it should include
+	 * the whole text (no spaces or codes trim left/right)
+	 * @return true if a text with a single segment should include the whole
+	 * text.
+	 */
+	public boolean oneSegmentIncludesAll();
+	
+	/**
+	 * Sets the language used to apply the rules.
+	 * @param languageCode Code of the language to use to apply the rules.
+	 */
+	public void setLanguage(LocaleId locale);
+	
+	public void setIncludeEndCodes(boolean includeEndCodes);
+	
+	public void setIncludeIsolatedCodes(boolean includeIsolatedCodes);
+	
+	public void setIncludeStartCodes(boolean includeStartCodes);
+	
+	public void setOneSegmentIncludesAll(boolean oneSegmentIncludesAll);
+	
+	/**
+	 * Sets the options for this segmenter.
+	 * @param segmentSubFlows true to segment sub-flows, false to no segment them.
+	 * @param includeStartCodes true to include start codes just before a break in the 'left' segment,
+	 * false to put them in the next segment. 
+	 * @param includeEndCodes  true to include end codes just before a break in the 'left' segment,
+	 * false to put them in the next segment.
+	 * @param includeIsolatedCodes true to include isolated codes just before a break in the 'left' segment,
+	 * false to put them in the next segment.
+	 * @param oneSegmentIncludesAll true to include everything in segments that are alone.
+	 * @param trimLeadingWS true to trim leading white-spaces from the segments, false to keep them.
+	 * @param trimTrailingWS true to trim trailing white-spaces from the segments, false to keep them.
+	 */
+	public void setOptions(boolean segmentSubFlows, boolean includeStartCodes,
+			boolean includeEndCodes, boolean includeIsolatedCodes,
+			boolean oneSegmentIncludesAll, boolean trimLeadingWS,
+			boolean trimTrailingWS);
+	
+	public void setSegmentSubFlows(boolean segmentSubFlows);
+	
+	public void setTrimCodes(boolean trimCodes);
+	
+	public void setTrimLeadingWS(boolean trimLeadingWS);
+	
+	public void setTrimTrailingWS(boolean trimTrailingWS);	
 }

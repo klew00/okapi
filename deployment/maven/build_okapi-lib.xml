@@ -541,10 +541,14 @@
 		</copy>
 		<copy todir="${dist}/localweb" file="../../website/okapi.css"/>
 		<!-- javadoc files -->
+		<property name="depOpennlp-toolsBind" value="${mavenStore}/org/apache/opennlp/opennlp-tools/${org.apache.opennlp.opennlp-tools.version}"/>		
+		<property name="depOpennlp-maxentBind" value="${mavenStore}/org/apache/opennlp/opennlp-maxent/${org.apache.opennlp.opennlp-maxent.version}"/>		
 		<javadoc destdir="${dist}/localweb/javadoc" Encoding="UTF-8" packagenames="net.sf.okapi.*">
 			<classpath>
 				<pathelement path="${depSlf4jApi}/${jarSlf4jApi}"/>
 				<pathelement path="${dep020}/${jar020}"/>
+				<pathelement path="${depOpennlp-toolsBind}/opennlp-tools-${org.apache.opennlp.opennlp-tools.version}.jar"/>
+				<pathelement path="${depOpennlp-maxentBind}/opennlp-maxent-${org.apache.opennlp.opennlp-maxent.version}.jar"/>				
 			</classpath>
 			<packageset dir="../../okapi/core/src/main/java" defaultexcludes="yes"/>
 			<packageset dir="../../okapi/libraries/lib-segmentation/src/main/java" defaultexcludes="yes"/>

@@ -32,6 +32,7 @@ import org.w3c.dom.NodeList;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Hashtable;
 
@@ -118,6 +119,16 @@ public class Project {
 			// Compute the new relative path
 			input.relativePath = fullPath.substring(newRoot.length()+1);
 		}
+		
+		// Try to use existing raw input root if possible
+		String currentRawRoot = getRawInputRoot(listIndex);
+		if (!currentRawRoot.equals(currentRoot)) {
+			String difference = currentRoot.substring(newRoot.length());
+			if (currentRawRoot.endsWith(difference)) {
+				newRoot = currentRawRoot.substring(0, currentRawRoot.length() - difference.length());
+			}
+		}
+		
 		setInputRoot(listIndex, newRoot, true);
 		return true; // Has adjusted
 	}
@@ -459,6 +470,8 @@ public class Project {
 			if ( !useCustomInputRoots.get(listIndex) ) isModified = true;
 			useCustomInputRoots.set(listIndex, true);
 			if ( !inputRoots.get(listIndex).equals(newRoot) ) {
+				if (!Util.validateVariables(newRoot, true, true, false))
+					throw new RuntimeException(Res.getString("MainForm.badVariables"));
 				inputRoots.set(listIndex, newRoot);
 				isModified = true;
 			}
@@ -472,14 +485,27 @@ public class Project {
 	}
 	
 	public String getInputRoot (int listIndex) {
+		
+		String rootDir = (path == null)
+				? System.getProperty("user.home") //$NON-NLS-1$
+				: Util.getDirectoryName(path);
+		
+		if ( useCustomInputRoots.get(listIndex) ) {
+			try {
+				return Util.expandPath(inputRoots.get(listIndex), rootDir, null);
+			} catch (IOException ex) {
+				throw new RuntimeException(ex);
+			}
+		}
+		// Else: use the same folder as the project
+		return rootDir;
+	}
+	
+	public String getRawInputRoot (int listIndex) {
 		if ( useCustomInputRoots.get(listIndex) ) {
 			return inputRoots.get(listIndex);
 		}
-		// Else: use the same folder as the project
-		if ( path == null ) {
-			return System.getProperty("user.home"); //$NON-NLS-1$
-		}
-		return Util.getDirectoryName(path);
+		return getInputRoot(listIndex);
 	}
 	
 	public String getInputRootDisplay (int listIndex) {

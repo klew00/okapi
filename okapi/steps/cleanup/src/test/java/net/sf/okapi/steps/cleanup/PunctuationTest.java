@@ -38,19 +38,22 @@ import net.sf.okapi.steps.cleanup.Cleaner;
 import org.junit.Before;
 import org.junit.Test;
 
-public class CleanerPunctuationTest {
+public class PunctuationTest {
 
 	private final LocaleId locFR = LocaleId.FRENCH;
 	private final LocaleId locDE = LocaleId.GERMAN;
 	
 	private GenericContent fmt;
 	private Cleaner cleaner;
+	private Parameters params;
 	
 	@Before
 	public void setup() {
 		
+		params = new Parameters();
+		params.setNormalizeQuotes(false);
 		fmt = new GenericContent();
-		cleaner = new Cleaner();
+		cleaner = new Cleaner(params);
 	}
 	
 	@Test
@@ -59,10 +62,27 @@ public class CleanerPunctuationTest {
 		TextFragment srcTf = new TextFragment("t1 \u201Ct2\u201D t3");
 		TextFragment trgTf = new TextFragment("t1 \u00AB\u00A0t2\u00A0\u00BB t3");
 		
-		cleaner.normalizeQuotation(srcTf, trgTf);
+		ITextUnit tu = new TextUnit("tu1");
+		TextContainer srcTc = tu.getSource();
+		srcTc.append(new Segment("seg1", srcTf));
 		
-		assertEquals("t1 \"t2\" t3", fmt.setContent(srcTf).toString());
-		assertEquals("t1 \"t2\" t3", fmt.setContent(trgTf).toString());
+		TextContainer frTc = tu.createTarget(locFR, true, IResource.CREATE_EMPTY);
+		frTc.append(new Segment("seg1", trgTf));
+		
+		if (!tu.isEmpty()) {
+			ISegments srcSegs = tu.getSourceSegments();
+			for (Segment srcSeg : srcSegs) {
+				Segment trgSeg = tu.getTargetSegment(locFR, srcSeg.getId(), false);
+				if (trgSeg != null) {
+					cleaner.normalizeQuotation(tu, srcSeg, locFR);
+				}
+			}
+		}
+		
+		assertEquals("[t1 \"t2\" t3]", fmt.printSegmentedContent(tu.getSource(), true, false));
+		assertEquals("[t1 \"t2\" t3]", fmt.printSegmentedContent(tu.getSource(), true, true));
+		assertEquals("[t1 \"t2\" t3]", fmt.printSegmentedContent(tu.getTarget(locFR), true, false));
+		assertEquals("[t1 \"t2\" t3]", fmt.printSegmentedContent(tu.getTarget(locFR), true, true));
 	}
 	
 	@Test
@@ -102,7 +122,7 @@ public class CleanerPunctuationTest {
 			for (Segment srcSeg : srcSegs) {
 				Segment trgSeg = tu.getTargetSegment(locFR, srcSeg.getId(), false);
 				if (trgSeg != null) {
-					cleaner.normalizeQuotation(srcSeg.text, trgSeg.text);
+					cleaner.normalizeQuotation(tu, srcSeg, locFR);
 				}
 			}
 		}
@@ -119,9 +139,51 @@ public class CleanerPunctuationTest {
 		TextFragment srcTf = new TextFragment("t1, 0 . 235:t2, t3, t4 ; t5 .");
 		TextFragment trgTf = new TextFragment("t1 ,235 : t2 ,t3 , t4 ;t5 . ");
 		
-		cleaner.normalizePunctuation(srcTf, trgTf);
+		ITextUnit tu = new TextUnit("tu1");
+		TextContainer srcTc = tu.getSource();
+		srcTc.append(new Segment("seg1", srcTf));
 		
-		assertEquals("t1, 0.235: t2, t3, t4; t5.", fmt.setContent(srcTf).toString());
-		assertEquals("t1 ,235: t2, t3, t4; t5.", fmt.setContent(trgTf).toString());
+		TextContainer trgTc = tu.createTarget(locFR, true, IResource.CREATE_EMPTY);
+		trgTc.append(new Segment("seg1", trgTf));
+		
+		if (!tu.isEmpty()) {
+			ISegments srcSegs = tu.getSourceSegments();
+			for (Segment srcSeg : srcSegs) {
+				Segment trgSeg = tu.getTargetSegment(locFR, srcSeg.getId(), false);
+				if (trgSeg != null) {
+					cleaner.normalizeMarks(tu, srcSeg, locFR);
+				}
+			}
+		}		
+		
+		assertEquals("[t1, 0.235: t2, t3, t4; t5.]", fmt.printSegmentedContent(tu.getSource(), true, false));
+		assertEquals("[t1, 0.235: t2, t3, t4; t5.]", fmt.printSegmentedContent(tu.getSource(), true, true));
 	}
+	
+//	@Test
+//	public void testSimplePunctuationNearQuote() {
+//		
+//		TextFragment srcTf = new TextFragment("\" t1\" , 0 . 235:t2, t3, t4 ; t5 .");
+//		TextFragment trgTf = new TextFragment("« t1 », ,235 : t2 ,t3 , t4 ;t5 . ");
+//		
+//		ITextUnit tu = new TextUnit("tu1");
+//		TextContainer srcTc = tu.getSource();
+//		srcTc.append(new Segment("seg1", srcTf));
+//		
+//		TextContainer trgTc = tu.createTarget(locFR, true, IResource.CREATE_EMPTY);
+//		trgTc.append(new Segment("seg1", trgTf));
+//		
+//		if (!tu.isEmpty()) {
+//			ISegments srcSegs = tu.getSourceSegments();
+//			for (Segment srcSeg : srcSegs) {
+//				Segment trgSeg = tu.getTargetSegment(locFR, srcSeg.getId(), false);
+//				if (trgSeg != null) {
+//					cleaner.normalizeMarks(tu, srcSeg, locFR, false);			
+//				}
+//			}
+//		}		
+//		
+//		assertEquals("[\"t1\", 0.235: t2, t3, t4; t5.]", fmt.printSegmentedContent(tu.getSource(), true, false));
+//		assertEquals("[\"t1\", 0.235: t2, t3, t4; t5.]", fmt.printSegmentedContent(tu.getSource(), true, true));
+//	}
 }
