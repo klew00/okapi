@@ -474,12 +474,12 @@ public class HTML5FilterTest {
 			+ "<p><span its-provenance-records-ref=\"#myProv\">Text1</span> "
 			+ "<span its-loc-quality-issues-ref=\"#myLqi\""
 			+ ">text2</span> text3</p>"
-			+ "<script id=\"myLqi\" type=\"application/its+xml\">"
-			+ "<its:locQualityIssues xmlns:its=\"http://www.w3.org/2005/11/its\" version=\"2.0\" xml:id=\"myLqi\">"
-			+ "<its:locQualityIssue locQualityIssueComment=\"comment1\"/>"
-			+ "<its:locQualityIssue locQualityIssueSeverity=\"50.5\" locQualityIssueType=\"terminology\"/>"
-			+ "<its:locQualityIssue locQualityIssueComment=\"comment2\" locQualityIssueEnabled=\"no\"/>"
-			+ "</its:locQualityIssues></script>"
+			+ "<script id=\"myLqi\" type=\"application/its+xml\">\n"
+			+ "<its:locQualityIssues xmlns:its=\"http://www.w3.org/2005/11/its\" version=\"2.0\" xml:id=\"myLqi\">\n"
+			+ "<its:locQualityIssue locQualityIssueComment=\"comment1\"/>\n"
+			+ "<its:locQualityIssue locQualityIssueSeverity=\"50.5\" locQualityIssueType=\"terminology\"/>\n"
+			+ "<its:locQualityIssue locQualityIssueComment=\"comment2\" locQualityIssueEnabled=\"no\"/>\n"
+			+ "</its:locQualityIssues>\n</script>\n"
 			+ "<script id=\"myProv\" type=\"application/its+xml\">"
 			+ "<its:provenanceRecords xmlns:its=\"http://www.w3.org/2005/11/its\" version=\"2.0\" xml:id=\"myProv\">"
 			+ "<its:provenanceRecord person=\"person1\"/><its:provenanceRecord orgRef=\"org1\"/>"
@@ -499,12 +499,12 @@ public class HTML5FilterTest {
 		String expected = "<!DOCTYPE html>\n<html><head><title>t1</title></head><body>"
 			+ "<span its-provenance-records-ref=\"#myProv\">Text1</span> <span its-loc-quality-issues-ref=\"#myLqi\""
 			+ ">text2</span> text3"
-			+ "<script id=\"myLqi\" type=\"application/its+xml\">"
-			+ "<its:locQualityIssues xmlns:its=\"http://www.w3.org/2005/11/its\" version=\"2.0\" xml:id=\"myLqi\">"
-			+ "<its:locQualityIssue locQualityIssueComment=\"comment1\"/>"
-			+ "<its:locQualityIssue locQualityIssueSeverity=\"50.5\" locQualityIssueType=\"terminology\"/>"
-			+ "<its:locQualityIssue locQualityIssueComment=\"comment2\" locQualityIssueEnabled=\"no\"/>"
-			+ "</its:locQualityIssues></script>"
+			+ "<script id=\"myLqi\" type=\"application/its+xml\">\n"
+			+ "<its:locQualityIssues xmlns:its=\"http://www.w3.org/2005/11/its\" version=\"2.0\" xml:id=\"myLqi\">\n"
+			+ "<its:locQualityIssue locQualityIssueComment=\"comment1\"/>\n"
+			+ "<its:locQualityIssue locQualityIssueSeverity=\"50.5\" locQualityIssueType=\"terminology\"/>\n"
+			+ "<its:locQualityIssue locQualityIssueComment=\"comment2\" locQualityIssueEnabled=\"no\"/>\n"
+			+ "</its:locQualityIssues>\n</script>\n"
 			+ "<script id=\"myProv\" type=\"application/its+xml\">"
 			+ "<its:provenanceRecords xmlns:its=\"http://www.w3.org/2005/11/its\" version=\"2.0\" xml:id=\"myProv\">"
 			+ "<its:provenanceRecord person=\"person1\"/><its:provenanceRecord orgRef=\"org1\"/>"
@@ -513,7 +513,7 @@ public class HTML5FilterTest {
 		assertEquals(expected, FilterTestDriver.generateOutput(list, locFR,
 			filter.createSkeletonWriter(), filter.getEncoderManager()));
 	}
-	
+
 	@Test
 	public void testOpenTwice () throws URISyntaxException {
 		File file = new File(root+"test01.html");

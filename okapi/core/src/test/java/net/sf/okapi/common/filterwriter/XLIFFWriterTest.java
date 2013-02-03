@@ -26,12 +26,15 @@ import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 
+import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.TestUtil;
 import net.sf.okapi.common.annotation.GenericAnnotation;
 import net.sf.okapi.common.annotation.GenericAnnotationType;
+import net.sf.okapi.common.annotation.GenericAnnotations;
 import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.TextContainer;
+import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.resource.TextUnit;
 
@@ -118,120 +121,125 @@ public class XLIFFWriterTest {
 			+ "</body>\n</file>\n</xliff>\n", result);
 	}
 
-//TODO: special case for inline LQI	
-//	@Test
-//	public void testAnnotations ()
-//		throws IOException
-//	{
-//		writer.create(root+"out.xlf", null, locEN, locFR, null, "original.ext", null);
-//		writer.writeStartFile(null, null, null);
-//		ITextUnit tu = new TextUnit("tu1");
-//		TextFragment tf = tu.getSource().getFirstSegment().getContent();
-//		tf.append("t1 t2");
-//		GenericAnnotations anns = new GenericAnnotations();
-//		anns.setData("lqi1");
-//		GenericAnnotation ann = anns.add(GenericAnnotationType.LQI);
-//		ann.setString(GenericAnnotationType.LQI_COMMENT, "rem1");
-//		ann.setBoolean(GenericAnnotationType.LQI_ENABLED, false);
-//		ann.setString(GenericAnnotationType.LQI_PROFILEREF, "uri");
-//		ann = anns.add(GenericAnnotationType.LQI);
-//		ann.setString(GenericAnnotationType.LQI_COMMENT, "rem2");
-//		ann.setBoolean(GenericAnnotationType.LQI_ENABLED, true);
-//		ann.setDouble(GenericAnnotationType.LQI_SEVERITY, 12.34);
-//		ann.setString(GenericAnnotationType.LQI_TYPE, "grammar");
-//		tf.annotate(0, 2, GenericAnnotationType.GENERIC, anns);
-//		tf = tu.createTarget(locFR, false, IResource.COPY_ALL).getFirstContent();
-//		ann = ann.clone();
-//		ann.setString(GenericAnnotationType.LQI_COMMENT, "rem3");
-//		ann.setDouble(GenericAnnotationType.LQI_SEVERITY, 99.0);
-//		anns = new GenericAnnotations();
-//		anns.setData("lqi2");
-//		anns.add(ann);
-//		tf.annotate(3+4, 5+4, GenericAnnotationType.GENERIC, anns); // +4 is for the markers of the previous annotation
-//		writer.writeTextUnit(tu);
-//		writer.writeEndFile();
-//		writer.close();
-//		
-//		String result = readFile(root+"out.xlf");
-//		assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-//			+ "<xliff version=\"1.2\" xmlns=\"urn:oasis:names:tc:xliff:document:1.2\" xmlns:okp=\"okapi-framework:xliff-extensions\" xmlns:its=\"http://www.w3.org/2005/11/its\">\n"
-//			+ "<file original=\"unknown\" source-language=\"en\" target-language=\"fr\" datatype=\"x-undefined\">\n"
-//			+ "<body>\n<trans-unit id=\"tu1\">\n"
-//			+ "<source xml:lang=\"en\"><mrk mtype=\"x-its\" its:locQualityIssuesRef=\"#lqi1\">t1</mrk> t2</source>\n"
-//			+ "<target xml:lang=\"fr\"><mrk mtype=\"x-its\" its:locQualityIssuesRef=\"#lqi2\">t1</mrk> "
-//			+ "<mrk mtype=\"x-its\" its:locQualityIssueComment=\"rem3\" its:locQualityIssueSeverity=\"99\" its:locQualityIssueType=\"grammar\">t2</mrk></target>\n"
-//			+ "<its:locQualityIssues xml:id=\"lqi1\">\n"
-//			+ "<its:locQualityIssue locQualityIssueComment=\"rem1\" locQualityIssueEnabled=\"no\" locQualityIssueProfileRef=\"uri\"></its:locQualityIssue>\n"
-//			+ "<its:locQualityIssue locQualityIssueComment=\"rem2\" locQualityIssueSeverity=\"12.34\" locQualityIssueType=\"grammar\"></its:locQualityIssue>\n"
-//			+ "</its:locQualityIssues>\n"
-//			+ "<its:locQualityIssues xml:id=\"lqi2\">\n"
-//			+ "<its:locQualityIssue locQualityIssueComment=\"rem1\" locQualityIssueEnabled=\"no\" locQualityIssueProfileRef=\"uri\"></its:locQualityIssue>\n"
-//			+ "<its:locQualityIssue locQualityIssueComment=\"rem2\" locQualityIssueSeverity=\"12.34\" locQualityIssueType=\"grammar\"></its:locQualityIssue>\n"
-//			+ "</its:locQualityIssues>\n"
-//			+ "</trans-unit>\n"
-//			+ "</body>\n</file>\n</xliff>\n", result);
-//	}
+	@Test
+	public void testAnnotations ()
+		throws IOException
+	{
+		writer.create(root+"out.xlf", null, locEN, locFR, null, "original.ext", null);
+		writer.writeStartFile(null, null, null);
+		ITextUnit tu = new TextUnit("tu1");
+		TextFragment tf = tu.getSource().getFirstSegment().getContent();
+		tf.append("t1 t2");
+		GenericAnnotations anns1 = new GenericAnnotations();
+		anns1.setData("lqi1");
+		GenericAnnotation ann1 = anns1.add(GenericAnnotationType.LQI);
+		ann1.setString(GenericAnnotationType.LQI_COMMENT, "rem1");
+		ann1.setBoolean(GenericAnnotationType.LQI_ENABLED, false);
+		ann1.setString(GenericAnnotationType.LQI_PROFILEREF, "uri");
+		GenericAnnotation ann2 = anns1.add(GenericAnnotationType.LQI);
+		ann2.setString(GenericAnnotationType.LQI_COMMENT, "rem2");
+		ann2.setBoolean(GenericAnnotationType.LQI_ENABLED, true);
+		ann2.setDouble(GenericAnnotationType.LQI_SEVERITY, 12.34);
+		ann2.setString(GenericAnnotationType.LQI_TYPE, "grammar");
+		tf.annotate(0, 2, GenericAnnotationType.GENERIC, anns1);
+		tf = tu.createTarget(locFR, false, IResource.COPY_ALL).getFirstContent();
+		GenericAnnotation ann3 = ann2.clone();
+		ann3.setString(GenericAnnotationType.LQI_COMMENT, "rem3");
+		ann3.setDouble(GenericAnnotationType.LQI_SEVERITY, 99.0);
+		GenericAnnotations anns3 = new GenericAnnotations();
+		anns3.setData("lqi2");
+		anns3.add(ann3);
+		anns3.add(new GenericAnnotation(GenericAnnotationType.LQI,
+			GenericAnnotationType.LQI_COMMENT, "rem4"));
+		tf.annotate(3+4, 5+4, GenericAnnotationType.GENERIC, anns3); // +4 is for the markers of the previous annotation
+		writer.writeTextUnit(tu);
+		writer.writeEndFile();
+		writer.close();		
 
-//	@Test
-//	public void testmultipleLQI ()
-//		throws IOException
-//	{
-//		writer.create(root+"out.xlf", null, locEN, locFR, null, "original.ext", null);
-//		writer.writeStartFile(null, null, null);
-//		ITextUnit tu = new TextUnit("tu1");
-//		
-//		TextFragment tf = tu.getSource().getFirstSegment().getContent();
-//		tf.setCodedText("Span 1 Span 2");
-//		//               0123456789012
-//		// First LQI
-//		GenericAnnotations anns = new GenericAnnotations();
-//		anns.add(new GenericAnnotation(GenericAnnotationType.LQI,
-//			GenericAnnotationType.LQI_COMMENT, "comment-1a"));
-//		anns.add(new GenericAnnotation(GenericAnnotationType.LQI,
-//			GenericAnnotationType.LQI_COMMENT, "comment-1b"));
-//		tf.annotate(0, 6, GenericAnnotationType.GENERIC, anns);
-//		// second LQI
-//		anns = new GenericAnnotations();
-//		anns.add(new GenericAnnotation(GenericAnnotationType.LQI,
-//			GenericAnnotationType.LQI_COMMENT, "comment-2a"));
-//		anns.add(new GenericAnnotation(GenericAnnotationType.LQI,
-//			GenericAnnotationType.LQI_COMMENT, "comment-2b"));
-//		tf.annotate(11, 17, GenericAnnotationType.GENERIC, anns); // +4 is for first marker
-//
-//		//This is done by default: tu.createTarget(locFR, false, IResource.COPY_ALL);
-//
-//		writer.writeTextUnit(tu);
-//		writer.writeEndFile();
-//		writer.close();
-//		
-//		String result = readFile(root+"out.xlf");
-//		assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-//			+ "<xliff version=\"1.2\" xmlns=\"urn:oasis:names:tc:xliff:document:1.2\" xmlns:okp=\"okapi-framework:xliff-extensions\" xmlns:its=\"http://www.w3.org/2005/11/its\">\n"
-//			+ "<file original=\"unknown\" source-language=\"en\" target-language=\"fr\" datatype=\"x-undefined\">\n"
-//			+ "<body>\n<trans-unit id=\"tu1\">\n"
-//			+ "<source xml:lang=\"en\"><mrk mtype=\"x-its\" its:locQualityIssuesRef=\"#lqi1\">Span 1</mrk> "
-//			+ "<mrk mtype=\"x-its\" its:locQualityIssuesRef=\"#lqi2\">Span 2</mrk></source>\n"
-//			+ "<target xml:lang=\"fr\"><mrk mtype=\"x-its\" its:locQualityIssuesRef=\"#lqi3\">Span 1</mrk> "
-//			+ "<mrk mtype=\"x-its\" its:locQualityIssuesRef=\"#lqi4\">Span 2</mrk></target>\n"
-//			+ "<its:locQualityIssues xml:id=\"lqi1\">\n"
-//			+ "<its:locQualityIssue locQualityIssueComment=\"comment-1a\"></its:locQualityIssue>\n"
-//			+ "<its:locQualityIssue locQualityIssueComment=\"comment-1b\"></its:locQualityIssue>\n"
-//			+ "</its:locQualityIssues>\n"
-//			+ "<its:locQualityIssues xml:id=\"lqi2\">\n"
-//			+ "<its:locQualityIssue locQualityIssueComment=\"comment-2a\"></its:locQualityIssue>\n"
-//			+ "<its:locQualityIssue locQualityIssueComment=\"comment-2b\"></its:locQualityIssue>\n"
-//			+ "</its:locQualityIssues>\n"
-//			+ "<its:locQualityIssues xml:id=\"lqi3\">\n"
-//			+ "<its:locQualityIssue locQualityIssueComment=\"comment-1a\"></its:locQualityIssue>\n"
-//			+ "<its:locQualityIssue locQualityIssueComment=\"comment-1b\"></its:locQualityIssue>\n"
-//			+ "</its:locQualityIssues>\n"
-//			+ "<its:locQualityIssues xml:id=\"lqi4\">\n"
-//			+ "<its:locQualityIssue locQualityIssueComment=\"comment-2a\"></its:locQualityIssue>\n"
-//			+ "<its:locQualityIssue locQualityIssueComment=\"comment-2b\"></its:locQualityIssue>\n"
-//			+ "</its:locQualityIssues>\n"
-//			+ "</trans-unit>\n"
-//			+ "</body>\n</file>\n</xliff>\n", result);
-//	}
+		String result = readFile(root+"out.xlf");
+		assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+			+ "<xliff version=\"1.2\" xmlns=\"urn:oasis:names:tc:xliff:document:1.2\" xmlns:okp=\"okapi-framework:xliff-extensions\" xmlns:its=\"http://www.w3.org/2005/11/its\">\n"
+			+ "<file original=\"unknown\" source-language=\"en\" target-language=\"fr\" datatype=\"x-undefined\">\n"
+			+ "<body>\n<trans-unit id=\"tu1\">\n"
+			+ "<source xml:lang=\"en\"><mrk mtype=\"x-its\" its:locQualityIssuesRef=\"#VARID\">t1</mrk> t2</source>\n"
+			+ "<target xml:lang=\"fr\"><mrk mtype=\"x-its\" its:locQualityIssuesRef=\"#VARID\">t1</mrk> "
+			+ "<mrk mtype=\"x-its\" its:locQualityIssuesRef=\"#VARID\">t2</mrk></target>\n"
+			+ "<its:locQualityIssues xml:id=\"VARID\">\n"
+			+ "<its:locQualityIssue locQualityIssueComment=\"rem1\" locQualityIssueEnabled=\"no\" locQualityIssueProfileRef=\"uri\"/>\n"
+			+ "<its:locQualityIssue locQualityIssueComment=\"rem2\" locQualityIssueSeverity=\"12.34\" locQualityIssueType=\"grammar\"/>\n"
+			+ "</its:locQualityIssues>\n"
+			+ "<its:locQualityIssues xml:id=\"VARID\">\n"
+			+ "<its:locQualityIssue locQualityIssueComment=\"rem1\" locQualityIssueEnabled=\"no\" locQualityIssueProfileRef=\"uri\"/>\n"
+			+ "<its:locQualityIssue locQualityIssueComment=\"rem2\" locQualityIssueSeverity=\"12.34\" locQualityIssueType=\"grammar\"/>\n"
+			+ "</its:locQualityIssues>\n"
+			+ "<its:locQualityIssues xml:id=\"VARID\">\n"
+			+ "<its:locQualityIssue locQualityIssueComment=\"rem3\" locQualityIssueSeverity=\"99\" locQualityIssueType=\"grammar\"/>\n"
+			+ "<its:locQualityIssue locQualityIssueComment=\"rem4\"/>\n"
+			+ "</its:locQualityIssues>\n"
+			+ "</trans-unit>\n"
+			+ "</body>\n</file>\n</xliff>\n", stripVariableID(result));
+	}
+
+	@Test
+	public void testmultipleLQI ()
+		throws IOException
+	{
+		writer.create(root+"out.xlf", null, locEN, locFR, null, "original.ext", null);
+		writer.writeStartFile(null, null, null);
+		ITextUnit tu = new TextUnit("tu1");
+		
+		TextFragment tf = tu.getSource().getFirstSegment().getContent();
+		tf.setCodedText("Span 1 Span 2");
+		//               0123456789012
+		// First LQI
+		GenericAnnotations anns = new GenericAnnotations();
+		anns.add(new GenericAnnotation(GenericAnnotationType.LQI,
+			GenericAnnotationType.LQI_COMMENT, "comment-1a"));
+		anns.add(new GenericAnnotation(GenericAnnotationType.LQI,
+			GenericAnnotationType.LQI_COMMENT, "comment-1b"));
+		tf.annotate(0, 6, GenericAnnotationType.GENERIC, anns);
+		// second LQI
+		anns = new GenericAnnotations();
+		anns.add(new GenericAnnotation(GenericAnnotationType.LQI,
+			GenericAnnotationType.LQI_COMMENT, "comment-2a"));
+		anns.add(new GenericAnnotation(GenericAnnotationType.LQI,
+			GenericAnnotationType.LQI_COMMENT, "comment-2b"));
+		tf.annotate(11, 17, GenericAnnotationType.GENERIC, anns); // +4 is for first marker
+
+		tu.createTarget(locFR, false, IResource.COPY_ALL);
+
+		writer.writeTextUnit(tu);
+		writer.writeEndFile();
+		writer.close();
+		
+		String result = readFile(root+"out.xlf");
+		assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+			+ "<xliff version=\"1.2\" xmlns=\"urn:oasis:names:tc:xliff:document:1.2\" xmlns:okp=\"okapi-framework:xliff-extensions\" xmlns:its=\"http://www.w3.org/2005/11/its\">\n"
+			+ "<file original=\"unknown\" source-language=\"en\" target-language=\"fr\" datatype=\"x-undefined\">\n"
+			+ "<body>\n<trans-unit id=\"tu1\">\n"
+			+ "<source xml:lang=\"en\"><mrk mtype=\"x-its\" its:locQualityIssuesRef=\"#VARID\">Span 1</mrk> "
+			+ "<mrk mtype=\"x-its\" its:locQualityIssuesRef=\"#VARID\">Span 2</mrk></source>\n"
+			+ "<target xml:lang=\"fr\"><mrk mtype=\"x-its\" its:locQualityIssuesRef=\"#VARID\">Span 1</mrk> "
+			+ "<mrk mtype=\"x-its\" its:locQualityIssuesRef=\"#VARID\">Span 2</mrk></target>\n"
+			+ "<its:locQualityIssues xml:id=\"VARID\">\n"
+			+ "<its:locQualityIssue locQualityIssueComment=\"comment-1a\"/>\n"
+			+ "<its:locQualityIssue locQualityIssueComment=\"comment-1b\"/>\n"
+			+ "</its:locQualityIssues>\n"
+			+ "<its:locQualityIssues xml:id=\"VARID\">\n"
+			+ "<its:locQualityIssue locQualityIssueComment=\"comment-2a\"/>\n"
+			+ "<its:locQualityIssue locQualityIssueComment=\"comment-2b\"/>\n"
+			+ "</its:locQualityIssues>\n"
+			+ "<its:locQualityIssues xml:id=\"VARID\">\n"
+			+ "<its:locQualityIssue locQualityIssueComment=\"comment-1a\"/>\n"
+			+ "<its:locQualityIssue locQualityIssueComment=\"comment-1b\"/>\n"
+			+ "</its:locQualityIssues>\n"
+			+ "<its:locQualityIssues xml:id=\"VARID\">\n"
+			+ "<its:locQualityIssue locQualityIssueComment=\"comment-2a\"/>\n"
+			+ "<its:locQualityIssue locQualityIssueComment=\"comment-2b\"/>\n"
+			+ "</its:locQualityIssues>\n"
+			+ "</trans-unit>\n"
+			+ "</body>\n</file>\n</xliff>\n", stripVariableID(result));
+	}
 	
 	@Test
 	public void testTextWithDefaultCodes ()
@@ -388,4 +396,9 @@ public class XLIFFWriterTest {
 		return tmp;
 	}
 
+	private String stripVariableID (String text) {
+		text = text.replaceAll("locQualityIssuesRef=\"#(.*?)\"", "locQualityIssuesRef=\"#VARID\""); 
+		text = text.replaceAll("xml:id=\"(.*?)\"", "xml:id=\"VARID\""); 
+		return text;
+	}
 }

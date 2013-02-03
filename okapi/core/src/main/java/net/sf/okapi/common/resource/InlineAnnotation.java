@@ -53,8 +53,7 @@ public class InlineAnnotation implements IAnnotation {
 	 */
 	@Override
 	public InlineAnnotation clone () {
-		InlineAnnotation newObj = new InlineAnnotation(this.data);
-		return newObj;
+		return new InlineAnnotation(this.data);
 	}
 	
 	/**

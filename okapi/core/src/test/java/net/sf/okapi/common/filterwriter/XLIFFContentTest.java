@@ -126,31 +126,30 @@ public class XLIFFContentTest {
 			fmt.setContent(tf).toString(true));
 	}
 
-//TODO: special case for inline LQI	
-//	@Test
-//	public void testmultipleLQI () {
-//		TextFragment tf = new TextFragment("Span 1 Span 2");
-//		//                                  0123456789012
-//		// First LQI
-//		GenericAnnotations anns = new GenericAnnotations();
-//		anns.setData("id1");
-//		anns.add(new GenericAnnotation(GenericAnnotationType.LQI,
-//			GenericAnnotationType.LQI_COMMENT, "comment-1a"));
-//		anns.add(new GenericAnnotation(GenericAnnotationType.LQI,
-//			GenericAnnotationType.LQI_COMMENT, "comment-1b"));
-//		tf.annotate(0, 6, GenericAnnotationType.GENERIC, anns);
-//		// second LQI (no ID defined)
-//		anns = new GenericAnnotations();
-//		anns.add(new GenericAnnotation(GenericAnnotationType.LQI,
-//			GenericAnnotationType.LQI_COMMENT, "comment-2a"));
-//		anns.add(new GenericAnnotation(GenericAnnotationType.LQI,
-//			GenericAnnotationType.LQI_COMMENT, "comment-2b"));
-//		tf.annotate(11, 17, GenericAnnotationType.GENERIC, anns); // +4 is for first marker
-//		
-//		assertEquals("<mrk mtype=\"x-its\" its:locQualityIssuesRef=\"#lqi1\">Span 1</mrk> "
-//			+ "<mrk mtype=\"x-its\" its:locQualityIssuesRef=\"#lqi2\">Span 2</mrk>",
-//			fmt.setContent(tf).toString(true));
-//	}
+	@Test
+	public void testmultipleLQI () {
+		TextFragment tf = new TextFragment("Span 1 Span 2");
+		//                                  0123456789012
+		// First LQI
+		GenericAnnotations anns = new GenericAnnotations();
+		anns.setData("id1");
+		anns.add(new GenericAnnotation(GenericAnnotationType.LQI,
+			GenericAnnotationType.LQI_COMMENT, "comment-1a"));
+		anns.add(new GenericAnnotation(GenericAnnotationType.LQI,
+			GenericAnnotationType.LQI_COMMENT, "comment-1b"));
+		tf.annotate(0, 6, GenericAnnotationType.GENERIC, anns);
+		// second LQI (no ID defined)
+		anns = new GenericAnnotations();
+		anns.add(new GenericAnnotation(GenericAnnotationType.LQI,
+			GenericAnnotationType.LQI_COMMENT, "comment-2a"));
+		anns.add(new GenericAnnotation(GenericAnnotationType.LQI,
+			GenericAnnotationType.LQI_COMMENT, "comment-2b"));
+		tf.annotate(11, 17, GenericAnnotationType.GENERIC, anns); // +4 is for first marker
+		
+		assertEquals("<mrk mtype=\"x-its\" its:locQualityIssuesRef=\"#VARID\">Span 1</mrk> "
+			+ "<mrk mtype=\"x-its\" its:locQualityIssuesRef=\"#VARID\">Span 2</mrk>",
+			stripVariableID(fmt.setContent(tf).toString(true)));
+	}
 
 	@Test
 	public void testAnnotationOnOriginalCode () {
@@ -219,6 +218,11 @@ public class XLIFFContentTest {
 		tf.append(TagType.CLOSING, "b2", "</b2>");
 		tf.append(TagType.CLOSING, "b3", "</b3>");
 		return tf;
+	}
+
+	private String stripVariableID (String text) {
+		text = text.replaceAll("locQualityIssuesRef=\"#(.*?)\"", "locQualityIssuesRef=\"#VARID\""); 
+		return text;
 	}
 	
 }

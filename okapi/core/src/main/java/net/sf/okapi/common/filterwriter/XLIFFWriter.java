@@ -30,8 +30,6 @@ import net.sf.okapi.common.Util;
 import net.sf.okapi.common.XMLWriter;
 import net.sf.okapi.common.annotation.AltTranslation;
 import net.sf.okapi.common.annotation.AltTranslationsAnnotation;
-import net.sf.okapi.common.annotation.GenericAnnotation;
-import net.sf.okapi.common.annotation.GenericAnnotationType;
 import net.sf.okapi.common.annotation.GenericAnnotations;
 import net.sf.okapi.common.annotation.TermsAnnotation;
 import net.sf.okapi.common.encoder.EncoderManager;
@@ -563,19 +561,19 @@ public class XLIFFWriter implements IFilterWriter {
 		}
 		
 		if ( srcStandoff != null ) {
-			writeStandoffLQI(srcStandoff);
+			writer.writeRawXML(writeStandoffLQI(srcStandoff));
 		}
-		if ( itsContForSrcCont != null ) {
-			writer.writeRawXML(itsContForSrcCont.writeStandoffLQI(itsContForSrcCont.getStandoff()));
+		if (( itsContForSrcCont != null ) && itsContForSrcCont.hasStandoff() ) {
+			writer.writeRawXML(itsContForSrcCont.writeStandoffLQI());
 		}
 		if ( trgStandoff != null ) {
-			writeStandoffLQI(trgStandoff);
+			writer.writeRawXML(writeStandoffLQI(trgStandoff));
 		}
-		if ( itsContForTrgCont != null ) {
-			writer.writeRawXML(itsContForTrgCont.writeStandoffLQI(itsContForTrgCont.getStandoff()));
+		if (( itsContForTrgCont != null ) && itsContForTrgCont.hasStandoff() ) {
+			writer.writeRawXML(itsContForTrgCont.writeStandoffLQI());
 		}
-		if ( itsContForUnit != null ) {
-			writer.writeRawXML(itsContForUnit.writeStandoffLQI(itsContForUnit.getStandoff()));
+		if (( itsContForUnit != null ) && itsContForUnit.hasStandoff() ) {
+			writer.writeRawXML(itsContForUnit.writeStandoffLQI());
 		}
 		
 		// Temporary output for terms annotation
@@ -761,38 +759,12 @@ public class XLIFFWriter implements IFilterWriter {
 		writeTextUnit(tu, null);
 	}
 
-	private void writeStandoffLQI (List<GenericAnnotations> list) {
-		if ( list == null ) return;
-		for ( GenericAnnotations anns : list ) {
-			writer.writeStartElement("its:locQualityIssues");
-			writer.writeAttributeString("xml:id", anns.getData());
-			writer.writeLineBreak();
-			for ( GenericAnnotation ann : anns.getAnnotations(GenericAnnotationType.LQI) ) {
-				writer.writeStartElement("its:locQualityIssue");
-				String strVal = ann.getString(GenericAnnotationType.LQI_COMMENT);
-				if ( strVal != null ) {
-					writer.writeAttributeString("locQualityIssueComment", strVal);
-				}
-				Boolean booVal = ann.getBoolean(GenericAnnotationType.LQI_ENABLED);
-				if (( booVal != null ) && !booVal ) {
-					writer.writeAttributeString("locQualityIssueEnabled", "no");
-				}
-				strVal = ann.getString(GenericAnnotationType.LQI_PROFILEREF);
-				if ( strVal != null ) {
-					writer.writeAttributeString("locQualityIssueProfileRef", strVal);
-				}
-				Double dblVal = ann.getDouble(GenericAnnotationType.LQI_SEVERITY);
-				if ( dblVal != null ) {
-					writer.writeAttributeString("locQualityIssueSeverity", Util.formatDouble(dblVal));
-				}
-				strVal = ann.getString(GenericAnnotationType.LQI_TYPE);
-				if ( strVal != null ) {
-					writer.writeAttributeString("locQualityIssueType", strVal);
-				}
-				writer.writeEndElementLineBreak();
-			}
-			writer.writeEndElementLineBreak();
+	private String writeStandoffLQI (List<GenericAnnotations> list) {
+		if ( Util.isEmpty(list) ) return "";
+		if ( itsContForUnit == null ) {
+			itsContForUnit = new ITSContent(xliffCont.getCharsetEncoder(), false);
 		}
+		return itsContForUnit.writeStandoffLQI(list);
 	}
-		
+	
 }

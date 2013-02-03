@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.UUID;
 
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.resource.Code;
@@ -33,6 +34,7 @@ import net.sf.okapi.common.resource.TextContainer;
 
 /**
  * Provides access to a list of {@link GenericAnnotation}.
+ * This annotation set assumes its data field is used to store a unique ID for the set.
  * <p>This annotation can be used inline as well as on structural objects.
  */
 public class GenericAnnotations extends InlineAnnotation implements Iterable<GenericAnnotation> {
@@ -104,7 +106,7 @@ public class GenericAnnotations extends InlineAnnotation implements Iterable<Gen
 	public GenericAnnotations (String storage) {
 		fromString(storage);
 	}
-	
+
 	/**
 	 * Creates an annotation set and add a given one.
 	 * @param annotation the annotation to add.
@@ -113,9 +115,19 @@ public class GenericAnnotations extends InlineAnnotation implements Iterable<Gen
 		this.add(annotation);
 	}
 	
+	/**
+	 * Clones this annotation and make sure its still has a unique ID.
+	 * @return A new InlineAnnotation object that is a copy of this one.
+	 */
 	@Override
 	public GenericAnnotations clone () {
-		return new GenericAnnotations(this.toString());
+		GenericAnnotations newAnns = new GenericAnnotations(this.toString());
+		// This type of annotation uses the data field for its unique ID
+		// So we need to create a new unique ID
+		if ( newAnns.getData() != null ) {
+			newAnns.setData(Util.makeId(UUID.randomUUID().toString()));
+		}
+		return newAnns;
 	}
 	
 	/**
