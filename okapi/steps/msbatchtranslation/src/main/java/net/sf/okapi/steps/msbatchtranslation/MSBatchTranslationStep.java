@@ -21,14 +21,21 @@
 package net.sf.okapi.steps.msbatchtranslation;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import net.sf.okapi.common.Base64;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
@@ -138,6 +145,64 @@ public class MSBatchTranslationStep extends BasePipelineStep {
 		this.params = (Parameters)params;
 	}
 	
+	public String getCategory(String key){
+		String parsedKey;
+		//--Check if Predefined--
+		if (key != null && key.contains("@@@")){
+			//--parse key--
+			Pattern pattern = Pattern.compile("@@@(.+?)@@@");
+	        Matcher matcher = pattern.matcher(key);
+	        if(matcher.find()){
+	        	parsedKey = matcher.group(1);
+	        }else{
+				//--can't parse string--
+				logger.error("Not able to parse predefined engine string: "+ key + ". Using empty category");
+				return "";
+	        }
+	        //--locate in properties file--
+	        if(params.getConfigPath()!=null && params.getConfigPath().trim().length() > 0){
+	        	Properties prop = new Properties();
+	        	String keyWithLoc;
+	        	try {
+	        		prop.load(new FileInputStream(params.getConfigPath()));
+	        		keyWithLoc = parsedKey + "." + targetLocale.toJavaLocale().getLanguage().toUpperCase();
+	        		String category = prop.getProperty(keyWithLoc);
+	        		if(category != null){
+	        			logger.info("Found engine "+ keyWithLoc +". Using category: "+ category);
+	        			return Base64.decodePassword(category);
+	        		}else{
+	        			logger.warn("Can't find engine "+ keyWithLoc + ". Try fallback");
+	        			//--recursively try fallback--
+		        		int index = parsedKey.lastIndexOf('.');
+		        		while (index != -1){
+			        		parsedKey = parsedKey.substring(0, index);
+			        		keyWithLoc =  parsedKey + "." + targetLocale.toJavaLocale().getLanguage().toUpperCase();
+		        			category = prop.getProperty(keyWithLoc);
+		        			if(category != null){
+		        				logger.warn("Found fallback engine "+ keyWithLoc +". Using category: "+ category);
+		        				return Base64.decodePassword(category);
+			        		}
+		        			index = parsedKey.lastIndexOf('.');
+		        		}
+	        		}
+	        	} catch (IOException ex) {
+	        		logger.warn("Can't load: " + params.getConfigPath()+ ". Using empty category");
+	        		return "";
+	            }
+	        }else{
+	        	//--no property file specified--
+				logger.error("No engine property file specified. Using empty category");
+				return "";
+	        }
+	        logger.warn("No engine found. Using empty category.");
+	        return "";
+		}else{
+			//--get the specified category
+			logger.info("Using category "+ params.getCategory());
+			return params.getCategory();
+		}
+	} 
+	
 	@Override
 	protected Event handleStartBatch (Event event) {
 		count = 0;
@@ -150,7 +215,7 @@ public class MSBatchTranslationStep extends BasePipelineStep {
 		net.sf.okapi.connectors.microsoft.Parameters prm = (net.sf.okapi.connectors.microsoft.Parameters)conn.getParameters();
 		prm.setClientId(params.getClientId());
 		prm.setSecret(params.getSecret());
-		prm.setCategory(params.getCategory());
+		prm.setCategory(getCategory(params.getCategory()));
 		conn.setLanguages(sourceLocale, targetLocale);
 		conn.setMaximumHits(params.getMaxMatches());
 		conn.setThreshold(params.getThreshold());

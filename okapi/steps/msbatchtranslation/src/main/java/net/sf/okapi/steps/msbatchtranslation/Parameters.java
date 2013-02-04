@@ -38,6 +38,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	private static final String CLIENTID = "clientId";
 	private static final String SECRET = "secret";
 	private static final String CATEGORY = "category";
+	private static final String CONFIGPATH = "configPath";
 	private static final String ANNOTATE = "annotate";
 	private static final String MAKETMX = "makeTmx";
 	private static final String TMXPATH = "tmxPath";
@@ -53,6 +54,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	private String clientId;
 	private String secret;
 	private String category;
+	private String configPath;
 	private String tmxPath;
 	private boolean markAsMT;
 	private int maxEvents;
@@ -81,6 +83,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		clientId = buffer.getEncodedString(CLIENTID, clientId);
 		secret = buffer.getEncodedString(SECRET, secret);
 		category = buffer.getEncodedString(CATEGORY, category);
+		configPath = buffer.getString(CONFIGPATH, configPath);		
 		tmxPath = buffer.getString(TMXPATH, tmxPath);
 		markAsMT = buffer.getBoolean(MARKASMT, markAsMT);
 		maxEvents = buffer.getInteger(MAXEVENTS, maxEvents);
@@ -101,6 +104,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		secret = "";
 		category = "";
 		tmxPath = "${rootDir}/tmFromMS.tmx";
+		configPath = "";
 		markAsMT = true;
 		maxEvents = 20;
 		maxMatches = 1;
@@ -119,6 +123,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		buffer.setString(CLIENTID,clientId);
 		buffer.setEncodedString(SECRET, secret);
 		buffer.setEncodedString(CATEGORY, category);
+		buffer.setString(CONFIGPATH, configPath);		
 		buffer.setString(TMXPATH, tmxPath);
 		buffer.setBoolean(MARKASMT, markAsMT);
 		buffer.setInteger(MAXEVENTS, maxEvents);
@@ -188,6 +193,14 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	public void setTmxPath (String tmxPath) {
 		this.tmxPath = tmxPath;
 	}
+	
+	public String getConfigPath () {
+		return configPath;
+	}
+
+	public void setConfigPath (String configPath) {
+		this.configPath = configPath;
+	}
 
 	public String getClientId () {
 		return clientId;
@@ -251,6 +264,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		desc.add(CLIENTID, "Client ID", "Client ID in Microsoft Azure Marketplace");
 		desc.add(SECRET, "Client Secret", "Client Secret from Microsoft Azure Marketplace");
 		desc.add(CATEGORY, "Category", "Category code if accessing a trained system");
+		desc.add(CONFIGPATH, "Engines", "Full path of the file listing the engines");		
 		desc.add(MAXEVENTS, "Events buffer", "Number of events to store before sending a query");
 		desc.add(MAXMATCHES, "Maximum matches", "Maximum number of matches allowed");
 		desc.add(THRESHOLD, "Threshold", "Score below which matches are not retained");
@@ -284,6 +298,12 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		tip.setAllowEmpty(true);
 		tip.setPassword(false);
 
+		PathInputPart pip1 = desc.addPathInputPart(paramsDesc.get(CONFIGPATH), "Config Path", false);
+		pip1.setBrowseFilters("MS HUB Config (*.properties)\tAll Files (*.*)", "*.properties\t*.*");
+		pip1.setVertical(false);
+		pip1.setWithLabel(true);
+		pip1.setAllowEmpty(true);
+		
 		sp = desc.addSeparatorPart();
 		sp.setVertical(true);
 		
