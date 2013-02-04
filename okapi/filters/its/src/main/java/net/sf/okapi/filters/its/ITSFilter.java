@@ -603,63 +603,8 @@ public abstract class ITSFilter implements IFilter {
 		ContextItem ci = new ContextItem(
 			(context.isEmpty() ? attr.getParentNode() : context.peek().node), trav, attr);
 		
-		// ITS annotators reference
-//TODO: how to attach the info?		
-		String value = trav.getAnnotatorsRef();
-		if ( value != null ) {
-			GenericAnnotation.addAnnotation(tu, new GenericAnnotation(GenericAnnotationType.ANNOT,
-				GenericAnnotationType.ANNOT_VALUEREF, value));
-		}
+		processTextUnit(tu, ci, null);
 		
-		// ITS Localization Note
-		if ( !Util.isEmpty(ci.locNote) ) {
-			tu.setProperty(new Property(Property.NOTE, ci.locNote));
-		}
-		// ITS Domain
-		if ( !Util.isEmpty(ci.domains) ) {
-			GenericAnnotation.addAnnotation(tu, new GenericAnnotation(GenericAnnotationType.DOMAIN,
-				GenericAnnotationType.DOMAIN_VALUE, ci.domains)
-			);
-		}
-		// ITS Disambiguation
-		if ( ci.disambig != null ) {
-			GenericAnnotations.addAnnotations(tu.getSource(), ci.disambig);
-		}
-		// ITS External Resource
-		if ( !Util.isEmpty(ci.externalRes) ) {
-			GenericAnnotation.addAnnotation(tu, new GenericAnnotation(GenericAnnotationType.EXTERNALRES,
-				GenericAnnotationType.EXTERNALRES_VALUE, ci.externalRes)
-			);
-		}
-		// ITS MT confidence
-		if ( ci.mtConfidence != null ) {
-			GenericAnnotation.addAnnotation(tu, new GenericAnnotation(GenericAnnotationType.MTCONFIDENCE,
-				GenericAnnotationType.MTCONFIDENCE_VALUE, ci.mtConfidence)
-			);
-		}
-		// ITS Storage Size
-		if ( ci.storageSize != null ) {
-			GenericAnnotations.addAnnotations(tu, ci.storageSize);
-		}
-		// ITS Allowed characters
-		if ( ci.allowedChars != null ) {
-			GenericAnnotation.addAnnotation(tu, new GenericAnnotation(GenericAnnotationType.ALLOWEDCHARS,
-				GenericAnnotationType.ALLOWEDCHARS_VALUE, ci.allowedChars)
-			);
-		}
-		// ITS Provenance
-		if ( ci.prov != null ) {
-			GenericAnnotations.addAnnotations(tu, ci.prov);
-		}
-		// ITS Localization Quality Rating
-		if ( ci.lqRating != null ) {
-			GenericAnnotations.addAnnotations(tu, ci.lqRating);
-		}
-		// ITS Localization Quality Issue (on the source)
-		if ( ci.lqIssues != null ) {
-			GenericAnnotations.addAnnotations(tu.getSource(), ci.lqIssues);
-		}
-
 		queue.add(new Event(EventType.TEXT_UNIT, tu));
 		if ( addToSkeleton ) skel.addReference(tu);
 		return id;
@@ -978,7 +923,6 @@ public abstract class ITSFilter implements IFilter {
 			extract = frag.hasText(false)
 				|| ( params.extractIfOnlyCodes && frag.hasCode() );
 		}
-		
 		if ( !extract ) {
 			if ( !frag.isEmpty() ) { // Nothing but white spaces
 				skel.add(frag.toText().replace("\n", (params.escapeLineBreak ? "&#10;" : lineBreak))); // Pass them as skeleton
@@ -997,10 +941,38 @@ public abstract class ITSFilter implements IFilter {
 		// Create the unit
 		ITextUnit tu = new TextUnit(String.valueOf(++tuId));
 		tu.setMimeType(mimeType);
-		
 		tu.setSourceContent(frag);
+
+		processTextUnit(tu, context.peek(), node.getNodeName());
+
+		// Process the skeleton
+		skel.addContentPlaceholder(tu);
+		if ( popStack ) {
+			context.pop();
+			skel.add(buildEndTag(node));
+		}
+		tu.setSkeleton(skel);
+		queue.add(new Event(EventType.TEXT_UNIT, tu));
+		nullFragment();
+		if ( popStack && isContextTranslatable() ) {
+			initFragment();
+		}
+		skel = new GenericSkeleton();
+		return true;
+	}
+
+	private void processTextUnit (ITextUnit tu,
+		ContextItem ci,
+		String nodeName)
+	{
+		// ITS annotators reference
+//TODO: how to attach the info?		
+		String value = trav.getAnnotatorsRef();
+		if ( value != null ) {
+			GenericAnnotation.addAnnotation(tu, new GenericAnnotation(GenericAnnotationType.ANNOT,
+				GenericAnnotationType.ANNOT_VALUEREF, value));
+		}
 		
-		ContextItem ci = context.peek();
 		// ITS Localization Note
 		if ( !Util.isEmpty(ci.locNote) ) {
 			tu.setProperty(new Property(Property.NOTE, ci.locNote));
@@ -1078,7 +1050,7 @@ public abstract class ITSFilter implements IFilter {
 		
 		// Set the information about preserving or not white-spaces
 		if ( isHTML5 ) {
-			if ( node.getNodeName().equals("pre") ) {
+			if (( nodeName != null ) && nodeName.equals("pre") ) {
 				ci.preserveWS = true;
 			}
 		}
@@ -1089,20 +1061,6 @@ public abstract class ITSFilter implements IFilter {
 			tu.setPreserveWhitespaces(false);
 			tu.getSource().unwrap(false, true);
 		}
-		
-		skel.addContentPlaceholder(tu);
-		if ( popStack ) {
-			context.pop();
-			skel.add(buildEndTag(node));
-		}
-		tu.setSkeleton(skel);
-		queue.add(new Event(EventType.TEXT_UNIT, tu));
-		nullFragment();
-		if ( popStack && isContextTranslatable() ) {
-			initFragment();
-		}
-		skel = new GenericSkeleton();
-		return true;
 	}
 	
 	/**

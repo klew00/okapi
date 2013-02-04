@@ -3632,8 +3632,11 @@ public class ITSEngine implements IProcessor, ITraversal {
 	}
 
 	@Override
-	public boolean preserveWS () {
-		return trace.peek().preserveWS;
+	public boolean preserveWS (Attr attribute) {
+		if ( attribute == null ) return trace.peek().preserveWS;
+		String tmp;
+		if ( (tmp = (String)attribute.getUserData(FLAGNAME)) == null ) return trace.peek().preserveWS;
+		return (tmp.charAt(FP_PRESERVEWS) == 'y' );
 	}
 
 	@Override

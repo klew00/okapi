@@ -426,7 +426,7 @@ public class Main {
 			if ( out1 != null ) writer.print(String.format("\tidValue=\"%s\"", escape(out1)));
 		}
 		else if ( dc.equals(DC_PRESERVESPACE) ) {
-			out1 = (trav.preserveWS() ? "preserve" : "default");
+			out1 = (trav.preserveWS(attr) ? "preserve" : "default");
 			if ( out1 != null ) writer.print(String.format("\tspace=\"%s\"", escape(out1)));
 		}
 		else if ( dc.equals(DC_LOCQUALITYISSUE) ) {

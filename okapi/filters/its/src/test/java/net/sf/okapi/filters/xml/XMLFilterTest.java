@@ -278,8 +278,10 @@ public class XMLFilterTest {
 			+ "<doc><its:rules version=\"2.0\" xmlns:its=\"http://www.w3.org/2005/11/its\">"
 			+ "<its:preserveSpaceRule selector=\"//grp\" space='preserve'/>"
 			+ "<its:preserveSpaceRule selector=\"//grp/p\" space='default'/>"
+			+ "<its:translateRule selector=\"//@text\" translate='yes'/>"
+			+ "<its:preserveSpaceRule selector=\"//@text\" space='preserve'/>"
 			+ "</its:rules>"
-			+ "<p>  a  b  c  </p>"
+			+ "<p text=\"  A  B  \">  a  b  c  </p>"
 			+ "<grp>"
 			+ "<p>  a  b  c  </p>"
 			+ "</grp>"
@@ -287,9 +289,12 @@ public class XMLFilterTest {
 		ArrayList<Event> list = getEvents(snippet);
 		ITextUnit tu = FilterTestDriver.getTextUnit(list, 1);
 		assertNotNull(tu);
+		assertEquals("  A  B  ", tu.getSource().toString());
+		tu = FilterTestDriver.getTextUnit(list, 2);
+		assertNotNull(tu);
 		assertEquals(" a b c ", tu.getSource().toString());
 		assertFalse(tu.preserveWhitespaces());
-		tu = FilterTestDriver.getTextUnit(list, 2);
+		tu = FilterTestDriver.getTextUnit(list, 3);
 		assertNotNull(tu);
 		assertEquals("  a  b  c  ", tu.getSource().toString());
 		assertTrue(tu.preserveWhitespaces());

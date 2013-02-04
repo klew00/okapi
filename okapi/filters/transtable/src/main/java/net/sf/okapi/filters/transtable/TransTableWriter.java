@@ -48,6 +48,7 @@ import net.sf.okapi.common.resource.StartSubDocument;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.TextFragment;
+import net.sf.okapi.common.resource.TextPart;
 import net.sf.okapi.common.skeleton.ISkeletonWriter;
 
 public class TransTableWriter implements IFilterWriter {
@@ -302,6 +303,47 @@ public class TransTableWriter implements IFilterWriter {
 			throw new OkapiIOException("Error writing segments.", e);
 		}
 	}
+
+//	private void processWithSegments__TESTNEW (ITextUnit tu) {
+//		try {
+//			TextContainer srcCont = tu.getSource();
+//			TextContainer trgCont = tu.getTarget(language);
+//			
+//			StringBuilder sb = new StringBuilder();
+//			for ( int i=0; i<srcCont.count(); i++ ) {
+//				TextPart srcPart = srcCont.get(i);
+//				if ( srcPart.isSegment() ) {
+//					
+//				}
+//				else {
+//					sb.append(srcPart.toString())
+//				}
+//			}
+//	
+//			for ( Segment srcSeg : srcSegs ) {
+//				// Write the ID
+//				writer.write("\"" + crumbs + ":" + TEXTUNIT_CRUMB+tu.getId() + ":" + SEGMENT_CRUMB+srcSeg.getId()+ "\"\t");
+//				
+//				// Write the source
+//				writeQuotedContent(srcSeg.getContent());
+//				writer.write("\t");
+//				
+//				// Write the target
+//				if ( trgSegs != null ) {
+//					Segment trgSeg = trgSegs.get(srcSeg.getId());
+//					if ( trgSeg != null ) {
+//						writeQuotedContent(trgSeg.getContent());
+//					}
+//				}
+//				// EOL
+//				writer.write(LINEBREAK);
+//			}
+//		}
+//		catch ( IOException e ) {
+//			throw new OkapiIOException("Error writing segments.", e);
+//		}
+//	}
+	
 	
 	private void processWithoutSegments (ITextUnit tu) {
 		try {

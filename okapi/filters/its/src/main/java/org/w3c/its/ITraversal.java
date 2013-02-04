@@ -158,11 +158,11 @@ public interface ITraversal {
 	
 	/**
 	 * Indicates if the white spaces of the current element of the traversal
-	 * must be preserved. 
-	 * @return True if the white spaces of the current element must be preserve,
+	 * or the given attribute must be preserved. 
+	 * @return True if the white spaces of the current element or the given attribute must be preserve,
 	 * false if they may or may not be preserved.
 	 */
-	public boolean preserveWS ();
+	public boolean preserveWS (Attr attribute);
 
 	/**
 	 * Gets the language for the current element of the traversal and its attributes.

@@ -60,7 +60,7 @@ class ContextItem {
 		this.trgPointer = trav.getTargetPointer(attribute);
 		this.idValue = trav.getIdValue(attribute);
 		this.locNote = trav.getLocNote(attribute);
-		this.preserveWS = trav.preserveWS();
+		this.preserveWS = trav.preserveWS(attribute);
 		this.domains = trav.getDomains(attribute);
 		this.externalRes = trav.getExternalResourceRef(attribute);
 		this.allowedChars = trav.getAllowedCharacters(attribute);

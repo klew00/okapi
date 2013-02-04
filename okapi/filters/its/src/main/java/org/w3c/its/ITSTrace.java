@@ -72,7 +72,7 @@ class ITSTrace {
 		locNote = initialTrace.locNote;
 		locNoteType = initialTrace.locNoteType;
 		
-		// preserveWS: Inheritance for child elements but not attributes
+		// preserveWS: Inheritance for child elements including attributes
 		preserveWS = initialTrace.preserveWS;
 	
 		// language: Inheritance for child element including attributes 

@@ -466,9 +466,9 @@ public class TraversalTest {
 		ITraversal trav = applyITSRules(doc, null, false, null);
 		Element elem = getElement(trav, "p", 1);
 		assertNotNull(elem);
-		assertFalse(trav.preserveWS());
+		assertFalse(trav.preserveWS(null));
 		elem = getElement(trav, "pre", 1);
-		assertTrue(trav.preserveWS());
+		assertTrue(trav.preserveWS(null));
 	}
 
 	@Test
