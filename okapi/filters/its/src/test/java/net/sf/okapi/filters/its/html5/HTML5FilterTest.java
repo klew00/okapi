@@ -524,6 +524,35 @@ public class HTML5FilterTest {
 		filter.close();
 	}
 
+	@Test
+	public void testDATAContentOutput () {
+		String snippet = "<!DOCTYPE html>\n<html lang=en translate=\"no\"><head><meta charset=utf-8><title>Title</title>"
+			+ "<style>\n<!--\n.totrans { background-color: #FFFF00 }\n-->\n</style>\n"
+			+ "<script type=\"application/its+xml\">\n"
+			+ "<its:rules xmlns:its=\"http://www.w3.org/2005/11/its\""
+			+ " xmlns:h=\"http://www.w3.org/1999/xhtml\" version=\"2.0\">\n"
+			+ "<its:translateRule selector=\"//h:*[@class='totrans']\" translate=\"yes\"/>\n"
+			+ "</its:rules>\n</script>\n"
+			+ "</head><body>"
+			+ "<p>Text1<p class=\"totrans\">Text2</body></html>";
+		ArrayList<Event> list = getEvents(snippet);
+		ITextUnit tu = FilterTestDriver.getTextUnit(list, 1);
+		assertEquals("Text2", tu.getSource().toString());
+		// Test the output
+		String expected = "<!DOCTYPE html>\n<html lang=\"en\" translate=\"no\"><head><meta charset=\"UTF-8\"><title>Title</title>"
+			+ "<style>\n<!--\n.totrans { background-color: #FFFF00 }\n-->\n</style>\n"
+			+ "<script type=\"application/its+xml\">\n"
+			+ "<its:rules xmlns:its=\"http://www.w3.org/2005/11/its\""
+			+ " xmlns:h=\"http://www.w3.org/1999/xhtml\" version=\"2.0\">\n"
+			+ "<its:translateRule selector=\"//h:*[@class='totrans']\" translate=\"yes\"/>\n"
+			+ "</its:rules>\n</script>\n"
+			+ "</head><body>"
+			+ "<p>Text1</p><p class=\"totrans\">Text2</p></body></html>";
+		assertEquals(expected, FilterTestDriver.generateOutput(list, locFR,
+			filter.createSkeletonWriter(), filter.getEncoderManager()));
+	}
+
+	
 	private void addStandoffAnnotations (ITextUnit tu) {
 		// Content is "Text1 text2 text3"
 		// Creates a target (no override)

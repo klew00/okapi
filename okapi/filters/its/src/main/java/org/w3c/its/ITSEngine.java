@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 import java.util.TreeMap;
+import java.util.regex.Pattern;
 
 import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -90,6 +91,12 @@ public class ITSEngine implements IProcessor, ITraversal {
 	
 	private static final String PTRFLAG = "@@"; // Flag for pointer-type attributes
 	private static final String REFFLAG = "\u0011"; // Flag for Ref vs non-Ref attributes
+
+	// Pattern to validate the pattern allowed for Allowed Characters (thanks you Shaun!)
+	private static final String VALIDALLOWEDCHARS = ("^(\\.|\\[^?-?(([\\u0009\\u000A\\u000D\\u0020-\\u002C\\u002E-\\u005B\\u005F-\\uD7FF\\uE000-\\uFFFD]"
+		+ "|\\\\n|\\\\r|\\\\t|\\\\]|\\\\^|\\\\-|\\\\\\\\)(-([\\u0009\\u000A\\u000D\\u0020-\\u002C\\u002E-\\u005B\\u005F-\\uD7FF\\uE000-\\uFFFD]"
+		+ "|\\\\n|\\\\r|\\\\t|\\\\]|\\\\^|\\\\-|\\\\\\\\))?)+-?\\])?$");
+	private Pattern validAllowedChars;
 
 	// Indicator position
 	private static final int      FP_TRANSLATE             = 0;
@@ -2570,19 +2577,32 @@ public class ITSEngine implements IProcessor, ITraversal {
 		boolean qualified,
 		boolean useHTML5)
 	{
+		String regex = null;
 		if ( useHTML5 ) {
 			if ( elem.hasAttribute("its-allowed-characters") )
-				return elem.getAttribute("its-allowed-characters");
+				regex = elem.getAttribute("its-allowed-characters");
 		}
 		else if ( qualified ) {
 			if ( elem.hasAttributeNS(ITS_NS_URI, "allowedCharacters") )
-				return elem.getAttributeNS(ITS_NS_URI, "allowedCharacters");
+				regex = elem.getAttributeNS(ITS_NS_URI, "allowedCharacters");
 		}
 		else {
 			if ( elem.hasAttribute("allowedCharacters") )
-				return elem.getAttribute("allowedCharacters");
+				regex = elem.getAttribute("allowedCharacters");
 		}
-		return null;
+		
+		// Verify it uses the allowed syntax
+		if ( regex != null ) {
+			if ( validAllowedChars == null ) {
+				validAllowedChars = Pattern.compile(VALIDALLOWEDCHARS); 
+			}
+			if ( !validAllowedChars.matcher(regex).matches() ) {
+				logger.error("The pattern '{}' is not valid for the Allowed Characters data category.", regex);
+			}
+		}
+		
+		// Return it
+		return regex;
 	}
 	
 	private String retrieveMtconfidence (Element elem,

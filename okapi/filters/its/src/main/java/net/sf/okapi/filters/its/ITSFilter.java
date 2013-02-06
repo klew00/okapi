@@ -103,6 +103,7 @@ public abstract class ITSFilter implements IFilter {
 	private TermsAnnotation terms;
 	private Map<String, String> variables;
 	private LinkedHashMap<String, GenericAnnotations> inlineLQIs;
+	private boolean inNoEscapeContent;
 
 	public ITSFilter (boolean isHTML5,
 		String mimeType)
@@ -215,6 +216,7 @@ public abstract class ITSFilter implements IFilter {
 		tuId = 0;
 		otherId = new IdGenerator(null, "o");
 		hasStandoffLocation = false;
+		inNoEscapeContent = false;
 
 		initializeDocument();
 		
@@ -319,8 +321,13 @@ public abstract class ITSFilter implements IFilter {
 
 			case Node.TEXT_NODE:
 				if ( frag == null ) {//TODO: escape unsupported chars
-					skel.append(Util.escapeToXML(
-						node.getNodeValue().replace("\n", lineBreak), 0, false, null));
+					if ( inNoEscapeContent ) {
+						skel.append(node.getNodeValue().replace("\n", lineBreak));
+					}
+					else {
+						skel.append(Util.escapeToXML(
+							node.getNodeValue().replace("\n", lineBreak), 0, false, null));
+					}
 				}
 				else {
 					if ( extract() ) {
@@ -680,6 +687,11 @@ public abstract class ITSFilter implements IFilter {
 					attachAnnotations(code, frag);
 				}
 			}
+
+			// Checks if we are closing a no-escape element
+			if ( isHTML5 && "script|style".indexOf(node.getLocalName()) != -1 ) {
+				inNoEscapeContent = false;
+			}
 		}
 		else { // Else: Start tag
 			// Test if this node is involved in a source/target pair
@@ -732,6 +744,10 @@ public abstract class ITSFilter implements IFilter {
 					}
 					if ( node.hasChildNodes() ) {
 						context.push(new ContextItem(node, trav));
+					}
+					// Check if we are opening a no-escape element
+					if ( isHTML5 && "script|style".indexOf(node.getLocalName()) != -1 ) {
+						inNoEscapeContent = true;
 					}
 				}
 				else { // Already in extraction

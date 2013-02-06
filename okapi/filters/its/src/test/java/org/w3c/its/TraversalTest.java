@@ -476,7 +476,7 @@ public class TraversalTest {
 		InputSource is = new InputSource(new StringReader("<doc>"
 			+ "<i:rules xmlns:i='"+ITSEngine.ITS_NS_URI+"' version='2.0'>"
 			+ "<i:allowedCharactersRule selector='//p' allowedCharacters='[a-zA-Z]'/>"
-			+ "<i:allowedCharactersRule selector='//p/@abc' allowedCharacters='[0-9]'/>"
+			+ "<i:allowedCharactersRule selector='//p/@abc' allowedCharacters='[^*+]'/>"
 			+ "</i:rules>"
 			+ "<p abc='123'>text</p></doc>"));
 		Document doc = fact.newDocumentBuilder().parse(is);
@@ -484,7 +484,7 @@ public class TraversalTest {
 		Element elem = getElement(trav, "p", 1);
 		assertEquals("[a-zA-Z]", trav.getAllowedCharacters(null));
 		Attr attr = elem.getAttributeNode("abc");
-		assertEquals("[0-9]", trav.getAllowedCharacters(attr));
+		assertEquals("[^*+]", trav.getAllowedCharacters(attr));
 	}
 
 	@Test

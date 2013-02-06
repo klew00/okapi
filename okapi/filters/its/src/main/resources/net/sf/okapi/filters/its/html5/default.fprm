@@ -13,7 +13,7 @@
   | //h:u | //h:isindex" />
   
  <!-- Non-translatable elements -->
- <its:translateRule selector="//h:script|h:style" translate="no"/>
+ <its:translateRule selector="//h:script|//h:style" translate="no"/>
  
  <its:translateRule selector="//h:del" translate="no"/>
  <its:translateRule selector="//h:del/descendant-or-self::*/@*" translate="no"/>

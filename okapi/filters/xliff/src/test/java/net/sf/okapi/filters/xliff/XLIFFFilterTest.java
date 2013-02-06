@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2011 by the Okapi Framework contributors
+  Copyright (C) 2008-2013 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -20,12 +20,19 @@
 
 package net.sf.okapi.filters.xliff;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IResource;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.TestUtil;
 import net.sf.okapi.common.annotation.AltTranslation;
 import net.sf.okapi.common.annotation.AltTranslationsAnnotation;
@@ -33,31 +40,27 @@ import net.sf.okapi.common.annotation.GenericAnnotation;
 import net.sf.okapi.common.annotation.GenericAnnotationType;
 import net.sf.okapi.common.annotation.GenericAnnotations;
 import net.sf.okapi.common.filters.FilterConfiguration;
+import net.sf.okapi.common.filters.FilterTestDriver;
+import net.sf.okapi.common.filters.InputDocument;
+import net.sf.okapi.common.filters.RoundTripComparison;
 import net.sf.okapi.common.filterwriter.GenericContent;
 import net.sf.okapi.common.filterwriter.XLIFFWriter;
 import net.sf.okapi.common.query.MatchType;
 import net.sf.okapi.common.resource.Code;
-import net.sf.okapi.common.resource.InlineAnnotation;
+import net.sf.okapi.common.resource.ISegments;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.RawDocument;
-import net.sf.okapi.common.resource.ISegments;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.StartGroup;
 import net.sf.okapi.common.resource.StartSubDocument;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
-import net.sf.okapi.common.resource.TextPart;
-import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.TextFragment.TagType;
-import net.sf.okapi.common.filters.FilterTestDriver;
-import net.sf.okapi.common.filters.InputDocument;
-import net.sf.okapi.common.filters.RoundTripComparison;
-import net.sf.okapi.common.LocaleId;
-import net.sf.okapi.filters.xliff.XLIFFFilter;
+import net.sf.okapi.common.resource.TextPart;
 
 import org.junit.Before;
 import org.junit.Test;
-import static org.junit.Assert.*;
 
 public class XLIFFFilterTest {
 
@@ -73,7 +76,7 @@ public class XLIFFFilterTest {
 	private LocaleId locDE = LocaleId.fromString("de");
 
 	@Before
-	public void setUp() {
+	public void setUp () {
 		filter = new XLIFFFilter();
 		fmt = new GenericContent();
 		root = TestUtil.getParentDir(this.getClass(), "/JMP-11-Test01.xlf");
@@ -1298,6 +1301,39 @@ public class XLIFFFilterTest {
 		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 		assertEquals("A <1/> Z", fmt.setContent(tu.getSource().getFirstContent()).toString());
 		assertEquals("<mrk mtype=\"protected\">code</mrk>", tu.getSource().getFirstContent().getCode(0).getOuterData());
+	}
+
+	@Test
+	public void testITSAnnotations () {
+		String snippet = "<?xml version=\"1.0\"?>\r"
+			+ "<xliff version=\"1.2\" xmlns:its=\"http://www.w3.org/2005/11/its\" its:version=\"2.0\">\n"
+			+ "<file source-language=\"en\" target-language='fr' datatype=\"plaintext\" original=\"file.ext\"><body>"
+			+ "<trans-unit id=\"1\" its:locQualityIssueComment='c1' its:allowedCharacters='[a-z0-9]'"
+			+ " its:storageSize='10' its:storageEncoding='us-ascii' its:lineBreakType='cr' >\n"
+			+ "<source its:locQualityIssueComment='c2'>t1 "
+			+ "<mrk ctype='x-its' its:locQualityIssueComment='c3'>t2</mrk>"
+			+ "</source>"
+			+ "<target its:locQualityIssueComment='c4'>trg1</target>"
+			+ "</trans-unit>"
+			+ "</body></file></xliff>";
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		// TU level
+		GenericAnnotations anns = tu.getAnnotation(GenericAnnotations.class);
+		assertNotNull(anns);
+		assertEquals("c1", anns.getFirstAnnotation(GenericAnnotationType.LQI).getString(GenericAnnotationType.LQI_COMMENT));
+		assertEquals("[a-z0-9]", anns.getFirstAnnotation(GenericAnnotationType.ALLOWEDCHARS).getString(GenericAnnotationType.ALLOWEDCHARS_VALUE));
+		assertEquals(10, (int)anns.getFirstAnnotation(GenericAnnotationType.STORAGESIZE).getInteger(GenericAnnotationType.STORAGESIZE_SIZE));
+		assertEquals("us-ascii", anns.getFirstAnnotation(GenericAnnotationType.STORAGESIZE).getString(GenericAnnotationType.STORAGESIZE_ENCODING));
+		assertEquals("cr", anns.getFirstAnnotation(GenericAnnotationType.STORAGESIZE).getString(GenericAnnotationType.STORAGESIZE_LINEBREAK));
+		// Source-level
+		anns = tu.getSource().getAnnotation(GenericAnnotations.class);
+		assertNotNull(anns);
+		assertEquals("c2", anns.getFirstAnnotation(GenericAnnotationType.LQI).getString(GenericAnnotationType.LQI_COMMENT));
+		// Target-level
+		anns = tu.getTarget(LocaleId.FRENCH).getAnnotation(GenericAnnotations.class);
+		assertNotNull(anns);
+		assertEquals("c4", anns.getFirstAnnotation(GenericAnnotationType.LQI).getString(GenericAnnotationType.LQI_COMMENT));
+		
 	}
 
 	private ArrayList<Event> createSimpleXLIFF () {

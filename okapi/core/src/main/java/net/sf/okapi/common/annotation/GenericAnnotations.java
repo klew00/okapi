@@ -49,11 +49,12 @@ public class GenericAnnotations extends InlineAnnotation implements Iterable<Gen
 	 * otherwise all the annotations of the set passed as argument are added to
 	 * the existing set. 
 	 * @param tu the text unit where to attached the new set.
-	 * @param newSet the new set to add.
+	 * @param newSet the new set to add (can be null: then nothing is attached).
 	 */
 	static public void addAnnotations (ITextUnit tu,
 		GenericAnnotations newSet)
 	{
+		if ( newSet == null ) return;
 		GenericAnnotations current = tu.getAnnotation(GenericAnnotations.class);
 		if ( current == null ) tu.setAnnotation(newSet); 
 		else current.addAll(newSet);
@@ -65,11 +66,12 @@ public class GenericAnnotations extends InlineAnnotation implements Iterable<Gen
 	 * otherwise all the annotations of the set passed as argument are added to
 	 * the existing set. 
 	 * @param tc the text container where to attached the new set.
-	 * @param newSet the new set to add.
+	 * @param newSet the new set to add (can be null: then nothing is attached).
 	 */
 	static public void addAnnotations (TextContainer tc,
 		GenericAnnotations newSet)
 	{
+		if ( newSet == null ) return;
 		GenericAnnotations current = tc.getAnnotation(GenericAnnotations.class);
 		if ( current == null ) tc.setAnnotation(newSet); 
 		else current.addAll(newSet);
@@ -81,11 +83,12 @@ public class GenericAnnotations extends InlineAnnotation implements Iterable<Gen
 	 * otherwise all the annotations of the set passed as argument are added to
 	 * the existing set. 
 	 * @param code the code where to add the annotation.
-	 * @param newSet the new set to add.
+	 * @param newSet the new set to add (can be null: then nothing is attached).
 	 */
 	static public void addAnnotations (Code code,
 		GenericAnnotations newSet)
 	{
+		if ( newSet == null ) return;
 		GenericAnnotations current = (GenericAnnotations)code.getAnnotation(GenericAnnotationType.GENERIC);
 		if ( current == null ) code.setAnnotation(GenericAnnotationType.GENERIC, newSet);
 		else current.addAll(newSet);

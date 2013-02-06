@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2013 by the Okapi Framework contributors
+  Copyright (C) 2013-2013 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -36,7 +36,6 @@ import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.common.skeleton.GenericSkeletonPart;
 import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
-import net.sf.okapi.filters.its.ITSFilter;
 
 /**
  * Implements ISkeletonWriter for the ITS filters 

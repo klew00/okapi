@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2012 by the Okapi Framework contributors
+  Copyright (C) 2012-2013 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -42,7 +42,6 @@ import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.common.skeleton.ISkeletonWriter;
 import net.sf.okapi.filters.its.ITSFilter;
 import net.sf.okapi.filters.its.Parameters;
-import nu.validator.htmlparser.common.XmlViolationPolicy;
 import nu.validator.htmlparser.dom.HtmlDocumentBuilder;
 
 import org.w3c.dom.Document;

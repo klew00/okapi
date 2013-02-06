@@ -47,6 +47,7 @@ import net.sf.okapi.common.annotation.AltTranslation;
 import net.sf.okapi.common.annotation.AltTranslationsAnnotation;
 import net.sf.okapi.common.annotation.GenericAnnotation;
 import net.sf.okapi.common.annotation.GenericAnnotationType;
+import net.sf.okapi.common.annotation.GenericAnnotations;
 import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.exceptions.OkapiIllegalFilterOperationException;
@@ -55,6 +56,7 @@ import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filters.IFilterConfigurationMapper;
 import net.sf.okapi.common.filterwriter.GenericFilterWriter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
+import net.sf.okapi.common.filterwriter.ITSContent;
 import net.sf.okapi.common.filterwriter.XLIFFWriter;
 import net.sf.okapi.common.query.MatchType;
 import net.sf.okapi.common.resource.Code;
@@ -88,6 +90,10 @@ public class XLIFFFilter implements IFilter {
 	public static final String PROP_WASSEGMENTED = "wassegmented";
 	
 	private static final String ALTTRANSTYPE_PROPOSAL = "proposal";
+	
+	private static final int FOR_TU = 0;
+	private static final int FOR_TC = 1;
+	private static final int FOR_IC = 2;
 	
 	private boolean hasNext;
 	private XMLStreamReader reader;
@@ -663,7 +669,7 @@ public class XLIFFFilter implements IFilter {
 			segSourceDone = false;
 			tu = new TextUnit(String.valueOf(++tuId));
 			storeStartElement(false, true);
-
+			
 			String tmp = reader.getAttributeValue(null, "translate");
 			if ( tmp != null ) tu.setIsTranslatable(tmp.equals("yes"));
 
@@ -691,39 +697,8 @@ public class XLIFFFilter implements IFilter {
 				}
 			}
 
-			//tmp = reader.getAttributeValue(null, "maxbytes");
-			// ITS Storage size
-			tmp = reader.getAttributeValue(XLIFFWriter.NS_ITS20, "storageSize");
-			if ( tmp != null ) { // Get encoding info
-				String enc = reader.getAttributeValue(XLIFFWriter.NS_ITS20, "storageEncoding");
-				if ( enc == null ) enc = "UTF-8";
-				String lb = reader.getAttributeValue(XLIFFWriter.NS_ITS20, "lineBreakType");
-				if ( lb == null ) lb = "lf";
-				GenericAnnotation.addAnnotation(tu, new GenericAnnotation(GenericAnnotationType.STORAGESIZE,
-					GenericAnnotationType.STORAGESIZE_SIZE, Integer.parseInt(tmp),
-					GenericAnnotationType.STORAGESIZE_ENCODING, enc,
-					GenericAnnotationType.STORAGESIZE_LINEBREAK, lb));
-			}
-			// ITS Allowed characters
-			tmp = reader.getAttributeValue(XLIFFWriter.NS_ITS20, "allowedCharacters");
-			if ( tmp != null ) { // Get Allowed Character info
-				GenericAnnotation.addAnnotation(tu, new GenericAnnotation(GenericAnnotationType.ALLOWEDCHARS,
-					GenericAnnotationType.ALLOWEDCHARS_VALUE, tmp));
-			}
-			// ITS Domain
-			tmp = reader.getAttributeValue(XLIFFWriter.NS_XLIFFOKAPI, "istDomain");
-			if ( tmp != null ) {
-				GenericAnnotation.addAnnotation(tu, new GenericAnnotation(GenericAnnotationType.DOMAIN,
-					GenericAnnotationType.DOMAIN_VALUE, tmp)
-				);
-			}
-			// External Resource
-			tmp = reader.getAttributeValue(XLIFFWriter.NS_XLIFFOKAPI, "itsExternalResourceRef");
-			if ( tmp != null ) {
-				GenericAnnotation.addAnnotation(tu, new GenericAnnotation(GenericAnnotationType.EXTERNALRES,
-					GenericAnnotationType.EXTERNALRES_VALUE, tmp)
-				);
-			}
+			// Process the text unit-level ITS attributes (attached them as annotations)
+			GenericAnnotations.addAnnotations(tu, readITSAttributes(FOR_TU));
 			
 			// Set restype (can be null)
 			tu.setType(reader.getAttributeValue(null, "restype"));
@@ -838,6 +813,105 @@ public class XLIFFFilter implements IFilter {
 		return false;
 	}
 	
+	/**
+	 * Reads the ITS local attribute in the current element.
+	 * @param type type of processing to do (use: {@link #FOR_TU}, {@link #FOR_TC} or {@link #FOR_IC}).
+	 * @return An annotations set with all the read annotations.
+	 */
+	private GenericAnnotations readITSAttributes (int type) {
+		boolean found = false;
+		int i;
+		for ( i=0; i<reader.getAttributeCount(); i++ ) {
+			String ns = reader.getAttributeNamespace(i);
+			if (( ns != null ) && ( ns.equals(ITSContent.ITS_NS_URI) || ns.equals(XLIFFWriter.NS_XLIFFOKAPI) )) {
+				found = true;
+				break;
+			}
+		}
+		if ( !found ) return null;
+
+		// At least one ITS info
+		GenericAnnotations anns = new GenericAnnotations();
+		
+		// Check for LQI
+		String val1 = reader.getAttributeValue(ITSContent.ITS_NS_URI, "locQualityIssuesRef");
+		if ( val1 != null ) {
+//TODO: get the ref and fetch the standoff markup
+		}
+		else { // Otherwise check for on-element LQI attributes
+			val1 = reader.getAttributeValue(ITSContent.ITS_NS_URI, "locQualityIssueComment");
+			String val2 = reader.getAttributeValue(ITSContent.ITS_NS_URI, "locQualityIssueType");
+			if (( val1 != null ) || ( val2 != null )) {
+				// OK to create with one null value
+				GenericAnnotation ann = new GenericAnnotation(GenericAnnotationType.LQI,
+					GenericAnnotationType.LQI_COMMENT, val1,
+					GenericAnnotationType.LQI_TYPE, val2);
+				if ( (val1 = reader.getAttributeValue(ITSContent.ITS_NS_URI, "locQualityIssueSeverity")) != null ) {
+					ann.setDouble(GenericAnnotationType.LQI_SEVERITY, Double.parseDouble(val1));
+				}
+				if ( (val1 = reader.getAttributeValue(ITSContent.ITS_NS_URI, "locQualityIssueProfileRef")) != null ) {
+					ann.setString(GenericAnnotationType.LQI_PROFILEREF, val1);
+				}
+				if ( (val1 = reader.getAttributeValue(ITSContent.ITS_NS_URI, "locQualityIssueEnabled")) != null ) {
+					ann.setBoolean(GenericAnnotationType.LQI_ENABLED, val1.equals("yes"));
+				}
+				// Add the annotation to the list
+				anns.add(ann);
+			}
+		}
+		
+		// ITS Allowed characters
+		if ( (val1 = reader.getAttributeValue(ITSContent.ITS_NS_URI, "allowedCharacters")) != null ) {
+			if (( type == FOR_TU ) || ( type == FOR_IC )) {
+				anns.add(new GenericAnnotation(GenericAnnotationType.ALLOWEDCHARS,
+					GenericAnnotationType.ALLOWEDCHARS_VALUE, val1));
+			}
+			else {
+				logger.warn("ITS Allowed Characters data category is to be used only on trans-unit and mrk.");
+			}
+		}
+	
+		// ITS Storage size
+		if ( (val1 = reader.getAttributeValue(XLIFFWriter.NS_ITS20, "storageSize")) != null ) { // Get encoding info
+			if (( type == FOR_TU ) || ( type == FOR_IC )) {
+				String enc = reader.getAttributeValue(XLIFFWriter.NS_ITS20, "storageEncoding");
+				if ( enc == null ) enc = "UTF-8";
+				String lb = reader.getAttributeValue(XLIFFWriter.NS_ITS20, "lineBreakType");
+				if ( lb == null ) lb = "lf";
+				anns.add(new GenericAnnotation(GenericAnnotationType.STORAGESIZE,
+					GenericAnnotationType.STORAGESIZE_SIZE, Integer.parseInt(val1),
+					GenericAnnotationType.STORAGESIZE_ENCODING, enc,
+					GenericAnnotationType.STORAGESIZE_LINEBREAK, lb));
+			}
+			else {
+				logger.warn("ITS Storage Size data category is to be used only on trans-unit and mrk.");
+			}
+		}
+		
+		// ITS Domain
+		if ( (val1 = reader.getAttributeValue(XLIFFWriter.NS_XLIFFOKAPI, "istDomain")) != null ) {
+			if ( type == FOR_TU ) {
+				anns.add(new GenericAnnotation(GenericAnnotationType.DOMAIN,
+					GenericAnnotationType.DOMAIN_VALUE, val1));
+			}
+			else {
+				logger.warn("ITS Domain data category is to be used only on trans-unit.");
+			}
+		}
+		// External Resource
+		if ( (val1 = reader.getAttributeValue(XLIFFWriter.NS_XLIFFOKAPI, "itsExternalResourceRef")) != null ) {
+			if (( type == FOR_TU ) || ( type == FOR_IC )) {
+				anns.add(new GenericAnnotation(GenericAnnotationType.EXTERNALRES,
+					GenericAnnotationType.EXTERNALRES_VALUE, val1));
+			}
+			else {
+				logger.warn("ITS External Resource data category is to be used only on trans-unit and mrk.");
+			}
+		}
+		
+		return (anns.size() == 0 ? null : anns);
+	}
+	
 	private void processSource (boolean isSegSource) {
 		TextContainer tc;
 		if ( sourceDone ) { // Case of an alt-trans entry
@@ -883,18 +957,24 @@ public class XLIFFFilter implements IFilter {
 				}
 			}
 		}
-		else {
+		else { // Main source of the trans-unit
 			// Get the coord attribute if available
 			String tmp = reader.getAttributeValue(null, "coord");
 			if ( tmp != null ) {
 				tu.setSourceProperty(new Property(Property.COORDINATES, tmp, true));
 			}
+			// Get the ITS annotations for the source
+			GenericAnnotations anns = readITSAttributes(FOR_TC);
+			
 			skel.addContentPlaceholder(tu);
 			tc = processContent(isSegSource ? "seg-source" : "source", false);
 			if ( !preserveSpaces.peek() ) {
 				tc.unwrap(true, false);
 			}
 			tu.setPreserveWhitespaces(preserveSpaces.peek());
+			// Attach the annotation if needed
+			GenericAnnotations.addAnnotations(tc, anns);
+			
 			tu.setSource(tc);
 			sourceDone = true;
 		}
@@ -949,6 +1029,9 @@ public class XLIFFFilter implements IFilter {
 			// Get the coord attribute if available
 			String coordValue = reader.getAttributeValue(null, "coord");
 
+			// Get the ITS annotations for the target
+			GenericAnnotations anns = readITSAttributes(FOR_TC);
+			
 			// Get the target itself
 			skel.addContentPlaceholder(tu, trgLang);
 			tc = processContent("target", false);
@@ -957,6 +1040,9 @@ public class XLIFFFilter implements IFilter {
 				tc.unwrap(true, false);
 			}
 			tu.setPreserveWhitespaces(preserveSpaces.peek());
+			// Attach the annotation if needed
+			GenericAnnotations.addAnnotations(tc, anns);
+
 			tu.setTarget(trgLang, tc);
 			
 			// Set the target properties (after the target container has been set)

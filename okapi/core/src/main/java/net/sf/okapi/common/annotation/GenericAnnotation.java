@@ -122,6 +122,7 @@ public class GenericAnnotation {
 	/**
 	 * Sets a list of key+values pairs for this annotation.
 	 * Each pair must be made of a string that is the name of the field, and an object that is the value to set.
+	 * The object can be null in that case: the key is not set or deleted.
 	 * Only supported types must be used.
 	 * @param list the list of key+value pairs to set.
 	 */
@@ -141,6 +142,9 @@ public class GenericAnnotation {
 			}
 			else if ( list[i+1] instanceof Double ) {
 				setDouble((String)list[i], (Double)list[i+1]);
+			}
+			else if ( list[i+1] == null ) {
+				// Do nothing with a null value
 			}
 			else {
 				throw new InvalidParameterException("Invalid field value in key+value pair.");
