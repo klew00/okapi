@@ -28,7 +28,11 @@ public class RainbowTest {
 		String distDir;
 		String osName = System.getProperty("os.name");
 		if ( osName.startsWith("Mac OS") ) { // Macintosh case
-			distDir = "dist_cocoa-macosx";
+			if ( System.getProperty("os.arch").equals("x86_64") || System.getProperty("os.arch").equals("amd64")) {
+                distDir = "dist_cocoa-macosx-x86_64";
+            } else {
+                distDir = "dist_cocoa-macosx";
+            }
 			//TODO: How to detect carbon vs cocoa?
 		}
 		else if ( osName.startsWith("Windows") ) { // Windows case
@@ -58,8 +62,11 @@ public class RainbowTest {
 		if ( osName.startsWith("Windows") ) { // Windows case
 			javaRainbow = "java -jar \"" + libDir + "rainbow.jar\"";
 
+		} else if ( osName.startsWith("Mac OS") ) { // Mac case
+			// OS X requires -XstartOnFirstThread for GUI applications
+			javaRainbow = "java -XstartOnFirstThread -jar " + libDir + "rainbow.jar";
 		}
-		else { // Assumes Mac, Unix or Linux
+		else { // Assumes Unix or Linux
 			javaRainbow = "java -jar " + libDir + "rainbow.jar";
 		}
 	}
