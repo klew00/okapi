@@ -58,7 +58,7 @@ public class HTML5FilterTest {
 		assertNotNull(tu);
 		assertEquals("Text in <1>italics</1>.", fmt.setContent(tu.getSource().getFirstContent()).toString());
 	}
-	
+
 	@Test
 	public void testTranslateLocally () {
 		String snippet = "<!DOCTYPE html><html lang=\"en\"><head><meta charset=utf-8><title>Title</title></head><body>"

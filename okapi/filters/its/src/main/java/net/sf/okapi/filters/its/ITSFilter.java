@@ -231,7 +231,8 @@ public abstract class ITSFilter implements IFilter {
 		}
 
 		// Create the ITS engine
-		trav = new ITSEngine(doc, input.getInputURI(), isHTML5, variables);
+		//trav = new ITSEngine(doc, input.getInputURI(), isHTML5, variables);
+		trav = new ITSEngine(doc, input.getInputURI(), input.getEncoding(), isHTML5, variables);
 		// Load the parameters file if there is one
 		if ( params != null ) {
 			if ( params.getDocument() != null ) {

@@ -166,6 +166,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 	private String version;
 	private IdGenerator idGen;
 	private IdGenerator idProvGen;
+	private String docEncoding;
 
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 	
@@ -174,6 +175,24 @@ public class ITSEngine implements IProcessor, ITraversal {
 	{
 		// For backward compatibility
 		this(doc, docURI, false, null);
+	}
+	
+	/**
+	 * Creates a new ITSEngine object.
+	 * @param doc the document to process.
+	 * @param docURI the URI of the document to process.
+	 * @param docEncoding the default encoding for the document.
+	 * @param isHTML5 true if the document is an HTML5 document.
+	 * @param map map of the parameters key-value pairs (can be null).
+	 */
+	public ITSEngine (Document doc,
+		URI docURI,
+		String docEncoding,
+		boolean isHTML5,
+		Map<String,String> map)
+	{
+		this(doc, docURI, isHTML5, map);
+		this.docEncoding = docEncoding;
 	}
 	
 	public ITSEngine (Document doc,
@@ -319,7 +338,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 				if ( content.endsWith("-->")) content = content.substring(0, content.length()-3);
 				content = content.trim();
 				// Parse the content
-				InputSource is = new InputSource(new ByteArrayInputStream(content.getBytes()));
+				InputSource is = new InputSource(new ByteArrayInputStream(docEncoding != null ? content.getBytes(docEncoding) : content.getBytes()));
 				Document scriptDoc = parseXMLDocument(is);
 				// And compile the rules
 				compileRules(scriptDoc, docURI, isInternal);
@@ -3125,7 +3144,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 				issuesXPath = createXPath();
 				// Parse the content
 				try {
-					InputSource is = new InputSource(new ByteArrayInputStream(content.getBytes()));
+					InputSource is = new InputSource(new ByteArrayInputStream(docEncoding != null ? content.getBytes(docEncoding) : content.getBytes()));
 					issuesDoc = parseXMLDocument(is);
 				}
 				catch ( Throwable e ) {
@@ -3270,7 +3289,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 				issuesXPath = createXPath();
 				// Parse the content
 				try {
-					InputSource is = new InputSource(new ByteArrayInputStream(content.getBytes()));
+					InputSource is = new InputSource(new ByteArrayInputStream(docEncoding != null ? content.getBytes(docEncoding) : content.getBytes()));
 					issuesDoc = parseXMLDocument(is);
 				}
 				catch ( Throwable e ) {

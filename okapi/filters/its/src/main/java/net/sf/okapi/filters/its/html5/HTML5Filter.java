@@ -125,7 +125,7 @@ public class HTML5Filter extends ITSFilter {
 		HtmlDocumentBuilder docBuilder = new HtmlDocumentBuilder();
 		try {
 			InputSource is = new InputSource(input.getStream());
-			//is.setEncoding(input.getEncoding());
+			is.setEncoding(input.getEncoding());
 			doc = docBuilder.parse(is);
 		}
 		catch ( SAXException e ) {
