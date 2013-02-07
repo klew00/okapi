@@ -44,38 +44,44 @@ public class CharacterTest {
 	
 	private GenericContent fmt;
 	private Cleaner cleaner;
+	private Parameters params;
 	
 	@Before
 	public void setup() {
 		
+		params = new Parameters();
+		params.setCheckCharacters(true);
 		fmt = new GenericContent();
 		cleaner = new Cleaner();
 	}
 	
-//	@Test
-//	public void testSimpleCharacter() {
-//
-//		TextFragment srcTf = new TextFragment("t1 , 0 . 235:t2, t3, t4 ; t5 .");
-//		TextFragment trgTf = new TextFragment("t1, ,235 : t2 ,t3 , t4 ;t5 . ");
-//		
-//		ITextUnit tu = new TextUnit("tu1");
-//		TextContainer srcTc = tu.getSource();
-//		srcTc.append(new Segment("seg1", srcTf));
-//		
-//		TextContainer trgTc = tu.createTarget(locFR, true, IResource.CREATE_EMPTY);
-//		trgTc.append(new Segment("seg1", trgTf));
-//		
-//		if (!tu.isEmpty()) {
-//			ISegments srcSegs = tu.getSourceSegments();
-//			for (Segment srcSeg : srcSegs) {
-//				Segment trgSeg = tu.getTargetSegment(locFR, srcSeg.getId(), false);
-//				if (trgSeg != null) {
-//					cleaner.checkCharacters(tu, srcSeg, locFR);			
-//				}
-//			}
-//		}		
-//		
-//		assertEquals("[\"t1\", 0.235: t2, t3, t4; t5.]", fmt.printSegmentedContent(tu.getSource(), true, false));
-//		assertEquals("[\"t1\", 0.235: t2, t3, t4; t5.]", fmt.printSegmentedContent(tu.getSource(), true, true));
-//	}
+	@Test
+	public void testSimpleCharacter() {
+
+		TextFragment srcTf = new TextFragment("This is some normal text");
+		// Ëþáûå äâèæåíèÿ
+		TextFragment trgTf = new TextFragment("\u00CB\u00FE\u00E1\u00FB\u00E5 \u00E4\u00E2\u00E8\u00E6\u00E5\u00ED\u00E8\u00FF");
+		
+		ITextUnit tu = new TextUnit("tu1");
+		TextContainer srcTc = tu.getSource();
+		srcTc.append(new Segment("seg1", srcTf));
+		
+		TextContainer trgTc = tu.createTarget(locFR, true, IResource.CREATE_EMPTY);
+		trgTc.append(new Segment("seg1", trgTf));
+		
+		if (!tu.isEmpty()) {
+			ISegments srcSegs = tu.getSourceSegments();
+			for (Segment srcSeg : srcSegs) {
+				Segment trgSeg = tu.getTargetSegment(locFR, srcSeg.getId(), false);
+				if (trgSeg != null) {
+					cleaner.checkCharacters(tu, srcSeg, locFR);			
+				}
+			}
+		}		
+		
+		assertEquals("[This is some normal text]", fmt.printSegmentedContent(tu.getSource(), true, false));
+		assertEquals("[This is some normal text]", fmt.printSegmentedContent(tu.getSource(), true, true));
+		assertEquals("[]", fmt.printSegmentedContent(tu.getTarget(locFR), true, false));
+		assertEquals("[]", fmt.printSegmentedContent(tu.getTarget(locFR), true, true));
+	}
 }

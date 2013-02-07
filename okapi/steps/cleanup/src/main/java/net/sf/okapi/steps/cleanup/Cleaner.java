@@ -109,10 +109,10 @@ public class Cleaner {
 				if (params.getNormalizeQuotes()) {
 					normalizeQuotation(tu, srcSeg, targetLocale);
 				}
-//				if (params.getCheckCharacters()) {
-//					checkCharacters(tu, srcSeg, targetLocale);
-//
-//				}
+				if (params.getCheckCharacters()) {
+					checkCharacters(tu, srcSeg, targetLocale);
+
+				}
 				if (params.getMatchRegexExpressions()) {
 					matchRegexExpressions(tu, srcSeg, targetLocale);
 				}
@@ -848,9 +848,13 @@ public class Cleaner {
 	 * @param seg: the Segment to update
 	 * @param targetLocale: the language for which the text should be updated
 	 */
-	private void checkCharacters(ITextUnit tu, Segment seg, LocaleId targetLocale) {
+	protected void checkCharacters(ITextUnit tu, Segment seg, LocaleId targetLocale) {
 		
+		// check for standard corruption
 		removeCorruptions(tu, seg, targetLocale);
+		
+		// check for strings of unusual characters
+		checkUnusualCharacters(tu, seg, targetLocale);
 	}
 	
 	/**
@@ -862,8 +866,9 @@ public class Cleaner {
 	 */
 	private void removeCorruptions(ITextUnit tu, Segment seg, LocaleId targetLocale) {
 		
-		StringBuilder srcText = new StringBuilder(seg.text);
-		StringBuilder trgText = new StringBuilder(tu.getTargetSegment(targetLocale, seg.getId(), false).text);
+		TextFragment trgFrag = tu.getTargetSegment(targetLocale, seg.getId(), false).getContent();
+		StringBuilder srcText = new StringBuilder(seg.getContent().getCodedText());
+		StringBuilder trgText = new StringBuilder(trgFrag.getCodedText());
 		
 		Matcher matcher;
 		String corruptionRegex = "\\u00C3[\\u00A4-\\u00B6]|\\u00C3\\u201E|\\u00C3\\u2026|\\u00C3\\u2013";
@@ -882,7 +887,32 @@ public class Cleaner {
 	}
 	
 	private void checkUnusualCharacters(ITextUnit tu, Segment seg, LocaleId targetLocale) {
+
+		TextFragment trgFrag = tu.getTargetSegment(targetLocale, seg.getId(), false).getContent();
+		StringBuilder srcText = new StringBuilder(seg.getContent().getCodedText());
+		StringBuilder trgText = new StringBuilder(trgFrag.getCodedText());
 		
+		boolean isFound = false;
+		Pattern pattern;
+		
+		// any 3 extended characters together 
+		pattern = Pattern.compile("[\\u00C0-\\u00FF]{3}");
+		
+		// check source
+		if ((pattern.matcher(srcText).find() == true) && (isFound == false)) {
+			isFound = true;
+			markSegmentForRemoval(tu, seg, targetLocale);
+		}
+		
+		// check target
+		if ((pattern.matcher(trgText).find() == true) && (isFound == false)) {
+			isFound = true;
+			markSegmentForRemoval(tu, seg, targetLocale);
+		}
+		
+	}
+
+	private void checkCharacterSet(ITextUnit tu, Segment seg, LocaleId targetLocale) {
 		CharsetEncoder encoder1 = null;
 		CharsetEncoder encoder2 = null;
 		Pattern extraCharsAllowed = null;
