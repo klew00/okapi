@@ -206,16 +206,18 @@ public class ITSContent {
 	public void outputAnnotations (Code code,
 		StringBuilder output)
 	{
-		outputAnnotations((GenericAnnotations)code.getAnnotation(GenericAnnotationType.GENERIC), output);
+		outputAnnotations(code.getGenericAnnotations(), output, true);
 	}
 
 	/**
 	 * Generates the markup for the ITS attributes for a given annotation set.
 	 * @param anns the annotations set (can be null).
 	 * @param output the buffer where to append the output.
+	 * @param inline true if the element is an inline element (e.g. XLIFF mrk).
 	 */
 	public void outputAnnotations (GenericAnnotations anns,
-		StringBuilder output)
+		StringBuilder output,
+		boolean inline)
 	{
 		if ( anns == null ) return;
 		
@@ -265,6 +267,21 @@ public class ITSContent {
 				tmp = ann.getString(GenericAnnotationType.STORAGESIZE_LINEBREAK);
 				if ( !tmp.equals("lf") ) printITSStringAttribute(tmp,
 					(isHTML5 ? "storage-linebreak" : "storageLinebreak"), output);
+			}
+			
+			// Localization Note
+			else if ( ann.getType().equals(GenericAnnotationType.LOCNOTE) ) {
+				if ( inline && !isHTML5 ) {
+					// in mrk element
+					output.append(" comment=\""+Util.escapeToXML(ann.getString(GenericAnnotationType.LOCNOTE_VALUE), 3, false, encoder)+"\"");
+					printITSExtStringAttribute(ann.getString(GenericAnnotationType.LOCNOTE_TYPE), "itsLocNoteType", output);
+				}
+				else {
+					printITSStringAttribute(ann.getString(GenericAnnotationType.LOCNOTE_VALUE),
+						(isHTML5 ? "loc-note" : "locNote"), output);
+					printITSIntegerAttribute(ann.getInteger(GenericAnnotationType.LOCNOTE),
+						(isHTML5 ? "loc-note" : "locNote"), output);
+				}
 			}
 
 			// Domain

@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2011 by the Okapi Framework contributors
+  Copyright (C) 2008-2013 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -44,6 +44,7 @@ import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filters.IFilterConfigurationMapper;
 import net.sf.okapi.common.filterwriter.GenericFilterWriter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
+import net.sf.okapi.common.filterwriter.ITSContent;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Ending;
@@ -573,7 +574,25 @@ public class ODFFilter implements IFilter {
 			if ( context.peek().extract ) {
 				if ( name.equals("text:a") ) processStartALink(name);
 				else if ( toProtect.contains(name) ) processReadOnlyInlineElement(name);
-				else tf.append(new Code(TagType.OPENING, name, buildStartTag(name, false)));
+				else {
+					// Check for ITS translate
+					String val = reader.getAttributeValue(ITSContent.ITS_NS_URI, "translate");
+					if (( val != null ) && val.equals("no") ) {
+						processReadOnlyInlineElement(name);
+						return;
+					}
+					// Check for ITS Locale Filter
+					// TODO
+					
+					// Check for ITS Terminology
+					//TODO
+					
+					// Check for ITS Localization Note
+					//TODO
+					
+					// Else: normal content
+					tf.append(new Code(TagType.OPENING, name, buildStartTag(name, false)));
+				}
 			}
 			else { // Append to skel
 				buildStartTag(name, true);

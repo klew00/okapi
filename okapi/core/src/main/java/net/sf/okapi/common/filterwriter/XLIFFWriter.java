@@ -458,7 +458,7 @@ public class XLIFFWriter implements IFilterWriter {
 			if ( itsContForUnit == null ) {
 				itsContForUnit = new ITSContent(xliffCont.getCharsetEncoder(), false);
 			}
-			itsContForUnit.outputAnnotations(anns, sb);
+			itsContForUnit.outputAnnotations(anns, sb, false);
 			writer.appendRawXML(sb.toString());
 		}
 		
@@ -480,7 +480,7 @@ public class XLIFFWriter implements IFilterWriter {
 			if ( itsContForSrcCont == null ) {
 				itsContForSrcCont = new ITSContent(xliffCont.getCharsetEncoder(), false);
 			}
-			itsContForSrcCont.outputAnnotations(anns, sb);
+			itsContForSrcCont.outputAnnotations(anns, sb, false);
 			writer.appendRawXML(sb.toString());
 		}
 		
@@ -522,7 +522,7 @@ public class XLIFFWriter implements IFilterWriter {
 					if ( itsContForTrgCont == null ) {
 						itsContForTrgCont = new ITSContent(xliffCont.getCharsetEncoder(), false);
 					}
-					itsContForTrgCont.outputAnnotations(anns, sb);
+					itsContForTrgCont.outputAnnotations(anns, sb, false);
 					writer.appendRawXML(sb.toString());
 				}
 				

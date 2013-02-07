@@ -18,6 +18,7 @@ import net.sf.okapi.common.annotation.GenericAnnotations;
 import net.sf.okapi.common.annotation.TermsAnnotation;
 import net.sf.okapi.common.filters.FilterTestDriver;
 import net.sf.okapi.common.filterwriter.GenericContent;
+import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.RawDocument;
@@ -140,11 +141,15 @@ public class HTML5FilterTest {
 		String snippet = "<!DOCTYPE html><html lang=en><head><meta charset=utf-8><title>Title</title></head><body>"
 			+ "<p its-locale-filter-list='de'>Text 1</p>"
 			+ "<p its-locale-filter-list='FR'>Text 2</p>"
+			+ "<p>Text 3 <span its-locale-filter-list='de'>no-trans</span>.</p>"
 			+ "</body></html>";
 		ArrayList<Event> list = getEvents(snippet);
 		ITextUnit tu = FilterTestDriver.getTextUnit(list, 2);
 		assertNotNull(tu);
 		assertEquals("Text 2", fmt.setContent(tu.getSource().getFirstContent()).toString());
+		tu = FilterTestDriver.getTextUnit(list, 3);
+		assertNotNull(tu);
+		assertEquals("Text 3 <1><2/></1>.", fmt.setContent(tu.getSource().getFirstContent()).toString());
 	}
 	
 	@Test
@@ -215,12 +220,17 @@ public class HTML5FilterTest {
 		String snippet = "<!DOCTYPE html><html lang=en><head><meta charset=utf-8><title>Title</title></head><body>"
 			+ "<p its-loc-note='note'>text</p>"
 			+ "<p its-loc-note-ref='note ref'>text</p>"
+			+ "<p>Text 2 <span its-loc-note='lc-value' its-loc-note-type='alert'>stuff</span></p>"
 			+ "</body></html>";
 		ArrayList<Event> list = getEvents(snippet);
 		ITextUnit tu = FilterTestDriver.getTextUnit(list, 2);
 		assertEquals("note", tu.getProperty(Property.NOTE).getValue());
 		tu = FilterTestDriver.getTextUnit(list, 3);
 		assertEquals("REF:note ref", tu.getProperty(Property.NOTE).getValue());
+		tu = FilterTestDriver.getTextUnit(list, 4);
+		GenericAnnotation ann = tu.getSource().getFirstContent().getCode(0).getGenericAnnotations().getFirstAnnotation(GenericAnnotationType.LOCNOTE);
+		assertEquals("lc-value", ann.getString(GenericAnnotationType.LOCNOTE_VALUE));
+		assertEquals("alert", ann.getString(GenericAnnotationType.LOCNOTE_TYPE));
 	}
 	
 	@Test

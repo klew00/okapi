@@ -89,17 +89,23 @@ public class XLIFFContentTest {
 	}
 
 	@Test
-	public void testDisambiguityAnnotation () {
+	public void testDisambiguityAnnotationAndLocNote () {
 		GenericAnnotations anns = new GenericAnnotations();
 		GenericAnnotation ga = anns.add(GenericAnnotationType.DISAMB);
 		ga.setString(GenericAnnotationType.DISAMB_SOURCE, "src");
 		ga.setString(GenericAnnotationType.DISAMB_GRANULARITY, GenericAnnotationType.DISAMB_GRANULARITY_ENTITY);
 		TextFragment tf = new TextFragment("Before the span after.");
-		tf.annotate(7, 15, GenericAnnotationType.GENERIC, anns);
-		assertEquals("Before <mrk mtype=\"x-its\" its:disambigSource=\"src\">the span</mrk> after.",
+		//                                  0123456789012345678901
+		int diff = tf.annotate(7, 15, GenericAnnotationType.GENERIC, anns);
+		tf.annotate(7+(diff/2), 15+diff, GenericAnnotationType.GENERIC,
+			new GenericAnnotations(new GenericAnnotation(GenericAnnotationType.LOCNOTE,
+				GenericAnnotationType.LOCNOTE_VALUE, "comment",
+				GenericAnnotationType.LOCNOTE_TYPE, "alert")));
+		assertEquals("Before <mrk mtype=\"x-its\" its:disambigSource=\"src\">"
+			+ "<mrk mtype=\"x-its\" comment=\"comment\" okp:itsLocNoteType=\"alert\">the span</mrk></mrk> after.",
 			fmt.setContent(tf).toString(true));
 	}
-	
+
 	@Test
 	public void testVariousAnnotations () {
 		GenericAnnotations anns = new GenericAnnotations();

@@ -43,6 +43,14 @@ public class GenericAnnotationType {
 	
 	/**
 	 * Annotation identifier for the 
+	 * <a href='http://www.w3.org/TR/its20/#locnote'>ITS Localization Note</a> data category.
+	 */
+	public static final String LOCNOTE = "its-ln";
+	public static final String LOCNOTE_VALUE = "lnValue";
+	public static final String LOCNOTE_TYPE = "lnType";
+	
+	/**
+	 * Annotation identifier for the 
 	 * <a href='http://www.w3.org/TR/its20/#terminology'>ITS Terminology</a> data category.
 	 */
 	public static final String TERM = "its-term";

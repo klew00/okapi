@@ -179,7 +179,7 @@ public class XLIFFContent {
 					}
 					else if ( code.hasAnnotation(GenericAnnotationType.GENERIC) ) {
 						tmp.append("<mrk mtype=\"x-its\"");
-						outputITSAttributes((GenericAnnotations)code.getAnnotation(GenericAnnotationType.GENERIC), quoteMode, escapeGT, tmp);
+						outputITSAttributes(code.getGenericAnnotations(), quoteMode, escapeGT, tmp, true);
 						tmp.append(">");
 					}
 				}
@@ -376,12 +376,13 @@ public class XLIFFContent {
 	private void outputITSAttributes (GenericAnnotations anns,
 		int quoteMode,
 		boolean escapeGT,
-		StringBuilder output)
+		StringBuilder output,
+		boolean inline)
 	{
 		if ( itsCont == null ) {
 			itsCont = new ITSContent(chsEnc, false);
 		}
-		itsCont.outputAnnotations(anns, output);
+		itsCont.outputAnnotations(anns, output, inline);
 		standoff = itsCont.getStandoff();
 	}
 

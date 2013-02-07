@@ -1457,7 +1457,7 @@ public class XLIFFFilter implements IFilter {
 			return Integer.valueOf(id);
 		}
 		catch ( NumberFormatException e ) {
-			// Falls back to the has-code
+			// Falls back to the hash-code
 			//TODO: At some point code id needs to support a string
 			return id.hashCode();
 		}

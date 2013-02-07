@@ -521,7 +521,7 @@ public abstract class ITSFilter implements IFilter {
 	/**
 	 * Attaches the annotations of the current node to a give code.
 	 * @param code the code (corresponding to the node being processed).
-	 * @param frag the fragmnent where the inline code has been added.
+	 * @param frag the fragment where the inline code has been added.
 	 */
 	private void attachAnnotations (Code code,
 		TextFragment frag)
@@ -534,6 +534,15 @@ public abstract class ITSFilter implements IFilter {
 		if ( value != null ) {
 			GenericAnnotation.addAnnotation(code, new GenericAnnotation(GenericAnnotationType.ANNOT,
 				GenericAnnotationType.ANNOT_VALUEREF, value));
+		}
+		
+		// ITS Localization Note
+		value = trav.getLocNote(null);
+		if ( value != null ) {
+			String type = trav.getLocNoteType(null);
+			GenericAnnotation.addAnnotation(code, new GenericAnnotation(GenericAnnotationType.LOCNOTE,
+				GenericAnnotationType.LOCNOTE_VALUE, value,
+				GenericAnnotationType.LOCNOTE_TYPE, type));
 		}
 		
 		// ITS Disambiguation
@@ -993,6 +1002,11 @@ public abstract class ITSFilter implements IFilter {
 		// ITS Localization Note
 		if ( !Util.isEmpty(ci.locNote) ) {
 			tu.setProperty(new Property(Property.NOTE, ci.locNote));
+//Need tyep too			
+//			GenericAnnotation.addAnnotation(tu, new GenericAnnotation(GenericAnnotationType.LOCNOTE,
+//				GenericAnnotationType.LOCNOTE_VALUE, value,
+//				GenericAnnotationType.LOCNOTE_TYPE, type));
+			
 		}
 		// ITS Domain
 		if ( !Util.isEmpty(ci.domains) ) {
