@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2008-2013 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -20,12 +20,18 @@
 
 package net.sf.okapi.common.resource;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertTrue;
+
 import java.util.ArrayList;
 import java.util.List;
 
+import net.sf.okapi.common.annotation.GenericAnnotation;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 
-import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -45,6 +51,15 @@ public class CodeTest {
     	code.setOuterData("outerData");
     	assertEquals("outerData", code.getOuterData());
     	assertEquals("data", code.getData());
+    }
+
+    @Test
+    public void testSimpleAnnotations () {
+    	Code code = new Code(TagType.OPENING, "ctype", "data");
+    	code.setAnnotation("displayText", new InlineAnnotation("[display]"));
+    	assertEquals("[display]", code.getAnnotation("displayText").getData());
+    	GenericAnnotation.addAnnotation(code, new GenericAnnotation("disp", "disp_value", "[display]"));
+    	assertEquals("[display]", code.getGenericAnnotationString("disp", "disp_value"));
     }
 
     @Test

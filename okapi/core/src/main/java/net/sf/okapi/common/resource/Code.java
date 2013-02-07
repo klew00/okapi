@@ -24,6 +24,9 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 
+import net.sf.okapi.common.annotation.GenericAnnotation;
+import net.sf.okapi.common.annotation.GenericAnnotationType;
+import net.sf.okapi.common.annotation.GenericAnnotations;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 
 /**
@@ -685,6 +688,34 @@ public class Code {
 			annotations.remove(type);
 		}
 		//TODO: update closing code if needed (when they'll be linked)
+	}
+	
+	/**
+	 * Gets the generic annotation set assigned to the code if any.
+	 * @return the annotation set, or null if there is none.
+	 */
+	public GenericAnnotations getGenericAnnotations () {
+		return (GenericAnnotations)getAnnotation(GenericAnnotationType.GENERIC);
+	}
+
+	/**
+	 * Gets the value of a string field for the first generic annotation of a given type
+	 * in the annotation set associated with this code.
+	 * If several annotations of the given type exist, this method return only the value for 
+	 * the given field for the first one.
+	 * @param type the type of generic annotation to lookup
+	 * @param fieldName the name of the field to retrieve.
+	 * @return the string value of the field 
+	 * or null if there is no such field, annotation, or annotation set.
+	 */
+	public String getGenericAnnotationString (String type,
+		String fieldName)
+	{
+		GenericAnnotations anns = getGenericAnnotations();
+		if ( anns == null ) return null;
+		GenericAnnotation ann = anns.getFirstAnnotation(type);
+		if ( ann == null ) return null;
+		return ann.getString(fieldName);
 	}
 
 }
