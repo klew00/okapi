@@ -1308,7 +1308,7 @@ public class XLIFFFilterTest {
 		String snippet = "<?xml version=\"1.0\"?>\r"
 			+ "<xliff version=\"1.2\" xmlns:its=\"http://www.w3.org/2005/11/its\" its:version=\"2.0\">\n"
 			+ "<file source-language=\"en\" target-language='fr' datatype=\"plaintext\" original=\"file.ext\"><body>"
-			+ "<trans-unit id=\"1\" its:locQualityIssueComment='c1' its:allowedCharacters='[a-z0-9]'"
+			+ "<trans-unit id=\"1\" its:allowedCharacters='[a-z0-9]'"
 			+ " its:storageSize='10' its:storageEncoding='us-ascii' its:lineBreakType='cr' >\n"
 			+ "<source its:locQualityIssueComment='c2'>t1 "
 			+ "<mrk ctype='x-its' its:locQualityIssueComment='c3'>t2</mrk>"
@@ -1320,7 +1320,6 @@ public class XLIFFFilterTest {
 		// TU level
 		GenericAnnotations anns = tu.getAnnotation(GenericAnnotations.class);
 		assertNotNull(anns);
-		assertEquals("c1", anns.getFirstAnnotation(GenericAnnotationType.LQI).getString(GenericAnnotationType.LQI_COMMENT));
 		assertEquals("[a-z0-9]", anns.getFirstAnnotation(GenericAnnotationType.ALLOWEDCHARS).getString(GenericAnnotationType.ALLOWEDCHARS_VALUE));
 		assertEquals(10, (int)anns.getFirstAnnotation(GenericAnnotationType.STORAGESIZE).getInteger(GenericAnnotationType.STORAGESIZE_SIZE));
 		assertEquals("us-ascii", anns.getFirstAnnotation(GenericAnnotationType.STORAGESIZE).getString(GenericAnnotationType.STORAGESIZE_ENCODING));

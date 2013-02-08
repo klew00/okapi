@@ -27,6 +27,7 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.net.URI;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -569,4 +570,17 @@ public final class FileUtil {
 		ResourceBundle.getBundle(baseName, locale.toJavaLocale(), control);
 		return control.toString();
 	}
+
+	/**
+	 * Gets the URI part before the file name.
+	 * @param uri The URI to process.
+	 * @return the URI part before the file name.
+	 */
+	public static String getPartBeforeFile (URI uri) {
+		String tmp = uri.toString();
+		int n = tmp.lastIndexOf('/');
+		if ( n == -1 ) return uri.toString();
+		else return tmp.substring(0, n+1);
+	}
+	
 }

@@ -6,4 +6,5 @@ REM c:\top_dir\okapi-html5
 REM c:\top_dir\ITS-2.0-Testsuite
 REM Note: Please make sure to name the Testsuite repository ITS-2.0-Testsuite or update the batch file to your custom name.
 
-XCOPY %~dp0..\..\..\..\..\..\..\ITS-2.0-Testsuite\its2.0\* %~dp0\its2.0 /s /i
+XCOPY %~dp0..\..\..\..\..\..\..\ITS-2.0-Testsuite\its2.0\expected\* %~dp0\its2.0\expected /s /i /y
+XCOPY %~dp0..\..\..\..\..\..\..\ITS-2.0-Testsuite\its2.0\inputdata\* %~dp0\its2.0\inputdata /s /i /y

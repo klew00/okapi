@@ -20,27 +20,37 @@
 
 package net.sf.okapi.filters.xliff;
 
+import java.io.ByteArrayInputStream;
 import java.io.InputStreamReader;
+import java.net.URI;
+import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
 
 import javax.xml.XMLConstants;
+import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpression;
+import javax.xml.xpath.XPathExpressionException;
 
 import net.sf.okapi.common.BOMNewlineEncodingDetector;
 import net.sf.okapi.common.ClassUtil;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
+import net.sf.okapi.common.FileUtil;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.IdGenerator;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.MimeTypeMapper;
+import net.sf.okapi.common.NSContextManager;
 import net.sf.okapi.common.UsingParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.annotation.AltTranslation;
@@ -79,6 +89,10 @@ import net.sf.okapi.common.skeleton.ISkeletonWriter;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
 
 @UsingParameters(Parameters.class)
 public class XLIFFFilter implements IFilter {
@@ -114,7 +128,7 @@ public class XLIFFFilter implements IFilter {
 	private boolean targetDone;
 	private boolean altTransDone;
 	private boolean segSourceDone;
-	//private TextContainer content;
+	private URI docURI;
 	private String encoding;
 	private Stack<String> parentIds;
 	private List<String> groupUsedIds;
@@ -128,6 +142,10 @@ public class XLIFFFilter implements IFilter {
 	private String lineBreak;
 	private boolean hasUTF8BOM;
 	private EncoderManager encoderManager;
+	
+	private Document standoffDoc;
+	private XPath standoffPath;
+	private DocumentBuilderFactory xmlFactory;	
 	
 	public XLIFFFilter () {
 		params = new Parameters();
@@ -284,6 +302,7 @@ public class XLIFFFilter implements IFilter {
 			if ( input.getInputURI() != null ) {
 				docName = input.getInputURI().getPath();
 			}
+			docURI = input.getInputURI();
 
 			preserveSpaces = new Stack<Boolean>();
 			preserveSpaces.push(false);
@@ -836,27 +855,33 @@ public class XLIFFFilter implements IFilter {
 		// Check for LQI
 		String val1 = reader.getAttributeValue(ITSContent.ITS_NS_URI, "locQualityIssuesRef");
 		if ( val1 != null ) {
+			
 //TODO: get the ref and fetch the standoff markup
 		}
 		else { // Otherwise check for on-element LQI attributes
 			val1 = reader.getAttributeValue(ITSContent.ITS_NS_URI, "locQualityIssueComment");
 			String val2 = reader.getAttributeValue(ITSContent.ITS_NS_URI, "locQualityIssueType");
 			if (( val1 != null ) || ( val2 != null )) {
-				// OK to create with one null value
-				GenericAnnotation ann = new GenericAnnotation(GenericAnnotationType.LQI,
-					GenericAnnotationType.LQI_COMMENT, val1,
-					GenericAnnotationType.LQI_TYPE, val2);
-				if ( (val1 = reader.getAttributeValue(ITSContent.ITS_NS_URI, "locQualityIssueSeverity")) != null ) {
-					ann.setDouble(GenericAnnotationType.LQI_SEVERITY, Double.parseDouble(val1));
+				if (( type == FOR_TC ) || ( type == FOR_IC )) {
+					// OK to create with one null value
+					GenericAnnotation ann = new GenericAnnotation(GenericAnnotationType.LQI,
+						GenericAnnotationType.LQI_COMMENT, val1,
+						GenericAnnotationType.LQI_TYPE, val2);
+					if ( (val1 = reader.getAttributeValue(ITSContent.ITS_NS_URI, "locQualityIssueSeverity")) != null ) {
+						ann.setDouble(GenericAnnotationType.LQI_SEVERITY, Double.parseDouble(val1));
+					}
+					if ( (val1 = reader.getAttributeValue(ITSContent.ITS_NS_URI, "locQualityIssueProfileRef")) != null ) {
+						ann.setString(GenericAnnotationType.LQI_PROFILEREF, val1);
+					}
+					if ( (val1 = reader.getAttributeValue(ITSContent.ITS_NS_URI, "locQualityIssueEnabled")) != null ) {
+						ann.setBoolean(GenericAnnotationType.LQI_ENABLED, val1.equals("yes"));
+					}
+					// Add the annotation to the list
+					anns.add(ann);
 				}
-				if ( (val1 = reader.getAttributeValue(ITSContent.ITS_NS_URI, "locQualityIssueProfileRef")) != null ) {
-					ann.setString(GenericAnnotationType.LQI_PROFILEREF, val1);
+				else {
+					logger.warn("ITS Localization Quality Issue data category is to be used only on the main source and target and on mrk.");
 				}
-				if ( (val1 = reader.getAttributeValue(ITSContent.ITS_NS_URI, "locQualityIssueEnabled")) != null ) {
-					ann.setBoolean(GenericAnnotationType.LQI_ENABLED, val1.equals("yes"));
-				}
-				// Add the annotation to the list
-				anns.add(ann);
 			}
 		}
 		
@@ -1757,5 +1782,137 @@ public class XLIFFFilter implements IFilter {
 		queue.add(new Event(EventType.END_GROUP, ending));
 		return true;
 	}
+
+	/*
+	private GenericAnnotations fetchLocQualityStandoffData (String ref,
+		String originalRef)
+	{
+		if ( Util.isEmpty(ref) ) {
+			throw new InvalidParameterException("The reference URI cannot be null or empty.");
+		}
+		// Identify the type of reference (internal/external)
+		// and get the element
+		int n = ref.lastIndexOf('#');
+		String id = null;
+		String firstPart = null;
+		if ( n > -1 ) {
+			id = ref.substring(n+1);
+			firstPart = ref.substring(0, n);
+		}
+		else {
+			// No ID in the URI
+			throw new RuntimeException(String.format("URI to standoff markup does not have an id: '%s'.", ref));
+		}
+
+		Document containerDoc = null;
+		XPath containerXPath = null;
+		
+		if ( !Util.isEmpty(firstPart) ) {
+			// Load the document and the rules
+			try {
+				String baseFolder = "";
+				if ( docURI != null) baseFolder = FileUtil.getPartBeforeFile(docURI);
+				if ( baseFolder.length() > 0 ) {
+					if ( baseFolder.endsWith("/") )
+						baseFolder = baseFolder.substring(0, baseFolder.length()-1);
+					if ( !ref.startsWith("/") ) ref = baseFolder + "/" + ref;
+					else ref = baseFolder + ref;
+				}
+				// Remove the ID if any
+				int p = ref.lastIndexOf('#');
+				if ( p > -1 ) {
+					ref = ref.substring(0, p);
+				}
+				// Detect format based on extension: .html and .html as HTML, everything else as XML.
+				if ( ref.endsWith(".html") ) {
+					logger.error("Problem with '{}': external standoff markup is only supported for XML documents.", originalRef);
+					return null; // No annotation
+				}
+				standoffDoc = parseXMLDocument(ref);
+				standoffPath = xpFact.newXPath();
+				NSContextManager nsc = new NSContextManager();
+				nsc.addNamespace(ITS_NS_PREFIX, ITS_NS_URI);
+				nsc.addNamespace(XML_NS_PREFIX, XML_NS_URI);
+				standoffPath.setNamespaceContext(nsc);
+
+			}
+			catch ( Throwable e) {
+				throw new RuntimeException(String.format("Error with URI '%s'.\n"+e.getMessage(), ref));
+			}
+		}
+		else {
+			// Else, the standoff markup is in the same document as the annotated content
+			containerDoc = doc;
+			containerXPath = xpath;
+		}
+		
+		// Create the new annotation set
+		GenericAnnotations anns = new GenericAnnotations();
+		anns.setData(id);
+
+		Document issuesDoc = null;
+		XPath issuesXPath = null;
+
+		issuesDoc = containerDoc;
+		issuesXPath = containerXPath;
+		
+		// Now get the element holding the list of issues
+		Element elem1;
+		try {
+			String tmp = String.format("//%s:locQualityIssues[@xml:id='%s']", ITS_NS_PREFIX, id);
+			XPathExpression expr = issuesXPath.compile(tmp);
+			elem1 = (Element)expr.evaluate(issuesDoc, XPathConstants.NODE);
+		}
+		catch ( XPathExpressionException e ) {
+			throw new RuntimeException("XPath error.", e);
+		}
+		if ( elem1 == null ) {
+			// Entry not found
+			logger.warn("Cannot find standoff markup for '{}'", originalRef);
+			GenericAnnotation ann = addIssueItem(anns);
+			ann.setString(GenericAnnotationType.LQI_ISSUESREF, originalRef); // For information only
+			return anns;
+		}
+		
+		// Then get the list of items in the element
+		NodeList items = elem1.getElementsByTagNameNS(ITS_NS_URI, "locQualityIssue");
+		for ( int i=0; i<items.getLength(); i++ ) {
+			// For each entry 
+			Element elem2 = (Element)items.item(i);
+			// Add the annotation to the set
+			GenericAnnotation ann = addIssueItem(anns);
+			ann.setString(GenericAnnotationType.LQI_ISSUESREF, originalRef); // For information only
+			// Gather the local information (never in HTML since if it's HTML it's inside a script)
+			String[] values = retrieveLocQualityIssueData(elem2, false, false);
+			if ( values[0] != null ) {
+				logger.warn("Cannot have a standoff reference in a standoff element (reference='{}').", ref);
+			}
+			if ( values[1] != null ) ann.setString(GenericAnnotationType.LQI_TYPE, values[1]);
+			if ( values[2] != null ) ann.setString(GenericAnnotationType.LQI_COMMENT, values[2]);
+			if ( values[3] != null ) ann.setDouble(GenericAnnotationType.LQI_SEVERITY, Double.parseDouble(values[3]));
+			if ( values[4] != null ) ann.setString(GenericAnnotationType.LQI_PROFILEREF, values[4]);
+			if ( values[5] != null ) ann.setBoolean(GenericAnnotationType.LQI_ENABLED, values[5].equals("yes"));
+		}
+
+		return anns;
+	}
+
+	private void ensureDocumentBuilderFactoryExists () {
+		if ( xmlFactory == null ) { 
+			xmlFactory = DocumentBuilderFactory.newInstance();
+			xmlFactory.setNamespaceAware(true);
+			xmlFactory.setValidating(false);
+		}
+	}
 	
+	private Document parseXMLDocument (String uriString) {
+		ensureDocumentBuilderFactoryExists();
+		try {
+			return xmlFactory.newDocumentBuilder().parse(uriString);
+		}
+		catch ( Throwable e ) {
+			throw new RuntimeException("Error parsing an XML document.\n"+e.getMessage(), e);
+		}
+	}
+*/	
 }

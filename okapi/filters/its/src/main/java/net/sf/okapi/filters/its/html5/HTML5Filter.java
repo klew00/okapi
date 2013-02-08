@@ -31,6 +31,7 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 
 import net.sf.okapi.common.BOMNewlineEncodingDetector;
+import net.sf.okapi.common.FileUtil;
 import net.sf.okapi.common.MimeTypeMapper;
 import net.sf.okapi.common.UsingParameters;
 import net.sf.okapi.common.encoder.EncoderManager;
@@ -190,7 +191,7 @@ public class HTML5Filter extends ITSFilter {
 				// get the HREF value (could be surrounded by spaces, so we trim)
 				href = elem.getAttribute("href").trim();
 				if (( href.indexOf('/') == -1 ) && ( href.indexOf('\\') == -1 )) {
-					String base = itsEng.getPartBeforeFile(docURI);
+					String base = FileUtil.getPartBeforeFile(docURI);
 					href = base + href;
 				}
 				itsEng.addExternalRules(new URI(href));

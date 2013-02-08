@@ -40,6 +40,7 @@ import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
+import net.sf.okapi.common.FileUtil;
 import net.sf.okapi.common.IdGenerator;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.annotation.GenericAnnotation;
@@ -409,7 +410,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 					// xlink:href allows the use of xml:base so we need to calculate it
 					// The initial base is the folder of the current document
 					String baseFolder = "";
-					if ( docURI != null) baseFolder = getPartBeforeFile(docURI);
+					if ( docURI != null) baseFolder = FileUtil.getPartBeforeFile(docURI);
 					
 					// Then we look for the last xml:base specified
 					Node node = rulesElem;
@@ -537,18 +538,6 @@ public class ITSEngine implements IProcessor, ITraversal {
  		}
 		// Do not overwrite existing values (the element defines defaults)
 		varResolver.add(new QName(name), value, false);
-	}
-	
-	/**
-	 * Gets the URI part before the file name.
-	 * @param uri The URI to process.
-	 * @return the URI part before the file name.
-	 */
-	public String getPartBeforeFile (URI uri) {
-		String tmp = uri.toString();
-		int n = tmp.lastIndexOf('/');
-		if ( n == -1 ) return uri.toString();
-		else return tmp.substring(0, n+1);
 	}
 	
 	private void loadLinkedRules (URI docURI,
@@ -3084,7 +3073,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 			// Load the document and the rules
 			try {
 				String baseFolder = "";
-				if ( docURI != null) baseFolder = getPartBeforeFile(docURI);
+				if ( docURI != null) baseFolder = FileUtil.getPartBeforeFile(docURI);
 				if ( baseFolder.length() > 0 ) {
 					if ( baseFolder.endsWith("/") )
 						baseFolder = baseFolder.substring(0, baseFolder.length()-1);
@@ -3229,7 +3218,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 			// Load the document and the rules
 			try {
 				String baseFolder = "";
-				if ( docURI != null) baseFolder = getPartBeforeFile(docURI);
+				if ( docURI != null) baseFolder = FileUtil.getPartBeforeFile(docURI);
 				if ( baseFolder.length() > 0 ) {
 					if ( baseFolder.endsWith("/") )
 						baseFolder = baseFolder.substring(0, baseFolder.length()-1);
