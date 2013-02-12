@@ -7,6 +7,10 @@
 			<fileset dir="done"/>
 		</delete>
 
+		<!-- Generate libVersions.properties -->
+		<ant antfile="build_getVerProp.xml">
+		</ant>
+
 		<!-- One for all platforms -->
 		<ant antfile="build_okapi-lib.xml">
 		</ant>
