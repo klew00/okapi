@@ -212,7 +212,7 @@ public class ReportGeneratorTest {
 		
 		String report = gen.generate();
 		assertEquals("Test report\n\n#Creation Date: <a1>\n#Project Name: <a2>\n#Target Locale: <a3>\n\n" +
-				"[?[?A7]]\n\n" +
+				"{?[?A7]}\n\n" +
 				"Total,<a4>,<a5>,<a6>\n\nThe report was created on <a1>\n", report);
 	}
 	

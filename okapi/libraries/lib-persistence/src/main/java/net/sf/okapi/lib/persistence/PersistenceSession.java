@@ -184,6 +184,7 @@ public abstract class PersistenceSession implements IPersistenceSession, IObserv
 			
 		case WRITING:
 			if (outStream != null) {
+				//!!! TODO uncomment !!! 
 				refResolver.updateFrames();
 				endWriting(outStream);
 			}
