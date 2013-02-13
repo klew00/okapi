@@ -870,6 +870,10 @@ public class Main {
 	String pathInsertOutBeforeExt(String oldPath) {
 		String ext = Util.getExtension(oldPath);
 		int n = oldPath.lastIndexOf('.');
+		if (n == -1) {
+			// Filename with no extension
+			return oldPath + ".out";
+		}
 		return oldPath.substring(0, n) + ".out" + ext; //$NON-NLS-1$
 	}
 
