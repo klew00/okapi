@@ -105,7 +105,8 @@ If okapi-xliff has changed since last release:
 - Update the okapi-xliff project to increment the version, even if it is just snapshot.
 - Make sure the new version is available on the continous build site.
 
---- 10) Update the versions numbers in the files for the next version
+--- 10) switch to the dev branch
+- Update the versions numbers in the files for the next version
 - change also the version references to okapi-xliff
 - All the POM.XML files
 - trunk/deployment/shared/release.properties
