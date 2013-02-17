@@ -5,7 +5,7 @@ call mvn install
 if ERRORLEVEL 1 goto end
 
 cd deployment/maven
-call ant build_getVerProp.xml
+call ant -f build_getVerProp.xml
 if ERRORLEVEL 1 goto end
 
 call ant -f build_okapi-lib.xml
