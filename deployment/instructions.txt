@@ -93,6 +93,7 @@ http://www.opentag.com/okapi/wiki/index.php?title=Main_Page
 
 
 --- 9) Commit all changed files
+Make sure the 'master' branch of the source code is this latest version.
 This revision is the one for this release.
 
 - create a tag for the release (e.g. m17)
@@ -100,6 +101,7 @@ This revision is the one for this release.
 
 --- 9bis)
 
+If okapi-xliff has changed since last release:
 - Update the okapi-xliff project to increment the version, even if it is just snapshot.
 - Make sure the new version is available on the continous build site.
 
@@ -110,6 +112,7 @@ This revision is the one for this release.
 - trunk/deployment/shared/changes.html (make the Changes Log ready for next set of changes)
 - Rebuild all. Make sure tests pass.
 - Commit all changed files.
+- make sure 'dev' branch is up-to-date
 
 Now any new build will be a snapshot of the next release
 

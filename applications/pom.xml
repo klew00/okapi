@@ -4,7 +4,7 @@
     <parent>
 		<artifactId>build-okapi</artifactId>
 		<groupId>net.sf.okapi</groupId>
-		<version>0.20-SNAPSHOT</version>
+		<version>0.20</version>
 		<relativePath>../okapi/pom.xml</relativePath>
 	</parent>
     <modelVersion>4.0.0</modelVersion>

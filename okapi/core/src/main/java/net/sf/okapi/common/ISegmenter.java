@@ -137,8 +137,8 @@ public interface ISegmenter {
 	public boolean oneSegmentIncludesAll();
 	
 	/**
-	 * Sets the language used to apply the rules.
-	 * @param languageCode Code of the language to use to apply the rules.
+	 * Sets the locale used to apply the rules.
+	 * @param locale Code of the language to use to apply the rules.
 	 */
 	public void setLanguage(LocaleId locale);
 	
