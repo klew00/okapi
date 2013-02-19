@@ -247,8 +247,18 @@ public class ITSContent {
 				printITSBooleanAttribute(true, "term", output);
 				printITSDoubleAttribute(ann.getDouble(GenericAnnotationType.TERM_CONFIDENCE),
 					(isHTML5 ? "term-confidence" : "termConfidence"), output);
-				printITSStringAttribute(ann.getString(GenericAnnotationType.TERM_INFO),
-					(isHTML5 ? "term-info" : "termInfo"), output);
+				// If it's not a Ref info, we must used a user-define attribute because there is no local ITS termInfo attribute
+				String value = ann.getString(GenericAnnotationType.TERM_INFO);
+				if ( value != null ) {
+					if ( value.startsWith(REF_PREFIX) ) {
+						String ref = (isHTML5 ? "-ref" : "Ref");
+						value = value.substring(REF_PREFIX.length());
+						output.append(" "+prefix+(isHTML5 ? "term-info" : "termInfo")+ref+"=\""+Util.escapeToXML(value, 3, false, encoder)+"\"");
+					}
+					else {
+						printITSExtStringAttribute(value, "itsTermInfo", output);
+					}
+				}
 			}
 			
 			// Allowed Characters

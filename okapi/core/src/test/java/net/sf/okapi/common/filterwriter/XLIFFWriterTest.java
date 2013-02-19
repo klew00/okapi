@@ -181,6 +181,37 @@ public class XLIFFWriterTest {
 	}
 
 	@Test
+	public void testTerminologyAnnotations ()
+		throws IOException
+	{
+		writer.create(root+"out.xlf", null, locEN, locFR, null, "original.ext", null);
+		writer.writeStartFile(null, null, null);
+		ITextUnit tu = new TextUnit("tu1");
+		TextFragment tf = tu.getSource().getFirstSegment().getContent();
+		tf.append("t1");
+		
+		TextContainer tc = tu.getSource();
+		GenericAnnotations anns = new GenericAnnotations();
+		anns.add(new GenericAnnotation(GenericAnnotationType.TERM,
+			GenericAnnotationType.TERM_CONFIDENCE, 0.5,
+			GenericAnnotationType.TERM_INFO, "REF:info"));
+		tc.setAnnotation(anns);
+		writer.writeTextUnit(tu);
+		writer.writeEndFile();
+		writer.close();		
+
+		String result = readFile(root+"out.xlf");
+		assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+			+ "<xliff version=\"1.2\" xmlns=\"urn:oasis:names:tc:xliff:document:1.2\" xmlns:okp=\"okapi-framework:xliff-extensions\" xmlns:its=\"http://www.w3.org/2005/11/its\">\n"
+			+ "<file original=\"unknown\" source-language=\"en\" target-language=\"fr\" datatype=\"x-undefined\">\n"
+			+ "<body>\n<trans-unit id=\"tu1\">\n"
+			+ "<source xml:lang=\"en\" its:term=\"yes\" its:termConfidence=\"0.5\" its:termInfoRef=\"info\">t1</source>\n"
+			+ "<target xml:lang=\"fr\" its:term=\"yes\" its:termConfidence=\"0.5\" its:termInfoRef=\"info\">t1</target>\n"
+			+ "</trans-unit>\n"
+			+ "</body>\n</file>\n</xliff>\n", stripVariableID(result));
+	}
+
+	@Test
 	public void testmultipleLQI ()
 		throws IOException
 	{

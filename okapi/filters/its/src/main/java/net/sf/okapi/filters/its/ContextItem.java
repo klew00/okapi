@@ -41,6 +41,7 @@ class ContextItem {
 	GenericAnnotations storageSize;
 	GenericAnnotations lqRating;
 	GenericAnnotations disambig;
+	GenericAnnotations terminology;
 	Double mtConfidence;
 	GenericAnnotations prov;
 
@@ -70,6 +71,7 @@ class ContextItem {
 		this.mtConfidence = trav.getMtConfidence(attribute);
 		this.disambig = trav.getDisambiguationAnnotation(attribute);
 		this.prov = trav.getProvenanceAnnotation(attribute);
+		this.terminology = trav.getTerminologyAnnotation(attribute);
 	}
 
 }

@@ -1130,11 +1130,31 @@ public class XMLFilterTest {
 	public void testTerms () {
 		String snippet = "<?xml version=\"1.0\"?>\n"
 			+ "<doc its:version=\"2.0\" xmlns:its=\"http://www.w3.org/2005/11/its\">"
-			+ "<p>One <its:span term='yes' termInfo='info1'>term</its:span>, and more.</p></doc>";
+			+ "<gloss its:translate='no'>"
+			+ "<termInfo id='ti1'>term info 1</termInfo>"
+			+ "<termInfo id='ti2'>term info 2</termInfo></gloss>"
+			+ "<p>One <its:span withinText='yes' term='yes' termInfoRef='#ti1'>term</its:span>, and more.</p>"
+			+ "<p><its:span withinText='yes' term='no' termInfoRef='#ti1'>not a term</its:span></p>"
+			+ "<p its:term='yes' its:termInfoRef='#ti2'>term2</p>"
+			+ "</doc>";
 		ArrayList<Event> list = getEvents(snippet);
 		ITextUnit tu = FilterTestDriver.getTextUnit(list, 1);
 		assertNotNull(tu);
-//TODO: test annotation when it's implemented
+		assertEquals("One <1>term</1>, and more.", fmt.setContent(tu.getSource().getFirstContent()).toString());
+		Code code = tu.getSource().getFirstContent().getCode(0);
+		GenericAnnotation ann = code.getGenericAnnotations().getFirstAnnotation(GenericAnnotationType.TERM);
+		//TODO??? add term_value info? assertTrue("yes", ann.getBoolean(GenericAnnotationType.TERM));
+		assertEquals("REF:#ti1", ann.getString(GenericAnnotationType.TERM_INFO));
+		// Second inline
+		tu = FilterTestDriver.getTextUnit(list, 2);
+		code = tu.getSource().getFirstContent().getCode(0);
+//TODO: should we get annotation on term='no'???
+//		ann = code.getGenericAnnotations().getFirstAnnotation(GenericAnnotationType.TERM);
+		// Term on p
+		tu = FilterTestDriver.getTextUnit(list, 3);
+		assertEquals("term2", tu.getSource().toString());
+		ann = tu.getSource().getAnnotation(GenericAnnotations.class).getFirstAnnotation(GenericAnnotationType.TERM);
+		assertEquals("REF:#ti2", ann.getString(GenericAnnotationType.TERM_INFO));
 	}
 	
 	@Test

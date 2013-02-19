@@ -550,14 +550,22 @@ public abstract class ITSFilter implements IFilter {
 		if ( anns != null ) {
 			GenericAnnotations.addAnnotations(code, anns);
 		}
+		
 		// ITS Allowed Characters
 		value = trav.getAllowedCharacters(null);
 		if ( value != null ) {
 			GenericAnnotation.addAnnotation(code, new GenericAnnotation(GenericAnnotationType.ALLOWEDCHARS,
 				GenericAnnotationType.ALLOWEDCHARS_VALUE, value));
 		}
+		
 		// ITS Storage Size
 		anns = trav.getStorageSizeAnnotation(null);
+		if ( anns != null ) {
+			GenericAnnotations.addAnnotations(code, anns);
+		}
+		
+		// ITS Terminology
+		anns = trav.getTerminologyAnnotation(null);
 		if ( anns != null ) {
 			GenericAnnotations.addAnnotations(code, anns);
 		}
@@ -1002,56 +1010,66 @@ public abstract class ITSFilter implements IFilter {
 		// ITS Localization Note
 		if ( !Util.isEmpty(ci.locNote) ) {
 			tu.setProperty(new Property(Property.NOTE, ci.locNote));
-//Need tyep too			
+//Need type too			
 //			GenericAnnotation.addAnnotation(tu, new GenericAnnotation(GenericAnnotationType.LOCNOTE,
 //				GenericAnnotationType.LOCNOTE_VALUE, value,
 //				GenericAnnotationType.LOCNOTE_TYPE, type));
 			
 		}
+		
 		// ITS Domain
 		if ( !Util.isEmpty(ci.domains) ) {
 			GenericAnnotation.addAnnotation(tu, new GenericAnnotation(GenericAnnotationType.DOMAIN,
 				GenericAnnotationType.DOMAIN_VALUE, ci.domains)
 			);
 		}
+		
 		// ITS Disambiguation
 		if ( ci.disambig != null ) {
 			GenericAnnotations.addAnnotations(tu.getSource(), ci.disambig);
 		}
+		
 		// ITS External resources Reference
 		if ( !Util.isEmpty(ci.externalRes) ) {
 			GenericAnnotation.addAnnotation(tu, new GenericAnnotation(GenericAnnotationType.EXTERNALRES,
 				GenericAnnotationType.EXTERNALRES_VALUE, ci.externalRes)
 			);
 		}
+		
 		// ITS MT confidence
 		if ( ci.mtConfidence != null ) {
 			GenericAnnotation.addAnnotation(tu, new GenericAnnotation(GenericAnnotationType.MTCONFIDENCE,
 				GenericAnnotationType.MTCONFIDENCE_VALUE, ci.mtConfidence)
 			);
 		}
+		
 		// ITS Storage Size
 		if ( ci.storageSize != null ) {
 			GenericAnnotations.addAnnotations(tu, ci.storageSize);
 		}
+		
 		// ITS Allowed characters
 		if ( ci.allowedChars != null ) {
 			GenericAnnotation.addAnnotation(tu, new GenericAnnotation(GenericAnnotationType.ALLOWEDCHARS,
 				GenericAnnotationType.ALLOWEDCHARS_VALUE, ci.allowedChars)
 			);
 		}
+		
 		// ITS Provenance
 		if ( ci.prov != null ) {
 			GenericAnnotations.addAnnotations(tu, ci.prov);
 		}
+		
 		// ITS Localization Quality rating
 		if ( ci.lqRating != null ) {
 			GenericAnnotations.addAnnotations(tu, ci.lqRating);
 		}
+		
 		// ITS Localization Quality Issue
 		if ( ci.lqIssues != null ) {
 			GenericAnnotations.addAnnotations(tu.getSource(), ci.lqIssues);
 		}
+		
 		// Attach also the inline LQI annotations at the text container level
 		// (more logical to have the inline ones after the parent level ones)
 		if ( inlineLQIs != null ) {
@@ -1060,7 +1078,12 @@ public abstract class ITSFilter implements IFilter {
 			}
 		}
 		
-		// Set term info
+		// ITS Terminology
+		if ( ci.terminology != null ) {
+			GenericAnnotations.addAnnotations(tu.getSource(), ci.terminology);
+		}
+		
+		// Backward compatibility: Set term info
 		if ( terms != null ) {
 			tu.getSource().setAnnotation(terms);
 //			// Term as a generic annotation
