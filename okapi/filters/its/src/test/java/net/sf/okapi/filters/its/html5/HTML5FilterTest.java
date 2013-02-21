@@ -72,11 +72,19 @@ public class HTML5FilterTest {
 	}
 	
 	@Test
-	public void testTranslateOverridenByRule () {
-		ArrayList<Event> list = getEvents(new File(root+"test01.html"));
+	public void testTranslateOnAttribute () {
+		String snippet = "<!DOCTYPE html><html lang=\"en\" translate=\"no\"><head><meta charset=utf-8>"
+			+ "<meta name='keywords' content='text-k'>"
+			+ "<title>text-t</title></head><body>"
+			+ "<p translate='yes'>text-p</p>"
+			+ "</body></html>";
+		ArrayList<Event> list = getEvents(snippet);
 		ITextUnit tu = FilterTestDriver.getTextUnit(list, 1);
-		assertNotNull(tu); // Para should be first because the rules associated to test1.html override meta[keywords] as translatable
-		assertEquals("This is a <1>motherboard</1>.", fmt.setContent(tu.getSource().getFirstContent()).toString());
+		assertNotNull(tu);
+		// keywords get extracted because of default rules are applied to that node, so the html-level translate='no' is not inherited
+		assertEquals("text-k", fmt.setContent(tu.getSource().getFirstContent()).toString());
+		tu = FilterTestDriver.getTextUnit(list, 2);
+		assertEquals("text-p", fmt.setContent(tu.getSource().getFirstContent()).toString());
 	}
 	
 	@Test
@@ -91,6 +99,14 @@ public class HTML5FilterTest {
 		tu = FilterTestDriver.getTextUnit(list, 3);
 		assertNotNull(tu);
 		assertEquals("Text <1/>.", fmt.setContent(tu.getSource().getFirstContent()).toString());
+	}
+	
+	@Test
+	public void testTranslateOverridenByRule () {
+		ArrayList<Event> list = getEvents(new File(root+"test01.html"));
+		ITextUnit tu = FilterTestDriver.getTextUnit(list, 1);
+		assertNotNull(tu); // Para should be first because the rules associated to test1.html override meta[keywords] as translatable
+		assertEquals("This is a <1>motherboard</1>.", fmt.setContent(tu.getSource().getFirstContent()).toString());
 	}
 	
 	@Test

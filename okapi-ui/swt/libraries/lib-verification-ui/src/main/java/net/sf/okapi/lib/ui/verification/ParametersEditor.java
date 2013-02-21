@@ -162,11 +162,25 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 	private Button chkBetweenCodes;
 	
 	// Flag to indicate the editor is use for step parameters
-	// We default to true because the step cannot set this option
-	private boolean stepMode = false; // Disabled for now
+	private boolean stepMode = true;
 	// step-mode fields:
 	private TextAndBrowsePanel pnlSessionPath;
 	private Button chkSaveSession;
+	
+	/**
+	 * Creates an editor (with step mode on).
+	 */
+	public ParametersEditor () {
+		// Nothing to do
+	}
+	
+	/**
+	 * Creates an editor with the given step mode. 
+	 * @param stepMode true to display the step-specific options.
+	 */
+	public ParametersEditor (boolean stepMode) {
+		this.stepMode = stepMode;
+	}
 	
 	@Override
 	public boolean edit (IParameters params,

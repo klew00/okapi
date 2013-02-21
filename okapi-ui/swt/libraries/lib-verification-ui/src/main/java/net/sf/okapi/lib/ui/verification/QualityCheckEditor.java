@@ -1403,7 +1403,7 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 
 	private void editConfiguration () {
 		try {
-			ParametersEditor editor = new ParametersEditor();
+			ParametersEditor editor = new ParametersEditor(false); // Not in step-mode
 			BaseContext context = new BaseContext();
 			if ( help != null ) context.setObject("help", help);
 			context.setObject("shell", shell);

@@ -196,6 +196,13 @@ public class XLIFFWriterTest {
 			GenericAnnotationType.TERM_CONFIDENCE, 0.5,
 			GenericAnnotationType.TERM_INFO, "REF:info"));
 		tc.setAnnotation(anns);
+		
+		anns = new GenericAnnotations();
+		anns.add(new GenericAnnotation(GenericAnnotationType.TERM,
+			GenericAnnotationType.TERM_CONFIDENCE, 0.7,
+			GenericAnnotationType.TERM_INFO, "REF:info2"));
+		tc.get(0).getContent().annotate(0, 2, GenericAnnotationType.GENERIC, anns);
+		
 		writer.writeTextUnit(tu);
 		writer.writeEndFile();
 		writer.close();		
@@ -205,8 +212,10 @@ public class XLIFFWriterTest {
 			+ "<xliff version=\"1.2\" xmlns=\"urn:oasis:names:tc:xliff:document:1.2\" xmlns:okp=\"okapi-framework:xliff-extensions\" xmlns:its=\"http://www.w3.org/2005/11/its\">\n"
 			+ "<file original=\"unknown\" source-language=\"en\" target-language=\"fr\" datatype=\"x-undefined\">\n"
 			+ "<body>\n<trans-unit id=\"tu1\">\n"
-			+ "<source xml:lang=\"en\" its:term=\"yes\" its:termConfidence=\"0.5\" its:termInfoRef=\"info\">t1</source>\n"
-			+ "<target xml:lang=\"fr\" its:term=\"yes\" its:termConfidence=\"0.5\" its:termInfoRef=\"info\">t1</target>\n"
+			+ "<source xml:lang=\"en\" its:term=\"yes\" its:termConfidence=\"0.5\" its:termInfoRef=\"info\">"
+			+ "<mrk mtype=\"x-its\" its:term=\"yes\" its:termConfidence=\"0.7\" its:termInfoRef=\"info2\">t1</mrk></source>\n"
+			+ "<target xml:lang=\"fr\" its:term=\"yes\" its:termConfidence=\"0.5\" its:termInfoRef=\"info\">"
+			+ "<mrk mtype=\"x-its\" its:term=\"yes\" its:termConfidence=\"0.7\" its:termInfoRef=\"info2\">t1</mrk></target>\n"
 			+ "</trans-unit>\n"
 			+ "</body>\n</file>\n</xliff>\n", stripVariableID(result));
 	}
