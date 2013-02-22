@@ -173,7 +173,7 @@ public class HTML5SkeletonWriter extends GenericSkeletonWriter {
 				part.setData(""); // Clear the marker in all cases
 				// And add the markup if there is something to output
 				if ( !Util.isEmpty(standoff) ) {
-					if ( itsCont == null ) itsCont = new ITSContent(encoderManager.getCharsetEncoder(), true);
+					if ( itsCont == null ) itsCont = new ITSContent(encoderManager.getCharsetEncoder(), true, false);
 					part.append(itsCont.writeStandoffLQI(standoff));
 					part.append(itsCont.writeStandoffProvenance(standoff));
 				}

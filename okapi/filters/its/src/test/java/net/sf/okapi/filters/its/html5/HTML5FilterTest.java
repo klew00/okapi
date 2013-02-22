@@ -76,7 +76,7 @@ public class HTML5FilterTest {
 		String snippet = "<!DOCTYPE html><html lang=\"en\" translate=\"no\"><head><meta charset=utf-8>"
 			+ "<meta name='keywords' content='text-k'>"
 			+ "<title>text-t</title></head><body>"
-			+ "<p translate='yes'>text-p</p>"
+			+ "<p translate=''>text-p</p>" // empty == yes
 			+ "</body></html>";
 		ArrayList<Event> list = getEvents(snippet);
 		ITextUnit tu = FilterTestDriver.getTextUnit(list, 1);

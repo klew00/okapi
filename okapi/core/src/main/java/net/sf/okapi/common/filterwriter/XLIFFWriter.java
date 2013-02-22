@@ -456,7 +456,7 @@ public class XLIFFWriter implements IFilterWriter {
 		if ( anns != null ) {
 			StringBuilder sb = new StringBuilder();
 			if ( itsContForUnit == null ) {
-				itsContForUnit = new ITSContent(xliffCont.getCharsetEncoder(), false);
+				itsContForUnit = new ITSContent(xliffCont.getCharsetEncoder(), false, true);
 			}
 			itsContForUnit.outputAnnotations(anns, sb, false);
 			writer.appendRawXML(sb.toString());
@@ -478,7 +478,7 @@ public class XLIFFWriter implements IFilterWriter {
 		if ( anns != null ) {
 			StringBuilder sb = new StringBuilder();
 			if ( itsContForSrcCont == null ) {
-				itsContForSrcCont = new ITSContent(xliffCont.getCharsetEncoder(), false);
+				itsContForSrcCont = new ITSContent(xliffCont.getCharsetEncoder(), false, true);
 			}
 			itsContForSrcCont.outputAnnotations(anns, sb, false);
 			writer.appendRawXML(sb.toString());
@@ -520,7 +520,7 @@ public class XLIFFWriter implements IFilterWriter {
 				if ( anns != null ) {
 					StringBuilder sb = new StringBuilder();
 					if ( itsContForTrgCont == null ) {
-						itsContForTrgCont = new ITSContent(xliffCont.getCharsetEncoder(), false);
+						itsContForTrgCont = new ITSContent(xliffCont.getCharsetEncoder(), false, true);
 					}
 					itsContForTrgCont.outputAnnotations(anns, sb, false);
 					writer.appendRawXML(sb.toString());
@@ -762,7 +762,7 @@ public class XLIFFWriter implements IFilterWriter {
 	private String writeStandoffLQI (List<GenericAnnotations> list) {
 		if ( Util.isEmpty(list) ) return "";
 		if ( itsContForUnit == null ) {
-			itsContForUnit = new ITSContent(xliffCont.getCharsetEncoder(), false);
+			itsContForUnit = new ITSContent(xliffCont.getCharsetEncoder(), false, true);
 		}
 		return itsContForUnit.writeStandoffLQI(list);
 	}

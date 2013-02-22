@@ -21,6 +21,7 @@
 package net.sf.okapi.common.filterwriter;
 
 import java.nio.charset.CharsetEncoder;
+import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -51,19 +52,27 @@ public class ITSContent {
 	
 	private CharsetEncoder encoder;
 	private boolean isHTML5;
+	private boolean isXLIFF;
 	private List<GenericAnnotations> standoff;
 	private String prefix;
 	
 	/**
 	 * Creates an ITSContent object with a given character set encoder.
 	 * @param encoder the character set encoder to use (can be null for UTF-8)
-	 * @param isHTML5 true to general markup for HTML5, false for XML.
+	 * @param isHTML5 true to generate markup for HTML5, false for XML.
+	 * @param isXLIFF true if the XML output is XLIFF, false for generic ITS.
+	 * This parameter is ignored if <code>isHTML5</code is true.
 	 */
 	public ITSContent (CharsetEncoder encoder,
-		boolean isHTML5)
+		boolean isHTML5,
+		boolean isXLIFF)
 	{
+		if ( isHTML5 && isXLIFF ) {
+			throw new InvalidParameterException("You can have both isHTML5 and isXLIFF true at the same time");
+		}
 		this.encoder = encoder;
 		this.isHTML5 = isHTML5;
+		this.isXLIFF = isXLIFF;
 		this.prefix = (isHTML5 ? "its-" : "its:");
 	}
 
@@ -198,16 +207,16 @@ public class ITSContent {
 		return partialName+"=\""+Util.escapeToXML(value, 3, false, encoder)+"\"";
 	}
 
-	/**
-	 * Generates the markup for the ITS attributes for a given annotation set on an inline code.
-	 * @param code the code where the annotation set is localed.
-	 * @param output the buffer where to append the output.
-	 */
-	public void outputAnnotations (Code code,
-		StringBuilder output)
-	{
-		outputAnnotations(code.getGenericAnnotations(), output, true);
-	}
+//	/**
+//	 * Generates the markup for the ITS attributes for a given annotation set on an inline code.
+//	 * @param code the code where the annotation set is localed.
+//	 * @param output the buffer where to append the output.
+//	 */
+//	public void outputAnnotations (Code code,
+//		StringBuilder output)
+//	{
+//		outputAnnotations(code.getGenericAnnotations(), output, true);
+//	}
 
 	/**
 	 * Generates the markup for the ITS attributes for a given annotation set.
@@ -221,6 +230,7 @@ public class ITSContent {
 	{
 		if ( anns == null ) return;
 		
+		boolean hasTerm = false;
 		for ( GenericAnnotation ann : anns ) {
 			// AnnotatorsRef
 			//TODO
@@ -244,7 +254,10 @@ public class ITSContent {
 			
 			// Terminology
 			else if ( ann.getType().equals(GenericAnnotationType.TERM) ) {
-				printITSBooleanAttribute(true, "term", output);
+				hasTerm = true;
+				if ( !(isXLIFF && inline) ) {
+					printITSBooleanAttribute(true, "term", output);
+				}
 				printITSDoubleAttribute(ann.getDouble(GenericAnnotationType.TERM_CONFIDENCE),
 					(isHTML5 ? "term-confidence" : "termConfidence"), output);
 				// If it's not a Ref info, we must used a user-define attribute because there is no local ITS termInfo attribute
@@ -256,7 +269,7 @@ public class ITSContent {
 						output.append(" "+prefix+(isHTML5 ? "term-info" : "termInfo")+ref+"=\""+Util.escapeToXML(value, 3, false, encoder)+"\"");
 					}
 					else {
-						printITSExtStringAttribute(value, "itsTermInfo", output);
+						output.append((isHTML5 ? " data-its-term-info" : " comment")+"=\""+Util.escapeToXML(value, 3, false, encoder)+"\"");
 					}
 				}
 			}
@@ -386,6 +399,11 @@ public class ITSContent {
 			newSet.addAll(list);
 			if ( standoff == null ) standoff = new ArrayList<GenericAnnotations>();
 			standoff.add(newSet);
+		}
+		
+		// Output mtype if needed
+		if ( isXLIFF && inline ) {
+			output.append(" mtype=\"" + (hasTerm ? "term" : "x-its") + "\"");
 		}
 	}
 	

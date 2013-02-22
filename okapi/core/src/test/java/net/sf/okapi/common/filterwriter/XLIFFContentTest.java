@@ -101,8 +101,8 @@ public class XLIFFContentTest {
 			new GenericAnnotations(new GenericAnnotation(GenericAnnotationType.LOCNOTE,
 				GenericAnnotationType.LOCNOTE_VALUE, "comment",
 				GenericAnnotationType.LOCNOTE_TYPE, "alert")));
-		assertEquals("Before <mrk mtype=\"x-its\" its:disambigSource=\"src\">"
-			+ "<mrk mtype=\"x-its\" comment=\"comment\" okp:itsLocNoteType=\"alert\">the span</mrk></mrk> after.",
+		assertEquals("Before <mrk its:disambigSource=\"src\" mtype=\"x-its\">"
+			+ "<mrk comment=\"comment\" okp:itsLocNoteType=\"alert\" mtype=\"x-its\">the span</mrk></mrk> after.",
 			fmt.setContent(tf).toString(true));
 	}
 
@@ -124,11 +124,11 @@ public class XLIFFContentTest {
 			GenericAnnotationType.LQI_SEVERITY, 98.5));
 		TextFragment tf = new TextFragment("Before the span after.");
 		tf.annotate(7, 15, GenericAnnotationType.GENERIC, anns);
-		assertEquals("Before <mrk mtype=\"x-its\" its:allowedCharacters=\"[a-z]\""
+		assertEquals("Before <mrk its:allowedCharacters=\"[a-z]\""
 			+ " its:storageSize=\"25\" its:storageEncoding=\"iso-8859-1\" its:storageLinebreak=\"nel\""
-			+ " its:term=\"yes\" its:termConfidence=\"0.5\" its:termInfoRef=\"myUri\""
+			+ " its:termConfidence=\"0.5\" its:termInfoRef=\"myUri\""
 			+ " its:locQualityIssueComment=\"blah\" its:locQualityIssueSeverity=\"98.5\" its:locQualityIssueType=\"grammar\""
-			+ ">the span</mrk> after.",
+			+ " mtype=\"term\">the span</mrk> after.",
 			fmt.setContent(tf).toString(true));
 	}
 
@@ -152,8 +152,8 @@ public class XLIFFContentTest {
 			GenericAnnotationType.LQI_COMMENT, "comment-2b"));
 		tf.annotate(11, 17, GenericAnnotationType.GENERIC, anns); // +4 is for first marker
 		
-		assertEquals("<mrk mtype=\"x-its\" its:locQualityIssuesRef=\"#VARID\">Span 1</mrk> "
-			+ "<mrk mtype=\"x-its\" its:locQualityIssuesRef=\"#VARID\">Span 2</mrk>",
+		assertEquals("<mrk its:locQualityIssuesRef=\"#VARID\" mtype=\"x-its\">Span 1</mrk> "
+			+ "<mrk its:locQualityIssuesRef=\"#VARID\" mtype=\"x-its\">Span 2</mrk>",
 			stripVariableID(fmt.setContent(tf).toString(true)));
 	}
 
@@ -173,7 +173,7 @@ public class XLIFFContentTest {
 //TODO: We have to find a better way to attach annotation on span		
 		GenericAnnotations.addAnnotations(end, anns);
 		// Output
-		assertEquals("Before <g id=\"1\"><mrk mtype=\"x-its\" its:allowedCharacters=\"[a-z]\">the span</mrk></g> after.",
+		assertEquals("Before <g id=\"1\"><mrk its:allowedCharacters=\"[a-z]\" mtype=\"x-its\">the span</mrk></g> after.",
 			fmt.setContent(tf).toString(true));
 	}
 	

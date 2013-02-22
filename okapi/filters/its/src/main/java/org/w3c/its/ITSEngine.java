@@ -560,7 +560,6 @@ public class ITSEngine implements IProcessor, ITraversal {
 		rule.isInternal = isInternal;
 		
 		String value = elem.getAttribute("translate");
-		if ( isHTML5 ) value = value.toLowerCase();
 		if ( "yes".equals(value) ) rule.flag = true;
 		else if ( "no".equals(value) ) rule.flag = false;
 		else throw new ITSException("Invalid value for 'translate'.");
@@ -1905,7 +1904,10 @@ public class ITSEngine implements IProcessor, ITraversal {
 						&& "translateRule".equals(attr.getOwnerElement().getLocalName()) ) continue;
 					// Validate the value
 					String value = attr.getValue();
-					if ( isHTML5 ) value = value.toLowerCase();
+					if ( isHTML5 ) {
+						if ( value.isEmpty() ) value = "yes"; // In HTML5 "" == "yes"
+						else value = value.toLowerCase();
+					}
 					if (( !"yes".equals(value) ) && ( !"no".equals(value) )) {
 						throw new ITSException("Invalid value for 'translate'.");
 					}
