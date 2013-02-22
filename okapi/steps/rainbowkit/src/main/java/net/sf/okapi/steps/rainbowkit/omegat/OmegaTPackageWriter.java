@@ -157,7 +157,8 @@ public class OmegaTPackageWriter extends XLIFFPackageWriter {
 				
 				// Finally, write the element only if we have a path
 				if ( jarPath != null ) {
-					String externalCmd = String.format("java -jar \"%s\" -x TranslationKitPostProcessing -np \"${projectRoot}manifest.rkm\" -fc okf_rainbowkit-noprompt",
+					String externalCmd = String.format("java %s -jar \"%s\" -x TranslationKitPostProcessing -np \"${projectRoot}manifest.rkm\" -fc okf_rainbowkit-noprompt",
+						System.getProperty("os.name").contains("OS X") ? "-XstartOnFirstThread" : "",
 						jarPath);
 					XR.writeStartElement("external_command");
 					XR.writeString(externalCmd);
