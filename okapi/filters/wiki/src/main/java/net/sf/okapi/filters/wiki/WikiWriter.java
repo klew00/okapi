@@ -55,6 +55,13 @@ import net.sf.okapi.common.skeleton.ISkeletonWriter;
  */
 public class WikiWriter implements IFilterWriter {
 	
+	private static final String SELF_REF = "$self$";
+	private static final String DUMMY_SKELETON = String.format(
+			"%s%s%s",
+			TextFragment.REFMARKER_START,
+			SELF_REF,
+			TextFragment.REFMARKER_END);
+	
 	private OutputStream output;
 	private String outputPath;
 	private OutputStreamWriter writer;
@@ -293,10 +300,10 @@ public class WikiWriter implements IFilterWriter {
 		ITextUnit tu = event.getTextUnit();
 		
 		GenericSkeleton skel = (GenericSkeleton) tu.getSkeleton();
-		assert(skel != null);
 		
 		StringBuilder tuText = new StringBuilder();
-		tuText.append(skel.toString());
+		
+		tuText.append(skel != null ? skel.toString() : DUMMY_SKELETON);
 		
 		// Body of TU
 		TextContainer bodyContainer = null;
