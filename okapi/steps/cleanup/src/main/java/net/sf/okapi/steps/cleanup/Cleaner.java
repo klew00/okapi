@@ -56,13 +56,13 @@ public class Cleaner {
 	private static String SQ_REPLACE = "\u0027";
 	private static String SPECIALPUNC = "\"\u0027";
 	
-	private static final String SINGLEQUOTES = "\'‘’‚‛‹›";
-	private static final String DOUBLEQUOTES = "\"“”„‟«»";
-	private static final String PUNCTUATION = ".,;:!¡?¿";
-	private static final String OPENINGQUOTES = "‘‚‹“„«";
-	private static final String CLOSINGQUOTES = "’‛›”‟»";
-	private static final String MARKS = "\'‘’‚‛‹›\"“”„‟«».,;:!¡?¿";
-	private static final String QUOTES = "\'‘’‚‛‹›\"“”„‟«»";
+	private static final String SINGLEQUOTES = "\'\u2018\u2019\u201A\u201B\u2039\u203A";
+	private static final String DOUBLEQUOTES = "\"\u201C\u201D\u201E\u201F\u00AB\u00BB";
+	private static final String PUNCTUATION = ".,;:!\u00A1?\u00BF";
+	private static final String OPENINGQUOTES = "\u2018\u201A\u2039\u201C\u201E\u00AB";
+	private static final String CLOSINGQUOTES = "\u2019\u201B\u203A\u201D\u201F\u00BB";
+	private static final String MARKS = "\'\u2018\u2019\u201A\u201B\u2039\u203A\"\u201C\u201D\u201E\u201F\u00AB\u00BB.,;:!\u00A1?\u00BF";
+	private static final String QUOTES = "\'\u2018\u2019\u201A\u201B\u2039\u203A\"\u201C\u201D\u201E\u201F\u00AB\u00BB";
 
 	private Parameters params;
 	
@@ -189,262 +189,532 @@ public class Cleaner {
 	}
 
 	protected void normalizeMarks(ITextUnit tu, Segment seg, LocaleId targetLocale) {
-		
-//		TextFragment trgFrag = tu.getTargetSegment(targetLocale, seg.getId(), false).getContent();
-		StringBuilder srcText = new StringBuilder(seg.text);
-//		StringBuilder trgText = new StringBuilder(trgFrag.getCodedText());
-		
-		int cursor = 0;
-		int proxyCheck = 0;
-		int proximityThreshold = 2;
-		int ch = 0;
-		int quoteCh = 0;
-		int puncCh = 0;
-		int nearQuote = -1;
-		int nearPunc = -1;
-		
-		boolean doQuotes = params.getNormalizeQuotes();
-		boolean isPunctuation = false;
-		boolean isQuote = false;
-		boolean isNearQuote = false;
-		boolean isNearPuncuation = false;
-		
-		// normalize source
-		while (cursor <= srcText.length() - 1) {
-			ch = srcText.charAt(cursor);
-			char c = (char)ch;
-			if (MARKS.indexOf(ch) != -1) {
-				// Punctuation
-				if(PUNCTUATION.indexOf(ch) != -1) {
-					if(nearQuote >= -1) {
-						// check proximity backwards
-						proxyCheck = cursor;
-						while((proxyCheck > 0) && ((cursor - proxyCheck) < proximityThreshold) && (isNearQuote == false)) {
-							proxyCheck -= 1;
-							if(QUOTES.indexOf(srcText.charAt(proxyCheck)) != -1) {
-								nearQuote = proxyCheck;
-								isNearQuote = true;
-								quoteCh = srcText.charAt(proxyCheck);
-								break;
-							}
-						}
-						// check proximity forwards
-						proxyCheck = cursor;
-						while ((proxyCheck < srcText.length() - 1) && ((proxyCheck - cursor) < proximityThreshold) && (isNearQuote == false)) {
-							proxyCheck += 1;
-							if(QUOTES.indexOf(srcText.charAt(proxyCheck)) != -1) {
-								nearQuote = proxyCheck;
-								isNearQuote = true;
-								quoteCh = srcText.charAt(proxyCheck);
-								break;
-							}
-						}
-						// TODO: quotes are both back and forwards; "a " for example.
-						
-						// TODO: process PUNCTUATION based on rules and known attributes
-						if(isNearQuote == false) {
-							// treat PUNCTUATION according to rules
-							switch(ch) {
-								case '\u002E': // period "."
-									// characters after period
-									if (cursor < srcText.length() - 1) {
-										if ((Character.isWhitespace(srcText.charAt(cursor + 1))) || (srcText.charAt(cursor + 1) == '\u00A0')) {
-											srcText.deleteCharAt(cursor + 1);
-										}
-										// end of abbreviation
-										if ((Pattern.compile("([a-zA-Z]{1,3}\\.[\\s ]?)+").matcher(srcText.subSequence(cursor - 4, cursor - 1)).find() == true) && (Character.isLowerCase(srcText.charAt(cursor + 1)))) {
-											srcText.insert(cursor + 1, ' ');
-										}
-										// end of a sentence
-										if (Character.isUpperCase(srcText.charAt(cursor + 1))) {
-											srcText.insert(cursor + 1, ' ');
-										}
-									}
-									// characters before period
-									if (cursor > 0) {
-										if ((Character.isWhitespace(srcText.charAt(cursor - 1))) || (srcText.charAt(cursor - 1) == '\u00A0')) {
-											// end of a sentence
-											if (cursor == srcText.length() - 1) {
-												srcText.deleteCharAt(cursor - 1);
-												cursor -= 1;
-											} else {
-												// period is a decimal marker
-												if ((cursor < srcText.length() - 1) && (!Character.isDigit(srcText.charAt(cursor - 1))) && (Character.isDigit(srcText.charAt(cursor + 1)))) {
-													srcText.deleteCharAt(cursor - 1);
-													cursor -= 1;
-												}
-											}
-										}
-									}
-									break;
-								case '\u002C': // comma ","
-									// characters after comma
-									if (cursor < srcText.length() - 1) {
-										if ((Character.isWhitespace(srcText.charAt(cursor + 1))) || (srcText.charAt(cursor + 1) == '\u00A0')) {
-											srcText.deleteCharAt(cursor + 1);
-										}
-										// normal instance
-										if (Character.isLetterOrDigit(srcText.charAt(cursor + 1))) {
-											srcText.insert(cursor + 1, ' ');
-										}
-									}
-									// characters before comma
-									if (cursor > 0) {
-										if((Character.isWhitespace(srcText.charAt(cursor - 1))) || (srcText.charAt(cursor - 1) == '\u00A0')) {
-											// comma is a decimal marker
-											if ((cursor < srcText.length() - 1) && (!Character.isDigit(srcText.charAt(cursor - 1))) && (Character.isDigit(srcText.charAt(cursor + 1)))) {
-												srcText.deleteCharAt(cursor - 1);
-												cursor -= 1;
-											}
-										}
-									}
-									break;
-								case '\u003B': // semicolon ";"
-									// characters after colon
-									if (cursor < srcText.length() - 1) {
-										if ((Character.isWhitespace(srcText.charAt(cursor + 1))) || (srcText.charAt(cursor + 1) == '\u00A0')) {
-											srcText.deleteCharAt(cursor + 1);
-										}
-										// normal instance
-										if (Character.isLetterOrDigit(srcText.charAt(cursor + 1))) {
-											srcText.insert(cursor + 1, ' ');
-										}
-									}
-									// characters before colon
-									if (cursor > 0) {
-										if ((Character.isWhitespace(srcText.charAt(cursor - 1))) || (srcText.charAt(cursor - 1) == '\u00A0')) {
-											srcText.deleteCharAt(cursor - 1);
-											cursor -= 1;
-										}
-									}
-									break;
-								case '\u003A': // colon ":"
-									// characters after colon
-									if (cursor < srcText.length() - 1) {
-										if ((Character.isWhitespace(srcText.charAt(cursor + 1))) || (srcText.charAt(cursor + 1) == '\u00A0')) {
-											srcText.deleteCharAt(cursor + 1);
-										}
-										// normal instance
-										if (Character.isLetterOrDigit(srcText.charAt(cursor + 1))) {
-											srcText.insert(cursor + 1, ' ');
-										}
-									}
-									// characters before colon
-									if (cursor > 0) {
-										if ((Character.isWhitespace(srcText.charAt(cursor - 1))) || (srcText.charAt(cursor - 1) == '\u00A0')) {
-											srcText.deleteCharAt(cursor - 1);
-											cursor -= 1;
-										}
-									}
-									break;
-								case '\u0021': // exclamation mark "!"
-									// characters after colon
-									if (cursor < srcText.length() - 1) {
-										if ((Character.isWhitespace(srcText.charAt(cursor + 1))) || (srcText.charAt(cursor + 1) == '\u00A0')) {
-											srcText.deleteCharAt(cursor + 1);
-										}
-										// normal instance
-										if (Character.isLetterOrDigit(srcText.charAt(cursor + 1))) {
-											srcText.insert(cursor + 1, ' ');
-										}
-									}
-									// characters before colon
-									if (cursor > 0) {
-										if ((Character.isWhitespace(srcText.charAt(cursor - 1))) || (srcText.charAt(cursor - 1) == '\u00A0')) {
-											srcText.deleteCharAt(cursor - 1);
-											cursor -= 1;
-										}
-									}
-									break;
-								case '\u00A1': // inverted exclamation mark "¡"
-									break;
-								case '\u003F': // question mark "?"
-									// characters after colon
-									if (cursor < srcText.length() - 1) {
-										if ((Character.isWhitespace(srcText.charAt(cursor + 1))) || (srcText.charAt(cursor + 1) == '\u00A0')) {
-											srcText.deleteCharAt(cursor + 1);
-										}
-										// normal instance
-										if (Character.isLetterOrDigit(srcText.charAt(cursor + 1))) {
-											srcText.insert(cursor + 1, ' ');
-										}
-									}
-									// characters before colon
-									if (cursor > 0) {
-										if ((Character.isWhitespace(srcText.charAt(cursor - 1))) || (srcText.charAt(cursor - 1) == '\u00A0')) {
-											srcText.deleteCharAt(cursor - 1);
-											cursor -= 1;
-										}
-									}
-									break;
-								case '\u00BF': // inverted question mark "¿"
-									break;
-								default:
-									// other punctuation marks are retained as-is
-									break;
-							}
-						} else {
-							// exceptions to the rules
-						}
-					}
-				} else { // end PUNCTUATION
-					// Quotation
-					if (nearPunc >= -1) {
-						// check proximity backwards
-						proxyCheck = cursor;
-						while((proxyCheck > 0) && ((cursor - proxyCheck) < proximityThreshold) && (isNearPuncuation == false)) {
-							proxyCheck -= 1;
-							if(PUNCTUATION.indexOf(srcText.charAt(proxyCheck)) != -1) {
-								nearPunc = proxyCheck;
-								isNearPuncuation = true;
-								puncCh = srcText.charAt(srcText.charAt(proxyCheck));
-								break;
-							}
-						}
-						// check proximity forwards
-						proxyCheck = cursor;
-						while((proxyCheck < srcText.length() - 1) && ((proxyCheck - cursor) < proximityThreshold) && (isNearPuncuation == false)) {
-							proxyCheck += 1;
-							if(PUNCTUATION.indexOf(srcText.charAt(proxyCheck)) != -1) {
-								nearPunc = proxyCheck;
-								isNearPuncuation = true;
-								puncCh = srcText.charAt(srcText.charAt(proxyCheck));
-								break;
-							}
-						}
-						// TODO: punctuation is both back and forwards.
-						
-						// TODO: process QUOTES based on rules and known attributes
-						if(isNearPuncuation == false) {
-							if (doQuotes == true) {
-								// TODO: treat QUOTES according to rules
-							}
-						} else {
-							if (doQuotes == true) {
-								// TODO: exceptions to the rules
-							}
-						}
-					}
-				} // end QUOTATION
-			} // end MARKS
-			
-			// reset booleans
-			// TODO: move these to a better place
-			quoteCh = 0;
-			puncCh = 0;
-			nearQuote = -1;
-			nearPunc = -1;			
-			isPunctuation = false;
-			isQuote = false;
-			isNearQuote = false;
-			isNearPuncuation = false;
-			
-			// iterate
-			cursor += 1;
-		}
-		
-		// save updated strings
-		seg.getContent().setCodedText(srcText.toString());
+//		
+////		TextFragment trgFrag = tu.getTargetSegment(targetLocale, seg.getId(), false).getContent();
+//		StringBuilder srcText = new StringBuilder(seg.text);
+////		StringBuilder trgText = new StringBuilder(trgFrag.getCodedText());
+//		
+//		int cursor = 0;
+//		int proxyCheck = 0;
+//		int proximityThreshold = 2;
+//		int ch = 0;
+//		int quoteChBefore = 0;
+//		int quoteChAfter = 0;
+//		int puncCh = 0;
+//		int nearQuote = -1;
+//		int nearPunc = -1;
+//		
+//		boolean doQuotes = params.getNormalizeQuotes();
+//		boolean isPunctuation = false;
+//		boolean isQuote = false;
+//		boolean isNearQuote = false;
+//		boolean isBeforeQuote = false;
+//		boolean isAfterQuote = false;
+//		boolean isNearPuncuation = false;
+//		
+//		// normalize source
+//		while (cursor <= srcText.length() - 1) {
+//			ch = srcText.charAt(cursor);
+//			char c = (char)ch;
+//			if (MARKS.indexOf(ch) != -1) {
+//				// Punctuation
+//				if(PUNCTUATION.indexOf(ch) != -1) {
+//					if(nearQuote >= -1) {
+//						// check proximity backwards
+//						proxyCheck = cursor;
+//						while((proxyCheck > 0) && ((cursor - proxyCheck) < proximityThreshold) && (isAfterQuote == false)) {
+//							proxyCheck -= 1;
+//							if(QUOTES.indexOf(srcText.charAt(proxyCheck)) != -1) {
+//								nearQuote = proxyCheck;
+//								isNearQuote = true;
+//								isAfterQuote = true;
+//								quoteChAfter = srcText.charAt(proxyCheck);
+//								break;
+//							}
+//						}
+//						// check proximity forwards
+//						proxyCheck = cursor;
+//						while ((proxyCheck < srcText.length() - 1) && ((proxyCheck - cursor) < proximityThreshold) && (isBeforeQuote == false)) {
+//							proxyCheck += 1;
+//							if(QUOTES.indexOf(srcText.charAt(proxyCheck)) != -1) {
+//								nearQuote = proxyCheck;
+//								isNearQuote = true;
+//								isBeforeQuote = true;
+//								quoteChBefore = srcText.charAt(proxyCheck);
+//								break;
+//							}
+//						}
+//						// TODO: quotes are both back and forwards; "a " for example.
+//						
+//						// TODO: process PUNCTUATION based on rules and known attributes
+//						if(isNearQuote == false) {
+//							// treat PUNCTUATION according to rules
+//							switch(ch) {
+//								case '\u002E': // period "."
+//									// characters after period
+//									if (cursor < srcText.length() - 1) {
+//										if ((Character.isWhitespace(srcText.charAt(cursor + 1))) || (srcText.charAt(cursor + 1) == '\u00A0')) {
+//											srcText.deleteCharAt(cursor + 1);
+//										}
+//										// end of abbreviation
+//										if ((Pattern.compile("([a-zA-Z]{1,3}\\.[\\s ]?)+").matcher(srcText.subSequence(cursor - 4, cursor - 1)).find() == true) && (Character.isLowerCase(srcText.charAt(cursor + 1)))) {
+//											srcText.insert(cursor + 1, ' ');
+//										}
+//										// end of a sentence
+//										if (Character.isUpperCase(srcText.charAt(cursor + 1))) {
+//											srcText.insert(cursor + 1, ' ');
+//										}
+//									}
+//									// characters before period
+//									if (cursor > 0) {
+//										if ((Character.isWhitespace(srcText.charAt(cursor - 1))) || (srcText.charAt(cursor - 1) == '\u00A0')) {
+//											// end of a sentence
+//											if (cursor == srcText.length() - 1) {
+//												srcText.deleteCharAt(cursor - 1);
+//												cursor -= 1;
+//											} else {
+//												// period is a decimal marker
+//												if ((cursor < srcText.length() - 1) && (!Character.isDigit(srcText.charAt(cursor - 1))) && (Character.isDigit(srcText.charAt(cursor + 1)))) {
+//													srcText.deleteCharAt(cursor - 1);
+//													cursor -= 1;
+//												}
+//											}
+//										}
+//									}
+//									break;
+//								case '\u002C': // comma ","
+//									// characters after comma
+//									if (cursor < srcText.length() - 1) {
+//										if ((Character.isWhitespace(srcText.charAt(cursor + 1))) || (srcText.charAt(cursor + 1) == '\u00A0')) {
+//											srcText.deleteCharAt(cursor + 1);
+//										}
+//										// normal instance
+//										if (Character.isLetterOrDigit(srcText.charAt(cursor + 1))) {
+//											srcText.insert(cursor + 1, ' ');
+//										}
+//									}
+//									// characters before comma
+//									if (cursor > 0) {
+//										if((Character.isWhitespace(srcText.charAt(cursor - 1))) || (srcText.charAt(cursor - 1) == '\u00A0')) {
+//											// comma is a decimal marker
+//											if ((cursor < srcText.length() - 1) && (!Character.isDigit(srcText.charAt(cursor - 1))) && (Character.isDigit(srcText.charAt(cursor + 1)))) {
+//												srcText.deleteCharAt(cursor - 1);
+//												cursor -= 1;
+//											}
+//										}
+//									}
+//									break;
+//								case '\u003B': // semicolon ";"
+//									// characters after colon
+//									if (cursor < srcText.length() - 1) {
+//										if ((Character.isWhitespace(srcText.charAt(cursor + 1))) || (srcText.charAt(cursor + 1) == '\u00A0')) {
+//											srcText.deleteCharAt(cursor + 1);
+//										}
+//										// normal instance
+//										if (Character.isLetterOrDigit(srcText.charAt(cursor + 1))) {
+//											srcText.insert(cursor + 1, ' ');
+//										}
+//									}
+//									// characters before colon
+//									if (cursor > 0) {
+//										if ((Character.isWhitespace(srcText.charAt(cursor - 1))) || (srcText.charAt(cursor - 1) == '\u00A0')) {
+//											srcText.deleteCharAt(cursor - 1);
+//											cursor -= 1;
+//										}
+//									}
+//									break;
+//								case '\u003A': // colon ":"
+//									// characters after colon
+//									if (cursor < srcText.length() - 1) {
+//										if ((Character.isWhitespace(srcText.charAt(cursor + 1))) || (srcText.charAt(cursor + 1) == '\u00A0')) {
+//											srcText.deleteCharAt(cursor + 1);
+//										}
+//										// normal instance
+//										if (Character.isLetterOrDigit(srcText.charAt(cursor + 1))) {
+//											srcText.insert(cursor + 1, ' ');
+//										}
+//									}
+//									// characters before colon
+//									if (cursor > 0) {
+//										if ((Character.isWhitespace(srcText.charAt(cursor - 1))) || (srcText.charAt(cursor - 1) == '\u00A0')) {
+//											srcText.deleteCharAt(cursor - 1);
+//											cursor -= 1;
+//										}
+//									}
+//									break;
+//								case '\u0021': // exclamation mark "!"
+//									// characters after colon
+//									if (cursor < srcText.length() - 1) {
+//										if ((Character.isWhitespace(srcText.charAt(cursor + 1))) || (srcText.charAt(cursor + 1) == '\u00A0')) {
+//											srcText.deleteCharAt(cursor + 1);
+//										}
+//										// normal instance
+//										if (Character.isLetterOrDigit(srcText.charAt(cursor + 1))) {
+//											srcText.insert(cursor + 1, ' ');
+//										}
+//									}
+//									// characters before colon
+//									if (cursor > 0) {
+//										if ((Character.isWhitespace(srcText.charAt(cursor - 1))) || (srcText.charAt(cursor - 1) == '\u00A0')) {
+//											srcText.deleteCharAt(cursor - 1);
+//											cursor -= 1;
+//										}
+//									}
+//									break;
+//								case '\u00A1': // inverted exclamation mark "¡"
+//									break;
+//								case '\u003F': // question mark "?"
+//									// characters after colon
+//									if (cursor < srcText.length() - 1) {
+//										if ((Character.isWhitespace(srcText.charAt(cursor + 1))) || (srcText.charAt(cursor + 1) == '\u00A0')) {
+//											srcText.deleteCharAt(cursor + 1);
+//										}
+//										// normal instance
+//										if (Character.isLetterOrDigit(srcText.charAt(cursor + 1))) {
+//											srcText.insert(cursor + 1, ' ');
+//										}
+//									}
+//									// characters before colon
+//									if (cursor > 0) {
+//										if ((Character.isWhitespace(srcText.charAt(cursor - 1))) || (srcText.charAt(cursor - 1) == '\u00A0')) {
+//											srcText.deleteCharAt(cursor - 1);
+//											cursor -= 1;
+//										}
+//									}
+//									break;
+//								case '\u00BF': // inverted question mark "¿"
+//									break;
+//								default:
+//									// other punctuation marks are retained as-is
+//									break;
+//							}
+//						} else {
+//							// TODO: exceptions to the rules
+//							switch(ch) {
+//								case '\u002E': // period "."
+//									// ch is after quote
+//									if (isAfterQuote == true) {
+//										if (OPENINGQUOTES.indexOf(quoteChAfter) != -1) {
+//											if (cursor < srcText.length() - 1) {
+//												if ((Character.isWhitespace(srcText.charAt(cursor + 1))) || (srcText.charAt(cursor + 1) == '\u00A0')) {
+//													srcText.deleteCharAt(cursor + 1);
+//												}
+//												// end of abbreviation
+//												if ((Pattern.compile("([a-zA-Z]{1,3}\\.[\\s ]?)+").matcher(srcText.subSequence(cursor - 4, cursor - 1)).find() == true) && (Character.isLowerCase(srcText.charAt(cursor + 1)))) {
+//													srcText.insert(cursor + 1, ' ');
+//												}
+//												// end of a sentence
+//												if (Character.isUpperCase(srcText.charAt(cursor + 1))) {
+//													srcText.insert(cursor + 1, ' ');
+//												}
+//											}
+//											if (cursor > 0) {
+//												if ((Character.isWhitespace(srcText.charAt(cursor - 1))) || (srcText.charAt(cursor - 1) == '\u00A0')) {
+//													if (cursor == srcText.length() - 1) {
+//														srcText.deleteCharAt(cursor - 1);
+//														cursor -= 1;
+//													} else {
+//														// period is a decimal marker
+//														if ((cursor < srcText.length() - 1) && (!Character.isDigit(srcText.charAt(cursor - 1))) && (Character.isDigit(srcText.charAt(cursor + 1)))) {
+//															srcText.deleteCharAt(cursor - 1);
+//															cursor -= 1;
+//														}
+//													}
+//												}
+//											}
+//										} else	if (CLOSINGQUOTES.indexOf(quoteChAfter) != -1) {
+//											if(cursor < srcText.length() - 1) {
+//												if ((Character.isWhitespace(srcText.charAt(cursor + 1))) || (srcText.charAt(cursor + 1) == '\u00A0')) {
+//													srcText.deleteCharAt(cursor + 1);
+//												}
+//												// end of abbreviation
+//												if ((Pattern.compile("([a-zA-Z]{1,3}\\.[\\s ]?)+").matcher(srcText.subSequence(cursor - 4, cursor - 1)).find() == true) && (Character.isLowerCase(srcText.charAt(cursor + 1)))) {
+//													srcText.insert(cursor + 1, ' ');
+//												}
+//												// end of a sentence
+//												if (Character.isUpperCase(srcText.charAt(cursor + 1))) {
+//													srcText.insert(cursor + 1, ' ');
+//												}
+//											}
+//											if (cursor > 0) {
+//												if ((Character.isWhitespace(srcText.charAt(cursor - 1))) || (srcText.charAt(cursor - 1) == '\u00A0')) {
+//													// end of a sentence
+//													if (cursor == srcText.length() - 1) {
+//														srcText.deleteCharAt(cursor - 1);
+//														cursor -= 1;
+//														srcText.deleteCharAt(cursor);
+//														srcText.insert(cursor - 1, '.');
+//													} else {
+//														// period is a decimal marker
+//														if ((cursor < srcText.length() - 1) && (!Character.isDigit(srcText.charAt(cursor - 1))) && (Character.isDigit(srcText.charAt(cursor + 1)))) {
+//															srcText.deleteCharAt(cursor - 1);
+//															cursor -= 1;
+//														}
+//														// end of an embedded sentence
+//														if(cursor < srcText.length() - 1) {
+//															srcText.deleteCharAt(cursor - 1);
+//															cursor -= 1;
+//															if (srcText.charAt(cursor + 1) != ' ') {
+//																srcText.insert(cursor + 1, ' ');
+//															}
+//															// move period inside quotes
+//															srcText.deleteCharAt(cursor);
+//															srcText.insert(cursor - 1, '.');
+//														}
+//													}
+//												}
+//											}
+//										} else {
+//											// default case
+//											if(cursor < srcText.length() - 1) {
+//												if ((Character.isWhitespace(srcText.charAt(cursor + 1))) || (srcText.charAt(cursor + 1) == '\u00A0')) {
+//													srcText.deleteCharAt(cursor + 1);
+//												}
+//												// end of abbreviation
+//												if ((Pattern.compile("([a-zA-Z]{1,3}\\.[\\s ]?)+").matcher(srcText.subSequence(cursor - 4, cursor - 1)).find() == true) && (Character.isLowerCase(srcText.charAt(cursor + 1)))) {
+//													srcText.insert(cursor + 1, ' ');
+//												}
+//												// end of a sentence
+//												if (Character.isUpperCase(srcText.charAt(cursor + 1))) {
+//													srcText.insert(cursor + 1, ' ');
+//												}
+//											}
+//											if (cursor > 0) {
+//												if ((Character.isWhitespace(srcText.charAt(cursor - 1))) || (srcText.charAt(cursor - 1) == '\u00A0')) {
+//													// end of a sentence
+//													if (cursor == srcText.length() - 1) {
+//														srcText.deleteCharAt(cursor - 1);
+//														cursor -= 1;
+//														srcText.deleteCharAt(cursor);
+//														srcText.insert(cursor - 1, '.');
+//													} else {
+//														// period is a decimal marker
+//														if ((cursor < srcText.length() - 1) && (!Character.isDigit(srcText.charAt(cursor - 1))) && (Character.isDigit(srcText.charAt(cursor + 1)))) {
+//															srcText.deleteCharAt(cursor - 1);
+//															cursor -= 1;
+//														}
+//														// end of an embedded sentence
+//														if(cursor < srcText.length() - 1) {
+//															srcText.deleteCharAt(cursor - 1);
+//															cursor -= 1;
+//															if (srcText.charAt(cursor + 1) != ' ') {
+//																srcText.insert(cursor + 1, ' ');
+//															}
+//															// move period inside quotes
+//															srcText.deleteCharAt(cursor);
+//															srcText.insert(cursor - 1, '.');
+//														}
+//													}
+//												}
+//											}
+//										} 
+//									} // end isAfterQuote
+//									
+//									// ch is before quote
+//									if (isBeforeQuote == true) {
+//										if (OPENINGQUOTES.indexOf(quoteChBefore) != -1) {
+//											if (cursor < srcText.length() - 1) {
+//												if ((Character.isWhitespace(srcText.charAt(cursor + 1))) || (srcText.charAt(cursor + 1) == '\u00A0')) {
+//													srcText.deleteCharAt(cursor + 1);
+//												}
+//												// end of abbreviation
+//												if (cursor > 3) {
+//													if ((Pattern.compile("([a-zA-Z]{1,3}\\.[\\s ]?)+").matcher(srcText.subSequence(cursor - 4, cursor - 1)).find() == true) && (Character.isLowerCase(srcText.charAt(cursor + 1)))) {
+//														srcText.insert(cursor + 1, ' ');
+//													}
+//												}
+//												// end of a sentence
+//												if (Character.isUpperCase(srcText.charAt(cursor + 1))) {
+//													srcText.insert(cursor + 1, ' ');
+//												}
+//											}
+//											if (cursor > 0) {
+//												if ((Character.isWhitespace(srcText.charAt(cursor - 1))) || (srcText.charAt(cursor - 1) == '\u00A0')) {
+//													if (cursor == srcText.length() - 1) {
+//														srcText.deleteCharAt(cursor - 1);
+//														cursor -= 1;
+//													} else {
+//														// period is a decimal marker
+//														if ((cursor < srcText.length() - 1) && (!Character.isDigit(srcText.charAt(cursor - 1))) && (Character.isDigit(srcText.charAt(cursor + 1)))) {
+//															srcText.deleteCharAt(cursor - 1);
+//															cursor -= 1;
+//														}
+//														// end of an embedded sentence
+//														if(cursor < srcText.length() - 1) {
+//															srcText.deleteCharAt(cursor - 1);
+//															cursor -= 1;
+//															if (srcText.charAt(cursor + 1) != ' ') {
+//																srcText.insert(cursor + 1, ' ');
+//															}
+//														}
+//													}
+//												}
+//											}
+//										} else if (CLOSINGQUOTES.indexOf(quoteChBefore) != -1) {
+//											if(cursor < srcText.length() - 1) {
+//												if ((Character.isWhitespace(srcText.charAt(cursor + 1))) || (srcText.charAt(cursor + 1) == '\u00A0')) {
+//													srcText.deleteCharAt(cursor + 1);
+//												}
+//												// end of abbreviation
+//												if ((Pattern.compile("([a-zA-Z]{1,3}\\.[\\s ]?)+").matcher(srcText.subSequence(cursor - 4, cursor - 1)).find() == true) && (Character.isLowerCase(srcText.charAt(cursor + 1)))) {
+//													srcText.insert(cursor + 1, ' ');
+//												}
+//												// end of a sentence
+//												if (Character.isUpperCase(srcText.charAt(cursor + 1))) {
+//													srcText.insert(cursor + 1, ' ');
+//												}
+//											}
+//											if (cursor > 0) {
+//												if ((Character.isWhitespace(srcText.charAt(cursor - 1))) || (srcText.charAt(cursor - 1) == '\u00A0')) {
+//													// end of a sentence
+//													if (cursor == srcText.length() - 1) {
+//														srcText.deleteCharAt(cursor - 1);
+//														cursor -= 1;
+//														srcText.deleteCharAt(cursor);
+//														srcText.insert(cursor - 1, '.');
+//													} else {
+//														// period is a decimal marker
+//														if ((cursor < srcText.length() - 1) && (!Character.isDigit(srcText.charAt(cursor - 1))) && (Character.isDigit(srcText.charAt(cursor + 1)))) {
+//															srcText.deleteCharAt(cursor - 1);
+//															cursor -= 1;
+//														}
+//														// end of an embedded sentence
+//														if(cursor < srcText.length() - 1) {
+//															srcText.deleteCharAt(cursor - 1);
+//															cursor -= 1;
+//															if (srcText.charAt(cursor + 1) != ' ') {
+//																srcText.insert(cursor + 1, ' ');
+//															}
+//														}
+//													}
+//												}
+//											}
+//										} else {
+//											// default case
+//											if(cursor < srcText.length() - 1) {
+//												if ((Character.isWhitespace(srcText.charAt(cursor + 1))) || (srcText.charAt(cursor + 1) == '\u00A0')) {
+//													srcText.deleteCharAt(cursor + 1);
+//												}
+//												// end of abbreviation
+//												if ((Pattern.compile("([a-zA-Z]{1,3}\\.[\\s ]?)+").matcher(srcText.subSequence(cursor - 4, cursor - 1)).find() == true) && (Character.isLowerCase(srcText.charAt(cursor + 1)))) {
+//													srcText.insert(cursor + 1, ' ');
+//												}
+//												// end of a sentence
+//												if (Character.isUpperCase(srcText.charAt(cursor + 1))) {
+//													srcText.insert(cursor + 1, ' ');
+//												}
+//											}
+//											if (cursor > 0) {
+//												if ((Character.isWhitespace(srcText.charAt(cursor - 1))) || (srcText.charAt(cursor - 1) == '\u00A0')) {
+//													// end of a sentence
+//													if (cursor == srcText.length() - 1) {
+//														srcText.deleteCharAt(cursor - 1);
+//														cursor -= 1;
+//														srcText.deleteCharAt(cursor);
+//														srcText.insert(cursor - 1, '.');
+//													} else {
+//														// period is a decimal marker
+//														if ((cursor < srcText.length() - 1) && (!Character.isDigit(srcText.charAt(cursor - 1))) && (Character.isDigit(srcText.charAt(cursor + 1)))) {
+//															srcText.deleteCharAt(cursor - 1);
+//															cursor -= 1;
+//														}
+//														// end of an embedded sentence
+//														if(cursor < srcText.length() - 1) {
+//															srcText.deleteCharAt(cursor - 1);
+//															cursor -= 1;
+//															if (srcText.charAt(cursor + 1) != ' ') {
+//																srcText.insert(cursor + 1, ' ');
+//															}
+//															// move period inside quotes
+//															srcText.deleteCharAt(cursor);
+//															srcText.insert(cursor - 1, '.');
+//														}
+//													}
+//												}
+//											}
+//										}
+//									} // end isBeforeQuote
+//									break;
+//								case '\u002C': // comma ","
+//									break;
+//								case '\u003B': // semicolon ";"
+//									break;
+//								case '\u003A': // colon ":"
+//									break;
+//								case '\u0021': // exclamation mark "!"
+//									break;
+//								case '\u00A1': // inverted exclamation mark "¡"
+//									break;
+//								case '\u003F': // question mark "?"
+//									break;
+//								case '\u00BF': // inverted question mark "¿"
+//									break;
+//								default:
+//									break;
+//							}
+//						}
+//					}
+//				} else { // end PUNCTUATION
+//					// Quotation
+//					if (nearPunc >= -1) {
+//						// check proximity backwards
+//						proxyCheck = cursor;
+//						while((proxyCheck > 0) && ((cursor - proxyCheck) < proximityThreshold) && (isNearPuncuation == false)) {
+//							proxyCheck -= 1;
+//							if(PUNCTUATION.indexOf(srcText.charAt(proxyCheck)) != -1) {
+//								nearPunc = proxyCheck;
+//								isNearPuncuation = true;
+//								puncCh = srcText.charAt(proxyCheck);
+//								break;
+//							}
+//						}
+//						// check proximity forwards
+//						proxyCheck = cursor;
+//						while((proxyCheck < srcText.length() - 1) && ((proxyCheck - cursor) < proximityThreshold) && (isNearPuncuation == false)) {
+//							proxyCheck += 1;
+//							if(PUNCTUATION.indexOf(srcText.charAt(proxyCheck)) != -1) {
+//								nearPunc = proxyCheck;
+//								isNearPuncuation = true;
+//								puncCh = srcText.charAt(proxyCheck);
+//								break;
+//							}
+//						}
+//						// TODO: punctuation is both back and forwards.
+//						
+//						// TODO: process QUOTES based on rules and known attributes
+//						if(isNearPuncuation == false) {
+//							if (doQuotes == true) {
+//								// TODO: treat QUOTES according to rules
+//							}
+//						} else {
+//							if (doQuotes == true) {
+//								// TODO: exceptions to the rules
+//							}
+//						}
+//					}
+//				} // end QUOTATION
+//				
+//				// reset booleans
+//				quoteChBefore = 0;
+//				quoteChAfter = 0;
+//				puncCh = 0;
+//				nearQuote = -1;
+//				nearPunc = -1;			
+//				isPunctuation = false;
+//				isQuote = false;
+//				isNearQuote = false;
+//				isBeforeQuote = false;
+//				isAfterQuote = false;
+//				isNearPuncuation = false;
+//				
+//			} // end MARKS
+//			
+//			// iterate
+//			cursor += 1;
+//		}
+//		
+//		// save updated strings
+//		seg.getContent().setCodedText(srcText.toString());
 	}
 	
 	/**

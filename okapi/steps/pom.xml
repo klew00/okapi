@@ -25,6 +25,7 @@
 		<module>fullwidthconversion</module>
 		<module>generatesimpletm</module>
 		<module>imagemodification</module>
+		<module>languagetool</module>
 		<module>leveraging</module>
 		<module>linebreakconversion</module>
         <module>moses</module>
