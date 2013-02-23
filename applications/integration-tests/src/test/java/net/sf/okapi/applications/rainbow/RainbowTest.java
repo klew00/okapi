@@ -213,13 +213,13 @@ public class RainbowTest {
     	return fc.compareFilesPerLines(outputPath, goldPath, encoding);
     }
 
-    private boolean compareWithGoldFile (String outputBase,
-    	String goldBase)
-    {
-		String outputPath = root + File.separator + outputBase;
-		String goldPath = root + File.separator + "gold" + File.separator + goldBase;
-		return fc.filesExactlyTheSame(outputPath, goldPath);
-	}        
+//    private boolean compareWithGoldFile (String outputBase,
+//    	String goldBase)
+//    {
+//		String outputPath = root + File.separator + outputBase;
+//		String goldPath = root + File.separator + "gold" + File.separator + goldBase;
+//		return fc.filesExactlyTheSame(outputPath, goldPath);
+//	}        
     
     private boolean deleteOutputFile (String filename) {
     	File f = new File(root + File.separator + filename);

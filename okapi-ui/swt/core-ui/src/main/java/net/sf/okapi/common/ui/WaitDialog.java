@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2011 by the Okapi Framework contributors
+  Copyright (C) 2011-2013 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -99,7 +99,8 @@ public class WaitDialog implements IWaitDialog {
 
 	@Override
 	public int waitForUserInput (String message,
-		String okLabel) {
+		String okLabel)
+	{
 		result = 0;
 		createDialog("Waiting User Input", message, okLabel);
 		shell.open();

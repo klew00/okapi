@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2011 by the Okapi Framework contributors
+  Copyright (C) 2011-2013 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -26,6 +26,12 @@ package net.sf.okapi.common;
  */
 public interface IWaitDialog {
 
+	/**
+	 * Opens a dialog or prompt and waits for the user input.
+	 * @param message the message to display.
+	 * @param okLabel the label to display for the OK button.
+	 * @return 0 if the user cancels, a positive value otherwise.
+	 */
 	public int waitForUserInput (String message,
 		String okLabel);
 
