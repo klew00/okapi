@@ -137,8 +137,14 @@ public class TradosAnalysisStep extends BasePipelineStep{
 		TradosUtils.deleteLogIfRequested( (!params.getAppendToLog()), logToOpen);
 		Util.createDirectories(logToOpen);
 		
+		int taskCount=1;
+		if (params.getExportUnknown()) 
+			taskCount++;
+		if (params.isCreatePrjTm()) 
+			taskCount++;		
+		
 		job.append("LogFile="+logToOpen+"\n");
-		job.append("Tasks="+(params.getExportUnknown() ? 2 : 1)+"\n");
+		job.append("Tasks=" + taskCount + "\n");
 		job.append("[Task1]\n");
 		job.append("Task=Analyse\n");
 		job.append("Files="+inputFiles.size()+"\n");
@@ -148,7 +154,7 @@ public class TradosAnalysisStep extends BasePipelineStep{
 			job.append("File"+i+"="+file+"\n");
 			i++;
 		}
-		
+
 		//--add ExportUnknown task if selected--
 		String tmxOutput = Util.fillRootDirectoryVariable(params.getTmxPath(), rootDir);
 		tmxOutput = Util.fillInputRootDirectoryVariable(tmxOutput, inputRootDir);
@@ -156,11 +162,28 @@ public class TradosAnalysisStep extends BasePipelineStep{
 		Util.createDirectories(tmxOutput);
 		
 		if ( params.getExportUnknown() ) {
+
 			job.append("[Task2]\n");
 			job.append("Task=ExportUnknown\n");
 			job.append("MaxMatch="+params.getMaxMatch()+"\n");
 			job.append("File="+tmxOutput+"\n");
 			job.append("FileType=5\n");					
+		}
+		
+		if ( params.isCreatePrjTm() ) {
+
+			String tmOutput = Util.fillRootDirectoryVariable(params.getPrjTmPath(), rootDir);
+			tmOutput = Util.fillInputRootDirectoryVariable(tmOutput, inputRootDir);
+			tmOutput = LocaleId.replaceVariables(tmOutput, sourceLocale, targetLocale);
+			Util.createDirectories(tmOutput);
+			
+			if (params.getExportUnknown()){
+				job.append("[Task3]\n");				
+			}else{
+				job.append("[Task2]\n");
+			}
+			job.append("Task=CreateProjectTM\n");
+			job.append("File="+tmOutput+"\n");
 		}
 		
 		File jobFile;
