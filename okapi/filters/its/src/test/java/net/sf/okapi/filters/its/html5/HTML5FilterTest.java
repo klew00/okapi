@@ -491,7 +491,7 @@ public class HTML5FilterTest {
 	public void testAddITSAnnotations2 () {
 		String snippet = "<!DOCTYPE html>\n<html lang=en><head><meta charset=utf-8><title>Title</title></head><body>"
 			+ "<p>Text1 text2 text3</p>"
-			+ "</body></html>";
+			+ "\n</body></html>";
 		ArrayList<Event> list = getEvents(snippet);
 		ITextUnit tu = FilterTestDriver.getTextUnit(list, 2);
 		addStandoffAnnotations(tu);
@@ -499,7 +499,7 @@ public class HTML5FilterTest {
 		String expected = "<!DOCTYPE html>\n<html lang=\"en\"><head><meta charset=\"UTF-8\"><title>Title</title></head><body>"
 			+ "<p><span its-provenance-records-ref=\"#myProv\">Text1</span> "
 			+ "<span its-loc-quality-issues-ref=\"#myLqi\""
-			+ ">text2</span> text3</p>"
+			+ ">text2</span> text3</p>\n"
 			+ "<script id=\"myLqi\" type=\"application/its+xml\">\n"
 			+ "<its:locQualityIssues xmlns:its=\"http://www.w3.org/2005/11/its\" version=\"2.0\" xml:id=\"myLqi\">\n"
 			+ "<its:locQualityIssue locQualityIssueComment=\"comment1\"/>\n"

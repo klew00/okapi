@@ -683,6 +683,13 @@ public abstract class ITSFilter implements IFilter {
 					addTextUnit(node, false);
 				}
 				// Add the marker for the standoff markup location
+				// First: flush any existing skeleton parts
+				if ( !skel.isEmpty() ) {
+					DocumentPart dp = new DocumentPart(otherId.createId(), false, skel);
+					queue.add(new Event(EventType.DOCUMENT_PART, dp));
+					skel = new GenericSkeleton();
+				}
+				// Then create the skeleton with the placeholder
 				skel.add(ITSContent.STANDOFFMARKER);
 				DocumentPart dp = new DocumentPart(otherId.createId(), false, skel);
 				queue.add(new Event(EventType.DOCUMENT_PART, dp));
