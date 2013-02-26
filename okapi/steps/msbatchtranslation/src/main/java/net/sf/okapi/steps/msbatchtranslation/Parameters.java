@@ -264,7 +264,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		desc.add(CLIENTID, "Client ID", "Client ID in Microsoft Azure Marketplace");
 		desc.add(SECRET, "Client Secret", "Client Secret from Microsoft Azure Marketplace");
 		desc.add(CATEGORY, "Category", "Category code if accessing a trained system");
-		desc.add(CONFIGPATH, "Engines", "Full path of the file listing the engines");		
+		desc.add(CONFIGPATH, "Engine mapping", "Full path of the properties file listing the engines");		
 		desc.add(MAXEVENTS, "Events buffer", "Number of events to store before sending a query");
 		desc.add(MAXMATCHES, "Maximum matches", "Maximum number of matches allowed");
 		desc.add(THRESHOLD, "Threshold", "Score below which matches are not retained");

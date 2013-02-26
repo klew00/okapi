@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009-2010 by the Okapi Framework contributors
+  Copyright (C) 2009-2013 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -194,7 +194,7 @@ public class MyMemoryTMConnector extends BaseConnector implements ITMQuery {
 			current = 0;
 		}
 		catch ( Throwable e ) {
-			throw new RuntimeException("Error querying the server." + e.getMessage(), e);
+			throw new RuntimeException("Error querying the server.\n" + e.getMessage(), e);
 		}
 		if ( results.size() > 0 ) current = 0;
 		return results.size();

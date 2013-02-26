@@ -145,58 +145,63 @@ public class MSBatchTranslationStep extends BasePipelineStep {
 		this.params = (Parameters)params;
 	}
 	
-	public String getCategory(String key){
+	private String getCategory (String key) {
 		String parsedKey;
 		//--Check if Predefined--
-		if (key != null && key.contains("@@@")){
+		if ( key != null && key.contains("@@@") ) {
 			//--parse key--
 			Pattern pattern = Pattern.compile("@@@(.+?)@@@");
 	        Matcher matcher = pattern.matcher(key);
-	        if(matcher.find()){
+	        if ( matcher.find() ) {
 	        	parsedKey = matcher.group(1);
-	        }else{
+	        }
+	        else {
 				//--can't parse string--
 				logger.error("Not able to parse predefined engine string: "+ key + ". Using empty category");
 				return "";
 	        }
 	        //--locate in properties file--
-	        if(params.getConfigPath()!=null && params.getConfigPath().trim().length() > 0){
+	        if (( params.getConfigPath() != null ) && ( params.getConfigPath().trim().length() > 0 )) {
 	        	Properties prop = new Properties();
 	        	String keyWithLoc;
 	        	try {
 	        		prop.load(new FileInputStream(params.getConfigPath()));
 	        		keyWithLoc = parsedKey + "." + targetLocale.toJavaLocale().getLanguage().toUpperCase();
 	        		String category = prop.getProperty(keyWithLoc);
-	        		if(category != null){
+	        		if ( category != null ) {
 	        			logger.info("Found engine "+ keyWithLoc +". Using category: "+ category);
 	        			return Base64.decodePassword(category);
-	        		}else{
+	        		}
+	        		else {
 	        			logger.warn("Can't find engine "+ keyWithLoc + ". Try fallback");
 	        			//--recursively try fallback--
 		        		int index = parsedKey.lastIndexOf('.');
-		        		while (index != -1){
+		        		while ( index != -1 ) {
 			        		parsedKey = parsedKey.substring(0, index);
 			        		keyWithLoc =  parsedKey + "." + targetLocale.toJavaLocale().getLanguage().toUpperCase();
 		        			category = prop.getProperty(keyWithLoc);
-		        			if(category != null){
+		        			if ( category != null ) {
 		        				logger.warn("Found fallback engine "+ keyWithLoc +". Using category: "+ category);
 		        				return Base64.decodePassword(category);
 			        		}
 		        			index = parsedKey.lastIndexOf('.');
 		        		}
 	        		}
-	        	} catch (IOException ex) {
-	        		logger.warn("Can't load: " + params.getConfigPath()+ ". Using empty category");
+	        	}
+	        	catch ( IOException ex ) {
+	        		logger.error("Can't load: " + params.getConfigPath()+ ". Using empty category");
 	        		return "";
 	            }
-	        }else{
+	        }
+	        else {
 	        	//--no property file specified--
 				logger.error("No engine property file specified. Using empty category");
 				return "";
 	        }
 	        logger.warn("No engine found. Using empty category.");
 	        return "";
-		}else{
+		}
+		else {
 			//--get the specified category
 			logger.info("Using category "+ params.getCategory());
 			return params.getCategory();

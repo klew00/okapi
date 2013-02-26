@@ -13,7 +13,7 @@ public class Manual {
 		conn.open();
 		conn.setLanguages(LocaleId.ENGLISH, LocaleId.FRENCH);
 
-		TextFragment tf = new TextFragment("Open with the application");
+		TextFragment tf = new TextFragment("Open the Download window");
 		
 		conn.query(tf);
 		while ( conn.hasNext() ) {
