@@ -70,6 +70,20 @@ public class WikiWriterTest {
 		String result = eventWriter(snippet);
 		assertEquals(expected, result);
 	}
+
+	@Test
+	public void testWhitespaces() throws IOException {
+		String snippet = " white    space!  \n";
+		String expected = " white space!  \n";
+		String result = eventWriter(snippet);
+		assertEquals(expected, result);
+		
+		filter.getParameters().fromString("{preserve_whitespace: true}");
+		result = eventWriter(snippet);
+		assertEquals(snippet, result);
+		
+		filter.getParameters().reset();
+	}
 	
 	private String eventWriter(String input) throws IOException {
 		try {

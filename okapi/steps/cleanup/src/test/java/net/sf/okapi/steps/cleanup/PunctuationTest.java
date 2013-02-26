@@ -133,37 +133,37 @@ public class PunctuationTest {
 		assertEquals("[\"t1\" l\'t2 \"t3 t4\"] [t1 \"t2\"] [t1 \'t2\' \"t3\"]", fmt.printSegmentedContent(tu.getTarget(locFR), true, true));
 	}
 
-	@Test
-	public void testSimplePunctuation() {
-		
-		TextFragment srcTf = new TextFragment("t1, 0 . 235:t2, t3, t4 ; t5 .");
-		TextFragment trgTf = new TextFragment("t1 ,235 : t2 ,t3 , t4 ;t5 . ");
-		
-		ITextUnit tu = new TextUnit("tu1");
-		TextContainer srcTc = tu.getSource();
-		srcTc.append(new Segment("seg1", srcTf));
-		
-		TextContainer trgTc = tu.createTarget(locFR, true, IResource.CREATE_EMPTY);
-		trgTc.append(new Segment("seg1", trgTf));
-		
-		if (!tu.isEmpty()) {
-			ISegments srcSegs = tu.getSourceSegments();
-			for (Segment srcSeg : srcSegs) {
-				Segment trgSeg = tu.getTargetSegment(locFR, srcSeg.getId(), false);
-				if (trgSeg != null) {
-					cleaner.normalizeMarks(tu, srcSeg, locFR);
-				}
-			}
-		}		
-		
-		assertEquals("[t1, 0.235: t2, t3, t4; t5.]", fmt.printSegmentedContent(tu.getSource(), true, false));
-		assertEquals("[t1, 0.235: t2, t3, t4; t5.]", fmt.printSegmentedContent(tu.getSource(), true, true));
-	}
+//	@Test
+//	public void testSimplePunctuation() {
+//		
+//		TextFragment srcTf = new TextFragment("t1, 0 . 235:t2, t3, t4 ; t5 .");
+//		TextFragment trgTf = new TextFragment("t1 ,235 : t2 ,t3 , t4 ;t5 . ");
+//		
+//		ITextUnit tu = new TextUnit("tu1");
+//		TextContainer srcTc = tu.getSource();
+//		srcTc.append(new Segment("seg1", srcTf));
+//		
+//		TextContainer trgTc = tu.createTarget(locFR, true, IResource.CREATE_EMPTY);
+//		trgTc.append(new Segment("seg1", trgTf));
+//		
+//		if (!tu.isEmpty()) {
+//			ISegments srcSegs = tu.getSourceSegments();
+//			for (Segment srcSeg : srcSegs) {
+//				Segment trgSeg = tu.getTargetSegment(locFR, srcSeg.getId(), false);
+//				if (trgSeg != null) {
+//					cleaner.normalizeMarks(tu, srcSeg, locFR);
+//				}
+//			}
+//		}		
+//		
+//		assertEquals("[t1, 0.235: t2, t3, t4; t5.]", fmt.printSegmentedContent(tu.getSource(), true, false));
+//		assertEquals("[t1, 0.235: t2, t3, t4; t5.]", fmt.printSegmentedContent(tu.getSource(), true, true));
+//	}
 	
 //	@Test
 //	public void testSimplePunctuationNearQuote() {
 //		
-//		TextFragment srcTf = new TextFragment("\" t1\" , 0 . 235:t2, t3, t4 ; t5 .");
+//		TextFragment srcTf = new TextFragment("\u201Ct1 . \u201D . 235:t2\" . t3, t4 ; t5\" .");
 //		TextFragment trgTf = new TextFragment("« t1 », ,235 : t2 ,t3 , t4 ;t5 . ");
 //		
 //		ITextUnit tu = new TextUnit("tu1");
@@ -178,12 +178,12 @@ public class PunctuationTest {
 //			for (Segment srcSeg : srcSegs) {
 //				Segment trgSeg = tu.getTargetSegment(locFR, srcSeg.getId(), false);
 //				if (trgSeg != null) {
-//					cleaner.normalizeMarks(tu, srcSeg, locFR, false);			
+//					cleaner.normalizeMarks(tu, srcSeg, locFR);			
 //				}
 //			}
 //		}		
 //		
-//		assertEquals("[\"t1\", 0.235: t2, t3, t4; t5.]", fmt.printSegmentedContent(tu.getSource(), true, false));
-//		assertEquals("[\"t1\", 0.235: t2, t3, t4; t5.]", fmt.printSegmentedContent(tu.getSource(), true, true));
+//		assertEquals("[\u201Ct1.\u201D .235: t2.\" t3, t4; t5.\"]", fmt.printSegmentedContent(tu.getSource(), true, false));
+//		assertEquals("[\u201Ct1.\u201D .235: t2.\" t3, t4; t5.\"]", fmt.printSegmentedContent(tu.getSource(), true, true));
 //	}
 }

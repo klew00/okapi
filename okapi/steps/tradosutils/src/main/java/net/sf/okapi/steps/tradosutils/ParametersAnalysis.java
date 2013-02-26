@@ -41,6 +41,8 @@ public class ParametersAnalysis extends BaseParameters implements IEditorDescrip
 	private static final String LOGPATH = "logPath";
 	private static final String AUTOOPENLOG = "autoOpenLog";
 	private static final String APPENDTOLOG = "appendToLog";
+	private static final String CREATEPRJTM = "createPrjTm";
+	private static final String PRJTMPATH = "prjTmPath";
 	private static final String EXPORTUNKNOWN = "exportUnknown";
 	private static final String TMXPATH = "tmxPath";	
 	private static final String MAXMATCH = "maxMatch";
@@ -52,11 +54,29 @@ public class ParametersAnalysis extends BaseParameters implements IEditorDescrip
 	private String logPath;
 	private String tmxPath;
 	private String existingTm;
+	private boolean createPrjTm;
+	private String prjTmPath;
 	private boolean exportUnknown;
 	private boolean useExisting;
 	private boolean autoOpenLog;
 	private boolean appendToLog;
 	private boolean sendTmx;
+
+	public String getPrjTmPath() {
+		return prjTmPath;
+	}
+
+	public void setPrjTmPath(String prjTmPath) {
+		this.prjTmPath = prjTmPath;
+	}
+
+	public boolean isCreatePrjTm() {
+		return createPrjTm;
+	}
+
+	public void setCreatePrjTm(boolean createPrjTm) {
+		this.createPrjTm = createPrjTm;
+	}
 
 	public String getUser() {
 		return user;
@@ -159,6 +179,8 @@ public class ParametersAnalysis extends BaseParameters implements IEditorDescrip
 		logPath = Util.INPUT_ROOT_DIRECTORY_VAR+"/log.txt";
 		autoOpenLog = false;
 		appendToLog = true;
+		createPrjTm = false;
+		prjTmPath = Util.INPUT_ROOT_DIRECTORY_VAR+"/project.tmw";
 		exportUnknown = false;
 		tmxPath = Util.INPUT_ROOT_DIRECTORY_VAR+"/unknownSegments.tmx";
 		maxMatch = 90;
@@ -175,6 +197,8 @@ public class ParametersAnalysis extends BaseParameters implements IEditorDescrip
 		logPath = buffer.getString(LOGPATH, logPath);
 		autoOpenLog = buffer.getBoolean(AUTOOPENLOG, autoOpenLog);
 		appendToLog = buffer.getBoolean(APPENDTOLOG, appendToLog);
+		createPrjTm = buffer.getBoolean(CREATEPRJTM, createPrjTm);
+		prjTmPath = buffer.getString(PRJTMPATH, prjTmPath);
 		exportUnknown = buffer.getBoolean(EXPORTUNKNOWN, exportUnknown);
 		tmxPath = buffer.getString(TMXPATH, tmxPath);
 		maxMatch = buffer.getInteger(MAXMATCH, maxMatch);
@@ -193,6 +217,8 @@ public class ParametersAnalysis extends BaseParameters implements IEditorDescrip
 		buffer.setBoolean(AUTOOPENLOG, autoOpenLog);
 		buffer.setBoolean(APPENDTOLOG, appendToLog);
 
+		buffer.setBoolean(CREATEPRJTM, createPrjTm);
+		buffer.setString(PRJTMPATH, prjTmPath);
 		buffer.setBoolean(EXPORTUNKNOWN, exportUnknown);
 		buffer.setString(TMXPATH, tmxPath);
 		buffer.setInteger(MAXMATCH, maxMatch);
@@ -212,6 +238,8 @@ public class ParametersAnalysis extends BaseParameters implements IEditorDescrip
 		desc.add(APPENDTOLOG, "Append to the log file if one exists already", null);
 		desc.add(AUTOOPENLOG, "Open the log file after completion", null);
 
+		desc.add(CREATEPRJTM, "Create project TM:", null);
+		desc.add(PRJTMPATH, "Full path of the new Trados project TM to create", "Full path of the new Trados project TM to create");
 		desc.add(EXPORTUNKNOWN, "Export unknown segments:", null);
 		desc.add(TMXPATH, "Full path of the new TMX document to create", "Full path of the new TMX document to create");
 		desc.add(MAXMATCH, "Export threshold", "Export segments with no match above this threshold");
@@ -248,6 +276,13 @@ public class ParametersAnalysis extends BaseParameters implements IEditorDescrip
 
 		cbp = desc.addCheckboxPart(paramDesc.get(AUTOOPENLOG));
 
+		desc.addSeparatorPart();
+
+		cbp = desc.addCheckboxPart(paramDesc.get(CREATEPRJTM));
+		pip = desc.addPathInputPart(paramDesc.get(PRJTMPATH), "TM Path", true);
+		pip.setMasterPart(cbp, true);
+		pip.setWithLabel(false);
+		
 		desc.addSeparatorPart();
 		
 		cbp = desc.addCheckboxPart(paramDesc.get(EXPORTUNKNOWN));

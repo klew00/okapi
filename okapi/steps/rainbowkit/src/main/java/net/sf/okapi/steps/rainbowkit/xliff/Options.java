@@ -126,7 +126,7 @@ public class Options extends BaseParameters implements IEditorDescriptionProvide
 		desc.add(PLACEHOLDERMODE, "Use <g></g> and <x/> notation", null);
 		desc.add(INCLUDENOTRANSLATE, "Include non-translatable text units", null);
 		desc.add(SETAPPROVEDASNOTRANSLATE, "Set approved entries as non-translatable", null);
-		desc.add(COPYSOURCE, "Copy source text in target if no traget is available", null);
+		desc.add(COPYSOURCE, "Copy source text in target if no target is available", null);
 		desc.add(INCLUDEALTTRANS, "Include <alt-trans> elements", null);
 		return desc;
 	}
