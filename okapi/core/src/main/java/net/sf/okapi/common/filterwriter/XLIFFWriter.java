@@ -207,6 +207,7 @@ public class XLIFFWriter implements IFilterWriter {
 		writer.writeAttributeString("xmlns", NS_XLIFF12);
 		writer.writeAttributeString("xmlns:okp", NS_XLIFFOKAPI); 
 		writer.writeAttributeString("xmlns:its", NS_ITS20); 
+		writer.writeAttributeString("its:version", "2.0"); 
 
 		if ( !Util.isEmpty(message) ) {
 			writer.writeLineBreak();

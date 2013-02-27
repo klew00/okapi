@@ -32,7 +32,9 @@ import net.sf.okapi.common.TestUtil;
 import net.sf.okapi.common.annotation.GenericAnnotation;
 import net.sf.okapi.common.annotation.GenericAnnotationType;
 import net.sf.okapi.common.annotation.GenericAnnotations;
+import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.ITextUnit;
+import net.sf.okapi.common.resource.InlineAnnotation;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextFragment.TagType;
@@ -65,7 +67,8 @@ public class XLIFFWriterTest {
 		
 		String result = readFile(root+"out.xlf");
 		assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-			+ "<xliff version=\"1.2\" xmlns=\"urn:oasis:names:tc:xliff:document:1.2\" xmlns:okp=\"okapi-framework:xliff-extensions\" xmlns:its=\"http://www.w3.org/2005/11/its\">\n"
+			+ "<xliff version=\"1.2\" xmlns=\"urn:oasis:names:tc:xliff:document:1.2\" xmlns:okp=\"okapi-framework:xliff-extensions\"" +
+			" xmlns:its=\"http://www.w3.org/2005/11/its\" its:version=\"2.0\">\n"
 			+ "<file original=\"unknown\" source-language=\"en\" datatype=\"x-undefined\">\n"
 			+ "<body>\n</body>\n</file>\n</xliff>\n", result);
 	}
@@ -79,7 +82,8 @@ public class XLIFFWriterTest {
 		
 		String result = readFile(root+"out.xlf");
 		assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-			+ "<xliff version=\"1.2\" xmlns=\"urn:oasis:names:tc:xliff:document:1.2\" xmlns:okp=\"okapi-framework:xliff-extensions\" xmlns:its=\"http://www.w3.org/2005/11/its\">\n"
+			+ "<xliff version=\"1.2\" xmlns=\"urn:oasis:names:tc:xliff:document:1.2\" xmlns:okp=\"okapi-framework:xliff-extensions\"" +
+			" xmlns:its=\"http://www.w3.org/2005/11/its\" its:version=\"2.0\">\n"
 			+ "<file original=\"original.ext\" source-language=\"en\" datatype=\"x-undefined\">\n"
 			+ "<body>\n</body>\n</file>\n</xliff>\n", result);
 	}
@@ -95,7 +99,8 @@ public class XLIFFWriterTest {
 		
 		String result = readFile(root+"out.xlf");
 		assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-			+ "<xliff version=\"1.2\" xmlns=\"urn:oasis:names:tc:xliff:document:1.2\" xmlns:okp=\"okapi-framework:xliff-extensions\" xmlns:its=\"http://www.w3.org/2005/11/its\">\n"
+			+ "<xliff version=\"1.2\" xmlns=\"urn:oasis:names:tc:xliff:document:1.2\" xmlns:okp=\"okapi-framework:xliff-extensions\"" +
+			" xmlns:its=\"http://www.w3.org/2005/11/its\" its:version=\"2.0\">\n"
 			+ "<file original=\"unknown\" source-language=\"en\" datatype=\"x-undefined\">\n"
 			+ "<header><phase-group phase-name=\"a\" process-name=\"b\"/></header>\n"
 			+ "<body>\n</body>\n</file>\n</xliff>\n", result);
@@ -112,7 +117,8 @@ public class XLIFFWriterTest {
 
 		String result = readFile(root+"out.xlf");
 		assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-			+ "<xliff version=\"1.2\" xmlns=\"urn:oasis:names:tc:xliff:document:1.2\" xmlns:okp=\"okapi-framework:xliff-extensions\" xmlns:its=\"http://www.w3.org/2005/11/its\">\n"
+			+ "<xliff version=\"1.2\" xmlns=\"urn:oasis:names:tc:xliff:document:1.2\" xmlns:okp=\"okapi-framework:xliff-extensions\"" +
+			" xmlns:its=\"http://www.w3.org/2005/11/its\" its:version=\"2.0\">\n"
 			+ "<file original=\"original.ext\" source-language=\"en\" datatype=\"x-undefined\">\n"
 			+ "<body>\n"
 			+ "<trans-unit id=\"tu1\">\n"
@@ -158,7 +164,8 @@ public class XLIFFWriterTest {
 
 		String result = readFile(root+"out.xlf");
 		assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-			+ "<xliff version=\"1.2\" xmlns=\"urn:oasis:names:tc:xliff:document:1.2\" xmlns:okp=\"okapi-framework:xliff-extensions\" xmlns:its=\"http://www.w3.org/2005/11/its\">\n"
+			+ "<xliff version=\"1.2\" xmlns=\"urn:oasis:names:tc:xliff:document:1.2\" xmlns:okp=\"okapi-framework:xliff-extensions\"" +
+			" xmlns:its=\"http://www.w3.org/2005/11/its\" its:version=\"2.0\">\n"
 			+ "<file original=\"unknown\" source-language=\"en\" target-language=\"fr\" datatype=\"x-undefined\">\n"
 			+ "<body>\n<trans-unit id=\"tu1\">\n"
 			+ "<source xml:lang=\"en\"><mrk its:locQualityIssuesRef=\"#VARID\" mtype=\"x-its\">t1</mrk> t2</source>\n"
@@ -209,7 +216,8 @@ public class XLIFFWriterTest {
 
 		String result = readFile(root+"out.xlf");
 		assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-			+ "<xliff version=\"1.2\" xmlns=\"urn:oasis:names:tc:xliff:document:1.2\" xmlns:okp=\"okapi-framework:xliff-extensions\" xmlns:its=\"http://www.w3.org/2005/11/its\">\n"
+			+ "<xliff version=\"1.2\" xmlns=\"urn:oasis:names:tc:xliff:document:1.2\" xmlns:okp=\"okapi-framework:xliff-extensions\"" +
+			" xmlns:its=\"http://www.w3.org/2005/11/its\" its:version=\"2.0\">\n"
 			+ "<file original=\"unknown\" source-language=\"en\" target-language=\"fr\" datatype=\"x-undefined\">\n"
 			+ "<body>\n<trans-unit id=\"tu1\">\n"
 			+ "<source xml:lang=\"en\" its:term=\"yes\" its:termConfidence=\"0.5\" its:termInfoRef=\"info\">"
@@ -254,7 +262,8 @@ public class XLIFFWriterTest {
 		
 		String result = readFile(root+"out.xlf");
 		assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-			+ "<xliff version=\"1.2\" xmlns=\"urn:oasis:names:tc:xliff:document:1.2\" xmlns:okp=\"okapi-framework:xliff-extensions\" xmlns:its=\"http://www.w3.org/2005/11/its\">\n"
+			+ "<xliff version=\"1.2\" xmlns=\"urn:oasis:names:tc:xliff:document:1.2\" xmlns:okp=\"okapi-framework:xliff-extensions\"" +
+			" xmlns:its=\"http://www.w3.org/2005/11/its\" its:version=\"2.0\">\n"
 			+ "<file original=\"unknown\" source-language=\"en\" target-language=\"fr\" datatype=\"x-undefined\">\n"
 			+ "<body>\n<trans-unit id=\"tu1\">\n"
 			+ "<source xml:lang=\"en\"><mrk its:locQualityIssuesRef=\"#VARID\" mtype=\"x-its\">Span 1</mrk> "
@@ -296,7 +305,8 @@ public class XLIFFWriterTest {
 
 		String result = readFile(root+"out.xlf");
 		assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-			+ "<xliff version=\"1.2\" xmlns=\"urn:oasis:names:tc:xliff:document:1.2\" xmlns:okp=\"okapi-framework:xliff-extensions\" xmlns:its=\"http://www.w3.org/2005/11/its\">\n"
+			+ "<xliff version=\"1.2\" xmlns=\"urn:oasis:names:tc:xliff:document:1.2\" xmlns:okp=\"okapi-framework:xliff-extensions\"" +
+			" xmlns:its=\"http://www.w3.org/2005/11/its\" its:version=\"2.0\">\n"
 			+ "<file original=\"original.ext\" source-language=\"en\" datatype=\"x-undefined\">\n"
 			+ "<body>\n"
 			+ "<trans-unit id=\"tu1\">\n"
@@ -321,7 +331,8 @@ public class XLIFFWriterTest {
 
 		String result = readFile(root+"out.xlf");
 		assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-			+ "<xliff version=\"1.2\" xmlns=\"urn:oasis:names:tc:xliff:document:1.2\" xmlns:okp=\"okapi-framework:xliff-extensions\" xmlns:its=\"http://www.w3.org/2005/11/its\">\n"
+			+ "<xliff version=\"1.2\" xmlns=\"urn:oasis:names:tc:xliff:document:1.2\" xmlns:okp=\"okapi-framework:xliff-extensions\"" +
+			" xmlns:its=\"http://www.w3.org/2005/11/its\" its:version=\"2.0\">\n"
 			+ "<file original=\"original.ext\" source-language=\"en\" datatype=\"x-undefined\">\n"
 			+ "<body>\n"
 			+ "<trans-unit id=\"tu1\">\n"
@@ -342,7 +353,8 @@ public class XLIFFWriterTest {
 
 		String result = readFile(root+"out.xlf");
 		assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-			+ "<xliff version=\"1.2\" xmlns=\"urn:oasis:names:tc:xliff:document:1.2\" xmlns:okp=\"okapi-framework:xliff-extensions\" xmlns:its=\"http://www.w3.org/2005/11/its\">\n"
+			+ "<xliff version=\"1.2\" xmlns=\"urn:oasis:names:tc:xliff:document:1.2\" xmlns:okp=\"okapi-framework:xliff-extensions\"" +
+			" xmlns:its=\"http://www.w3.org/2005/11/its\" its:version=\"2.0\">\n"
 			+ "<file original=\"original.ext\" source-language=\"en\" datatype=\"x-undefined\">\n"
 			+ "<body>\n"
 			+ "<trans-unit id=\"tu1\">\n"
@@ -363,7 +375,8 @@ public class XLIFFWriterTest {
 
 		String result = readFile(root+"out.xlf");
 		assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-			+ "<xliff version=\"1.2\" xmlns=\"urn:oasis:names:tc:xliff:document:1.2\" xmlns:okp=\"okapi-framework:xliff-extensions\" xmlns:its=\"http://www.w3.org/2005/11/its\">\n"
+			+ "<xliff version=\"1.2\" xmlns=\"urn:oasis:names:tc:xliff:document:1.2\" xmlns:okp=\"okapi-framework:xliff-extensions\"" +
+			" xmlns:its=\"http://www.w3.org/2005/11/its\" its:version=\"2.0\">\n"
 			+ "<file original=\"original.ext\" source-language=\"en\" target-language=\"fr\" datatype=\"x-undefined\">\n"
 			+ "<body>\n"
 			+ "<trans-unit id=\"tu1\">\n"
@@ -385,7 +398,8 @@ public class XLIFFWriterTest {
 
 		String result = readFile(root+"out.xlf");
 		assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-			+ "<xliff version=\"1.2\" xmlns=\"urn:oasis:names:tc:xliff:document:1.2\" xmlns:okp=\"okapi-framework:xliff-extensions\" xmlns:its=\"http://www.w3.org/2005/11/its\">\n"
+			+ "<xliff version=\"1.2\" xmlns=\"urn:oasis:names:tc:xliff:document:1.2\" xmlns:okp=\"okapi-framework:xliff-extensions\"" +
+			" xmlns:its=\"http://www.w3.org/2005/11/its\" its:version=\"2.0\">\n"
 			+ "<!--messageValue-->\n"
 			+ "<file original=\"original.ext\" source-language=\"en\" target-language=\"fr\" datatype=\"x-dtValue\">\n"
 			+ "<header><skl><external-file href=\"skel.skl\"></external-file></skl></header>\n"
@@ -412,7 +426,8 @@ public class XLIFFWriterTest {
 
 		String result = readFile(root+"out.xlf");
 		assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-			+ "<xliff version=\"1.2\" xmlns=\"urn:oasis:names:tc:xliff:document:1.2\" xmlns:okp=\"okapi-framework:xliff-extensions\" xmlns:its=\"http://www.w3.org/2005/11/its\">\n"
+			+ "<xliff version=\"1.2\" xmlns=\"urn:oasis:names:tc:xliff:document:1.2\" xmlns:okp=\"okapi-framework:xliff-extensions\"" +
+			" xmlns:its=\"http://www.w3.org/2005/11/its\" its:version=\"2.0\">\n"
 			+ "<file original=\"original.ext\" source-language=\"en\" datatype=\"x-undefined\">\n"
 			+ "<body>\n"
 			+ "<trans-unit id=\"tu1\" okp:itsDomain=\"dom1, dom2\" okp:itsExternalResourceRef=\"http://example.com/res\">\n"
@@ -421,6 +436,69 @@ public class XLIFFWriterTest {
 			+ "</body>\n</file>\n</xliff>\n", result);
 	}
 	
+	@Test
+	public void testVariousITSAnnotations ()
+		throws IOException
+	{
+		writer.create(root+"out.xlf", null, locEN, locFR, null, "original.ext", null);
+		writer.writeStartFile(null, null, null);
+		
+		ITextUnit tu = new TextUnit("tu1");
+		TextFragment tf = tu.getSource().getFirstSegment().getContent();
+		tf.append("Text ");
+		
+		// Translate:
+		// There is no pre-defined annotation for Translate because the filters usually convert the not-transltable content into code
+		// But you can add an mrk element for this this way:
+		// Add the starting code for the original starting tag
+		Code code = tf.append(TagType.OPENING, "span", "<its:span translate='no'>");
+		// Set a general annotation of type 'protected', this will get you an mrk with mtype='protected'
+		code.setAnnotation("protected", new InlineAnnotation("protected"));
+		// Add the text not to translate
+		tf.append("DO-NOT-TRANSLATE");
+		// Add the original closing tag 
+		tf.append(TagType.CLOSING, "span", "</its:span>");
+		
+		// Terminology:
+		// There is a pre-define annotation for Terminology: GenericAnnotationType.TERM 
+		tf.append(" term");
+		GenericAnnotations anns = new GenericAnnotations(
+			new GenericAnnotation(GenericAnnotationType.TERM,
+				GenericAnnotationType.TERM_INFO, "Definition of 'term'"));
+		// Annotate using offsets
+		// Each inline code takes 2 chars. so:
+		// Text ##DO-NOT-TRANSLATE## term
+		// 0123456789012345678901234567890
+		tf.annotate(26, 30, GenericAnnotationType.GENERIC, anns);
+		
+		// Localization Note
+		tf.append(" etc.");
+		anns = new GenericAnnotations(
+			new GenericAnnotation(GenericAnnotationType.LOCNOTE,
+				GenericAnnotationType.LOCNOTE_TYPE, "alert",
+				GenericAnnotationType.LOCNOTE_VALUE, "Text of the localization note."));
+		// Text ##DO-NOT-TRANSLATE## ##term## etc.
+		// 0123456789012345678901234567890123456789
+		tf.annotate(35, 39, GenericAnnotationType.GENERIC, anns);
+		
+		writer.writeTextUnit(tu);
+		writer.writeEndFile();
+		writer.close();		
+
+		String result = readFile(root+"out.xlf");
+		assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+			+ "<xliff version=\"1.2\" xmlns=\"urn:oasis:names:tc:xliff:document:1.2\" xmlns:okp=\"okapi-framework:xliff-extensions\"" +
+			" xmlns:its=\"http://www.w3.org/2005/11/its\" its:version=\"2.0\">\n"
+			+ "<file original=\"unknown\" source-language=\"en\" target-language=\"fr\" datatype=\"x-undefined\">\n"
+			+ "<body>\n<trans-unit id=\"tu1\">\n"
+			+ "<source xml:lang=\"en\">Text <g id=\"1\"><mrk mtype=\"protected\">DO-NOT-TRANSLATE</g> <mrk comment=\"Definition of 'term'\"" +
+			" mtype=\"term\">term</mrk> <mrk comment=\"Text of the localization note.\" okp:itsLocNoteType=\"alert\" mtype=\"x-its\">etc.</mrk></source>\n"
+			+ "<target xml:lang=\"fr\">Text <g id=\"1\"><mrk mtype=\"protected\">DO-NOT-TRANSLATE</g> <mrk comment=\"Definition of 'term'\"" +
+			" mtype=\"term\">term</mrk> <mrk comment=\"Text of the localization note.\" okp:itsLocNoteType=\"alert\" mtype=\"x-its\">etc.</mrk></target>\n"
+			+ "</trans-unit>\n"
+			+ "</body>\n</file>\n</xliff>\n", result);
+	}
+
 	private String readFile (String path)
 		throws IOException
 	{
