@@ -122,7 +122,8 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		desc.add(EXTRACTNOTES, "Extract notes", null);
 		desc.add(EXTRACTMASTERSPREADS, "Extract master spreads", null);
 		desc.add(SIMPLIFYCODES, "Simplify inline codes when possible", null);
-		desc.add(NEWTUONBR, "Create new paragraphs on hard returns (<Br/> elements) [BETA]", null);
+		desc.add(NEWTUONBR, "Create new paragraphs on hard returns [IMPORTANT: STILL BETA! May prevent merge!]",
+			"Option is BETA and may prevent you to merge back. Make sure to test round-trip!");
 		desc.add(SKIPTHRESHOLD, "Maximum spread size", "Skip any spread larger than the given value (in Kbytes)");
 		return desc;
 	}
@@ -136,7 +137,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		desc.addSeparatorPart();
 		
 		desc.addCheckboxPart(paramsDesc.get(SIMPLIFYCODES));
-//TODO: NOT READY YET		desc.addCheckboxPart(paramsDesc.get(NEWTUONBR));
+		desc.addCheckboxPart(paramsDesc.get(NEWTUONBR));
 		desc.addSeparatorPart();
 		
 		SpinInputPart sip = desc.addSpinInputPart(paramsDesc.get(SKIPTHRESHOLD));
