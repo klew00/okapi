@@ -1134,8 +1134,9 @@ public class XMLFilterTest {
 			+ "<termInfo id='ti1'>term info 1</termInfo>"
 			+ "<termInfo id='ti2'>term info 2</termInfo></gloss>"
 			+ "<p>One <its:span withinText='yes' term='yes' termInfoRef='#ti1'>term</its:span>, and more.</p>"
-			+ "<p><its:span withinText='yes' term='no' termInfoRef='#ti1'>not a term</its:span></p>"
+			+ "<p><span its:withinText='yes' its:term='no' its:termInfoRef='#ti1'>not a term</span></p>"
 			+ "<p its:term='yes' its:termInfoRef='#ti2'>term2</p>"
+			+ "<p>Last <span its:withinText='yes' its:term='yes' its:termInfoRef='#ti2'>term</span>, and more.</p>"
 			+ "</doc>";
 		ArrayList<Event> list = getEvents(snippet);
 		ITextUnit tu = FilterTestDriver.getTextUnit(list, 1);
@@ -1154,6 +1155,12 @@ public class XMLFilterTest {
 		tu = FilterTestDriver.getTextUnit(list, 3);
 		assertEquals("term2", tu.getSource().toString());
 		ann = tu.getSource().getAnnotation(GenericAnnotations.class).getFirstAnnotation(GenericAnnotationType.TERM);
+		assertEquals("REF:#ti2", ann.getString(GenericAnnotationType.TERM_INFO));
+		// Inline term with <span>
+		tu = FilterTestDriver.getTextUnit(list, 4);
+		assertEquals("Last <1>term</1>, and more.", fmt.setContent(tu.getSource().getFirstContent()).toString());
+		code = tu.getSource().getFirstContent().getCode(0);
+		ann = code.getGenericAnnotations().getFirstAnnotation(GenericAnnotationType.TERM);
 		assertEquals("REF:#ti2", ann.getString(GenericAnnotationType.TERM_INFO));
 	}
 	
