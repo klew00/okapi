@@ -28,6 +28,8 @@ import net.sf.okapi.common.uidescription.TextInputPart;
 
 public class Parameters extends BaseParameters implements IEditorDescriptionProvider {
 
+	public static final String DOMAINVAR = "${domain}";
+	
 	private static final String CLIENTID = "clientId";
 	private static final String SECRET = "secret";
 	private static final String CATEGORY = "category";
@@ -62,7 +64,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	}
 
 	public void setCategory (String category) {
-		this.category = category;
+		this.category = (category == null ? "" : category);
 	}
 
 	@Override

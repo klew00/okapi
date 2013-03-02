@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2011 by the Okapi Framework contributors
+  Copyright (C) 2011-2013 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -44,6 +44,9 @@ import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.UsingParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.annotation.AltTranslationsAnnotation;
+import net.sf.okapi.common.annotation.GenericAnnotation;
+import net.sf.okapi.common.annotation.GenericAnnotationType;
+import net.sf.okapi.common.annotation.GenericAnnotations;
 import net.sf.okapi.common.filterwriter.TMXWriter;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
 import net.sf.okapi.common.pipeline.annotations.StepParameterMapping;
@@ -82,6 +85,8 @@ public class MSBatchTranslationStep extends BasePipelineStep {
 	private String tmxOutputPath;
 	private int batchInputCount;
 	private int count;
+	private String tempCategory;
+	private String computedCategory;
 
 	public MSBatchTranslationStep () {
 		params = new Parameters();
@@ -145,19 +150,19 @@ public class MSBatchTranslationStep extends BasePipelineStep {
 		this.params = (Parameters)params;
 	}
 	
-	private String getCategory (String key) {
+	private String computeCategory (String initialValue) {
 		String parsedKey;
 		//--Check if Predefined--
-		if ( key != null && key.contains("@@@") ) {
+		if (( initialValue != null ) && initialValue.contains("@@@") ) {
 			//--parse key--
 			Pattern pattern = Pattern.compile("@@@(.+?)@@@");
-	        Matcher matcher = pattern.matcher(key);
+			Matcher matcher = pattern.matcher(initialValue);
 	        if ( matcher.find() ) {
 	        	parsedKey = matcher.group(1);
 	        }
 	        else {
 				//--can't parse string--
-				logger.error("Not able to parse predefined engine string: "+ key + ". Using empty category");
+				logger.error("Not able to parse predefined engine string '{}'. Using empty category.", initialValue);
 				return "";
 	        }
 	        //--locate in properties file--
@@ -169,11 +174,11 @@ public class MSBatchTranslationStep extends BasePipelineStep {
 	        		keyWithLoc = parsedKey + "." + targetLocale.toJavaLocale().getLanguage().toUpperCase();
 	        		String category = prop.getProperty(keyWithLoc);
 	        		if ( category != null ) {
-	        			logger.info("Found engine "+ keyWithLoc +". Using category: "+ category);
+	        			logger.info("Found engine '{}'. Using category '{}'.", keyWithLoc, category);
 	        			return Base64.decodePassword(category);
 	        		}
 	        		else {
-	        			logger.warn("Can't find engine "+ keyWithLoc + ". Try fallback");
+	        			logger.warn("Cannot find engine '{}'. Try fallback.", keyWithLoc);
 	        			//--recursively try fallback--
 		        		int index = parsedKey.lastIndexOf('.');
 		        		while ( index != -1 ) {
@@ -181,7 +186,7 @@ public class MSBatchTranslationStep extends BasePipelineStep {
 			        		keyWithLoc =  parsedKey + "." + targetLocale.toJavaLocale().getLanguage().toUpperCase();
 		        			category = prop.getProperty(keyWithLoc);
 		        			if ( category != null ) {
-		        				logger.warn("Found fallback engine "+ keyWithLoc +". Using category: "+ category);
+		        				logger.info("Found fallback engine '{}'. Using category '{}'.", keyWithLoc, category);
 		        				return Base64.decodePassword(category);
 			        		}
 		        			index = parsedKey.lastIndexOf('.');
@@ -189,22 +194,23 @@ public class MSBatchTranslationStep extends BasePipelineStep {
 	        		}
 	        	}
 	        	catch ( IOException ex ) {
-	        		logger.error("Can't load: " + params.getConfigPath()+ ". Using empty category");
+	        		logger.error("Can't load: '{}'. Using empty category.", params.getConfigPath());
 	        		return "";
 	            }
 	        }
 	        else {
 	        	//--no property file specified--
-				logger.error("No engine property file specified. Using empty category");
+				logger.error("No engine mapping property file specified. Using empty category.");
 				return "";
 	        }
 	        logger.warn("No engine found. Using empty category.");
 	        return "";
 		}
 		else {
-			//--get the specified category
-			logger.info("Using category "+ params.getCategory());
-			return params.getCategory();
+			//--Use the specified category
+			if ( initialValue == null ) initialValue = ""; // Null means empty
+			logger.info("Using category '{}'.", initialValue);
+			return initialValue;
 		}
 	} 
 	
@@ -220,7 +226,18 @@ public class MSBatchTranslationStep extends BasePipelineStep {
 		net.sf.okapi.connectors.microsoft.Parameters prm = (net.sf.okapi.connectors.microsoft.Parameters)conn.getParameters();
 		prm.setClientId(params.getClientId());
 		prm.setSecret(params.getSecret());
-		prm.setCategory(getCategory(params.getCategory()));
+		
+		// Initializes the category: if it has the variable for Domain: set it to null, it'll be set later
+		tempCategory = params.getCategory();
+		if ( tempCategory.contains(net.sf.okapi.connectors.microsoft.Parameters.DOMAINVAR) ) {
+			computedCategory = null;
+			prm.setCategory(""); // Use empty category for any entries before the batch with the first Domain annotation. 
+		}
+		else { // Otherwise: set it with the real value now.
+			computedCategory = computeCategory(params.getCategory());
+			prm.setCategory(computedCategory);
+		}
+		
 		conn.setLanguages(sourceLocale, targetLocale);
 		conn.setMaximumHits(params.getMaxMatches());
 		conn.setThreshold(params.getThreshold());
@@ -331,12 +348,35 @@ public class MSBatchTranslationStep extends BasePipelineStep {
 			needReset = false;
 			events.clear();
 		}
+		
 		// Add the event
 		events.add(event);
+		
+		// If needed: Compute the category on the first domain found
+		if (( computedCategory == null ) && event.isTextUnit() ) {
+			ITextUnit tu = event.getTextUnit();
+			// Get the ITS Domain information from the text unit
+			GenericAnnotations anns = tu.getAnnotation(GenericAnnotations.class);
+			if ( anns != null ) {
+				GenericAnnotation ann = anns.getFirstAnnotation(GenericAnnotationType.DOMAIN);
+				if ( ann != null ) {
+					String domain = ann.getString(GenericAnnotationType.DOMAIN_VALUE);
+					if ( domain != null ) {
+						logger.info("First domain value ('{}') detected on text unit id='{}'.", domain, tu.getId());
+						// Use tempCategory that holds the initial value
+						computedCategory = computeCategory(tempCategory.replace(net.sf.okapi.connectors.microsoft.Parameters.DOMAINVAR, domain));
+						net.sf.okapi.connectors.microsoft.Parameters prm = (net.sf.okapi.connectors.microsoft.Parameters)conn.getParameters();
+						prm.setCategory(computedCategory);
+					}
+				}
+			}
+		}
+		
 		// And trigger the process if needed
 		if ( mustProcess || ( events.size() >= maxEvents )) {
 			return processEvents();
 		}
+		
 		// Else, if we just store this event, we pass a no-operation event down for now
 		return Event.NOOP_EVENT;
 	}
@@ -346,7 +386,7 @@ public class MSBatchTranslationStep extends BasePipelineStep {
 			return; // Nothing to do
 		}
 	
-		// Process the text unit to leverage
+		// Process the text units to leverage
 		ArrayList<TextFragment> fragments = new ArrayList<TextFragment>();
 		ArrayList<String> segIds = new ArrayList<String>();
 		ArrayList<String> tuIds = new ArrayList<String>();
