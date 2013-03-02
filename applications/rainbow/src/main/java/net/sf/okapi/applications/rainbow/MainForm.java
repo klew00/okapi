@@ -1946,7 +1946,17 @@ public class MainForm { //implements IParametersProvider {
 			String newRoot = dlg.showDialog();
 			if ( newRoot == null ) return; // Canceled
 			if ( newRoot.length() < 2 ) newRoot = ""; // Use project's //$NON-NLS-1$
-			//TODO: additional check, dir exists, no trailing separator, etc.
+			
+			//--remove trailing separator
+			if (newRoot.endsWith(File.separator)){
+				newRoot = newRoot.substring(0, newRoot.length() - 1);
+			}
+			
+			//--check dir exists
+			File chkFile = new File(newRoot);
+			if (! chkFile.isDirectory())
+				throw new RuntimeException("Not a valid directory");
+			
 			prj.setInputRoot(currentInput, newRoot, newRoot.length()>0);
 			resetDisplay(currentInput);
 		}
