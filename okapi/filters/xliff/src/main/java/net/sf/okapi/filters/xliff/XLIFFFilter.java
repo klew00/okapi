@@ -109,6 +109,7 @@ public class XLIFFFilter implements IFilter {
 	
 	private boolean hasNext;
 	private XMLStreamReader reader;
+	private RawDocument input;
 	private String docName;
 	private int tuId;
 	private IdGenerator otherId;
@@ -158,6 +159,10 @@ public class XLIFFFilter implements IFilter {
 			if ( reader != null ) {
 				reader.close();
 				reader = null;
+			}
+			if ( input != null ) {
+				input.close();
+				input = null;
 			}
 			hasNext = false;
 		}
@@ -245,6 +250,7 @@ public class XLIFFFilter implements IFilter {
 		try {
 			close();
 			canceled = false;
+			this.input = input;
 
 			XMLInputFactory fact = null;
 			if ( params.getUseCustomParser() ) {

@@ -77,6 +77,7 @@ public class TXMLFilter implements IFilter {
 	private Parameters params;
 	private boolean hasNext;
 	private XMLStreamReader reader;
+	private RawDocument input;
 	private LocaleId srcLoc;
 	private LocaleId trgLoc;
 	private LinkedList<Event> queue;
@@ -105,6 +106,10 @@ public class TXMLFilter implements IFilter {
 			if ( reader != null ) {
 				reader.close();
 				reader = null;
+			}
+			if ( input != null ) {
+				input.close();
+				input = null;
 			}
 		}
 		catch ( XMLStreamException e) {
@@ -201,6 +206,7 @@ public class TXMLFilter implements IFilter {
 		try {
 			close();
 			canceled = false;
+			this.input = input;
 
 			XMLInputFactory fact = XMLInputFactory.newInstance();
 			fact.setProperty(XMLInputFactory.IS_COALESCING, true);

@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2011 by the Okapi Framework contributors
+  Copyright (C) 2008-2013 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -91,6 +91,7 @@ public class TTXFilter implements IFilter {
 	
 	private boolean hasNext;
 	private XMLStreamReader reader;
+	private RawDocument input;
 	private String docName;
 	private int tuId;
 	private IdGenerator otherId;
@@ -129,6 +130,10 @@ public class TTXFilter implements IFilter {
 			if ( reader != null ) {
 				reader.close();
 				reader = null;
+			}
+			if ( input != null ) {
+				input.close();
+				input = null;
 			}
 			hasNext = false;
 		}
@@ -216,6 +221,7 @@ public class TTXFilter implements IFilter {
 		try {
 			close();
 			canceled = false;
+			this.input = input;
 
 			XMLInputFactory fact = XMLInputFactory.newInstance();
 			fact.setProperty(XMLInputFactory.IS_COALESCING, true);

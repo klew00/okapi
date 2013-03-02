@@ -101,6 +101,7 @@ public class POFilter implements IFilter {
 
 	private Parameters params;
 	private BufferedReader reader;
+	private RawDocument input;
 	private boolean canceled;
 	private String encoding;
 	private boolean autoDetected;
@@ -146,6 +147,10 @@ public class POFilter implements IFilter {
 				reader.close();
 				reader = null;
 				docName = null;
+			}
+			if ( input != null ) {
+				input.close();
+				input = null;
 			}
 			parseState = 0;
 		}
@@ -237,6 +242,7 @@ public class POFilter implements IFilter {
 		close();
 		parseState = 1;
 		canceled = false;
+		this.input = input;
 
 		// Initializes the variables
 		nPlurals = DEFAULT_NPLURALS;
