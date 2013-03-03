@@ -165,12 +165,20 @@ public class MSBatchTranslationStep extends BasePipelineStep {
 				logger.error("Not able to parse predefined engine string '{}'. Using empty category.", initialValue);
 				return "";
 	        }
+	        
 	        //--locate in properties file--
-	        if (( params.getConfigPath() != null ) && ( params.getConfigPath().trim().length() > 0 )) {
+	        String propFile = params.getConfigPath();
+	        if ( propFile != null ) {
+	        	propFile = propFile.trim();
+	        	propFile = Util.fillRootDirectoryVariable(propFile, rootDir);
+	        	propFile = Util.fillInputRootDirectoryVariable(propFile, inputRootDir);
+	        	propFile = LocaleId.replaceVariables(propFile, sourceLocale, targetLocale);
+	        }
+	        if ( !Util.isEmpty(propFile) ) {
 	        	Properties prop = new Properties();
 	        	String keyWithLoc;
 	        	try {
-	        		prop.load(new FileInputStream(params.getConfigPath()));
+	        		prop.load(new FileInputStream(propFile));
 	        		keyWithLoc = parsedKey + "." + targetLocale.toJavaLocale().getLanguage().toUpperCase();
 	        		String category = prop.getProperty(keyWithLoc);
 	        		if ( category != null ) {
@@ -194,7 +202,7 @@ public class MSBatchTranslationStep extends BasePipelineStep {
 	        		}
 	        	}
 	        	catch ( IOException ex ) {
-	        		logger.error("Can't load: '{}'. Using empty category.", params.getConfigPath());
+	        		logger.error("Can't load: '{}'. Using empty category.", propFile);
 	        		return "";
 	            }
 	        }
