@@ -24,12 +24,12 @@ import net.sf.okapi.common.exceptions.OkapiUnexpectedResourceTypeException;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.EndSubfilter;
 import net.sf.okapi.common.resource.Ending;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.MultiEvent;
 import net.sf.okapi.common.resource.PipelineParameters;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.StartGroup;
-import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.StartSubDocument;
 import net.sf.okapi.common.resource.StartSubfilter;
 
@@ -168,6 +168,15 @@ public class Event {
 	 */
 	public boolean isStartDocument () {
 		return (filterEventType == EventType.START_DOCUMENT);
+	}
+	
+	/**
+	 * Convenience method to tell if this Event carries a {@link StartBatchItem}
+	 * 
+	 * @return true if {@link StartBatchItem}, false otherwise
+	 */
+	public boolean isStartBatchItem () {
+		return (filterEventType == EventType.START_BATCH_ITEM);
 	}
 	
 	/**
@@ -331,7 +340,6 @@ public class Event {
 		}
 		throw new OkapiUnexpectedResourceTypeException("Event resource is not a StartDocument");
 	}
-	
 	
 	/**
 	 * Convenience method returns the {@link IResource} as a {@link StartSubfilter}. The

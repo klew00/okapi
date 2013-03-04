@@ -134,10 +134,9 @@ public class Property {
 	 * @param type the type of annotation to retrieve.
 	 * @return the annotation, or null if this property has no annotation of the requested type.
 	 */
-	@SuppressWarnings("unchecked")
-	public <A> A getAnnotation (Class<? extends IAnnotation> type) {
+	public <A extends IAnnotation> A getAnnotation (Class<A> type) {
 		if ( annotations == null ) return null;
-		return (A)annotations.get(type);
+		return annotations.get(type);
 	}
 
 	/**

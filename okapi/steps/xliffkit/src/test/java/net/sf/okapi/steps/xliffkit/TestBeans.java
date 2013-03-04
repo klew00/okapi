@@ -41,7 +41,6 @@ import net.sf.okapi.lib.beans.sessions.OkapiJsonSession;
 
 import org.junit.Test;
 
-
 public class TestBeans {
 
 	@Test

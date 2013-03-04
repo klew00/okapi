@@ -26,6 +26,8 @@ import java.text.DecimalFormatSymbols;
 import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.util.regex.Matcher;
@@ -301,6 +303,18 @@ public class ReportGenerator {
 	
 	public String getField(String fieldName) {
 		return simpleFields.get(fieldName);
+	}
+	
+	public List<String> getMultiField(String multiFieldName) {
+		return multiFields.get(multiFieldName);
+	}
+	
+	public Set<String> getFieldNames() {
+		return simpleFields.keySet();
+	}
+	
+	public Set<String> getMultiFieldNames() {
+		return multiFields.keySet();
 	}
 
 //	private String generateRow(String rowTemplate) {

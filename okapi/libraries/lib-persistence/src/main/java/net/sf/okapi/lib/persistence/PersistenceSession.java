@@ -22,11 +22,14 @@ package net.sf.okapi.lib.persistence;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.annotation.Annotations;
+import net.sf.okapi.common.annotation.IAnnotation;
 import net.sf.okapi.common.observer.BaseObservable;
 import net.sf.okapi.common.observer.IObservable;
 import net.sf.okapi.common.observer.IObserver;
@@ -64,6 +67,7 @@ public abstract class PersistenceSession implements IPersistenceSession, IObserv
 	private LinkedList<IPersistenceBean<?>> queue = new LinkedList<IPersistenceBean<?>>();
 	private boolean readingDone = false;
 	private IVersionDriver versionDriver = null;
+	private Annotations annotations = new Annotations();
 
 	public PersistenceSession() {
 		super();
@@ -256,9 +260,12 @@ public abstract class PersistenceSession implements IPersistenceSession, IObserv
 		else {
 			bean = (IPersistenceBean<Object>) refResolver.uncacheBean(obj); // get a bean created earlier by ReferenceBean
 			if (bean == null) {
-				bean = (IPersistenceBean<Object>) refResolver.createBean(obj.getClass());
-				if (bean == null) return;
+				if (obj instanceof IPersistenceBean)
+					bean = (IPersistenceBean<Object>) obj; // If the object implements the bean interface, return itself, no need to create a bean
+				else
+					bean = (IPersistenceBean<Object>) refResolver.createBean(obj.getClass());
 				
+				if (bean == null) return;				
 				//refResolver.cacheBean(obj, bean);			
 			}
 					
@@ -456,7 +463,10 @@ public abstract class PersistenceSession implements IPersistenceSession, IObserv
 			throw new IllegalArgumentException("PersistenceSession: cannot write a null object");
 
 		// Throws an exception if fails
-		IPersistenceBean<Object> bean = (IPersistenceBean<Object>) refResolver.createBean(obj.getClass());
+		IPersistenceBean<Object> bean =
+				(obj instanceof IPersistenceBean) ?
+						(IPersistenceBean<Object>) obj :
+						(IPersistenceBean<Object>) refResolver.createBean(obj.getClass());
 
 		refResolver.setRootId(bean.getRefId());
 		refResolver.setRefIdForObject(obj, bean.getRefId());
@@ -464,5 +474,61 @@ public abstract class PersistenceSession implements IPersistenceSession, IObserv
 	
 		notifyObservers(bean);
 		return writeBeanToString(bean);
+	}
+	
+//	protected Iterable<IAnnotation> getAnnotations () {
+//		if ( annotations == null ) {
+//			return Collections.emptyList();
+//		}
+//		return annotations;
+//	}
+	
+//	protected void setAnnotations(Map<Class<? extends IAnnotation>, IAnnotation> annotations) {
+//		annotations.clear();
+//		for (IAnnotation annotation : annotations.values()) {
+//			setAnnotation(annotation);
+//		}
+//	}
+	
+//	protected void setAnnotations(Annotations annotations) {
+//		this.annotations = annotations; 
+//	}
+	
+	protected IPersistenceBean<Annotations> getAnnotationsBean() {
+		IPersistenceBean<Annotations> bean = refResolver.createBean(Annotations.class);
+		if (bean == null) {
+			return null; // TODO log warning
+		}
+		
+		bean.set(annotations, this);
+		return bean;
+	}
+	
+	protected void setAnnotations(IPersistenceBean<Annotations> annotationsBean) {
+		if (annotationsBean == null) {
+			return; // TODO log warning
+		}
+		annotations = annotationsBean.get(Annotations.class, this);
+	}
+	
+	@Override
+	public <A extends IAnnotation> A getAnnotation(Class<A> annotationType) {
+		return annotations.get(annotationType);
+	}
+	
+	/**
+	 * The annotation is expected to have its bean registered in the session's bean mapper. 
+	 */
+	@Override
+	public void setAnnotation(IAnnotation annotation) {
+		annotations.set(annotation);
+	}
+	
+	@Override
+	public Iterable<IAnnotation> getAnnotations() {
+		if ( annotations == null ) {
+			return Collections.emptyList();
+		}
+		return annotations;
 	}
 }

@@ -33,8 +33,6 @@ import java.io.UnsupportedEncodingException;
 import java.text.DateFormat;
 import java.util.Date;
 import java.util.List;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IResource;
@@ -46,6 +44,7 @@ import net.sf.okapi.common.pipeline.IPipelineStep;
 import net.sf.okapi.common.pipeline.annotations.StepParameterMapping;
 import net.sf.okapi.common.pipeline.annotations.StepParameterType;
 import net.sf.okapi.common.query.MatchType;
+import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.lib.extra.steps.CompoundStep;
 import net.sf.okapi.lib.reporting.ReportGenerator;
@@ -77,6 +76,9 @@ import net.sf.okapi.steps.wordcount.categorized.okapi.MTWordCountStep;
 import net.sf.okapi.steps.wordcount.categorized.okapi.PhraseAssembledWordCountStep;
 import net.sf.okapi.steps.wordcount.common.BaseCounter;
 import net.sf.okapi.steps.wordcount.common.GMX;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @UsingParameters(Parameters.class)
 public class ScopingReportStep extends CompoundStep {
@@ -248,7 +250,7 @@ public class ScopingReportStep extends CompoundStep {
 		
 //@		resolver = new CategoryResolver(list); // List should be filled up at this point
 	}
-
+	
 	@Override
 	protected Event handleStartBatch(Event event) {
 		//@		resolver.reset();
@@ -275,7 +277,7 @@ public class ScopingReportStep extends CompoundStep {
 	 */
 	@Override
 	protected Event handleEndBatch(Event event) {
-		IResource res = event.getResource();
+		Ending res = event.getEnding();		
 		if (res != null) {
 			//@			resolver.resolve(res, EventType.END_BATCH);
 			
@@ -527,7 +529,7 @@ public class ScopingReportStep extends CompoundStep {
 		
 		return super.handleEndBatchItem(event);
 	}
-	
+		
 	@Override
 	protected Event handleStartDocument(Event event) {
 		Event ev = super.handleStartDocument(event); // Sets srcLoc and other stuff
@@ -554,7 +556,7 @@ public class ScopingReportStep extends CompoundStep {
 		return super.handleTextUnit(event);
 	}
 	
-	public ReportGenerator getReportGenerator () {
+	protected ReportGenerator getReportGenerator () {
 		return gen;
 	}
 

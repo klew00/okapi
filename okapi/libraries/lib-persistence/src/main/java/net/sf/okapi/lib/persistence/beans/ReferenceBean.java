@@ -59,7 +59,10 @@ public class ReferenceBean extends PersistenceBean<Object> {
 			return;
 		}
 		
-		IPersistenceBean<Object> bean = (IPersistenceBean<Object>) session.createBean(ClassUtil.getClass(obj));
+		IPersistenceBean<Object> bean =
+				(obj instanceof IPersistenceBean) ?
+						(IPersistenceBean<Object>) obj :	
+						(IPersistenceBean<Object>) session.createBean(ClassUtil.getClass(obj));
 		session.cacheBean(obj, bean); // for a FactoryBean or PersistenceSession.serialize() to hook up later
 		reference = bean.getRefId();
 		// session.setRefIdForObject(obj, bean.getRefId());

@@ -27,11 +27,12 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.PrintWriter;
+import java.io.Serializable;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
+
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
@@ -39,28 +40,21 @@ import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.MimeTypeMapper;
 import net.sf.okapi.common.UsingParameters;
 import net.sf.okapi.common.Util;
-import net.sf.okapi.common.XMLWriter;
+import net.sf.okapi.common.annotation.IAnnotation;
 import net.sf.okapi.common.encoder.EncoderManager;
-import net.sf.okapi.common.filterwriter.XLIFFContent;
 import net.sf.okapi.common.filterwriter.XLIFFWriter;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
 import net.sf.okapi.common.pipeline.annotations.StepParameterMapping;
 import net.sf.okapi.common.pipeline.annotations.StepParameterType;
-import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.ITextUnit;
-import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.StartGroup;
 import net.sf.okapi.common.resource.StartSubDocument;
-import net.sf.okapi.common.resource.TextContainer;
-import net.sf.okapi.common.resource.TextFragment;
-import net.sf.okapi.lib.persistence.IPersistenceSession;
-import net.sf.okapi.lib.persistence.PersistenceSession;
-import net.sf.okapi.lib.beans.v1.OkapiBeans;
-import net.sf.okapi.persistence.json.jackson.JSONPersistenceSession;
 import net.sf.okapi.lib.beans.sessions.OkapiJsonSession;
+import net.sf.okapi.lib.persistence.PersistenceSession;
 import net.sf.okapi.steps.xliffkit.opc.TKitRelationshipTypes;
+
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.openxml4j.opc.PackagePart;
@@ -156,9 +150,13 @@ public class XLIFFKitWriterStep extends BasePipelineStep {
 		case START_DOCUMENT:			
 			processStartDocument((StartDocument)event.getResource());
 			break;
-		case END_DOCUMENT:
-			session.serialize(event);
-			processEndDocument(); // Closes persistence session
+//		case END_DOCUMENT:
+//			session.serialize(event);
+//			processEndDocument(); // Closes persistence session
+//			close();
+//			break;
+		case END_BATCH_ITEM:
+			processEndBatchItem(event.getEnding()); // Closes persistence session
 			close();
 			break;
 		case START_SUBDOCUMENT:
@@ -236,7 +234,7 @@ public class XLIFFKitWriterStep extends BasePipelineStep {
 	
 	private void processStartDocument (StartDocument resource) {
 		close();
-
+		
 		srcLoc = resource.getLocale();						
 		docMimeType = resource.getMimeType();
 		docName = resource.getName();
@@ -312,7 +310,18 @@ public class XLIFFKitWriterStep extends BasePipelineStep {
 		return part;
 	}
 	
-	private void processEndDocument () {		
+	
+	
+	private void processEndBatchItem (Ending ending) {
+		// Get serializable annotations and store them in session annotations
+		// No need to remove them form the resource as EBI is not serialized (only SD...ED)
+		if (ending != null)
+			for (IAnnotation ann : ending.getAnnotations()) {
+				if (ann instanceof Serializable) {
+					session.setAnnotation(ann);
+				}
+			}
+		
 		// Skeleton
 		session.end();
 		
@@ -369,11 +378,11 @@ public class XLIFFKitWriterStep extends BasePipelineStep {
 		return params;
 	}
 
-	public PersistenceSession getSession() {
+	protected PersistenceSession getSession() {
 		return session;
 	}
 
-	public void setSession(PersistenceSession session) {
+	protected void setSession(PersistenceSession session) {
 		this.session = session;
 	}
 

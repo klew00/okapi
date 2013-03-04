@@ -32,6 +32,7 @@ import java.util.List;
 
 import net.sf.okapi.common.StreamUtil;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.annotation.Annotations;
 import net.sf.okapi.common.exceptions.OkapiFileNotFoundException;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.lib.persistence.IPersistenceBean;
@@ -62,6 +63,7 @@ public abstract class JSONPersistenceSession extends PersistenceSession {
 	private static final String JSON_CLASS = "itemClass"; //$NON-NLS-1$
 	private static final String JSON_MIME = "mimeType"; //$NON-NLS-1$
 	private static final String JSON_FRAMES = "frames"; //$NON-NLS-1$
+	private static final String JSON_ANNOTATIONS = "annotations"; //$NON-NLS-1$
 
 	//private static final String VERSION = "1.0"; //$NON-NLS-1$	
 	// JSON RFC http://www.ietf.org/rfc/rfc4627.txt
@@ -198,6 +200,17 @@ public abstract class JSONPersistenceSession extends PersistenceSession {
 						
 			this.setFrames(mapper.readValue(parser, List.class));
 			parser.nextToken();
+			
+			// Optional annotations entry
+			if (JSON_ANNOTATIONS.equalsIgnoreCase(parser.getCurrentName())) {
+				parser.nextToken();
+				Class<IPersistenceBean<Annotations>> beanClass = 
+						this.getBeanClass(Annotations.class);
+				IPersistenceBean<Annotations> bean = mapper.readValue(parser, beanClass);
+				this.setAnnotations(bean);
+				parser.nextToken();
+			}
+						
 			parser.nextToken();
 			
 			// Prepare the stream for items deserialization
@@ -272,7 +285,8 @@ public abstract class JSONPersistenceSession extends PersistenceSession {
 			headerGen.writeStringField(JSON_DESCR, this.getDescription());			
 			headerGen.writeStringField(JSON_CLASS, this.getItemClass());
 			headerGen.writeStringField(JSON_MIME, this.getMimeType());			
-			headerGen.writeObjectField(JSON_FRAMES, this.getFrames());			
+			headerGen.writeObjectField(JSON_FRAMES, this.getFrames());
+			headerGen.writeObjectField(JSON_ANNOTATIONS, this.getAnnotationsBean());			
 			headerGen.writeEndObject();
 			
 			headerGen.writeFieldName(JSON_BODY);

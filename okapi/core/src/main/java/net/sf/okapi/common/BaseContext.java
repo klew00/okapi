@@ -121,11 +121,10 @@ public class BaseContext implements IContext {
 			properties.clear();
 		}
 	}
-	
-	@SuppressWarnings("unchecked")
-	public <A> A getAnnotation (Class<? extends IAnnotation> type) {
+		
+	public <A extends IAnnotation> A getAnnotation (Class<A> type) {
 		if ( annotations == null ) return null;
-		return (A)annotations.get(type);
+		return annotations.get(type);
 	}
 
 	public void setAnnotation (IAnnotation annotation) {

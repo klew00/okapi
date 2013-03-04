@@ -276,6 +276,28 @@ public final class Util {
 	}	
 	
 	/**
+	 * Builds a path from given parts. Path separators are normalized. 
+	 * @param parts parts of the path
+	 * @return path containing the given parts separated with a file name separator 
+	 * for the current platform. 
+	 */
+	public static String buildPath(String... parts) {
+		String res = null;
+		for (String part : parts) {
+			if (res == null) {
+				res = part;
+			}
+			else {
+				if (!res.endsWith("/") || !res.endsWith("\\")) {
+					res += File.separator;
+				}
+				res += part;
+			}
+		}
+		return res.replace("/", File.separator);
+	}
+	
+	/**
 	 * Return a list of files based on suffix (i.e, .xml, .html etc.)
 	 * @param directory - directory where files are located
 	 * @param suffix - the sufix used to filter files

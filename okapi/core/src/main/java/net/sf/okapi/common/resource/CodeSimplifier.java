@@ -292,7 +292,8 @@ public class CodeSimplifier {
 		//System.out.println(TextUnitUtil.toText(tf));
 		TextUnitUtil.restoreSegmentation(tc, tf);
 		//System.out.println(TextUnitUtil.restoreSegmentation(tc, tf));
-		TextUnitUtil.convertTextParts(tc);
+//		TextUnitUtil.convertTextPartsToCodes(tc);
+		TextUnitUtil.convertTextParts_whitespaceCodesToText(tc);
 //		System.out.println(res[0]);
 //		System.out.println(res[1]);
 		
@@ -699,7 +700,8 @@ public class CodeSimplifier {
 		}
 		else {
 			String gap = codedText.substring(node1.offset+2, node2.offset);
-			boolean gapIsWhitespace = StringUtil.isWhitespace(gap);
+			boolean gapIsWhitespace = StringUtil.isWhitespace(gap); // &&
+//					(!(node1.));
 			
 			if (gapIsWhitespace) 
 				node1.gapToNext = gap;

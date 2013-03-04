@@ -25,10 +25,13 @@ import java.net.URI;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.UsingParameters;
+import net.sf.okapi.common.annotation.IAnnotation;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
 import net.sf.okapi.common.pipeline.annotations.StepParameterMapping;
 import net.sf.okapi.common.pipeline.annotations.StepParameterType;
 import net.sf.okapi.common.resource.RawDocument;
+import net.sf.okapi.common.resource.StartDocument;
+import net.sf.okapi.lib.persistence.PersistenceSession;
 import net.sf.okapi.steps.xliffkit.opc.OPCPackageReader;
 
 @UsingParameters()
@@ -77,6 +80,8 @@ public class XLIFFKitReaderStep extends BasePipelineStep {
 	
 	@Override
 	public Event handleEvent(Event event) {
+		event = super.handleEvent(event); // to allow access to handleStartDocument() etc. 
+		
 		switch (event.getEventType()) {
 		case START_BATCH:
 			isDone = true;
@@ -85,7 +90,7 @@ public class XLIFFKitReaderStep extends BasePipelineStep {
 		case START_BATCH_ITEM:
 			isDone = false;
 			return event;
-
+			
 		case RAW_DOCUMENT:
 			isDone = false;
 			RawDocument rd = (RawDocument)event.getResource();
@@ -94,16 +99,29 @@ public class XLIFFKitReaderStep extends BasePipelineStep {
 			merger.setUseApprovedOnly(params.isUseApprovedOnly());
 			merger.setUpdateApprovedFlag(params.isUpdateApprovedFlag());
 			if (params.isGenerateTargets())
-				reader.setGeneratorOptions(outputEncoding, outputPath);
+				reader.setGeneratorOptions(outputEncoding, outputPath, params.isGroupByPackagePath());
 			
 			//reader.setGenerateTargets(params.isGenerateTargets());
-			reader.open(rd);
-			return reader.next();
+			reader.open(rd); // Annotations are deserialized here
+			
+			Event e = reader.next(); 
+			if (e.isStartDocument()) {
+				StartDocument sd = e.getStartDocument();
+				for (IAnnotation annotation : getSession().getAnnotations()) {
+					sd.setAnnotation(annotation);
+				}
+			}
+			return e;
 		}
 
 		if (isDone) {
 			return event;
 		} else {
+//			if (event.getEventType() == EventType.START_DOCUMENT) {
+//				RefsAnnotation ra = new RefsAnnotation(
+//						getSession().getAnnotation());
+//			}
+			
 			
 //			if (writeTargets) {
 //				switch (event.getEventType()) {				
@@ -126,7 +144,7 @@ public class XLIFFKitReaderStep extends BasePipelineStep {
 //				}
 //			}
 			
-			Event e = reader.next(); 
+			Event e = reader.next();
 			isDone = !reader.hasNext();			
 //			if (isDone && e.getEventType() == EventType.END_DOCUMENT)
 //				processEndDocument(e);
@@ -154,6 +172,30 @@ public class XLIFFKitReaderStep extends BasePipelineStep {
 	public IParameters getParameters() {
 		return params;
 	}
+	
+	protected PersistenceSession getSession() {
+		return reader.getSession();
+	}
+	
+//	@Override
+//	protected Event handleRawDocument(Event event) {
+//		event = super.handleRawDocument(event); 
+//		
+//		RawDocument rd = event.getRawDocument();
+//		for (IAnnotation annotation : getSession().getAnnotations()) {
+//			rd.setAnnotation(annotation);
+//		}
+//		return event;
+//	}
+	
+//	@Override
+//	protected Event handleStartBatchItem(Event event) {
+//		StartBatchItem sbi = event.getStartBatchItem();
+//		for (IAnnotation annotation : getSession().getAnnotations()) {
+//			sbi.setAnnotation(annotation);
+//		}
+//		return super.handleStartBatchItem(event);
+//	}
 	
 //	private void processStartDocument (Event event) {
 //		StartDocument startDoc = (StartDocument)event.getResource();

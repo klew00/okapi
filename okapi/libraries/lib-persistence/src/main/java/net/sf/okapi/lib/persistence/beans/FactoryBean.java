@@ -127,8 +127,13 @@ public class FactoryBean extends PersistenceBean<Object> {
 			return this;
 		}
 		else {
-			if (bean == null)
-				bean = (IPersistenceBean<Object>) session.createBean(ClassUtil.getClass(obj));
+			if (bean == null) {
+				if (obj instanceof IPersistenceBean)
+					bean = (IPersistenceBean<Object>) obj;
+				else
+					bean = (IPersistenceBean<Object>) session.createBean(ClassUtil.getClass(obj));
+			}
+				
 			
 			//session.cacheBean(obj, bean);
 			reference = 0;
