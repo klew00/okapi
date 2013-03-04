@@ -171,9 +171,9 @@ public class Event {
 	}
 	
 	/**
-	 * Convenience method to tell if this Event carries a {@link StartBatchItem}
+	 * Convenience method to tell if this Event is START_BATCH_ITEM 
 	 * 
-	 * @return true if {@link StartBatchItem}, false otherwise
+	 * @return true if START_BATCH_ITEM, false otherwise
 	 */
 	public boolean isStartBatchItem () {
 		return (filterEventType == EventType.START_BATCH_ITEM);

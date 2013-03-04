@@ -700,8 +700,7 @@ public class CodeSimplifier {
 		}
 		else {
 			String gap = codedText.substring(node1.offset+2, node2.offset);
-			boolean gapIsWhitespace = StringUtil.isWhitespace(gap); // &&
-//					(!(node1.));
+			boolean gapIsWhitespace = StringUtil.isWhitespace(gap);
 			
 			if (gapIsWhitespace) 
 				node1.gapToNext = gap;
