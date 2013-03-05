@@ -95,6 +95,7 @@ public class IDMLFilter implements IFilter {
 	private EncoderManager encoderManager;
 	private HashMap<String, ZipEntry> stories;
 	private LinkedHashMap<String, ArrayList<String>> spreads;
+	private ArrayList<String> hiddenLayers;
 	private ArrayList<String> storiesDone;
 	private Iterator<String> storyIter;
 	private Iterator<String> spreadIter;
@@ -345,8 +346,19 @@ public class IDMLFilter implements IFilter {
 		spreads = new LinkedHashMap<String, ArrayList<String>>();
 		storiesDone = new ArrayList<String>();
 		stories = new HashMap<String, ZipEntry>();
+		hiddenLayers = new ArrayList<String>();
 		try {
 			zipFile = new ZipFile(new File(docURI));
+			
+			// Get the designmap to check the layers
+			if ( !params.getExtractHiddenLayers() ) {
+				ZipEntry designMapEntry = zipFile.getEntry("designmap.xml");
+				if ( designMapEntry != null ) {
+					gatherHiddenLayers(designMapEntry);
+				}
+			}
+			
+			// Gather the extraction information
 			Enumeration<? extends ZipEntry> entries = zipFile.entries();
 			while( entries.hasMoreElements() ) {
 				ZipEntry entry = entries.nextElement();
@@ -374,6 +386,25 @@ public class IDMLFilter implements IFilter {
 	}
 
 	/**
+	 * Gather all the layers that are not visible in the given designmap.xml entry.
+	 * @param entry the zip entry for the designmap.xml file.
+	 */
+	private void gatherHiddenLayers (ZipEntry entry)
+		throws SAXException, IOException, ParserConfigurationException
+	{
+		Document doc = docBuilder.parse(zipFile.getInputStream(entry));
+		NodeList list = doc.getElementsByTagName("Layer");
+		for ( int i=0; i<list.getLength(); i++ ) {
+			Element elem = (Element)list.item(i);
+			String tmp = elem.getAttribute("Visible");
+			if ( tmp.equals("false")) {
+				hiddenLayers.add(elem.getAttribute("Self"));
+			}
+		}
+	}
+
+	
+	/**
 	 * Gather all the stories used in this spread.
 	 * @param entry the zip entry for the spread.
 	 * @return the total number of stories in the given spread.
@@ -396,14 +427,21 @@ public class IDMLFilter implements IFilter {
 		NodeList list = doc.getElementsByTagName("TextFrame");
 		for ( int i=0; i<list.getLength(); i++ ) {
 			Element tf = (Element)list.item(i);
-			String tmp = tf.getAttribute("ParentStory");
-			if ( Util.isEmpty(tmp) ) {
+			// Check parent story
+			String parentStory = tf.getAttribute("ParentStory");
+			if ( Util.isEmpty(parentStory) ) {
 				throw new IOException("Missing value for parentStory.");
 			}
+			// Check ItemLayer
+			String itemLayer = tf.getAttribute("ItemLayer");
+			if ( !Util.isEmpty(itemLayer) ) {
+				// If this textFrame is in an hidden layer, skip it
+				if ( hiddenLayers.contains(itemLayer) ) continue;
+			}
 			// Add the the story to the lookup list
-			if ( !storiesDone.contains(tmp) ) {
-				storyList.add(tmp);
-				storiesDone.add(tmp);
+			if ( !storiesDone.contains(parentStory) ) {
+				storyList.add(parentStory);
+				storiesDone.add(parentStory);
 			}
 		}
 		
@@ -440,14 +478,21 @@ public class IDMLFilter implements IFilter {
 		NodeList list = doc.getElementsByTagName("TextFrame");
 		for ( int i=0; i<list.getLength(); i++ ) {
 			Element tf = (Element)list.item(i);
-			String tmp = tf.getAttribute("ParentStory");
-			if ( Util.isEmpty(tmp) ) {
+			// Get parent story
+			String parentStory = tf.getAttribute("ParentStory");
+			if ( Util.isEmpty(parentStory) ) {
 				throw new IOException("Missing value for parentStory.");
 			}
+			// Check ItemLayer
+			String itemLayer = tf.getAttribute("ItemLayer");
+			if ( !Util.isEmpty(itemLayer) ) {
+				// If this textFrame is in an hidden layer, skip it
+				if ( hiddenLayers.contains(itemLayer) ) continue;
+			}
 			// Add the the story to the lookup list
-			if ( !storiesDone.contains(tmp) ) {
-				storyList.add(tmp);
-				storiesDone.add(tmp);
+			if ( !storiesDone.contains(parentStory) ) {
+				storyList.add(parentStory);
+				storiesDone.add(parentStory);
 			}
 		}
 		

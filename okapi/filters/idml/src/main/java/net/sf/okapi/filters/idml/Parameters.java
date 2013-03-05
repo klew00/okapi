@@ -35,12 +35,14 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	private static final String EXTRACTMASTERSPREADS = "extractMasterSpreads";
 	private static final String SKIPTHRESHOLD = "skipThreshold";
 	private static final String NEWTUONBR = "newTuOnBr";
+	private static final String EXTRACTHIDDENLAYERS = "extractHiddenLayers";
 
 	private boolean extractNotes;
 	private boolean simplifyCodes;
 	private boolean extractMasterSpreads;
 	private int skipThreshold;
 	private boolean newTuOnBr;
+	private boolean extractHiddenLayers;
 
 	public Parameters () {
 		reset();
@@ -53,6 +55,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		extractMasterSpreads = true;
 		skipThreshold = 1000;
 		newTuOnBr = false; //true;
+		extractHiddenLayers = false;
 	}
 
 	public void fromString (String data) {
@@ -63,6 +66,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		extractMasterSpreads = buffer.getBoolean(EXTRACTMASTERSPREADS, extractMasterSpreads);
 		skipThreshold = buffer.getInteger(SKIPTHRESHOLD, skipThreshold);
 		newTuOnBr = buffer.getBoolean(NEWTUONBR, newTuOnBr);
+		extractHiddenLayers = buffer.getBoolean(EXTRACTHIDDENLAYERS, extractHiddenLayers);
 	}
 	
 	@Override
@@ -73,6 +77,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		buffer.setBoolean(EXTRACTMASTERSPREADS, extractMasterSpreads);
 		buffer.setInteger(SKIPTHRESHOLD, skipThreshold);
 		buffer.setBoolean(NEWTUONBR, newTuOnBr);
+		buffer.setBoolean(EXTRACTHIDDENLAYERS, extractHiddenLayers);
 		return buffer.toString();
 	}
 
@@ -116,11 +121,20 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		this.newTuOnBr = newTuOnBr;
 	}
 
+	public boolean getExtractHiddenLayers () {
+		return extractHiddenLayers;
+	}
+	
+	public void setExtractHiddenLayers (boolean extractHiddenLayers) {
+		this.extractHiddenLayers = extractHiddenLayers;
+	}
+
 	@Override
 	public ParametersDescription getParametersDescription() {
 		ParametersDescription desc = new ParametersDescription(this);
 		desc.add(EXTRACTNOTES, "Extract notes", null);
 		desc.add(EXTRACTMASTERSPREADS, "Extract master spreads", null);
+		desc.add(EXTRACTHIDDENLAYERS, "Extract hidden layers", null);
 		desc.add(SIMPLIFYCODES, "Simplify inline codes when possible", null);
 		desc.add(NEWTUONBR, "Create new paragraphs on hard returns [IMPORTANT: STILL BETA! May prevent merge!]",
 			"Option is BETA and may prevent you to merge back. Make sure to test round-trip!");
@@ -134,6 +148,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		
 		desc.addCheckboxPart(paramsDesc.get(EXTRACTNOTES));
 		desc.addCheckboxPart(paramsDesc.get(EXTRACTMASTERSPREADS));
+		desc.addCheckboxPart(paramsDesc.get(EXTRACTHIDDENLAYERS));
 		desc.addSeparatorPart();
 		
 		desc.addCheckboxPart(paramsDesc.get(SIMPLIFYCODES));
