@@ -67,12 +67,12 @@ class TmxTu {
 	/**
 	 * Removes from the from of a string any of the specified characters. 
 	 * @param lang The language of the new TmxTuv.
-	 * @param trgType Indicates if it's TuvXmlLang.SOURCE, TuvXmlLang.TARGET, or TuvXmlLang.OTHER. 
+	 * @param trgType Indicates if it's TuvXmlLang.SOURCE, TuvXmlLang.TARGET, or TuvXmlLang.OTHER.
 	 * @return The added TmxTuv.
 	 */	
 	TmxTuv addTmxTuv(LocaleId lang, TuvXmlLang trgType){
 		int counter = langCount(lang);
-		TmxTuv newTmxTuv = new TmxTuv(lang, trgType, ++counter, segType);
+		TmxTuv newTmxTuv = new TmxTuv(lang, trgType, ++counter, segType, lineBreak);
 		
 		tuvs.add(newTmxTuv);
 		curTuv = newTmxTuv;
@@ -106,6 +106,15 @@ class TmxTu {
 	 */			
 	int tuvCount(){
 		return tuvs.size();
+	}
+	
+	
+	/**
+	 * Returns whether there is at least one TmxTuv in the current TmxTu. 
+	 * @return true if at least one TmxTuv exists in the current TmxTu
+	 */
+	boolean hasTuvs() {
+		return !tuvs.isEmpty();
 	}
 	
 	
@@ -226,19 +235,13 @@ class TmxTu {
 
 		int count = reader.getNamespaceCount();
 		for ( int i=0; i<count; i++ ) {
-			prefix = reader.getNamespacePrefix(i);
-			skelBefore.append(String.format(" xmlns%s=\"%s\"",
-				((prefix.length()>0) ? ":"+prefix : ""),
-				reader.getNamespaceURI(i)));
+			TmxUtils.copyXMLNSToSkeleton(skelBefore, reader.getNamespacePrefix(i), 
+										 reader.getNamespaceURI(i));
 		}
 		count = reader.getAttributeCount();
 		for ( int i=0; i<count; i++ ) {
 			if ( !reader.isAttributeSpecified(i) ) continue; // Skip defaults
-			prefix = reader.getAttributePrefix(i); 
-			skelBefore.append(String.format(" %s%s=\"%s\"",
-				(((prefix==null)||(prefix.length()==0)) ? "" : prefix+":"),
-				reader.getAttributeLocalName(i),
-				Util.escapeToXML(reader.getAttributeValue(i).replace("\n", lineBreak), 3, escapeGT, null)));
+			TmxUtils.copyAttributeToSkeleton(skelBefore, reader, i, lineBreak, escapeGT);
 			
 			if(elem!=null && elem.equals("prop")){
 				if(reader.getAttributeLocalName(i).equals("type")){
@@ -258,7 +261,6 @@ class TmxTu {
 		
 		return propName;
 	}		
-	
 	
 	/**
 	 * Parse end element adding skeleton to TmxTu afterSkel
@@ -298,7 +300,7 @@ class TmxTu {
 	 */	
 	void enforceTuRules(){
 		// RULE 1: Make sure each <tu> contains at least one <tuv>
-		if ( tuvCount() < 1 ) {
+		if ( !hasTuvs() ) {
 			throw new OkapiBadFilterInputException("Each <tu> requires at least one <tuv>");							
 		}
 

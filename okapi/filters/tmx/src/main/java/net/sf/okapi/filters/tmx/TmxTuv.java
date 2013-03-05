@@ -23,6 +23,7 @@ package net.sf.okapi.filters.tmx;
 import javax.xml.stream.XMLStreamReader;
 
 import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.Util;
 import net.sf.okapi.common.resource.AlignmentStatus;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.TextContainer;
@@ -37,6 +38,7 @@ public class TmxTuv {
 	GenericSkeleton skelBefore = new GenericSkeleton();		
 	GenericSkeleton skelAfter = new GenericSkeleton();
 	TextContainer tc = new TextContainer();
+	String lineBreak;
 	boolean finishedSegSection;								//flag helping determine if adding/appending to skelBefore or skelAfter
 	//boolean allSkeleton;									//Redundant convenience variable
 	
@@ -48,10 +50,11 @@ public class TmxTuv {
 	 * @param counter Higher than 1 indicates the number of duplicate 
 	 * @param segType 0 = sentence = segmented, 1 = paragraph = unsegmented
 	 */		
-	TmxTuv (LocaleId lang, TuvXmlLang trgType, int counter, int segType){
+	TmxTuv (LocaleId lang, TuvXmlLang trgType, int counter, int segType, String lineBreak){
 		this.lang = lang;
 		this.trgType = trgType;
-		this.langCount= counter;
+		this.langCount = counter;
+		this.lineBreak = lineBreak;
 				
 		if (segType == 0){
 			tc.setHasBeenSegmentedFlag(true);
@@ -68,10 +71,12 @@ public class TmxTuv {
 	 * @param reader XmlStreamReader.
 	 * @param tuvTrgType Together with processAllTargets determines if property should be added. 
 	 * @param processAllTargets Together with tuvTrgType determines if property should be added.
+	 * @param escapeGT whether to escape the '>' symbol in attribute values
 	 * @return Name of property if elem is passed as "prop" or "note".
 	 */
-	void parseStartElement (XMLStreamReader reader , TuvXmlLang tuvTrgType, boolean processAllTargets) {
-		parseStartElement (reader,tuvTrgType, processAllTargets, null);
+	void parseStartElement (XMLStreamReader reader , TuvXmlLang tuvTrgType, boolean processAllTargets,
+							boolean escapeGT) {
+		parseStartElement (reader,tuvTrgType, processAllTargets, escapeGT, null);
 	}	
 	
 	
@@ -82,7 +87,8 @@ public class TmxTuv {
 	 * @param processAllTargets Together with tuvTrgType determines if property should be added.
 	 * @return Name of property if elem is passed as "prop" or "note".
 	 */
-	String parseStartElement (XMLStreamReader reader , TuvXmlLang tuvTrgType, boolean processAllTargets, String elem) {
+	String parseStartElement (XMLStreamReader reader , TuvXmlLang tuvTrgType, boolean processAllTargets, 
+						      boolean escapeGT, String elem) {
 
 		String propName="";
 		
@@ -96,19 +102,13 @@ public class TmxTuv {
 
 		int count = reader.getNamespaceCount();
 		for ( int i=0; i<count; i++ ) {
-			prefix = reader.getNamespacePrefix(i);
-			skelBefore.append(String.format(" xmlns%s=\"%s\"",
-				((prefix.length()>0) ? ":"+prefix : ""),
-				reader.getNamespaceURI(i)));
+			TmxUtils.copyXMLNSToSkeleton(skelBefore, reader.getNamespacePrefix(i), 
+					 reader.getNamespaceURI(i));
 		}
 		count = reader.getAttributeCount();
 		for ( int i=0; i<count; i++ ) {
 			if ( !reader.isAttributeSpecified(i) ) continue; // Skip defaults
-			prefix = reader.getAttributePrefix(i); 
-			skelBefore.append(String.format(" %s%s=\"%s\"",
-				(((prefix==null)||(prefix.length()==0)) ? "" : prefix+":"),
-				reader.getAttributeLocalName(i),
-				reader.getAttributeValue(i)));
+			TmxUtils.copyAttributeToSkeleton(skelBefore, reader, i, lineBreak, escapeGT);
 			
 			if(elem!=null && elem.equals("prop")){
 				if(reader.getAttributeLocalName(i).equals("type")){
@@ -130,7 +130,6 @@ public class TmxTuv {
 		
 		return propName;		
 	}
-	
 	
 	/**
 	 * Appends skeleton to either 'skelBefore' or 'skelAfter' depending on the value of 'finishedSegSection'. 

@@ -27,6 +27,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.regex.Pattern;
 
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.TestUtil;
@@ -58,6 +59,11 @@ public class ExtractionStepTest {
 	@Before
 	public void setUp() {
 		root = TestUtil.getParentDir(this.getClass(), "/test01.properties");
+		// Java returns paths with a leading slash even on Windows; this
+		// does not represent what will really be passed to the step in practice.
+		// Strip the leading slash if we're on Windows with a drive-letter path.
+		if (System.getProperty("os.name").startsWith("Windows") && Pattern.matches("^/[A-Z]:.*$", root))
+			root = root.substring(1);
 	}
 
 	@Test

@@ -771,6 +771,22 @@ public class TmxFilterTest {
 		list.clear();
 		list.add(new InputDocument(root+"compkit/ImportTest1I.tmx", null));
 		assertTrue(rtc.executeCompare(filter, list, "UTF-8", locENUS, locJAJP));
-	}	
+	}
+	
+	@Test
+	public void testTUTUVAttrEscaping () {
+		String snippet = "<?xml version=\"1.0\"?>\r"
+			+ "<tmx version=\"1.4\"><header creationtool=\"z\" creationtoolversion=\"z\" segtype=\"block\" o-tmf=\"z\" adminlang=\"en\" srclang=\"en\" datatype=\"unknown\"></header>"
+			+ "<body><tu tuid=\"tuid_1\" foo=\"&lt;VALUE1&amp;VALUE2\">"
+			+ "<prop type=\"p1\">val1</prop>"
+			+ "<tuv xml:lang=\"en\" foo=\"&lt;VALUE1&amp;VALUE2;\"><seg>Hello World!</seg></tuv></tu></body></tmx>\r";
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 1);
+		assertNotNull(tu);
+		// We should not find invalid skeleton content.  The skeleton content 
+		// includes both the TU and TUV attribute values, so the easiest way to
+		// check this is by making sure unescaped stuff didn't sneak in.
+		assertTrue(tu.getSkeleton().toString().indexOf("<VALUE1") == -1);
+		assertTrue(tu.getSkeleton().toString().indexOf("&VALUE2") == -1);
+	}
 	
 }

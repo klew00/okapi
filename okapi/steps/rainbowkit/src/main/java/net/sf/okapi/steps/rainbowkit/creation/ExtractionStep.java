@@ -222,10 +222,8 @@ public class ExtractionStep extends BasePipelineStep {
 	@Override
 	protected Event handleStartDocument (Event event) {
 		StartDocument sd = event.getStartDocument();
-		String tmpIn = inputURI.getPath();
-		String relativeInput = tmpIn.substring(inputRootDir.length()+1);
-		String tmpOut = outputURI.getPath();
-		String relativeOutput = tmpOut.substring(outputRootDir.length()+2);
+		String relativeInput = new File(inputRootDir).toURI().relativize(inputURI).getPath();
+		String relativeOutput = new File(outputRootDir).toURI().relativize(outputURI).getPath();
 
 		IParameters prm = sd.getFilterParameters();
 		String paramsData = null;

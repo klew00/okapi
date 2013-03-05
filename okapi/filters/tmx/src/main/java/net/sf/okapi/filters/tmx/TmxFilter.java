@@ -445,19 +445,13 @@ public class TmxFilter implements IFilter {
 
 		int count = reader.getNamespaceCount();
 		for ( int i=0; i<count; i++ ) {
-			prefix = reader.getNamespacePrefix(i);
-			skel.append(String.format(" xmlns%s=\"%s\"",
-				((prefix.length()>0) ? ":"+prefix : ""),
-				reader.getNamespaceURI(i)));
+			TmxUtils.copyXMLNSToSkeleton(skel, reader.getNamespacePrefix(i), 
+					 reader.getNamespaceURI(i));
 		}
 		count = reader.getAttributeCount();
 		for ( int i=0; i<count; i++ ) {
 			if ( !reader.isAttributeSpecified(i) ) continue; // Skip defaults
-			prefix = reader.getAttributePrefix(i); 
-			skel.append(String.format(" %s%s=\"%s\"",
-				(((prefix==null)||(prefix.length()==0)) ? "" : prefix+":"),
-				reader.getAttributeLocalName(i),
-				Util.escapeToXML(reader.getAttributeValue(i).replace("\n", lineBreak), 3, params.escapeGT, null)));
+			TmxUtils.copyAttributeToSkeleton(skel, reader, i, prefix, params.escapeGT);
 		}
 		skel.append(">");
 	}
@@ -526,7 +520,8 @@ public class TmxFilter implements IFilter {
 			propName = tmxTu.parseStartElement(reader,startElement, params.escapeGT);
 		}else if (tuvTrgType == TuvXmlLang.SOURCE || tuvTrgType == TuvXmlLang.TARGET || params.processAllTargets){
 			//determine the property name and add skel to TmxTuv
-			propName = tmxTu.curTuv.parseStartElement(reader, tuvTrgType, params.processAllTargets, startElement);
+			propName = tmxTu.curTuv.parseStartElement(reader, tuvTrgType, params.processAllTargets, 
+													  params.escapeGT, startElement);
 		}
 		
 		try {
@@ -590,7 +585,7 @@ public class TmxFilter implements IFilter {
 		}
 		
 		//storeTuStartElement();							//store the <seg> element with it's properties
-		tmxTu.curTuv.parseStartElement(reader, tuvTrgType, params.processAllTargets);
+		tmxTu.curTuv.parseStartElement(reader, tuvTrgType, params.processAllTargets, params.escapeGT);
 		
 		try {
 			while(reader.hasNext()){					//loop through the <seg> content
@@ -648,7 +643,7 @@ public class TmxFilter implements IFilter {
 						}
 						break;
 					}else{
-						tmxTu.curTuv.parseStartElement(reader, tuvTrgType, params.processAllTargets);
+						tmxTu.curTuv.parseStartElement(reader, tuvTrgType, params.processAllTargets, params.escapeGT);
 					}
 					break;
 					
@@ -768,7 +763,7 @@ public class TmxFilter implements IFilter {
 						tuvTrgType = getTuvTrgType(currentLang);
 						
 						TmxTuv tmxTuv = tmxTu.addTmxTuv(currentLang,tuvTrgType);
-						tmxTuv.parseStartElement(reader,tuvTrgType, params.processAllTargets);
+						tmxTuv.parseStartElement(reader,tuvTrgType, params.processAllTargets, params.escapeGT);
 						
 					}else if(reader.getLocalName().equals("seg")){
 						elemStack.push("seg");
@@ -841,11 +836,7 @@ public class TmxFilter implements IFilter {
 			String prefix;
 			for ( int i=0; i<count; i++ ) {
 				if ( !reader.isAttributeSpecified(i) ) continue; // Skip defaults
-				prefix = reader.getAttributePrefix(i); 
-				outerCode.append(String.format(" %s%s=\"%s\"",
-					(((prefix==null)||(prefix.length()==0)) ? "" : prefix+":"),
-					reader.getAttributeLocalName(i),
-					Util.escapeToXML(reader.getAttributeValue(i).replace("\n", lineBreak), 3, params.escapeGT, null)));
+				TmxUtils.copyAttributeToBuffer(outerCode, reader, i, lineBreak, params.escapeGT);
 			}
 			outerCode.append(">");
 			
@@ -881,19 +872,13 @@ public class TmxFilter implements IFilter {
 					}
 					count = reader.getNamespaceCount();
 					for ( int i=0; i<count; i++ ) {
-						prefix = reader.getNamespacePrefix(i);
-						tmpg.append(String.format(" xmlns%s=\"%s\"",
-							((prefix!=null) ? ":"+prefix : ""),
-							reader.getNamespaceURI(i)));
+						TmxUtils.copyXMLNSToBuffer(tmpg, reader.getNamespacePrefix(i), 
+												   reader.getNamespaceURI(i));
 					}
 					count = reader.getAttributeCount();
 					for ( int i=0; i<count; i++ ) {
 						if ( !reader.isAttributeSpecified(i) ) continue; // Skip defaults
-						prefix = reader.getAttributePrefix(i); 
-						tmpg.append(String.format(" %s%s=\"%s\"",
-							(((prefix==null)||(prefix.length()==0)) ? "" : prefix+":"),
-							reader.getAttributeLocalName(i),
-							Util.escapeToXML(reader.getAttributeValue(i).replace("\n", lineBreak), 3, params.escapeGT, null)));
+						TmxUtils.copyAttributeToBuffer(tmpg, reader, i, lineBreak, params.escapeGT);
 					}
 					tmpg.append(">");
 				
@@ -941,7 +926,6 @@ public class TmxFilter implements IFilter {
 			throw new OkapiIOException(e);
 		}
 	}	
-	
 
 	/**
 	 * Gets the TuvXmlLang based on current language and source and specified target lang
