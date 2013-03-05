@@ -3,7 +3,7 @@
   <parent>
     <groupId>net.sf.okapi.applications</groupId>
     <artifactId>build-applications</artifactId>
-    <version>0.20-SNAPSHOT</version>
+    <version>0.21-SNAPSHOT</version>
   </parent>
   <artifactId>okapi-application-checkmate-webapp</artifactId>
   <name>Okapi CheckMate (Web version)</name>

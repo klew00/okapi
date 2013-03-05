@@ -4,7 +4,7 @@
 
 	<groupId>net.sf.okapi</groupId>
 	<artifactId>build-okapi-superpom</artifactId>
-	<version>0.20-SNAPSHOT</version>
+	<version>0.21-SNAPSHOT</version>
 
 	<packaging>pom</packaging>
 	<name>Okapi SuperPOM</name>
