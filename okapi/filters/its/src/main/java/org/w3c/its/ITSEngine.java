@@ -1166,7 +1166,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 		rule.flag = retrieveLocNoteType(elem, false, true, false);
 
 		// Try to get the locNote element
-		String value1 = "";
+		String value1 = null;
 		NodeList list = elem.getElementsByTagNameNS(ITS_NS_URI, "locNote");
 		if ( list.getLength() > 0 ) {
 			value1 = getTextContent(list.item(0));
@@ -1176,7 +1176,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 		String value3 = elem.getAttribute("locNoteRef");
 		String value4 = elem.getAttribute("locNoteRefPointer");
 		
-		if ( value1.length() > 0 ) {
+		if ( value1 != null ) {
 			rule.infoType = INFOTYPE_TEXT;
 			rule.info = value1;
 			if (( value2.length() > 0 ) || ( value3.length() > 0 ) || ( value4.length() > 0 )) {
