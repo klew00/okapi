@@ -42,11 +42,13 @@ public class Parameters extends BaseParameters {
 	private static final String DEEPENSEGMENTATION = "deepenSegmentation";
 	private static final String SOURCESRXPATH = "sourceSrxPath";
 	private static final String TARGETSRXPATH = "targetSrxPath";
+	private static final String RENUMBERCODES = "renumberCodes";
 	
 	public boolean segmentSource;
 	public boolean segmentTarget;
 	public boolean copySource;
 	public boolean checkSegments;
+	public boolean renumberCodes;
 	public int trimSrcLeadingWS;
 	public int trimSrcTrailingWS;
 	public int trimTrgLeadingWS;
@@ -65,6 +67,7 @@ public class Parameters extends BaseParameters {
 	public void reset() {
 		segmentSource = true;
 		segmentTarget = false;
+		renumberCodes = false;
 		sourceSrxPath = "";
 		targetSrxPath = "";
 		copySource = true;
@@ -104,6 +107,14 @@ public class Parameters extends BaseParameters {
 		return targetSrxPath;
 	}
 
+	public boolean getRenumberCodes() {
+		return renumberCodes;
+	}
+	
+	public void setRenumberCodes(boolean renumberCodes) {
+		this.renumberCodes = renumberCodes;
+	}
+	
 	public void fromString (String data) {
 		reset();
 		buffer.fromString(data);
@@ -120,6 +131,7 @@ public class Parameters extends BaseParameters {
 		forceSegmentedOutput = buffer.getBoolean(FORCESEGMENTEDOUTPUT, forceSegmentedOutput);
 		overwriteSegmentation = buffer.getBoolean(OVERWRITESEGMENTATION, overwriteSegmentation);
 		deepenSegmentation = buffer.getBoolean(DEEPENSEGMENTATION, deepenSegmentation);
+		renumberCodes = buffer.getBoolean(RENUMBERCODES, renumberCodes);
 	}
 
 	@Override
@@ -138,6 +150,7 @@ public class Parameters extends BaseParameters {
 		buffer.setBoolean(FORCESEGMENTEDOUTPUT, forceSegmentedOutput);
 		buffer.setBoolean(OVERWRITESEGMENTATION, overwriteSegmentation);
 		buffer.setBoolean(DEEPENSEGMENTATION, deepenSegmentation);
+		buffer.setBoolean(RENUMBERCODES, renumberCodes);
 		return buffer.toString();
 	}
 

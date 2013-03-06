@@ -36,11 +36,14 @@ import net.sf.okapi.common.Util;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
 import net.sf.okapi.common.pipeline.annotations.StepParameterMapping;
 import net.sf.okapi.common.pipeline.annotations.StepParameterType;
+import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.ISegments;
 import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextContainer;
+import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextPart;
+import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.lib.segmentation.SRXDocument;
 import net.sf.okapi.steps.segmentation.Parameters.SegmStrategy;
 
@@ -192,6 +195,10 @@ public class SegmentationStep extends BasePipelineStep {
 				// Has been segmented or not (if unsegmented, it's still 1 segment)
 				deepenSegmentation(tu.getSource(), srcSeg);
 			}
+			
+			if ( params.renumberCodes ) {
+				RenumberingUtil.renumberCodesForSegmentation(tu.getSource());
+			}
 		}
 		
 		if (targetLocales != null) {
@@ -209,6 +216,9 @@ public class SegmentationStep extends BasePipelineStep {
 					else if (params.getSegmentationStrategy() == SegmStrategy.DEEPEN_EXISTING) {
 						// Has been segmented or not (if unsegmented, it's still 1 segment)
 						deepenSegmentation(trgCont, trgSeg);
+					}
+					if ( params.renumberCodes ) {
+						RenumberingUtil.renumberCodesForSegmentation(trgCont);
 					}
 				}
 				

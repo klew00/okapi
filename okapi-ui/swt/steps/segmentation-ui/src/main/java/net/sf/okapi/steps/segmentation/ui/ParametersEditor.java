@@ -64,6 +64,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 	private Button chkCopySource;
 	private Button chkCheckSegments;
 	private Button chkForceSegmentedOutput;
+	private Button chkRenumberCodes;
 	private Text edSourceSRX;
 	private Text edTargetSRX;
 	private IHelp help;
@@ -260,6 +261,10 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		chkForceSegmentedOutput = new Button(grpOptions, SWT.CHECK);
 		chkForceSegmentedOutput.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		chkForceSegmentedOutput.setText("When possible force the output to show the segmentation");
+		
+		chkRenumberCodes = new Button(grpOptions, SWT.CHECK);
+		chkRenumberCodes.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		chkRenumberCodes.setText("Renumber code IDs");
 	}
 		
 	private boolean showDialog () {
@@ -327,6 +332,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		chkCopySource.setSelection(params.copySource);
 		chkCheckSegments.setSelection(params.checkSegments);
 		chkForceSegmentedOutput.setSelection(params.getForcesegmentedOutput());
+		chkRenumberCodes.setSelection(params.getRenumberCodes());
 		listBehaviorForSegmented.setSelection(params.getSegmentationStrategy().ordinal());
 		updateSourceDisplay();
 		updateTargetDisplay();
@@ -345,6 +351,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		params.copySource = chkCopySource.getSelection();
 		params.checkSegments = chkCheckSegments.getSelection();
 		params.setForcesegmentedOutput(chkForceSegmentedOutput.getSelection());
+		params.setRenumberCodes(chkRenumberCodes.getSelection());
 		params.setSegmentationStrategy(SegmStrategy.values()[listBehaviorForSegmented.getSelectionIndex()]);
 		result = true;
 		return true;
