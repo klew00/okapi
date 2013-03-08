@@ -23,6 +23,11 @@ distribution.</p>
 </ul>
 <h2>Changes from M20 to M21-SNAPSHOT</h2>
 <ul>
+	<li>Tikal:<ul>
+	<li>Added the <code>-safe</code> option to prompt user when overriding a 
+	directory when extracting.</li>
+</ul>
+	</li>
 	<li>Filters:<ul>
 	<li>ITS Filters (XML Filter and HTML5+ITS Filter):<ul>
 	<li>Continued implementation of ITS 2.0.</li>
@@ -72,7 +77,14 @@ distribution.</p>
 	parameters.</li>
 </ul>
 	</li>
-    <li>Segmentation and Desegmentation Steps:<ul>
+    <li>Rainbow Translation Kit Creation Step:<ul>
+	<li>Added to XLIFF outputs the option of outputting <code>ctype</code> and
+	<code>equiv-text</code> attributes in inline codes.</li>
+	<li>Added to OmegaT output the output of <code>ctype</code> and <code>
+	equiv-text</code> attributes in inline codes.</li>
+</ul>
+    </li>
+	<li>Segmentation and Desegmentation Steps:<ul>
     <li>Added the option to renumber code IDs after segmentation so that they 
         are 1-indexed as much as possible.  A corresponding option on the 
         desegmentation step reverses the process.  This option will not 
@@ -84,6 +96,8 @@ distribution.</p>
 	</li>
 	<li>Libraries:<ul>
 	<li>Continued implementation of ITS 2.0 in XLIFF Writer.</li>
+	<li>Changed options settings for the XLIFFWriter class to use an object 
+	rather than multiple setters.</li>
 </ul>
 	</li>
 </ul>
