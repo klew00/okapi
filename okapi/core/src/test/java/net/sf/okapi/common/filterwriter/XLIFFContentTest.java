@@ -174,7 +174,20 @@ public class XLIFFContentTest {
 		GenericAnnotations.addAnnotations(end, anns);
 		// Output
 		assertEquals("Before <g id=\"1\"><mrk its:allowedCharacters=\"[a-z]\" mtype=\"x-its\">the span</mrk></g> after.",
-			fmt.setContent(tf).toString(true));
+			fmt.setContent(tf).toString(1, true, false, true, false));
+	}
+
+	@Test
+	public void testCodeExtendedAttributes () {
+		TextFragment tf = new TextFragment("Beginning ");
+		Code img = tf.append(TagType.PLACEHOLDER, "image", "<img/>");
+		img.setDisplayText("[hint for user]");
+		tf.append(" middle ");
+		tf.append(TagType.PLACEHOLDER, "other", "<other/>");
+		tf.append(" end.");
+
+		assertEquals("Beginning <x id=\"1\" ctype=\"image\" equiv-text=\"[hint for user]\"/> middle <x id=\"2\" ctype=\"x-other\"/> end.",
+				fmt.setContent(tf).toString(1, true, false, true, true));
 	}
 	
 	private TextFragment createTextFragment () {

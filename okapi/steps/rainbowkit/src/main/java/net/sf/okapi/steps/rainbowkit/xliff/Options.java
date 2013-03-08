@@ -33,12 +33,14 @@ public class Options extends BaseParameters implements IEditorDescriptionProvide
 	private static final String SETAPPROVEDASNOTRANSLATE = "setApprovedAsNoTranslate"; //$NON-NLS-1$
 	private static final String COPYSOURCE = "copySource"; //$NON-NLS-1$
 	private static final String INCLUDEALTTRANS = "includeAltTrans"; //$NON-NLS-1$
+	private static final String INCLUDECODEATTRS = "includeCodeAttrs"; //$NON-NLS-1$
 	
 	private boolean placeholderMode;
 	private boolean includeNoTranslate;
 	private boolean setApprovedAsNoTranslate;
 	private boolean copySource;
 	private boolean includeAltTrans;
+	private boolean includeCodeAttrs;
 
 	public Options () {
 		reset();
@@ -51,6 +53,7 @@ public class Options extends BaseParameters implements IEditorDescriptionProvide
 		setApprovedAsNoTranslate = false;
 		copySource = true;
 		includeAltTrans = true;
+		includeCodeAttrs = false;
 	}
 
 	@Override
@@ -62,6 +65,7 @@ public class Options extends BaseParameters implements IEditorDescriptionProvide
 		setApprovedAsNoTranslate = buffer.getBoolean(SETAPPROVEDASNOTRANSLATE, setApprovedAsNoTranslate);
 		copySource = buffer.getBoolean(COPYSOURCE, copySource);
 		includeAltTrans = buffer.getBoolean(INCLUDEALTTRANS, includeAltTrans);
+		includeCodeAttrs = buffer.getBoolean(INCLUDECODEATTRS, includeCodeAttrs);
 		
 		// Make sure the we can merge later
 		if ( !includeNoTranslate ) {
@@ -77,6 +81,7 @@ public class Options extends BaseParameters implements IEditorDescriptionProvide
 		buffer.setBoolean(SETAPPROVEDASNOTRANSLATE, setApprovedAsNoTranslate);
 		buffer.setBoolean(COPYSOURCE, copySource);
 		buffer.setBoolean(INCLUDEALTTRANS, includeAltTrans);
+		buffer.setBoolean(INCLUDECODEATTRS, includeCodeAttrs);
 		return buffer.toString();
 	}
 
@@ -120,6 +125,14 @@ public class Options extends BaseParameters implements IEditorDescriptionProvide
 		this.includeAltTrans = includeAltTrans;
 	}
 
+	public boolean getIncludeCodeAttrs () {
+		return includeCodeAttrs;
+	}
+
+	public void setIncludeCodeAttrs (boolean includeCodeAttrs) {
+		this.includeCodeAttrs = includeCodeAttrs;
+	}
+
 	@Override
 	public ParametersDescription getParametersDescription() {
 		ParametersDescription desc = new ParametersDescription(this);
@@ -128,6 +141,7 @@ public class Options extends BaseParameters implements IEditorDescriptionProvide
 		desc.add(SETAPPROVEDASNOTRANSLATE, "Set approved entries as non-translatable", null);
 		desc.add(COPYSOURCE, "Copy source text in target if no target is available", null);
 		desc.add(INCLUDEALTTRANS, "Include <alt-trans> elements", null);
+		desc.add(INCLUDECODEATTRS, "Include extended code attributes", null);
 		return desc;
 	}
 
@@ -140,6 +154,7 @@ public class Options extends BaseParameters implements IEditorDescriptionProvide
 		desc.addCheckboxPart(paramsDesc.get(PLACEHOLDERMODE));
 		desc.addCheckboxPart(paramsDesc.get(COPYSOURCE));
 		desc.addCheckboxPart(paramsDesc.get(INCLUDEALTTRANS));
+		desc.addCheckboxPart(paramsDesc.get(INCLUDECODEATTRS));
 		return desc;
 	}
 

@@ -55,6 +55,7 @@ import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.FilterConfigurationMapper;
 import net.sf.okapi.common.filters.IFilterConfigurationEditor;
 import net.sf.okapi.common.filters.IFilterConfigurationListEditor;
+import net.sf.okapi.common.filterwriter.XLIFFWriterParameters;
 import net.sf.okapi.common.filterwriter.XLIFFWriter;
 import net.sf.okapi.common.pipeline.IPipelineStep;
 import net.sf.okapi.common.pipelinedriver.BatchItemContext;
@@ -157,6 +158,7 @@ public class Main {
 	protected String levOptTMXPath;
 	protected boolean extOptCopy = true; // Copy source in empty target by default
 	protected boolean extOptAltTrans = true; // Output alt-trans by default
+	protected boolean extOptCodeAttrs = false; // Disable extended code attributes by default
 	protected boolean mosesCopyToTarget = false;
 	protected boolean mosesOverwriteTarget = false;
 	protected boolean moses2Outputs = false;
@@ -346,6 +348,9 @@ public class Main {
 				}
 				else if ( arg.equals("-noalttrans") ) {
 					prog.extOptAltTrans = false;
+				}
+				else if ( arg.equals("-codeattrs") ) {
+					prog.extOptCodeAttrs = true;
 				}
 				else if ( arg.equals("-maketmx") ) {
 					prog.levOptTMXPath = "pretrans.tmx";
@@ -1503,9 +1508,11 @@ public class Main {
 		// Filter events to raw document final step (using the XLIFF writer)
 		FilterEventsWriterStep fewStep = new FilterEventsWriterStep();
 		XLIFFWriter writer = new XLIFFWriter();
-		writer.setPlaceholderMode(true);
-		writer.setCopySource(extOptCopy);
-		writer.setIncludeAltTrans(extOptAltTrans);
+		XLIFFWriterParameters paramsXliff = (XLIFFWriterParameters)writer.getParameters();
+		paramsXliff.setPlaceholderMode(true);
+		paramsXliff.setCopySource(extOptCopy);
+		paramsXliff.setIncludeAltTrans(extOptAltTrans);
+		paramsXliff.setIncludeCodeAttrs(extOptCodeAttrs);
 		fewStep.setFilterWriter(writer);
 		fewStep.setDocumentRoots(rootDir);
 		driver.addStep(fewStep);

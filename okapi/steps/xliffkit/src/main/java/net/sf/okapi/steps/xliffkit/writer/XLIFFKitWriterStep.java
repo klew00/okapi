@@ -41,6 +41,7 @@ import net.sf.okapi.common.UsingParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.XMLWriter;
 import net.sf.okapi.common.encoder.EncoderManager;
+import net.sf.okapi.common.filterwriter.XLIFFWriterParameters;
 import net.sf.okapi.common.filterwriter.XLIFFContent;
 import net.sf.okapi.common.filterwriter.XLIFFWriter;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
@@ -216,10 +217,12 @@ public class XLIFFKitWriterStep extends BasePipelineStep {
 		} catch (InvalidFormatException e1) {
 			// TODO Handle exception
 		}
-		
-		writer.setCopySource(params.isCopySource());
-        writer.setPlaceholderMode(params.isPlaceholderMode());
-		
+
+		XLIFFWriterParameters paramsXliff = (XLIFFWriterParameters)writer.getParameters();
+		paramsXliff.setCopySource(params.isCopySource());
+		paramsXliff.setPlaceholderMode(params.isPlaceholderMode());
+		paramsXliff.setIncludeCodeAttrs(params.isIncludeCodeAttrs());
+
 		session.setDescription(params.getMessage());
 	}
 	

@@ -336,8 +336,9 @@ public abstract class ITSFilter implements IFilter {
 						else frag.append(node.getNodeValue());
 					}
 					else {//TODO: escape unsupported chars
-						frag.append(TagType.PLACEHOLDER, null, Util.escapeToXML(
-							node.getNodeValue().replace("\n", (params.escapeLineBreak ? "&#10;" : lineBreak)), 0, false, null));
+						String text = node.getNodeValue().replace("\n", (params.escapeLineBreak ? "&#10;" : lineBreak));
+						Code code = frag.append(TagType.PLACEHOLDER, null, Util.escapeToXML(text, 0, false, null));
+						code.setDisplayText(text);
 					}
 				}
 				break;

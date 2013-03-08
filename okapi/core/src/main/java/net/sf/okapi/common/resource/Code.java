@@ -36,6 +36,10 @@ import net.sf.okapi.common.resource.TextFragment.TagType;
 public class Code {
 
 	/**
+	 * Code type value for null type, to prevent it from ever being truly null.
+	 */
+	public static final String TYPE_NULL = "null";
+	/**
 	 * Code type value for bold.
 	 */
 	public static final String TYPE_BOLD = "bold";
@@ -112,7 +116,7 @@ public class Code {
 	protected int id;
 	/**
 	 * Type of the code.
-	 * It MUST NEVER be null (so internal compare can be fast), null is mapped to "null"
+	 * It MUST NEVER be null (so internal compare can be fast), null is mapped to {@link #TYPE_NULL}
 	 */
 	protected String type;
 	/**
@@ -259,7 +263,7 @@ public class Code {
 				Code code = new Code(TagType.valueOf(tmpFields[0]), tmpFields[2], tmpFields[3]);
 				code.id = Integer.valueOf(tmpFields[1]);
 				code.flag = Integer.valueOf(tmpFields[4]);
-				if ( !tmpFields[5].equals("null") ) {
+				if ( !tmpFields[5].equals(TYPE_NULL) ) {
 					if (code.outerData == null) {
 						code.outerData = new StringBuilder(DATA_DEFAULT_SIZE);
 					}
@@ -311,7 +315,7 @@ public class Code {
 		this.tagType = tagType;
 		flag = 0; // Default: not cloneable, not deleteable
 		// Never let the type to be null
-		if ( type == null ) this.type = "null";
+		if ( type == null ) this.type = TYPE_NULL;
 		else this.type = type;
 		
 		// Initialize data
@@ -497,7 +501,7 @@ public class Code {
 	
 	/**
 	 * Gets the abstract type for the code. For example: "bold".
-	 * @return the abstract type of the code. This value should never be null (it is set to "null" if not otherwise set).
+	 * @return the abstract type of the code. This value should never be null (it is set to {@link #TYPE_NULL} if not otherwise set).
 	 */
 	public String getType () {
 		return type;
@@ -506,10 +510,10 @@ public class Code {
 	/**
 	 * Sets the abstract type of the code. This member is used to match up
 	 * together opening and closing codes.
-	 * @param value the new abstract type of the code. Null is mapped to "null".
+	 * @param value the new abstract type of the code. Null is mapped to {@link #TYPE_NULL}.
 	 */
 	public void setType (String value) {
-		if ( value == null ) type = "null";
+		if ( value == null ) type = TYPE_NULL;
 		else type = value;
 	}
 	
@@ -718,4 +722,23 @@ public class Code {
 		return ann.getString(fieldName);
 	}
 
+	/**
+	 * Set the display equivalent text for this code. This is intended to be
+	 * an explanatory hint displayed to the user.
+	 * @param text The display text for this code
+	 */
+	public void setDisplayText(String text) {
+		GenericAnnotation ann = new GenericAnnotation(GenericAnnotationType.DISPLAYTEXT);
+		ann.setString(GenericAnnotationType.DISPLAYTEXT_VALUE, text);
+		GenericAnnotation.addAnnotation(this, ann);
+	}
+
+	/**
+	 * Get the display equivalent text for this code.
+	 * @return The display text for this code, or null if none exists
+	 */
+	public String getDisplayText() {
+		return getGenericAnnotationString(GenericAnnotationType.DISPLAYTEXT,
+				GenericAnnotationType.DISPLAYTEXT_VALUE);
+	}
 }

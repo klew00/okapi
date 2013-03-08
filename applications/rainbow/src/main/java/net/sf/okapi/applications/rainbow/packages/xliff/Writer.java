@@ -344,13 +344,13 @@ public class Writer extends BaseWriter {
 		writer.writeAttributeString("xml:lang", manifest.getSourceLanguage().toBCP47());
 		// Write full source content (always without segments markers
 		writer.writeRawXML(xliffCont.toSegmentedString(tc, 0, false, false,
-			options.gMode));
+			options.gMode, false));
 		writer.writeEndElementLineBreak(); // source
 		// Write segmented source (with markers) if needed
 		if ( tc.hasBeenSegmented() ) {
 			writer.writeStartElement("seg-source");
 			writer.writeRawXML(xliffCont.toSegmentedString(tc, 0, false, true,
-				options.gMode));
+				options.gMode, false));
 			writer.writeEndElementLineBreak(); // seg-source
 		}
 
@@ -373,7 +373,7 @@ public class Writer extends BaseWriter {
 		
 		// Now tc hold the content to write. Write it with or without marks
 		writer.writeRawXML(xliffCont.toSegmentedString(tc, 0, false, tc.hasBeenSegmented(),
-			options.gMode));
+			options.gMode, false));
 		writer.writeEndElementLineBreak(); // target
 		
 		// Note
@@ -429,14 +429,14 @@ public class Writer extends BaseWriter {
 			if ( !cont.isEmpty() ) {
 				writer.writeStartElement("source");
 				writer.writeAttributeString("xml:lang", at.getSourceLocale().toBCP47());
-				writer.writeRawXML(xliffCont.toSegmentedString(cont, 0, false, false, options.gMode));
+				writer.writeRawXML(xliffCont.toSegmentedString(cont, 0, false, false, options.gMode, false));
 				writer.writeEndElementLineBreak(); // alt-trans
 			}
 			// alt-trans target
 			writer.writeStartElement("target");
 			writer.writeAttributeString("xml:lang", at.getTargetLocale().toBCP47());
 			cont = at.getTarget();
-			writer.writeRawXML(xliffCont.toSegmentedString(cont, 0, false, false, options.gMode));
+			writer.writeRawXML(xliffCont.toSegmentedString(cont, 0, false, false, options.gMode, false));
 			writer.writeEndElementLineBreak(); // target
 			// End of alt-trans
 			writer.writeEndElementLineBreak();
