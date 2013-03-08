@@ -142,7 +142,7 @@ public class XLIFFWriterParameters extends BaseParameters {
 
 	/**
 	 * Sets the flag indicating if extended code attributes should be output or not.
-	 * @param includeAltTrans true to include extended code attributes in the output.
+	 * @param includeCodeAttrs true to include extended code attributes in the output.
 	 */
 	public void setIncludeCodeAttrs(boolean includeCodeAttrs) {
 		this.includeCodeAttrs = includeCodeAttrs;
