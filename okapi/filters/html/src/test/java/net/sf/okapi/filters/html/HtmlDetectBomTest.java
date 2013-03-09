@@ -53,7 +53,7 @@ public class HtmlDetectBomTest {
 				assertTrue(sd.hasUTF8BOM());
 				assertEquals("UTF-8", sd.getEncoding());
 				assertEquals(locEN, sd.getLocale());
-				assertEquals("\r\n", sd.getLineBreak());
+				assertEquals("\n", sd.getLineBreak());
 			}
 		}
 	}
@@ -100,7 +100,7 @@ public class HtmlDetectBomTest {
 				assertFalse(sd.hasUTF8BOM());
 				assertEquals("UTF-8", sd.getEncoding());
 				assertEquals(locEN, sd.getLocale());
-				assertEquals("\r\n", sd.getLineBreak());
+				assertEquals("\n", sd.getLineBreak());
 			}
 		}		
 	}	
