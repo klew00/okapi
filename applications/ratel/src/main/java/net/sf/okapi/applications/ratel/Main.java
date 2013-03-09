@@ -48,6 +48,7 @@ public class Main {
 			// Start the application
 			dispMain = new Display();
 			Shell shlMain = new Shell(dispMain);
+			shlMain.setSize(700, 600);
 			SRXEditor editor = new SRXEditor(shlMain, false, help);
 			if ( args.length > 0 ) editor.showDialog(args[0]);
 			else editor.showDialog(null);

@@ -50,6 +50,8 @@ public class Main {
 			// Create the main shell
 			dispMain = new Display();
 			Shell shlMain = new Shell(dispMain);
+			shlMain.setSize(700, 600);
+			
 			// Create the editor
 			QualityCheckEditor editor = new QualityCheckEditor();
 			// Create and fill the configuration mapper

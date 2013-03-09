@@ -23,6 +23,7 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -220,6 +221,21 @@ public class ServalForm {
 		});
 		modResults = new TableModel();
 		modResults.linkTable(tblResults);
+		
+		if (!shell.getMaximized()) { // not RWT full-screen mode
+			// Set the minimal size to the packed size
+			// And then set the start size
+			Point startSize = shell.getSize();
+			shell.pack();
+			shell.setMinimumSize(shell.getSize());
+			shell.setSize(startSize);
+			
+			// Workaround for RWT (stretches the shell horizontally when column widths are adjusted)
+			shell.setMaximized(true);
+			shell.setMaximized(false);
+
+			UIUtil.centerShell(shell);
+		}
 	}
 	
 	private boolean setAttributes () {
@@ -333,10 +349,10 @@ public class ServalForm {
 	
 	public void run () {
 		try {
-			Display Disp = shell.getDisplay();
+			Display disp = shell.getDisplay();			
 			while ( !shell.isDisposed() ) {
-				if (!Disp.readAndDispatch())
-					Disp.sleep();
+				if (!disp.readAndDispatch())
+					disp.sleep();
 			}
 		}
 		finally {

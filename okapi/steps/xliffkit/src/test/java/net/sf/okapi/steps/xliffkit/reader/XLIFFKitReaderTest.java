@@ -174,6 +174,30 @@ public class XLIFFKitReaderTest {
 //				new FilterEventsToRawDocumentStep()
 		).execute();
 	}
+	
+	// DEBUG 		
+		@Test
+		public void testReader7() throws URISyntaxException {
+			
+			new XPipeline(
+					"Test pipeline for XLIFFKitReaderStep",
+					new XBatch(
+							new XBatchItem(
+									this.getClass().getResource("testPackageFormat7.xliff.kit").toURI(),
+									"UTF-8",
+									new File(Util.getTempDirectory() + "/testPackageFormat2").toURI(),
+									"UTF-8",
+									ENUS,
+									FRFR)
+							),
+					new XLIFFKitReaderStep()
+					,				
+					new EventLogger()
+//					,
+//					
+//					new FilterEventsToRawDocumentStep()
+			).execute();
+		}
 
 	
 	// DEBUG 	@Test

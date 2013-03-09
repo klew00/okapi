@@ -44,14 +44,17 @@ import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.annotation.AltTranslationsAnnotation;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filterwriter.GenericFilterWriter;
 import net.sf.okapi.common.observer.IObservable;
 import net.sf.okapi.common.observer.IObserver;
+import net.sf.okapi.common.query.MatchType;
 import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextContainer;
+import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnitUtil;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.filters.table.TableFilter;
@@ -1133,6 +1136,7 @@ public class XLIFFKitWriterTest {
 		writerStep.handleEvent(e6);
 		writerStep.handleEvent(e7);
 		writerStep.handleEvent(new Event(EventType.END_DOCUMENT));
+		writerStep.handleEvent(new Event(EventType.END_BATCH_ITEM)); // Closes the session and doesn't let END_BATCH serialized
 		writerStep.handleEvent(new Event(EventType.END_BATCH));
 		
 		assertEquals(9, beans.size());
@@ -1277,4 +1281,50 @@ public class XLIFFKitWriterTest {
 //		logger.info("Factory class: {}", ClassUtil.getQualifiedClassName(fact));
 //		logger.info("Reader class: {}", ClassUtil.getQualifiedClassName(reader));
 	}
+	
+	// DEBUG 
+		@Test
+		public void testAnnotations() throws URISyntaxException, MalformedURLException {
+
+			String pathBase = Util.getDirectoryName(this.getClass().getResource("test2.txt").toURI().getPath()) + "/";
+			String src1Path = pathBase + "src1/";
+			String src2Path = pathBase + "src2/";
+			//System.out.println(pathBase);
+			net.sf.okapi.connectors.pensieve.Parameters params = 
+				new net.sf.okapi.connectors.pensieve.Parameters();
+			params.setDbDirectory(pathBase + "testtm");
+			
+			XLIFFKitWriterStep ws = new XLIFFKitWriterStep();
+			AltTranslationsAnnotation ata = new AltTranslationsAnnotation();
+			ws.getSession().setAnnotation(ata);
+			ata.add(LocaleId.ENGLISH, LocaleId.GERMAN, new TextFragment("original source"), new TextFragment("alternate source"), new TextFragment("alternate target"), MatchType.EXACT, 100, "tests", 100, 100);
+			
+			new XPipeline(
+					"Test pipeline for XLIFFKitWriterStep",
+					new XBatch(								
+							new XBatchItem(
+									new URL("file", null, src1Path + "test12.html"),
+									"UTF-8",
+									ENUS,
+									DEDE)
+							),
+									
+							new RawDocumentToFilterEventsStep()
+					,				
+					new XPipelineStep(new LeveragingStep(), 
+							//new XParameter("resourceClassName", net.sf.okapi.connectors.opentran.OpenTranTMConnector.class.getName()),
+							new XParameter("resourceClassName", net.sf.okapi.connectors.pensieve.PensieveTMConnector.class.getName()),
+							new XParameter("resourceParameters", params.toString(), true),
+							new XParameter("threshold", 80),
+							new XParameter("fillTarget", true)
+					),
+					
+					new XPipelineStep(
+							ws,								
+							new XParameter("gMode", true),
+							new XParameter("includeOriginal", true),
+							new XParameter("message", "This document is a part of the test t-kit, generated from net.sf.okapi.steps.xliffkit.writer.testPackageFormat()"),
+							new XParameter("outputURI", new File(pathBase + "testPackageFormat7.xliff.kit").toURI().toString()))
+			).execute();
+		}
 }

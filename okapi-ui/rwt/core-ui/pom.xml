@@ -1,0 +1,101 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <parent>
+    <groupId>net.sf.okapi</groupId>
+    <artifactId>build-okapi-ui-rwt</artifactId>
+    <version>0.21-SNAPSHOT</version>
+  </parent>
+  
+  <modelVersion>4.0.0</modelVersion>
+  <artifactId>okapi-core-ui-rwt</artifactId>
+  <!--Used for display purposes only-->
+    <name>Eclipse RWT Okapi Core UI</name>
+   
+  	<repositories>
+		<!-- In Project repository -->
+		<repository>
+		<id>in-project</id>
+		<name>RWT 1.5.1 In-project Repo</name>
+		<url>file://${project.basedir}/repo</url>
+		</repository>
+	</repositories>
+  
+  <dependencies>
+  	<dependency>
+  		<groupId>org.eclipse.rap</groupId>
+  		<artifactId>rwt</artifactId>
+  		<version>1.5.1</version>
+  	</dependency>
+  	<dependency>
+  		<groupId>org.eclipse.rap</groupId>
+  		<artifactId>rwt-fileupload</artifactId>
+  		<version>1.5.1</version>
+  	</dependency>
+  	<dependency>
+  		<groupId>org.eclipse.rap</groupId>
+  		<artifactId>rwt-filedialog</artifactId>
+  		<version>1.5.1</version>
+  	</dependency>
+  	<dependency>
+  		<groupId>commons-io</groupId>
+  		<artifactId>commons-io</artifactId>
+  	</dependency>
+  	<dependency>
+  		<groupId>commons-fileupload</groupId>
+  		<artifactId>commons-fileupload</artifactId>
+  		<version>1.2.2</version>
+  	</dependency>
+  	<dependency>
+  		<groupId>javax.servlet</groupId>
+  		<artifactId>javax.servlet-api</artifactId>
+  		<version>3.0.1</version>
+  		<scope>provided</scope> <!-- !!! Not to include it in the WAR/lib -->
+  	</dependency>
+  	<dependency>
+  		<groupId>net.sf.okapi</groupId>
+  		<artifactId>okapi-core-ui</artifactId>
+  		<version>${project.version}</version>
+  		<exclusions>
+			<exclusion>
+				<artifactId>macosx</artifactId>
+				<groupId>org.eclipse.swt.carbon</groupId>
+			</exclusion>
+			<exclusion>
+				<artifactId>ppc</artifactId>
+				<groupId>org.eclipse.swt.gtk.linux</groupId>
+			</exclusion>
+			<exclusion>
+				<artifactId>x86</artifactId>
+				<groupId>org.eclipse.swt.gtk.linux</groupId>
+			</exclusion>
+			<exclusion>
+				<artifactId>x86_64</artifactId>
+				<groupId>org.eclipse.swt.gtk.linux</groupId>
+			</exclusion>
+			<exclusion>
+				<artifactId>sparc</artifactId>
+				<groupId>org.eclipse.swt.gtk.solaris</groupId>
+			</exclusion>
+			<exclusion>
+				<artifactId>ppc</artifactId>
+				<groupId>org.eclipse.swt.motif.aix</groupId>
+			</exclusion>
+			<exclusion>
+				<artifactId>x86</artifactId>
+				<groupId>org.eclipse.swt.win32.win32</groupId>
+			</exclusion>
+			<exclusion>
+				<artifactId>x86</artifactId>
+				<groupId>org.eclipse.swt.wpf.win32</groupId>
+			</exclusion>
+		</exclusions>		
+  	</dependency>
+  	<!-- 
+  	<dependency>
+  		<groupId>net.sf.okapi</groupId>
+  		<artifactId>okapi-core</artifactId>
+  		<version>${project.version}</version>
+  	</dependency>
+  	 -->
+  </dependencies>
+  
+</project>

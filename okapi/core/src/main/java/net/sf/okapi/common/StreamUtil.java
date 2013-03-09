@@ -21,6 +21,7 @@
 package net.sf.okapi.common;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -128,4 +129,18 @@ public class StreamUtil {
 	public static String streamAsString(InputStream in) {
         return streamAsString(in, "UTF-8");
     }
+	
+	public static InputStream stringAsStream(String str) {
+		return new ByteArrayInputStream(str.getBytes());
+	}
+	
+	public static InputStream stringAsStream(String str, String encoding) {
+		InputStream is = null;
+		try {
+			is = new ByteArrayInputStream(str.getBytes(encoding));
+		} catch (IOException e) {
+			throw new OkapiIOException(e);
+		}
+		return is;
+	}
 }

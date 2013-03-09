@@ -212,7 +212,7 @@ public class ReportGeneratorTest {
 		
 		String report = gen.generate();
 		assertEquals("Test report\n\n#Creation Date: <a1>\n#Project Name: <a2>\n#Target Locale: <a3>\n\n" +
-				"[?[?A7]]\n\n" +
+				"{?[?A7]}\n\n" +
 				"Total,<a4>,<a5>,<a6>\n\nThe report was created on <a1>\n", report);
 	}
 	
@@ -320,6 +320,25 @@ public class ReportGeneratorTest {
 		
 		assertEquals("   import [?IMPORT]; // description 1\n   import [?IMPORT]; " +
 				"// description 2\n   import [?IMPORT]; // description 3", 
+				gen.generate());
+	}
+	
+	@Test
+	public void tableReportTest12() {
+		ReportGenerator gen = new ReportGenerator(this.getClass().getResourceAsStream("test_template4.txt"));
+		assertFalse(gen.isHtmlReport());
+		assertTrue(gen.isMultiItemReport());
+		
+		gen.setField("IMPORT", "import1");
+		gen.setField("IMPORT", "import2");
+		gen.setField("IMPORT", "import3");
+		
+		gen.setField("IMPORT_DESCR", "description 1");
+		gen.setField("IMPORT_DESCR", "description 2");
+		gen.setField("IMPORT_DESCR", "description 3");
+		
+		assertEquals("     line 1\n  line 2\n   import import1; // description 1\n   import import2; " +
+				"// description 2\n   import import3; // description 3", 
 				gen.generate());
 	}
 }
