@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2011 by the Okapi Framework contributors
+  Copyright (C) 2008-2013 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -31,6 +31,7 @@ import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.ISkeleton;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.TestUtil;
+import net.sf.okapi.common.Util;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.ITextUnit;
@@ -200,7 +201,7 @@ public class RegexFilterTest {
 		filter.close();
 		return list;
 	}
-
+	
 	@Test
 	public void testEmptyLines() {
 		Parameters params = new Parameters();
@@ -253,7 +254,28 @@ public class RegexFilterTest {
 		testEvent(EventType.TEXT_UNIT, "Line 4");
 		testEvent(EventType.DOCUMENT_PART, "\n\n\n\n\n\n");
 		testEvent(EventType.END_DOCUMENT, "");
-	}	
+	}
+
+	@Test
+	public void testSemicolonInData() {
+		
+		IParameters params = filter.getParameters();
+		params.load(Util.toURI(root + "/okf_regex@macStrings.fprm"), false);
+						
+		filter.open(new RawDocument(Util.toURI(root + "/TestRules07.strings"), "Windows-1252", locEN));
+		
+		testEvent(EventType.START_DOCUMENT, "");
+		testEvent(EventType.DOCUMENT_PART, "/* Comment 1 */\n\"Item_Without_semicolon\" = \"");
+		testEvent(EventType.TEXT_UNIT, "Text1");
+		testEvent(EventType.DOCUMENT_PART, "\";");
+		testEvent(EventType.DOCUMENT_PART, "\n\n/* Comment 2 */\n\"Item_With_semicolon\" = \"");
+		testEvent(EventType.TEXT_UNIT, "Text2;Text3");
+		testEvent(EventType.DOCUMENT_PART, "\";");
+		testEvent(EventType.DOCUMENT_PART, "\n\n/* Comment 3 */\n\"Item_With_colon\" = \"");
+		testEvent(EventType.TEXT_UNIT, "Text4:Text5");
+		testEvent(EventType.DOCUMENT_PART, "\";");
+		testEvent(EventType.END_DOCUMENT, "");
+	}
 	
 	private void testEvent(EventType expectedType, String expectedText) {
 		assertNotNull(filter);
@@ -265,7 +287,7 @@ public class RegexFilterTest {
             case TEXT_UNIT:
                 IResource res = event.getResource();
                 assertTrue(res instanceof ITextUnit);
-                assertEquals(res.toString(), expectedText);
+                assertEquals(expectedText, Util.normalizeNewlines(res.toString()));
                 break;
 
             case DOCUMENT_PART:
@@ -273,7 +295,7 @@ public class RegexFilterTest {
                 assertTrue(res instanceof DocumentPart);
                 ISkeleton skel = res.getSkeleton();
                 if (skel != null) {
-                    assertEquals(skel.toString(), expectedText);
+                    assertEquals(expectedText, Util.normalizeNewlines(skel.toString()));
                 }
                 break;
             case CANCELED:
