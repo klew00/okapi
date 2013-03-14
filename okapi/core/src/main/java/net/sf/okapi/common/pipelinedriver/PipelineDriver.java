@@ -29,6 +29,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import net.sf.okapi.common.ExecutionContext;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.exceptions.OkapiBadStepInputException;
 import net.sf.okapi.common.filters.IFilterConfigurationMapper;
@@ -59,6 +60,7 @@ public class PipelineDriver implements IPipelineDriver {
 	private String rootDir;
 	private String inputRootDir;
 	private Object uiParent;
+	private ExecutionContext context;
 	
 	/**
 	 * Creates an new PipelineDriver object with an empty pipeline.
@@ -86,6 +88,11 @@ public class PipelineDriver implements IPipelineDriver {
 	@Override
 	public void setUIParent (Object uiParent) {
 		this.uiParent = uiParent;
+	}
+	
+	@Override
+	public void setExecutionContext (ExecutionContext context) {
+		this.context = context;
 	}
 
 	@Override
@@ -297,6 +304,9 @@ public class PipelineDriver implements IPipelineDriver {
 						break;
 					case BATCH_INPUT_COUNT:
 						method.invoke(p.getStep(), batchItems.size());
+						break;
+					case EXECUTION_CONTEXT:
+						method.invoke(p.getStep(), context);
 						break;
 					default:
 						throw new OkapiBadStepInputException(String.format(

@@ -33,6 +33,7 @@ import net.sf.okapi.applications.rainbow.pipeline.PipelineEditor;
 import net.sf.okapi.applications.rainbow.pipeline.PipelineWrapper;
 import net.sf.okapi.applications.rainbow.pipeline.PreDefinedPipelines;
 import net.sf.okapi.applications.rainbow.utilities.IUtility;
+import net.sf.okapi.common.ExecutionContext;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.DefaultFilters;
@@ -60,6 +61,7 @@ public class CommandLine {
 	private BaseHelp help;
 	private PluginsManager pm;
 	private PrintStream ps = null;
+	private ExecutionContext context;
 	
 	public int execute (Shell shell,
 		String[] args)
@@ -148,6 +150,7 @@ public class CommandLine {
 			}
 			else if ( "-np".equals(arg) ) { // No prompt for options //$NON-NLS-1$
 				promptForOptions = false;
+				context.setIsNoPrompt(true);
 			}
 			else if (( "-h".equals(arg) ) || ( "-?".equals(arg) )) { // Help //$NON-NLS-1$ //$NON-NLS-2$
 				help.showWiki("Rainbow Help#Rainbow - Command Line"); //$NON-NLS-1$
@@ -270,6 +273,10 @@ public class CommandLine {
 
 		utilitiesAccess = new UtilitiesAccess();
 		utilitiesAccess.loadMenu(sharedFolder+File.separator+"rainbowUtilities.xml");
+		
+		context = new ExecutionContext();
+		context.setApplicationName("Rainbow");
+		context.setUiParent(shell);
 	}
 	
 	private void launchUtility () {
@@ -312,7 +319,7 @@ public class CommandLine {
 		fcMapper.updateCustomConfigurations();
 		
 		PipelineWrapper wrapper = new PipelineWrapper(fcMapper, appRootFolder, pm,
-			prj.getProjectFolder(), prj.getInputRoot(0), null);
+			prj.getProjectFolder(), prj.getInputRoot(0), null, context);
 
 		// If we have a predefined pipeline: set it
 		if ( predefinedPipeline != null ) {

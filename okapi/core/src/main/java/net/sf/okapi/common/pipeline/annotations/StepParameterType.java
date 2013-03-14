@@ -91,7 +91,10 @@ public enum StepParameterType {
 	
 	/**
 	 * UI parent object of the calling application (shell, main window, etc.)
+	 * 
+	 * @deprecated The UI parent is encapsulated in {@link StepParameterType#EXECUTION_CONTEXT}. Use that instead.
 	 */
+	@Deprecated
 	UI_PARENT,
 
 	/**
@@ -102,6 +105,11 @@ public enum StepParameterType {
 	/**
 	 * Root directory of the first set of input files.
 	 */
-	INPUT_ROOT_DIRECTORY
+	INPUT_ROOT_DIRECTORY,
+	
+	/**
+	 * Context in which execution is occurring (CLI parameters, UI parent shell, etc.), via an {@link ExecutionContext}.
+	 */
+	EXECUTION_CONTEXT
 	
 }

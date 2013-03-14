@@ -30,6 +30,7 @@ import java.util.HashMap;
 
 import net.sf.okapi.applications.rainbow.Input;
 import net.sf.okapi.applications.rainbow.pipeline.PipelineWrapper;
+import net.sf.okapi.common.ExecutionContext;
 import net.sf.okapi.common.filters.DefaultFilters;
 import net.sf.okapi.common.filters.FilterConfigurationMapper;
 import net.sf.okapi.common.plugins.PluginsManager;
@@ -66,7 +67,7 @@ public class BatchConfigurationTest {
 
         // creates a simple PipelineWrapper
         PipelineWrapper wrapper = new PipelineWrapper(
-            fcMapper, "", pm, "", "", null);
+            fcMapper, "", pm, "", "", null, new ExecutionContext());
 
         // creates a list of Input files
         Input html = new Input();

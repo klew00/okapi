@@ -22,7 +22,9 @@ package net.sf.okapi.common.resource;
 
 import java.net.URI;
 import java.util.Collections;
+import java.util.List;
 
+import net.sf.okapi.common.ExecutionContext;
 import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.ISkeleton;
 import net.sf.okapi.common.LocaleId;
@@ -40,6 +42,7 @@ public class PipelineParameters implements IResource {
 	private String id;
 	private URI outputURI;
 	private LocaleId targetLocale;
+	private List<LocaleId> trgLocs;
 	private LocaleId sourceLocale;
 	private String outputEncoding;
 	private URI inputURI;
@@ -51,6 +54,7 @@ public class PipelineParameters implements IResource {
 	private String rootDirectory;
 	private String inputRootDirectory;
 	private Object uiParent;
+	private ExecutionContext context;
 	private int batchInputCount = -1;
 
 	/**
@@ -118,6 +122,14 @@ public class PipelineParameters implements IResource {
 		return targetLocale;
 	}
 
+	public void setTargetLocales (List<LocaleId> trgLocs) {
+		this.trgLocs = trgLocs;
+	}
+
+	public List<LocaleId> getTargetLocales () {
+		return trgLocs;
+	}
+	
 	public void setSourceLocale (LocaleId sourceLocale) {
 		this.sourceLocale = sourceLocale;
 	}
@@ -204,6 +216,14 @@ public class PipelineParameters implements IResource {
 	
 	public Object getUIParent () {
 		return uiParent;
+	}
+	
+	public void setExecutionContext (ExecutionContext context) {
+		this.context = context;
+	}
+	
+	public ExecutionContext getExecutionContext () {
+		return context;
 	}
 
 	public void setBatchInputCount (int batchInputCount) {

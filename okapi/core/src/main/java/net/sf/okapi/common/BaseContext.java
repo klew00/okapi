@@ -64,7 +64,8 @@ public class BaseContext implements IContext {
 
 	public boolean getBoolean (String name) {
 		if ( properties == null ) return false;
-		return (Boolean)properties.get(name);
+		Object result = properties.get(name);
+		return result == null ? false : (Boolean) result;
 	}
 	
 	public void setBoolean (String name,

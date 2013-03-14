@@ -70,6 +70,7 @@ import net.sf.okapi.applications.rainbow.pipeline.XMLCharactersFixingPipeline;
 import net.sf.okapi.applications.rainbow.pipeline.XMLValidationPipeline;
 import net.sf.okapi.applications.rainbow.pipeline.XSLTransformPipeline;
 import net.sf.okapi.applications.rainbow.pipeline.SnRWithoutFilterPipeline;
+import net.sf.okapi.common.ExecutionContext;
 import net.sf.okapi.common.UserConfiguration;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.DefaultFilters;
@@ -235,6 +236,7 @@ public class MainForm { //implements IParametersProvider {
 	private ToolItem tbiAddDocs;
 	private ToolItem tbiOpenFolder;
 	private ToolItem tbiEditDocProp;
+	private ExecutionContext context;
 
 	public MainForm (Shell shell,
 		String projectFile)
@@ -250,6 +252,10 @@ public class MainForm { //implements IParametersProvider {
 			config.load(APPNAME); // Load the current user preferences
 			mruList = new MRUList(9);
 			mruList.getFromProperties(config);
+			
+			context = new ExecutionContext();
+			context.setApplicationName("Rainbow");
+			context.setUiParent(shell);
 			
 			createContent();
 			createProject(false);
@@ -2575,7 +2581,7 @@ public class MainForm { //implements IParametersProvider {
 		saveSurfaceData();
 		updateCustomConfigurations();
 		if ( wrapper == null ) {
-			wrapper = new PipelineWrapper(fcMapper, appRootFolder, pm, prj.getProjectFolder(), prj.getInputRoot(0), shell);
+			wrapper = new PipelineWrapper(fcMapper, appRootFolder, pm, prj.getProjectFolder(), prj.getInputRoot(0), shell, context);
 		}
 		else { // Make sure to reset the root dir each time
 			wrapper.setRootDirectories(prj.getProjectFolder(), prj.getInputRoot(0));

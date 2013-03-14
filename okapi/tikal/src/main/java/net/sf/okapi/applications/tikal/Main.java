@@ -44,6 +44,7 @@ import org.slf4j.LoggerFactory;
 import net.sf.okapi.applications.tikal.logger.ILogHandler;
 import net.sf.okapi.applications.tikal.logger.LogHandlerFactory;
 
+import net.sf.okapi.common.ExecutionContext;
 import net.sf.okapi.common.FileUtil;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.LocaleId;
@@ -169,6 +170,7 @@ public class Main {
 	protected String skeletonDir;
 	protected String outputDir;
 	protected String rootDir = System.getProperty("user.dir");
+	protected ExecutionContext context;
 	
 	private FilterConfigurationMapper fcMapper;
 	private Hashtable<String, String> extensionsMap;
@@ -503,6 +505,9 @@ public class Main {
 				else if ( arg.equals("-continue") ) {
 					prog.abortOnFailure = false;
 				}
+				else if ( arg.equals("-safe") ) {
+					prog.context.setIsNoPrompt(false);
+				}
 				//=== Input file or error
 				else if ( !arg.startsWith("-") ) {
 					prog.inputs.add(args.get(i));
@@ -609,6 +614,9 @@ public class Main {
 
 	public Main () {
 		inputs = new ArrayList<String>();
+		context = new ExecutionContext();
+		context.setApplicationName("Tikal");
+		context.setIsNoPrompt(true);
 	}
 	
 	protected String getArgument (ArrayList<String> args, int index) {
@@ -1489,6 +1497,7 @@ public class Main {
 		PipelineDriver driver = new PipelineDriver();
 		driver.setFilterConfigurationMapper(fcMapper);
 		driver.setRootDirectories(rootDir, Util.getDirectoryName(rd.getInputURI().getPath()));
+		driver.setExecutionContext(context);
 
 		// Raw document to filter events step 
 		RawDocumentToFilterEventsStep rd2feStep = new RawDocumentToFilterEventsStep();

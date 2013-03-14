@@ -32,6 +32,7 @@ import org.slf4j.LoggerFactory;
 
 import net.sf.okapi.applications.rainbow.Input;
 import net.sf.okapi.applications.rainbow.Project;
+import net.sf.okapi.common.ExecutionContext;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IParametersEditorMapper;
 import net.sf.okapi.common.LocaleId;
@@ -68,7 +69,8 @@ public class PipelineWrapper {
 		PluginsManager pm,
 		String rootDir,
 		String inputRootDir,
-		Object uiParent)
+		Object uiParent,
+		ExecutionContext context)
 	{
 		this.fcMapper = fcMapper;
 		this.pm = pm;
@@ -77,7 +79,7 @@ public class PipelineWrapper {
 		driver.setFilterConfigurationMapper(this.fcMapper);
 		driver.setRootDirectories(rootDir, inputRootDir);
 		driver.setUIParent(uiParent);
-		
+		driver.setExecutionContext(context);
 		refreshAvailableStepsList();
 	}
 	
