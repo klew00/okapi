@@ -25,8 +25,10 @@ import java.net.URI;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
+import net.sf.okapi.common.ExecutionContext;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IResource;
+import net.sf.okapi.common.IUserPrompt;
 import net.sf.okapi.common.UsingParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
@@ -58,6 +60,7 @@ public class FormatConversionStep extends BasePipelineStep {
 	private URI outputURI;
 	private LocaleId targetLocale;
 	private String rootDir;
+	private ExecutionContext context;
 
 	public FormatConversionStep () {
 		params = new Parameters();
@@ -82,7 +85,12 @@ public class FormatConversionStep extends BasePipelineStep {
 	public void setRootDirectory (String rootDir) {
 		this.rootDir = rootDir;
 	}
-	
+
+	@StepParameterMapping(parameterType = StepParameterType.EXECUTION_CONTEXT)
+	public void setExecutionContext (ExecutionContext context) {
+		this.context = context;
+	}
+
 	public String getDescription () {
 		return "Converts the output of a filter into a specified file format."
 			+ " Expects: filter events. Sends back: filter events.";
@@ -235,17 +243,20 @@ public class FormatConversionStep extends BasePipelineStep {
 	}
 	
 	private void startPOOutput () {
+		File outFile;
 		if ( params.getSingleOutput() ) {
-			writer.setOutput(Util.fillRootDirectoryVariable(params.getOutputPath(), rootDir));
+			outFile = new File(Util.fillRootDirectoryVariable(params.getOutputPath(), rootDir));
 		}
 		else {
 			if ( params.getAutoExtensions() ) {
-				writer.setOutput(inputURI.getPath() + ".po");
+				outFile = new File(inputURI.getPath() + ".po");
 			}
 			else {
-				writer.setOutput(outputURI.getPath());
+				outFile = new File(outputURI.getPath());
 			}
 		}
+		if (outFile.exists()) promptShouldOverwrite();
+		writer.setOutput(outFile.getPath());
 		// Not needed, writer does this: Util.createDirectories(outFile.getAbsolutePath());
 		writer.setOptions(targetLocale, "UTF-8");
 		firstOutputCreated = true;
@@ -274,6 +285,7 @@ public class FormatConversionStep extends BasePipelineStep {
 				outFile = new File(outputURI);
 			}
 		}
+		if (outFile.exists()) promptShouldOverwrite();
 		writer.setOutput(outFile.getPath());
 		writer.setOptions(targetLocale, "UTF-8");
 		firstOutputCreated = true;
@@ -300,6 +312,7 @@ public class FormatConversionStep extends BasePipelineStep {
 				outFile = new File(outputURI);
 			}
 		}
+		if (outFile.exists()) promptShouldOverwrite();
 		writer.setOutput(outFile.getPath());
 		writer.setOptions(targetLocale, "UTF-8");
 		firstOutputCreated = true;
@@ -329,6 +342,7 @@ public class FormatConversionStep extends BasePipelineStep {
 				outFile = new File(outputURI);
 			}
 		}
+		if (outFile.exists()) promptShouldOverwrite();
 		// Not needed, writer does this: Util.createDirectories(outFile.getAbsolutePath());
 		writer.setOutput(outFile.getPath());
 		writer.setOptions(targetLocale, "UTF-8");
@@ -345,19 +359,37 @@ public class FormatConversionStep extends BasePipelineStep {
 	}
 
 	private void startPensieveOutput () {
+		File outFile;
 		if ( params.getSingleOutput() ) {
-			writer.setOutput(Util.fillRootDirectoryVariable(params.getOutputPath(), rootDir));
+			outFile = new File(Util.fillRootDirectoryVariable(params.getOutputPath(), rootDir));
 		}
 		else {
 			if ( params.getAutoExtensions() ) {
-				writer.setOutput(inputURI.getPath() + ".pentm");
+				outFile = new File(inputURI.getPath() + ".pentm");
 			}
 			else {
-				writer.setOutput(outputURI.getPath());
+				outFile = new File(outputURI.getPath());
 			}
 		}
+		if (outFile.exists()) promptShouldOverwrite();
+		writer.setOutput(outFile.getPath());
 		writer.setOptions(targetLocale, "UTF-8");
 		firstOutputCreated = true;
 	}
 
+	private void promptShouldOverwrite() {
+		if (context == null || context.getIsNoPrompt()) return;
+		
+		String promptClass = context.getIsGui() ? "net.sf.okapi.common.ui.UserPrompt"
+				: "net.sf.okapi.common.UserPrompt";
+		
+		IUserPrompt p;
+		try {
+			p = (IUserPrompt) Class.forName(promptClass).newInstance();
+			p.initialize(context.getUiParent(), context.getApplicationName());
+		} catch (Throwable e) {
+			throw new InstantiationError("Could not instantiate user prompt.");
+		}
+		p.promptOKCancel("A file already exists in the target location. Select OK to overwrite it.");
+	}
 }
