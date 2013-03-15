@@ -89,11 +89,10 @@ public class XLIFFContentTest {
 	}
 
 	@Test
-	public void testDisambiguityAnnotationAndLocNote () {
+	public void testTextAnalysisAnnotationAndLocNote () {
 		GenericAnnotations anns = new GenericAnnotations();
-		GenericAnnotation ga = anns.add(GenericAnnotationType.DISAMB);
-		ga.setString(GenericAnnotationType.DISAMB_SOURCE, "src");
-		ga.setString(GenericAnnotationType.DISAMB_GRANULARITY, GenericAnnotationType.DISAMB_GRANULARITY_ENTITY);
+		GenericAnnotation ga = anns.add(GenericAnnotationType.TA);
+		ga.setString(GenericAnnotationType.TA_SOURCE, "src");
 		TextFragment tf = new TextFragment("Before the span after.");
 		//                                  0123456789012345678901
 		int diff = tf.annotate(7, 15, GenericAnnotationType.GENERIC, anns);
@@ -101,7 +100,7 @@ public class XLIFFContentTest {
 			new GenericAnnotations(new GenericAnnotation(GenericAnnotationType.LOCNOTE,
 				GenericAnnotationType.LOCNOTE_VALUE, "comment",
 				GenericAnnotationType.LOCNOTE_TYPE, "alert")));
-		assertEquals("Before <mrk its:disambigSource=\"src\" mtype=\"x-its\">"
+		assertEquals("Before <mrk its:taSource=\"src\" mtype=\"x-its\">"
 			+ "<mrk comment=\"comment\" okp:itsLocNoteType=\"alert\" mtype=\"x-its\">the span</mrk></mrk> after.",
 			fmt.setContent(tf).toString(true));
 	}

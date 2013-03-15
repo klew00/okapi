@@ -66,18 +66,13 @@ public class GenericAnnotationType {
 	
 	/**
 	 * Annotation identifier for the
-	 * <a href='http://www.w3.org/TR/its20/#Disambiguation'>ITS Disambiguation</a> data category.
+	 * <a href='http://www.w3.org/TR/its20/#Disambiguation'>ITS Text Analysis</a> data category.
 	 */
-	public static final String DISAMB = "its-disamb";
-	public static final String DISAMB_CLASS = "disambClass";
-	public static final String DISAMB_SOURCE = "disambSource";
-	public static final String DISAMB_IDENT = "disambIdent";
-	public static final String DISAMB_CONFIDENCE = "disambConfidence"; // Float
-	public static final String DISAMB_GRANULARITY = "disambGranularity";
-	// Values for the granularity information of the Disambiguation data category.
-	public static final String DISAMB_GRANULARITY_LEXICAL = "lexical-concept";
-	public static final String DISAMB_GRANULARITY_ONTOLOGY = "ontology-concept";
-	public static final String DISAMB_GRANULARITY_ENTITY = "entity";
+	public static final String TA = "its-ta";
+	public static final String TA_CLASS = "taClass";
+	public static final String TA_SOURCE = "taSource";
+	public static final String TA_IDENT = "taIdent";
+	public static final String TA_CONFIDENCE = "taConfidence"; // Float
 
 	/**
 	 * Annotation identifier for the

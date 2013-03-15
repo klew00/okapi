@@ -201,15 +201,13 @@ public interface ITraversal {
 	 */
 	public Double getMtConfidence (Attr attribute);
 
-	public String getDisambigGranularity (Attr attribute);
-
-	public String getDisambigClass (Attr attribute);
+	public String getTextAnalysisClass (Attr attribute);
 	
-	public String getDisambigSource (Attr attribute);
+	public String getTextAnalysisSource (Attr attribute);
 	
-	public String getDisambigIdent (Attr attribute);
+	public String getTextAnalysisIdent (Attr attribute);
 	
-	public Double getDisambigConfidence (Attr attribute);
+	public Double getTextAnalysisConfidence (Attr attribute);
 
 	public Double getLocQualityRatingScore (Attr attribute);
 	

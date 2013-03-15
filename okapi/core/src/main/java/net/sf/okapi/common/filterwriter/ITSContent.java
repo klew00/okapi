@@ -235,21 +235,17 @@ public class ITSContent {
 			// AnnotatorsRef
 			//TODO
 
-			// Disambiguation
-			if ( ann.getType().equals(GenericAnnotationType.DISAMB) ) {
+			// Text Analysis
+			if ( ann.getType().equals(GenericAnnotationType.TA) ) {
 				
-				printITSStringAttribute(ann.getString(GenericAnnotationType.DISAMB_CLASS),
-					(isHTML5 ? "disambig-class" : "disambigClass"), output);
-				printITSDoubleAttribute(ann.getDouble(GenericAnnotationType.DISAMB_CONFIDENCE),
-					(isHTML5 ? "disambig-confidence" : "disambigConfidence"), output);
-				String value = ann.getString(GenericAnnotationType.DISAMB_GRANULARITY);
-				if ( !value.equals(GenericAnnotationType.DISAMB_GRANULARITY_ENTITY) ) { // Output only the non-default value
-					printITSStringAttribute(value, (isHTML5 ? "disambig-granularity" : "disambigGranularity"), output);
-				}
-				printITSStringAttribute(ann.getString(GenericAnnotationType.DISAMB_IDENT),
-					(isHTML5 ? "disambig-ident" : "disambigIdent"), output);
-				printITSStringAttribute(ann.getString(GenericAnnotationType.DISAMB_SOURCE),
-					(isHTML5 ? "disambig-source" : "disambigSource"), output);
+				printITSStringAttribute(ann.getString(GenericAnnotationType.TA_CLASS),
+					(isHTML5 ? "ta-class" : "taClass"), output);
+				printITSDoubleAttribute(ann.getDouble(GenericAnnotationType.TA_CONFIDENCE),
+					(isHTML5 ? "ta-confidence" : "taConfidence"), output);
+				printITSStringAttribute(ann.getString(GenericAnnotationType.TA_IDENT),
+					(isHTML5 ? "ta-ident" : "taIdent"), output);
+				printITSStringAttribute(ann.getString(GenericAnnotationType.TA_SOURCE),
+					(isHTML5 ? "ta-source" : "taSource"), output);
 			}
 			
 			// Terminology

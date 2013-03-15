@@ -47,7 +47,7 @@ public class ITSTest_TestSuite {
 		processBatches(root+"/languageinformation", Main.DC_LANGUAGEINFORMATION);
 		processBatches(root+"/elementswithintext", Main.DC_WITHINTEXT);
 		processBatches(root+"/domain", Main.DC_DOMAIN);
-		processBatches(root+"/disambiguation", Main.DC_DISAMBIGUATION);
+		processBatches(root+"/textanalysis", Main.DC_TEXTANALYSIS);
 		processBatches(root+"/localefilter", Main.DC_LOCALEFILTER);
 		processBatches(root+"/externalresource", Main.DC_EXTERNALRESOURCE);
 		processBatches(root+"/targetpointer", Main.DC_TARGETPOINTER);

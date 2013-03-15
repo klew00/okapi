@@ -193,17 +193,13 @@ public class HTML5SkeletonWriter extends GenericSkeletonWriter {
 		for ( GenericAnnotation ann : anns ) {
 			// AnnotatorsRef
 			//TODO
-			// Disambiguation
-			if ( ann.getType().equals(GenericAnnotationType.DISAMB) ) {
-				printITSStringAttribute(ann.getString(GenericAnnotationType.DISAMB_CLASS), "disambig-class", output);
-				printITSDoubleAttribute(ann.getDouble(GenericAnnotationType.DISAMB_CONFIDENCE), "disambigConfidence", output);
+			// Text Analysis
+			if ( ann.getType().equals(GenericAnnotationType.TA) ) {
+				printITSStringAttribute(ann.getString(GenericAnnotationType.TA_CLASS), "ta-class", output);
+				printITSDoubleAttribute(ann.getDouble(GenericAnnotationType.TA_CONFIDENCE), "taConfidence", output);
 				//TODO: needs annotatorsRef if confidence is there
-				String value = ann.getString(GenericAnnotationType.DISAMB_GRANULARITY);
-				if ( !value.equals(GenericAnnotationType.DISAMB_GRANULARITY_ENTITY) ) { // Output only the non-default value
-					printITSStringAttribute(value, "disambig-granularity", output);
-				}
-				printITSStringAttribute(ann.getString(GenericAnnotationType.DISAMB_IDENT), "disambig-ident", output);
-				printITSStringAttribute(ann.getString(GenericAnnotationType.DISAMB_SOURCE), "disambig-source", output);
+				printITSStringAttribute(ann.getString(GenericAnnotationType.TA_IDENT), "ta-ident", output);
+				printITSStringAttribute(ann.getString(GenericAnnotationType.TA_SOURCE), "ta-source", output);
 			}
 			
 			// Terminology

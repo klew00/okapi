@@ -55,7 +55,7 @@ public class Main {
 	public static final String DC_LANGUAGEINFORMATION = "lang";
 	public static final String DC_WITHINTEXT = "withintext";
 	public static final String DC_DOMAIN = "domain";
-	public static final String DC_DISAMBIGUATION = "disambiguation";
+	public static final String DC_TEXTANALYSIS = "textanalysis";
 	public static final String DC_LOCALEFILTER = "localefilter";
 	public static final String DC_PROVENANCE = "provenance";
 	public static final String DC_EXTERNALRESOURCE = "externalresource";
@@ -101,7 +101,7 @@ public class Main {
 						+ "\n" + DC_LANGUAGEINFORMATION
 						+ "\n" + DC_WITHINTEXT
 						+ "\n" + DC_DOMAIN
-						+ "\n" + DC_DISAMBIGUATION
+						+ "\n" + DC_TEXTANALYSIS
 						+ "\n" + DC_LOCALEFILTER
 						+ "\n" + DC_PROVENANCE
 						+ "\n" + DC_EXTERNALRESOURCE
@@ -351,38 +351,36 @@ public class Main {
 			out1 = trav.getDomains(attr);
 			if ( out1 != null ) writer.print(String.format("\tdomains=\"%s\"", escape(out1)));
 		}
-		else if ( dc.equals(DC_DISAMBIGUATION) ) {
+		else if ( dc.equals(DC_TEXTANALYSIS) ) {
 			out1 = trav.getAnnotatorsRef();
 			if ( out1 != null ) {
 				writer.print(String.format("\tannotatorsRef=\"%s\"", escape(out1)));
 			}
-			out1 = trav.getDisambigClass(attr);
+			out1 = trav.getTextAnalysisClass(attr);
 			if ( out1 != null ) {
 				if ( out1.startsWith(GenericAnnotationType.REF_PREFIX) ) {
-					writer.print(String.format("\tdisambigClassRef=\"%s\"", escape(out1.substring(GenericAnnotationType.REF_PREFIX.length()))));
+					writer.print(String.format("\ttaClassRef=\"%s\"", escape(out1.substring(GenericAnnotationType.REF_PREFIX.length()))));
 				}
 				else {
-					writer.print(String.format("\tdisambigClass=\"%s\"", escape(out1)));
+					writer.print(String.format("\ttaClass=\"%s\"", escape(out1)));
 				}
 			}
-			Double outFloat = trav.getDisambigConfidence(attr);
+			Double outFloat = trav.getTextAnalysisConfidence(attr);
 			if ( outFloat != null ) {
-				writer.print(String.format("\tdisambigConfidence=\"%s\"", Util.formatDouble(outFloat)));
+				writer.print(String.format("\ttaConfidence=\"%s\"", Util.formatDouble(outFloat)));
 			}
-			out1 = trav.getDisambigGranularity(attr);
-			if ( out1 != null ) writer.print(String.format("\tdisambigGranularity=\"%s\"", escape(out1)));
-			out1 = trav.getDisambigIdent(attr);
+			out1 = trav.getTextAnalysisIdent(attr);
 			if ( out1 != null ) {
 				if ( out1.startsWith(GenericAnnotationType.REF_PREFIX) ) {
-					writer.print(String.format("\tdisambigIdentRef=\"%s\"", escape(out1.substring(GenericAnnotationType.REF_PREFIX.length()))));
+					writer.print(String.format("\ttaIdentRef=\"%s\"", escape(out1.substring(GenericAnnotationType.REF_PREFIX.length()))));
 				}
 				else {
-					writer.print(String.format("\tdisambigIdent=\"%s\"", escape(out1)));
+					writer.print(String.format("\ttaIdent=\"%s\"", escape(out1)));
 				}
 			}
-			out1 = trav.getDisambigSource(attr);
+			out1 = trav.getTextAnalysisSource(attr);
 			if ( out1 != null ) {
-				writer.print(String.format("\tdisambigSource=\"%s\"", escape(out1)));
+				writer.print(String.format("\ttaSource=\"%s\"", escape(out1)));
 			}
 		}
 		else if ( dc.equals(DC_LOCALEFILTER) ) {

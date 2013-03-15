@@ -284,13 +284,13 @@ public class TraversalTest {
 	}
 	
 	@Test
-	public void testDisambiguationPointerHtml () throws SAXException, IOException, ParserConfigurationException {
+	public void testTextAnalysisPointerHtml () throws SAXException, IOException, ParserConfigurationException {
 		InputSource is = new InputSource(new StringReader("<!DOCTYPE html><html lang=en><head><meta charset=utf-8>"
 			+ "<title>Title</title>"
 			+ "<script type='application/its+xml'>"
 			+ "<its:rules xmlns:its='http://www.w3.org/2005/11/its' version='2.0'>"
-			+ "<its:disambiguationRule selector='//*[@typeof and @about]' "
-			+ " disambigClassRefPointer='@typeof' disambigIdentRefPointer='@about' disambigGranularity='entity'/>"
+			+ "<its:textAnalysisRule selector='//*[@typeof and @about]' "
+			+ " taClassRefPointer='@typeof' taIdentRefPointer='@about'/>"
 			+ "</its:rules>"
 			+ "</script>"
 			+ "</head><body>"
@@ -301,40 +301,37 @@ public class TraversalTest {
 		ITSEngine trav = applyITSRules(doc, null, true, null);
 		Element elem = getElement(trav, "span", 1);
 		assertNotNull(elem);
-		GenericAnnotations anns = trav.getDisambiguationAnnotation(null);
+		GenericAnnotations anns = trav.getTextAnalysisAnnotation(null);
 		assertNotNull(anns);
-		GenericAnnotation ann = anns.getAnnotations(GenericAnnotationType.DISAMB).get(0);
-		assertEquals(GenericAnnotationType.DISAMB_GRANULARITY_ENTITY, ann.getString(GenericAnnotationType.DISAMB_GRANULARITY));
-		assertEquals(GenericAnnotationType.REF_PREFIX+"http:/nerd.eurecom.fr/ontology#Place", ann.getString(GenericAnnotationType.DISAMB_CLASS));
-		assertEquals(GenericAnnotationType.REF_PREFIX+"http://dbpedia.org/resource/Dublin", ann.getString(GenericAnnotationType.DISAMB_IDENT));
+		GenericAnnotation ann = anns.getAnnotations(GenericAnnotationType.TA).get(0);
+		assertEquals(GenericAnnotationType.REF_PREFIX+"http:/nerd.eurecom.fr/ontology#Place", ann.getString(GenericAnnotationType.TA_CLASS));
+		assertEquals(GenericAnnotationType.REF_PREFIX+"http://dbpedia.org/resource/Dublin", ann.getString(GenericAnnotationType.TA_IDENT));
 	}
 
 	@Test
-	public void testDisambiguationSimpleHtml () throws SAXException, IOException, ParserConfigurationException {
+	public void testTextAnalysisSimpleHtml () throws SAXException, IOException, ParserConfigurationException {
 		InputSource is = new InputSource(new StringReader("<p>hello "
-			+ "<span its-disambig-ident-ref=\"http://purl.org/vocabularies/princeton/wn30/synset-sweet-adjective-1.rdf\" "
-			+ "its-disambig-granularity=\"Lexical-CONCEPT\">sweet</span> "
-			+ "<span its-disambig-ident-ref=\"http://dbpedia.org/resource/Paris\" "
-			+ "its-disambig-class-ref=\"http://schema.org/Place\">Paris</span> summer</p>"));
+			+ "<span its-ta-ident-ref=\"http://purl.org/vocabularies/princeton/wn30/synset-sweet-adjective-1.rdf\" "
+			+ ">sweet</span> "
+			+ "<span its-ta-ident-ref=\"http://dbpedia.org/resource/Paris\" "
+			+ "its-ta-class-ref=\"http://schema.org/Place\">Paris</span> summer</p>"));
 		Document doc = htmlDocBuilder.parse(is);
 		ITSEngine trav = applyITSRules(doc, null, true, null);
 		Element elem = getElement(trav, "span", 1);
 		assertEquals("sweet", elem.getTextContent());
-		assertEquals(GenericAnnotationType.REF_PREFIX+"http://purl.org/vocabularies/princeton/wn30/synset-sweet-adjective-1.rdf", trav.getDisambigIdent(null));
-		assertEquals(GenericAnnotationType.DISAMB_GRANULARITY_LEXICAL, trav.getDisambigGranularity(null));
+		assertEquals(GenericAnnotationType.REF_PREFIX+"http://purl.org/vocabularies/princeton/wn30/synset-sweet-adjective-1.rdf", trav.getTextAnalysisIdent(null));
 		elem = getElement(trav, "span", 2);
 		assertEquals("Paris", elem.getTextContent());
-		assertEquals(GenericAnnotationType.REF_PREFIX+"http://dbpedia.org/resource/Paris", trav.getDisambigIdent(null));
-		assertEquals(GenericAnnotationType.REF_PREFIX+"http://schema.org/Place", trav.getDisambigClass(null));
-		assertEquals(GenericAnnotationType.DISAMB_GRANULARITY_ENTITY, trav.getDisambigGranularity(null));
+		assertEquals(GenericAnnotationType.REF_PREFIX+"http://dbpedia.org/resource/Paris", trav.getTextAnalysisIdent(null));
+		assertEquals(GenericAnnotationType.REF_PREFIX+"http://schema.org/Place", trav.getTextAnalysisClass(null));
 	}
 
 	@Test
-	public void testDisambiguationOnAttribute () throws SAXException, IOException, ParserConfigurationException {
+	public void testTextAnalysisOnAttribute () throws SAXException, IOException, ParserConfigurationException {
 		InputSource is = new InputSource(new StringReader("<doc>"
 			+ "<i:rules xmlns:i='"+ITSEngine.ITS_NS_URI+"' version='2.0'>"
-			+ "<i:disambiguationRule selector='//entry/@text' disambigSourcePointer='../@attSource' "
-			+ " disambigIdentPointer='../@attIdent' />"
+			+ "<i:textAnalysisRule selector='//entry/@text' taSourcePointer='../@attSource' "
+			+ " taIdentPointer='../@attIdent' />"
 			+ "</i:rules>"
 			+ "<entry text='Some text' attIdent='ident1' attSource='src1'>Content</entry></doc>"));
 		Document doc = fact.newDocumentBuilder().parse(is);
@@ -342,9 +339,8 @@ public class TraversalTest {
 		Element elem = getElement(trav, "entry", 1);
 		Attr attr = elem.getAttributeNode("text");
 		assertNotNull(attr);
-		assertEquals("src1", trav.getDisambigSource(attr));
-		assertEquals("ident1", trav.getDisambigIdent(attr));
-		assertEquals(GenericAnnotationType.DISAMB_GRANULARITY_ENTITY, trav.getDisambigGranularity(attr));
+		assertEquals("src1", trav.getTextAnalysisSource(attr));
+		assertEquals("ident1", trav.getTextAnalysisIdent(attr));
 	}
 	
 	@Test
@@ -668,16 +664,16 @@ public class TraversalTest {
 	public void testAnnotatorsRef () throws SAXException, IOException, ParserConfigurationException {
 		InputSource is = new InputSource(new StringReader("<doc xmlns:i='"+ITSEngine.ITS_NS_URI+"' i:version='2.0'>"
 			+ "<group i:annotatorsRef='terminology|uri2 mt-confidence|uri1'>"
-			+ "<p i:annotatorsRef='disambiguation|uriDisamb'>Text with <z i:annotatorsRef='terminology|uri3'"
+			+ "<p i:annotatorsRef='textanalysis|uriDisamb'>Text with <z i:annotatorsRef='terminology|uri3'"
 			+ " i:term='yes'>a term</z></p></group></doc>"));
 		Document doc = fact.newDocumentBuilder().parse(is);
 		ITraversal trav = applyITSRules(doc, null, false, null);
 		getElement(trav, "group", 1);
 		assertEquals("mt-confidence|uri1 terminology|uri2", trav.getAnnotatorsRef());
 		getElement(trav, "p", 1);
-		assertEquals("disambiguation|uriDisamb mt-confidence|uri1 terminology|uri2", trav.getAnnotatorsRef());
+		assertEquals("mt-confidence|uri1 terminology|uri2 textanalysis|uriDisamb", trav.getAnnotatorsRef());
 		getElement(trav, "z", 1);
-		assertEquals("disambiguation|uriDisamb mt-confidence|uri1 terminology|uri3", trav.getAnnotatorsRef());
+		assertEquals("mt-confidence|uri1 terminology|uri3 textanalysis|uriDisamb", trav.getAnnotatorsRef());
 	}
 	
 	@Test

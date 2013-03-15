@@ -40,7 +40,7 @@ class ContextItem {
 	GenericAnnotations lqIssues;
 	GenericAnnotations storageSize;
 	GenericAnnotations lqRating;
-	GenericAnnotations disambig;
+	GenericAnnotations ta;
 	GenericAnnotations terminology;
 	Double mtConfidence;
 	GenericAnnotations prov;
@@ -69,7 +69,7 @@ class ContextItem {
 		this.lqIssues = trav.getLocQualityIssueAnnotation(attribute);
 		this.lqRating = trav.getLocQualityRatingAnnotation();
 		this.mtConfidence = trav.getMtConfidence(attribute);
-		this.disambig = trav.getDisambiguationAnnotation(attribute);
+		this.ta = trav.getTextAnalysisAnnotation(attribute);
 		this.prov = trav.getProvenanceAnnotation(attribute);
 		this.terminology = trav.getTerminologyAnnotation(attribute);
 	}

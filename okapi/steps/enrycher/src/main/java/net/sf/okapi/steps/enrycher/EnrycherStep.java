@@ -286,19 +286,14 @@ public class EnrycherStep extends BasePipelineStep {
 		String secondStr,
 		List<Element> itsSpans)
 	{
-
-		List<Insertion> insertions = new LinkedList<Insertion>();		
-		
+		List<Insertion> insertions = new LinkedList<Insertion>();			
 		int index1 = 0;
 		int index2 = 0;
 		
 		for (Element itsSpan : itsSpans) {
-			
 			Insertion ins = getInsertion(index1, firstStr, index2, secondStr, itsSpan);
-			
 			index1 = ins.end;
 			index2 = itsSpan.getEndTag().getEnd();
-			
 			insertions.add(ins);			
 		}
 
@@ -339,29 +334,25 @@ public class EnrycherStep extends BasePipelineStep {
 		
 		GenericAnnotations gas = new GenericAnnotations();
 		
-		GenericAnnotation ga = gas.add(GenericAnnotationType.DISAMB);
-		ga.setString(GenericAnnotationType.DISAMB_GRANULARITY, GenericAnnotationType.DISAMB_GRANULARITY_ENTITY); // Default
+		GenericAnnotation ga = gas.add(GenericAnnotationType.TA);
 
 		Attributes attributes = itsSpan.getAttributes();
 		for ( Attribute attr : attributes ) {
-			if ( attr.getKey().equals("its-disambig-class-ref") ) {
-				ga.setString(GenericAnnotationType.DISAMB_CLASS, REF_PREFIX+attr.getValue());
+			if ( attr.getKey().equals("its-ta-class-ref") ) {
+				ga.setString(GenericAnnotationType.TA_CLASS, REF_PREFIX+attr.getValue());
 			}
-			else if ( attr.getKey().equals("its-disambig-source") ) {
-				ga.setString(GenericAnnotationType.DISAMB_SOURCE, attr.getValue());
+			else if ( attr.getKey().equals("its-ta-source") ) {
+				ga.setString(GenericAnnotationType.TA_SOURCE, attr.getValue());
 			}
 			
-			else if ( attr.getKey().equals("its-disambig-ident") ) {
-				ga.setString(GenericAnnotationType.DISAMB_IDENT, attr.getValue());
+			else if ( attr.getKey().equals("its-ta-ident") ) {
+				ga.setString(GenericAnnotationType.TA_IDENT, attr.getValue());
 			}
-			else if ( attr.getKey().equals("its-disambig-ident-ref") ) {
-				ga.setString(GenericAnnotationType.DISAMB_IDENT, REF_PREFIX+attr.getValue());
+			else if ( attr.getKey().equals("its-ta-ident-ref") ) {
+				ga.setString(GenericAnnotationType.TA_IDENT, REF_PREFIX+attr.getValue());
 			}
-			else if ( attr.getKey().equals("its-disambig-confidence") ) {
-				ga.setDouble(GenericAnnotationType.DISAMB_CONFIDENCE, Double.parseDouble(attr.getValue()));
-			}
-			else if ( attr.getKey().equals("its-disambig-granularity") ) {
-				ga.setString(GenericAnnotationType.DISAMB_GRANULARITY, attr.getValue());
+			else if ( attr.getKey().equals("its-ta-confidence") ) {
+				ga.setDouble(GenericAnnotationType.TA_CONFIDENCE, Double.parseDouble(attr.getValue()));
 			}
 		}
 		return gas;
@@ -420,16 +411,16 @@ public class EnrycherStep extends BasePipelineStep {
 	}
 	
 	/**
-	 * Return the elements containing its-disambig- attributes
+	 * Return the elements containing its-ta- attributes
 	 * @param doc
 	 * @return
 	 */
 	List<Element> getItsElements (Source doc) {
 		List<Element> itsSpans = new LinkedList<Element>();
 		for ( Element span : doc.getAllElements("span") ) {
-			//--check if any of the attributes is its-disambig-
+			//--check if any of the attributes is its-ta-
 			for ( Attribute a : span.getAttributes() ) {
-				if ( a.getKey().startsWith("its-disambig-" ) ) {
+				if ( a.getKey().startsWith("its-ta-" ) ) {
 					itsSpans.add(span);
 					break;
 				}				

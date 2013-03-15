@@ -478,7 +478,7 @@ public class HTML5FilterTest {
 		addVariousAnnotations(tu);
 		// Test the output
 		String expected = "<!DOCTYPE html>\n<html lang=\"en\"><head><meta charset=\"UTF-8\"><title>Title</title></head><body>"
-			+ "<p>Text1 <span its-disambig-class-ref=\"classRefWith&quot;&#39;&amp;&lt;>[]{}\""
+			+ "<p>Text1 <span its-ta-class-ref=\"classRefWith&quot;&#39;&amp;&lt;>[]{}\""
 			+ " its-allowed-characters=\"[a-z]\""
 			+ " its-term=\"yes\" its-term-confidence=\"0.123\" its-term-info=\"terminfo\""
 			+ ">text2</span> text3</p>"
@@ -614,9 +614,8 @@ public class HTML5FilterTest {
 		TextFragment tf = tu.createTarget(locFR, false, IResource.COPY_ALL).getFirstContent();
 		// Add a simple LQI annotation
 		GenericAnnotations anns = new GenericAnnotations(
-			new GenericAnnotation(GenericAnnotationType.DISAMB,
-				GenericAnnotationType.DISAMB_GRANULARITY, GenericAnnotationType.DISAMB_GRANULARITY_ENTITY, // Default
-				GenericAnnotationType.DISAMB_CLASS, "REF:classRefWith\"'&<>[]{}"));
+			new GenericAnnotation(GenericAnnotationType.TA,
+				GenericAnnotationType.TA_CLASS, "REF:classRefWith\"'&<>[]{}"));
 		anns.add(new GenericAnnotation(GenericAnnotationType.ALLOWEDCHARS,
 			GenericAnnotationType.ALLOWEDCHARS_VALUE, "[a-z]"));
 		anns.add(new GenericAnnotation(GenericAnnotationType.TERM,

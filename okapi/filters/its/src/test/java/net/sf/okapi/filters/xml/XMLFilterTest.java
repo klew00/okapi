@@ -46,7 +46,6 @@ import net.sf.okapi.common.filterwriter.GenericContent;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.RawDocument;
-import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 
@@ -1047,36 +1046,34 @@ public class XMLFilterTest {
 	}
 
 	@Test
-	public void testDisambiguation () {
+	public void testTextAnalysis () {
 		String snippet = "<?xml version=\"1.0\"?>\n"
-			+ "<doc xmlns:its=\"http://www.w3.org/2005/11/its\" its:version=\"2.0\" its:annotatorsRef=\"disambiguation|http://enrycher.ijs.si\">"
+			+ "<doc xmlns:its=\"http://www.w3.org/2005/11/its\" its:version=\"2.0\" its:annotatorsRef=\"text-analysis|http://enrycher.ijs.si\">"
 			+ "<its:rules version='2.0'>"
 			+ "<its:withinTextRule selector='//its:span' withinText='yes'/>"
 			+ "</its:rules>"
-			+ "<p its:disambigConfidence='0.7' its:disambigClassRef='http://nerd.eurecom.fr/ontology#Place'"  
-			+ " its:disambigIdentRef='http://dbpedia.org/resource/Dublin' its:disambigGranularity='entity'>Dublin</p>"
-			+ "<p>The <its:span disambigSource='Wordnet3.0' disambigIdent='301467919' disambigGranularity='lexical-concept'"
-			+ " disambigConfidence='0.5'>capital</its:span> of Ireland.</p>"
+			+ "<p its:taConfidence='0.7' its:taClassRef='http://nerd.eurecom.fr/ontology#Place'"  
+			+ " its:taIdentRef='http://dbpedia.org/resource/Dublin'>Dublin</p>"
+			+ "<p>The <its:span taSource='Wordnet3.0' taIdent='301467919'"
+			+ " taConfidence='0.5'>capital</its:span> of Ireland.</p>"
 			+ "</doc>";
 		ArrayList<Event> list = getEvents(snippet);
 		ITextUnit tu = FilterTestDriver.getTextUnit(list, 1);
 		assertNotNull(tu);
 		assertEquals("Dublin", tu.getSource().toString());
 		GenericAnnotations anns = tu.getSource().getAnnotation(GenericAnnotations.class);
-		GenericAnnotation ga = anns.getFirstAnnotation(GenericAnnotationType.DISAMB);
-		assertEquals(0.7, ga.getDouble(GenericAnnotationType.DISAMB_CONFIDENCE), 0.0);
-		assertEquals(GenericAnnotationType.DISAMB_GRANULARITY_ENTITY, ga.getString(GenericAnnotationType.DISAMB_GRANULARITY));
-		assertEquals("REF:http://dbpedia.org/resource/Dublin", ga.getString(GenericAnnotationType.DISAMB_IDENT));
-		assertEquals("REF:http://nerd.eurecom.fr/ontology#Place", ga.getString(GenericAnnotationType.DISAMB_CLASS));
+		GenericAnnotation ga = anns.getFirstAnnotation(GenericAnnotationType.TA);
+		assertEquals(0.7, ga.getDouble(GenericAnnotationType.TA_CONFIDENCE), 0.0);
+		assertEquals("REF:http://dbpedia.org/resource/Dublin", ga.getString(GenericAnnotationType.TA_IDENT));
+		assertEquals("REF:http://nerd.eurecom.fr/ontology#Place", ga.getString(GenericAnnotationType.TA_CLASS));
 		//TODO test annotatorsRef
 		tu = FilterTestDriver.getTextUnit(list, 2);
 		Code code = tu.getSource().getFirstContent().getCode(0);
 		anns = (GenericAnnotations)code.getAnnotation(GenericAnnotationType.GENERIC);
-		ga = anns.getFirstAnnotation(GenericAnnotationType.DISAMB);
-		assertEquals(0.5, ga.getDouble(GenericAnnotationType.DISAMB_CONFIDENCE), 0.0);
-		assertEquals(GenericAnnotationType.DISAMB_GRANULARITY_LEXICAL, ga.getString(GenericAnnotationType.DISAMB_GRANULARITY));
-		assertEquals("301467919", ga.getString(GenericAnnotationType.DISAMB_IDENT));
-		assertEquals("Wordnet3.0", ga.getString(GenericAnnotationType.DISAMB_SOURCE));
+		ga = anns.getFirstAnnotation(GenericAnnotationType.TA);
+		assertEquals(0.5, ga.getDouble(GenericAnnotationType.TA_CONFIDENCE), 0.0);
+		assertEquals("301467919", ga.getString(GenericAnnotationType.TA_IDENT));
+		assertEquals("Wordnet3.0", ga.getString(GenericAnnotationType.TA_SOURCE));
 	}
 
 	@Test

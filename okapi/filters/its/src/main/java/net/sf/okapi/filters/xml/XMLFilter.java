@@ -201,7 +201,7 @@ public class XMLFilter extends ITSFilter {
 			| IProcessor.DC_DOMAIN | IProcessor.DC_TARGETPOINTER | IProcessor.DC_EXTERNALRES
 			| IProcessor.DC_LOCFILTER | IProcessor.DC_PRESERVESPACE | IProcessor.DC_LOCQUALITYISSUE
 			| IProcessor.DC_STORAGESIZE | IProcessor.DC_ALLOWEDCHARS | IProcessor.DC_MTCONFIDENCE
-			| IProcessor.DC_DISAMBIGUATION | IProcessor.DC_LOCQUALITYRATING | IProcessor.DC_PROVENANCE
+			| IProcessor.DC_TEXTANALYSIS | IProcessor.DC_LOCQUALITYRATING | IProcessor.DC_PROVENANCE
 			| IProcessor.DC_SUBFILTER);
 	}
 	

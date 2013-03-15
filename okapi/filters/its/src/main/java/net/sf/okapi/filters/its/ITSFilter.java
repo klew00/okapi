@@ -547,7 +547,7 @@ public abstract class ITSFilter implements IFilter {
 		}
 		
 		// ITS Disambiguation
-		GenericAnnotations anns = trav.getDisambiguationAnnotation(null);
+		GenericAnnotations anns = trav.getTextAnalysisAnnotation(null);
 		if ( anns != null ) {
 			GenericAnnotations.addAnnotations(code, anns);
 		}
@@ -1033,8 +1033,8 @@ public abstract class ITSFilter implements IFilter {
 		}
 		
 		// ITS Disambiguation
-		if ( ci.disambig != null ) {
-			GenericAnnotations.addAnnotations(tu.getSource(), ci.disambig);
+		if ( ci.ta != null ) {
+			GenericAnnotations.addAnnotations(tu.getSource(), ci.ta);
 		}
 		
 		// ITS External resources Reference

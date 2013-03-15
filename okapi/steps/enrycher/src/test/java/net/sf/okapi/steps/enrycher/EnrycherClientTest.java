@@ -29,8 +29,8 @@ public class EnrycherClientTest {
 		// Detection (use the s element to avoid the change in the p element)
 		String res = ec.processContent("<p id=\"1\"><s>CMS</s></p>");
 		System.out.println(res);
-		System.out.println("<p\n id=\"1\"><s><span\n its-disambig-ident-ref=\"http://dbpedia.org/resource/CMS\"\n its-disambig-granularity=\"entity\"\n its-disambig-class-ref=\"http://schema.org/Thing\">CMS</span></s></p>\n\n");
-		assertEquals("<p\n id=\"1\"><s><span\n its-disambig-ident-ref=\"http://dbpedia.org/resource/CMS\"\n its-disambig-granularity=\"entity\"\n its-disambig-class-ref=\"http://schema.org/Thing\">CMS</span></s></p>\n\n", res);
+		System.out.println("<p\n id=\"1\"><s><span\n its-ta-ident-ref=\"http://dbpedia.org/resource/CMS\"\n its-ta-class-ref=\"http://schema.org/Thing\">CMS</span></s></p>\n\n");
+		assertEquals("<p\n id=\"1\"><s><span\n its-ta-ident-ref=\"http://dbpedia.org/resource/CMS\"\n its-ta-class-ref=\"http://schema.org/Thing\">CMS</span></s></p>\n\n", res);
 
 		// Nothing to annotate
 		res = ec.processContent("<p id=\"1\"><s>something</s></p>");
@@ -42,14 +42,14 @@ public class EnrycherClientTest {
 	@Test
 	public void synchToFirstInsertionPosition() {
 		TextFragment tf = new TextFragment("<p>hello sweet Paris summer</p>");
-		Source source = new Source("<p>hello <span its-disambig-ident-ref=\"http://purl.org/vocabularies/princeton/wn30/synset-sweet-adjective-1.rdf\" its-disambig-granularity=\"lexicalConcept\">sweet</span> <span its-disambig-ident-ref=\"http://dbpedia.org/resource/Paris\" its-disambig-granularity=\"entity\" its-disambig-class-ref=\"http://schema.org/Place\">Paris</span> summer</p>");
+		Source source = new Source("<p>hello <span its-ta-ident-ref=\"http://purl.org/vocabularies/princeton/wn30/synset-sweet-adjective-1.rdf\">sweet</span> <span its-ta-ident-ref=\"http://dbpedia.org/resource/Paris\" its-ta-class-ref=\"http://schema.org/Place\">Paris</span> summer</p>");
 
 		assertEquals(9, new EnrycherStep().getInsertionPosition(0,tf.toString(), 0, source.toString(), 9));
 	}
 
 	@Test
 	public void getItsSpans() {
-		Source source = new Source("hello <span its-disambig-ident-ref=\"http://purl.org/vocabularies/princeton/wn30/synset-sweet-adjective-1.rdf\" its-disambig-granularity=\"lexicalConcept\">sweet</span> <span its-disambig-ident-ref=\"http://dbpedia.org/resource/Paris\" its-disambig-granularity=\"entity\" its-disambig-class-ref=\"http://schema.org/Place\">Paris</span> summer");
+		Source source = new Source("hello <span its-ta-ident-ref=\"http://purl.org/vocabularies/princeton/wn30/synset-sweet-adjective-1.rdf\">sweet</span> <span its-ta-ident-ref=\"http://dbpedia.org/resource/Paris\" its-ta-class-ref=\"http://schema.org/Place\">Paris</span> summer");
 		
 		List<Element> itsSpans = new EnrycherStep().getItsElements(source);
 		
@@ -58,15 +58,15 @@ public class EnrycherClientTest {
 		
 		//--check correct open and closing pos
 		assertEquals(6, itsSpans.get(0).getBegin());		
-		assertEquals(164, itsSpans.get(0).getEnd());		
-		assertEquals(165, itsSpans.get(1).getBegin());		
-		assertEquals(325, itsSpans.get(1).getEnd());
+		assertEquals(116, itsSpans.get(0).getEnd());		
+		assertEquals(117, itsSpans.get(1).getBegin());		
+		assertEquals(231, itsSpans.get(1).getEnd());
 	}
 	
 	@Test
 	public void genericAnnotations() {
 		TextFragment tf = new TextFragment("hello sweet Paris summer");		
-		Source source = new Source("hello <span its-disambig-ident-ref=\"http://purl.org/vocabularies/princeton/wn30/synset-sweet-adjective-1.rdf\" its-disambig-granularity=\"lexicalConcept\">sweet</span> <span its-disambig-ident-ref=\"http://dbpedia.org/resource/Paris\" its-disambig-granularity=\"entity\" its-disambig-class-ref=\"http://schema.org/Place\">Paris</span> summer");
+		Source source = new Source("hello <span its-ta-ident-ref=\"http://purl.org/vocabularies/princeton/wn30/synset-sweet-adjective-1.rdf\">sweet</span> <span its-ta-ident-ref=\"http://dbpedia.org/resource/Paris\" its-ta-class-ref=\"http://schema.org/Place\">Paris</span> summer");
 		
 		EnrycherStep dummy = new EnrycherStep();
 		
@@ -76,21 +76,19 @@ public class EnrycherClientTest {
 		assertEquals(2, insertions.size());
 		
 		Insertion ins = insertions.get(0);
-		List<GenericAnnotation> gas = ins.genAnn.getAnnotations(GenericAnnotationType.DISAMB);
+		List<GenericAnnotation> gas = ins.genAnn.getAnnotations(GenericAnnotationType.TA);
 		GenericAnnotation ga = gas.get(0);
 		
 		//--check first GenericAnnotation
-		assertEquals("REF:http://purl.org/vocabularies/princeton/wn30/synset-sweet-adjective-1.rdf", ga.getString(GenericAnnotationType.DISAMB_IDENT));
-		assertEquals("lexicalConcept", ga.getString(GenericAnnotationType.DISAMB_GRANULARITY));
+		assertEquals("REF:http://purl.org/vocabularies/princeton/wn30/synset-sweet-adjective-1.rdf", ga.getString(GenericAnnotationType.TA_IDENT));
 		
 		ins = insertions.get(1);
-		gas = ins.genAnn.getAnnotations(GenericAnnotationType.DISAMB);
+		gas = ins.genAnn.getAnnotations(GenericAnnotationType.TA);
 		ga = gas.get(0);
 		
 		//--check second GenericAnnotation
-		assertEquals("REF:http://dbpedia.org/resource/Paris", ga.getString(GenericAnnotationType.DISAMB_IDENT));
-		assertEquals("entity", ga.getString(GenericAnnotationType.DISAMB_GRANULARITY));
-		assertEquals("REF:http://schema.org/Place", ga.getString(GenericAnnotationType.DISAMB_CLASS));
+		assertEquals("REF:http://dbpedia.org/resource/Paris", ga.getString(GenericAnnotationType.TA_IDENT));
+		assertEquals("REF:http://schema.org/Place", ga.getString(GenericAnnotationType.TA_CLASS));
 
 		//--TextFragment before
 		assertEquals("hello sweet Paris summer", tf.toString());
@@ -118,7 +116,7 @@ public class EnrycherClientTest {
 
 		TextFragment tf = new TextFragment("hello sweet Paris summer");
 		String source_org = new String("hello sweet Paris summer");
-		Source source = new Source("hello <span its-disambig-ident-ref=\"http://purl.org/vocabularies/princeton/wn30/synset-sweet-adjective-1.rdf\" its-disambig-granularity=\"lexicalConcept\">sweet</span> <span its-disambig-ident-ref=\"http://dbpedia.org/resource/Paris\" its-disambig-granularity=\"entity\" its-disambig-class-ref=\"http://schema.org/Place\">Paris</span> summer");
+		Source source = new Source("hello <span its-ta-ident-ref=\"http://purl.org/vocabularies/princeton/wn30/synset-sweet-adjective-1.rdf\">sweet</span> <span its-ta-ident-ref=\"http://dbpedia.org/resource/Paris\" its-ta-class-ref=\"http://schema.org/Place\">Paris</span> summer");
 
 		List<Element> spans = source.getAllElements("span");
 
