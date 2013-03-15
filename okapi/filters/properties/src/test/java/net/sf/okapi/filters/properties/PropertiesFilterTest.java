@@ -298,6 +298,28 @@ public class PropertiesFilterTest {
 	}
 	
 	@Test
+	public void testWithSubfilterOutputEscapeExtended () throws URISyntaxException, IOException {
+		Parameters p = (Parameters)filter.getParameters();
+		p.setSubfilter("okf_html");
+		filter.setParameters(p);
+		String inSnippet = "key=v\u00c3\u201el\u00c3\u00bc\u00c3\u00a9 w\u00c3\u00aeth <b>html</b>\n";
+		String outSnippet = "key=v\\u00c3\\u201el\\u00c3\\u00bc\\u00c3\\u00a9 w\\u00c3\\u00aeth <b>html</b>\n";
+		String result = FilterTestDriver.generateOutput(getEvents(inSnippet), filter.getEncoderManager(), locEN);
+		assertEquals(outSnippet, result);
+	}
+	
+	@Test
+	public void testWithSubfilterOutputDoNotEscapeExtended () throws URISyntaxException, IOException {
+		Parameters p = (Parameters)filter.getParameters();
+		p.setSubfilter("okf_html");
+		p.setEscapeExtendedChars(false);		
+		filter.setParameters(p);
+		String snippet = "key=v\u00c3\u201el\u00c3\u00bc\u00c3\u00a9 w\u00c3\u00aeth <b>html</b>\n";
+		String result = FilterTestDriver.generateOutput(getEvents(snippet), filter.getEncoderManager(), locEN);
+		assertEquals(snippet, result);
+	}
+	
+	@Test
 	public void testHtmlOutput () {
 //		Parameters p = (Parameters)filter.getParameters();
 //		p.setSubfilter("okf_html");
