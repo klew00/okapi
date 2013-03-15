@@ -25,8 +25,10 @@ import java.net.URI;
 import java.util.UUID;
 
 import net.sf.okapi.common.Event;
+import net.sf.okapi.common.ExecutionContext;
 import net.sf.okapi.common.FileUtil;
 import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.IUserPrompt;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.UsingParameters;
 import net.sf.okapi.common.Util;
@@ -37,6 +39,7 @@ import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.filters.rainbowkit.Manifest;
 import net.sf.okapi.filters.rainbowkit.RainbowKitFilter;
+import net.sf.okapi.steps.rainbowkit.common.IMergeable;
 import net.sf.okapi.steps.rainbowkit.common.IPackageWriter;
 import net.sf.okapi.steps.rainbowkit.xliff.XLIFF2Options;
 import net.sf.okapi.steps.rainbowkit.xliff.XLIFF2PackageWriter;
@@ -58,6 +61,7 @@ public class ExtractionStep extends BasePipelineStep {
 	private String resolvedOutputDir;
 	private String tempPackageRoot;
 	private boolean createTipp;
+	private ExecutionContext context;
 
 	public ExtractionStep () {
 		super();
@@ -117,6 +121,11 @@ public class ExtractionStep extends BasePipelineStep {
 		this.outputRootDir = inputRootDir;
 	}
 
+	@StepParameterMapping(parameterType = StepParameterType.EXECUTION_CONTEXT)
+	public void setContext (ExecutionContext context) {
+		this.context = context;
+	}
+
 	@Override
 	public Event handleEvent (Event event) {
 		switch ( event.getEventType() ) {
@@ -154,7 +163,14 @@ public class ExtractionStep extends BasePipelineStep {
 			resolvedOutputDir = Util.fillRootDirectoryVariable(resolvedOutputDir, rootDir);
 			resolvedOutputDir = Util.fillInputRootDirectoryVariable(resolvedOutputDir, inputRootDir);
 			resolvedOutputDir = LocaleId.replaceVariables(resolvedOutputDir, srcLoc, trgLoc);
-			Util.deleteDirectory(resolvedOutputDir, false);
+			// Give the writer a chance to merge the new package with the old one
+			if ( new File(resolvedOutputDir).isDirectory() ) {
+				if (shouldMerge()) {
+					((IMergeable)writer).prepareForMerge(resolvedOutputDir);
+				} else {
+					Util.deleteDirectory(resolvedOutputDir, false);
+				}
+			}
 			
 			String packageId = UUID.randomUUID().toString();
 			String projectId = Util.makeId(params.getPackageName()+srcLoc.toString()+trgLoc.toString());
@@ -245,5 +261,41 @@ public class ExtractionStep extends BasePipelineStep {
 	public IParameters getParameters () {
 		return params;
 	}
+	
+	private boolean shouldMerge() {
+		if (context == null || context.getIsNoPrompt()) return false;
+		
+		if (writer instanceof IMergeable) {
+			return promptShouldMerge();
+		} else {
+			return !promptShouldOverwrite();
+		}
+	}
 
+	private boolean promptShouldMerge() {
+		String message = "A directory already exists at the target location. "
+				+ "Would you like to merge the new translation kit with the existing directory? "
+				+ "Select \"No\" to overwrite the existing directory.";
+		
+		return getPrompt().promptYesNoCancel(message);
+	}
+
+	private boolean promptShouldOverwrite() {
+		String message = "A directory already exists at the target location. "
+				+ "Select \"OK\" to overwrite it.";
+		
+		return getPrompt().promptOKCancel(message);
+	}
+
+	private IUserPrompt getPrompt() {
+		String promptClass = context.getIsGui() ? "net.sf.okapi.common.ui.UserPrompt"
+				: "net.sf.okapi.common.UserPrompt";
+		try {
+			IUserPrompt p = (IUserPrompt) Class.forName(promptClass).newInstance();
+			p.initialize(context.getUiParent(), context.getApplicationName());
+			return p;
+		} catch (Throwable e) {
+			throw new InstantiationError("Could not instantiate user prompt.");
+		}
+	}
 }

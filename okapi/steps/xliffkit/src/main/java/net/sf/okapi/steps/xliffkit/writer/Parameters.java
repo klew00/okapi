@@ -39,6 +39,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	static final String OUTPUT_URI = "outputURI"; //$NON-NLS-1$
 	static final String INCLUDE_SOURCE = "includeSource"; //$NON-NLS-1$
 	static final String INCLUDE_ORIGINAL = "includeOriginal"; //$NON-NLS-1$
+	static final String INCLUDE_CODE_ATTRS = "includeCodeAttrs"; //$NON-NLS-1$
 	
 	private boolean placeholderMode;
 	private boolean copySource;
@@ -48,6 +49,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	private String outputURI;
 	private boolean includeSource;
 	private boolean includeOriginal;
+	private boolean includeCodeAttrs;
 	
 	public Parameters () {
 		reset();
@@ -62,6 +64,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		outputURI = "";
 		includeSource = true;
 		includeOriginal = false;
+		includeCodeAttrs = false;
 	}
 
 	public void fromString (String data) {
@@ -76,6 +79,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		outputURI = buffer.getString(OUTPUT_URI, outputURI);
 		includeSource = buffer.getBoolean(INCLUDE_SOURCE, includeSource);
 		includeOriginal = buffer.getBoolean(INCLUDE_ORIGINAL, includeOriginal);
+		includeCodeAttrs = buffer.getBoolean(INCLUDE_CODE_ATTRS, includeCodeAttrs);
 		
 		// Make sure the we can merge later
 		if ( !includeNoTranslate ) {
@@ -95,6 +99,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		buffer.setParameter(OUTPUT_URI, outputURI);
 		buffer.setParameter(INCLUDE_SOURCE, includeSource);
 		buffer.setParameter(INCLUDE_ORIGINAL, includeOriginal);
+		buffer.setParameter(INCLUDE_CODE_ATTRS, includeCodeAttrs);
 		
 		return buffer.toString();
 	}
@@ -111,6 +116,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		desc.add(OUTPUT_URI, "Directory of the T-kit file", "T-kit Path");
 		desc.add(INCLUDE_SOURCE, "Include source files in the T-kit file", "Include source");
 		desc.add(INCLUDE_ORIGINAL, "Include original files in the T-kit file", "Include originals");
+		desc.add(INCLUDE_CODE_ATTRS, "Include original files in the T-kit file", "Include originals");
 		
 		return desc;
 	}
@@ -127,6 +133,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		desc.addTextInputPart(parametersDescription.get(OUTPUT_URI));
 		desc.addCheckboxPart(parametersDescription.get(INCLUDE_SOURCE));
 		desc.addCheckboxPart(parametersDescription.get(INCLUDE_ORIGINAL));
+		desc.addCheckboxPart(parametersDescription.get(INCLUDE_CODE_ATTRS));
 		
 		return desc;
 	}
@@ -193,5 +200,13 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 
 	public boolean isCopySource() {
 		return copySource;
-	}	
+	}
+
+	public void setIncludeCodeAttrs(boolean includeCodeAttrs) {
+		this.includeCodeAttrs = includeCodeAttrs;
+	}
+
+	public boolean isIncludeCodeAttrs() {
+		return includeCodeAttrs;
+	}
 }

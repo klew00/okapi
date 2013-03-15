@@ -39,6 +39,7 @@ import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.StartSubDocument;
 import net.sf.okapi.filters.xliff.XLIFFFilter;
 import net.sf.okapi.lib.beans.sessions.OkapiJsonSession;
+import net.sf.okapi.lib.persistence.PersistenceSession;
 import net.sf.okapi.steps.xliffkit.reader.TextUnitMerger;
 
 import org.apache.poi.openxml4j.opc.OPCPackage;
@@ -59,6 +60,7 @@ public class OPCPackageReader extends AbstractFilter {
 	private IFilterWriter filterWriter;
 	private boolean generateTargets = false;
 	private String outputPath;
+	private boolean groupByPackagePath = true;
 	private boolean cacheEvents = false;
 	private LinkedList<Event> events = new LinkedList<Event>();
 	//private Event sde;
@@ -138,7 +140,7 @@ public class OPCPackageReader extends AbstractFilter {
 			activePart = coreParts.poll();
 			if (activePart == null) 
 				return null;
-			else
+			else {
 				resourcesPart = OPCPackageUtil.getResourcesPart(activePart);
 				try {
 					if (resourcesPart != null)
@@ -161,6 +163,7 @@ public class OPCPackageReader extends AbstractFilter {
 							activePart.getPartName().getName()), e);
 				}
 			}
+		}
 		event = session.deserialize(Event.class);
 		if (event == null) {			
 			session.end();
@@ -246,7 +249,9 @@ public class OPCPackageReader extends AbstractFilter {
 		StartDocument startDoc = (StartDocument)event.getResource();
 		String srcName = startDoc.getName();		
 		String partName = activePart.getPartName().toString();
-		String outFileName = outputPath + Util.getDirectoryName(partName) + "/" + Util.getFilename(srcName, true);
+		String outFileName = groupByPackagePath ? 
+				Util.buildPath(outputPath, Util.getDirectoryName(partName), Util.getFilename(srcName, true)) :
+				Util.buildPath(outputPath, Util.getFilename(srcName, true));
 		
 		filterWriter = startDoc.getFilterWriter();
 		//System.out.println(startDoc.getName());
@@ -283,9 +288,14 @@ public class OPCPackageReader extends AbstractFilter {
 		writeEvent(event);
 	}
 
-	public void setGeneratorOptions(String outputEncoding, String outputPath) {
+	public void setGeneratorOptions(String outputEncoding, String outputPath, boolean groupByPackagePath) {
 		this.outputEncoding = outputEncoding;
 		this.generateTargets = !Util.isEmpty(outputPath);
 		this.outputPath = outputPath;
+		this.groupByPackagePath = groupByPackagePath;
+	}
+	
+	public PersistenceSession getSession() {
+		return session;
 	}
 }

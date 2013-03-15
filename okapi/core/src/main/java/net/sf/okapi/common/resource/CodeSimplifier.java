@@ -292,7 +292,8 @@ public class CodeSimplifier {
 		//System.out.println(TextUnitUtil.toText(tf));
 		TextUnitUtil.restoreSegmentation(tc, tf);
 		//System.out.println(TextUnitUtil.restoreSegmentation(tc, tf));
-		TextUnitUtil.convertTextParts(tc);
+//		TextUnitUtil.convertTextPartsToCodes(tc);
+		TextUnitUtil.convertTextParts_whitespaceCodesToText(tc);
 //		System.out.println(res[0]);
 //		System.out.println(res[1]);
 		

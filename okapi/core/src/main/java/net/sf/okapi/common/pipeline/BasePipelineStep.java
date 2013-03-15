@@ -356,6 +356,11 @@ public abstract class BasePipelineStep implements IPipelineStep {
 						method.invoke(param.getStep(), pp.getTargetLocale());
 					}
 					break;
+				case TARGET_LOCALES:
+					if ( pp.getTargetLocales() != null ) {
+						method.invoke(param.getStep(), pp.getTargetLocales());
+					}
+					break;
 				case THIRD_INPUT_RAWDOC:
 					if ( pp.getThirdInputRawDocument() != null ) {
 						method.invoke(param.getStep(), pp.getThirdInputRawDocument());
@@ -364,6 +369,11 @@ public abstract class BasePipelineStep implements IPipelineStep {
 				case UI_PARENT:
 					if ( pp.getUIParent() != null ) {
 						method.invoke(param.getStep(), pp.getUIParent());
+					}
+					break;
+				case EXECUTION_CONTEXT:
+					if ( pp.getExecutionContext() != null ) {
+						method.invoke(param.getStep(), pp.getExecutionContext());
 					}
 					break;
 				case BATCH_INPUT_COUNT:

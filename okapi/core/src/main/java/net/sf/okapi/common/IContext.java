@@ -116,7 +116,7 @@ public interface IContext {
 	 * @param type the type of the annotation to retrieve.
 	 * @return the annotation for the given type, or null if it is not defined.
 	 */
-	public <A> A getAnnotation (Class<? extends IAnnotation> type);
+	public <A extends IAnnotation> A getAnnotation (Class<A> type);
 
 	/**
 	 * Sets an annotation for this context.

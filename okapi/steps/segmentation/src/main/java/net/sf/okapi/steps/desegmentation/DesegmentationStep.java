@@ -29,8 +29,13 @@ import net.sf.okapi.common.UsingParameters;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
 import net.sf.okapi.common.pipeline.annotations.StepParameterMapping;
 import net.sf.okapi.common.pipeline.annotations.StepParameterType;
+import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.ITextUnit;
+import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextContainer;
+import net.sf.okapi.common.resource.TextFragment;
+import net.sf.okapi.common.resource.TextFragment.TagType;
+import net.sf.okapi.steps.segmentation.RenumberingUtil;
 
 @UsingParameters(Parameters.class)
 public class DesegmentationStep extends BasePipelineStep {
@@ -74,9 +79,12 @@ public class DesegmentationStep extends BasePipelineStep {
 
 		// Skip non-translatable
 		if ( !tu.isTranslatable() ) return event;
-		
+				
 		// Desegment source if needed
 		if ( params.getDesegmentSource() && tu.getSource().hasBeenSegmented() ) {
+			if (params.getRenumberCodes()) {
+				RenumberingUtil.renumberCodesForDesegmentation(tu.getSource());
+			}
 			tu.getSource().getSegments().joinAll();
 		}
 		
@@ -86,6 +94,9 @@ public class DesegmentationStep extends BasePipelineStep {
 				TextContainer cont = tu.getTarget(targetLocale);
 				if ( cont != null ) {
 					if ( cont.hasBeenSegmented() ) {
+						if (params.getRenumberCodes()) {
+							RenumberingUtil.renumberCodesForDesegmentation(cont);
+						}
 						cont.getSegments().joinAll();
 					}
 				}
@@ -94,5 +105,6 @@ public class DesegmentationStep extends BasePipelineStep {
 		
 		return event;
 	}
+
 
 }

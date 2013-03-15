@@ -31,9 +31,11 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	
 	private static final String DESEGMENTSOURCE = "desegmentSource";
 	private static final String DESEGMENTTARGET = "desegmentTarget";
+	private static final String RENUMBERCODES = "renumberCodes";
 	
 	private boolean desegmentSource;
 	private boolean desegmentTarget;
+	public boolean renumberCodes;
 	
 	public Parameters () {
 		reset();
@@ -54,11 +56,20 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	public void setDesegmentTarget (boolean desegmentTarget) {
 		this.desegmentTarget = desegmentTarget;
 	}
+	
+	public boolean getRenumberCodes() {
+		return renumberCodes;
+	}
+	
+	public void setRenumberCodes(boolean renumberCodes) {
+		this.renumberCodes = renumberCodes;
+	}
 
 	@Override
 	public void reset () {
 		desegmentSource = true;
 		desegmentTarget = true;
+		renumberCodes = false;
 	}
 
 	@Override
@@ -67,6 +78,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		buffer.fromString(data);
 		desegmentSource = buffer.getBoolean(DESEGMENTSOURCE, desegmentSource);
 		desegmentTarget = buffer.getBoolean(DESEGMENTTARGET, desegmentTarget);
+		renumberCodes = buffer.getBoolean(RENUMBERCODES, renumberCodes);
 	}
 
 	@Override
@@ -74,6 +86,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		buffer.reset();
 		buffer.setBoolean(DESEGMENTSOURCE, desegmentSource);
 		buffer.setBoolean(DESEGMENTTARGET, desegmentTarget);
+		buffer.setBoolean(RENUMBERCODES, renumberCodes);
 		return buffer.toString();
 	}
 	
@@ -82,6 +95,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		ParametersDescription desc = new ParametersDescription(this);
 		desc.add(DESEGMENTSOURCE, "Join all segments of the source text", null);
 		desc.add(DESEGMENTTARGET, "Join all segments of the target text", null);
+		desc.add(RENUMBERCODES, "Restore original IDs to renumbered codes", null);
 		return desc;
 	}
 	
@@ -90,6 +104,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		EditorDescription desc = new EditorDescription("Desegmentation", true, false);
 		desc.addCheckboxPart(paramDesc.get(DESEGMENTSOURCE));
 		desc.addCheckboxPart(paramDesc.get(DESEGMENTTARGET));
+		desc.addCheckboxPart(paramDesc.get(RENUMBERCODES));
 		return desc;
 	}
 

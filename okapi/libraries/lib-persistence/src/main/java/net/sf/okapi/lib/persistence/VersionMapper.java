@@ -20,15 +20,16 @@
 
 package net.sf.okapi.lib.persistence;
 
-import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import net.sf.okapi.common.ClassUtil;
 import net.sf.okapi.common.Util;
 
 public class VersionMapper {
 
-	private static HashMap<String, IVersionDriver> versionMap = new HashMap<String, IVersionDriver>();
-	private static HashMap<String, String> versionIdMap = new HashMap<String, String>(); 
+	private static Map<String, IVersionDriver> versionMap = new ConcurrentHashMap<String, IVersionDriver>();
+	private static Map<String, String> versionIdMap = new ConcurrentHashMap<String, String>(); 
 	
 	public static void registerVersion(Class<? extends IVersionDriver> versionDriverClass) {
 		IVersionDriver versionDriver = null;

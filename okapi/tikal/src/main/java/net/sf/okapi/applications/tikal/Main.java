@@ -44,6 +44,7 @@ import org.slf4j.LoggerFactory;
 import net.sf.okapi.applications.tikal.logger.ILogHandler;
 import net.sf.okapi.applications.tikal.logger.LogHandlerFactory;
 
+import net.sf.okapi.common.ExecutionContext;
 import net.sf.okapi.common.FileUtil;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.LocaleId;
@@ -55,6 +56,7 @@ import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.FilterConfigurationMapper;
 import net.sf.okapi.common.filters.IFilterConfigurationEditor;
 import net.sf.okapi.common.filters.IFilterConfigurationListEditor;
+import net.sf.okapi.common.filterwriter.XLIFFWriterParameters;
 import net.sf.okapi.common.filterwriter.XLIFFWriter;
 import net.sf.okapi.common.pipeline.IPipelineStep;
 import net.sf.okapi.common.pipelinedriver.BatchItemContext;
@@ -157,6 +159,7 @@ public class Main {
 	protected String levOptTMXPath;
 	protected boolean extOptCopy = true; // Copy source in empty target by default
 	protected boolean extOptAltTrans = true; // Output alt-trans by default
+	protected boolean extOptCodeAttrs = false; // Disable extended code attributes by default
 	protected boolean mosesCopyToTarget = false;
 	protected boolean mosesOverwriteTarget = false;
 	protected boolean moses2Outputs = false;
@@ -167,6 +170,7 @@ public class Main {
 	protected String skeletonDir;
 	protected String outputDir;
 	protected String rootDir = System.getProperty("user.dir");
+	protected ExecutionContext context;
 	
 	private FilterConfigurationMapper fcMapper;
 	private Hashtable<String, String> extensionsMap;
@@ -347,6 +351,9 @@ public class Main {
 				else if ( arg.equals("-noalttrans") ) {
 					prog.extOptAltTrans = false;
 				}
+				else if ( arg.equals("-codeattrs") ) {
+					prog.extOptCodeAttrs = true;
+				}
 				else if ( arg.equals("-maketmx") ) {
 					prog.levOptTMXPath = "pretrans.tmx";
 					if ( args.size() > i+1 ) {
@@ -498,6 +505,9 @@ public class Main {
 				else if ( arg.equals("-continue") ) {
 					prog.abortOnFailure = false;
 				}
+				else if ( arg.equals("-safe") ) {
+					prog.context.setIsNoPrompt(false);
+				}
 				//=== Input file or error
 				else if ( !arg.startsWith("-") ) {
 					prog.inputs.add(args.get(i));
@@ -604,6 +614,9 @@ public class Main {
 
 	public Main () {
 		inputs = new ArrayList<String>();
+		context = new ExecutionContext();
+		context.setApplicationName("Tikal");
+		context.setIsNoPrompt(true);
 	}
 	
 	protected String getArgument (ArrayList<String> args, int index) {
@@ -1484,6 +1497,7 @@ public class Main {
 		PipelineDriver driver = new PipelineDriver();
 		driver.setFilterConfigurationMapper(fcMapper);
 		driver.setRootDirectories(rootDir, Util.getDirectoryName(rd.getInputURI().getPath()));
+		driver.setExecutionContext(context);
 
 		// Raw document to filter events step 
 		RawDocumentToFilterEventsStep rd2feStep = new RawDocumentToFilterEventsStep();
@@ -1503,9 +1517,11 @@ public class Main {
 		// Filter events to raw document final step (using the XLIFF writer)
 		FilterEventsWriterStep fewStep = new FilterEventsWriterStep();
 		XLIFFWriter writer = new XLIFFWriter();
-		writer.setPlaceholderMode(true);
-		writer.setCopySource(extOptCopy);
-		writer.setIncludeAltTrans(extOptAltTrans);
+		XLIFFWriterParameters paramsXliff = (XLIFFWriterParameters)writer.getParameters();
+		paramsXliff.setPlaceholderMode(true);
+		paramsXliff.setCopySource(extOptCopy);
+		paramsXliff.setIncludeAltTrans(extOptAltTrans);
+		paramsXliff.setIncludeCodeAttrs(extOptCodeAttrs);
 		fewStep.setFilterWriter(writer);
 		fewStep.setDocumentRoots(rootDir);
 		driver.addStep(fewStep);

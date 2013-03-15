@@ -987,26 +987,32 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 		statusBar = new StatusBar(shell, SWT.NONE);
 		updateMRU();
 		
-		// Set minimum and start sizes
-		Point defaultSize = shell.getSize();
-		shell.pack();
-		shell.setMinimumSize(shell.getSize());
-		Point startSize = defaultSize;
-		if ( startSize.x < 700 ) startSize.x = 700; 
-		if ( startSize.y < 600 ) startSize.y = 600; 
-		shell.setSize(startSize);
-		
-		// Maximize if requested
-		if ( config.getBoolean(OPT_MAXIMIZED) ) {
+		if (!shell.getMaximized()) { // not RWT full-screen mode
+			// Set minimum and start sizes
+			Point defaultSize = shell.getSize();
+			shell.pack();
+			shell.setMinimumSize(shell.getSize());
+			Point startSize = defaultSize;			 
+			shell.setSize(startSize);
+			
+			// Workaround for RWT (stretches the shell horizontally when column widths are adjusted)
 			shell.setMaximized(true);
-		}
-		else { // Or try to re-use the bounds of the previous session
-			Rectangle ar = UIUtil.StringToRectangle(config.getProperty(OPT_BOUNDS));
-			if ( ar != null ) {
-				Rectangle dr = shell.getDisplay().getBounds();
-				if ( dr.contains(ar.x+ar.width, ar.y+ar.height)
-					&& dr.contains(ar.x, ar.y) ) {
-					shell.setBounds(ar);
+			shell.setMaximized(false);
+
+			UIUtil.centerShell(shell);
+						
+			// Maximize if requested
+			if ( config.getBoolean(OPT_MAXIMIZED) ) {
+				shell.setMaximized(true);
+			}
+			else { // Or try to re-use the bounds of the previous session
+				Rectangle ar = UIUtil.StringToRectangle(config.getProperty(OPT_BOUNDS));
+				if ( ar != null ) {
+					Rectangle dr = shell.getDisplay().getBounds();
+					if ( dr.contains(ar.x+ar.width, ar.y+ar.height)
+						&& dr.contains(ar.x, ar.y) ) {
+						shell.setBounds(ar);
+					}
 				}
 			}
 		}

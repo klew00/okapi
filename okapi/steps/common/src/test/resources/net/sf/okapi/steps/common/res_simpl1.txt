@@ -15,5 +15,5 @@ dp7: referent
 
 tu2:
       Skeleton: <td valign="middle">[#$$self$]
-      Source (en-us): [#$dp6][#$dp7]</a>       
-         0: [#$dp6][#$dp7]</a>       
+      Source (en-us): [#$dp6][#$dp7]</a>ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+         0: [#$dp6][#$dp7]</a>ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½

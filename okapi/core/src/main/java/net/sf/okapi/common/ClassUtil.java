@@ -36,8 +36,8 @@ public class ClassUtil {
 	private static String MSG_NONRESOLVABLE = "ClassUtil: cannot resolve class name %s";
 	
 	/**
-	 * Gets the runtime class of the given object.
-	 * @param obj The object
+	 * Gets the runtime class of a given object.
+	 * @param obj The given object
 	 * @return The object's runtime class
 	 */
 	public static Class<?> getClass(Object obj) {
@@ -47,9 +47,9 @@ public class ClassUtil {
 	}
 
 	/**
-	 * Gets a class reference for a qualified class name. 
-	 * @param className the given class name
-	 * @return class reference
+	 * Gets the class reference for a given qualified class name. 
+	 * @param className The given class name
+	 * @return Class reference
 	 */
 	public static Class<?> getClass(String className) {
 		if (Util.isEmpty(className))
@@ -65,8 +65,8 @@ public class ClassUtil {
 	}
 	
 	/**
-	 * Gets non-qualified (without package name prefix) class name for the given object.
-	 * @param obj The object
+	 * Gets the non-qualified (without package name prefix) class name for a given object.
+	 * @param obj The given object
 	 * @return The object's class name (w/o package name prefix)
 	 */
 	public static String getClassName(Object obj) {
@@ -76,8 +76,8 @@ public class ClassUtil {
 	}
 	
 	/**
-	 * Gets non-qualified (w/o package name prefix) name for the given class.
-	 * @param classRef Class reference
+	 * Gets the non-qualified (w/o package name prefix) class name of a given class reference.
+	 * @param classRef The given class reference
 	 * @return The name of the class (w/o package name prefix)
 	 */
 	public static String getClassName(Class<?> classRef) {
@@ -87,8 +87,8 @@ public class ClassUtil {
 	}
 
 	/**
-	 * Gets a qualified class name of the given object.
-	 * @param obj The object
+	 * Gets the qualified class name of a given object.
+	 * @param obj The given object
 	 * @return Qualified class name
 	 */
 	public static String getQualifiedClassName(Object obj) {
@@ -98,8 +98,8 @@ public class ClassUtil {
 	}
 	
 	/**
-	 * Gets a qualified class name.
-	 * @param classRef Class reference
+	 * Gets the qualified class name of a given class reference.
+	 * @param classRef The given class reference
 	 * @return Qualified class name
 	 */
 	public static String getQualifiedClassName(Class<?> classRef) {
@@ -107,11 +107,33 @@ public class ClassUtil {
 		
 		return classRef.getName();
 	}
+	
+	/**
+	 * Gets the non-qualified class name (w/o package name prefix) of a given class reference.
+	 * @param classRef The given class reference
+	 * @return Non-qualified class name
+	 */
+	public static String getShortClassName(Class<?> classRef) {
+		if (classRef == null) return "";
+		
+		return extractShortClassName(getQualifiedClassName(classRef));
+	}
+	
+	/**
+	 * Gets the non-qualified class name (w/o package name prefix) of a given object.
+	 * @param obj The given object
+	 * @return Non-qualified class name
+	 */
+	public static String getShortClassName(Object obj) {
+		if (obj == null) return "";
+		
+		return extractShortClassName(getQualifiedClassName(obj));
+	}
 		
 	/**
-	 * Gets the name of the package containing the given object's class.
-	 * @param obj The object
-	 * @return Package name of the object's class (without the trailing dot), or an empty string
+	 * Gets the name of the package containing a given object's class.
+	 * @param obj The given object
+	 * @return Package name of the given object's class (w/o the trailing dot), or an empty string
 	 */
 	public static String getPackageName(Object obj) {
 		if (obj == null) return "";
@@ -120,9 +142,9 @@ public class ClassUtil {
 	}
 	
 	/**
-	 * Gets a package name for the given class. 
-	 * @param classRef Class reference
-	 * @return Package name of the class (without the trailing dot), or an empty string 
+	 * Gets the package name of a given class reference. 
+	 * @param classRef The given class reference
+	 * @return Package name of the given class reference (w/o the trailing dot), or an empty string 
 	 */
 	public static String getPackageName(Class<?> classRef) {
 		if (classRef == null) return "";
@@ -158,7 +180,7 @@ public class ClassUtil {
 	/**
 	 * Extracts the package name part of a qualified class name.
 	 * @param className Qualified class name
-	 * @return Package name (without the trailing dot)
+	 * @return Package name (w/o the trailing dot)
 	 */
 	public static String extractPackageName(String className) {
 		if (Util.isEmpty(className)) return "";
@@ -169,9 +191,24 @@ public class ClassUtil {
 		
 		return "";
 	}
+	
+	/**
+	 * Extracts the class name part of a qualified class name.
+	 * @param className Qualified class name
+	 * @return Class name
+	 */
+	public static String extractShortClassName(String className) {
+		if (Util.isEmpty(className)) return "";
+		
+		int index = className.lastIndexOf(".");
+		if (index > -1)
+			return className.substring(index + 1);
+		
+		return className;
+	}
 
 	/**
-	 * Gets a qualified class name.  
+	 * Builds a qualified class name from given parts.  
 	 * @param packageName Package name
 	 * @param shortClassName Class name
 	 * @return Qualified class name
@@ -190,7 +227,7 @@ public class ClassUtil {
 	}
 
 	/**
-	 * Gets a qualified class name for the given class name. Package name is determined 
+	 * Builds a qualified class name for the given class name. Package name is determined 
 	 * from a reference to another class in the same package.
 	 * @param siblingClassRef Reference to another class in the same package
 	 * @param shortClassName Non-qualified name of the class to get a qualified name for
@@ -201,7 +238,7 @@ public class ClassUtil {
 	}
 	
 	/**
-	 * Gets a qualified class name for the given class name. Package name is determined 
+	 * Builds a qualified class name for the given class name. Package name is determined 
 	 * from an instance of another class in the same package.
 	 * @param sibling Existing object, an instance of another class in the same package
 	 * @param shortClassName Non-qualified name of the class to get a qualified name for

@@ -27,9 +27,10 @@ import net.sf.okapi.common.Event;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.XMLWriter;
 import net.sf.okapi.filters.rainbowkit.Manifest;
+import net.sf.okapi.steps.rainbowkit.common.IMergeable;
 import net.sf.okapi.steps.rainbowkit.xliff.XLIFFPackageWriter;
 
-public class OmegaTPackageWriter extends XLIFFPackageWriter {
+public class OmegaTPackageWriter extends XLIFFPackageWriter implements IMergeable {
 
 	public static final String OKAPI_HOME = "OKAPI_HOME";
 	
@@ -75,9 +76,14 @@ public class OmegaTPackageWriter extends XLIFFPackageWriter {
 	}
 	
 	private void createOmegaTProject () {
+		String projectSaveFile = manifest.getPackageRoot() + "omegat.project";
+		// Don't write new file if we have an old one (merging kits)
+		if (new File(projectSaveFile).isFile()) {
+			return;
+		}
 		XMLWriter XR = null;
 		try {
-			XR = new XMLWriter(manifest.getPackageRoot() + "omegat.project");
+			XR = new XMLWriter(projectSaveFile);
 			XR.writeStartDocument();
 			XR.writeStartElement("omegat");
 			XR.writeStartElement("project");
@@ -177,4 +183,48 @@ public class OmegaTPackageWriter extends XLIFFPackageWriter {
 		}
 	}
 
+	private static String[] RENAME_FILES = new String[] {
+		"tm" + File.separator + "unapproved.tmx",
+		"tm" + File.separator + "alternate.tmx",
+		"tm" + File.separator + "leverage.tmx"
+	};
+
+	@Override
+	public void prepareForMerge(String dir) {
+		if (!dir.endsWith(File.separator)) dir = dir + File.separator;
+		String tmDir = dir + "tm" + File.separator;
+		Util.createDirectories(tmDir);
+		
+		String projSave = dir + "omegat" + File.separator + "project_save.tmx";
+		if (new File(projSave).isFile()) {
+			Util.copyFile(projSave,
+					uniqueName(tmDir + "project_save.tmx", "-orig"),
+					true);
+		}
+		for (String file : RENAME_FILES) {
+			if (! new File(dir + file).isFile()) continue;
+			Util.copyFile(dir + file,
+					uniqueName(dir + file, "-orig"),
+					true);
+		}
+		File manifest = new File(dir + "manifest.rkm");
+		if (manifest.isFile()) manifest.delete();
+		
+		Util.deleteDirectory(dir + "original", false);
+		Util.deleteDirectory(dir + "source", false);
+		Util.deleteDirectory(dir + "target", false);
+	}
+
+	private String uniqueName(String path, String suffix) {
+		int lastDot = path.lastIndexOf(".");
+		String base = path.substring(0, lastDot);
+		String ext = path.substring(lastDot);
+		File newFile = new File(base + suffix + ext);
+		int n = 1;
+		while (newFile.isFile()) {
+			newFile = new File(base + suffix + "-" + n + ext);
+			n++;
+		}
+		return newFile.toString();
+	}
 }

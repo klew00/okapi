@@ -319,7 +319,7 @@ public class XLIFFWriterTest {
 	public void testTextWithEncapsulatedCodes ()
 		throws IOException
 	{
-		writer.setPlaceholderMode(false);
+		((XLIFFWriterParameters)writer.getParameters()).setPlaceholderMode(false);
 		writer.create(root+"out.xlf", null, locEN, null, null, "original.ext", null);
 		ITextUnit tu = new TextUnit("tu1");
 		tu.getSource().getFirstSegment().getContent().append(TagType.OPENING, "z", "<z>");
@@ -347,7 +347,7 @@ public class XLIFFWriterTest {
 	{
 		writer.create(root+"out.xlf", null, locEN, null, null, "original.ext", null);
 		ITextUnit tu = new TextUnit("tu1", "src1 with <>");
-		writer.setEscapeGt(true);
+		((XLIFFWriterParameters)writer.getParameters()).setEscapeGt(true);
 		writer.writeTextUnit(tu);
 		writer.close();
 

@@ -7,18 +7,22 @@ import static org.junit.Assert.assertTrue;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.util.Arrays;
+import java.util.List;
 
 import net.sf.okapi.common.ClassUtil;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.filterwriter.GenericContent;
+import net.sf.okapi.common.resource.Code;
+import net.sf.okapi.common.resource.ISegments;
 import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextPart;
 import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.filters.xml.XMLFilter;
 import net.sf.okapi.lib.extra.pipelinebuilder.XBatch;
 import net.sf.okapi.lib.extra.pipelinebuilder.XBatchItem;
@@ -27,6 +31,7 @@ import net.sf.okapi.lib.extra.pipelinebuilder.XPipeline;
 import net.sf.okapi.lib.extra.pipelinebuilder.XPipelineStep;
 import net.sf.okapi.lib.extra.steps.EventLogger;
 import net.sf.okapi.steps.common.RawDocumentToFilterEventsStep;
+import net.sf.okapi.steps.desegmentation.DesegmentationStep;
 import net.sf.okapi.steps.segmentation.Parameters.SegmStrategy;
 
 import org.junit.Before;
@@ -51,7 +56,7 @@ public class SegmentationStepTest {
 		params.segmentTarget = true;
 		segStep.handleStartBatchItem(new Event(EventType.START_BATCH_ITEM));
 	}
-	
+
 	@Test
 	public void testSegmentationStrategy() {
 		ITextUnit tu1 = new TextUnit("tu1");

@@ -64,7 +64,8 @@ public class BaseContext implements IContext {
 
 	public boolean getBoolean (String name) {
 		if ( properties == null ) return false;
-		return (Boolean)properties.get(name);
+		Object result = properties.get(name);
+		return result == null ? false : (Boolean) result;
 	}
 	
 	public void setBoolean (String name,
@@ -121,11 +122,10 @@ public class BaseContext implements IContext {
 			properties.clear();
 		}
 	}
-	
-	@SuppressWarnings("unchecked")
-	public <A> A getAnnotation (Class<? extends IAnnotation> type) {
+		
+	public <A extends IAnnotation> A getAnnotation (Class<A> type) {
 		if ( annotations == null ) return null;
-		return (A)annotations.get(type);
+		return annotations.get(type);
 	}
 
 	public void setAnnotation (IAnnotation annotation) {

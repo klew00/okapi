@@ -1,0 +1,12 @@
+Tests that don't use poms for artifacts creation (create new poms), the step 2 below creates artifacts based on info in existing poms and packages those poms.
+mvn install:install-file -Dfile=org.eclipse.rap.rwt_1.5.1.20120917-1116_unsigned.jar -DgroupId=org.eclipse.rap -DartifactId=rwt -Dversion=1.5.1 -Dpackaging=jar -DlocalRepositoryPath=repo -DcreateChecksum=true
+mvn install:install-file -Dfile=org.eclipse.rap.rwt.supplemental.filedialog_1.5.0.20120220-1720_unsigned.jar -DgroupId=org.eclipse.rap -DartifactId=rwt-filedialog -Dversion=1.5.1 -Dpackaging=jar -DlocalRepositoryPath=repo -DcreateChecksum=true
+mvn install:install-file -Dfile=org.eclipse.rap.rwt.supplemental.fileupload_1.5.0.20120220-1720_unsigned.jar -DgroupId=org.eclipse.rap -DartifactId=rwt-fileupload -Dversion=1.5.1 -Dpackaging=jar -DlocalRepositoryPath=repo -DcreateChecksum=true
+
+1. Create a temp dir, copy all from /lib
+2. Open console, cd to the temp dir, run one-by-one:
+mvn install:install-file -Dfile=org.eclipse.rap.rwt_1.5.1.20120917-1116_unsigned.jar -DpomFile=rwt-1.5.1.pom -Dpackaging=jar -DlocalRepositoryPath=repo -DcreateChecksum=true
+mvn install:install-file -Dfile=org.eclipse.rap.rwt.supplemental.filedialog_1.5.0.20120220-1720_unsigned.jar -DpomFile=rwt-filedialog-1.5.1.pom -Dpackaging=jar -DlocalRepositoryPath=repo -DcreateChecksum=true
+mvn install:install-file -Dfile=org.eclipse.rap.rwt.supplemental.fileupload_1.5.0.20120220-1720_unsigned.jar -DpomFile=rwt-fileupload-1.5.1.pom -Dpackaging=jar -DlocalRepositoryPath=repo -DcreateChecksum=true
+3. /repo will be created, copy to the project
+

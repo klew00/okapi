@@ -24,6 +24,7 @@ import java.net.URI;
 import java.util.List;
 
 import net.sf.okapi.common.filters.IFilterConfigurationMapper;
+import net.sf.okapi.common.ExecutionContext;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.pipeline.IPipeline;
 import net.sf.okapi.common.pipeline.IPipelineStep;
@@ -61,6 +62,12 @@ public interface IPipelineDriver {
 	 * on the caller, for example for SWT you pass the shell of the caller.
 	 */
 	public void setUIParent (Object uiParent);
+	
+	/**
+	 * Sets the execution context for this driver.
+	 * @param context the execution context such as batch  mode, CLI/GUI, etc.
+	 */
+	public void setExecutionContext (ExecutionContext context);
 	
 	/**
 	 * Gets the {@link IPipeline} currently associated with this driver.

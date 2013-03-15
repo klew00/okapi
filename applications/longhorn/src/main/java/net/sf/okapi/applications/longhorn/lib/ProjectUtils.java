@@ -34,6 +34,7 @@ import net.sf.okapi.applications.rainbow.batchconfig.BatchConfiguration;
 import net.sf.okapi.applications.rainbow.lib.LanguageManager;
 import net.sf.okapi.applications.rainbow.pipeline.PipelineWrapper;
 import net.sf.okapi.applications.rainbow.pipeline.StepInfo;
+import net.sf.okapi.common.ExecutionContext;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.DefaultFilters;
@@ -105,8 +106,12 @@ public class ProjectUtils {
 		fcMapper.updateCustomConfigurations();
 
 		// Load pipeline
+		ExecutionContext context = new ExecutionContext();
+		context.setApplicationName("Longhorn");
+		context.setIsNoPrompt(true);
 		PipelineWrapper pipelineWrapper = new PipelineWrapper(fcMapper, WorkspaceUtils.getConfigDirPath(projId),
-				plManager, WorkspaceUtils.getInputDirPath(projId), WorkspaceUtils.getInputDirPath(projId), null);
+				plManager, WorkspaceUtils.getInputDirPath(projId), WorkspaceUtils.getInputDirPath(projId),
+				null, context);
 		pipelineWrapper.addFromPlugins(plManager);
 		return pipelineWrapper;
 	}

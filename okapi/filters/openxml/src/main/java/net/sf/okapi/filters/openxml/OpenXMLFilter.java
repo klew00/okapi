@@ -32,6 +32,7 @@ import java.util.Enumeration;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.TreeSet;
+import java.util.Collections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.util.zip.ZipEntry;
@@ -438,6 +439,19 @@ public class OpenXMLFilter implements IFilter {
 		this.cparams = (ConditionalParameters)params; // DWH 6-25-09 was net.sf.okapi.filters.abstractmarkup.Parameters
 		readParams(); // DWH 6-19-09
 	}
+    
+	private Enumeration<? extends ZipEntry> getZipFileEntries() {
+		List<? extends ZipEntry> list = Collections.list(zipFile.entries());	
+		if (!list.isEmpty() && !list.get(0).getName().equals("[Content_Types].xml")) {		
+			for (int pos = 1; pos < list.size(); pos++) {
+				if (list.get(pos).getName().equals("[Content_Types].xml")) {
+					Collections.swap(list,0 ,pos);
+					break;
+				}
+			}
+		}
+		return Collections.enumeration(list);
+	}
 
 	/**
 	 * Opens the document at the URI specified in the call to open(..),
@@ -452,7 +466,7 @@ public class OpenXMLFilter implements IFilter {
 		{
 			fZip = new File(docURI.getPath());
 			zipFile = new ZipFile(fZip,ZipFile.OPEN_READ);
-			entries = zipFile.entries();
+			entries = getZipFileEntries();
 
 			nZipType = -1;
 			while( entries.hasMoreElements() )
@@ -494,7 +508,7 @@ public class OpenXMLFilter implements IFilter {
 			}
 			if (nZipType==MSWORD && !bPreferenceTranslateWordHidden)
 				bMinedHiddenStyles = false; // DWH 5-28-09 so mine hidden styles first
-			entries = zipFile.entries();
+			entries = getZipFileEntries();
 			openXMLContentFilter.initFileTypes(); // new HashTable for file types in zip file
 			openXMLContentFilter.setBPreferenceTranslateWordHidden(bPreferenceTranslateWordHidden);
 				// DWH 5-29-09 whether or not to translate hidden text
@@ -589,7 +603,7 @@ public class OpenXMLFilter implements IFilter {
 			    	if (sEntryName.equals("word/styles.xml"))
 			    	{
 			    		bMinedHiddenStyles = true;
-			    		entries = zipFile.entries(); // reset to go through all of them except styles and Content_Types
+			    		entries = getZipFileEntries(); // reset to go through all of them except styles and Content_Types
 			    	}
 			    	else if (!sEntryName.equals("[Content_Types].xml"))
 			    		continue;                    // save all but styles and Content_Types for 2nd go around
@@ -834,7 +848,7 @@ public class OpenXMLFilter implements IFilter {
 	{
 		if (!bProcessedExcelSheets && !entries.hasMoreElements()) // DWH 6-13-09 Excel options
 		{ // this only happens if bPreferenceTranslateExcelExcludeColors || bPreferenceTranslateExcelExcludeColumns
-			entries = zipFile.entries();  // after going through all the sheets, reset to go through the rest
+			entries = getZipFileEntries();  // after going through all the sheets, reset to go through the rest
 			bProcessedExcelSheets = true; // and indicate you have already gone through the sheets
 		}
 	}

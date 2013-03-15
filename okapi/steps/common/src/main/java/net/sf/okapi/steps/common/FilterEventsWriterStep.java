@@ -24,6 +24,8 @@ import java.io.File;
 import java.net.URI;
 
 import net.sf.okapi.common.Event;
+import net.sf.okapi.common.ExecutionContext;
+import net.sf.okapi.common.IUserPrompt;
 import net.sf.okapi.common.UsingParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.exceptions.OkapiFilterCreationException;
@@ -56,6 +58,7 @@ public class FilterEventsWriterStep extends BasePipelineStep {
 	private LocaleId targetLocale;
 	private String outputEncoding;
 	private String documentsRoot;
+	private ExecutionContext context;
 
 	/**
 	 * Creates a new FilterEventsWriterStep object.
@@ -98,7 +101,12 @@ public class FilterEventsWriterStep extends BasePipelineStep {
 	public void setOutputEncoding (String outputEncoding) {
 		this.outputEncoding = outputEncoding;
 	}
-	
+
+	@StepParameterMapping(parameterType = StepParameterType.EXECUTION_CONTEXT)
+	public void setExecutionContext (ExecutionContext context) {
+		this.context = context;
+	}
+
 	/**
 	 * Sets the filter writer for this EventsWriterStep object.
 	 * @param filterWriter the filter writer to use.
@@ -155,6 +163,9 @@ public class FilterEventsWriterStep extends BasePipelineStep {
 				filterWriter.setOutput(outputURI.getPath());
 				normalizeResourceName(event);
 			}
+			if (new File(outputURI).exists()) {
+				promptShouldOverwrite();
+			}
 			return filterWriter.handleEvent(event);
 
 		// Filter events:
@@ -202,4 +213,19 @@ public class FilterEventsWriterStep extends BasePipelineStep {
 		res.setName(name);
 	}
 
+	private void promptShouldOverwrite() {
+		if (context == null || context.getIsNoPrompt()) return;
+		
+		String promptClass = context.getIsGui() ? "net.sf.okapi.common.ui.UserPrompt"
+				: "net.sf.okapi.common.UserPrompt";
+		
+		IUserPrompt p;
+		try {
+			p = (IUserPrompt) Class.forName(promptClass).newInstance();
+			p.initialize(context.getUiParent(), context.getApplicationName());
+		} catch (Throwable e) {
+			throw new InstantiationError("Could not instantiate user prompt.");
+		}
+		p.promptOKCancel("A file already exists in the target location. Select OK to overwrite it.");
+	}
 }

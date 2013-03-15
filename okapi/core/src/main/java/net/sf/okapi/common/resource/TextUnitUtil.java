@@ -1953,9 +1953,9 @@ public class TextUnitUtil {
 	 * an encoder.
 	 * @param tc the given TextContainer
 	 */
-	public static void convertTextParts(TextContainer tc) {
+	public static void convertTextPartsToCodes(TextContainer tc) {
 		for (TextPart textPart : tc) {
-			convertTextPart(textPart);
+			convertTextPartToCode(textPart);
 		}
 	}
 	
@@ -1966,7 +1966,7 @@ public class TextUnitUtil {
 	 * is performed.
 	 * @param textPart the given TextPart
 	 */
-	public static void convertTextPart(TextPart textPart) {
+	public static void convertTextPartToCode(TextPart textPart) {
 		if (!textPart.isSegment()) {
 			TextFragment tf = textPart.getContent();
 			if (tf.hasCode()) return;
@@ -1974,6 +1974,24 @@ public class TextUnitUtil {
 			// Move the whole text of text part to a single code
 			tf.changeToCode(0, tf.getCodedText().length(), 
 					TagType.PLACEHOLDER, null);
+		}
+	}
+	
+	public static void convertTextParts_whitespaceCodesToText(TextContainer tc) {
+		for (TextPart textPart : tc) {
+			convertTextPart_whitespaceCodesToText(textPart);
+		}
+	}
+	
+	public static void convertTextPart_whitespaceCodesToText(TextPart textPart) {
+		if (textPart.isSegment()) return;
+		
+		TextFragment tf = textPart.getContent();
+		if (tf.hasText()) return;
+		
+		if (Util.isEmpty(tf.toText().trim())) {
+			// Move all codes into text
+			textPart.setContent(new TextFragment(tf.toText()));
 		}
 	}
 

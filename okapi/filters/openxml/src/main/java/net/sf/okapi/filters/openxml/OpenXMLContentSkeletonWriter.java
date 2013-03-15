@@ -318,9 +318,10 @@ public class OpenXMLContentSkeletonWriter extends GenericSkeletonWriter {
 		return result;
 	}
 	
-//	// SV 2-27-1012
+//	// SV 2-27-2012
+	// If spaces are located in the code, wrap with <w:t xml:space="preserve"/>
 //	@Override
-//	protected String expandCodeContent(Code code, LocaleId locToUse, int context) {
+//	protected String expandCodeContent(Code code, LocaleId locToUse, EncoderContext context) {
 //		String text = super.expandCodeContent(code, locToUse, context);
 //		if (configurationType != MSWORD) return text;
 //		

@@ -22,6 +22,7 @@ package net.sf.okapi.steps.rainbowkit.xliff;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.filterwriter.XLIFFWriterParameters;
 import net.sf.okapi.common.filterwriter.XLIFFWriter;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.filters.rainbowkit.Manifest;
@@ -70,6 +71,7 @@ public class XLIFFPackageWriter extends BasePackageWriter {
 		rawDocPath = manifest.getTempSourceDirectory() + item.getRelativeInputPath() + ".xlf";
 		writer.setOutput(rawDocPath); // Not really used, but doesn't hurt just in case
 
+		XLIFFWriterParameters paramsXliff = (XLIFFWriterParameters)writer.getParameters();
 		// Set the writer's options
 		Options options = new Options();
 		if ( forOmegat ) {
@@ -77,8 +79,9 @@ public class XLIFFPackageWriter extends BasePackageWriter {
 			options.setCopySource(true);
 			options.setPlaceholderMode(true);
 			options.setIncludeAltTrans(false);
+			options.setIncludeCodeAttrs(true);
 			// Direct setting for the writer (not an XLIFF option)
-			writer.setUseSourceForTranslated(true);
+			paramsXliff.setUseSourceForTranslated(true);
 		}
 		else {
 			// Get the options from the parameters
@@ -86,12 +89,12 @@ public class XLIFFPackageWriter extends BasePackageWriter {
 				options.fromString(params.getWriterOptions());
 			}
 		}
-		//TODO: Would be easier to use IParameters in XLIFFWriter.
-		writer.setPlaceholderMode(options.getPlaceholderMode());
-		writer.setCopySource(options.getCopySource());
-		writer.setIncludeAltTrans(options.getIncludeAltTrans());
-		writer.setSetApprovedAsNoTranslate(options.getSetApprovedAsNoTranslate());
-		writer.setIncludeNoTranslate(options.getIncludeNoTranslate());
+		paramsXliff.setPlaceholderMode(options.getPlaceholderMode());
+		paramsXliff.setCopySource(options.getCopySource());
+		paramsXliff.setIncludeAltTrans(options.getIncludeAltTrans());
+		paramsXliff.setSetApprovedAsNoTranslate(options.getSetApprovedAsNoTranslate());
+		paramsXliff.setIncludeNoTranslate(options.getIncludeNoTranslate());
+		paramsXliff.setIncludeCodeAttrs(options.getIncludeCodeAttrs());
 		
 		StartDocument sd = event.getStartDocument();
 		writer.create(rawDocPath, null, manifest.getSourceLocale(), manifest.getTargetLocale(),

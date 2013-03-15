@@ -70,6 +70,7 @@ import net.sf.okapi.applications.rainbow.pipeline.XMLCharactersFixingPipeline;
 import net.sf.okapi.applications.rainbow.pipeline.XMLValidationPipeline;
 import net.sf.okapi.applications.rainbow.pipeline.XSLTransformPipeline;
 import net.sf.okapi.applications.rainbow.pipeline.SnRWithoutFilterPipeline;
+import net.sf.okapi.common.ExecutionContext;
 import net.sf.okapi.common.UserConfiguration;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.DefaultFilters;
@@ -235,6 +236,7 @@ public class MainForm { //implements IParametersProvider {
 	private ToolItem tbiAddDocs;
 	private ToolItem tbiOpenFolder;
 	private ToolItem tbiEditDocProp;
+	private ExecutionContext context;
 
 	public MainForm (Shell shell,
 		String projectFile)
@@ -250,6 +252,10 @@ public class MainForm { //implements IParametersProvider {
 			config.load(APPNAME); // Load the current user preferences
 			mruList = new MRUList(9);
 			mruList.getFromProperties(config);
+			
+			context = new ExecutionContext();
+			context.setApplicationName("Rainbow");
+			context.setUiParent(shell);
 			
 			createContent();
 			createProject(false);
@@ -302,7 +308,7 @@ public class MainForm { //implements IParametersProvider {
 	{
 		GridLayout layTmp = new GridLayout(3, false);
 		shell.setLayout(layTmp);
-		shell.setImage(rm.getImage("Rainbow")); //$NON-NLS-1$
+		shell.setImages(rm.getImages("rainbow")); //$NON-NLS-1$
 		
 		// Handling of the closing event
 		shell.addShellListener(new ShellListener() {
@@ -1146,26 +1152,35 @@ public class MainForm { //implements IParametersProvider {
 		statusBar = new StatusBar(shell, SWT.NONE);
 		updateMRU();
 		
-		// Set the minimal size to the packed size
-		// And then set the start size
-		Point startSize = shell.getSize();
-		shell.pack();
-		shell.setMinimumSize(shell.getSize());
-		shell.setSize(startSize);
-		// Maximize if requested
-		if ( config.getBoolean("maximized") ) { //$NON-NLS-1$
+		if (!shell.getMaximized()) { // not RWT full-screen mode
+			// Set the minimal size to the packed size
+			// And then set the start size
+			Point startSize = shell.getSize();
+			shell.pack();
+			shell.setMinimumSize(shell.getSize());
+			shell.setSize(startSize);
+			
+			// Workaround for RWT (stretches the shell horizontally when column widths are adjusted)
 			shell.setMaximized(true);
-		}
-		else { // Or try to re-use the bounds of the previous session
-			Rectangle ar = UIUtil.StringToRectangle(config.getProperty(OPT_BOUNDS));
-			if ( ar != null ) {
-				Rectangle dr = shell.getDisplay().getBounds();
-				if ( dr.contains(ar.x+ar.width, ar.y+ar.height)
-					&& dr.contains(ar.x, ar.y) ) {
-					shell.setBounds(ar);
+			shell.setMaximized(false);
+
+			UIUtil.centerShell(shell);
+			
+			// Maximize if requested
+			if ( config.getBoolean("maximized") ) { //$NON-NLS-1$
+				shell.setMaximized(true);
+			}
+			else { // Or try to re-use the bounds of the previous session
+				Rectangle ar = UIUtil.StringToRectangle(config.getProperty(OPT_BOUNDS));
+				if ( ar != null ) {
+					Rectangle dr = shell.getDisplay().getBounds();
+					if ( dr.contains(ar.x+ar.width, ar.y+ar.height)
+						&& dr.contains(ar.x, ar.y) ) {
+						shell.setBounds(ar);
+					}
 				}
 			}
-		}
+		}		
 	}
 
 	private void updatePluginsAndDependencies () {
@@ -1408,14 +1423,14 @@ public class MainForm { //implements IParametersProvider {
 	}
 	
 	private void buildInputTab (int index,
-		Composite comp)
+		final Composite comp)
 	{
 		final Table table = new Table(comp, SWT.BORDER | SWT.MULTI | SWT.FULL_SELECTION);
 		
 		table.setHeaderVisible(true);
 		table.setLinesVisible(true);
 		GridData gdTmp = new GridData(GridData.FILL_BOTH);
-		gdTmp.horizontalSpan = 3;
+		gdTmp.horizontalSpan = 1;
 		table.setLayoutData(gdTmp);
 		table.addControlListener(new ControlAdapter() {
 		    public void controlResized(ControlEvent e) {
@@ -1894,7 +1909,7 @@ public class MainForm { //implements IParametersProvider {
 		throws Exception 
 	{
 		rm = new ResourceManager(MainForm.class, shell.getDisplay());
-		rm.addImage("Rainbow"); //$NON-NLS-1$
+		rm.addImages("rainbow", "rainbow16", "rainbow32"); //$NON-NLS-1$
 		rm.addImage("newproject"); //$NON-NLS-1$
 		rm.addImage("openproject"); //$NON-NLS-1$
 		rm.addImage("saveproject"); //$NON-NLS-1$
@@ -2566,7 +2581,7 @@ public class MainForm { //implements IParametersProvider {
 		saveSurfaceData();
 		updateCustomConfigurations();
 		if ( wrapper == null ) {
-			wrapper = new PipelineWrapper(fcMapper, appRootFolder, pm, prj.getProjectFolder(), prj.getInputRoot(0), shell);
+			wrapper = new PipelineWrapper(fcMapper, appRootFolder, pm, prj.getProjectFolder(), prj.getInputRoot(0), shell, context);
 		}
 		else { // Make sure to reset the root dir each time
 			wrapper.setRootDirectories(prj.getProjectFolder(), prj.getInputRoot(0));

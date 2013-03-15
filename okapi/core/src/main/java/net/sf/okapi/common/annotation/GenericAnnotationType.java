@@ -155,4 +155,10 @@ public class GenericAnnotationType {
 	public static final String STORAGESIZE_ENCODING = "storagesizeEncoding";
 	public static final String STORAGESIZE_LINEBREAK = "storagesizeLinebreak";
 
+	/**
+	 * Annotation identifier for display text (hint displayed to end-user).
+	 */
+	public static final String DISPLAYTEXT = "displayText";
+	public static final String DISPLAYTEXT_VALUE = "displayTextValue";
+	
 }

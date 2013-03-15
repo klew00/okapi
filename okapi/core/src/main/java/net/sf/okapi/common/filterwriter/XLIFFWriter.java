@@ -49,6 +49,7 @@ import net.sf.okapi.common.skeleton.ISkeletonWriter;
  * Writer for creating XLIFF document.
  */
 public class XLIFFWriter implements IFilterWriter {
+	private XLIFFWriterParameters params = new XLIFFWriterParameters();
 
 	/**
 	 * URI for the XLIFF 1.2 namespace.
@@ -95,15 +96,6 @@ public class XLIFFWriter implements IFilterWriter {
 
 	private boolean inFile;
 	private boolean hasFile;
-	private boolean useSourceForTranslated = false;
-
-	private boolean escapeGt = false;
-	private boolean placeholderMode = true;
-	
-	private boolean includeNoTranslate = true;
-	private boolean setApprovedAsNoTranslate = false;
-	private boolean copySource = true;
-	private boolean includeAltTrans = true;
 	
 	/**
 	 * Creates an XLIFF writer object.
@@ -112,67 +104,6 @@ public class XLIFFWriter implements IFilterWriter {
 		xliffCont = new XLIFFContent();
 	}
 	
-	/**
-	 * Sets the copySource flag indicating to copy the source at the target spot if there is no target defined.
-	 * @param copySource true to copy the source at the target spot if there is no target defined.
-	 */
-	public void setCopySource (boolean copySource) {
-		this.copySource = copySource;
-	}
-	
-	/**
-	 * Sets the flag indicating if the inline code should use the place-holder notation (g and x elements).
-	 * @param placeholderMode true if the inline code should use the place-holder notation.
-	 */
-	public void setPlaceholderMode (boolean placeholderMode) {
-		this.placeholderMode = placeholderMode;
-	}
-	
-	/**
-	 * Sets the flag indicating if '>' should be escaped or not.
-	 * @param escapeGt true to always escape '>', false to not escape it.
-	 */
-	public void setEscapeGt (boolean escapeGt) {
-		this.escapeGt = escapeGt;
-	}
-	
-	/**
-	 * Sets the flag indicating if the source text is used in the target, even if 
-	 * a target is available.
-	 * <p>This is for the tools where we trust the target will be obtained by the tool
-	 * from the TMX from original. This is to allow editing of pre-translated items in XLIFF 
-	 * editors that use directly the <target> element.
-	 * @param useSourceForTranslated true to use the source in the target even if a target text
-	 * is available.
-	 */
-	public void setUseSourceForTranslated (boolean useSourceForTranslated) {
-		this.useSourceForTranslated = useSourceForTranslated;
-	}
-	
-	/**
-	 * Sets the flag indicating if non-translatable text units should be output or not.
-	 * @param includeNoTranslate true to include non-translatable text unit in the output.
-	 */
-	public void setIncludeNoTranslate (boolean includeNoTranslate) {
-		this.includeNoTranslate = includeNoTranslate;
-	}
-	
-	/**
-	 * Sets the flag indicating if alt-trans elements should be output or not.
-	 * @param includeAltTrans true to include alt-trans element in the output.
-	 */
-	public void setIncludeAltTrans (boolean includeAltTrans) {
-		this.includeAltTrans = includeAltTrans;
-	}
-	
-	/**
-	 * Sets the flag indicating to mark as not translatable all entries that are approved.
-	 * @param setApprovedasNoTranslate true to mark approved entries as not translatable.
-	 */
-	public void setSetApprovedAsNoTranslate (boolean setApprovedasNoTranslate) {
-		this.setApprovedAsNoTranslate = setApprovedasNoTranslate;
-	}
-
 	/**
 	 * Creates a new XLIFF document.
 	 * @param xliffPath the full path of the document to create.
@@ -401,14 +332,14 @@ public class XLIFFWriter implements IFilterWriter {
 		// Avoid writing out some entries in non-IFilterWriter mode
 		if ( fwConfigId == null ) {
 			// Check if we need to set the entry as non-translatable
-			if ( setApprovedAsNoTranslate ) {
+			if ( params.getSetApprovedAsNoTranslate() ) {
 				Property prop = tu.getTargetProperty(trgLoc, Property.APPROVED);
 				if (( prop != null ) && prop.getValue().equals("yes") ) {
 					tu.setIsTranslatable(false);
 				}
 			}
 			// Check if we need to skip non-translatable entries
-			if ( !tu.isTranslatable() && !includeNoTranslate ) {
+			if ( !tu.isTranslatable() && !params.getIncludeNoTranslate() ) {
 				return;
 			}
 		}
@@ -486,13 +417,15 @@ public class XLIFFWriter implements IFilterWriter {
 		}
 		
 		// Write full source content (always without segments markers
-		writer.writeRawXML(xliffCont.toSegmentedString(tc, 0, escapeGt, false, placeholderMode));
+		writer.writeRawXML(xliffCont.toSegmentedString(tc, 0, params.getEscapeGt(), false, params.getPlaceholderMode(),
+				params.getIncludeCodeAttrs()));
 		List<GenericAnnotations> srcStandoff = xliffCont.getStandoff();
 		writer.writeEndElementLineBreak(); // source
 		// Write segmented source (with markers) if needed
 		if ( tc.hasBeenSegmented() ) {
 			writer.writeStartElement("seg-source");
-			writer.writeRawXML(xliffCont.toSegmentedString(tc, 0, escapeGt, true, placeholderMode));
+			writer.writeRawXML(xliffCont.toSegmentedString(tc, 0, params.getEscapeGt(), true, params.getPlaceholderMode(),
+					params.getIncludeCodeAttrs()));
 			// No repeat of the standoff
 			writer.writeEndElementLineBreak(); // seg-source
 		}
@@ -505,11 +438,11 @@ public class XLIFFWriter implements IFilterWriter {
 			// Do we have an available target to use instead?
 			tc = tu.getTarget(trgLoc);
 			boolean outputTarget = true;
-			if ( useSourceForTranslated || ( tc == null ) || ( tc.isEmpty() )
+			if ( params.getUseSourceForTranslated() || ( tc == null ) || ( tc.isEmpty() )
 				|| ( srcHasText && !tc.hasText(false) )) {
 				tc = tu.getSource(); // Fall back to source
 				// Output copy of source only if requested
-				outputTarget = copySource;
+				outputTarget = params.getCopySource();
 			}
 
 			if ( outputTarget ) {
@@ -528,13 +461,14 @@ public class XLIFFWriter implements IFilterWriter {
 				}
 				
 				// Now tc hold the content to write. Write it with or without marks
-				writer.writeRawXML(xliffCont.toSegmentedString(tc, 0, escapeGt, tc.hasBeenSegmented(), placeholderMode));
+				writer.writeRawXML(xliffCont.toSegmentedString(tc, 0, params.getEscapeGt(), tc.hasBeenSegmented(), params.getPlaceholderMode(),
+						params.getIncludeCodeAttrs()));
 				trgStandoff = xliffCont.getStandoff();
 				writer.writeEndElementLineBreak(); // target
 			}
 
 			// Possible alternate translations
-			if ( includeAltTrans ) {
+			if ( params.getIncludeAltTrans() ) {
 				// We re-get the target because tc could be coming from the source
 				TextContainer altCont = tu.getTarget(trgLoc);
 				if ( altCont != null ) {
@@ -621,12 +555,14 @@ public class XLIFFWriter implements IFilterWriter {
 				writer.writeStartElement("source");
 				writer.writeAttributeString("xml:lang", alt.getSourceLocale().toBCP47());
 				// Write full source content (always without segments markers
-				writer.writeRawXML(xliffCont.toSegmentedString(cont, 0, escapeGt, false, placeholderMode));
+				writer.writeRawXML(xliffCont.toSegmentedString(cont, 0, params.getEscapeGt(), false, params.getPlaceholderMode(),
+						params.getIncludeCodeAttrs()));
 				writer.writeEndElementLineBreak(); // source
 			}
 			writer.writeStartElement("target");
 			writer.writeAttributeString("xml:lang", alt.getTargetLocale().toBCP47());
-			writer.writeRawXML(xliffCont.toSegmentedString(alt.getTarget(), 0, escapeGt, false, placeholderMode));
+			writer.writeRawXML(xliffCont.toSegmentedString(alt.getTarget(), 0, params.getEscapeGt(), false, params.getPlaceholderMode(),
+					params.getIncludeCodeAttrs()));
 			writer.writeEndElementLineBreak(); // target
 			writer.writeEndElementLineBreak(); // alt-trans
 		}
@@ -655,8 +591,7 @@ public class XLIFFWriter implements IFilterWriter {
 
 	@Override
 	public IParameters getParameters () {
-		// Not used for now
-		return null;
+		return params;
 	}
 
 	@Override
@@ -711,8 +646,8 @@ public class XLIFFWriter implements IFilterWriter {
 
 	@Override
 	public void setParameters (IParameters params) {
-		// Not used for now
-		// Options are set individually
+		if (params instanceof XLIFFWriterParameters)
+			this.params = (XLIFFWriterParameters) params;
 	}
 
 	// Use for IFilterWriter mode

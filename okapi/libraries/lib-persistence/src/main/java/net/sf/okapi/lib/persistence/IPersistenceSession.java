@@ -23,6 +23,8 @@ package net.sf.okapi.lib.persistence;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import net.sf.okapi.common.annotation.IAnnotation;
+
 public interface IPersistenceSession {
 
 	void registerVersions();
@@ -123,4 +125,10 @@ public interface IPersistenceSession {
 	void registerBean(
 			Class<?> classRef, 
 			Class<? extends IPersistenceBean<?>> beanClassRef);
+	
+	<A extends IAnnotation> A getAnnotation (Class<A> annotationType);
+	
+	void setAnnotation (IAnnotation annotation);
+	
+	Iterable<IAnnotation> getAnnotations ();
 }

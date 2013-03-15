@@ -28,22 +28,22 @@ import java.util.regex.PatternSyntaxException;
 import net.sf.okapi.common.IHelp;
 import net.sf.okapi.common.ISegmenter;
 import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.UserConfiguration;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filterwriter.GenericContent;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.ui.AboutDialog;
 import net.sf.okapi.common.ui.CharacterInfoDialog;
+import net.sf.okapi.common.ui.ConstrainedSashForm;
 import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.InputDialog;
 import net.sf.okapi.common.ui.ResourceManager;
 import net.sf.okapi.common.ui.UIUtil;
-import net.sf.okapi.common.UserConfiguration;
 import net.sf.okapi.lib.segmentation.LanguageMap;
 import net.sf.okapi.lib.segmentation.Rule;
 import net.sf.okapi.lib.segmentation.SRXDocument;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.dnd.Clipboard;
 import org.eclipse.swt.dnd.DND;
 import org.eclipse.swt.dnd.DropTarget;
@@ -164,8 +164,8 @@ public class SRXEditor {
 		
 		createMenus();
 		
-		SashForm sashForm = new SashForm(shell, SWT.VERTICAL);
-		sashForm.setLayoutData(new GridData(GridData.FILL_BOTH));
+		ConstrainedSashForm sashForm = new ConstrainedSashForm(shell, false);
+		sashForm.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
 		sashForm.setSashWidth(3);
 		sashForm.setBackground(shell.getDisplay().getSystemColor(SWT.COLOR_WIDGET_NORMAL_SHADOW));
 		
@@ -208,13 +208,14 @@ public class SRXEditor {
 		tblRules.setLinesVisible(true);
 		gdTmp = new GridData(GridData.FILL_BOTH);
 		gdTmp.horizontalSpan = 6;
-		gdTmp.minimumHeight = 130;
+		gdTmp.minimumHeight = 40;
+		gdTmp.grabExcessVerticalSpace = true;
 		tblRules.setLayoutData(gdTmp);
 		tblRules.addControlListener(new ControlAdapter() {
 		    public void controlResized(ControlEvent e) {
 		    	Rectangle rect = tblRules.getClientArea();
 				//TODO: Check behavior when manual resize a column width out of client area
-		    	int typeColWidth = 75;
+		    	int typeColWidth = 90;
 				int nHalf = (int)((rect.width-typeColWidth) / 2);
 				tblRules.getColumn(0).setWidth(typeColWidth);
 				tblRules.getColumn(1).setWidth(nHalf);
@@ -379,6 +380,7 @@ public class SRXEditor {
 		gdTmp.horizontalSpan = 3;
 		edResults.setEditable(false);
 		edResults.setFont(sampleFont);
+		sashForm.setWeights(new int[] {1, 1});
 
 		edSampleText.addModifyListener(new ModifyListener () {
 			public void modifyText(ModifyEvent e) {
@@ -412,36 +414,43 @@ public class SRXEditor {
 			}
 		});
 
-		// Size
-		shell.pack();
-		shell.setMinimumSize(shell.getSize());
-		Point startSize = shell.getMinimumSize();
-		if ( startSize.x < 700 ) startSize.x = 700; 
-		if ( startSize.y < 600 ) startSize.y = 600; 
-		shell.setSize(startSize);
-		
-		// Maximize if requested
-		if ( config.getBoolean(OPT_MAXIMIZED) ) {
+		if (!shell.getMaximized()) { // not RWT full-screen mode 
+			// Size
+			Point startSize = shell.getSize();
+			shell.pack();
+			shell.setMinimumSize(shell.getSize());
+			shell.setSize(startSize);
+			
+			// Workaround for RWT (stretches the shell horizontally when column widths are adjusted)
 			shell.setMaximized(true);
-		}
-		else { // Or try to re-use the bounds of the previous session
-			Rectangle ar = UIUtil.StringToRectangle(config.getProperty(OPT_BOUNDS));
-			if ( ar != null ) {
-				Rectangle dr = shell.getDisplay().getBounds();
-				if ( dr.contains(ar.x+ar.width, ar.y+ar.height)
-					&& dr.contains(ar.x, ar.y) ) {
-					shell.setBounds(ar);
+			shell.setMaximized(false);
+			
+			UIUtil.centerShell(shell);			
+				
+			// Maximize if requested
+			if ( config.getBoolean(OPT_MAXIMIZED) ) {
+				shell.setMaximized(true);
+			}
+			else { // Or try to re-use the bounds of the previous session
+				shell.setMaximized(false);
+				Rectangle ar = UIUtil.StringToRectangle(config.getProperty(OPT_BOUNDS));
+				if ( ar != null ) {
+					Rectangle dr = shell.getDisplay().getBounds();
+					if ( dr.contains(ar.x+ar.width, ar.y+ar.height)
+						&& dr.contains(ar.x, ar.y) ) {
+						shell.setBounds(ar);
+					}
+				}
+				else if ( asDialog ) {
+					Dialogs.centerWindow(shell, parent);
 				}
 			}
-			else if ( asDialog ) {
-				Dialogs.centerWindow(shell, parent);
-			}
-		}
+		}		
 
 		// Start with a default document
 		newSRXDocument(1, false);
 	}
-	
+
 	private void createMenus () {
 		// Menus
 	    Menu menuBar = new Menu(shell, SWT.BAR);
@@ -785,12 +794,16 @@ public class SRXEditor {
 	
 	private void updateCaption () {
 		String filename;
-		if ( srxPath != null ) filename = Util.getFilename(srxPath, true);
+		if ( srxPath != null ) filename = updateCaption_getFileName(srxPath);
 		else filename = Res.getString("SRXEditor.untitled");  //$NON-NLS-1$
 		String text = Res.getString("edit.captionApp");  //$NON-NLS-1$
 		shell.setText(filename + " - " + text); //$NON-NLS-1$
 	}
 	
+	protected String updateCaption_getFileName(String srxPath) {
+		return Util.getFilename(srxPath, true);
+	}
+
 	private void updateAll () {
 		cbGroup.removeAll();
 		setSurfaceData();
@@ -896,6 +909,7 @@ public class SRXEditor {
 				dlg.open();
 			}
 			srxPath = path; // Set the path only after the load is fine
+			loadSRXDocument_rulesLoaded(srxPath);
 		}
 		catch ( Throwable e ) {
 			Dialogs.showError(shell, e.getLocalizedMessage(), null);
@@ -906,6 +920,9 @@ public class SRXEditor {
 		}
 	}
 	
+	protected void loadSRXDocument_rulesLoaded(String path) {
+	}
+
 	private void copySRXDocumentToClipboard () {
 		if ( !srxDoc.getVersion().equals("2.0") ) { //$NON-NLS-1$
 			MessageBox dlg = new MessageBox(shell, SWT.ICON_QUESTION | SWT.YES | SWT.NO | SWT.CANCEL);
@@ -935,10 +952,9 @@ public class SRXEditor {
 				dlg.setMessage(Res.getString("edit.saveDocVersionWarning")); //$NON-NLS-1$
 				if ( dlg.open() != SWT.YES ) return false;
 			}
-			if ( path == null ) {
-				path = Dialogs.browseFilenamesForSave(shell, Res.getString("edit.saveDocCaption"), null, null, //$NON-NLS-1$
-					Res.getString("edit.saveDocFileTypes"), //$NON-NLS-1$
-					Res.getString("edit.saveDocFilters")); //$NON-NLS-1$
+			boolean saveAsMode = path == null;
+			if ( saveAsMode ) {
+				path = saveSRXDocument_getPath();
 				if ( path == null ) return false;
 			}
 			getSurfaceData();
@@ -946,11 +962,22 @@ public class SRXEditor {
 			srxDoc.saveRules(path, true, false);
 			srxPath = path;
 			updateCaption();
+			saveSRXDocument_afterSave(path, saveAsMode);
 		}
 		catch ( Exception e ) {
 			Dialogs.showError(shell, e.getLocalizedMessage(), null);
 		}
 		return true;
+	}
+
+	protected String saveSRXDocument_getPath() {
+		return Dialogs.browseFilenamesForSave(shell, Res.getString("edit.saveDocCaption"), null, null, //$NON-NLS-1$
+			Res.getString("edit.saveDocFileTypes"), //$NON-NLS-1$
+			Res.getString("edit.saveDocFilters")); //$NON-NLS-1$
+	}
+	
+	protected void saveSRXDocument_afterSave(String path, boolean saveAsMode) {
+		// Do nothing
 	}
 	
 	private void editRule (boolean createNewRule) {
@@ -1090,9 +1117,7 @@ public class SRXEditor {
 
 	private void segmentTextFile () {
 		try {
-			// Get the input file
-			FileProcessingDialog dlg = new FileProcessingDialog(shell, help);
-			String[] result = dlg.showDialog(testInputPath, testOutputPath, htmlOutput);
+			String[] result = segmentTextFile_getPaths(testInputPath, testOutputPath, htmlOutput);
 			if ( result == null ) return; // Canceled
 			testInputPath = result[0];
 			testOutputPath = result[1];
@@ -1100,13 +1125,24 @@ public class SRXEditor {
 
 			// Process
 			fileProc.process(testInputPath, testOutputPath, htmlOutput, segmenter);
-
-			// Show the result
-			UIUtil.start(testOutputPath);
+			
+			segmentTextFile_processResult(testOutputPath);
 		}
 		catch ( Throwable e ) {
 			Dialogs.showError(shell, e.getLocalizedMessage(), null);
 		}
 	}
 
+	protected String[] segmentTextFile_getPaths(String testInputPath, String testOutputPath, boolean htmlOutput) {
+		// Get the input file
+		FileProcessingDialog dlg = new FileProcessingDialog(shell, help);
+		String[] result = dlg.showDialog(testInputPath, testOutputPath, htmlOutput);
+		return result;
+	}
+
+	protected void segmentTextFile_processResult(String testOutputPath) {
+		// Show the result
+		UIUtil.start(testOutputPath);
+	}
+	
 }
