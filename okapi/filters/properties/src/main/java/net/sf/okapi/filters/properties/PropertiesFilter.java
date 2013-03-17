@@ -597,8 +597,13 @@ public class PropertiesFilter implements IFilter {
 	}
 
 	private void processWithSubfilter(String parentId, ITextUnit parentTu) {
+		if ( this.encoderManager != null ) {
+			this.encoderManager.setDefaultOptions(params, encoding,
+				lineBreak);
+			this.encoderManager.updateEncoder(MimeTypeMapper.PROPERTIES_MIME_TYPE);
+		}
 		SubFilter subfilter = new SubFilter(sf, 
-				null, // no encoding is needed, html encoding is performed by the subfilter
+				encoderManager.getEncoder(), 
 				++sectionIndex, parentId, parentTu.getName());
 		subfilter.open(new RawDocument(parentTu.getSource().toString(),
 				srcLocale));
