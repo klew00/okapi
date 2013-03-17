@@ -41,7 +41,7 @@ public interface IUserPrompt {
 	 * @return true if yes, false if no
 	 * @throws OkapiUserCanceledException If user cancels
 	 */
-	public boolean promptYesNoCancel(String message)
+	public boolean promptYesNoCancel (String message)
 			throws OkapiUserCanceledException;
 
 	/**
@@ -51,6 +51,6 @@ public interface IUserPrompt {
 	 * @return true if OK
 	 * @throws OkapiUserCanceledException If user cancels
 	 */
-	public boolean promptOKCancel(String message)
+	public boolean promptOKCancel (String message)
 			throws OkapiUserCanceledException;
 }

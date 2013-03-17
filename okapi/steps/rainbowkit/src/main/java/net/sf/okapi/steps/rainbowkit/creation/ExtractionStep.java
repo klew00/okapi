@@ -262,27 +262,28 @@ public class ExtractionStep extends BasePipelineStep {
 		return params;
 	}
 	
-	private boolean shouldMerge() {
+	private boolean shouldMerge () {
 		if (context == null || context.getIsNoPrompt()) return false;
 		
-		if (writer instanceof IMergeable) {
+		if ( writer instanceof IMergeable ) {
 			return promptShouldMerge();
-		} else {
+		}
+		else {
 			return !promptShouldOverwrite();
 		}
 	}
 
-	private boolean promptShouldMerge() {
+	private boolean promptShouldMerge () {
 		String message = "A directory already exists at the target location. "
-				+ "Would you like to merge the new translation kit with the existing directory? "
-				+ "Select \"No\" to overwrite the existing directory.";
+			+ "Would you like to merge the new translation kit with the existing directory? "
+			+ "Select \"No\" to overwrite the existing directory.";
 		
 		return getPrompt().promptYesNoCancel(message);
 	}
 
-	private boolean promptShouldOverwrite() {
-		String message = "A directory already exists at the target location. "
-				+ "Select \"OK\" to overwrite it.";
+	private boolean promptShouldOverwrite () {
+		String message = "A directory already exists at the target location.\n"
+			+ "Select \"OK\" to overwrite it.";
 		
 		return getPrompt().promptOKCancel(message);
 	}
@@ -294,7 +295,8 @@ public class ExtractionStep extends BasePipelineStep {
 			IUserPrompt p = (IUserPrompt) Class.forName(promptClass).newInstance();
 			p.initialize(context.getUiParent(), context.getApplicationName());
 			return p;
-		} catch (Throwable e) {
+		}
+		catch ( Throwable e ) {
 			throw new InstantiationError("Could not instantiate user prompt.");
 		}
 	}

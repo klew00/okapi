@@ -381,15 +381,16 @@ public class FormatConversionStep extends BasePipelineStep {
 		if (context == null || context.getIsNoPrompt()) return;
 		
 		String promptClass = context.getIsGui() ? "net.sf.okapi.common.ui.UserPrompt"
-				: "net.sf.okapi.common.UserPrompt";
+			: "net.sf.okapi.common.UserPrompt";
 		
 		IUserPrompt p;
 		try {
-			p = (IUserPrompt) Class.forName(promptClass).newInstance();
+			p = (IUserPrompt)Class.forName(promptClass).newInstance();
 			p.initialize(context.getUiParent(), context.getApplicationName());
-		} catch (Throwable e) {
+		}
+		catch ( Throwable e ) {
 			throw new InstantiationError("Could not instantiate user prompt.");
 		}
-		p.promptOKCancel("A file already exists in the target location. Select OK to overwrite it.");
+		p.promptOKCancel("A file already exists in the target location.\nSelect \"OK\" to overwrite it.");
 	}
 }

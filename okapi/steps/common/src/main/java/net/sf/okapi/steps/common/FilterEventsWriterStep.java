@@ -163,7 +163,7 @@ public class FilterEventsWriterStep extends BasePipelineStep {
 				filterWriter.setOutput(outputURI.getPath());
 				normalizeResourceName(event);
 			}
-			if (new File(outputURI).exists()) {
+			if ( new File(outputURI).exists() ) {
 				promptShouldOverwrite();
 			}
 			return filterWriter.handleEvent(event);
@@ -213,7 +213,7 @@ public class FilterEventsWriterStep extends BasePipelineStep {
 		res.setName(name);
 	}
 
-	private void promptShouldOverwrite() {
+	private void promptShouldOverwrite () {
 		if (context == null || context.getIsNoPrompt()) return;
 		
 		String promptClass = context.getIsGui() ? "net.sf.okapi.common.ui.UserPrompt"
@@ -223,9 +223,10 @@ public class FilterEventsWriterStep extends BasePipelineStep {
 		try {
 			p = (IUserPrompt) Class.forName(promptClass).newInstance();
 			p.initialize(context.getUiParent(), context.getApplicationName());
-		} catch (Throwable e) {
+		}
+		catch ( Throwable e ) {
 			throw new InstantiationError("Could not instantiate user prompt.");
 		}
-		p.promptOKCancel("A file already exists in the target location. Select OK to overwrite it.");
+		p.promptOKCancel("A file already exists in the target location.\nSelect \"OK\" to overwrite it.");
 	}
 }
