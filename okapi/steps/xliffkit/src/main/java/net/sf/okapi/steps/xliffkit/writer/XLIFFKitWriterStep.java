@@ -139,7 +139,7 @@ public class XLIFFKitWriterStep extends BasePipelineStep {
 	}
 	
 	public Event handleEvent (Event event) {
-		//System.out.println(event.getEventType());
+//		System.out.println(event.getEventType());
 		switch ( event.getEventType() ) {
 		case NO_OP:
 			return event;
@@ -196,14 +196,9 @@ public class XLIFFKitWriterStep extends BasePipelineStep {
 	}
 		
 	private void processStartBatch() {		
-		try {
-			// If outputURI is defined explicitly in parameters, get it from there, otherwise use the one from the batch item
-			if (params != null && !Util.isEmpty(params.getOutputURI())) {
-				outputURI = new URI(params.getOutputURI());
-			}
-		} catch (URISyntaxException e) {
-			// TODO Handle exception
-			e.printStackTrace();
+		// If outputURI is defined explicitly in parameters, get it from there, otherwise use the one from the batch item
+		if (params != null && !Util.isEmpty(params.getOutputURI())) {
+			outputURI = Util.toURI(params.getOutputURI());
 		}
 		
 		File outFile = new File(outputURI);

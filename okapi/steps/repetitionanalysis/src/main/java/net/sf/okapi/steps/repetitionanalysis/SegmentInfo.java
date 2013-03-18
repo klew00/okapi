@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2011 by the Okapi Framework contributors
+  Copyright (C) 2008-2013 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -44,6 +44,23 @@ public class SegmentInfo {
 		this(metadata.get(MetadataType.ID), 
 			 metadata.get(MetadataType.GROUP_NAME),				
 			 metadata.get(MetadataType.FILE_NAME));
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof SegmentInfo) {
+			SegmentInfo si = (SegmentInfo) obj;
+			if (!si.tuid.equals(this.tuid)) return false;
+			if (!si.groupId.equals(this.groupId)) return false;
+			if (!si.segId.equals(this.segId)) return false;
+			return true;
+		}
+		return false;
+	}
+	
+	@Override
+	public int hashCode() {
+		return (String.format("%s %s %s", tuid, groupId, segId)).hashCode();
 	}
 	
 	public String getTuid() {
