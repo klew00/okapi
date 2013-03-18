@@ -33,23 +33,23 @@ import java.util.concurrent.ConcurrentHashMap;
 import net.sf.okapi.common.ClassUtil;
 
 public class ReferenceResolver {
-	private final String MSG1 = "ReferenceResolver: class %s is not registered";
-	private final String MSG2 = "ReferenceResolver: cannot instantiate %s";
-//	private final String MSG3 = "ReferenceResolver.createAntiBean: anti-bean class mismatch (actual: %s, expected: %s)";
-	private final String MSG3 = "ReferenceResolver: object references are broken, reference to a non-existing object";
-	private final String MSG4 = "ReferenceResolver.createAntiBean: objClassRef cannot be null";
-	private final String MSG5 = "ReferenceResolver.createAntiBean: refId cannot be 0";
+	private final static String MSG1 = "ReferenceResolver: class %s is not registered";
+	private final static String MSG2 = "ReferenceResolver: cannot instantiate %s";
+//	private final static String MSG3 = "ReferenceResolver.createAntiBean: anti-bean class mismatch (actual: %s, expected: %s)";
+	private final static String MSG3 = "ReferenceResolver: object references are broken, reference to a non-existing object";
+	private final static String MSG4 = "ReferenceResolver.createAntiBean: objClassRef cannot be null";
+	private final static String MSG5 = "ReferenceResolver.createAntiBean: refId cannot be 0";
 	private final static String MSG6 = "ReferenceResolver: idCounter overflow";
 	
 	private static long idCounter = 0;
 	private long rootId = 0;
 	private IPersistenceSession session;
 
-	private static Map<Object, Long> refIdLookup = new ConcurrentHashMap<Object, Long>();
-	private static Map<Long, Object> objectLookup = new ConcurrentHashMap<Long, Object>();
-	private static Map<Long, Long> rootLookup = new ConcurrentHashMap<Long, Long>();
-	private static Map<Object, IPersistenceBean<?>> beanCache = new ConcurrentHashMap<Object, IPersistenceBean<?>>();
-	private static Map<Long, IPersistenceBean<?>> beanCache2 = new ConcurrentHashMap<Long, IPersistenceBean<?>>();
+	private Map<Object, Long> refIdLookup = new ConcurrentHashMap<Object, Long>();
+	private Map<Long, Object> objectLookup = new ConcurrentHashMap<Long, Object>();
+	private Map<Long, Long> rootLookup = new ConcurrentHashMap<Long, Long>();
+	private Map<Object, IPersistenceBean<?>> beanCache = new ConcurrentHashMap<Object, IPersistenceBean<?>>();
+	private Map<Long, IPersistenceBean<?>> beanCache2 = new ConcurrentHashMap<Long, IPersistenceBean<?>>();
 	private Map<Long, Set<Long>> references = new LinkedHashMap<Long, Set<Long>>();
 	private Set<Set<Long>> frames = new TreeSet<Set<Long>>(new Comparator<Set<Long>>() {
 		@Override

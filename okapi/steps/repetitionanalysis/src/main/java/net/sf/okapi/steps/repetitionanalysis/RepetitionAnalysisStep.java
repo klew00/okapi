@@ -61,8 +61,18 @@ import net.sf.okapi.tm.pensieve.writer.TmWriterFactory;
 public class RepetitionAnalysisStep extends BasePipelineStep {
 
 	private Parameters params;
-	private boolean searchExact;	
+	private boolean searchExact;
+	/**
+	 * Counter of non-empty segments within a TU (local segment counter).
+	 */
+	private int segCounter;
+	/**
+	 * Counter of all non-empty segments within the document (global segment counter). 
+	 */
 	private long tuCounter;	
+	/**
+	 * Counter of TUs that have at least one non-empty segment (global TU counter).
+	 */
 	private long groupCounter;	
 	private String tmDir;
 	private PensieveWriter tmWriter;
@@ -171,7 +181,7 @@ public class RepetitionAnalysisStep extends BasePipelineStep {
 //				if (ttc != null) tsegments = ttc.getSegments();
 			}
 			
-			int segCounter = 0;
+			segCounter = 0;
 			boolean hasTranslationUnits = false;
 			for (Segment seg : ssegments) {
 				segCounter++;
