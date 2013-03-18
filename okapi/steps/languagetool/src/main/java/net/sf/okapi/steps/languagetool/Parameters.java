@@ -27,45 +27,55 @@ import net.sf.okapi.common.EditorFor;
 import net.sf.okapi.common.ParametersDescription;
 import net.sf.okapi.common.uidescription.EditorDescription;
 import net.sf.okapi.common.uidescription.IEditorDescriptionProvider;
-import net.sf.okapi.common.uidescription.TextInputPart;
 
 @EditorFor(Parameters.class)
 public class Parameters extends BaseParameters implements IEditorDescriptionProvider {
 
-	public Parameters() {
+	private static final String ENABLEFALSEFRIENDS = "enableFalseFriends";
 
+	private boolean enableFalseFriends;
+	
+	public Parameters () {
 		reset();
 	}
 
-	public void reset() {
-
+	@Override
+	public void reset () {
+		enableFalseFriends = true;
 	}
 
-	public void fromString(String data) {
-
+	@Override
+	public void fromString (String data) {
 		reset();
 		buffer.fromString(data);
 	}
 
-	public String toString() {
-
+	@Override
+	public String toString () {
 		buffer.reset();
 		return buffer.toString();
 	}
-
-	@Override
-	public ParametersDescription getParametersDescription() {
-
-//		ParametersDescription desc = new ParametersDescription(this);
-//		return desc;
-		return null;
+	
+	public boolean getEnableFalseFriends () {
+		return enableFalseFriends;
+	}
+	
+	public void setEnableFalseFriends (boolean enableFalseFriends) {
+		this.enableFalseFriends = enableFalseFriends;
 	}
 
-	public EditorDescription createEditorDescription(ParametersDescription paramDesc) {
+	@Override
+	public ParametersDescription getParametersDescription () {
+		ParametersDescription desc = new ParametersDescription(this);
+		desc.add(ENABLEFALSEFRIENDS, "Check for false friends", null);
+		return desc;
+	}
 
-//		EditorDescription desc = new EditorDescription("LanguageTool", true, false);
-//		return desc;
-		return null;
+	@Override
+	public EditorDescription createEditorDescription (ParametersDescription paramDesc) {
+		EditorDescription desc = new EditorDescription("LanguageTool", true, false);
+		desc.addCheckboxPart(paramDesc.get(ENABLEFALSEFRIENDS));
+		return desc;
 	}
 
 }

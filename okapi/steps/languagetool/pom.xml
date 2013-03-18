@@ -7,7 +7,7 @@
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>okapi-step-languagetool</artifactId>
-	<name>Okapi Step for proofreading and correcting text units</name>
+	<name>Okapi Step for calling LanguageTool on text units</name>
 	<dependencies>
 		<dependency>
 			<groupId>net.sf.okapi</groupId>

@@ -498,6 +498,11 @@
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
+			<groupId>net.sf.okapi.steps</groupId>
+			<artifactId>okapi-step-languagetool</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
 			<groupId>log4j</groupId>
 			<artifactId>log4j</artifactId>
 		</dependency>

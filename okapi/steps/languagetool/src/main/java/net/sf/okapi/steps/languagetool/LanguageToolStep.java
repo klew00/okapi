@@ -49,56 +49,50 @@ public class LanguageToolStep extends BasePipelineStep {
 	private LocaleId targetLocale;
 
 	public LanguageToolStep() {
-
 		this.params = new Parameters();
-		this.langTool = new LanguageTool(params);
 	}
 
 	@Override
-	public String getName() {
-
+	public String getName () {
 		return "LanguageTool";
 	}
 
 	@Override
-	public String getDescription() {
-
-		return "Proofreads and corrects spelling and grammar mistakes based on a predefined set of rules. "
-				+ "Expects: filter events. Sends back: filter events.";
+	public String getDescription () {
+		return "Invokes the LanguageTool checker to verify style, grammar and spelling errors. "
+			+ "Expects: filter events. Sends back: filter events.";
 	}
 
 	@Override
-	public IParameters getParameters() {
-
+	public IParameters getParameters () {
 		return params;
 	}
 
 	@Override
-	public void setParameters(IParameters params) {
-
+	public void setParameters (IParameters params) {
 		this.params = (Parameters) params;
 	}
 
 	@StepParameterMapping(parameterType = StepParameterType.TARGET_LOCALE)
-	public void setTargetLocale(LocaleId targetLocale) {
-
+	public void setTargetLocale (LocaleId targetLocale) {
 		this.targetLocale = targetLocale;
 	}
 
 	@StepParameterMapping(parameterType = StepParameterType.SOURCE_LOCALE)
-	public void setSourceLocale(LocaleId sourceLocale) {
-
+	public void setSourceLocale (LocaleId sourceLocale) {
 		this.sourceLocale = sourceLocale;
 	}
 
 	@Override
-	protected Event handleTextUnit(Event event) {
-
-		// TODO: move to cleaner. create run method
+	protected Event handleTextUnit (Event event) {
+		// Initialize the LT object if needed
+		if ( langTool == null ) {
+			langTool = new LanguageTool(params, sourceLocale, targetLocale);
+		}
 
 		ITextUnit tu = event.getTextUnit();
-
-		langTool.run(tu, targetLocale);
+		langTool.run(tu);
+		
 		return event;
 	}
 

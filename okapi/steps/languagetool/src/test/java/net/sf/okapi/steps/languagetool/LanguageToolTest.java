@@ -22,42 +22,52 @@
 
 package net.sf.okapi.steps.languagetool;
 
-import static org.junit.Assert.fail;
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.annotation.GenericAnnotations;
+import net.sf.okapi.common.filterwriter.GenericContent;
+import net.sf.okapi.common.resource.ITextUnit;
+import net.sf.okapi.common.resource.TextFragment;
+import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.resource.TextFragment.TagType;
 
 import org.junit.Before;
 import org.junit.Test;
-import net.sf.okapi.common.IResource;
-import net.sf.okapi.common.LocaleId;
-import net.sf.okapi.common.filterwriter.GenericContent;
-import net.sf.okapi.common.resource.ITextUnit;
-import net.sf.okapi.common.resource.Segment;
-import net.sf.okapi.common.resource.TextContainer;
-import net.sf.okapi.common.resource.TextFragment;
-import net.sf.okapi.common.resource.TextFragment.TagType;
-import net.sf.okapi.common.resource.TextPart;
-import net.sf.okapi.common.resource.TextUnit;
 
 public class LanguageToolTest {
 
-	private final LocaleId locFR = LocaleId.FRENCH;
-	
 	private GenericContent fmt;
-	private LanguageTool langTool;
+	private LanguageTool lt;
 	private Parameters params;
 
 	@Before
-	public void setUp() {
-
+	public void setUp () {
 		params = new Parameters();
 		fmt = new GenericContent();
-		langTool = new LanguageTool();
+		lt = new LanguageTool(null, LocaleId.ENGLISH, LocaleId.FRENCH);
 	}
 
 	@Test
-	public void simpleLanguageToolTest() {
+	public void simpleTest () {
+		ITextUnit tu = new TextUnit("id", "original teext");
+		tu.setTargetContent(LocaleId.FRENCH, new TextFragment("texte original"));
+		lt.run(tu);
+		GenericAnnotations anns = tu.getAnnotation(GenericAnnotations.class);
+		assertNotNull(anns);
+	}
 
-//		fail("Not yet implemented");
+	@Test
+	public void testWithCodes () {
+		TextFragment tf = new TextFragment();
+		tf.append(TagType.OPENING, "b", "<b>");
+		tf.append("text");
+		tf.append(TagType.CLOSING, "b", "</b>");
+		ITextUnit tu = new TextUnit("id");
+		tu.setSourceContent(tf);
+		tu.setTargetContent(LocaleId.FRENCH, tf.clone());
+		lt.run(tu);
+		GenericAnnotations anns = tu.getAnnotation(GenericAnnotations.class);
+		assertNotNull(anns);
 	}
 
 }
