@@ -97,7 +97,7 @@ public class XLIFFContent {
 	/**
 	 * Sets the fragment to format.
 	 * @param content The TextFragment object to format.
-	 * @param resetStandoff true to reset the standoff items (e.g. when the fragment is the whole content of a text container).
+	 * @param resetStandoff true to reset the ITS standoff items (e.g. when the fragment is the whole content of a text container).
 	 * @return Itself
 	 */
 	public XLIFFContent setContent (TextFragment content,
@@ -114,22 +114,22 @@ public class XLIFFContent {
 	
 	/**
 	 * Generates an XLIFF string from the content.
-	 * This is the same as calling this.toString(1, true, false, false).
+	 * This is the same as calling this.toString(1, true, false, false, false, true).
 	 * @return The string formatted in XLIFF.
 	 */
 	@Override
 	public String toString () {
-		return toString(1, true, false, false, false);
+		return toString(1, true, false, false, false, true);
 	}
 
 	/**
 	 * Generates an XLIFF string from the content.
-	 * This is the same as calling this.toString(1, true, false) and setting gMode.
+	 * This is the same as calling this.toString(1, true, false, gMode, false, true) and setting gMode.
 	 * @param gMode True to use g/x markup, false to use bpt/ept/ph
 	 * @return The string formatted in XLIFF.
 	 */
 	public String toString (boolean gMode) {
-		return toString(1, true, false, gMode, false);
+		return toString(1, true, false, gMode, false, true);
 	}
 
 	/**
@@ -145,13 +145,15 @@ public class XLIFFContent {
 	 * @param gMode True to use g/x markup, false to use bpt/ept/ph
 	 * This option is to be used when the in-line code is an XLIFF-in-line code itself.
 	 * @param codeAttrs True to include extended code attributes in the output.
+	 * @params includeIts True to include ITS markup in the output.
 	 * @return The string formatted in XLIFF.
 	 */
 	public String toString (int quoteMode,
 		boolean escapeGT,
 		boolean codeOnlyMode,
 		boolean gMode,
-		boolean codeAttrs)
+		boolean codeAttrs,
+		boolean includeIts)
 	{
 		StringBuilder tmp = new StringBuilder();
 		int index;
@@ -184,7 +186,7 @@ public class XLIFFContent {
 					if ( code.hasAnnotation("protected") ) {
 						tmp.append("<mrk mtype=\"protected\">");
 					}
-					else if ( code.hasAnnotation(GenericAnnotationType.GENERIC) ) {
+					else if ( includeIts && code.hasAnnotation(GenericAnnotationType.GENERIC) ) {
 						tmp.append("<mrk");
 						outputITSAttributes(code.getGenericAnnotations(), quoteMode, escapeGT, tmp, true);
 						tmp.append(">");
@@ -199,7 +201,7 @@ public class XLIFFContent {
 				}
 				else {
 					// Close the marker, if needed
-					if ( code.hasAnnotation(GenericAnnotationType.GENERIC) ) {
+					if ( includeIts && code.hasAnnotation(GenericAnnotationType.GENERIC) ) {
 						tmp.append("</mrk>");
 					}
 					else if ( code.hasAnnotation("protected") ) {
@@ -335,6 +337,7 @@ public class XLIFFContent {
 	 * @param withMarkers True to output mrk elements, false to output only 
 	 * the content of mrk element.
 	 * @param gMode True to use g/x markup, false to use bpt/ept/ph
+	 * @param codeAttrs True to include extended code attributes in the output.
 	 * @return The coded string.
 	 */
 	public String toSegmentedString (TextContainer container,
@@ -342,7 +345,8 @@ public class XLIFFContent {
 		boolean escapeGT,
 		boolean withMarkers,
 		boolean gMode,
-		boolean codeAttrs)
+		boolean codeAttrs,
+		boolean includeIts)
 	{
 		StringBuilder tmp = new StringBuilder();
 		if ( innerContent == null ) {
@@ -361,7 +365,7 @@ public class XLIFFContent {
 			}
 			// Fragment
 			innerContent.setContent(part.text);
-			tmp.append(innerContent.toString(quoteMode, escapeGT, false, gMode, codeAttrs));
+			tmp.append(innerContent.toString(quoteMode, escapeGT, false, gMode, codeAttrs, includeIts));
 			standoff = innerContent.getStandoff(); // Trickle up the standoff information too.
 			if ( withMarkers && part.isSegment() && container.hasBeenSegmented() ) {
 				if ( withMarkers ) tmp.append("</mrk>");

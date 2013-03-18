@@ -24,6 +24,7 @@ import net.sf.okapi.common.BaseParameters;
 import net.sf.okapi.common.ParametersDescription;
 
 public class XLIFFWriterParameters extends BaseParameters {
+	
 	private boolean useSourceForTranslated;
 	private boolean escapeGt;
 	private boolean placeholderMode;
@@ -32,6 +33,7 @@ public class XLIFFWriterParameters extends BaseParameters {
 	private boolean copySource;
 	private boolean includeAltTrans;
 	private boolean includeCodeAttrs;
+	private boolean includeIts;
 
 	private static final String USESOURCEFORTRANSLATED = "useSourceForTranslated";
 	private static final String ESCAPEGT = "escapeGt";
@@ -41,13 +43,14 @@ public class XLIFFWriterParameters extends BaseParameters {
 	private static final String COPYSOURCE = "copySource";
 	private static final String INCLUDEALTTRANS = "includeAltTrans";
 	private static final String INCLUDECODEATTRS = "includeCodeAttrs";
+	private static final String INCLUDEITS = "includeIts";
 
-	public XLIFFWriterParameters() {
+	public XLIFFWriterParameters () {
 		reset();
 		toString(); // fill the list
 	}
 
-	public boolean getUseSourceForTranslated() {
+	public boolean getUseSourceForTranslated () {
 		return useSourceForTranslated;
 	}
 
@@ -60,11 +63,11 @@ public class XLIFFWriterParameters extends BaseParameters {
 	 * @param useSourceForTranslated true to use the source in the target even if a target text
 	 * is available.
 	 */
-	public void setUseSourceForTranslated(boolean useSourceForTranslated) {
+	public void setUseSourceForTranslated (boolean useSourceForTranslated) {
 		this.useSourceForTranslated = useSourceForTranslated;
 	}
 
-	public boolean getEscapeGt() {
+	public boolean getEscapeGt () {
 		return escapeGt;
 	}
 
@@ -72,7 +75,7 @@ public class XLIFFWriterParameters extends BaseParameters {
 	 * Sets the flag indicating if '>' should be escaped or not.
 	 * @param escapeGt true to always escape '>', false to not escape it.
 	 */
-	public void setEscapeGt(boolean escapeGt) {
+	public void setEscapeGt (boolean escapeGt) {
 		this.escapeGt = escapeGt;
 	}
 
@@ -80,7 +83,7 @@ public class XLIFFWriterParameters extends BaseParameters {
 	 * Sets the flag indicating if the inline code should use the place-holder notation (g and x elements).
 	 * @param placeholderMode true if the inline code should use the place-holder notation.
 	 */
-	public boolean getPlaceholderMode() {
+	public boolean getPlaceholderMode () {
 		return placeholderMode;
 	}
 
@@ -88,7 +91,7 @@ public class XLIFFWriterParameters extends BaseParameters {
 		this.placeholderMode = placeholderMode;
 	}
 
-	public boolean getIncludeNoTranslate() {
+	public boolean getIncludeNoTranslate () {
 		return includeNoTranslate;
 	}
 
@@ -96,11 +99,11 @@ public class XLIFFWriterParameters extends BaseParameters {
 	 * Sets the flag indicating if non-translatable text units should be output or not.
 	 * @param includeNoTranslate true to include non-translatable text unit in the output.
 	 */
-	public void setIncludeNoTranslate(boolean includeNoTranslate) {
+	public void setIncludeNoTranslate (boolean includeNoTranslate) {
 		this.includeNoTranslate = includeNoTranslate;
 	}
 
-	public boolean getSetApprovedAsNoTranslate() {
+	public boolean getSetApprovedAsNoTranslate () {
 		return setApprovedAsNoTranslate;
 	}
 
@@ -112,7 +115,7 @@ public class XLIFFWriterParameters extends BaseParameters {
 		this.setApprovedAsNoTranslate = setApprovedAsNoTranslate;
 	}
 
-	public boolean getCopySource() {
+	public boolean getCopySource () {
 		return copySource;
 	}
 
@@ -120,11 +123,11 @@ public class XLIFFWriterParameters extends BaseParameters {
 	 * Sets the copySource flag indicating to copy the source at the target spot if there is no target defined.
 	 * @param copySource true to copy the source at the target spot if there is no target defined.
 	 */
-	public void setCopySource(boolean copySource) {
+	public void setCopySource (boolean copySource) {
 		this.copySource = copySource;
 	}
 
-	public boolean getIncludeAltTrans() {
+	public boolean getIncludeAltTrans () {
 		return includeAltTrans;
 	}
 
@@ -132,11 +135,11 @@ public class XLIFFWriterParameters extends BaseParameters {
 	 * Sets the flag indicating if alt-trans elements should be output or not.
 	 * @param includeAltTrans true to include alt-trans element in the output.
 	 */
-	public void setIncludeAltTrans(boolean includeAltTrans) {
+	public void setIncludeAltTrans (boolean includeAltTrans) {
 		this.includeAltTrans = includeAltTrans;
 	}
 
-	public boolean getIncludeCodeAttrs() {
+	public boolean getIncludeCodeAttrs () {
 		return includeCodeAttrs;
 	}
 
@@ -146,6 +149,22 @@ public class XLIFFWriterParameters extends BaseParameters {
 	 */
 	public void setIncludeCodeAttrs(boolean includeCodeAttrs) {
 		this.includeCodeAttrs = includeCodeAttrs;
+	}
+
+	/**
+	 * Gets the flag indicating if ITS markup should be output or not.
+	 * @return true if ITS markup should be output, false otherwise.
+	 */
+	public boolean getIncludeIts () {
+		return includeIts;
+	}
+
+	/**
+	 * Sets the flag indicating if ITS markup should be output or not.
+	 * @param includeIts true to include ITS markup in the output.
+	 */
+	public void setIncludeIts (boolean includeIts) {
+		this.includeIts = includeIts;
 	}
 
 	@Override
@@ -158,6 +177,7 @@ public class XLIFFWriterParameters extends BaseParameters {
 		copySource = true;
 		includeAltTrans = true;
 		includeCodeAttrs = false;
+		includeIts = true;
 	}
 
 	@Override
@@ -173,6 +193,7 @@ public class XLIFFWriterParameters extends BaseParameters {
 		copySource = buffer.getBoolean(COPYSOURCE, copySource);
 		includeAltTrans = buffer.getBoolean(INCLUDEALTTRANS, includeAltTrans);
 		includeCodeAttrs = buffer.getBoolean(INCLUDECODEATTRS, includeCodeAttrs);
+		includeIts = buffer.getBoolean(INCLUDEITS, includeIts);
 	}
 
 	@Override
@@ -187,6 +208,7 @@ public class XLIFFWriterParameters extends BaseParameters {
 		buffer.setBoolean(COPYSOURCE, copySource);
 		buffer.setBoolean(INCLUDEALTTRANS, includeAltTrans);
 		buffer.setBoolean(INCLUDECODEATTRS, includeCodeAttrs);
+		buffer.setBoolean(INCLUDEITS, includeIts);
 
 		return buffer.toString();
 	}
@@ -203,6 +225,7 @@ public class XLIFFWriterParameters extends BaseParameters {
 		desc.add(COPYSOURCE, "Copy the source as target if there is no target defined", null);
 		desc.add(INCLUDEALTTRANS, "Output alt-trans elements", null);
 		desc.add(INCLUDECODEATTRS, "Output extended code attributes", null);
+		desc.add(INCLUDEITS, "Output ITS markup", null);
 
 		return desc;
 	}

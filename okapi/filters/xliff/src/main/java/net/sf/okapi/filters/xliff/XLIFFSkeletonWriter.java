@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2010-2011 by the Okapi Framework contributors
+  Copyright (C) 2010-2013 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -21,10 +21,6 @@
 package net.sf.okapi.filters.xliff;
 
 import java.nio.charset.CharsetEncoder;
-import java.util.List;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.LocaleId;
@@ -34,25 +30,26 @@ import net.sf.okapi.common.annotation.AltTranslationsAnnotation;
 import net.sf.okapi.common.encoder.EncoderContext;
 import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.filterwriter.ILayerProvider;
-import net.sf.okapi.common.filterwriter.ITSContent;
 import net.sf.okapi.common.filterwriter.XLIFFContent;
 import net.sf.okapi.common.filterwriter.XLIFFWriter;
 import net.sf.okapi.common.query.MatchType;
-import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.INameable;
 import net.sf.okapi.common.resource.IReferenceable;
+import net.sf.okapi.common.resource.ISegments;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.Segment;
-import net.sf.okapi.common.resource.ISegments;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextPart;
-import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.common.skeleton.GenericSkeletonPart;
 import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
 import net.sf.okapi.common.skeleton.StorageList;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class XLIFFSkeletonWriter extends GenericSkeletonWriter {
 
@@ -63,7 +60,7 @@ public class XLIFFSkeletonWriter extends GenericSkeletonWriter {
 	
 	private Parameters params;
 	private XLIFFContent fmt;
-	private ITSContent itsCont;
+	//private ITSContent itsCont;
 	private CharsetEncoder chsEnc;
 
 	// For serialization
@@ -306,11 +303,11 @@ public class XLIFFSkeletonWriter extends GenericSkeletonWriter {
 			if ( !cont.isEmpty() ) {
 				sb.append(String.format("<source xml:lang=\"%s\">", alt.getSourceLocale().toString()));
 				// Write full source content (never with segments markers)
-				sb.append(fmt.toSegmentedString(cont, 0, false, false, params.getAddAltTransGMode(), false));
+				sb.append(fmt.toSegmentedString(cont, 0, false, false, params.getAddAltTransGMode(), false, params.getIncludeIts()));
 				sb.append("</source>"+encoderManager.getLineBreak()); // source
 			}
 			sb.append(String.format("<target xml:lang=\"%s\">", alt.getTargetLocale().toString()));
-			sb.append(fmt.toSegmentedString(alt.getTarget(), 0, false, false, params.getAddAltTransGMode(), false));
+			sb.append(fmt.toSegmentedString(alt.getTarget(), 0, false, false, params.getAddAltTransGMode(), false, params.getIncludeIts()));
 			sb.append("</target>"+encoderManager.getLineBreak()); // target
 			sb.append("</alt-trans>"+encoderManager.getLineBreak()); // alt-trans
 		}

@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2011 by the Okapi Framework contributors
+  Copyright (C) 2008-2013 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -34,6 +34,7 @@ public class Options extends BaseParameters implements IEditorDescriptionProvide
 	private static final String COPYSOURCE = "copySource"; //$NON-NLS-1$
 	private static final String INCLUDEALTTRANS = "includeAltTrans"; //$NON-NLS-1$
 	private static final String INCLUDECODEATTRS = "includeCodeAttrs"; //$NON-NLS-1$
+	private static final String INCLUDEITS = "includeIts"; //$NON-NLS-1$
 	
 	private boolean placeholderMode;
 	private boolean includeNoTranslate;
@@ -41,6 +42,7 @@ public class Options extends BaseParameters implements IEditorDescriptionProvide
 	private boolean copySource;
 	private boolean includeAltTrans;
 	private boolean includeCodeAttrs;
+	private boolean includeIts;
 
 	public Options () {
 		reset();
@@ -54,6 +56,7 @@ public class Options extends BaseParameters implements IEditorDescriptionProvide
 		copySource = true;
 		includeAltTrans = true;
 		includeCodeAttrs = false;
+		includeIts = true;
 	}
 
 	@Override
@@ -66,6 +69,7 @@ public class Options extends BaseParameters implements IEditorDescriptionProvide
 		copySource = buffer.getBoolean(COPYSOURCE, copySource);
 		includeAltTrans = buffer.getBoolean(INCLUDEALTTRANS, includeAltTrans);
 		includeCodeAttrs = buffer.getBoolean(INCLUDECODEATTRS, includeCodeAttrs);
+		includeIts = buffer.getBoolean(INCLUDEITS, includeIts);
 		
 		// Make sure the we can merge later
 		if ( !includeNoTranslate ) {
@@ -82,6 +86,7 @@ public class Options extends BaseParameters implements IEditorDescriptionProvide
 		buffer.setBoolean(COPYSOURCE, copySource);
 		buffer.setBoolean(INCLUDEALTTRANS, includeAltTrans);
 		buffer.setBoolean(INCLUDECODEATTRS, includeCodeAttrs);
+		buffer.setBoolean(INCLUDEITS, includeIts);
 		return buffer.toString();
 	}
 
@@ -133,6 +138,14 @@ public class Options extends BaseParameters implements IEditorDescriptionProvide
 		this.includeCodeAttrs = includeCodeAttrs;
 	}
 
+	public boolean getIncludeIts () {
+		return includeIts;
+	}
+
+	public void setIncludeIts (boolean includeIts) {
+		this.includeIts = includeIts;
+	}
+
 	@Override
 	public ParametersDescription getParametersDescription() {
 		ParametersDescription desc = new ParametersDescription(this);
@@ -142,6 +155,7 @@ public class Options extends BaseParameters implements IEditorDescriptionProvide
 		desc.add(COPYSOURCE, "Copy source text in target if no target is available", null);
 		desc.add(INCLUDEALTTRANS, "Include <alt-trans> elements", null);
 		desc.add(INCLUDECODEATTRS, "Include extended code attributes", null);
+		desc.add(INCLUDEITS, "Include ITS markup", null);
 		return desc;
 	}
 
@@ -155,6 +169,7 @@ public class Options extends BaseParameters implements IEditorDescriptionProvide
 		desc.addCheckboxPart(paramsDesc.get(COPYSOURCE));
 		desc.addCheckboxPart(paramsDesc.get(INCLUDEALTTRANS));
 		desc.addCheckboxPart(paramsDesc.get(INCLUDECODEATTRS));
+		desc.addCheckboxPart(paramsDesc.get(INCLUDEITS));
 		return desc;
 	}
 

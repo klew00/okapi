@@ -101,7 +101,7 @@ public class XLIFFContentTest {
 				GenericAnnotationType.LOCNOTE_VALUE, "comment",
 				GenericAnnotationType.LOCNOTE_TYPE, "alert")));
 		assertEquals("Before <mrk its:taSource=\"src\" mtype=\"x-its\">"
-			+ "<mrk comment=\"comment\" okp:itsLocNoteType=\"alert\" mtype=\"x-its\">the span</mrk></mrk> after.",
+			+ "<mrk comment=\"comment\" itsx:locNoteType=\"alert\" mtype=\"x-its\">the span</mrk></mrk> after.",
 			fmt.setContent(tf).toString(true));
 	}
 
@@ -173,7 +173,7 @@ public class XLIFFContentTest {
 		GenericAnnotations.addAnnotations(end, anns);
 		// Output
 		assertEquals("Before <g id=\"1\"><mrk its:allowedCharacters=\"[a-z]\" mtype=\"x-its\">the span</mrk></g> after.",
-			fmt.setContent(tf).toString(1, true, false, true, false));
+			fmt.setContent(tf).toString(1, true, false, true, false, true));
 	}
 
 	@Test
@@ -186,7 +186,7 @@ public class XLIFFContentTest {
 		tf.append(" end.");
 
 		assertEquals("Beginning <x id=\"1\" ctype=\"image\" equiv-text=\"[hint for user]\"/> middle <x id=\"2\" ctype=\"x-other\"/> end.",
-				fmt.setContent(tf).toString(1, true, false, true, true));
+				fmt.setContent(tf).toString(1, true, false, true, true, true));
 	}
 	
 	private TextFragment createTextFragment () {

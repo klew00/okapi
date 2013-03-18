@@ -31,7 +31,6 @@ import net.sf.okapi.common.annotation.GenericAnnotation;
 import net.sf.okapi.common.annotation.GenericAnnotationType;
 import net.sf.okapi.common.annotation.GenericAnnotations;
 import net.sf.okapi.common.annotation.IssueAnnotation;
-import net.sf.okapi.common.resource.Code;
 
 /**
  * Utilities for writing out ITS markup.
@@ -293,7 +292,7 @@ public class ITSContent {
 				if ( inline && !isHTML5 ) {
 					// in mrk element
 					output.append(" comment=\""+Util.escapeToXML(ann.getString(GenericAnnotationType.LOCNOTE_VALUE), 3, false, encoder)+"\"");
-					printITSExtStringAttribute(ann.getString(GenericAnnotationType.LOCNOTE_TYPE), "itsLocNoteType", output);
+					printITSExtStringAttribute(ann.getString(GenericAnnotationType.LOCNOTE_TYPE), "locNoteType", output);
 				}
 				else {
 					printITSStringAttribute(ann.getString(GenericAnnotationType.LOCNOTE_VALUE),
@@ -305,12 +304,12 @@ public class ITSContent {
 
 			// Domain
 			else if ( ann.getType().equals(GenericAnnotationType.DOMAIN) ) {
-				printITSExtStringAttribute(ann.getString(GenericAnnotationType.DOMAIN_VALUE), "itsDomain", output);
+				printITSExtStringAttribute(ann.getString(GenericAnnotationType.DOMAIN_VALUE), "domain", output);
 			}
 			
 			// External Resource
 			else if ( ann.getType().equals(GenericAnnotationType.EXTERNALRES) ) {
-				printITSExtStringAttribute(ann.getString(GenericAnnotationType.EXTERNALRES_VALUE), "itsExternalResourceRef", output);
+				printITSExtStringAttribute(ann.getString(GenericAnnotationType.EXTERNALRES_VALUE), "externalResourceRef", output);
 			}
 			
 			// Localization Quality issue
@@ -445,7 +444,7 @@ public class ITSContent {
 		StringBuilder output)
 	{
 		if ( value != null ) {
-			output.append((isHTML5 ? " data-" : " okp:")+attrName+"=\""+Util.escapeToXML(value, 3, false, encoder)+"\"");
+			output.append((isHTML5 ? " data-" : " itsx:")+attrName+"=\""+Util.escapeToXML(value, 3, false, encoder)+"\"");
 		}
 	}
 

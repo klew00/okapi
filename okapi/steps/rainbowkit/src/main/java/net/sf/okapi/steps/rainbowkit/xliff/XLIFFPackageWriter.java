@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2010-2012 by the Okapi Framework contributors
+  Copyright (C) 2010-2013 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -95,6 +95,7 @@ public class XLIFFPackageWriter extends BasePackageWriter {
 		paramsXliff.setSetApprovedAsNoTranslate(options.getSetApprovedAsNoTranslate());
 		paramsXliff.setIncludeNoTranslate(options.getIncludeNoTranslate());
 		paramsXliff.setIncludeCodeAttrs(options.getIncludeCodeAttrs());
+		paramsXliff.setIncludeIts(options.getIncludeIts());
 		
 		StartDocument sd = event.getStartDocument();
 		writer.create(rawDocPath, null, manifest.getSourceLocale(), manifest.getTargetLocale(),

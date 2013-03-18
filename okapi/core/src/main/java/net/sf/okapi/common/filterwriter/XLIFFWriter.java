@@ -49,23 +49,32 @@ import net.sf.okapi.common.skeleton.ISkeletonWriter;
  * Writer for creating XLIFF document.
  */
 public class XLIFFWriter implements IFilterWriter {
-	private XLIFFWriterParameters params = new XLIFFWriterParameters();
-
+	
 	/**
 	 * URI for the XLIFF 1.2 namespace.
 	 */
 	public static final String NS_XLIFF12 = "urn:oasis:names:tc:xliff:document:1.2";
+	
 	/**
 	 * URI for the Okapi XLIFF extensions namespace.
 	 */
 	public static final String NS_XLIFFOKAPI = "okapi-framework:xliff-extensions";
+	
 	/**
 	 * Name of the Okapi XLIFF extension matchType.
 	 */
 	public static final String OKP_MATCHTYPE = "matchType";
-	
+
+	/**
+	 * URI for the ITS 2.0 namespace.
+	 */
 	public static final String NS_ITS20 = "http://www.w3.org/2005/11/its";
 	
+	/**
+	 * URI for the ITS Extension namespace.
+	 */
+	public static final String NS_ITSEXT = "http://www.w3.org/2008/12/its-extensions";
+		
 	private static final String RESTYPEVALUES = 
 		";auto3state;autocheckbox;autoradiobutton;bedit;bitmap;button;caption;cell;"
 		+ "checkbox;checkboxmenuitem;checkedlistbox;colorchooser;combobox;comboboxexitem;"
@@ -96,6 +105,8 @@ public class XLIFFWriter implements IFilterWriter {
 
 	private boolean inFile;
 	private boolean hasFile;
+
+	private XLIFFWriterParameters params = new XLIFFWriterParameters();
 	
 	/**
 	 * Creates an XLIFF writer object.
@@ -136,9 +147,12 @@ public class XLIFFWriter implements IFilterWriter {
 		writer.writeStartElement("xliff");
 		writer.writeAttributeString("version", "1.2");
 		writer.writeAttributeString("xmlns", NS_XLIFF12);
-		writer.writeAttributeString("xmlns:okp", NS_XLIFFOKAPI); 
-		writer.writeAttributeString("xmlns:its", NS_ITS20); 
-		writer.writeAttributeString("its:version", "2.0"); 
+		writer.writeAttributeString("xmlns:okp", NS_XLIFFOKAPI);
+		if ( params.getIncludeIts() ) {
+			writer.writeAttributeString("xmlns:its", NS_ITS20); 
+			writer.writeAttributeString("xmlns:itsx", NS_ITSEXT); 
+			writer.writeAttributeString("its:version", "2.0");
+		}
 
 		if ( !Util.isEmpty(message) ) {
 			writer.writeLineBreak();
@@ -385,7 +399,7 @@ public class XLIFFWriter implements IFilterWriter {
 
 		// Annotations at the unit level
 		GenericAnnotations anns = tu.getAnnotation(GenericAnnotations.class);
-		if ( anns != null ) {
+		if (( anns != null ) && params.getIncludeIts() ) {
 			StringBuilder sb = new StringBuilder();
 			if ( itsContForUnit == null ) {
 				itsContForUnit = new ITSContent(xliffCont.getCharsetEncoder(), false, true);
@@ -407,7 +421,7 @@ public class XLIFFWriter implements IFilterWriter {
 		
 		// Annotations at the source container level
 		anns = tc.getAnnotation(GenericAnnotations.class);
-		if ( anns != null ) {
+		if (( anns != null ) && params.getIncludeIts() ) {
 			StringBuilder sb = new StringBuilder();
 			if ( itsContForSrcCont == null ) {
 				itsContForSrcCont = new ITSContent(xliffCont.getCharsetEncoder(), false, true);
@@ -418,14 +432,14 @@ public class XLIFFWriter implements IFilterWriter {
 		
 		// Write full source content (always without segments markers
 		writer.writeRawXML(xliffCont.toSegmentedString(tc, 0, params.getEscapeGt(), false, params.getPlaceholderMode(),
-				params.getIncludeCodeAttrs()));
+			params.getIncludeCodeAttrs(), params.getIncludeIts()));
 		List<GenericAnnotations> srcStandoff = xliffCont.getStandoff();
 		writer.writeEndElementLineBreak(); // source
 		// Write segmented source (with markers) if needed
 		if ( tc.hasBeenSegmented() ) {
 			writer.writeStartElement("seg-source");
 			writer.writeRawXML(xliffCont.toSegmentedString(tc, 0, params.getEscapeGt(), true, params.getPlaceholderMode(),
-					params.getIncludeCodeAttrs()));
+				params.getIncludeCodeAttrs(), params.getIncludeIts()));
 			// No repeat of the standoff
 			writer.writeEndElementLineBreak(); // seg-source
 		}
@@ -451,7 +465,7 @@ public class XLIFFWriter implements IFilterWriter {
 
 				// Annotations at the target container level
 				anns = tc.getAnnotation(GenericAnnotations.class);
-				if ( anns != null ) {
+				if (( anns != null ) && params.getIncludeIts() ) {
 					StringBuilder sb = new StringBuilder();
 					if ( itsContForTrgCont == null ) {
 						itsContForTrgCont = new ITSContent(xliffCont.getCharsetEncoder(), false, true);
@@ -462,7 +476,7 @@ public class XLIFFWriter implements IFilterWriter {
 				
 				// Now tc hold the content to write. Write it with or without marks
 				writer.writeRawXML(xliffCont.toSegmentedString(tc, 0, params.getEscapeGt(), tc.hasBeenSegmented(), params.getPlaceholderMode(),
-						params.getIncludeCodeAttrs()));
+					params.getIncludeCodeAttrs(), params.getIncludeIts()));
 				trgStandoff = xliffCont.getStandoff();
 				writer.writeEndElementLineBreak(); // target
 			}
@@ -556,13 +570,13 @@ public class XLIFFWriter implements IFilterWriter {
 				writer.writeAttributeString("xml:lang", alt.getSourceLocale().toBCP47());
 				// Write full source content (always without segments markers
 				writer.writeRawXML(xliffCont.toSegmentedString(cont, 0, params.getEscapeGt(), false, params.getPlaceholderMode(),
-						params.getIncludeCodeAttrs()));
+					params.getIncludeCodeAttrs(), params.getIncludeIts()));
 				writer.writeEndElementLineBreak(); // source
 			}
 			writer.writeStartElement("target");
 			writer.writeAttributeString("xml:lang", alt.getTargetLocale().toBCP47());
 			writer.writeRawXML(xliffCont.toSegmentedString(alt.getTarget(), 0, params.getEscapeGt(), false, params.getPlaceholderMode(),
-					params.getIncludeCodeAttrs()));
+				params.getIncludeCodeAttrs(), params.getIncludeIts()));
 			writer.writeEndElementLineBreak(); // target
 			writer.writeEndElementLineBreak(); // alt-trans
 		}
@@ -646,8 +660,7 @@ public class XLIFFWriter implements IFilterWriter {
 
 	@Override
 	public void setParameters (IParameters params) {
-		if (params instanceof XLIFFWriterParameters)
-			this.params = (XLIFFWriterParameters) params;
+		this.params = (XLIFFWriterParameters)params;
 	}
 
 	// Use for IFilterWriter mode

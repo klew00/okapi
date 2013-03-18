@@ -54,6 +54,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	private static final String INCLUDEEXTENSIONS = "includeExtensions";
 	private static final String TARGETSTATEMODE = "targetStateMode";
 	private static final String TARGETSTATEVALUE = "targetStateValue";
+	private static final String INCLUDEITS = "includeIts";
 	
 	private boolean useCustomParser;
 	private String factoryClass;
@@ -68,6 +69,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	private boolean includeExtensions;
 	private int targetStateMode;
 	private String targetStateValue;
+	private boolean includeIts;
 	
 	// Write-only parameters
 	public boolean quoteModeDefined;
@@ -166,6 +168,14 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		this.includeExtensions = includeExtensions;
 	}
 	
+	public boolean getIncludeIts () {
+		return this.includeIts;
+	}
+	
+	public void setIncludeIts (boolean includeIts) {
+		this.includeIts = includeIts;
+	}
+	
 	public int getTargetStateMode () {
 		return this.targetStateMode;
 	}
@@ -202,6 +212,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		addAltTrans = false;
 		addAltTransGMode = true;
 		includeExtensions = true;
+		includeIts = true;
 		targetStateMode = TARGETSTATEMODE_IGNORE;
 		targetStateValue = "needs-translation";
 		
@@ -224,6 +235,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		addAltTrans = buffer.getBoolean(ADDALTTRANS, addAltTrans);
 		addAltTransGMode = buffer.getBoolean(ADDALTTRANSGMODE, addAltTransGMode);
 		includeExtensions = buffer.getBoolean(INCLUDEEXTENSIONS, includeExtensions);
+		includeIts = buffer.getBoolean(INCLUDEITS, includeIts);
 		targetStateMode = buffer.getInteger(TARGETSTATEMODE, targetStateMode);
 		targetStateValue = buffer.getString(TARGETSTATEVALUE, targetStateValue);
 		
@@ -246,6 +258,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		buffer.setBoolean(ADDALTTRANS, addAltTrans);
 		buffer.setBoolean(ADDALTTRANSGMODE, addAltTransGMode);
 		buffer.setBoolean(INCLUDEEXTENSIONS, includeExtensions);
+		buffer.setBoolean(INCLUDEITS, includeIts);
 		buffer.setInteger(TARGETSTATEMODE, targetStateMode);
 		buffer.setString(TARGETSTATEVALUE, targetStateValue);
 		buffer.setBoolean(XMLEncoder.QUOTEMODEDEFINED, quoteModeDefined);
@@ -267,6 +280,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		desc.add(ADDALTTRANS, "Allow addition of new <alt-trans> elements", "Indicates wether or not to adding new <alt-trans> elements is allowed");
 		desc.add(ADDALTTRANSGMODE, "Use the <g> notation in new <alt-trans> elements", "Indicates wether or not to use the <g> notation in new <alt-trans> elements");
 		desc.add(INCLUDEEXTENSIONS, "Include extra information", "If set: non-standard information are included in the added <alt-trans>");
+		desc.add(INCLUDEITS, "Include ITS markup", "If set: ITS markup is included");
 		desc.add(TARGETSTATEMODE, "Action to do when the value of the state attribute matches the specified pattern", null);
 		desc.add(TARGETSTATEVALUE, "Pattern for the state attribute value", null);
 		return desc;
@@ -313,6 +327,8 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		ListSelectionPart lsp = desc.addListSelectionPart(paramDesc.get(OUTPUTSEGMENTATIONTYPE), values2);
 		lsp.setChoicesLabels(labels2);
 		
+		desc.addCheckboxPart(paramDesc.get(INCLUDEITS));
+
 		CheckboxPart cbp = desc.addCheckboxPart(paramDesc.get(ADDALTTRANS));
 		desc.addCheckboxPart(paramDesc.get(INCLUDEEXTENSIONS)).setMasterPart(cbp, true);
 		desc.addCheckboxPart(paramDesc.get(ADDALTTRANSGMODE)).setMasterPart(cbp, true);
