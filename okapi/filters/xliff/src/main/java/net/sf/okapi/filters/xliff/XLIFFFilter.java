@@ -901,7 +901,7 @@ public class XLIFFFilter implements IFilter {
 		}
 		
 		// ITS Domain
-		if ( (val1 = reader.getAttributeValue(XLIFFWriter.NS_XLIFFOKAPI, "istDomain")) != null ) {
+		if ( (val1 = reader.getAttributeValue(XLIFFWriter.NS_ITSEXT, "domain")) != null ) {
 			if ( type == FOR_TU ) {
 				anns.add(new GenericAnnotation(GenericAnnotationType.DOMAIN,
 					GenericAnnotationType.DOMAIN_VALUE, val1));
@@ -911,7 +911,7 @@ public class XLIFFFilter implements IFilter {
 			}
 		}
 		// External Resource
-		if ( (val1 = reader.getAttributeValue(XLIFFWriter.NS_XLIFFOKAPI, "itsExternalResourceRef")) != null ) {
+		if ( (val1 = reader.getAttributeValue(XLIFFWriter.NS_ITSEXT, "externalResourceRef")) != null ) {
 			if (( type == FOR_TU ) || ( type == FOR_IC )) {
 				anns.add(new GenericAnnotation(GenericAnnotationType.EXTERNALRES,
 					GenericAnnotationType.EXTERNALRES_VALUE, val1));
