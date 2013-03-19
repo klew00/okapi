@@ -429,13 +429,13 @@ public class PipelineWrapper {
 			availableSteps.put(step.stepClass, step);
 
 			ps = (IPipelineStep)Class.forName(
-			 	"net.sf.okapi.steps.languagetool.LanguageToolStep").newInstance();
+			 	"net.sf.okapi.steps.leveraging.LeveragingStep").newInstance();
 			params = ps.getParameters();
 			step = new StepInfo(ps.getName(), ps.getDescription(), ps.getClass().getName(), null,
 				params.getClass().getName());
 			if ( params != null ) {
 				step.paramsData = params.toString();
-				peMapper.addDescriptionProvider("net.sf.okapi.steps.languagetool.Parameters", step.paramsClass);
+				peMapper.addEditor("net.sf.okapi.steps.leveraging.ui.ParametersEditor", step.paramsClass);
 			}
 			availableSteps.put(step.stepClass, step);
 
@@ -786,19 +786,6 @@ public class PipelineWrapper {
 			if ( params != null ) {
 				step.paramsData = params.toString();
 				peMapper.addEditor("net.sf.okapi.steps.xsltransform.ui.ParametersEditor", step.paramsClass);
-			}
-			availableSteps.put(step.stepClass, step);
-
-//Temporary step for debug
-// Placed here it may fail to load in release mode, but should not affect the integration tests
-			ps = (IPipelineStep)Class.forName(
-			 	"net.sf.okapi.steps.leveraging.LeveragingStep").newInstance();
-			params = ps.getParameters();
-			step = new StepInfo(ps.getName(), ps.getDescription(), ps.getClass().getName(), null,
-				params.getClass().getName());
-			if ( params != null ) {
-				step.paramsData = params.toString();
-				peMapper.addEditor("net.sf.okapi.steps.leveraging.ui.ParametersEditor", step.paramsClass);
 			}
 			availableSteps.put(step.stepClass, step);
 

@@ -81,6 +81,20 @@
 		<copy todir="${tmp}" file="data/okapi-plugins/jacob-${net.sf.jacob-project.jacob.version}-x64.dll" overwrite="true"/>
 		<zip destfile="${dist_plugins}/${plg001}.zip" basedir="${tmp}"/>
 
+		<!-- ============== okapi-step-languagetool -->
+		<property name="plg002" value="okapi-step-languagetool-${okapilibStamp}"/>
+		<delete includeEmptyDirs="true" failonerror="false">
+			<fileset dir="${tmp}"/>
+		</delete>
+		<mkdir dir="${tmp}"/>
+		<copy todir="${tmp}" file="../../okapi/steps/languagetool/target/${plg002}.jar"/>
+		<mkdir dir="${tmp}/lib"/>
+		<copy todir="${tmp}/lib">
+		   <fileset dir="${mavenStore}/org/languagetool/languagetool/${org.languagetool.languagetool.version}" includes="**/languagetool-${org.languagetool.languagetool.version}.jar"/>
+		   <fileset dir="../shared/licenses" includes="**/languagetool-*"/>
+		</copy>
+		<zip destfile="${dist_plugins}/${plg002}.zip" basedir="${tmp}"/>
+
 		<!-- ============== okapi-step-xmlvalidation -->
 <!--		<property name="plg001" value="okapi-step-xmlvalidation-${okapilibStamp}"/>
 		<delete includeEmptyDirs="true" failonerror="false">
