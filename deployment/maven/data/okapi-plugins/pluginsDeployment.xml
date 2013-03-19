@@ -8,10 +8,11 @@
 Those steps are for Windows 32/64-bit and require Trados 7.x or 2007.</description>
  </plugin>
 
-<plugin name="okapiLanguageToolStep-@version@"
+<plugin name="okapiLanguageTool-@version@"
   helpURL="http://www.opentag.com/okapi/wiki/index.php?title=LanguageToolStep"
   provider="Okapi Framework">
-  <description>LanguageTool Step.</description>
+  <description>LanguageTool Step.
+A step to call the LanguageTool style, grammar and spelling checker.</description>
  </plugin>
 
 </pluginsDeployment>

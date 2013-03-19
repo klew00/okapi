@@ -46,3 +46,4 @@ local.properties
 /deployment/maven/tmp/
 /deployment/website/dist
 
+/okapi\libraries\lib-languagetool/dependency-reduced-pom.xml

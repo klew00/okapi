@@ -1,0 +1,44 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <!-- This library is used in the build for the LanguageTool plugin -->
+
+    <parent>
+        <artifactId>build-libraries</artifactId>
+        <groupId>net.sf.okapi.lib</groupId>
+        <version>0.21-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>okapi-lib-languagetool</artifactId>
+	<packaging>jar</packaging>
+    <name>Re-package LanguageTool library</name>
+    
+    <dependencies>
+        <dependency>
+			<groupId>org.languagetool</groupId>
+			<artifactId>languagetool</artifactId>
+        </dependency>
+    </dependencies>
+    
+    <build>
+    	<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-shade-plugin</artifactId>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>shade</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<finalName>${project.artifactId}-${project.version}</finalName>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+	
+</project>

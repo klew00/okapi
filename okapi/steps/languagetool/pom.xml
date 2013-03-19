@@ -14,9 +14,12 @@
 			<artifactId>okapi-core</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		
 		<dependency>
 			<groupId>org.languagetool</groupId>
 			<artifactId>languagetool</artifactId>
+			<scope>compile</scope>
 		</dependency>
 	</dependencies>
+
 </project>
