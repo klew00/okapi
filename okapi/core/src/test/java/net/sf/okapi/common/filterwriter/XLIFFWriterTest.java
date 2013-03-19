@@ -32,6 +32,8 @@ import net.sf.okapi.common.TestUtil;
 import net.sf.okapi.common.annotation.GenericAnnotation;
 import net.sf.okapi.common.annotation.GenericAnnotationType;
 import net.sf.okapi.common.annotation.GenericAnnotations;
+import net.sf.okapi.common.annotation.IssueAnnotation;
+import net.sf.okapi.common.annotation.IssueType;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.InlineAnnotation;
@@ -138,18 +140,17 @@ public class XLIFFWriterTest {
 		tf.append("t1 t2");
 		GenericAnnotations anns1 = new GenericAnnotations();
 		anns1.setData("lqi1");
-		GenericAnnotation ann1 = anns1.add(GenericAnnotationType.LQI);
-		ann1.setString(GenericAnnotationType.LQI_COMMENT, "rem1");
-		ann1.setBoolean(GenericAnnotationType.LQI_ENABLED, false);
-		ann1.setString(GenericAnnotationType.LQI_PROFILEREF, "uri");
-		GenericAnnotation ann2 = anns1.add(GenericAnnotationType.LQI);
-		ann2.setString(GenericAnnotationType.LQI_COMMENT, "rem2");
-		ann2.setBoolean(GenericAnnotationType.LQI_ENABLED, true);
-		ann2.setDouble(GenericAnnotationType.LQI_SEVERITY, 12.34);
-		ann2.setString(GenericAnnotationType.LQI_TYPE, "grammar");
+		IssueAnnotation ia1 = new IssueAnnotation(IssueType.LANGUAGETOOL_ERROR, "msg1", 1, "s1", -1, -1, 0, 2, null);
+		ia1.setITSType("misspelling");
+		ia1.setBoolean(GenericAnnotationType.LQI_ENABLED, false);
+		ia1.setString(GenericAnnotationType.LQI_PROFILEREF, "uri");
+		anns1.add(ia1);
+		IssueAnnotation ia2 = new IssueAnnotation(IssueType.LANGUAGETOOL_ERROR, "msg2", 1, "s1", -1, -1, 0, 2, null);
+		ia2.setITSType("grammar");
+		anns1.add(ia2);
 		tf.annotate(0, 2, GenericAnnotationType.GENERIC, anns1);
 		tf = tu.createTarget(locFR, false, IResource.COPY_ALL).getFirstContent();
-		GenericAnnotation ann3 = ann2.clone();
+		GenericAnnotation ann3 = ia2.clone();
 		ann3.setString(GenericAnnotationType.LQI_COMMENT, "rem3");
 		ann3.setDouble(GenericAnnotationType.LQI_SEVERITY, 99.0);
 		GenericAnnotations anns3 = new GenericAnnotations();
@@ -172,12 +173,12 @@ public class XLIFFWriterTest {
 			+ "<target xml:lang=\"fr\"><mrk its:locQualityIssuesRef=\"#VARID\" mtype=\"x-its\">t1</mrk> "
 			+ "<mrk its:locQualityIssuesRef=\"#VARID\" mtype=\"x-its\">t2</mrk></target>\n"
 			+ "<its:locQualityIssues xml:id=\"VARID\">\n"
-			+ "<its:locQualityIssue locQualityIssueComment=\"rem1\" locQualityIssueEnabled=\"no\" locQualityIssueProfileRef=\"uri\"/>\n"
-			+ "<its:locQualityIssue locQualityIssueComment=\"rem2\" locQualityIssueSeverity=\"12.34\" locQualityIssueType=\"grammar\"/>\n"
+			+ "<its:locQualityIssue locQualityIssueComment=\"msg1\" locQualityIssueEnabled=\"no\" locQualityIssueProfileRef=\"uri\" locQualityIssueSeverity=\"1\" locQualityIssueType=\"misspelling\" okp:lqiType=\"LANGUAGETOOL_ERROR\" okp:lqiPos=\"-1 -1 0 2\" okp:lqiSegId=\"s1\"/>\n"
+			+ "<its:locQualityIssue locQualityIssueComment=\"msg2\" locQualityIssueSeverity=\"1\" locQualityIssueType=\"grammar\" okp:lqiType=\"LANGUAGETOOL_ERROR\" okp:lqiPos=\"-1 -1 0 2\" okp:lqiSegId=\"s1\"/>\n"
 			+ "</its:locQualityIssues>\n"
 			+ "<its:locQualityIssues xml:id=\"VARID\">\n"
-			+ "<its:locQualityIssue locQualityIssueComment=\"rem1\" locQualityIssueEnabled=\"no\" locQualityIssueProfileRef=\"uri\"/>\n"
-			+ "<its:locQualityIssue locQualityIssueComment=\"rem2\" locQualityIssueSeverity=\"12.34\" locQualityIssueType=\"grammar\"/>\n"
+			+ "<its:locQualityIssue locQualityIssueComment=\"msg1\" locQualityIssueEnabled=\"no\" locQualityIssueProfileRef=\"uri\" locQualityIssueSeverity=\"1\" locQualityIssueType=\"misspelling\"/>\n"
+			+ "<its:locQualityIssue locQualityIssueComment=\"msg2\" locQualityIssueSeverity=\"1\" locQualityIssueType=\"grammar\"/>\n"
 			+ "</its:locQualityIssues>\n"
 			+ "<its:locQualityIssues xml:id=\"VARID\">\n"
 			+ "<its:locQualityIssue locQualityIssueComment=\"rem3\" locQualityIssueSeverity=\"99\" locQualityIssueType=\"grammar\"/>\n"

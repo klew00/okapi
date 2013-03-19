@@ -52,7 +52,9 @@ public class LanguageToolTest {
 		ITextUnit tu = new TextUnit("id", "original teext");
 		tu.setTargetContent(LocaleId.FRENCH, new TextFragment("texte original"));
 		lt.run(tu);
-		GenericAnnotations anns = tu.getAnnotation(GenericAnnotations.class);
+		GenericAnnotations anns = tu.getSource().getAnnotation(GenericAnnotations.class);
+		assertNotNull(anns);
+		anns = tu.getTarget(LocaleId.FRENCH).getAnnotation(GenericAnnotations.class);
 		assertNotNull(anns);
 	}
 
@@ -66,7 +68,9 @@ public class LanguageToolTest {
 		tu.setSourceContent(tf);
 		tu.setTargetContent(LocaleId.FRENCH, tf.clone());
 		lt.run(tu);
-		GenericAnnotations anns = tu.getAnnotation(GenericAnnotations.class);
+		GenericAnnotations anns = tu.getSource().getAnnotation(GenericAnnotations.class);
+		assertNotNull(anns);
+		anns = tu.getTarget(LocaleId.FRENCH).getAnnotation(GenericAnnotations.class);
 		assertNotNull(anns);
 	}
 

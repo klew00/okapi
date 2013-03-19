@@ -52,7 +52,7 @@ public class IssueAnnotation extends GenericAnnotation {
 		setBoolean(GenericAnnotationType.LQI_ENABLED, true);
 		setIssueType(issueType);
 		setString(GenericAnnotationType.LQI_COMMENT, comment);
-		setSeverity(severity);
+		setSeverity((double)severity);
 		setSourcePosition(srcStart, srcEnd);
 		setTargetPosition(trgStart, trgEnd);
 		setString(GenericAnnotationType.LQI_XSEGID, segId);

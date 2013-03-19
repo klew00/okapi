@@ -32,7 +32,9 @@ import net.sf.okapi.common.uidescription.IEditorDescriptionProvider;
 public class Parameters extends BaseParameters implements IEditorDescriptionProvider {
 
 	private static final String ENABLEFALSEFRIENDS = "enableFalseFriends";
+	private static final String CHECKSOURCE = "checkSource";
 
+	private boolean checkSource;
 	private boolean enableFalseFriends;
 	
 	public Parameters () {
@@ -41,6 +43,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 
 	@Override
 	public void reset () {
+		checkSource = true;
 		enableFalseFriends = true;
 	}
 
@@ -48,14 +51,26 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	public void fromString (String data) {
 		reset();
 		buffer.fromString(data);
+		checkSource = buffer.getBoolean(CHECKSOURCE, checkSource);
+		enableFalseFriends = buffer.getBoolean(ENABLEFALSEFRIENDS, enableFalseFriends);
 	}
 
 	@Override
 	public String toString () {
 		buffer.reset();
+		buffer.setBoolean(CHECKSOURCE, checkSource);
+		buffer.setBoolean(ENABLEFALSEFRIENDS, enableFalseFriends);
 		return buffer.toString();
 	}
 	
+	public boolean getCheckSource () {
+		return checkSource;
+	}
+	
+	public void setCheckSource (boolean chechSource) {
+		this.checkSource = chechSource;
+	}
+
 	public boolean getEnableFalseFriends () {
 		return enableFalseFriends;
 	}
@@ -67,6 +82,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	@Override
 	public ParametersDescription getParametersDescription () {
 		ParametersDescription desc = new ParametersDescription(this);
+		desc.add(CHECKSOURCE, "Check also the source text (in addition to the target)", null);
 		desc.add(ENABLEFALSEFRIENDS, "Check for false friends", null);
 		return desc;
 	}
@@ -74,6 +90,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	@Override
 	public EditorDescription createEditorDescription (ParametersDescription paramDesc) {
 		EditorDescription desc = new EditorDescription("LanguageTool", true, false);
+		desc.addCheckboxPart(paramDesc.get(CHECKSOURCE));
 		desc.addCheckboxPart(paramDesc.get(ENABLEFALSEFRIENDS));
 		return desc;
 	}

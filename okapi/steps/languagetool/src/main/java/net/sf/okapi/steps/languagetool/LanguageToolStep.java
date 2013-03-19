@@ -23,28 +23,19 @@
 package net.sf.okapi.steps.languagetool;
 
 import net.sf.okapi.common.Event;
-import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.UsingParameters;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
 import net.sf.okapi.common.pipeline.annotations.StepParameterMapping;
 import net.sf.okapi.common.pipeline.annotations.StepParameterType;
-import net.sf.okapi.common.resource.ISegments;
 import net.sf.okapi.common.resource.ITextUnit;
-import net.sf.okapi.common.resource.Segment;
-import net.sf.okapi.common.UsingParameters;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @UsingParameters(Parameters.class)
 public class LanguageToolStep extends BasePipelineStep {
 
-	private final Logger LOGGER = LoggerFactory.getLogger(getClass());
-
 	private Parameters params;
 	private LanguageTool langTool;
-
 	private LocaleId sourceLocale;
 	private LocaleId targetLocale;
 

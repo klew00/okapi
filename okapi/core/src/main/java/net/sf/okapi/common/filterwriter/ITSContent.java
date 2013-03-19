@@ -341,6 +341,22 @@ public class ITSContent {
 				(isHTML5 ? "loc-quality-issue-severity" : "locQualityIssueSeverity"), output);
 			printITSStringAttribute(ann.getString(GenericAnnotationType.LQI_TYPE),
 				(isHTML5 ? "loc-quality-issue-type" : "locQualityIssueType"), output);
+
+			// Extended data
+			if ( ann instanceof IssueAnnotation ) {
+				IssueAnnotation iann = (IssueAnnotation)ann;
+				output.append(" okp:lqiType=\"" + iann.getIssueType().toString() + "\"");
+				output.append(String.format(" okp:lqiPos=\"%d %d %d %d\"",
+					iann.getSourceStart(), iann.getSourceEnd(), iann.getTargetStart(), iann.getTargetEnd()));
+				String strVal = iann.getCodes();
+				if ( strVal != null ) {
+					output.append(" okp:lqiCodes=\"" + Util.escapeToXML(strVal, 3, false, encoder) + "\"");
+				}
+				strVal = iann.getSegId();
+				if ( strVal != null ) {
+					output.append(" okp:lqiSegId=\"" + Util.escapeToXML(strVal, 3, false, encoder) + "\"");
+				}
+			}
 		}
 		else if ( list.size() > 1 ) {
 			// If there are 2 or more: the items need to be output as standoff markup.

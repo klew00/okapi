@@ -40,6 +40,8 @@ import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.annotation.GenericAnnotation;
 import net.sf.okapi.common.annotation.GenericAnnotationType;
+import net.sf.okapi.common.annotation.IssueAnnotation;
+import net.sf.okapi.common.annotation.IssueType;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.resource.ISegments;
 import net.sf.okapi.common.resource.ITextUnit;
@@ -51,6 +53,8 @@ import net.sf.okapi.common.resource.TextUnit;
 import org.languagetool.JLanguageTool;
 import org.languagetool.Language;
 import org.languagetool.rules.RuleMatch;
+import org.languagetool.rules.bitext.BitextRule;
+import org.languagetool.tools.Tools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
@@ -59,10 +63,13 @@ public class LanguageTool {
 
 	private final Logger LOGGER = LoggerFactory.getLogger(getClass());
 	
-	private Parameters params;
-	private LocaleId srcLoc;
-	private LocaleId trgLoc;
-	private JLanguageTool proofer;
+	private final Parameters params;
+	private final LocaleId srcLoc;
+	private final LocaleId trgLoc;
+	private final JLanguageTool srcLt;
+	private final JLanguageTool trgLt;
+	
+	private List<BitextRule> bitextRules;
 	
 	/**
 	 * Creates a LanguageTool object with a given set of options.
@@ -75,6 +82,33 @@ public class LanguageTool {
 		this.params = (params == null ? new Parameters() : params);
 		srcLoc = sourceLocale;
 		trgLoc = targetLocale;
+		
+		srcLt = startInstance(srcLoc);
+		trgLt = startInstance(trgLoc);
+		
+		try {
+			bitextRules = Tools.getBitextRules(srcLt.getLanguage(), trgLt.getLanguage());
+		}
+		catch ( Throwable e ) {
+			LOGGER.warn("Cannot load bi-text rules ({}).\nOnly target rules for '{}' will be checked.",
+				e.getMessage(), trgLt.getLanguage().getShortNameWithVariant());
+			bitextRules = null;
+		}
+	}
+
+	private JLanguageTool startInstance (LocaleId locId) {
+		try {
+			JLanguageTool lt = new JLanguageTool(getLTLanguage(locId));
+			LOGGER.info("Using LT language '{}' for locale '{}'", lt.getLanguage().getShortNameWithVariant(), locId.toString());
+			lt.activateDefaultPatternRules();
+			if ( params.getEnableFalseFriends() ) {
+				lt.activateDefaultFalseFriendRules();
+			}
+			return lt;
+		}
+		catch ( Throwable e ) {
+			throw new OkapiIOException("Cannot create or initialize the LanguageTool object. "+e.getMessage());
+		}
 	}
 	
 	/**
@@ -87,34 +121,58 @@ public class LanguageTool {
 		if ( tu.isEmpty() ) return;
 
 		try {
-			if ( proofer == null ) {
-				proofer = new JLanguageTool(getLTLanguage(trgLoc));
-				proofer.activateDefaultPatternRules();
-				if ( params.getEnableFalseFriends() ) {
-					proofer.activateDefaultFalseFriendRules();
-				}
-			}
-
 			boolean isSegmented = tu.getSource().hasBeenSegmented();
+//TODO: source/target/bitext
 			
-			ISegments srcSegs = tu.getSourceSegments();
+			TextContainer srcTc = tu.getSource();
+			TextContainer trgTc = tu.getTarget(trgLoc);
+			ISegments srcSegs = srcTc.getSegments();
+			ISegments trgSegs = null;
+			if ( trgTc != null ) trgSegs = trgTc.getSegments();
+
+			List<RuleMatch> srcMatches = null;
+			List<RuleMatch> trgMatches = null;
 			for ( Segment srcSeg : srcSegs ) {
-				Segment trgSeg = tu.getTargetSegment(trgLoc, srcSeg.getId(), false);
-				if ( trgSeg == null ) continue;
+				if ( trgSegs != null ) {
+					Segment trgSeg = trgSegs.get(srcSeg.getId());
+					if ( trgSeg != null ) {
+						
+						if ( bitextRules != null ) {
+							trgMatches = Tools.checkBitext(
+								srcSeg.getContent().getCodedText(), trgSeg.getContent().getCodedText(),
+								srcLt, trgLt, bitextRules);
+						}
+						else {
+							trgMatches = trgLt.check(trgSeg.getContent().getCodedText());
+						}
+					}
+				}
 				
-				List<RuleMatch> matches = proofer.check(trgSeg.getContent().getCodedText());
-				for ( RuleMatch match : matches ) {
-					GenericAnnotation ann = new GenericAnnotation(GenericAnnotationType.LQI);
-					ann.setString(GenericAnnotationType.LQI_TYPE, match.getRule().getLocQualityIssueType());
-					ann.setString(GenericAnnotationType.LQI_COMMENT, match.getMessage());
-					ann.setInteger(GenericAnnotationType.LQI_XSTART, match.getFromPos());
-					ann.setInteger(GenericAnnotationType.LQI_XEND, match.getToPos());
-					GenericAnnotation.addAnnotation(tu, ann);
+				if ( params.getCheckSource() ) {
+					srcMatches = srcLt.check(srcSeg.getContent().getCodedText());
+				}
+
+				// Attach the results
+				if ( trgMatches != null ) {
+					for ( RuleMatch match : trgMatches ) {
+						IssueAnnotation ia = new IssueAnnotation(IssueType.LANGUAGETOOL_ERROR, match.getMessage(), 2, srcSeg.getId(),
+							-1, -1, match.getFromPos(), match.getToPos(), null);
+						ia.setITSType(match.getRule().getLocQualityIssueType());
+						GenericAnnotation.addAnnotation(trgTc, ia);
+					}
+				}
+				if ( srcMatches != null ) {
+					for ( RuleMatch match :srcMatches ) {
+						IssueAnnotation ia = new IssueAnnotation(IssueType.LANGUAGETOOL_ERROR, match.getMessage(), 2, srcSeg.getId(),
+							-1, -1, match.getFromPos(), match.getToPos(), null);
+						ia.setITSType(match.getRule().getLocQualityIssueType());
+						GenericAnnotation.addAnnotation(srcTc, ia);
+					}
 				}
 			}
 		}
 		catch ( Throwable e ) {
-			throw new OkapiIOException("Cannot create or initialize the LanguageTool object. "+e.getMessage());
+			throw new OkapiIOException("Error while checking. "+e.getMessage());
 		}
 	}
 

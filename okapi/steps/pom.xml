@@ -51,5 +51,6 @@
 		<module>msbatchtranslation</module>
 		<module>tradosutils</module>
 		<module>enrycher</module>
+		<module>languagetool</module>
     </modules>
 </project>
