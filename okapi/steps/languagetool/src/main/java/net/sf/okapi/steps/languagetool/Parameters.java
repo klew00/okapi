@@ -33,9 +33,11 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 
 	private static final String ENABLEFALSEFRIENDS = "enableFalseFriends";
 	private static final String CHECKSOURCE = "checkSource";
+	private static final String CHECKSPELLING = "checkSpelling";
 
 	private boolean checkSource;
 	private boolean enableFalseFriends;
+	private boolean checkSpelling;
 	
 	public Parameters () {
 		reset();
@@ -45,6 +47,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	public void reset () {
 		checkSource = true;
 		enableFalseFriends = true;
+		checkSpelling = true;
 	}
 
 	@Override
@@ -53,6 +56,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		buffer.fromString(data);
 		checkSource = buffer.getBoolean(CHECKSOURCE, checkSource);
 		enableFalseFriends = buffer.getBoolean(ENABLEFALSEFRIENDS, enableFalseFriends);
+		checkSpelling = buffer.getBoolean(CHECKSPELLING, checkSpelling);
 	}
 
 	@Override
@@ -60,6 +64,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		buffer.reset();
 		buffer.setBoolean(CHECKSOURCE, checkSource);
 		buffer.setBoolean(ENABLEFALSEFRIENDS, enableFalseFriends);
+		buffer.setBoolean(CHECKSPELLING, checkSpelling);
 		return buffer.toString();
 	}
 	
@@ -79,11 +84,20 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		this.enableFalseFriends = enableFalseFriends;
 	}
 
+	public boolean getCheckSpelling () {
+		return checkSpelling;
+	}
+	
+	public void setCheckSpelling (boolean chechSpelling) {
+		this.checkSpelling = chechSpelling;
+	}
+
 	@Override
 	public ParametersDescription getParametersDescription () {
 		ParametersDescription desc = new ParametersDescription(this);
 		desc.add(CHECKSOURCE, "Check also the source text (in addition to the target)", null);
 		desc.add(ENABLEFALSEFRIENDS, "Check for false friends", null);
+		desc.add(CHECKSPELLING, "Check for spelling mistakes", null);
 		return desc;
 	}
 
@@ -92,6 +106,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		EditorDescription desc = new EditorDescription("LanguageTool", true, false);
 		desc.addCheckboxPart(paramDesc.get(CHECKSOURCE));
 		desc.addCheckboxPart(paramDesc.get(ENABLEFALSEFRIENDS));
+		desc.addCheckboxPart(paramDesc.get(CHECKSPELLING));
 		return desc;
 	}
 

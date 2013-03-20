@@ -68,6 +68,7 @@ public class LanguageTool {
 	private final LocaleId trgLoc;
 	private final JLanguageTool srcLt;
 	private final JLanguageTool trgLt;
+	private final boolean skipSpelling;
 	
 	private List<BitextRule> bitextRules;
 	
@@ -80,6 +81,7 @@ public class LanguageTool {
 		LocaleId targetLocale)
 	{
 		this.params = (params == null ? new Parameters() : params);
+		skipSpelling = !params.getCheckSpelling();
 		srcLoc = sourceLocale;
 		trgLoc = targetLocale;
 		
@@ -155,6 +157,7 @@ public class LanguageTool {
 				// Attach the results
 				if ( trgMatches != null ) {
 					for ( RuleMatch match : trgMatches ) {
+						if ( skipSpelling && match.getRule().isSpellingRule() ) continue;
 						IssueAnnotation ia = new IssueAnnotation(IssueType.LANGUAGETOOL_ERROR, match.getMessage(), 2, srcSeg.getId(),
 							-1, -1, match.getFromPos(), match.getToPos(), null);
 						ia.setITSType(match.getRule().getLocQualityIssueType());
@@ -163,6 +166,7 @@ public class LanguageTool {
 				}
 				if ( srcMatches != null ) {
 					for ( RuleMatch match :srcMatches ) {
+						if ( skipSpelling && match.getRule().isSpellingRule() ) continue;
 						IssueAnnotation ia = new IssueAnnotation(IssueType.LANGUAGETOOL_ERROR, match.getMessage(), 2, srcSeg.getId(),
 							-1, -1, match.getFromPos(), match.getToPos(), null);
 						ia.setITSType(match.getRule().getLocQualityIssueType());

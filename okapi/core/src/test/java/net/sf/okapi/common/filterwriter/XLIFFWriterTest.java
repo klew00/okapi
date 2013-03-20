@@ -189,6 +189,36 @@ public class XLIFFWriterTest {
 	}
 
 	@Test
+	public void testSingleLQIAnnotation ()
+		throws IOException
+	{
+		writer.create(root+"out.xlf", null, locEN, locFR, null, "original.ext", null);
+		writer.writeStartFile(null, null, null);
+		ITextUnit tu = new TextUnit("tu1");
+		TextFragment tf = tu.getSource().getFirstSegment().getContent();
+		tf.append("t1 t2");
+		IssueAnnotation ia1 = new IssueAnnotation(IssueType.LANGUAGETOOL_ERROR, "msg1", 1, "s1", -1, -1, 0, 2, null);
+		ia1.setITSType("misspelling");
+		ia1.setBoolean(GenericAnnotationType.LQI_ENABLED, false);
+		ia1.setString(GenericAnnotationType.LQI_PROFILEREF, "uri");
+		GenericAnnotation.addAnnotation(tu.getSource(), ia1);
+		writer.writeTextUnit(tu);
+		writer.writeEndFile();
+		writer.close();		
+
+		String result = readFile(root+"out.xlf");
+		assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+			+ "<xliff version=\"1.2\" xmlns=\"urn:oasis:names:tc:xliff:document:1.2\" xmlns:okp=\"okapi-framework:xliff-extensions\"" +
+			" xmlns:its=\"http://www.w3.org/2005/11/its\" xmlns:itsx=\"http://www.w3.org/2008/12/its-extensions\" its:version=\"2.0\">\n"
+			+ "<file original=\"unknown\" source-language=\"en\" target-language=\"fr\" datatype=\"x-undefined\">\n"
+			+ "<body>\n<trans-unit id=\"tu1\">\n"
+			+ "<source xml:lang=\"en\" its:locQualityIssueComment=\"msg1\" its:locQualityIssueEnabled=\"no\" its:locQualityIssueProfile=\"uri\" its:locQualityIssueSeverity=\"1\" its:locQualityIssueType=\"misspelling\" okp:lqiType=\"LANGUAGETOOL_ERROR\" okp:lqiPos=\"-1 -1 0 2\" okp:lqiSegId=\"s1\">t1 t2</source>\n"
+			+ "<target xml:lang=\"fr\" its:locQualityIssueComment=\"msg1\" its:locQualityIssueEnabled=\"no\" its:locQualityIssueProfile=\"uri\" its:locQualityIssueSeverity=\"1\" its:locQualityIssueType=\"misspelling\" okp:lqiType=\"LANGUAGETOOL_ERROR\" okp:lqiPos=\"-1 -1 0 2\" okp:lqiSegId=\"s1\">t1 t2</target>\n"
+			+ "</trans-unit>\n"
+			+ "</body>\n</file>\n</xliff>\n", stripVariableID(result));
+	}
+
+	@Test
 	public void testTerminologyAnnotations ()
 		throws IOException
 	{

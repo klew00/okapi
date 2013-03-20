@@ -23,6 +23,10 @@
 package net.sf.okapi.steps.languagetool;
 
 import static org.junit.Assert.assertNotNull;
+
+import java.io.IOException;
+import java.util.List;
+
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.annotation.GenericAnnotations;
 import net.sf.okapi.common.filterwriter.GenericContent;
@@ -33,6 +37,10 @@ import net.sf.okapi.common.resource.TextFragment.TagType;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.languagetool.JLanguageTool;
+import org.languagetool.Language;
+import org.languagetool.rules.Category;
+import org.languagetool.rules.Rule;
 
 public class LanguageToolTest {
 
@@ -73,5 +81,18 @@ public class LanguageToolTest {
 		anns = tu.getTarget(LocaleId.FRENCH).getAnnotation(GenericAnnotations.class);
 		assertNotNull(anns);
 	}
+	
+//	@Test
+//	public void testRuleAccess () throws IOException {
+//		JLanguageTool jtl = new JLanguageTool(Language.AMERICAN_ENGLISH);
+//		List<Rule> list = jtl.getAllRules();
+//		for ( Rule rule : list ) {
+//			String id = rule.getId();
+//			Category cat = rule.getCategory();
+//			String catName = cat.getName();
+//			System.out.println("id="+id+", catName="+catName);
+//		}
+//	}
+	
 
 }
