@@ -670,7 +670,9 @@ public class TextFragment implements Appendable, CharSequence, Comparable<Object
 	 * @param keepCodeIds true to not change Ids of the codes of the inserted TextFragment. 
 	 */
 	public void insert (int offset,
-			TextFragment fragment, boolean keepCodeIds) {
+		TextFragment fragment,
+		boolean keepCodeIds)
+	{
 		if ( fragment == null ) return;
 		checkPositionForMarker(offset);
 		StringBuilder tmp = new StringBuilder(fragment.getCodedText());
@@ -679,22 +681,27 @@ public class TextFragment implements Appendable, CharSequence, Comparable<Object
 			codes = new ArrayList<Code>();
 		}
 		
+		int newLastId = Math.max(lastCodeID, fragment.getLastCodeId());
 		// Update the coded text to use new code indices
 		for ( int i=0; i<tmp.length(); i++ ) {
 			switch ( tmp.charAt(i) ) {
 			case MARKER_OPENING:
 			case MARKER_CLOSING:
 			case MARKER_ISOLATED:
-				Code c = newCodes.get(toIndex(tmp.charAt(++i))).clone();				
+				Code c = newCodes.get(toIndex(tmp.charAt(++i))).clone();
 				if ( !keepCodeIds && (c.getTagType() != TagType.CLOSING ) && ( c.getId() <= lastCodeID )) {
-					c.setId(++lastCodeID);
-					// Closing codes will be handled when re-balancing
+					// If the code is not a closing one (Closing codes will be handled when re-balancing)
+					// and if its id is less than the lastCodeID for this fragment: make that id the next one
+					// using the highest of the two possible
+					c.setId(++newLastId);
+					// 
 				}
 				codes.add(c);
 				tmp.setCharAt(i, toChar(codes.size()-1));
 				break;
 			}
 		}
+		lastCodeID = newLastId;
 
 		// Insert the new text in one chunk
 		if ( offset < 0 ) text.append(tmp);
@@ -1674,8 +1681,8 @@ public class TextFragment implements Appendable, CharSequence, Comparable<Object
 							if ( codes.get(j).id == code.id ) {
 								// Found it
 								found = true;
-								// Mark this closing code as used (==-99)
-								closingIds[j] = -99;
+								// Mark this closing code as used (==-9999)
+								closingIds[j] = -9999;
 								text.setCharAt(i, (char)MARKER_OPENING);
 								break;
 							}
@@ -1698,7 +1705,7 @@ public class TextFragment implements Appendable, CharSequence, Comparable<Object
 								stackType--;
 								if ( fixupMode ) { // Searching for closing code after overlapping is detected
 									//if (( candidate == -1 ) && ( closingIds[j] == -1 )) candidate = j;
-									if (( stackType == 0 ) && ( closingIds[j] != -99 )) {
+									if (( stackType == 0 ) && ( closingIds[j] != -9999 )) {
 										candidate = j;
 										// Stop now, but do not set this as 'found' 
 										break;
@@ -1707,10 +1714,10 @@ public class TextFragment implements Appendable, CharSequence, Comparable<Object
 								}
 								// Else: Normal process
 								if ( stackElem == 0 ) {
-									if (( stackType == 0 ) && ( closingIds[j] != -99 )) {
+									if (( stackType == 0 ) && ( closingIds[j] != -9999 )) {
 										codes.get(j).id = code.id;
-										// Mark this closing code as used (==-99)
-										closingIds[j] = -99;
+										// Mark this closing code as used (==-9999)
+										closingIds[j] = -9999;
 										found = true;
 										break;
 									}
@@ -1719,7 +1726,7 @@ public class TextFragment implements Appendable, CharSequence, Comparable<Object
 								}
 								else if ( stackElem > 0 ) {
 									// Remember possible closing code candidate in case of overlapping
-									if (( stackType == 0 ) && ( closingIds[j] != -99 )) {
+									if (( stackType == 0 ) && ( closingIds[j] != -9999 )) {
 										candidate = j;
 									}
 								}
@@ -1727,7 +1734,7 @@ public class TextFragment implements Appendable, CharSequence, Comparable<Object
 									// Do we have a candidate available?
 									if ( candidate != -1 ) break; // Stop now, but do not set this as 'found'
 									// Starting with this one
-									if (( stackType == 0 ) && ( closingIds[j] != -99 )) {
+									if (( stackType == 0 ) && ( closingIds[j] != -9999 )) {
 										candidate = j;
 										break;
 									}
@@ -1757,8 +1764,8 @@ public class TextFragment implements Appendable, CharSequence, Comparable<Object
 					}
 					break;
 				case CLOSING:
-					// If id in closingIds is -99: it has been matched (and therefore has id)
-					if ( closingIds[index] == -99 ) {
+					// If id in closingIds is -9999: it has been matched (and therefore has id)
+					if ( closingIds[index] == -9999 ) {
 						text.setCharAt(i, (char)MARKER_CLOSING);
 					}
 					// If id in closingIds is -1: it has not been matched and as no id

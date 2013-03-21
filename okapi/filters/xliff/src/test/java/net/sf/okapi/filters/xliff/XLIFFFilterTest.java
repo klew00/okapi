@@ -1328,6 +1328,12 @@ public class XLIFFFilterTest {
 		anns = tu.getSource().getAnnotation(GenericAnnotations.class);
 		assertNotNull(anns);
 		assertEquals("c2", anns.getFirstAnnotation(GenericAnnotationType.LQI).getString(GenericAnnotationType.LQI_COMMENT));
+		// inline level in source
+		List<Code> codes = tu.getSource().getFirstContent().getCodes();
+		assertEquals(2, codes.size());
+		Code code = codes.get(0);
+		assertTrue(code.hasOnlyAnnotation());
+		assertEquals("c3", code.getGenericAnnotationString(GenericAnnotationType.LQI, GenericAnnotationType.LQI_COMMENT));
 		// Target-level
 		anns = tu.getTarget(LocaleId.FRENCH).getAnnotation(GenericAnnotations.class);
 		assertNotNull(anns);

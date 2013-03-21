@@ -170,6 +170,10 @@ public class TextUnitUtil {
 			newCode = newCodes.get(i);
 			newCode.setOuterData(null); // Remove XLIFF outer codes if needed
 
+			if ( newCode.hasOnlyAnnotation() ) {
+				continue; // Skip annotation-only codes
+			}
+			
 			// Get the data from the original code (match on id)
 			oriCode = null;
 			for ( int j=0; j<oriIndices.length; j++ ) {

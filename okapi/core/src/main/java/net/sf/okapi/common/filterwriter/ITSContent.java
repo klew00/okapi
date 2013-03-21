@@ -253,18 +253,27 @@ public class ITSContent {
 				if ( !(isXLIFF && inline) ) {
 					printITSBooleanAttribute(true, "term", output);
 				}
-				printITSDoubleAttribute(ann.getDouble(GenericAnnotationType.TERM_CONFIDENCE),
-					(isHTML5 ? "term-confidence" : "termConfidence"), output);
+				if ( isXLIFF ) {
+					printITSExtDoubleAttribute(ann.getDouble(GenericAnnotationType.TERM_CONFIDENCE),
+						"termConfidence", output);
+				}
+				else {
+					printITSDoubleAttribute(ann.getDouble(GenericAnnotationType.TERM_CONFIDENCE),
+						(isHTML5 ? "term-confidence" : "termConfidence"), output);
+				}
 				// If it's not a Ref info, we must used a user-define attribute because there is no local ITS termInfo attribute
 				String value = ann.getString(GenericAnnotationType.TERM_INFO);
 				if ( value != null ) {
+					String ref = "";
 					if ( value.startsWith(REF_PREFIX) ) {
-						String ref = (isHTML5 ? "-ref" : "Ref");
+						ref = (isHTML5 ? "-ref" : "Ref");
 						value = value.substring(REF_PREFIX.length());
-						output.append(" "+prefix+(isHTML5 ? "term-info" : "termInfo")+ref+"=\""+Util.escapeToXML(value, 3, false, encoder)+"\"");
+					}
+					if ( isXLIFF ) {
+						printITSExtStringAttribute(value, "termInfo"+ref, output);
 					}
 					else {
-						output.append((isHTML5 ? " data-its-term-info" : " comment")+"=\""+Util.escapeToXML(value, 3, false, encoder)+"\"");
+						printITSStringAttribute(value, " "+prefix+(isHTML5 ? "term-info" : "termInfo")+ref, output);
 					}
 				}
 			}
@@ -470,6 +479,15 @@ public class ITSContent {
 	{
 		if ( value != null ) {
 			output.append(" "+prefix+attrName+"=\""+Util.formatDouble(value)+"\"");
+		}
+	}
+
+	private void printITSExtDoubleAttribute (Double value,
+		String attrName,
+		StringBuilder output)
+	{
+		if ( value != null ) {
+			output.append((isHTML5 ? " data-" : " itsx:")+attrName+"=\""+Util.formatDouble(value)+"\"");
 		}
 	}
 

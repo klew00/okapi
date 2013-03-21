@@ -251,10 +251,10 @@ public class XLIFFWriterTest {
 			" xmlns:its=\"http://www.w3.org/2005/11/its\" xmlns:itsx=\"http://www.w3.org/2008/12/its-extensions\" its:version=\"2.0\">\n"
 			+ "<file original=\"unknown\" source-language=\"en\" target-language=\"fr\" datatype=\"x-undefined\">\n"
 			+ "<body>\n<trans-unit id=\"tu1\">\n"
-			+ "<source xml:lang=\"en\" its:term=\"yes\" its:termConfidence=\"0.5\" its:termInfoRef=\"info\">"
-			+ "<mrk its:termConfidence=\"0.7\" its:termInfoRef=\"info2\" mtype=\"term\">t1</mrk></source>\n"
-			+ "<target xml:lang=\"fr\" its:term=\"yes\" its:termConfidence=\"0.5\" its:termInfoRef=\"info\">"
-			+ "<mrk its:termConfidence=\"0.7\" its:termInfoRef=\"info2\" mtype=\"term\">t1</mrk></target>\n"
+			+ "<source xml:lang=\"en\" its:term=\"yes\" itsx:termConfidence=\"0.5\" itsx:termInfoRef=\"info\">"
+			+ "<mrk itsx:termConfidence=\"0.7\" itsx:termInfoRef=\"info2\" mtype=\"term\">t1</mrk></source>\n"
+			+ "<target xml:lang=\"fr\" its:term=\"yes\" itsx:termConfidence=\"0.5\" itsx:termInfoRef=\"info\">"
+			+ "<mrk itsx:termConfidence=\"0.7\" itsx:termInfoRef=\"info2\" mtype=\"term\">t1</mrk></target>\n"
 			+ "</trans-unit>\n"
 			+ "</body>\n</file>\n</xliff>\n", stripVariableID(result));
 	}
@@ -522,9 +522,9 @@ public class XLIFFWriterTest {
 			" xmlns:its=\"http://www.w3.org/2005/11/its\" xmlns:itsx=\"http://www.w3.org/2008/12/its-extensions\" its:version=\"2.0\">\n"
 			+ "<file original=\"unknown\" source-language=\"en\" target-language=\"fr\" datatype=\"x-undefined\">\n"
 			+ "<body>\n<trans-unit id=\"tu1\">\n"
-			+ "<source xml:lang=\"en\">Text <g id=\"1\"><mrk mtype=\"protected\">DO-NOT-TRANSLATE</g> <mrk comment=\"Definition of 'term'\"" +
+			+ "<source xml:lang=\"en\">Text <g id=\"1\"><mrk mtype=\"protected\">DO-NOT-TRANSLATE</g> <mrk itsx:termInfo=\"Definition of 'term'\"" +
 			" mtype=\"term\">term</mrk> <mrk comment=\"Text of the localization note.\" itsx:locNoteType=\"alert\" mtype=\"x-its\">etc.</mrk></source>\n"
-			+ "<target xml:lang=\"fr\">Text <g id=\"1\"><mrk mtype=\"protected\">DO-NOT-TRANSLATE</g> <mrk comment=\"Definition of 'term'\"" +
+			+ "<target xml:lang=\"fr\">Text <g id=\"1\"><mrk mtype=\"protected\">DO-NOT-TRANSLATE</g> <mrk itsx:termInfo=\"Definition of 'term'\"" +
 			" mtype=\"term\">term</mrk> <mrk comment=\"Text of the localization note.\" itsx:locNoteType=\"alert\" mtype=\"x-its\">etc.</mrk></target>\n"
 			+ "</trans-unit>\n"
 			+ "</body>\n</file>\n</xliff>\n", result);

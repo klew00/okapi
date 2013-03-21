@@ -81,7 +81,7 @@ public class LanguageTool {
 		LocaleId targetLocale)
 	{
 		this.params = (params == null ? new Parameters() : params);
-		skipSpelling = !params.getCheckSpelling();
+		skipSpelling = !this.params.getCheckSpelling();
 		srcLoc = sourceLocale;
 		trgLoc = targetLocale;
 		

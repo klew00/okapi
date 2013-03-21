@@ -141,6 +141,7 @@ public class XLIFFFilter implements IFilter {
 	private String lineBreak;
 	private boolean hasUTF8BOM;
 	private EncoderManager encoderManager;
+	private int autoMid;
 	
 	private Document standoffDoc;
 	private XPath standoffPath;
@@ -829,12 +830,18 @@ public class XLIFFFilter implements IFilter {
 		int i;
 		for ( i=0; i<reader.getAttributeCount(); i++ ) {
 			String ns = reader.getAttributeNamespace(i);
-			if (( ns != null ) && ( ns.equals(ITSContent.ITS_NS_URI) || ns.equals(XLIFFWriter.NS_XLIFFOKAPI) )) {
+			if (( ns != null ) && ( ns.equals(ITSContent.ITS_NS_URI) || ns.equals(XLIFFWriter.NS_ITSEXT) )) {
 				found = true;
 				break;
 			}
 		}
-		if ( !found ) return null;
+		if ( !found ) {
+			// Last check for XLIFF native attributes that could be mappings
+			String mtype = reader.getAttributeValue(null, "mtype");
+			if (( mtype == null ) || ( !mtype.equals("term") && !mtype.equals("x-its") )) {
+				return null; // No annotations
+			}
+		}
 
 		// At least one ITS info
 		GenericAnnotations anns = new GenericAnnotations();
@@ -910,6 +917,7 @@ public class XLIFFFilter implements IFilter {
 				logger.warn("ITS Domain data category is to be used only on trans-unit.");
 			}
 		}
+
 		// External Resource
 		if ( (val1 = reader.getAttributeValue(XLIFFWriter.NS_ITSEXT, "externalResourceRef")) != null ) {
 			if (( type == FOR_TU ) || ( type == FOR_IC )) {
@@ -921,6 +929,39 @@ public class XLIFFFilter implements IFilter {
 			}
 		}
 		
+		String mtype = reader.getAttributeValue(null, "mtype");
+		if (( type == FOR_IC ) && ( mtype != null )) {
+			
+			// Terminology
+			if ( mtype.equals("term") ) {
+				String info = reader.getAttributeValue(XLIFFWriter.NS_ITSEXT, "termInfo");
+				String infoRef = reader.getAttributeValue(XLIFFWriter.NS_ITSEXT, "termInfoRef");
+				if (( info != null ) && ( infoRef != null )) {
+					logger.error("Cannot have both termInfo and termInfoRef on the same element. termInfo will be used.");
+				}
+				else if ( infoRef != null ) {
+					info = ITSContent.REF_PREFIX+infoRef;
+				}
+				
+				val1 = reader.getAttributeValue(XLIFFWriter.NS_ITSEXT, "termConfidence");
+				Double conf = null;
+				if ( val1 != null ) {
+					conf = Double.parseDouble(val1);
+				}
+				anns.add(new GenericAnnotation(GenericAnnotationType.TERM,
+					GenericAnnotationType.TERM_INFO, info,
+					GenericAnnotationType.TERM_CONFIDENCE, conf));
+			}
+		
+			// Localization Note
+			val1 = reader.getAttributeValue(null, "comment");
+			if ( val1 != null ) {
+				anns.add(new GenericAnnotation(GenericAnnotationType.LOCNOTE,
+						GenericAnnotationType.LOCNOTE_VALUE, val1));
+			}
+		}
+		
+		// Just in case there was no annotation, make sure we return null
 		return (anns.size() == 0 ? null : anns);
 	}
 	
@@ -1226,7 +1267,9 @@ public class XLIFFFilter implements IFilter {
 			TextContainer content = new TextContainer();
 			ISegments segments = content.getSegments();
 			int id = 0;
+			autoMid = -1;
 			Stack<Integer> idStack = new Stack<Integer>();
+			List<Integer> annIds = new ArrayList<Integer>();
 			idStack.push(id);
 			int eventType;
 			String name;
@@ -1288,13 +1331,22 @@ public class XLIFFFilter implements IFilter {
 						// Leave the id set to -1 for balancing
 						code = current.append(TagType.CLOSING, name, "");
 						// We do know the id since the content must be well-formed
-						code.setId(idStack.pop());
+						id = idStack.pop(); code.setId(id);
 						tmp = reader.getPrefix();
 						if (( tmp != null ) && ( tmp.length()>0 )) {
 							code.setOuterData("</"+tmp+":"+name+">");
 						}
 						else {
 							code.setOuterData("</"+name+">");
+						}
+						if ( name.equals("mrk") ) {
+							int n = -1;
+							if (( n = annIds.indexOf(id)) != -1 ) {
+								annIds.remove(n);
+								Code oc = current.getCode(current.getIndex(id));
+								GenericAnnotations.addAnnotations(code, oc.getGenericAnnotations());
+								code.setType(Code.TYPE_ANNOTATION_ONLY);
+							}
 						}
 					}
 					break;
@@ -1321,79 +1373,62 @@ public class XLIFFFilter implements IFilter {
 							continue;
 						}
 						else if (( type != null ) && type.equals("protected") ) {
-							id = retrieveId(id, reader.getAttributeValue(null, "mid"), false);
-							code = appendCode(TagType.PLACEHOLDER, id, name, name, store, current);
+							int mid = retrieveId(id, reader.getAttributeValue(null, "mid"), false, true);
+							code = appendCode(TagType.PLACEHOLDER, mid, name, name, store, current);
 							code.setDeleteable(false);
 							continue;
 						}
 					}
 					// Other cases
-					if ( name.equals("g") || name.equals("mrk") ) {
-						id = retrieveId(id, reader.getAttributeValue(null, "id"), false);
+					if ( name.equals("g") ) {
+						id = retrieveId(id, reader.getAttributeValue(null, "id"), false, false);
 						idStack.push(id);
 						code = current.append(TagType.OPENING, name, "", id);
 						// Get the outer code
-//						String prefix = reader.getPrefix();
-//						StringBuilder tmpg = new StringBuilder();
-//						if (( prefix != null ) && ( prefix.length()>0 )) {
-//							tmpg.append("<"+prefix+":"+reader.getLocalName());
-//						}
-//						else {
-//							tmpg.append("<"+reader.getLocalName());
-//						}
-//						int count = reader.getNamespaceCount();
-//						for ( int i=0; i<count; i++ ) {
-//							prefix = reader.getNamespacePrefix(i);
-//							tmpg.append(" xmlns");
-//							if (!Util.isEmpty(prefix))
-//								tmpg.append(":" + prefix);
-//							tmpg.append("=\"");
-//							tmpg.append(reader.getNamespaceURI(i));
-//							tmpg.append("\"");
-//						}
-//						count = reader.getAttributeCount();
-//						for ( int i=0; i<count; i++ ) {
-//							if ( !reader.isAttributeSpecified(i) ) continue; // Skip defaults
-//							prefix = reader.getAttributePrefix(i); 
-//							tmpg.append(" ");
-//							if ((prefix!=null) && (prefix.length()!=0))
-//								tmpg.append(prefix + ":");
-//							tmpg.append(reader.getAttributeLocalName(i));
-//							tmpg.append("=\"");
-//							tmpg.append(Util.escapeToXML(reader.getAttributeValue(i), 3, params.getEscapeGT(), null));
-//							tmpg.append("\"");
-//						}
-//						tmpg.append(">");
+						code.setOuterData(buildStartCode());
+					}
+					else if ( name.equals("mrk") ) {
+						int mid = retrieveId(id, reader.getAttributeValue(null, "mid"), false, true);
+						idStack.push(mid);
+						code = current.append(TagType.OPENING, name, "", mid);
+						// Get the annotations
+						GenericAnnotations anns = readITSAttributes(FOR_IC);
+						if ( anns != null ) {
+							annIds.add(mid);
+							GenericAnnotations.addAnnotations(code, anns);
+							code.setType(Code.TYPE_ANNOTATION_ONLY);
+						}
+						// Get the outer code
 						code.setOuterData(buildStartCode());
 					}
 					else if ( name.equals("x") ) {
-						id = retrieveId(id, reader.getAttributeValue(null, "id"), false);
+						id = retrieveId(id, reader.getAttributeValue(null, "id"), false, false);
 						appendCode(TagType.PLACEHOLDER, id, name, name, store, current);
 					}
 					else if ( name.equals("bx") ) {
-						id = retrieveId(id, reader.getAttributeValue(null, "id"), false);
+						id = retrieveId(id, reader.getAttributeValue(null, "id"), false, false);
 						appendCode(TagType.OPENING, id, name, "Xpt", store, current);
 					}
 					else if ( name.equals("ex") ) {
 						// No support for overlapping codes (use -1 as default)
-						id = retrieveId(id, reader.getAttributeValue(null, "id"), true);
+						id = retrieveId(id, reader.getAttributeValue(null, "id"), true, false);
 						appendCode(TagType.CLOSING, id, name, "Xpt", store, current);
 					}
 					else if ( name.equals("bpt") ) {
-						id = retrieveId(id, reader.getAttributeValue(null, "id"), false);
+						id = retrieveId(id, reader.getAttributeValue(null, "id"), false, false);
 						appendCode(TagType.OPENING, id, name, "Xpt", store, current);
 					}
 					else if ( name.equals("ept") ) {
 						// No support for overlapping codes (use -1 as default)
-						id = retrieveId(id, reader.getAttributeValue(null, "id"), true);
+						id = retrieveId(id, reader.getAttributeValue(null, "id"), true, false);
 						appendCode(TagType.CLOSING, id, name, "Xpt", store, current);
 					}
 					else if ( name.equals("ph") ) {
-						id = retrieveId(id, reader.getAttributeValue(null, "id"), false);
+						id = retrieveId(id, reader.getAttributeValue(null, "id"), false, false);
 						appendCode(TagType.PLACEHOLDER, id, name, name, store, current);
 					}
 					else if ( name.equals("it") ) {
-						id = retrieveId(id, reader.getAttributeValue(null, "id"), false);
+						id = retrieveId(id, reader.getAttributeValue(null, "id"), false, false);
 						tmp = reader.getAttributeValue(null, "pos");
 						TagType tt = TagType.PLACEHOLDER;
 						if ( tmp == null ) {
@@ -1459,10 +1494,12 @@ public class XLIFFFilter implements IFilter {
 	
 	private int retrieveId (int currentIdValue,
 		String id,
-		boolean useMinusOneasDefault)
+		boolean useMinusOneasDefault,
+		boolean useAutoMid)
 	{
 		if (( id == null ) || ( id.length() == 0 )) {
-			return (useMinusOneasDefault ? -1 : ++currentIdValue);
+			if ( useAutoMid ) return --autoMid;
+			else return (useMinusOneasDefault ? -1 : ++currentIdValue);
 		}
 		try {
 			return Integer.valueOf(id);
