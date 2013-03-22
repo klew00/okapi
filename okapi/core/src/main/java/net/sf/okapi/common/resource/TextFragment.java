@@ -678,6 +678,8 @@ public class TextFragment implements Appendable, CharSequence, Comparable<Object
 		StringBuilder tmp = new StringBuilder(fragment.getCodedText());
 		List<Code> newCodes = fragment.getCodes();
 
+		// Note: This code assumes the lastCodeID is up-to-date and no code ID is higher than it.
+		
 		// If we have new codes, we need to deal with them: 
 		if ( !newCodes.isEmpty() ) {
 			
@@ -686,15 +688,16 @@ public class TextFragment implements Appendable, CharSequence, Comparable<Object
 				codes = new ArrayList<Code>();
 			}
 			
-			// Get a list of the existing IDs
-			ArrayList<Integer> existingIds = new ArrayList<Integer>();
-			for ( Code code : codes ) {
-				existingIds.add(code.getId());
-			}
+//			// Get a list of the existing IDs
+//			ArrayList<Integer> existingIds = new ArrayList<Integer>();
+//			for ( Code code : codes ) {
+//				existingIds.add(code.getId());
+//			}
 		
 			int newLastId = lastCodeID;
 			int idOffset = lastCodeID;
 			int negId = fragment.getLastCodeId()+idOffset;
+			boolean doit = false;
 			// Update the coded text to use new code indices and possibly new IDs
 			for ( int i=0; i<tmp.length(); i++ ) {
 				switch ( tmp.charAt(i) ) {
@@ -706,13 +709,14 @@ public class TextFragment implements Appendable, CharSequence, Comparable<Object
 					if ( !keepCodeIds && (c.getTagType() != TagType.CLOSING ) ) {
 						if ( cid < 0 ) {
 							c.setId(++negId);
-							existingIds.add(c.getId());
+//							existingIds.add(c.getId());
 							if ( c.getId() > newLastId ) newLastId = c.getId();
 						}
-						else if ( existingIds.contains(cid) ) {
+						else if ( doit || cid <= lastCodeID ) {
 							c.setId(cid+idOffset);
-							existingIds.add(c.getId());
+//							existingIds.add(c.getId());
 							if ( c.getId() > newLastId ) newLastId = c.getId();
+							doit = true;
 						}
 					}
 					codes.add(c);

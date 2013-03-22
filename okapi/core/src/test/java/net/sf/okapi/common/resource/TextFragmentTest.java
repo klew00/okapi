@@ -108,7 +108,7 @@ public class TextFragmentTest {
 		assertEquals(1, tf1.getCode(0).getId());
 		assertEquals(2, tf1.getCode(1).getId());
 	}
-	
+
 	@Test
 	public void testInsertWithCodes_12_123_12345 () {
 		TextFragment tf1 = new TextFragment();
@@ -126,7 +126,7 @@ public class TextFragmentTest {
 	}
 	
 	@Test
-	public void testInsertWithCodes_145_134_145639 () {
+	public void testInsertWithCodes_145_134_145689 () {
 		TextFragment tf1 = new TextFragment();
 		tf1.append(TagType.PLACEHOLDER, "a", "a");
 		tf1.append(TagType.PLACEHOLDER, "b", "b", 4);
@@ -139,7 +139,7 @@ public class TextFragmentTest {
 		
 		tf1.insert(-1, tf2);
 		assertEquals("abcdef", tf1.toText());
-		assertEquals("<1/><4/><5/><6/><3/><9/>", fmt.setContent(tf1).toString());
+		assertEquals("<1/><4/><5/><6/><8/><9/>", fmt.setContent(tf1).toString());
 	}
 	
 	@Test
@@ -159,7 +159,7 @@ public class TextFragmentTest {
 	}
 
 	@Test
-	public void testInsertWithCodes_13_M3M_13___ () {
+	public void testInsertWithCodes_13_M3M_13768 () {
 		TextFragment tf1 = new TextFragment();
 		tf1.append(TagType.PLACEHOLDER, "a", "a");
 		tf1.append(TagType.PLACEHOLDER, "b", "b", 3);
