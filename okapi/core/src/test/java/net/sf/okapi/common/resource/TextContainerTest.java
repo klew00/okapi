@@ -1556,10 +1556,11 @@ public class TextContainerTest {
 		TextContainer tc = new TextContainer(tf);
 		tc.append(new TextFragment(" "));
 		tf = new TextFragment("text2");
-		Code code = tf.append(TagType.PLACEHOLDER, "br", "<br/>");
+		Code code = tf.append(TagType.PLACEHOLDER, "br", "<br/>", 2);
 		// Segmented text have continuous code IDs sequence across segments
 		// they do not restart at 1 for each segment
-		code.id = 2;
+//		code.id = 2;
+//		tf.balanceMarkers(); // Update lastCodeID
 		tc.getSegments().append(tf);
 		return tc;
 	}

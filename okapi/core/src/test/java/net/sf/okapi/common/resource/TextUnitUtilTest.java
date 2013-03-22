@@ -898,12 +898,12 @@ public class TextUnitUtilTest {
 //		assertEquals("<1/><1/><2/><3/><4/><2/><3/>[text part 1]<4/><5/><1/><2/><3/><4/><6/><7/>[text part 2]<8/>" +
 //			"<9/>[text part 3]<10/><11/><1/><2/><3/><4/><12/><13/>[text part 4]<14/>", 
 //			fmt.setContent(tf).toString());
-//		assertEquals("<1/><2/><3/><4/><5/><6/><7/>[text part 1]<8/><9/><10/><11/><12/><13/><14/><15/>[text part 2]<16/>" +
-//			"<17/>[text part 3]<18/><19/><20/><21/><22/><23/><24/><25/>[text part 4]<26/>",
-//			fmt.setContent(tf).toString());
-		assertEquals("<1/><5/><2/><3/><4/><6/><7/>[text part 1]<8/><9/><10/><11/><12/><13/><14/><15/>[text part 2]<16/>" +
-				"<17/>[text part 3]<18/><19/><20/><21/><22/><23/><24/><25/>[text part 4]<26/>",
-				fmt.setContent(tf).toString());
+		assertEquals("<1/><2/><3/><4/><5/><6/><7/>[text part 1]<8/><9/><10/><11/><12/><13/><14/><15/>[text part 2]<16/>" +
+			"<17/>[text part 3]<18/><19/><20/><21/><22/><23/><24/><25/>[text part 4]<26/>",
+			fmt.setContent(tf).toString());
+//		assertEquals("<1/><5/><2/><3/><4/><6/><7/>[text part 1]<8/><9/><10/><11/><12/><13/><14/><15/>[text part 2]<16/>" +
+//				"<17/>[text part 3]<18/><19/><20/><21/><22/><23/><24/><25/>[text part 4]<26/>",
+//				fmt.setContent(tf).toString());
 
 		TextUnitUtil.simplifyCodes(tf, false);
 		assertEquals("<1/>[text part 1]<2/>[text part 2]<3/>[text part 3]<4/>[text part 4]<5/>", 
@@ -1010,12 +1010,12 @@ public class TextUnitUtilTest {
 //		assertEquals("<1/><1/><2/>[seg 1]<3/><4/><2/><3/>[text part 1]<4/><5/>[seg 2]<1/><2/><3/><4/><6/><7/>" +
 //			"[text part 2]<8/><9/>[text part 3]<10/><11/><1/><2/><3/>[seg 3]<4/><12/><13/>[text part 4]<14/>", 
 //			fmt.setContent(tf).toString());
-//		assertEquals("<1/><2/><3/>[seg 1]<4/><5/><6/><7/>[text part 1]<8/><9/>[seg 2]<10/><11/><12/><13/><14/><15/>" +
-//			"[text part 2]<16/><17/>[text part 3]<18/><19/><20/><21/><22/>[seg 3]<23/><24/><25/>[text part 4]<26/>",
-//			fmt.setContent(tf).toString());
-		assertEquals("<1/><5/><2/>[seg 1]<3/><4/><6/><7/>[text part 1]<8/><9/>[seg 2]<10/><11/><12/><13/><14/><15/>" +
+		assertEquals("<1/><2/><3/>[seg 1]<4/><5/><6/><7/>[text part 1]<8/><9/>[seg 2]<10/><11/><12/><13/><14/><15/>" +
 			"[text part 2]<16/><17/>[text part 3]<18/><19/><20/><21/><22/>[seg 3]<23/><24/><25/>[text part 4]<26/>",
 			fmt.setContent(tf).toString());
+//		assertEquals("<1/><5/><2/>[seg 1]<3/><4/><6/><7/>[text part 1]<8/><9/>[seg 2]<10/><11/><12/><13/><14/><15/>" +
+//			"[text part 2]<16/><17/>[text part 3]<18/><19/><20/><21/><22/>[seg 3]<23/><24/><25/>[text part 4]<26/>",
+//			fmt.setContent(tf).toString());
 		
 		assertEquals("[#$s1@%$seg_start$]<x11/><x12/>[seg 1]<x13/><x14/>[#$s1@%$seg_end$]$tp_start$[text part 1]$tp_end$" +
 			"[#$s2@%$seg_start$][seg 2]<x21/><x22/><x23/><x24/>[#$s2@%$seg_end$]$tp_start$[text part 2]$tp_end$" +
@@ -1128,12 +1128,12 @@ public class TextUnitUtilTest {
 //		assertEquals("<1/><1/><2/>[seg 1]<3/><4/><2/><3/>[text part 1]<4/><5/>[seg 2]<1/><2/><3/><4/><6/><7/>" +
 //			"[text part 2]<8/><9/>[text part 3]<10/><11/><1/><2/><3/>[seg 3]<4/><12/><13/>[text part 4]<14/>", 
 //			fmt.setContent(tf).toString());
-//		assertEquals("<1/><2/><3/>[seg 1]<4/><5/><6/><7/>[text part 1]<8/><9/>[seg 2]<10/><11/><12/><13/><14/><15/>" +
-//				"[text part 2]<16/><17/>[text part 3]<18/><19/><20/><21/><22/>[seg 3]<23/><24/><25/>[text part 4]<26/>",
-//				fmt.setContent(tf).toString());
-		assertEquals("<1/><5/><2/>[seg 1]<3/><4/><6/><7/>[text part 1]<8/><9/>[seg 2]<10/><11/><12/><13/><14/><15/>" +
+		assertEquals("<1/><2/><3/>[seg 1]<4/><5/><6/><7/>[text part 1]<8/><9/>[seg 2]<10/><11/><12/><13/><14/><15/>" +
 				"[text part 2]<16/><17/>[text part 3]<18/><19/><20/><21/><22/>[seg 3]<23/><24/><25/>[text part 4]<26/>",
 				fmt.setContent(tf).toString());
+//		assertEquals("<1/><5/><2/>[seg 1]<3/><4/><6/><7/>[text part 1]<8/><9/>[seg 2]<10/><11/><12/><13/><14/><15/>" +
+//				"[text part 2]<16/><17/>[text part 3]<18/><19/><20/><21/><22/>[seg 3]<23/><24/><25/>[text part 4]<26/>",
+//				fmt.setContent(tf).toString());
 		
 		assertEquals("[#$s1@%$seg_start$]<x11/><x12/>[seg 1]<x13/><x14/>[#$s1@%$seg_end$]$tp_start$[text part 1]$tp_end$" +
 				"[#$s2@%$seg_start$][seg 2]<x21/><x22/><x23/><x24/>[#$s2@%$seg_end$]$tp_start$[text part 2]$tp_end$" +
@@ -1259,12 +1259,12 @@ public class TextUnitUtilTest {
 //		assertEquals("<1/><1/><2/>[seg 1]<3/><4/><2/><3/>[text part 1]<4/><5/>[seg 2]<1/><2/><3/><4/><6/><7/>" +
 //			"[text part 2]<8/><9/>[text part 3]<10/><11/><1/><2/><3/>[seg 3]<4/><12/><13/>[text part 4]<14/>", 
 //			fmt.setContent(tf).toString());
-//		assertEquals("<1/><2/><3/>[seg 1]<4/><5/><6/><7/>[text part 1]<8/><9/>[seg 2]<10/><11/><12/><13/><14/><15/>" +
-//			"[text part 2]<16/><17/>[text part 3]<18/><19/><20/><21/><22/>[seg 3]<23/><24/><25/>[text part 4]<26/>",
-//			fmt.setContent(tf).toString());
-		assertEquals("<1/><5/><2/>[seg 1]<3/><4/><6/><7/>[text part 1]<8/><9/>[seg 2]<10/><11/><12/><13/><14/><15/>" +
-				"[text part 2]<16/><17/>[text part 3]<18/><19/><20/><21/><22/>[seg 3]<23/><24/><25/>[text part 4]<26/>",
-				fmt.setContent(tf).toString());
+		assertEquals("<1/><2/><3/>[seg 1]<4/><5/><6/><7/>[text part 1]<8/><9/>[seg 2]<10/><11/><12/><13/><14/><15/>" +
+			"[text part 2]<16/><17/>[text part 3]<18/><19/><20/><21/><22/>[seg 3]<23/><24/><25/>[text part 4]<26/>",
+			fmt.setContent(tf).toString());
+//		assertEquals("<1/><5/><2/>[seg 1]<3/><4/><6/><7/>[text part 1]<8/><9/>[seg 2]<10/><11/><12/><13/><14/><15/>" +
+//				"[text part 2]<16/><17/>[text part 3]<18/><19/><20/><21/><22/>[seg 3]<23/><24/><25/>[text part 4]<26/>",
+//				fmt.setContent(tf).toString());
 		
 		assertEquals("[#$s1@%$seg_start$]<x11/><x12/>[seg 1]<x13/><x14/>[#$s1@%$seg_end$]$tp_start$[text part 1]$tp_end$" +
 				"[#$s2@%$seg_start$][seg 2]<x21/><x22/><x23/><x24/>[#$s2@%$seg_end$]$tp_start$[text part 2]$tp_end$" +
@@ -1276,12 +1276,12 @@ public class TextUnitUtilTest {
 //		assertEquals("<1/><1/><2/>[seg 1]<3/><4/><2/><3/>[text part 1]<4/><5/>[seg 2]<1/><2/><3/><4/><6/><7/>[text part 2]" +
 //			"<8/><9/>[text part 3]<10/><11/><1/><2/><3/>[seg 3]<4/><12/><13/>[text part 4]<14/>", 
 //			fmt.setContent(tf).toString());
-//		assertEquals("<1/><2/><3/>[seg 1]<4/><5/><6/><7/>[text part 1]<8/><9/>[seg 2]<10/><11/><12/><13/><14/><15/>[text part 2]" +
-//			"<16/><17/>[text part 3]<18/><19/><20/><21/><22/>[seg 3]<23/><24/><25/>[text part 4]<26/>",
-//			fmt.setContent(tf).toString());
-		assertEquals("<1/><5/><2/>[seg 1]<3/><4/><6/><7/>[text part 1]<8/><9/>[seg 2]<10/><11/><12/><13/><14/><15/>[text part 2]" +
-				"<16/><17/>[text part 3]<18/><19/><20/><21/><22/>[seg 3]<23/><24/><25/>[text part 4]<26/>",
-				fmt.setContent(tf).toString());
+		assertEquals("<1/><2/><3/>[seg 1]<4/><5/><6/><7/>[text part 1]<8/><9/>[seg 2]<10/><11/><12/><13/><14/><15/>[text part 2]" +
+			"<16/><17/>[text part 3]<18/><19/><20/><21/><22/>[seg 3]<23/><24/><25/>[text part 4]<26/>",
+			fmt.setContent(tf).toString());
+//		assertEquals("<1/><5/><2/>[seg 1]<3/><4/><6/><7/>[text part 1]<8/><9/>[seg 2]<10/><11/><12/><13/><14/><15/>[text part 2]" +
+//				"<16/><17/>[text part 3]<18/><19/><20/><21/><22/>[seg 3]<23/><24/><25/>[text part 4]<26/>",
+//				fmt.setContent(tf).toString());
 		
 		assertEquals("[#$s1@%$seg_start$]<x11/><x12/>[seg 1]<x13/><x14/>[#$s1@%$seg_end$]$tp_start$[text part 1]$tp_end$" +
 				"[#$s2@%$seg_start$][seg 2]<x21/><x22/><x23/><x24/>[#$s2@%$seg_end$]$tp_start$[text part 2]$tp_end$" +
@@ -1409,12 +1409,12 @@ public class TextUnitUtilTest {
 //		assertEquals("<1/><1/><2/><3/><4/><2/><3/>[text part 1]<4/><5/><1/><2/><3/><4/><6/><7/>[text part 2]<8/>" +
 //			"<9/>[text part 3]<10/><11/><1/><2/><3/><4/><12/><13/>[text part 4]<14/>", 
 //			fmt.setContent(tf).toString());
-//		assertEquals("<1/><2/><3/><4/><5/><6/><7/>[text part 1]<8/><9/><10/><11/><12/><13/><14/><15/>[text part 2]<16/>" + 
-//			"<17/>[text part 3]<18/><19/><20/><21/><22/><23/><24/><25/>[text part 4]<26/>",
-//			fmt.setContent(tf).toString());
-		assertEquals("<1/><5/><2/><3/><4/><6/><7/>[text part 1]<8/><9/><10/><11/><12/><13/><14/><15/>[text part 2]<16/>" + 
-				"<17/>[text part 3]<18/><19/><20/><21/><22/><23/><24/><25/>[text part 4]<26/>",
-				fmt.setContent(tf).toString());
+		assertEquals("<1/><2/><3/><4/><5/><6/><7/>[text part 1]<8/><9/><10/><11/><12/><13/><14/><15/>[text part 2]<16/>" + 
+			"<17/>[text part 3]<18/><19/><20/><21/><22/><23/><24/><25/>[text part 4]<26/>",
+			fmt.setContent(tf).toString());
+//		assertEquals("<1/><5/><2/><3/><4/><6/><7/>[text part 1]<8/><9/><10/><11/><12/><13/><14/><15/>[text part 2]<16/>" + 
+//				"<17/>[text part 3]<18/><19/><20/><21/><22/><23/><24/><25/>[text part 4]<26/>",
+//				fmt.setContent(tf).toString());
 		
 		
 		TextUnitUtil.restoreSegmentation(tc, tf);

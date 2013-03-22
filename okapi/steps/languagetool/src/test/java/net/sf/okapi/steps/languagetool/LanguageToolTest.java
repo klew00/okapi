@@ -23,35 +23,22 @@
 package net.sf.okapi.steps.languagetool;
 
 import static org.junit.Assert.assertNotNull;
-
-import java.io.IOException;
-import java.util.List;
-
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.annotation.GenericAnnotations;
-import net.sf.okapi.common.filterwriter.GenericContent;
 import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.TextFragment;
-import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.resource.TextFragment.TagType;
+import net.sf.okapi.common.resource.TextUnit;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.languagetool.JLanguageTool;
-import org.languagetool.Language;
-import org.languagetool.rules.Category;
-import org.languagetool.rules.Rule;
 
 public class LanguageToolTest {
 
-	private GenericContent fmt;
 	private LanguageTool lt;
-	private Parameters params;
 
 	@Before
 	public void setUp () {
-		params = new Parameters();
-		fmt = new GenericContent();
 		lt = new LanguageTool(null, LocaleId.ENGLISH, LocaleId.FRENCH);
 	}
 
@@ -93,6 +80,5 @@ public class LanguageToolTest {
 //			System.out.println("id="+id+", catName="+catName);
 //		}
 //	}
-	
 
 }

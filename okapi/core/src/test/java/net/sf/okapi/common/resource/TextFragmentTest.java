@@ -110,6 +110,71 @@ public class TextFragmentTest {
 	}
 	
 	@Test
+	public void testInsertWithCodes_12_123_12345 () {
+		TextFragment tf1 = new TextFragment();
+		tf1.append(TagType.PLACEHOLDER, "a", "a");
+		tf1.append(TagType.PLACEHOLDER, "b", "b");
+		
+		TextFragment tf2 = new TextFragment();
+		tf2.append(TagType.PLACEHOLDER, "c", "c");
+		tf2.append(TagType.PLACEHOLDER, "d", "d");
+		tf2.append(TagType.PLACEHOLDER, "e", "e");
+		
+		tf1.insert(-1, tf2);
+		assertEquals("abcde", tf1.toText());
+		assertEquals("<1/><2/><3/><4/><5/>", fmt.setContent(tf1).toString());
+	}
+	
+	@Test
+	public void testInsertWithCodes_145_134_145639 () {
+		TextFragment tf1 = new TextFragment();
+		tf1.append(TagType.PLACEHOLDER, "a", "a");
+		tf1.append(TagType.PLACEHOLDER, "b", "b", 4);
+		tf1.append(TagType.PLACEHOLDER, "c", "c", 5);
+		
+		TextFragment tf2 = new TextFragment();
+		tf2.append(TagType.PLACEHOLDER, "d", "d");
+		tf2.append(TagType.PLACEHOLDER, "e", "e", 3);
+		tf2.append(TagType.PLACEHOLDER, "f", "f", 4);
+		
+		tf1.insert(-1, tf2);
+		assertEquals("abcdef", tf1.toText());
+		assertEquals("<1/><4/><5/><6/><3/><9/>", fmt.setContent(tf1).toString());
+	}
+	
+	@Test
+	public void testInsertWithCodes_12_345_12345 () {
+		TextFragment tf1 = new TextFragment();
+		tf1.append(TagType.PLACEHOLDER, "a", "a");
+		tf1.append(TagType.PLACEHOLDER, "b", "b");
+
+		TextFragment tf2 = new TextFragment();
+		tf2.append(TagType.PLACEHOLDER, "c", "c", 3);
+		tf2.append(TagType.PLACEHOLDER, "d", "d", 4);
+		tf2.append(TagType.PLACEHOLDER, "e", "e", 5);
+		
+		tf1.insert(-1, tf2);
+		assertEquals("abcde", tf1.toText());
+		assertEquals("<1/><2/><3/><4/><5/>", fmt.setContent(tf1).toString());
+	}
+
+	@Test
+	public void testInsertWithCodes_13_M3M_13___ () {
+		TextFragment tf1 = new TextFragment();
+		tf1.append(TagType.PLACEHOLDER, "a", "a");
+		tf1.append(TagType.PLACEHOLDER, "b", "b", 3);
+
+		TextFragment tf2 = new TextFragment();
+		tf2.append(TagType.PLACEHOLDER, "C", "C", -2);
+		tf2.append(TagType.PLACEHOLDER, "d", "d", 3);
+		tf2.append(TagType.PLACEHOLDER, "E", "E", -3);
+		
+		tf1.insert(-1, tf2);
+		assertEquals("abCdE", tf1.toText());
+		assertEquals("<1/><3/><7/><6/><8/>", fmt.setContent(tf1).toString());
+	}
+	
+	@Test
 	public void testInsert () {
 		TextFragment tf1 = new TextFragment();
 		tf1.insert(0, new TextFragment("[ins1]"));

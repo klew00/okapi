@@ -677,42 +677,87 @@ public class TextFragment implements Appendable, CharSequence, Comparable<Object
 		checkPositionForMarker(offset);
 		StringBuilder tmp = new StringBuilder(fragment.getCodedText());
 		List<Code> newCodes = fragment.getCodes();
-		if (( codes == null ) && ( newCodes.size() > 0 )) {
-			codes = new ArrayList<Code>();
+
+		// If we have new codes, we need to deal with them: 
+		if ( !newCodes.isEmpty() ) {
+			
+			// make sure we have a list of codes available
+			if ( codes == null ) {
+				codes = new ArrayList<Code>();
+			}
+			
+			// Get a list of the existing IDs
+			ArrayList<Integer> existingIds = new ArrayList<Integer>();
+			for ( Code code : codes ) {
+				existingIds.add(code.getId());
+			}
+		
+			int newLastId = lastCodeID;
+			int idOffset = lastCodeID;
+			int negId = fragment.getLastCodeId()+idOffset;
+			// Update the coded text to use new code indices and possibly new IDs
+			for ( int i=0; i<tmp.length(); i++ ) {
+				switch ( tmp.charAt(i) ) {
+				case MARKER_OPENING:
+				case MARKER_CLOSING:
+				case MARKER_ISOLATED:
+					Code c = newCodes.get(toIndex(tmp.charAt(++i))).clone();
+					int cid = c.getId();
+					if ( !keepCodeIds && (c.getTagType() != TagType.CLOSING ) ) {
+						if ( cid < 0 ) {
+							c.setId(++negId);
+							existingIds.add(c.getId());
+							if ( c.getId() > newLastId ) newLastId = c.getId();
+						}
+						else if ( existingIds.contains(cid) ) {
+							c.setId(cid+idOffset);
+							existingIds.add(c.getId());
+							if ( c.getId() > newLastId ) newLastId = c.getId();
+						}
+					}
+					codes.add(c);
+					tmp.setCharAt(i, toChar(codes.size()-1));
+					break;
+				}
+			}
+			lastCodeID = newLastId;
+
 		}
 		
-		int newLastId = Math.max(lastCodeID, fragment.getLastCodeId());
-		// Update the coded text to use new code indices
-		for ( int i=0; i<tmp.length(); i++ ) {
-			switch ( tmp.charAt(i) ) {
-			case MARKER_OPENING:
-			case MARKER_CLOSING:
-			case MARKER_ISOLATED:
-				Code c = newCodes.get(toIndex(tmp.charAt(++i))).clone();
-				if ( !keepCodeIds && (c.getTagType() != TagType.CLOSING ) && ( c.getId() <= lastCodeID )) {
-					// If the code is not a closing one (Closing codes will be handled when re-balancing)
-					// and if its id is less than the lastCodeID for this fragment: make that id the next one
-					// using the highest of the two possible
-					c.setId(++newLastId);
-					// 
-				}
-				codes.add(c);
-				tmp.setCharAt(i, toChar(codes.size()-1));
-				break;
-			}
-		}
-		lastCodeID = newLastId;
-
 		// Insert the new text in one chunk
 		if ( offset < 0 ) text.append(tmp);
 		else text.insert(offset, tmp);
 		
 		// If there was new codes we will need to re-balance
-		if ( newCodes.size() > 0 ) {
-			this.isBalanced = false;
-		}
+		this.isBalanced = newCodes.isEmpty(); // Not empty -> not balanced anymore
 	}
 
+	
+
+	// Code with YS solution (not good enough: using offest would be better)
+//			int newLastId = Math.max(lastCodeID, fragment.getLastCodeId());
+//			// Update the coded text to use new code indices
+//			for ( int i=0; i<tmp.length(); i++ ) {
+//				switch ( tmp.charAt(i) ) {
+//				case MARKER_OPENING:
+//				case MARKER_CLOSING:
+//				case MARKER_ISOLATED:
+//					Code c = newCodes.get(toIndex(tmp.charAt(++i))).clone();
+//					if ( !keepCodeIds && (c.getTagType() != TagType.CLOSING ) && ( c.getId() <= lastCodeID )) {
+//						// If the code is not a closing one (Closing codes will be handled when re-balancing)
+//						// and if its id is less than the lastCodeID for this fragment: make that id the next one
+//						// using the highest of the two possible
+//						c.setId(++newLastId);
+//						// 
+//					}
+//					codes.add(c);
+//					tmp.setCharAt(i, toChar(codes.size()-1));
+//					break;
+//				}
+//			}
+//			lastCodeID = newLastId;
+
+	
 	/**
 	 * Clears the fragment of all content. The parent is not modified.
 	 */

@@ -157,20 +157,12 @@ public class LanguageTool {
 				// Attach the results
 				if ( trgMatches != null ) {
 					for ( RuleMatch match : trgMatches ) {
-						if ( skipSpelling && match.getRule().isSpellingRule() ) continue;
-						IssueAnnotation ia = new IssueAnnotation(IssueType.LANGUAGETOOL_ERROR, match.getMessage(), 2, srcSeg.getId(),
-							-1, -1, match.getFromPos(), match.getToPos(), null);
-						ia.setITSType(match.getRule().getLocQualityIssueType());
-						GenericAnnotation.addAnnotation(trgTc, ia);
+						GenericAnnotation.addAnnotation(trgTc, createAnnotation(match, true, srcSeg.getId()));
 					}
 				}
 				if ( srcMatches != null ) {
 					for ( RuleMatch match :srcMatches ) {
-						if ( skipSpelling && match.getRule().isSpellingRule() ) continue;
-						IssueAnnotation ia = new IssueAnnotation(IssueType.LANGUAGETOOL_ERROR, match.getMessage(), 2, srcSeg.getId(),
-							-1, -1, match.getFromPos(), match.getToPos(), null);
-						ia.setITSType(match.getRule().getLocQualityIssueType());
-						GenericAnnotation.addAnnotation(srcTc, ia);
+						GenericAnnotation.addAnnotation(srcTc, createAnnotation(match, false, srcSeg.getId()));
 					}
 				}
 			}
@@ -180,6 +172,28 @@ public class LanguageTool {
 		}
 	}
 
+	/**
+	 * Creates an LQI annotation based on the match and context.
+	 * @param match the LT rule match.
+	 * @param onTarget true if the issue was found on the target content.
+	 * @param segId segment id.
+	 * @return the new annotation, or null if none was created.
+	 */
+	private GenericAnnotation createAnnotation (RuleMatch match,
+		boolean onTarget,
+		String segId)
+	{
+		if ( skipSpelling && match.getRule().isSpellingRule() ) return null;
+		IssueAnnotation ia = new IssueAnnotation(IssueType.LANGUAGETOOL_ERROR, match.getMessage(), 2, segId,
+			(onTarget ? -1 : match.getFromPos()), // start in source
+			(onTarget ? -1 : match.getToPos()), // end in source
+			(onTarget ? match.getFromPos() : -1 ), // start in target
+			(onTarget ? match.getToPos() : -1 ), // end in target
+			null);
+		ia.setITSType(match.getRule().getLocQualityIssueType());
+		return ia;
+	}
+	
 	/**
 	 * Gets the LT language code for the given locale Id
 	 * @param localeId the locale id to map.

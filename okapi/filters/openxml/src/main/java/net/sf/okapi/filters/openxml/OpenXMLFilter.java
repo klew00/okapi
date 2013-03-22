@@ -661,7 +661,8 @@ public class OpenXMLFilter implements IFilter {
 				   			) ||
 				   	 (nZipType==MSPOWERPOINT &&
 				   	       (((sDocType.equals("notesSlide+xml") && bPreferenceTranslatePowerpointNotes)) ||
-				   	    	  sDocType.equals("slideMaster+xml") && bPreferenceTranslatePowerpointMasters))))) {
+				   	    	  sDocType.equals("slideMaster+xml") && bPreferenceTranslatePowerpointMasters)))))
+			{
 						     // DWH 5-26-09 translate if translating Powerpoint notes
 				if (nZipType==MSWORD && sDocType.equals("chart+xml")) // DWH 4-16-09
 					nFileType = MSWORDCHART;
