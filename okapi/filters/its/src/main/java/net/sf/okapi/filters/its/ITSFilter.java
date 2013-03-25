@@ -863,7 +863,7 @@ public abstract class ITSFilter implements IFilter {
 		String list = trav.getLocaleFilter();
 		// null is none-defined, so default is '*'
 		if (( list == null ) || list.equals("*") ) return true;
-		if ( list.length() == 0 ) return false; // Empty list is 'none'
+		if ( list.isEmpty() || list.equals("!*") ) return false;
 		
 		// More info for extended language range/filtering here:
 		// http://www.rfc-editor.org/rfc/bcp/bcp47.txt
@@ -879,17 +879,22 @@ public abstract class ITSFilter implements IFilter {
 	/**
 	 * Indicates if a given language tag matches at least one item of a list of extended language ranges.
 	 * <p>Based on the algorithm described at: http://tools.ietf.org/html/rfc4647#section-3.3.2
-	 * @param langRanges the list of extended language ranges
+	 * @param langRanges the list of extended language ranges (with optional '!' prefix for 'exclude')
 	 * @param langTag the language tag.
-	 * @return true if the language tag matches at least one item of a list of extended language ranges.
+	 * @return true if the language tag results in inclusion, false if it results in exclusion.
 	 */
 	public boolean extendedMatch (String langRanges,
 		String langTag)
 	{
-		for ( String langRange : ListUtil.stringAsArray(langRanges.toLowerCase()) ) {
-			if ( doesLangTagMacthesLangRange(langRange, langTag) ) return true;
+		boolean result = true;
+		if ( langRanges.startsWith("!") ) {
+			langRanges = langRanges.substring(1);
+			result = false;
 		}
-		return false;
+		for ( String langRange : ListUtil.stringAsArray(langRanges.toLowerCase()) ) {
+			if ( doesLangTagMacthesLangRange(langRange, langTag) ) return result;
+		}
+		return !result;
 	}
 
 	/**

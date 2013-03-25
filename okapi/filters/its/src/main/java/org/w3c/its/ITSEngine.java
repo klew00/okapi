@@ -2475,21 +2475,37 @@ public class ITSEngine implements IProcessor, ITraversal {
 	 * Retrieve the final list to use for a locale filter data category
 	 * @param elem the element where the attributes are defined.
 	 * @param qualified true if the attributes are expected to be qualified (local markup)
-	 * @return the final list.
+	 * @return the list of the locale, with an optional '!' pefix (when the type is 'exclude').
 	 */
 	private String retrieveLocaleFilterList (Element elem,
 		boolean qualified,
 		boolean useHTML5)
 	{
+		String[] data = new String[2];
 		if ( useHTML5 ) {
-			return elem.getAttribute("its-locale-filter-list").trim();
+			data[0] = elem.getAttribute("its-locale-filter-list").trim();
+			if ( elem.hasAttribute("its-locale-filter-type") )
+				data[1] = elem.getAttribute("its-locale-filter-type").toLowerCase();
 		}
-		if ( qualified ) { // Locally
-			return elem.getAttributeNS(ITS_NS_URI, "localeFilterList").trim();
+		else if ( qualified ) { // Locally
+			data[0] = elem.getAttributeNS(ITS_NS_URI, "localeFilterList").trim();
+			if ( elem.hasAttributeNS(ITS_NS_URI, "localeFilterType") )
+				data[1] = elem.getAttributeNS(ITS_NS_URI, "localeFilterType");
 		}
 		else { // Inside a global rule
-			return elem.getAttribute("localeFilterList").trim();
+			data[0] = elem.getAttribute("localeFilterList").trim();
+			if ( elem.hasAttribute("localeFilterType") )
+				data[1] = elem.getAttribute("localeFilterType");
 		}
+		
+		if ( data[1] == null ) data[1] = "include"; // Default
+		else if ( !data[1].equals("include") && !data[1].equals("exclude") ) {
+			logger.error("Invalid locale filter type '{}'.", data[1]);
+			return "*"; // Default if an error occurs.
+		}
+		// Return with optional prefix for exclude
+		if ( data[1].equals("exclude") ) return "!"+data[0];
+		else return data[0];
 	}
 
 	/**
@@ -2541,7 +2557,7 @@ public class ITSEngine implements IProcessor, ITraversal {
 		if ( useHTML5 ) {
 			return elem.getAttribute("data-itsx-sub-filter").trim();
 		}
-		if ( qualified ) { // Locally
+		else if ( qualified ) { // Locally
 			return elem.getAttributeNS(ITSX_NS_URI, "subFilter").trim();
 		}
 		else { // Inside a global rule

@@ -385,7 +385,15 @@ public class Main {
 		}
 		else if ( dc.equals(DC_LOCALEFILTER) ) {
 			out1 = trav.getLocaleFilter();
-			if ( out1 != null ) writer.print(String.format("\tlocaleFilterList=\"%s\"", escape(out1)));
+			if ( out1 != null ) {
+				boolean incFlag = true;
+				if ( out1.startsWith("!") ) {
+					out1 = out1.substring(1);
+					incFlag = false;
+				}
+				writer.print(String.format("\tlocaleFilterList=\"%s\"", out1));
+				writer.print(String.format("\tlocaleFilterType=\"%s\"", incFlag ? "include" : "exclude"));
+			}
 		}
 		else if ( dc.equals(DC_PROVENANCE) ) {
 			int count = trav.getProvRecordCount(attr);

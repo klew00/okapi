@@ -152,7 +152,8 @@ public interface ITraversal {
 	/**
 	 * Gets the locale filter information.
 	 * @return A a comma-separated list of extended language ranges as defined in 
-	 * BCP-47 (and possibly empty).
+	 * BCP-47 (and possibly empty). If the first character is '!' the type is 'exclude'
+	 * otherwise the type is 'include'.
 	 */
 	public String getLocaleFilter ();
 	
