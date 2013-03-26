@@ -82,6 +82,8 @@
 		<fileset dir="../../okapi/filters/transifex/target/classes" includes="net/**"/>
 		<fileset dir="../../okapi/libraries/lib-transifex/target/classes" includes="net/**"/>
 		<fileset dir="../../okapi/filters/po/target/classes" includes="net/**"/>
+		<!-- XLIFF filter -->
+		<fileset dir="../../okapi/filters/xliff/target/classes" includes="net/**"/>
 	</jar>
 
 	<!-- The the JSON library -->

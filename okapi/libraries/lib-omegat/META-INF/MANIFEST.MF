@@ -26,3 +26,6 @@ OmegaT-Plugin: filter
 Name: net.sf.okapi.lib.omegat.TXMLFilter
 OmegaT-Plugin: filter
 
+Name: net.sf.okapi.lib.omegat.XLIFFFilter
+OmegaT-Plugin: filter
+

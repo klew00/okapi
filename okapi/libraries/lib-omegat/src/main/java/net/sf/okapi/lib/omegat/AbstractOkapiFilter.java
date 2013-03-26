@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2010-2012 by the Okapi Framework contributors
+  Copyright (C) 2010-2013 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -30,17 +30,22 @@ import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.annotation.GenericAnnotation;
+import net.sf.okapi.common.annotation.GenericAnnotationType;
+import net.sf.okapi.common.annotation.GenericAnnotations;
 import net.sf.okapi.common.filters.FilterConfigurationMapper;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filterwriter.GenericContent;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
+import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.ISegments;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
-import net.sf.okapi.common.resource.ITextUnit;
+import net.sf.okapi.common.resource.TextFragment.TagType;
 
 import org.omegat.filters2.FilterContext;
 import org.omegat.filters2.IAlignCallback;
@@ -189,8 +194,8 @@ abstract class AbstractOkapiFilter implements org.omegat.filters2.IFilter {
 	}
 
     /**
-     * Method can be overrided for return true. It means what two-pass parsing and translating will be
-     * processed and prev/next segments will be linked.
+     * Method can be overridden for return true. It means what two-pass parsing and translating will be
+     * processed and previous/next segments will be linked.
      */
     protected boolean requirePrevNextFields () {
         return false; // Default: all Okapi filters have IDs
@@ -278,14 +283,14 @@ abstract class AbstractOkapiFilter implements org.omegat.filters2.IFilter {
 						// Exchange the data with OmegaT
 						if ( writer == null ) {
 							// Populate OmegaT
+							String comments = processComments(tu, srcSeg, trgSeg);
 							if (( trgSeg == null ) || trgSeg.text.isEmpty() ) {
 								// No existing translation
 								parseCallback.addEntry(
 									tu.getId()+"_"+srcSeg.id,
 									toOmegat(srcSeg.text),
 									null,
-									false,
-									null, this);
+									false, comments, this);
 							}
 							else {
 								// There is an existing translation
@@ -293,8 +298,7 @@ abstract class AbstractOkapiFilter implements org.omegat.filters2.IFilter {
 									tu.getId()+"_"+srcSeg.id,
 									toOmegat(srcSeg.text),
 									toOmegat(trgSeg.text),
-									isFuzzy,
-									null, this);
+									isFuzzy, comments, this);
 							}
 						}
 						else { // Translation coming back from OmegaT
@@ -330,7 +334,103 @@ abstract class AbstractOkapiFilter implements org.omegat.filters2.IFilter {
 		}
     	
     }
+    
+    /**
+     * Gather annotations to display them as comments
+     * @param tu the text unit to process.
+     * @param srcSeg the source segment to process.
+     * @param trgSeg the corresponding target segment (can be null).
+     * @return The comments or null if there are none.
+     */
+    protected String processComments (ITextUnit tu,
+    	Segment srcSeg,
+    	Segment trgSeg)
+    {
+    	TextFragment tf = srcSeg.getContent();
+    	if ( !tf.hasCode() ) return null;
+    	
+    	String ct = tf.getCodedText();
+		StringBuilder tmp = new StringBuilder();
+    	for ( int i=0; i<ct.length(); i++ ) {
+    		if ( TextFragment.isMarker(ct.charAt(i)) ) {
+    			Code c = tf.getCode(ct.charAt(++i));
+    			if ( c.getTagType() == TagType.CLOSING ) continue;
+    			GenericAnnotations anns = c.getGenericAnnotations();
+    			if ( anns == null ) continue;
+    			
+    			// else: process the annotations
+    			if ( tmp == null ) tmp = new StringBuilder();
+
+    			// Terminology
+    			GenericAnnotation ann = anns.getFirstAnnotation(GenericAnnotationType.TERM);
+    			if ( ann != null ) {
+    				if ( tmp.length() > 0 ) tmp.append("\n");
+    				tmp.append("Term: \'"+getSpan(ct, i+1, c, tf)+"'");
+    				String info = ann.getString(GenericAnnotationType.TERM_INFO);
+    				if ( info != null ) tmp.append(" "+info);
+    				Double conf = ann.getDouble(GenericAnnotationType.TERM_CONFIDENCE);
+    				if ( conf != null ) tmp.append(" Confidence="+Util.formatDouble(conf));
+    			}
+    			
+    			// Text Analysis
+    			ann = anns.getFirstAnnotation(GenericAnnotationType.TA);
+    			if ( ann != null ) {
+    				if ( tmp.length() > 0 ) tmp.append("\n");
+    				tmp.append("TA: \'"+getSpan(ct, i+1, c, tf)+"'");
+    				String str = ann.getString(GenericAnnotationType.TA_CLASS);
+    				if ( str != null ) tmp.append(" Class:"+str);
+    				str = ann.getString(GenericAnnotationType.TA_IDENT);
+    				if ( str != null ) tmp.append(" Ident:"+str);
+    				str = ann.getString(GenericAnnotationType.TA_SOURCE);
+    				if ( str != null ) tmp.append(" Src:"+str);
+    				Double conf = ann.getDouble(GenericAnnotationType.TERM_CONFIDENCE);
+    				if ( conf != null ) tmp.append(" Confidence="+Util.formatDouble(conf));
+    			}
+
+    			// Localization Quality Issue
+    			//TODO
+    		}
+    	}
+    	return ( Util.isEmpty(tmp) ? null : tmp.toString());
+    }
 	
+    /**
+     * Gets the text-only span of content for a given open/close code.
+     * @param ct the coded text to lookup.
+     * @param start the start index in the coded text.
+     * @param code the start code. 
+     * @param tf the text fragment corresponding to the coded text.
+     * @return the span of content (stripped of it's inline codes) that is between
+     * the given start code and its ending code.
+     */
+    private String getSpan (String ct,
+    	int start,
+    	Code code,
+    	TextFragment tf)
+    {
+    	// Get the index of the closing code
+    	int index = tf.getIndexForClosing(code.getId());
+    	// If none: return empty span
+    	if ( index == -1 ) return "";
+    	// Else: look for the corresponding code
+    	for ( int i=start; i<ct.length(); i++ ) {
+    		if ( TextFragment.isMarker(ct.charAt(i)) ) {
+    			if ( index == TextFragment.toIndex(ct.charAt(++i)) ) {
+    				// Ending found
+    				StringBuilder tmp = new StringBuilder(ct.substring(start, i-1));
+    				for ( i=0; i<tmp.length(); i++ ) {
+    					if ( TextFragment.isMarker(tmp.charAt(i)) ) {
+    						tmp.delete(i, i+1);
+    						i--; // To offset the next +1
+    					}
+    				}
+    				return tmp.toString();
+    			}
+    		}
+    	}
+    	return ""; // Just in case
+    }
+    
 	private String toOmegat (TextFragment tf) {
 		
 		return GenericContent.fromFragmentToLetterCoded(tf, true);

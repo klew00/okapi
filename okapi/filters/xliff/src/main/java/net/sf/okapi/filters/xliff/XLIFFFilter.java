@@ -849,7 +849,8 @@ public class XLIFFFilter implements IFilter {
 		// Check for LQI
 		String val1 = reader.getAttributeValue(ITSContent.ITS_NS_URI, "locQualityIssuesRef");
 		if ( val1 != null ) {
-			
+			//anns.addAll(fetchLocQualityStandoffData();
+			logger.warn("Standoff LQI annotations are not supported yet.");
 //TODO: get the ref and fetch the standoff markup
 		}
 		else { // Otherwise check for on-element LQI attributes
@@ -951,6 +952,33 @@ public class XLIFFFilter implements IFilter {
 				anns.add(new GenericAnnotation(GenericAnnotationType.TERM,
 					GenericAnnotationType.TERM_INFO, info,
 					GenericAnnotationType.TERM_CONFIDENCE, conf));
+			}
+			
+			// Text Analysis
+			String taClassRef = reader.getAttributeValue(XLIFFWriter.NS_ITS20, "taClassRef");
+			if ( taClassRef != null ) {
+				taClassRef = ITSContent.REF_PREFIX+taClassRef;
+			}
+			String taSource = null;
+			String taIdent = reader.getAttributeValue(XLIFFWriter.NS_ITS20, "taIdentRef");
+			if ( taIdent != null ) {
+				taIdent = ITSContent.REF_PREFIX+taIdent;
+			}
+			else {
+				taIdent = reader.getAttributeValue(XLIFFWriter.NS_ITS20, "taIdent");
+				taSource = reader.getAttributeValue(XLIFFWriter.NS_ITS20, "taSource");
+			}
+			if (( taClassRef != null ) || ( taIdent != null )) {
+				val1 = reader.getAttributeValue(XLIFFWriter.NS_ITS20, "taConfidence");
+				Double conf = null;
+				if ( val1 != null ) {
+					conf = Double.parseDouble(val1);
+				}
+				anns.add(new GenericAnnotation(GenericAnnotationType.TA,
+					GenericAnnotationType.TA_CLASS, taClassRef,
+					GenericAnnotationType.TA_SOURCE, taSource,
+					GenericAnnotationType.TA_IDENT, taIdent,
+					GenericAnnotationType.TA_CONFIDENCE, conf));
 			}
 		
 			// Localization Note
