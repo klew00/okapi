@@ -22,24 +22,10 @@
 
 package net.sf.okapi.steps.languagetool;
 
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetEncoder;
-import java.security.InvalidParameterException;
 import java.util.List;
-import java.util.Locale;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
 
-import javax.xml.parsers.ParserConfigurationException;
-
-import net.sf.okapi.common.Event;
-import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.LocaleId;
-import net.sf.okapi.common.Util;
 import net.sf.okapi.common.annotation.GenericAnnotation;
-import net.sf.okapi.common.annotation.GenericAnnotationType;
 import net.sf.okapi.common.annotation.IssueAnnotation;
 import net.sf.okapi.common.annotation.IssueType;
 import net.sf.okapi.common.exceptions.OkapiIOException;
@@ -47,8 +33,6 @@ import net.sf.okapi.common.resource.ISegments;
 import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextContainer;
-import net.sf.okapi.common.resource.TextFragment;
-import net.sf.okapi.common.resource.TextUnit;
 
 import org.languagetool.JLanguageTool;
 import org.languagetool.Language;
@@ -57,7 +41,6 @@ import org.languagetool.rules.bitext.BitextRule;
 import org.languagetool.tools.Tools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xml.sax.SAXException;
 
 public class LanguageTool {
 
@@ -184,7 +167,15 @@ public class LanguageTool {
 		String segId)
 	{
 		if ( skipSpelling && match.getRule().isSpellingRule() ) return null;
-		IssueAnnotation ia = new IssueAnnotation(IssueType.LANGUAGETOOL_ERROR, match.getMessage(), 2, segId,
+		String msg = match.getMessage();
+		// Process the message for tags
+		if ( msg.indexOf('&') > -1 ) {
+			msg = msg.replace("&lt;suggestion>", "\"");
+			msg = msg.replace("&lt;/suggestion>", "\"");
+			msg = msg.replace("&amp;", "&");
+		}
+		// Create the entry
+		IssueAnnotation ia = new IssueAnnotation(IssueType.LANGUAGETOOL_ERROR, msg, 2, segId,
 			(onTarget ? -1 : match.getFromPos()), // start in source
 			(onTarget ? -1 : match.getToPos()), // end in source
 			(onTarget ? match.getFromPos() : -1 ), // start in target
