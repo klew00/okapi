@@ -1083,6 +1083,36 @@ public class TextFragmentTest {
 		assertEquals("<b1/>A<e1/><b2/><x3/><e2/><b4/>B<e4/><b5/><x6/><e5/>", GenericContent.fromFragmentToLetterCoded(tf, true));
 	}
 
+	@Test
+	public void testManyNestedCodes() {
+		TextFragment tf = new TextFragment();
+		tf.append(TagType.OPENING, "b", "<b>");
+		tf.append(TagType.OPENING, "b", "<b>");
+		tf.append(TagType.OPENING, "b", "<b>");
+		tf.append(TagType.OPENING, "b", "<b>");
+		tf.append(TagType.OPENING, "b", "<b>");
+		tf.append(TagType.OPENING, "b", "<b>");
+		tf.append(TagType.OPENING, "b", "<b>");
+		tf.append(TagType.OPENING, "b", "<b>");
+		tf.append(TagType.OPENING, "b", "<b>");
+		tf.append(TagType.OPENING, "b", "<b>");
+		tf.append(TagType.OPENING, "b", "<b>");
+		tf.append("Content");
+		tf.append(TagType.CLOSING, "b", "</b>");
+		tf.append(TagType.CLOSING, "b", "</b>");
+		tf.append(TagType.CLOSING, "b", "</b>");
+		tf.append(TagType.CLOSING, "b", "</b>");
+		tf.append(TagType.CLOSING, "b", "</b>");
+		tf.append(TagType.CLOSING, "b", "</b>");
+		tf.append(TagType.CLOSING, "b", "</b>");
+		tf.append(TagType.CLOSING, "b", "</b>");
+		tf.append(TagType.CLOSING, "b", "</b>");
+		tf.append(TagType.CLOSING, "b", "</b>");
+		tf.append(TagType.CLOSING, "b", "</b>");
+		assertEquals("<b><b><b><b><b><b><b><b><b><b><b>Content</b></b></b></b></b></b></b></b></b></b></b>", tf.toText());
+		assertEquals("<1><2><3><4><5><6><7><8><9><10><11>Content</11></10></9></8></7></6></5></4></3></2></1>", fmt.setContent(tf).toString());
+	}
+	
 	/**
 	 * Makes a fragment <code>[b]A[br/]B[/b]C<code>
 	 * @return the new fragment.
