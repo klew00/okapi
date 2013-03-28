@@ -24,6 +24,7 @@ import net.sf.okapi.common.resource.ITextUnit;
 
 import org.w3c.dom.Node;
 
+//TODO: remove dependency to Okapi if possible
 public class TargetPointerEntry {
 
 	private static final String SRC_TRGPTRFLAGNAME = "\u10ff"; // Name of the user-data property that holds the target pointer flag in the source

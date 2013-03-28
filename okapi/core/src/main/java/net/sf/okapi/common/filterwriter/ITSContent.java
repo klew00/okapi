@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import net.sf.okapi.common.Namespaces;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.annotation.GenericAnnotation;
 import net.sf.okapi.common.annotation.GenericAnnotationType;
@@ -37,11 +38,6 @@ import net.sf.okapi.common.annotation.IssueAnnotation;
  */
 public class ITSContent {
 
-	/**
-	 * URI for the ITS namespace
-	 */
-	public static final String ITS_NS_URI = "http://www.w3.org/2005/11/its";
-	
 	/**
 	 * Marker used in a skeleton part to indicate where standoff markup can be inserted when merging.
 	 */
@@ -102,7 +98,7 @@ public class ITSContent {
 			// Output
 			if ( isHTML5 ) {
 				sb.append("<script id=\""+anns.getData()+"\" type=\"application/its+xml\">\n");
-				sb.append("<its:locQualityIssues xmlns:its=\""+ITS_NS_URI+"\" version=\"2.0\" ");
+				sb.append("<its:locQualityIssues xmlns:its=\""+Namespaces.ITS_NS_URI+"\" version=\"2.0\" ");
 			}
 			else {
 				sb.append("<its:locQualityIssues ");
@@ -167,7 +163,7 @@ public class ITSContent {
 			if ( isHTML5 ) {
 				sb.append("<script id=\""+anns.getData()+"\" type=\"application/its+xml\">");
 			}
-			sb.append("<its:provenanceRecords xmlns:its=\""+ITS_NS_URI+"\" version=\"2.0\" ");
+			sb.append("<its:provenanceRecords xmlns:its=\""+Namespaces.ITS_NS_URI+"\" version=\"2.0\" ");
 			sb.append("xml:id=\""+anns.getData()+"\">");
 			for ( GenericAnnotation ann : list ) {
 				sb.append("<its:provenanceRecord");

@@ -1341,6 +1341,35 @@ public class XLIFFFilterTest {
 		
 	}
 
+	@Test
+	public void testLQIAnnotations () {
+		// In source mrk of trans-unit 1
+		ITextUnit tu = FilterTestDriver.getTextUnit(filter,
+			new InputDocument(root+"lqiTest.xlf", null), "UTF-8", locEN, locFR, 1);
+		assertNotNull(tu);
+		Code code = tu.getSource().getFirstContent().getCode(0);
+		GenericAnnotations anns = code.getGenericAnnotations();
+		assertNotNull(anns);
+		List<GenericAnnotation> list = anns.getAnnotations(GenericAnnotationType.LQI);
+		assertEquals(2, list.size());
+		assertEquals("comment1", list.get(0).getString(GenericAnnotationType.LQI_COMMENT));
+		assertEquals("comment2", list.get(1).getString(GenericAnnotationType.LQI_COMMENT));
+		assertEquals("misspelling", list.get(1).getString(GenericAnnotationType.LQI_TYPE));
+
+		// In source mrk of trans-unit 2 (external)
+		tu = FilterTestDriver.getTextUnit(filter,
+			new InputDocument(root+"lqiTest.xlf", null), "UTF-8", locEN, locFR, 2);
+		assertNotNull(tu);
+		code = tu.getSource().getFirstContent().getCode(0);
+		anns = code.getGenericAnnotations();
+		assertNotNull(anns);
+		list = anns.getAnnotations(GenericAnnotationType.LQI);
+		assertEquals(2, list.size());
+		assertEquals("comment3", list.get(0).getString(GenericAnnotationType.LQI_COMMENT));
+		assertEquals("comment4", list.get(1).getString(GenericAnnotationType.LQI_COMMENT));
+		assertEquals("misspelling", list.get(1).getString(GenericAnnotationType.LQI_TYPE));
+	}
+	
 	private ArrayList<Event> createSimpleXLIFF () {
 		String snippet = "<?xml version=\"1.0\"?>\r"
 			+ "<xliff version=\"1.2\">\r"

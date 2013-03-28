@@ -26,6 +26,7 @@ import java.util.List;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.Namespaces;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.XMLWriter;
 import net.sf.okapi.common.annotation.AltTranslation;
@@ -65,16 +66,6 @@ public class XLIFFWriter implements IFilterWriter {
 	 */
 	public static final String OKP_MATCHTYPE = "matchType";
 
-	/**
-	 * URI for the ITS 2.0 namespace.
-	 */
-	public static final String NS_ITS20 = "http://www.w3.org/2005/11/its";
-	
-	/**
-	 * URI for the ITS Extension namespace.
-	 */
-	public static final String NS_ITSEXT = "http://www.w3.org/2008/12/its-extensions";
-		
 	private static final String RESTYPEVALUES = 
 		";auto3state;autocheckbox;autoradiobutton;bedit;bitmap;button;caption;cell;"
 		+ "checkbox;checkboxmenuitem;checkedlistbox;colorchooser;combobox;comboboxexitem;"
@@ -149,8 +140,8 @@ public class XLIFFWriter implements IFilterWriter {
 		writer.writeAttributeString("xmlns", NS_XLIFF12);
 		writer.writeAttributeString("xmlns:okp", NS_XLIFFOKAPI);
 		if ( params.getIncludeIts() ) {
-			writer.writeAttributeString("xmlns:its", NS_ITS20); 
-			writer.writeAttributeString("xmlns:itsx", NS_ITSEXT); 
+			writer.writeAttributeString("xmlns:"+Namespaces.ITS_NS_PREFIX, Namespaces.ITS_NS_URI); 
+			writer.writeAttributeString("xmlns:"+Namespaces.ITSX_NS_PREFIX, Namespaces.ITSX_NS_URI); 
 			writer.writeAttributeString("its:version", "2.0");
 		}
 
